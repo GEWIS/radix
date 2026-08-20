@@ -1,0 +1,14 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ 'An error occurred'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block contents %}
+    {# The catch-all for the status codes that have no page of their own. Debugging builds never reach it — the
+       profiler's exception page takes over — which is why nothing here prints the exception. #}
+    <div class="row text-center">
+        <div class="col-md-12">
+            <h3>{{ 'Something went wrong'|trans }}</h3>
+            <p>{{ 'The page could not be built. Try again later.'|trans }}</p>
+        </div>
+    </div>
+{% endblock %}

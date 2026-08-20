@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+# Symfony Scheduler takes over from the container crontab. Each schedule declared in src/Scheduler/ gets a transport
+# of its own named after it, and is dispatched by a long-running worker rather than by crond. compose.yaml starts one
+# per schedule:
+#
+#     bin/console messenger:consume scheduler_default      (scheduler-default)
+#     bin/console messenger:consume scheduler_gdpr         (scheduler-gdpr)
+#     bin/console messenger:consume scheduler_maintenance  (scheduler-maintenance)
+#
+# Command output no longer goes to a per-job file under /data/logs; it is captured by the worker and reaches the
+# monolog handlers along with everything else.
+#
+# Each schedule holds its own lock (see src/Scheduler/), which is what keeps a rolling deploy from dispatching the
+# same run twice while the outgoing and the incoming container overlap. That only works if the store is shared, so it
+# is left to config/packages/lock.yaml rather than pinned per schedule.

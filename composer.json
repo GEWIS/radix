@@ -1,0 +1,212 @@
+{
+    "name": "gewis/radix",
+    "description": "GEWIS Website and Database",
+    "type": "project",
+    "keywords": [
+        "gewis",
+        "website",
+        "members",
+        "decisions"
+    ],
+    "license": "GPL-3.0-only",
+    "homepage": "https://gewis.nl/",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.5",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "ext-intl": "*",
+        "ext-ldap": "*",
+        "ext-pdo_mysql": "*",
+        "ext-pdo_pgsql": "*",
+        "api-platform/doctrine-orm": "^4.3.17",
+        "api-platform/symfony": "^4.3.17",
+        "cweagans/composer-patches": "^2.0.0",
+        "doctrine/dbal": "^4.4.4",
+        "doctrine/doctrine-bundle": "^3.3.1",
+        "doctrine/doctrine-migrations-bundle": "^4.0.0",
+        "doctrine/orm": "^3.6.7",
+        "doctrineencryptbundle/doctrine-encrypt-bundle": "^7.0.3",
+        "dragonmantank/cron-expression": "^3.6",
+        "endroid/qr-code-bundle": "^7.0.1",
+        "fortawesome/font-awesome": "^7.3.1",
+        "intervention/image": "^4.2",
+        "intervention/image-driver-vips": "^4.1",
+        "jfcherng/php-diff": "^7.0.1",
+        "league/commonmark": "^2.9.0",
+        "league/flysystem-bundle": "^3.7",
+        "matomo/device-detector": "^6.5.1",
+        "nelmio/cors-bundle": "^2.6.1",
+        "nelmio/security-bundle": "^3.9",
+        "nikic/php-parser": "^5.8.0",
+        "phlak/semver": "^6.1",
+        "phpdocumentor/reflection-docblock": "^6.0.3",
+        "phpseclib/phpseclib": "^3.0.56",
+        "phpstan/phpdoc-parser": "^2.3.3",
+        "scheb/2fa-backup-code": "^8.6.1",
+        "scheb/2fa-bundle": "^8.6.1",
+        "scheb/2fa-totp": "^8.6.1",
+        "sensiolabs/typescript-bundle": "^0.2.2",
+        "setasign/fpdf": "^1.9",
+        "stripe/stripe-php": "^21.0",
+        "symfony/amqp-messenger": "8.1.*",
+        "symfony/asset": "8.1.*",
+        "symfony/asset-mapper": "8.1.*",
+        "symfony/cache": "8.1.*",
+        "symfony/console": "8.1.*",
+        "symfony/doctrine-messenger": "8.1.*",
+        "symfony/dotenv": "8.1.*",
+        "symfony/expression-language": "8.1.*",
+        "symfony/flex": "^2.11.0",
+        "symfony/form": "8.1.*",
+        "symfony/framework-bundle": "8.1.*",
+        "symfony/html-sanitizer": "8.1.*",
+        "symfony/http-client": "8.1.*",
+        "symfony/intl": "8.1.*",
+        "symfony/lock": "8.1.*",
+        "symfony/mailer": "8.1.*",
+        "symfony/mercure": "^0.8.0",
+        "symfony/mercure-bundle": "^0.5.0",
+        "symfony/messenger": "8.1.*",
+        "symfony/mime": "8.1.*",
+        "symfony/monolog-bundle": "^4.0.2",
+        "symfony/password-hasher": "8.1.*",
+        "symfony/process": "8.1.*",
+        "symfony/property-access": "8.1.*",
+        "symfony/property-info": "8.1.*",
+        "symfony/rate-limiter": "8.1.*",
+        "symfony/redis-messenger": "8.1.*",
+        "symfony/runtime": "8.1.*",
+        "symfony/scheduler": "8.1.*",
+        "symfony/security-bundle": "8.1.*",
+        "symfony/security-csrf": "8.1.*",
+        "symfony/serializer": "8.1.*",
+        "symfony/stimulus-bundle": "^3.4.0",
+        "symfony/string": "8.1.*",
+        "symfony/translation": "8.1.*",
+        "symfony/twig-bundle": "8.1.*",
+        "symfony/uid": "8.1.*",
+        "symfony/ux-autocomplete": "3.4.0",
+        "symfony/ux-calendar-link": "3.4.0",
+        "symfony/ux-live-component": "3.4.0",
+        "symfony/ux-twig-component": "^3.4",
+        "symfony/validator": "8.1.*",
+        "symfony/web-link": "8.1.*",
+        "symfony/workflow": "8.1.*",
+        "symfony/yaml": "8.1.*",
+        "symfonycasts/sass-bundle": "^0.10.0",
+        "tito10047/altcha-bundle": "^3.1",
+        "twbs/bootstrap": "^5.3.8",
+        "twig/extra-bundle": "^3.24.0",
+        "twig/intl-extra": "^3.26.0",
+        "twig/twig": "^3.28.0",
+        "web-token/jwt-bundle": "^4.1.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "cweagans/composer-patches": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        },
+        "bump-after-update": true,
+        "preferred-install": {
+            "doctrine/orm": "source",
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/",
+            "Database\\Migrations\\": "migrations/database/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/GEWIS/gewisphp-coding-standards.git"
+        }
+    ],
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts",
+            "@assets:update"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts",
+            "@assets:update"
+        ],
+        "assets:update": [
+            "rm -rf assets/fonts/fontawesome/*",
+            "rm -rf assets/sprites/fontawesome/*",
+            "cp -r vendor/fortawesome/font-awesome/webfonts/. assets/fonts/fontawesome/",
+            "cp -r vendor/fortawesome/font-awesome/sprites/. assets/sprites/fontawesome/",
+            "rm -f assets/js/bootstrap.bundle.min.js",
+            "cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js assets/js"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "patches": {
+            "doctrine/orm": {
+                "Fix issues with SubDecisions.": "https://raw.githubusercontent.com/GEWIS/orm/3.6.x/1-to-1-multiple-join-columns.patch"
+            }
+        },
+        "symfony": {
+            "allow-contrib": false,
+            "require": "8.1.*",
+            "docker": true
+        }
+    },
+    "require-dev": {
+        "dama/doctrine-test-bundle": "^8.6",
+        "doctrine/doctrine-fixtures-bundle": "^4.3.1",
+        "fakerphp/faker": "^1.24.1",
+        "gewis/gewisphp-coding-standards": "2.1.1",
+        "igor-php/igor-php": "^0.9.5",
+        "league/flysystem-memory": "^3.31",
+        "phpstan/extension-installer": "^1.4.3",
+        "phpstan/phpstan": "^2.2.8",
+        "phpstan/phpstan-deprecation-rules": "^2.0.5",
+        "phpstan/phpstan-doctrine": "^2.0.28",
+        "phpstan/phpstan-phpunit": "^2.0.18",
+        "phpstan/phpstan-strict-rules": "^2.0.12",
+        "phpstan/phpstan-symfony": "^2.0.20",
+        "phpunit/phpunit": "^13.3.1",
+        "spaze/phpstan-disallowed-calls": "^4.6",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/css-selector": "8.1.*",
+        "symfony/debug-bundle": "8.1.*",
+        "symfony/maker-bundle": "^1.67.0",
+        "symfony/phpunit-bridge": "^8.1.2",
+        "symfony/stopwatch": "8.1.*",
+        "symfony/web-profiler-bundle": "8.1.*",
+        "tomasvotruba/type-coverage": "^2.0"
+    }
+}

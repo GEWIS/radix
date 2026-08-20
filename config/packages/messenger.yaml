@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # Kept on the website database rather than on the ledger: a message that could not be handled is the
+            # application's own bookkeeping, and the ledger only holds what the association decided and who it is
+            # made up of.
+            #
+            # `auto_setup` is off because the table is owned by the website migrations, and because leaving it on
+            # breaks building the schemas from the mapping metadata: this transport hangs off `web` while the default
+            # manager is the ledger, so `doctrine:schema:create --em=default` asks the transport whether the two
+            # connections are the same database by running a statement through it. That statement hits a table that
+            # only exists on the ledger, the resulting `TableNotFoundException` is taken for a missing transport
+            # table, and the transport helpfully creates `messenger_messages` on the website database — which the
+            # subsequent `--em=web` then trips over.
+            failed: 'doctrine://web?queue_name=failed&auto_setup=false'
+            high_priority:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: high_priority
+                        type: direct
+                    queues:
+                        high_priority_queue: ~
+            normal_priority:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: normal_priority
+                        type: direct
+                    queues:
+                        normal_priority_queue: ~
+            bulk:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: bulk
+                        type: direct
+                    queues:
+                        bulk_queue: ~
+            # Dedicated transport for the image pipeline (variant pre-generation + album cover mosaics) so heavy,
+            # slow encoding never blocks the priority/bulk email queues and can be scaled independently.
+            images:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: images
+                        type: direct
+                    queues:
+                        images_queue: ~
+
+        default_bus: messenger.bus.default
+
+        buses:
+            messenger.bus.default: []
+
+        routing:
+            # Route your messages to the transports
+            # 'App\Message\YourMessage': async
+            'App\Message\User\PasswordResetRequestEmail': high_priority
+            # Async so the sign-up existence check runs off the request thread (no timing-based enumeration), mirroring
+            # the password-reset request above. The initial token email must be async for the same reason: a
+            # synchronous SMTP send on a fresh sign-up would make a new address respond slower than an already-signed-up
+            # one (which only re-queues a resend), leaking existence through response time.
+            'App\Message\Activity\ExternalSignupTokenEmail': high_priority
+            'App\Message\Activity\ExternalSignupResendVerificationEmail': high_priority
+            'App\Message\Activity\OrganiserAnnouncementEmail': bulk
+            'App\Message\Application\PublishDomainNotificationMessage': normal_priority
+            'App\Message\Decision\AuthorizationCreatedEmail': normal_priority
+            'App\Message\Decision\AuthorizationRevokedEmail': normal_priority
+            'App\Message\Application\SendNotificationDigestMessage': bulk
+            'App\Message\Photo\ProcessImageVariantsMessage': images
+            'App\Message\Photo\GenerateAlbumCoverMessage': images
+            # Rasterizing an exam and rebuilding a watermarked copy of it are both page-at-a-time image work, so they
+            # belong on the same queue as the photo pipeline rather than in front of anything time-sensitive.
+            'App\Message\Education\FlattenCourseDocumentMessage': images
+            'App\Message\Education\BuildWatermarkedDocumentMessage': images
+            'App\Message\User\CompanyUserInviteEmail': high_priority
+            'App\Message\Career\CareerReviewDecisionEmail': normal_priority
+            'App\Message\User\ExportUserDataMessage': bulk
+            'App\Message\User\RevokeSessionsRealtimeMessage': high_priority
+            # A security notice is worth little late, and it must not hold up whatever raised it.
+            'App\Message\User\SecurityNotificationMessage': high_priority
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                high_priority:
+                    dsn: 'in-memory://'
+                normal_priority:
+                    dsn: 'in-memory://'
+                bulk:
+                    dsn: 'in-memory://'
+                images:
+                    dsn: 'in-memory://'

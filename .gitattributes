@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+*.min.css linguist-generated
+*.min.js linguist-generated
+*.xlf linguist-generated
+
+openapi.yaml linguist-documentation
+
+vendor/** linguist-vendored

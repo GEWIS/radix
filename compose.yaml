@@ -1,0 +1,246 @@
+# The production stack, and the base of the development one.
+#
+# Everything the application needs is in this file, which is what makes it something you can paste into a Portainer
+# stack on its own: Portainer supplies the environment, and every `${VAR:?...}` below aborts the deploy with the
+# message named there rather than quietly starting on a default.
+#
+# `docker compose up` in a checkout also loads compose.override.yaml, which turns this into the development stack: it
+# adds the build definitions, the databases, the administration tools and the published ports, and it supplies the
+# values these guards ask for from `.env.local`. Naming this file with `-f`, as Portainer does, suppresses that file.
+#
+# Values that are the same on every deployment are not variables at all: they are `env(NAME): default` parameters in
+# config/services.yaml — the mail display names, the pinned Stripe and Mailman API versions, the watermark tag, the
+# TU/e subnets.
+x-app-environment: &app_environment
+    # Overridden to `dev` by compose.override.yaml. A Portainer stack has no `.env` to read, so this resolves to
+    # `prod` there.
+    APP_ENV: "${APP_ENV:-prod}"
+    APP_SECRET: "${APP_SECRET:?APP_SECRET must be set}"
+    SYMFONY_TRUSTED_PROXIES: "private_ranges"
+    SERVER_NAME: "${SERVER_NAME:?SERVER_NAME must be set}, app:80"
+    DEFAULT_URI: "${DEFAULT_URI:?DEFAULT_URI must be set}"
+    # The public face of the register: the host mail links back to when it cannot link into the request it was sent
+    # from.
+    APP_URL: "${APP_URL:?APP_URL must be set}"
+    CORS_ALLOW_ORIGIN: "${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN must be set}"
+    # Set to any non-empty value to serve the maintenance page to everyone, admins included, for work done before the
+    # application can serve properly. App-level maintenance is set through the admin interface instead.
+    MAINTENANCE: "${MAINTENANCE:-}"
+    # The domain the mailing lists are created under on Mailman, which is what it reports back when asked for a list.
+    SERVER_HOSTNAME: "${SERVER_HOSTNAME:?SERVER_HOSTNAME must be set}"
+
+    # The ledger, on PostgreSQL: the `default` connection. `role` is not a driver parameter —
+    # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it, so the
+    # application runs as a least-privileged role rather than as the owner of the schema it reads.
+    DATABASE_DSN: "postgresql://${DOCTRINE_DEFAULT_USER:?DOCTRINE_DEFAULT_USER must be set}:${DOCTRINE_DEFAULT_PASSWORD:?DOCTRINE_DEFAULT_PASSWORD must be set}@${DOCTRINE_DEFAULT_HOST:?DOCTRINE_DEFAULT_HOST must be set}:${DOCTRINE_DEFAULT_PORT:?DOCTRINE_DEFAULT_PORT must be set}/${DOCTRINE_DEFAULT_DATABASE:?DOCTRINE_DEFAULT_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${DOCTRINE_DEFAULT_SSLMODE:?DOCTRINE_DEFAULT_SSLMODE must be set}&role=${DOCTRINE_DEFAULT_ROLE:?DOCTRINE_DEFAULT_ROLE must be set}"
+    # Everything else, on MariaDB: the `web` connection. The charset and the collation belong in the DSN because they
+    # have to match what the tables were created with; a mismatch makes a schema comparison report every string column
+    # as changed.
+    WEB_DATABASE_DSN: "pdo-mysql://${DOCKER_DB_USERNAME:?DOCKER_DB_USERNAME must be set}:${DOCKER_DB_PASSWORD:?DOCKER_DB_PASSWORD must be set}@${DOCKER_DB_HOST:?DOCKER_DB_HOST must be set}:${DOCKER_DB_PORT:?DOCKER_DB_PORT must be set}/${DOCKER_DB_DATABASE:?DOCKER_DB_DATABASE must be set}?serverVersion=${DOCKER_DB_VERSION:?DOCKER_DB_VERSION must be set}&charset=${DOCKER_DB_CHARSET:?DOCKER_DB_CHARSET must be set}&collation=${DOCKER_DB_COLLATION:?DOCKER_DB_COLLATION must be set}"
+
+    MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER must be set}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS must be set}@${RABBITMQ_HOST:-rabbitmq}:${RABBITMQ_PORT:-5672}"
+    # The cache, Doctrine's second-level cache and symfony/lock all sit on this one Valkey. The locks have to be
+    # visible to every container: each schedule is consumed by a worker of its own, and during a rolling deploy the
+    # outgoing and the incoming container both hold one for a moment, which a per-container `flock` cannot see across.
+    VALKEY_DSN: &valkey_dsn "valkey://${VALKEY_HOST:-valkey}:${VALKEY_PORT:-6379}"
+    LOCK_DSN: *valkey_dsn
+    # The `mailer` service below: it relays to the real SMTP server here and catches everything in development, so the
+    # application talks to the same name either way.
+    MAILER_DSN: "smtp://mailer:1025"
+
+    # The Caddyfile's Mercure hub always wants a key, even where nothing publishes: development uses it for hot
+    # reload, production leaves the hub closed (no `anonymous`) and idle.
+    MERCURE_URL: "${MERCURE_URL:-http://app/.well-known/mercure}"
+    MERCURE_PUBLIC_URL: "${MERCURE_PUBLIC_URL:?MERCURE_PUBLIC_URL must be set}"
+    MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET must be set}"
+    MERCURE_PUBLISHER_JWT_KEY: "${MERCURE_JWT_SECRET}"
+    MERCURE_SUBSCRIBER_JWT_KEY: "${MERCURE_JWT_SECRET}"
+
+    # Signing key set for the external-application flow. It has no default anywhere, so an environment without it
+    # fails loudly rather than signing with an empty key set.
+    EXTERNAL_APP_JWKSET: "${EXTERNAL_APP_JWKSET:?EXTERNAL_APP_JWKSET must be set}"
+
+
+    # Mailing lists (App\Service\Database\MailmanService, App\Service\Database\ListmonkService).
+    MAILMAN_API_ENDPOINT: "${MAILMAN_API_ENDPOINT:?MAILMAN_API_ENDPOINT must be set}"
+    MAILMAN_API_USERNAME: "${MAILMAN_API_USERNAME:?MAILMAN_API_USERNAME must be set}"
+    MAILMAN_API_PASSWORD: "${MAILMAN_API_PASSWORD:?MAILMAN_API_PASSWORD must be set}"
+    LISTMONK_API_ENDPOINT: "${LISTMONK_API_ENDPOINT:?LISTMONK_API_ENDPOINT must be set}"
+    LISTMONK_API_USERNAME: "${LISTMONK_API_USERNAME:?LISTMONK_API_USERNAME must be set}"
+    LISTMONK_API_PASSWORD: "${LISTMONK_API_PASSWORD:?LISTMONK_API_PASSWORD must be set}"
+
+    # Stripe, which settles the membership fee during sign-up. The secret key must be a restricted key; see
+    # .env.local.dist for the permissions it needs. Development ships placeholders rather than leaving these empty, so
+    # that a checkout without a Stripe account still satisfies the guards.
+    STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY:?STRIPE_SECRET_KEY must be set}"
+    STRIPE_WEBHOOK_SIGNING_KEY: "${STRIPE_WEBHOOK_SIGNING_KEY:?STRIPE_WEBHOOK_SIGNING_KEY must be set}"
+    STRIPE_MEMBERSHIP_PRICE_ID: "${STRIPE_MEMBERSHIP_PRICE_ID:?STRIPE_MEMBERSHIP_PRICE_ID must be set}"
+    STRIPE_CANCEL_URL: "${STRIPE_CANCEL_URL:?STRIPE_CANCEL_URL must be set}"
+    STRIPE_SUCCESS_URL: "${STRIPE_SUCCESS_URL:?STRIPE_SUCCESS_URL must be set}"
+
+    # Public archive sync over SSH (App\Command\Application\SyncPublicArchiveCommand).
+    SSH_REMOTE: "${SSH_REMOTE:?SSH_REMOTE must be set}"
+    SSH_USERNAME: "${SSH_USERNAME:?SSH_USERNAME must be set}"
+    SSH_PASSWORD: "${SSH_PASSWORD:?SSH_PASSWORD must be set}"
+
+    MATOMO_DOMAIN: "${MATOMO_DOMAIN:?MATOMO_DOMAIN must be set}"
+    # The association's own agenda, drawn behind the days bodies ask for in the option calendar. Both fall back to
+    # `unknown` in config/services.yaml, which runs with that layer simply absent.
+    DOCKER_GOOGLE_API_KEY: "${DOCKER_GOOGLE_API_KEY:-unknown}"
+    DOCKER_GOOGLE_CALENDAR_KEY: "${DOCKER_GOOGLE_CALENDAR_KEY:-unknown}"
+    # The Supremum's API, which the infimum is drawn from. Without a key the request is refused and the panel keeps
+    # whatever it last had, so this is optional.
+    SUPREMUM_API_KEY: "${SUPREMUM_API_KEY:-}"
+
+    # Who the register writes as, and who it writes to. The display names that go with these are defaulted in
+    # config/services.yaml and are not repeated here.
+    MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:?MAIL_FROM_ADDRESS must be set}"
+    MAIL_FROM_SECRETARY_ADDRESS: "${MAIL_FROM_SECRETARY_ADDRESS:?MAIL_FROM_SECRETARY_ADDRESS must be set}"
+    MAIL_TO_CHECKER_RESULT_ADDRESS: "${MAIL_TO_CHECKER_RESULT_ADDRESS:?MAIL_TO_CHECKER_RESULT_ADDRESS must be set}"
+    MAIL_TO_REPORT_ERROR_ADDRESS: "${MAIL_TO_REPORT_ERROR_ADDRESS:?MAIL_TO_REPORT_ERROR_ADDRESS must be set}"
+    MAIL_TO_SUBSCRIPTION_ADDRESS: "${MAIL_TO_SUBSCRIPTION_ADDRESS:?MAIL_TO_SUBSCRIPTION_ADDRESS must be set}"
+
+x-app: &app
+    image: "abc.docker-registry.gewis.nl/web/radix/app:${RADIX_VERSION:-latest}"
+    restart: unless-stopped
+    networks:
+        - radix_network
+    depends_on:
+        mailer:
+            condition: service_started
+        valkey:
+            condition: service_healthy
+        rabbitmq:
+            condition: service_healthy
+    environment:
+        <<: *app_environment
+
+x-worker-volumes: &worker_volumes
+    - data:/app/data
+
+x-worker: &worker
+    <<: *app
+    entrypoint: []
+    volumes: *worker_volumes
+    # Workers skip the entrypoint (and thus migrations); wait for the app, which runs them. Restated in full
+    # because the `<<` merge replaces depends_on completely.
+    depends_on:
+        mailer:
+            condition: service_started
+        valkey:
+            condition: service_healthy
+        rabbitmq:
+            condition: service_healthy
+        app:
+            condition: service_healthy
+    deploy:
+        replicas: 1
+        update_config:
+            parallelism: 1
+            delay: 15s
+            order: start-first
+    healthcheck:
+        disable: true
+
+services:
+    app:
+        <<: *app
+        volumes:
+            - caddy_data:/data
+            - caddy_config:/config
+            - data:/app/data
+        ports:
+            - target: 80
+              published: 9200
+              protocol: tcp
+    messenger-high-priority:
+        <<: *worker
+        command: [ "php", "bin/console", "messenger:consume", "high_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    messenger-normal-priority:
+        <<: *worker
+        command: [ "php", "bin/console", "messenger:consume", "normal_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    messenger-bulk:
+        <<: *worker
+        command: [ "php", "bin/console", "messenger:consume", "bulk", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    messenger-images:
+        <<: *worker
+        # Image encoding is heavier and more memory-hungry, so recycle the worker sooner and give it more headroom.
+        command: [ "php", "bin/console", "messenger:consume", "images", "-vv", "--time-limit=600", "--limit=16", "--memory-limit=512M" ]
+    scheduler-default:
+        <<: *worker
+        command: [ "php", "bin/console", "messenger:consume", "scheduler_default", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    scheduler-gdpr:
+        <<: *worker
+        command: [ "php", "bin/console", "messenger:consume", "scheduler_gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    # The register's housekeeping is one schedule consumed by one worker, so its jobs run one after another: a nightly
+    # report regeneration that overruns delays the hourly mailing list sync behind it rather than running alongside it.
+    # No `--limit`, because a run of `report:generate:full` is one message that takes the better part of an hour.
+    scheduler-maintenance:
+        <<: *worker
+        command: [ "php", "bin/console", "messenger:consume", "scheduler_maintenance", "-vv", "--time-limit=3600", "--memory-limit=256M" ]
+    # The application always talks SMTP to this name. Here it hands the message to the real relay; development
+    # replaces this with a Mailpit that catches everything instead.
+    mailer:
+        image: axllent/mailpit
+        restart: unless-stopped
+        hostname: mailpit
+        environment:
+            MP_SMTP_RELAY_HOST: "${SMTP_SERVER:?SMTP_SERVER must be set}"
+            MP_SMTP_RELAY_PORT: "${SMTP_PORT:?SMTP_PORT must be set}"
+            MP_SMTP_RELAY_TLS: "true"
+            MP_SMTP_RELAY_AUTH: "login"
+            MP_SMTP_RELAY_USERNAME: "${SMTP_USERNAME:?SMTP_USERNAME must be set}"
+            MP_SMTP_RELAY_PASSWORD: "${SMTP_PASSWORD:?SMTP_PASSWORD must be set}"
+        ports:
+            - target: 1025
+              protocol: tcp
+        networks:
+            - radix_network
+    valkey:
+        image: valkey/valkey:9.1-alpine
+        restart: unless-stopped
+        hostname: valkey
+        volumes:
+            - valkey_data:/data
+        networks:
+            - radix_network
+        ports:
+            - target: 6379
+              protocol: tcp
+        healthcheck:
+            test: ["CMD", "valkey-cli", "ping"]
+            start_period: 10s
+            timeout: 10s
+            interval: 5s
+            retries: 5
+    rabbitmq:
+        image: rabbitmq:4.3-alpine
+        restart: unless-stopped
+        hostname: rabbitmq
+        environment:
+            RABBITMQ_NODENAME: rabbit@rabbitmq
+            RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER must be set}"
+            RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS must be set}"
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
+        networks:
+            - radix_network
+        ports:
+            - target: 5672
+              protocol: tcp
+        healthcheck:
+            test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
+            start_period: 10s
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    caddy_data:
+    caddy_config:
+    data:
+    rabbitmq_data:
+    valkey_data:
+
+networks:
+    radix_network:

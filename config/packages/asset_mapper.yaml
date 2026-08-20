@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+framework:
+    asset_mapper:
+        # The paths to make available to the asset mapper.
+        paths:
+            - assets/
+        excluded_patterns:
+            # Sass partials are compiled into app.scss; mapping them as assets of their own emits a stylesheet per
+            # partial that nothing loads.
+            - '*/assets/styles/_*.scss'
+            - '*/assets/styles/**/_*.scss'
+        missing_import_mode: strict
+
+sensiolabs_typescript:
+    # This must stay the top-level assets/ directory, not assets/controllers. swc writes its output
+    # to var/typescript/<basename of source_dir>/..., while the bundle's compiler reads it back from
+    # var/typescript/<source path relative to the project root>/.... Those only line up when the
+    # source_dir sits directly under the project root, so pointing it at the nested assets/controllers
+    # drops the assets/ segment and the compiler can no longer find the compiled JavaScript. Only
+    # assets/controllers holds TypeScript; the rest of assets/ is plain/vendored JavaScript that swc
+    # harmlessly (if needlessly) transpiles into var/typescript, where nothing reads it.
+    source_dir:
+        - '%kernel.project_dir%/assets'
+    swc_binary: /usr/local/bin/swc
+    swc_config_file: '%kernel.project_dir%/.swcrc'
+
+when@prod:
+    framework:
+        asset_mapper:
+            missing_import_mode: warn

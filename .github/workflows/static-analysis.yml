@@ -1,0 +1,51 @@
+name: PHP Static Analysis
+
+# Only run this action on pull requests (creation, synchronisation, and reopening).
+on: [pull_request]
+
+# Cancel running jobs that have become stale through updates to the ref (e.g., pushes to a pull request).
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+    phpstan:
+        name: PHPStan
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+                with:
+                    persist-credentials: false
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: '8.5'
+                    extensions: 'amqp, apcu, calendar, curl, gd, intl, ldap, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
+                    tools: 'cs2pr'
+
+            -   name: Load environment variables
+                uses: c-py/action-dotenv-to-setenv@925b5d99a3f1e4bd7b4e9928be4e2491e29891d9 # v5
+                with:
+                    env-file: .env.test
+
+            -   name: Install dependencies with Composer
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+
+            -   name: Warm the development container
+                # phpstan.dist.neon points `symfony.containerXmlPath` at the compiled dev container and
+                # `doctrine.objectManagerLoader` boots the kernel. Without this the Symfony and Doctrine extensions
+                # fall back to knowing nothing about the services and the mapping, and the analysis silently stops
+                # catching what they are there to catch. Neither step opens a database connection.
+                run: bin/console cache:warmup --env=dev
+
+            -   name: Run PHPStan
+                env:
+                    APP_ENV: test
+                run: vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit 1G --no-progress --error-format=checkstyle | cs2pr

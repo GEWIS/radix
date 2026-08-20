@@ -1,0 +1,354 @@
+# The development layer over compose.yaml, which is the production stack. Docker compose loads this file
+# automatically when no `-f` is given, so `docker compose up` in a checkout is development and Portainer — which names
+# compose.yaml with `-f` — never sees it.
+#
+# What it adds: the build definitions and the development image target, the databases and the administration tools
+# that production reaches over the network instead, the published ports, and a Mailpit that catches mail rather than
+# relaying it. The values compose.yaml's guards ask for come from `.env.local`, not from here.
+x-app-development: &app_development
+    image: abc.docker-registry.gewis.nl/web/radix/app:development
+    build:
+        context: .
+        dockerfile: Dockerfile
+        target: radix_app_development
+        args:
+            USER_UID: "${UID:-1000}"
+            USER_GID: "${GID:-1000}"
+            # `make buildappdev` passes this from the checkout's HEAD. Building through compose instead -- `compose
+            # build`, `up --build` -- would otherwise bake in an empty one, and the image would stop naming the build
+            # it is. The placeholder is the same one the Makefile falls back to when there is no git to ask.
+            GIT_COMMIT: "${GIT_COMMIT:-abcabcabc}"
+    environment:
+        APP_ENV: "dev"
+    depends_on:
+        mariadb:
+            condition: service_healthy
+        postgresql:
+            condition: service_healthy
+
+x-worker-dev-volumes: &worker_dev_volumes
+    - ./:/app
+    - ./data:/app/data
+    - ./var:/app/var
+
+services:
+    app:
+        <<: *app_development
+        restart: always
+        volumes:
+            - ./:/app
+            - ./data:/app/data
+            - ./var:/app/var
+            - ./docker/app/frankenphp/Caddyfile:/etc/frankenphp/Caddyfile:ro
+            - ./docker/app/frankenphp/conf.d/20-radix.dev.ini:/usr/local/etc/php/app.conf.d/20-radix.dev.ini:ro
+        environment:
+            # Hot reload is two halves. `watch` restarts the workers when a watched file changes — without it the
+            # kernel stays in memory and a code change does nothing until the container is restarted. `hot_reload`
+            # then tells the browser to reload itself, which it does over the Mercure hub in the Caddyfile;
+            # `anonymous` is what lets the page subscribe without a token, and `ui` serves the hub's own debug page.
+            #
+            # The directories are named rather than watching /app whole. Symfony rewrites `var/cache` as it serves, so
+            # watching everything means the workers restart on their own cache writes, in a loop that never settles.
+            # `var/sass` and `var/typescript` are where the two asset watchers put what they compile, and they are
+            # watched so a change to a stylesheet or a controller still reloads the page.
+            FRANKENPHP_WORKER_CONFIG: |
+                watch ./src
+                watch ./config
+                watch ./templates
+                watch ./translations
+                watch ./assets
+                watch ./var/sass
+                watch ./var/typescript
+            FRANKENPHP_SITE_CONFIG: "hot_reload"
+            MERCURE_EXTRA_DIRECTIVES: |
+                ui
+                anonymous
+            # See https://xdebug.org/docs/all_settings#mode
+            XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+            # Names the IDE's server configuration, which is what carries the path mapping from /app back to the
+            # checkout on the host. Without it a breakpoint is hit but the IDE cannot say which file it is in.
+            PHP_IDE_CONFIG: "${PHP_IDE_CONFIG:-serverName=localhost}"
+        ports:
+            - target: 80
+              published: 80
+              protocol: tcp
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        tty: true
+    messenger-high-priority: &worker_dev
+        <<: *app_development
+        volumes: *worker_dev_volumes
+    messenger-normal-priority: *worker_dev
+    messenger-bulk: *worker_dev
+    messenger-images: *worker_dev
+    scheduler-default: *worker_dev
+    scheduler-gdpr: *worker_dev
+    scheduler-maintenance: *worker_dev
+    rabbitmq:
+        image: rabbitmq:4.3-management-alpine
+        ports:
+            - target: 5672
+              protocol: tcp
+            - target: 15672
+              published: 15672
+              protocol: tcp
+    matomo:
+        image: abc.docker-registry.gewis.nl/web/radix/matomo:latest
+        build:
+            context: docker/matomo
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        env_file:
+            - .env.local
+        volumes:
+            - matomo:/var/www/html:rw
+        networks:
+            - radix_network
+        ports:
+            - target: 80
+              published: 82
+              protocol: tcp
+        depends_on:
+            mariadb:
+                condition: service_healthy
+    mariadb:
+        image: mariadb:11.8
+        restart: unless-stopped
+        env_file:
+            - .env.local
+        volumes:
+            - mariadb_data:/var/lib/mysql:rw
+        configs:
+            - source: init_matomo_db
+              target: /docker-entrypoint-initdb.d/matomo.sh
+              mode: 0644
+            - source: init_gewis_test_db
+              target: /docker-entrypoint-initdb.d/gewis-test.sh
+              mode: 0644
+        networks:
+            - radix_network
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            start_period: 30s
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    myadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        restart: unless-stopped
+        env_file:
+            -   .env.local
+        depends_on:
+            mariadb:
+                condition: service_healthy
+        networks:
+            - radix_network
+        ports:
+            - target: 80
+              published: 8080
+              protocol: tcp
+    # The ledger. Mailman and Listmonk keep their own databases on the same server; neither creates one and
+    # `POSTGRES_DB` only covers the application's own, so they are made on first boot (see `init_postgres_databases`).
+    postgresql:
+        image: postgres:${POSTGRES_VERSION:-16}-alpine
+        restart: unless-stopped
+        # The development containers are configured entirely from `.env.local`; `.env` holds nothing they need.
+        env_file:
+            - .env.local
+        environment:
+            # Left to itself the image names the database after `POSTGRES_USER`, which silently stops matching the
+            # moment a checkout points the ledger connection somewhere else. Name it from the same value the
+            # connection is built from instead.
+            POSTGRES_DB: "${DOCTRINE_DEFAULT_DATABASE:-gewisdb}"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data:rw
+        configs:
+            - source: init_postgres_databases
+              target: /docker-entrypoint-initdb.d/databases.sh
+              mode: 0644
+        networks:
+            - radix_network
+        ports:
+            - target: 5432
+              published: 5432
+              protocol: tcp
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-gewisdb}"]
+            start_period: 30s
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    pgadmin:
+        build:
+            context: .
+            dockerfile: docker/pgadmin/Dockerfile
+        restart: unless-stopped
+        env_file:
+            - .env.local
+        depends_on:
+            postgresql:
+                condition: service_healthy
+        networks:
+            - radix_network
+        ports:
+            - target: 80
+              published: 8081
+              protocol: tcp
+    mailman-core:
+        image: maxking/mailman-core:0.5
+        restart: unless-stopped
+        hostname: mailman-core
+        volumes:
+            - mailman_core:/opt/mailman/
+        depends_on:
+            postgresql:
+                condition: service_healthy
+        environment:
+            DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql/${POSTGRES_MAILMAN_DATABASE}"
+            DATABASE_TYPE: postgres
+            DATABASE_CLASS: mailman.database.postgresql.PostgreSQLDatabase
+            HYPERKITTY_API_KEY: somerandomapikeythatiobviouslydidnotcreatemyself
+            MAILMAN_DOMAIN: "${SERVER_HOSTNAME}"
+            SMTP_HOST: mailer
+            SMTP_PORT: 1025
+            SMTP_SECURE_MODE: smtp
+        networks:
+            - radix_network
+        ports:
+            - target: 8001
+              published: 8020
+              protocol: tcp
+    mailman-web:
+        image: maxking/mailman-web:0.5
+        restart: unless-stopped
+        hostname: mailman-web
+        depends_on:
+            postgresql:
+                condition: service_healthy
+        volumes:
+            - mailman_web:/opt/mailman-web-data/
+            - mailman_static:/opt/mailman-web-data/static/
+        environment:
+            DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql/${POSTGRES_MAILMAN_DATABASE}"
+            DATABASE_TYPE: postgres
+            DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,mailmanw
+            HYPERKITTY_API_KEY: somerandomapikeythatiobviouslydidnotcreatemyself
+            SECRET_KEY: anotherandomkeythatiobviouslydidnotcreatemyself
+            SERVE_FROM_DOMAIN: localhost
+            UWSGI_STATIC_MAP: /static=/opt/mailman-web-data/static
+            MAILMAN_ADMIN_USER: "${DEV_TOOLS_ADMIN_USERNAME:-admin}"
+            MAILMAN_ADMIN_EMAIL: "${DEV_TOOLS_ADMIN_USERNAME:-admin}@${SERVER_HOSTNAME}"
+            DJANGO_SUPERUSER_USERNAME: "${DEV_TOOLS_ADMIN_USERNAME:-admin}"
+            DJANGO_SUPERUSER_EMAIL: "${DEV_TOOLS_ADMIN_USERNAME:-admin}@${SERVER_HOSTNAME}"
+            DJANGO_SUPERUSER_PASSWORD: "${DEV_TOOLS_ADMIN_PASSWORD:-gewisdbgewis}"
+            SMTP_HOST: mailer
+            SMTP_PORT: 1025
+        networks:
+            - radix_network
+        ports:
+            - target: 8000
+              published: 8021
+              protocol: tcp
+    listmonk:
+        image: listmonk/listmonk:latest
+        restart: unless-stopped
+        hostname: listmonk
+        # --config (file) param is set to empty so that listmonk only uses the env vars (below) for config.
+        # --install --idempotent ensures that DB installation happens only once on an empty DB, on the first ever
+        # start. --upgrade automatically runs any DB migrations when a new image is pulled.
+        command: [sh, -c, "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
+        depends_on:
+            postgresql:
+                condition: service_healthy
+        environment:
+            LISTMONK_app__address: 0.0.0.0:9000
+            LISTMONK_db__user: "${POSTGRES_USER}"
+            LISTMONK_db__password: "${POSTGRES_PASSWORD}"
+            LISTMONK_db__database: "${POSTGRES_LISTMONK_DATABASE}"
+            LISTMONK_db__host: postgresql
+            LISTMONK_db__port: 5432
+            LISTMONK_db__ssl_mode: disable
+            LISTMONK_db__max_open: 25
+            LISTMONK_db__max_idle: 25
+            LISTMONK_db__max_lifetime: 300s
+            TZ: "${TZ}"
+            LISTMONK_ADMIN_USER: "${DEV_TOOLS_ADMIN_USERNAME:-admin}"
+            LISTMONK_ADMIN_PASSWORD: "${DEV_TOOLS_ADMIN_PASSWORD:-gewisdbgewis}"
+        volumes:
+            - listmonk_uploads:/listmonk/uploads:rw
+        networks:
+            - radix_network
+        ports:
+            - target: 9000
+              published: 8022
+              protocol: tcp
+    stripe:
+        image: stripe/stripe-cli:latest
+        command: listen --forward-to web:80/member/subscribe/checkout/webhook --skip-update -e charge.refund.updated,checkout.session.expired,checkout.session.completed,checkout.session.async_payment_succeeded,checkout.session.async_payment_failed
+        environment:
+            STRIPE_API_KEY: "${STRIPE_SECRET_KEY:-}"
+            STRIPE_DEVICE_NAME: "Radix on ${HOST:-}${NAME:-}"
+            STRIPE_CLI_TELEMETRY_OPTOUT: 1
+        depends_on:
+            - app
+        networks:
+            - radix_network
+    # Catches instead of relaying: an empty relay host is what stops Mailpit forwarding, and the web interface on
+    # http://localhost:8025 is where the mail ends up. Nothing leaves the machine.
+    mailer:
+        image: axllent/mailpit
+        ports:
+            - target: 8025
+              published: 8025
+              protocol: tcp
+        environment:
+            MP_SMTP_RELAY_HOST: ""
+            MP_SMTP_AUTH_ACCEPT_ANY: 1
+            MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###
+
+###> doctrine/doctrine-bundle ###
+###< doctrine/doctrine-bundle ###
+
+###> symfony/mailer ###
+###< symfony/mailer ###
+
+configs:
+    init_matomo_db:
+        content: |
+            mysql_note "Creating Matomo database and user"
+            docker_process_sql <<'EOF'
+                CREATE DATABASE `${MATOMO_DATABASE_DBNAME:-matomo}`;
+                CREATE USER '${MATOMO_DATABASE_USERNAME:-matomo}'@'%' IDENTIFIED BY '${MATOMO_DATABASE_PASSWORD:-matomo}';
+                GRANT ALL PRIVILEGES ON `${MATOMO_DATABASE_DBNAME:-matomo}`.* TO '${MATOMO_DATABASE_USERNAME:-matomo}'@'%';
+            EOF
+    # Isolated database for the PHPUnit integration tests (the `when@test` doctrine config appends the `_test` suffix).
+    # The schema itself is built by SchemaTool in App\Tests\Integration\DatabaseTestCase, so no migrations run here.
+    init_gewis_test_db:
+        content: |
+            mysql_note "Creating the isolated PHPUnit test database"
+            docker_process_sql <<'EOF'
+                CREATE DATABASE IF NOT EXISTS `${DOCKER_DB_DATABASE:-gewis}_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;
+                GRANT ALL PRIVILEGES ON `${DOCKER_DB_DATABASE:-gewis}_test`.* TO '${DOCKER_DB_USERNAME:-gewis}'@'%';
+            EOF
+    # The databases Mailman and Listmonk keep beside the ledger. The ledger's own database is the one the image
+    # creates from `POSTGRES_DB`; the test database is made by `make test-prepare`, which owns the schema in it.
+    init_postgres_databases:
+        content: |
+            psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER:-gewisdb}" <<-PGSQL
+                CREATE DATABASE ${POSTGRES_MAILMAN_DATABASE:-gewisdb_mailman};
+                GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_MAILMAN_DATABASE:-gewisdb_mailman} TO ${POSTGRES_USER:-gewisdb};
+                CREATE DATABASE ${POSTGRES_LISTMONK_DATABASE:-gewisdb_listmonk};
+                GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_LISTMONK_DATABASE:-gewisdb_listmonk} TO ${POSTGRES_USER:-gewisdb};
+            PGSQL
+
+volumes:
+    listmonk_uploads:
+    mailman_core:
+    mailman_static:
+    mailman_web:
+    mariadb_data:
+    matomo:
+    postgres_data:

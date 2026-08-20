@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+twig:
+    file_name_pattern: '*.twig'
+    form_themes:
+        - 'bootstrap_5_layout.html.twig'
+        - 'form/bootstrap_floating.html.twig'
+        - 'form/collection.html.twig'
+        - 'form/date_option_collection.html.twig'
+        - 'form/localised_text.html.twig'
+        - 'form/poll_option_collection.html.twig'
+        - 'form/signup_list_collection.html.twig'
+    globals:
+        supported_locales: '%kernel.enabled_locales%'
+        matomo_domain: '%env(MATOMO_DOMAIN)%'
+        external_affairs_email: '%app.email.external_affairs%'
+        education_email: '%app.email.education%'
+        # The build the container was made from. Read through the container rather than off `$_SERVER`, which never
+        # carries it: `variables_order` is GPCS, so no environment variable reaches the superglobal.
+        git_commit: '%env(string:default::GIT_COMMIT)%'
+
+when@test:
+    twig:
+        strict_variables: true

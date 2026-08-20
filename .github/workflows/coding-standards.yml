@@ -1,0 +1,24 @@
+name: PHP Coding Standards
+
+# Only run this action when pushing to main or on pull requests (creation, synchronisation, and reopening).
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+# Cancel running jobs that have become stale through updates to the ref (e.g., pushes to a pull request).
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+    php-codesniffer:
+        # Matched to the `gewis/gewisphp-coding-standards` version in composer.json, and to the PHP the application
+        # requires: the reusable workflow runs `composer install`, which refuses to resolve `php: ^8.5` on 8.4.
+        uses: 'GEWIS/gewisphp-coding-standards/.github/workflows/coding-standards.yml@ee93e44901014ff6255ecd676e95c013e0feed47' # 2.1.1
+        with:
+            php-version: '8.5'
+            extensions: 'amqp, apcu, calendar, curl, gd, intl, ldap, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'

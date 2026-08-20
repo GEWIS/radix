@@ -1,0 +1,37 @@
+{% extends 'layout-sidebar.html.twig' %}
+
+{% block page_title %}{{ 'Administration'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block sidebar_label %}{{ 'Administration'|trans }}{% endblock %}
+
+{% block sidebar %}
+    {% include 'partials/admin-sidebar.html.twig' %}
+{% endblock %}
+
+{# The build this is running, which is what a bug report needs. An image built outside the release pipeline carries
+   no commit, and a link to one that is not there is worse than saying so. #}
+{% block sidebar_footer %}
+    {# A row of the menu, built from the menu's own classes rather than from measurements of its own, so it keeps
+       whatever the rows above it are. #}
+    {% if git_commit is not empty %}
+        <a class="sidebar-link" href="https://github.com/GEWIS/radix/commit/{{ git_commit }}"
+           target="_blank" rel="noopener">
+            <span class="sidebar-icon fab fa-github" aria-hidden="true"></span>
+            <span class="sidebar-label sidebar-build-ref">{{ git_commit|slice(0, 7) }}</span>
+        </a>
+    {% else %}
+        <span class="sidebar-link sidebar-build-static">
+            <span class="sidebar-icon fab fa-github" aria-hidden="true"></span>
+            <span class="sidebar-label">{{ 'unreleased build'|trans }}</span>
+        </span>
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item active" aria-current="page">
+        <a href="{{ path('admin/index') }}">
+            {{ 'Admin'|trans }}
+        </a>
+    </li>
+    {% block admin_breadcrumbs %}{% endblock %}
+{% endblock %}

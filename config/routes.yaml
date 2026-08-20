@@ -1,0 +1,198 @@
+# The website's own pages. The register answers under the administration's prefix but with the locale as a path
+# segment, and the API and the anonymous sign-up flow under no prefix at all, so those controllers are excluded here
+# and imported below; leaving them in would give every one of their routes a second, wrong address as well.
+localised_routes:
+    resource: '../src/Controller/'
+    exclude:
+        - '../src/Controller/Application/ApplicationController.php'
+        - '../src/Controller/Database/'
+        - '../src/Controller/Report/'
+        - '../src/Controller/User/ApiPrincipalController.php'
+    type: attribute
+    prefix:
+        en: '/en'
+        nl: '/nl'
+    requirements:
+        _locale: 'en|nl'
+
+# The member register, which is part of the administration and answers under /{_locale}/admin with the rest of it.
+#
+# The locale is a path segment here rather than the per-locale prefix map above. A prefix map splits every route it
+# touches into `<name>.<locale>`, and the register is linked to, redirected to and named in security.yaml by a single
+# name per address throughout. Sharing a prefix with the routes above is not a conflict: two imports may contribute
+# routes under one path as long as no two of them claim the same path and method.
+#
+# The handful of addresses further down that have to keep answering without a prefix belong to these same controllers,
+# but carry no `#[Route]` of their own: an attribute here would be swallowed by the prefix, so those actions are given
+# their paths in this file instead.
+database_routes:
+    resource: '../src/Controller/Database/'
+    # The checkout return and webhook addresses are Stripe's, not ours to move; they are imported unprefixed below.
+    exclude: '../src/Controller/Database/CheckoutController.php'
+    type: attribute
+    prefix: '/{_locale}/admin'
+    # A URL built outside a request — an e-mail sent from a console command or a message handler — has no locale in
+    # the router context to fill the segment with, and one language is a better answer than a failure.
+    defaults:
+        _locale: '%kernel.default_locale%'
+    requirements:
+        _locale: '%app.locales%'
+
+# The language switch and the reference list of installation functions.
+application_routes:
+    resource: '../src/Controller/Application/ApplicationController.php'
+    type: attribute
+    prefix: '/{_locale}/admin'
+    defaults:
+        _locale: '%kernel.default_locale%'
+    requirements:
+        _locale: '%app.locales%'
+
+# Saved queries over the register.
+database_query_routes:
+    resource: '../src/Controller/Report/QueryController.php'
+    type: attribute
+    prefix: '/{_locale}/admin'
+    defaults:
+        _locale: '%kernel.default_locale%'
+    requirements:
+        _locale: '%app.locales%'
+
+# The bearer tokens the API below is read with, and who holds them.
+database_api_principal_routes:
+    resource: '../src/Controller/User/ApiPrincipalController.php'
+    type: attribute
+    prefix: '/{_locale}/admin'
+    defaults:
+        _locale: '%kernel.default_locale%'
+    requirements:
+        _locale: '%app.locales%'
+
+# The API is a contract with the other GEWIS applications: one address, no language in it, and the one that
+# openapi.yaml publishes. It is also what the stateless `api` firewall is matched on, so a prefix here would take
+# these endpoints out of that firewall and put them behind the login form instead.
+#
+# API Platform mounts on the same /api from config/routes/api_platform.yaml, which is loaded before this file. It
+# contributes no routes of its own — its entrypoint and its documentation are switched off because this contract owns
+# /api — so a resource declared later has to be given a path that is not one of the endpoints below.
+api_routes:
+    resource: '../src/Controller/Report/ApiController.php'
+    type: attribute
+
+# Where someone is returned to after paying, and where Stripe reports the payment. Both spellings of each: the sign-up
+# host exposes the short one and rewrites it onto the long one. These addresses are held by Stripe rather than by us —
+# the webhook is configured in its dashboard and the return addresses travel with a checkout session that may already
+# be open — so they answer where they always have.
+join_checkout_routes:
+    resource: '../src/Controller/Database/CheckoutController.php'
+    type: attribute
+
+# The rest of the anonymous flows, at the addresses they are reached by rather than under the register's prefix. A
+# language prefix in front of any of them would break the link in a renewal e-mail that went out last month, and the
+# short address gew.is/join points at.
+# The sign-up form carries its language in its address like every other page, so the language switch is the same
+# rewriting of the URL there as it is anywhere else rather than something remembered on the session.
+join_index:
+    path: '/{_locale}/join'
+    controller: App\Controller\Database\ProspectiveMemberController::subscribe
+    requirements:
+        _locale: '%app.locales%'
+    methods: [GET, POST]
+
+# The address on the posters and behind gew.is/join, which carries no language: it sends the visitor into whichever
+# one they are already reading the site in.
+join_index_short:
+    path: /join
+    controller: App\Controller\Database\ProspectiveMemberController::subscribeUnlocalised
+    methods: [GET]
+
+# Where signing up used to answer, kept because it is printed on posters and sits in mailboxes. GET only: a 301 in
+# answer to a POST is not something every client replays as a POST, and nothing submits to this address any more.
+join_subscribe_legacy:
+    path: /member/subscribe
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+    defaults:
+        route: join_index
+        permanent: true
+    methods: [GET]
+
+join_renew_short:
+    path: /renew/{token}
+    controller: App\Controller\Database\ProspectiveMemberController::renew
+    requirements:
+        token: '[a-zA-Z0-9_\-\+]+'
+    methods: [GET, POST]
+
+join_renew:
+    path: /member/renew/{token}
+    controller: App\Controller\Database\ProspectiveMemberController::renew
+    requirements:
+        token: '[a-zA-Z0-9_\-\+]+'
+    methods: [GET, POST]
+
+# The language switch stores a choice on the session, which is the only thing that decides the language of a page that
+# carries no locale of its own — the sign-up and renewal forms. It cannot move behind a prefix either.
+application_lang:
+    path: /lang/{lang}
+    controller: App\Controller\Application\ApplicationController::lang
+    requirements:
+        lang: '[a-zA-Z_]{2,5}'
+    methods: [GET]
+
+# Image serving is defined here (not as a controller attribute) so it is NOT locale-prefixed (image URLs are assets,
+# not pages), and so its slash-bearing {path} is matched before the localised page_route below could grab it.
+image_serve:
+    path: /img/{variant}/{path}
+    controller: App\Controller\Application\ImageController::serve
+    requirements:
+        variant: '[a-z0-9]+'
+        path: '.+'
+
+# The page route must be defined here. If it is an attribute in the PageController it requires a priority: -1 to ensure
+# that it does not "steal" the route from any other attribute-defined route.
+# And without the priority everything will land in the catch_all route below.
+#
+# It is also why everything above is above it: its first segment is a variable with no requirement on it, so it reads
+# /join and /en/admin/members alike as a page that does not exist.
+page_route:
+    path: /{_locale}/{category}/{subCategory}/{name}
+    controller: App\Controller\Frontpage\PageController::index
+    # A segment that does not read as a slug is not a page here, and falls through to the catch-all below. Deliberately
+    # not the bounded rule the page form holds a new address to: how long an address may be is a rule about writing one,
+    # and a page that was published before it existed still has to answer.
+    requirements:
+        category: !php/const App\Util\Application\SlugRule::ROUTE_REQUIREMENT
+        subCategory: !php/const App\Util\Application\SlugRule::ROUTE_REQUIREMENT
+        name: !php/const App\Util\Application\SlugRule::ROUTE_REQUIREMENT
+    defaults:
+        subCategory: null
+        name: null
+
+user_token:
+    path: /user/token/{app}
+    controller: App\Controller\User\UserController::token
+    requirements:
+        app: '[a-z][0-9a-z\_\-]{2,31}'
+
+# Public JWKS for verifying RS512 tokens issued to external applications. Locale-less, like user_token, so it is a plain
+# well-known URL an application can be configured with.
+external_app_jwks:
+    path: /.well-known/jwks.json
+    controller: App\Controller\User\JwksController::jwks
+
+# Legacy `/data/{path}` URLs (old bookmarks, caches, markdown embeds). Defined here, like image_serve, so it is not
+# locale-prefixed and its slash-bearing {path} is matched before page_route/catch_all could grab it. Inert while
+# public/data/ still exists (Caddy serves those files statically); the safety net once it is removed.
+legacy_data:
+    path: /data/{path}
+    controller: App\Controller\Application\LegacyDataController::resolve
+    requirements:
+        path: '.+'
+
+# Catch everything that is not matched to allow stateful 404 errors.
+# Without this, due to the required language prefix, sessions are lost for 404 errors.
+catch_all:
+    path: /{wildcard}
+    controller: App\Controller\Frontpage\FrontpageController::notFound
+    requirements:
+        wildcard: .*

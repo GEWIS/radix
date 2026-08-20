@@ -1,0 +1,15 @@
+# CI override: the images the workflows build are cached in the runner's GitHub Actions cache, which is the only cache
+# a fresh runner has. Only the services that are built appear here; the rest are pulled.
+services:
+    matomo:
+        build:
+            cache_from: [ type=gha ]
+            cache_to: [ "type=gha,mode=max" ]
+    pgadmin:
+        build:
+            cache_from: [ type=gha ]
+            cache_to: [ "type=gha,mode=max" ]
+    web:
+        build:
+            cache_from: [ type=gha ]
+            cache_to: [ "type=gha,mode=max" ]

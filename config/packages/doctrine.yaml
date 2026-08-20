@@ -1,0 +1,173 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+doctrine:
+    dbal:
+        default_connection: default
+        # doctrine-bundle keeps one type registry for the whole DBAL rather than one per connection, so a type is
+        # declared here even when a single entity on a single connection maps a column to it.
+        types:
+            stringable_datetime: App\Doctrine\Types\StringableDateTimeType
+        connections:
+            # The ledger, on PostgreSQL: the editable source of truth. The DSN's `role` is not a driver parameter —
+            # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it.
+            default:
+                url: '%env(resolve:DATABASE_DSN)%'
+                profiling_collect_backtrace: '%kernel.debug%'
+            # Everything the website owns, on MariaDB, together with the projection of the ledger the site and the
+            # API read.
+            web:
+                url: '%env(resolve:WEB_DATABASE_DSN)%'
+                profiling_collect_backtrace: '%kernel.debug%'
+    # The ledger is the default manager, so an unqualified `getRepository()` reaches the source of truth rather than a
+    # copy of it. For most of the codebase that is the wrong manager: ask for `web` explicitly.
+    orm:
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                # Both schemas were built with Doctrine's DefaultNamingStrategy verbatim. doctrine-bundle's own
+                # default, `underscore_number_aware`, would rename every camelCase column (`createdAt` to
+                # `created_at`) and the tables with them.
+                naming_strategy: doctrine.orm.naming_strategy.default
+                # ORM 3 resolves AUTO to IDENTITY on PostgreSQL where ORM 2 resolved it to SEQUENCE. The ledger's id
+                # columns are plain INT with no DEFAULT nextval(...), so IDENTITY fails every INSERT. MariaDB's
+                # AUTO_INCREMENT needs none of this, which is why the preference belongs to this manager alone.
+                identity_generation_preferences:
+                    Doctrine\DBAL\Platforms\PostgreSQLPlatform: sequence
+                mappings:
+                    # One directory, and therefore one entry: `App\Entity\Database\User` holds the accounts that
+                    # administer the ledger, and lives under the ledger's namespace precisely so that it is mapped
+                    # here rather than alongside the website's own users.
+                    Database:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Database'
+                        prefix: 'App\Entity\Database'
+                        alias: Database
+
+            web:
+                connection: web
+                # As on the ledger: the MariaDB schema is equally literal about its column names.
+                naming_strategy: doctrine.orm.naming_strategy.default
+                # `App\Entity\Decision\Member` is the only entity annotated for this: read on nearly every page,
+                # written only when the projection follows the ledger. Its region is NONSTRICT_READ_WRITE because
+                # those writes go through the ORM and a READ_ONLY region refuses an update outright; a reader may
+                # briefly see the version from before a write, which is not worth a lock for data that is rebuilt
+                # from the ledger anyway.
+                #
+                # Do NOT add `User` or `UserRole`: MFA toggles and admin role grants must take effect immediately.
+                second_level_cache:
+                    enabled: true
+                    log_enabled: '%kernel.debug%'
+                    region_lifetime: 1800
+                    regions:
+                        member_region:
+                            lifetime: 1800
+                            cache_driver:
+                                type: pool
+                                pool: cache.app
+                dql:
+                    # Registered on this manager alone: no query on the ledger uses any of the three, and MONTH and
+                    # RAND are spelled the way MariaDB spells them.
+                    numeric_functions:
+                        MONTH: App\Doctrine\Functions\Month
+                        RAND: App\Doctrine\Functions\Rand
+                        YEAR: App\Doctrine\Functions\Year
+                mappings:
+                    Activity:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Activity'
+                        prefix: 'App\Entity\Activity'
+                        alias: Activity
+                    Application:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Application'
+                        prefix: 'App\Entity\Application'
+                        alias: Application
+                    Company:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Career'
+                        prefix: 'App\Entity\Career'
+                        alias: Company
+                    Decision:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Decision'
+                        prefix: 'App\Entity\Decision'
+                        alias: Decision
+                    Education:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Education'
+                        prefix: 'App\Entity\Education'
+                        alias: Education
+                    Frontpage:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Frontpage'
+                        prefix: 'App\Entity\Frontpage'
+                        alias: Frontpage
+                    Photo:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Photo'
+                        prefix: 'App\Entity\Photo'
+                        alias: Photo
+                    User:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/User'
+                        prefix: 'App\Entity\User'
+                        alias: User
+
+when@test:
+    doctrine:
+        dbal:
+            connections:
+                # Both databases move aside, or a test run writes over the development ledger and the projection of
+                # it. "TEST_TOKEN" is typically set by ParaTest.
+                default:
+                    dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+                web:
+                    dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        dbal:
+            # The ledger states its TLS in the DSN, so there is nothing to add for `default` here.
+            connections:
+                web:
+                    # TLS to the production MariaDB. CAPATH points at the system CA bundle, which is present in the
+                    # production image. These are MySQL-specific PDO attributes, so they only apply to this
+                    # connection.
+                    options:
+                        !php/const Pdo\Mysql::ATTR_SSL_CAPATH: '/etc/ssl/certs/'
+                        !php/const Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT: true
+        orm:
+            # Both managers parse DQL and both serve pages, so both get the pools. Sharing them is safe: the ORM salts
+            # a query cache key with the platform behind the query.
+            entity_managers:
+                default:
+                    query_cache_driver:
+                        type: pool
+                        pool: doctrine.system_cache_pool
+                    result_cache_driver:
+                        type: pool
+                        pool: doctrine.result_cache_pool
+                web:
+                    query_cache_driver:
+                        type: pool
+                        pool: doctrine.system_cache_pool
+                    result_cache_driver:
+                        type: pool
+                        pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

@@ -1,0 +1,117 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/php:8.4",
+	"customizations": {
+		"vscode": {
+      		"extensions": [
+				"getpsalm.psalm-vscode-plugin",
+				"swordev.phpstan",
+				"bmewburn.vscode-intelephense-client",
+				"ms-vscode.makefile-tools",
+				"ms-azuretools.vscode-docker",
+				"wongjn.php-sniffer",
+				"ms-vscode-remote.remote-containers"
+			],
+			"settings": {
+				"makefile.configureOnOpen": false,
+				"phpSniffer.run": "onType",
+				"phpSniffer.autoDetect": true,
+				"[php]": {
+					"editor.defaultFormatter": "wongjn.php-sniffer"
+				}
+			}
+    	},
+		"codespaces": {
+			"repositories": {
+				"GEWIS/radix": {
+					"permissions": {
+						"metadata": "read",
+						"contents": "write",
+						"deployments": "read"
+					}
+				}
+			}
+		}
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"moby": false,
+			"installDockerBuildx": true,
+			"version": "latest",
+			"dockerDashComposeVersion": "v2"
+		},
+		"./local-features/radix-php-opcache": {
+			"version": "latest"
+		},
+		"./local-features/radix-php-intl": {
+			"version": "latest"
+		}
+	},
+	"remoteUser": "vscode",
+	"postCreateCommand": {
+		"build": "make setuplocalenv",
+		"noXdebug": "sudo rm -f /usr/local/etc/php/conf.d/xdebug.ini"
+	},
+	"postStartCommand": {
+		"runRadix": "(make start); true"
+	},
+	"waitFor": "postCreateCommand",
+	"forwardPorts": [
+		80,
+		82,
+		8021,
+		8022,
+		8025,
+		8080,
+		8081,
+		15672
+	],
+	"portsAttributes": {
+		"80": {
+			"label": "Radix web interface",
+			"onAutoForward": "openBrowserOnce",
+			"protocol": "http"
+		},
+		"82": {
+			"label": "Matomo",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		},
+		"8021": {
+			"label": "Mailman web interface",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		},
+		"8022": {
+			"label": "Listmonk admin interface",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		},
+		"8025": {
+			"label": "Mailpit",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		},
+		"8080": {
+			"label": "phpMyAdmin",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		},
+		"8081": {
+			"label": "pgAdmin",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		},
+		"15672": {
+			"label": "RabbitMQ management interface",
+			"onAutoForward": "silent",
+			"protocol": "http"
+		}
+	},
+	"shutdownAction": "stopContainer",
+	"hostRequirements": {
+		"cpus": 4,
+		"memory": "8gb",
+		"gpu": false,
+		"storage": "32gb"
+	}
+}

@@ -1,0 +1,145 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Entity\Application;
+
+use App\Entity\Application\Traits\IdentifiableTrait;
+use App\Entity\Application\Traits\TimestampableTrait;
+use App\Entity\User\CompanyUser as CompanyUserModel;
+use App\Entity\User\User as UserModel;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\MappedSuperclass;
+use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Mapping\PreUpdate;
+use LogicException;
+
+/**
+ * One message in the review discussion thread attached to a single revision (board <-> author back-and-forth, e.g.
+ * the feedback accompanying a "changes requested" or "rejected" decision).
+ *
+ * The author is the authenticated principal who wrote it. Either a member's {@see UserModel} account or (on the company
+ * portal) a {@see CompanyUserModel}; exactly one of the two is set, mirroring how a revision records its author.
+ *
+ * Concrete subclasses MUST declare the typed `revision` association for their own revision table, and MUST also declare
+ * {@see \Doctrine\ORM\Mapping\HasLifecycleCallbacks} for the timestamp callbacks from {@see TimestampableTrait} and
+ * {@see AbstractRevisionComment::assertSingleAuthor()}.
+ */
+#[MappedSuperclass]
+abstract class AbstractRevisionComment
+{
+    use IdentifiableTrait;
+    use TimestampableTrait;
+
+    /**
+     * The user (a member's account) who wrote this comment. Mutually exclusive with {@see $authorCompanyUser}. Set to
+     * null when the account goes, on the same terms as the company user beside it: the thread is the record of what
+     * was asked and answered during review, and it has to stay readable without the person who wrote it.
+     */
+    #[ManyToOne(targetEntity: UserModel::class)]
+    #[JoinColumn(
+        referencedColumnName: 'lidnr',
+        nullable: true,
+        onDelete: 'SET NULL',
+    )]
+    private ?UserModel $author = null;
+
+    /**
+     * The company user who wrote this comment (careers portal). Mutually exclusive with {@see $author}.
+     */
+    #[ManyToOne(targetEntity: CompanyUserModel::class)]
+    #[JoinColumn(
+        referencedColumnName: 'id',
+        nullable: true,
+        onDelete: 'SET NULL',
+    )]
+    private ?CompanyUserModel $authorCompanyUser = null;
+
+    #[Column(type: Types::TEXT)]
+    private string $body;
+
+    public function getAuthor(): ?UserModel
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?UserModel $author): void
+    {
+        $this->author = $author;
+    }
+
+    public function getAuthorCompanyUser(): ?CompanyUserModel
+    {
+        return $this->authorCompanyUser;
+    }
+
+    public function setAuthorCompanyUser(?CompanyUserModel $authorCompanyUser): void
+    {
+        $this->authorCompanyUser = $authorCompanyUser;
+    }
+
+    /**
+     * A human-readable name for whoever wrote this comment, whether a member's account or a company user.
+     */
+    public function getAuthorDisplayName(): string
+    {
+        return $this->author?->getDisplayName()
+            ?? $this->authorCompanyUser?->getDisplayName()
+            ?? '';
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
+    public function setBody(string $body): void
+    {
+        $this->body = $body;
+    }
+
+    /**
+     * Enforce that a comment starts out with exactly one author; never both and never neither.
+     *
+     * Should be registered as a callback on every concrete subclass via its
+     *
+     * @see \Doctrine\ORM\Mapping\HasLifecycleCallbacks}.
+     */
+    #[PrePersist]
+    public function assertAuthored(): void
+    {
+        if ((null === $this->author) === (null === $this->authorCompanyUser)) {
+            throw new LogicException('A revision comment must have exactly one author (a user or a company user).');
+        }
+    }
+
+    /**
+     * A comment can lose its author afterwards, since removing a company user outright nulls out everything that
+     * points at it, but it never gains a second one.
+     */
+    #[PreUpdate]
+    public function assertSingleAuthor(): void
+    {
+        if (
+            null !== $this->author
+            && null !== $this->authorCompanyUser
+        ) {
+            throw new LogicException('A revision comment cannot be written by both a member and a company user.');
+        }
+    }
+
+    /**
+     * The revision this comment belongs to.
+     */
+    abstract public function getRevision(): RevisionInterface;
+
+    /**
+     * Bind a freshly constructed comment to the revision it belongs to, so code that works across domains can start a
+     * thread entry without knowing the concrete types. Subclasses reject a revision of another domain, the way
+     * {@see RevisableInterface::markRevisionLive()} does.
+     */
+    abstract public function attachTo(RevisionInterface $revision): void;
+}

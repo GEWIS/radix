@@ -1,0 +1,20 @@
+# The web database's set, on MariaDB. The counterpart of default.yaml, shaped the same so the two commands differ only
+# in the file they name.
+em: 'web'
+
+# `DoctrineMigrations` is what GEWISWEB's 52 rows are recorded under; see default.yaml.
+migrations_paths:
+    'DoctrineMigrations': '../../../migrations/web'
+
+table_storage:
+    table_name: doctrine_migration_versions
+    version_column_name: version
+    version_column_length: 191
+    executed_at_column_name: executed_at
+    execution_time_column_name: execution_time
+
+all_or_nothing: true
+transactional: true
+check_database_platform: true
+
+custom_template: 'migrations/template.tpl'
