@@ -1,0 +1,126 @@
+<div class="panel mb-3">
+    <button type="button"
+            class="panel-heading panel-collapse-toggle d-flex justify-content-between align-items-start gap-2 w-100 border-0 bg-transparent text-start {% if not open %}collapsed{% endif %}"
+            data-bs-toggle="collapse" data-bs-target="#{{ collapseId }}"
+            aria-expanded="{{ open ? 'true' : 'false' }}" aria-controls="{{ collapseId }}">
+        <span>
+            <span class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                <span class="h5 mb-0">{{ list.name }}</span>
+                {% if list.promoted %}
+                    <span class="fas fa-star text-warning" title="{{ 'Promoted'|trans }}"></span>
+                {% endif %}
+            </span>
+            <span class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                {% if list.cancelled %}
+                    <span class="badge badge-danger">{{ 'Cancelled'|trans }}</span>
+                {% elseif list.isOpen %}
+                    <span class="badge badge-success">{{ 'Open'|trans }}</span>
+                {% elseif list.isClosed %}
+                    <span class="badge badge-danger">{{ 'Closed'|trans }}</span>
+                {% else %}
+                    <span class="badge badge-info">{{ 'Not yet open'|trans }}</span>
+                {% endif %}
+                {% if list.limitedCapacity %}
+                    <span class="badge badge-warning">
+                        {%- if list.capacity is not null -%}
+                            {{ 'Limited capacity (%capacity%)'|trans({'%capacity%': list.capacity}) }}
+                        {%- else -%}
+                            {{ 'Limited capacity'|trans }}
+                        {%- endif -%}
+                    </span>
+                {% endif %}
+                {% if list.onlyGEWIS %}
+                    <span class="badge badge-tag">{{ 'GEWIS members only'|trans }}</span>
+                {% endif %}
+            </span>
+            {% if not list.cancelled %}
+                <small class="text-muted d-block">
+                    {{ 'Open from %open% until %close%.'|trans({
+                        '%open%': list.openDate|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                        '%close%': list.closeDate|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                    }) }}
+                </small>
+                {% if list.drawAt is not null %}
+                    <small class="text-muted d-block">
+                        {{ 'Places are allocated by a draw on %date%.'|trans({
+                            '%date%': list.drawAt|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                        }) }}
+                    </small>
+                {% endif %}
+            {% endif %}
+        </span>
+        <span class="fas fa-chevron-down panel-collapse-chevron"></span>
+    </button>
+    <div class="collapse {% if open %}show{% endif %}" id="{{ collapseId }}">
+        {# pt-0: the .collapse wrapper defeats the panel's `.panel-heading + .panel-body` zero-top-padding rule, so the body's top padding would otherwise double. #}
+        <div class="panel-body pt-0">
+            {% if is_granted('ROLE_USER') %}
+                <twig:Activity:SignupList :signupList="list.listId" />
+            {% else %}
+                {% if list.cancelled %}
+                    <p class="text-danger mb-3">
+                        <span class="fas fa-ban"></span>
+                        {{ 'Sign-ups are closed because this activity has been cancelled.'|trans }}
+                    </p>
+                {% elseif list.isOpen %}
+                    {% if list.onlyGEWIS %}
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <a class="btn btn-sm btn-gewis-primary" href="{{ path('user_login') }}">{{ 'Log in to sign up'|trans }}</a>
+                        </div>
+                    {% elseif not list.onlyGEWIS %}
+                        {% set externalModalId = 'signup-external-modal-' ~ list.listId %}
+                        {% set resendModalId = 'resend-modal-' ~ list.listId %}
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <div class="btn-group btn-group-sm" role="group"
+                                 aria-label="{{ 'Sign up as a guest'|trans }}">
+                                <button type="button" class="btn btn-gewis-primary"
+                                        data-bs-toggle="modal" data-bs-target="#{{ externalModalId }}">
+                                    <span class="fas fa-user-plus"></span> {{ 'Sign up as a guest'|trans }}
+                                </button>
+                                <button type="button" class="btn btn-outline-gewis-primary"
+                                        data-bs-toggle="modal" data-bs-target="#{{ resendModalId }}">
+                                    {{ "Did not receive the confirmation email? Resend it."|trans }}
+                                </button>
+                            </div>
+                            <a class="btn btn-sm btn-link" href="{{ path('user_login') }}">
+                                {{ 'Have a GEWIS account? Log in to sign up.'|trans }}
+                            </a>
+                        </div>
+
+                        <div class="modal fade" id="{{ externalModalId }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{ "Sign up for '%name%'"|trans({'%name%': list.name}) }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="{{ 'Close'|trans }}"></button>
+                                    </div>
+                                    <twig:Activity:ExternalSignupForm :signupList="list.listId" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {# No captcha: this creates no data (only remails a pending sign-up) and always reports the same neutral result, so it never reveals whether an address is signed up. #}
+                        <div class="modal fade" id="{{ resendModalId }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{ 'Resend confirmation email'|trans }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="{{ 'Close'|trans }}"></button>
+                                    </div>
+                                    <twig:Activity:ExternalSignupResendForm :signupList="list.listId" />
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if list.displaySubscribedNumber %}
+                    <p class="mb-1">{{ 'Number of subscriptions: %count%'|trans({'%count%': list.subscriberCount}) }}</p>
+                {% endif %}
+                <a href="{{ path('user_login') }}">{{ 'Log in to view the subscribers.'|trans }}</a>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ album.name|page_title }}{{ parent() }}{% endblock %}
+
+{% import 'partials/photo/gallery.html.twig' as gallery %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item">
+        <a href="{{ path('photo/index') }}">{{ 'Photos'|trans }}</a>
+    </li>
+    {{ gallery.albumTrail(album.parent, false) }}
+    <li class="breadcrumb-item active" aria-current="page">{{ album.name }}</li>
+{% endblock %}
+
+{# Photos fill the full width of the window, like the old site. #}
+{% block container_class %}container-fluid{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# Only album pages carry the viewer, so its stylesheet is linked here rather than loaded on every page. #}
+    <link rel="stylesheet" href="{{ asset('vendor/photoswipe/dist/photoswipe.min.css') }}">
+{% endblock %}
+
+{% block contents %}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="mb-0">{{ album.name }}</h2>
+            {% include 'partials/photo/album-dates.html.twig' with { 'album': album } only %}
+        </div>
+        {% if album.parent %}
+            <a class="btn btn-outline-secondary btn-sm"
+               href="{{ path('photo/album', { type: 'album', album: album.parent.id }) }}">
+                <span class="fa-solid fa-arrow-left me-1"></span>{{ 'Back to parent album'|trans }}
+            </a>
+        {% endif %}
+    </div>
+
+    {% if children is not empty %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xxl-6 g-3 mb-4">
+            {% for child in children %}
+                {% include 'partials/photo/album-card.html.twig' with { 'album': child } only %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div {{ gallery.attributes(path('photo/manifest', { album: album.id }), false) }}>
+        {{ gallery.grid() }}
+    </div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ activity_title(activity)|page_title }}{{ parent() }}{% endblock %}
+
+{% block structured_data %}
+    {% set organizerName = activity.getOrgan is not null
+        ? activity.getOrgan.getName
+        : (activity.getCompany is not null ? activity.getCompany.getName : 'Study Association GEWIS'|trans) %}
+    <script type="application/ld+json">
+        {{ {
+            '@context': 'https://schema.org',
+            '@type': 'Event',
+            'name': activity_title(activity),
+            'startDate': activity.getBeginTime|date('c'),
+            'endDate': activity.getEndTime|date('c'),
+            'eventStatus': activity.isCancelled ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
+            'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
+            'location': {
+                '@type': 'Place',
+                'name': activity.getLocation|localise_text,
+            },
+            'organizer': {
+                '@type': 'Organization',
+                'name': organizerName,
+            },
+            'description': activity.getDescription|localise_text|markdown|striptags,
+            'url': url('activity/view', {'activity': activity.getId}),
+        }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_HEX_APOS') b-or constant('JSON_HEX_QUOT'))|raw }}
+    </script>
+{% endblock %}
+
+{% block contents %}
+    {% set isCareer = activity.getCategory.value == 'career' %}
+    {% if activity.isCancelled %}
+        <div class="alert alert-danger" role="alert">
+            <strong>{{ 'This activity has been cancelled.'|trans }}</strong>
+            {{ 'Sign-ups are closed and no further changes can be made.'|trans }}
+        </div>
+    {% endif %}
+    <div class="row">
+        <main class="col-md-8">
+            <h2 class="mb-2">{{ activity_title(activity) }}</h2>
+            <div class="d-flex flex-wrap gap-1 mb-3">
+                {% if activity.getCategory.value not in ['other', 'uncategorised'] %}
+                    <span class="badge badge-gewis-primary">{{ activity.getCategory|trans }}</span>
+                {% endif %}
+                {% for label in activity.getLabels %}
+                    <span class="badge badge-tag">{{ label.getName|localise_text }}</span>
+                {% endfor %}
+            </div>
+            <div class="panel mt-0">
+                <div class="panel-heading">
+                    <h3>{{ 'About this activity'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="markdown">
+                        {{ activity.getDescription|localise_text|markdown }}
+                    </div>
+
+                    {% set organ = activity.getOrgan %}
+                    {% set organInformation = organ is not null ? organ.getOrganInformation : null %}
+                    {% set organEmail = organInformation is not null ? organInformation.getEmail : null %}
+                    {# Obfuscate the @ so the addresses are not trivially scraped from the public page. #}
+                    {% set atSeparator = ' ' ~ '[at]'|trans ~ ' ' %}
+                    {% set boardEmail = ((isCareer ? 'ceb' : 'cib') ~ '@gewis.nl')|replace({'@': atSeparator}) %}
+                    <p class="text-muted small border-top pt-3 mt-3 mb-0">
+                        {% if organ is null %}
+                            {{ 'Please contact the board (%email%) with any questions or concerns. Have fun!'|trans({
+                                '%email%': boardEmail,
+                            }) }}
+                        {% else %}
+                            {% set organizer = organEmail is not empty
+                                ? organ.getAbbr ~ ' (' ~ organEmail|replace({'@': atSeparator}) ~ ')'
+                                : organ.getAbbr %}
+                            {{ 'Please contact %organizer% or the board (%email%) with any questions or concerns. Have fun!'|trans({
+                                '%organizer%': organizer,
+                                '%email%': boardEmail,
+                            }) }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </main>
+        <aside class="col-md-4">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Details'|trans }}</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ 'Start'|trans }}</h6>
+                        <p class="text-muted small mb-0">
+                            {% set start = activity.getBeginTime|format_datetime(pattern: 'EEEE d MMMM yyyy HH:mm', locale: app.request.locale) %}
+                            {{ start|first|upper ~ start|slice(1) }}
+                        </p>
+                    </div>
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ 'End'|trans }}</h6>
+                        <p class="text-muted small mb-0">
+                            {% set end = activity.getEndTime|format_datetime(pattern: 'EEEE d MMMM yyyy HH:mm', locale: app.request.locale) %}
+                            {{ end|first|upper ~ end|slice(1) }}
+                        </p>
+                    </div>
+                    {% set location = activity.getLocation|localise_text %}
+                    {% if location is not empty %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ 'Location'|trans }}</h6>
+                            <p class="text-muted small mb-0">{{ location }}</p>
+                        </div>
+                    {% endif %}
+                    {% set costs = activity.getCosts|localise_text %}
+                    {% if costs is not empty %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ 'Costs'|trans }}</h6>
+                            <p class="text-muted small mb-0">{{ costs }}</p>
+                        </div>
+                    {% endif %}
+                    {% if activity.getOrgan is not null or activity.getCompany is not null %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ 'Organised by'|trans }}</h6>
+                            <p class="text-muted small mb-0">
+                                {{ activity.getOrgan is not null ? activity.getOrgan.getName : activity.getCompany.getName }}
+                            </p>
+                        </div>
+                    {% endif %}
+                    {% if isCareer %}
+                        <a class="list-group-item list-group-item-action" href="https://myfuture.tue.nl/"
+                           target="_blank" rel="noopener">
+                            <img class="img-fluid" style="max-width: 125px;"
+                                 src="{{ asset('images/myfuture.png') }}" alt="MyFuture">
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="panel-footer dropdown">
+                    <button type="button" class="panel-footer-link btn btn-link p-0 dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-calendar-plus"></span> {{ 'Add to calendar'|trans }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for link in ux_calendar_links(calendarEvent) %}
+                            <li>
+                                <a class="dropdown-item" href="{{ link.url }}" target="_blank" rel="noopener">
+                                    {{ link.label }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    {% if signupListViews is not empty %}
+        {% set activeLists = signupListViews|filter(list => not list.isClosed) %}
+        {% set closedLists = signupListViews|filter(list => list.isClosed) %}
+
+        {% if activeLists is not empty %}
+            <h4 class="mt-4">{{ 'Sign-up lists'|trans }}</h4>
+            {% set openedFirst = false %}
+            {% for list in activeLists %}
+                {% set autoOpen = not openedFirst and list.isOpen %}
+                {% if autoOpen %}{% set openedFirst = true %}{% endif %}
+                {% include 'partials/activity/signup-list.html.twig' with {
+                    'list': list,
+                    'collapseId': 'signup-list-active-' ~ loop.index,
+                    'open': autoOpen,
+                } only %}
+            {% endfor %}
+        {% endif %}
+
+        {% if closedLists is not empty %}
+            <h4 class="mt-4 text-muted">{{ 'Closed sign-up lists'|trans }}</h4>
+            {% for list in closedLists %}
+                {% include 'partials/activity/signup-list.html.twig' with {
+                    'list': list,
+                    'collapseId': 'signup-list-closed-' ~ loop.index,
+                    'open': false,
+                } only %}
+            {% endfor %}
+        {% endif %}
+
+        {% if is_granted('ROLE_USER') %}
+            {% include 'partials/application/confirm-modal.html.twig' %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

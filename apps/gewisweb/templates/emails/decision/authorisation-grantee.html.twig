@@ -1,0 +1,12 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block emailTitle %}GMM authorisation from {{ grantor.getFullName }}{% endblock %}
+{% block preheader %}GMM&nbsp;authorisation&nbsp;from&nbsp;{{ grantor.getFullName }}{% endblock %}
+{% block heading %}GMM Authorisation{% endblock %}
+{% block subheading %}Granted authorisation for {{ meetingNumber }} GMM{% endblock %}
+{% block body %}
+    <p>Dear {{ grantee.getFullName }},</p>
+    <p>You have been granted an authorisation for the <strong>{{ meetingNumber }} GMM</strong> ({{ meetingDate }}) by <i>{{ grantor.getFullName }}</i>.</p>
+    With kind regards,<br> The ApplicatieBeheerCommissie
+{% endblock %}
+{% block footerNoteSection %}{% endblock %}

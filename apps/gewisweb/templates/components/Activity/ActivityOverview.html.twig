@@ -1,0 +1,118 @@
+<div {{ attributes }}>
+    {# data-live-ignore: keeps the injected label chips intact across re-renders. #}
+    <div class="collapse mb-3{{ this.crossYear ? ' show' }}" id="activity-filters" data-live-ignore>
+        <div class="panel my-0">
+            <div class="panel-body">
+                <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label" for="activity-overview-search">{{ 'Search'|trans }}</label>
+                    <input type="search" class="form-control" id="activity-overview-search"
+                           placeholder="{{ 'Search by activity name'|trans }}"
+                           data-model="debounce(300)|search"
+                           value="{{ this.search }}"
+                           {{ this.crossYear ? 'autofocus' }}>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="activity-overview-category">{{ 'Category'|trans }}</label>
+                    <select class="form-select" id="activity-overview-category" data-model="category">
+                        <option value="">{{ 'Any'|trans }}</option>
+                        {% for category in this.categories %}
+                            <option value="{{ category.value }}" {% if this.category == category.value %}selected{% endif %}>
+                                {{ category|trans }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="activity-overview-organ">{{ 'Organising party'|trans }}</label>
+                    <select class="form-select" id="activity-overview-organ" data-model="organFilter">
+                        <option value="">{{ 'Any'|trans }}</option>
+                        {% for organ in this.organs %}
+                            <option value="{{ organ.id }}" {% if this.organFilter == organ.id %}selected{% endif %}>
+                                {{ organ.abbr }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="activity-overview-from">{{ 'From'|trans }}</label>
+                    <input type="date" class="form-control" id="activity-overview-from"
+                           data-model="fromDate" value="{{ this.fromDate }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="activity-overview-until">{{ 'Until'|trans }}</label>
+                    <input type="date" class="form-control" id="activity-overview-until"
+                           data-model="untilDate" value="{{ this.untilDate }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="activity-overview-open-signup"
+                               data-model="openSignupOnly" {% if this.openSignupOnly %}checked{% endif %}>
+                        <label class="form-check-label" for="activity-overview-open-signup">{{ 'Only with open sign-up'|trans }}</label>
+                    </div>
+                </div>
+                {% if this.labels is not empty %}
+                    {# Tom Select replaces the select with markup of its own, which the live component's morph would
+                       take back out on every re-render. The option list never changes, so the subtree is left to it. #}
+                    <div class="col-12" data-live-ignore>
+                        <label class="form-label" for="activity-overview-labels">{{ 'Labels'|trans }}</label>
+                        <select class="form-select" id="activity-overview-labels" multiple
+                                data-model="labelFilters"
+                                data-controller="symfony--ux-autocomplete--autocomplete"
+                                data-placeholder="{{ 'Search labels...'|trans }}">
+                            {% for label in this.labels %}
+                                <option value="{{ label.id }}" {% if label.id in this.labelFilters %}selected{% endif %}>
+                                    {{ label.getName|localise_text }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if this.isGrouped %}
+        <div class="mb-2">
+            {% for activities in this.activitiesByAssociationYear %}
+                {% set currentMonth = null %}
+                {% for activity in activities %}
+                    {% set month = activity.getBeginTime|format_datetime(pattern: 'MMMM yyyy', locale: app.request.locale) %}
+                    {% if month != currentMonth %}
+                        <div class="month-divider">{{ month }}</div>
+                        {% set currentMonth = month %}
+                    {% endif %}
+                    {% include 'partials/activity/list-item.html.twig' with {'activity': activity} only %}
+                {% endfor %}
+            {% else %}
+                <p class="text-muted text-center py-4">{{ 'No activities match the current filters.'|trans }}</p>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="mb-2">
+            {% set currentMonth = null %}
+            {% for activity in this.activities %}
+                {% set month = activity.getBeginTime|format_datetime(pattern: 'MMMM yyyy', locale: app.request.locale) %}
+                {% if month != currentMonth %}
+                    <div class="month-divider">{{ month }}</div>
+                    {% set currentMonth = month %}
+                {% endif %}
+                {% include 'partials/activity/list-item.html.twig' with {'activity': activity} only %}
+            {% else %}
+                <p class="text-muted text-center py-4">{{ 'No activities match the current filters.'|trans }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if this.hasMore %}
+        <div data-controller="infinite-scroll" class="text-center py-3">
+            <button type="button" class="btn btn-outline-secondary"
+                    data-action="live#action" data-live-action-param="loadMore"
+                    data-infinite-scroll-target="button">
+                {{ 'Load more'|trans }}
+            </button>
+            <div data-infinite-scroll-target="sentinel" aria-hidden="true"></div>
+        </div>
+    {% endif %}
+</div>

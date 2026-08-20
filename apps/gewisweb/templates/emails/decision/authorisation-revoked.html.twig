@@ -1,0 +1,12 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block emailTitle %}GMM authorisation from {{ grantor.getFullName }} revoked{% endblock %}
+{% block preheader %}GMM&nbsp;authorisation&nbsp;from&nbsp;{{ grantor.getFullName }}&nbsp;revoked{% endblock %}
+{% block heading %}GMM Authorisation Update{% endblock %}
+{% block subheading %}Granted authorisation for {{ meetingNumber }} GMM revoked{% endblock %}
+{% block body %}
+    <p>Dear {{ grantee.getFullName }},</p>
+    <p>The authorisation granted to you by <i>{{ grantor.getFullName }}</i> for the <strong>{{ meetingNumber }} GMM</strong> has been revoked and is therefore not valid during the GMM.</p>
+    With kind regards,<br> The ApplicatieBeheerCommissie
+{% endblock %}
+{% block footerNoteSection %}{% endblock %}

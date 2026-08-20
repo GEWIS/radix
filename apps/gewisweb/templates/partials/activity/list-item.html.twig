@@ -1,0 +1,94 @@
+{% set now = date() %}
+{% set dateBadge = activity_date_badge(activity.getBeginTime, activity.getEndTime) %}
+{% set dateMeta %}
+    <span class="text-muted small">{{ activity_date_range(activity.getBeginTime, activity.getEndTime) }}</span>
+    {% if now.timestamp >= activity.getBeginTime.timestamp and now.timestamp <= activity.getEndTime.timestamp %}
+        <span class="badge badge-success">{{ 'ongoing for %duration%'|trans({'%duration%': human_time_diff(now, activity.getEndTime)}) }}</span>
+    {% elseif now.timestamp < activity.getBeginTime.timestamp %}
+        <span class="badge badge-tag">{{ 'in %duration%'|trans({'%duration%': human_time_diff(now, activity.getBeginTime)}) }}</span>
+    {% endif %}
+{% endset %}
+<div class="panel panel-surface activity-list-item mb-3" data-controller="activity-item"
+     data-activity-item-url-value="{{ path('activity/view', {'activity': activity.getId}) }}"
+     data-action="click->activity-item#open">
+    <div class="panel-body d-flex gap-3">
+
+        {# aria-hidden: activity_date_range() below already announces the full date to assistive tech. #}
+        <div class="activity-date-badge{{ dateBadge.range ? ' activity-date-badge-range' : '' }}" aria-hidden="true">
+            <span class="activity-date-badge-month">{{ dateBadge.month }}</span>
+            <span class="activity-date-badge-day">{{ dateBadge.day }}</span>
+            <span class="activity-date-badge-weekday">{{ dateBadge.weekday }}</span>
+        </div>
+
+        <div class="flex-grow-1 overflow-hidden d-flex flex-column flex-md-row justify-content-between gap-3">
+            <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <h5 class="mb-0">
+                        {% if activity.isCancelled %}
+                            <span class="text-danger">{{ '[CANCELLED]'|trans }}</span>
+                            <a class="text-muted text-decoration-line-through"
+                               href="{{ path('activity/view', {'activity': activity.getId}) }}">{{ activity.getName|localise_text }}</a>
+                        {% else %}
+                            <a class="text-body"
+                               href="{{ path('activity/view', {'activity': activity.getId}) }}">{{ activity_title(activity) }}</a>
+                        {% endif %}
+                    </h5>
+                    {% if activity.getCategory.value not in ['other', 'uncategorised'] %}
+                        <span class="badge badge-gewis-primary">{{ activity.getCategory|trans }}</span>
+                    {% endif %}
+                    {% for label in activity.getLabels %}
+                        <span class="badge badge-tag">{{ label.getName|localise_text }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex d-md-none flex-wrap align-items-center gap-2 mb-3">{{ dateMeta }}</div>
+
+                <div class="activity-description mb-3" data-controller="description-toggle"
+                     data-description-toggle-more-value="{{ 'Show more'|trans }}"
+                     data-description-toggle-less-value="{{ 'Show less'|trans }}">
+                    <div class="activity-description-content" data-description-toggle-target="content">
+                        {{ activity.getDescription|localise_text|markdown(['p', 'br', 'strong', 'em', 'del', 'a', 'ul', 'ol', 'li']) }}
+                    </div>
+                    <button type="button" class="btn btn-link btn-sm p-0 d-none"
+                            data-description-toggle-target="button"
+                            data-action="description-toggle#toggle">
+                        {{ 'Show more'|trans }}
+                    </button>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2 text-muted">
+                    <span class="small"><span class="fas fa-location-dot"></span> {{ activity.getLocation|localise_text }}</span>
+                    <span class="small"><span class="fas fa-tag"></span> {{ activity.getCosts|localise_text }}</span>
+                    {% set signupList = activity.getRelevantSignupList %}
+                    {% if not activity.isCancelled and null !== signupList %}
+                        {% if signupList.isOpen %}
+                            {% set secondsLeft = signupList.getCloseDate.timestamp - now.timestamp %}
+                            {% set tone = secondsLeft < 86400 ? 'badge-danger' : (secondsLeft < 604800 ? 'badge-warning' : 'badge-tag') %}
+                            <span class="badge badge-squared text-wrap {{ tone }}">
+                                <span class="fas fa-ticket"></span>
+                                {{ 'Sign-up closes:'|trans }}
+                                {{ signupList.getCloseDate|format_datetime(pattern: 'EEE d MMM. HH:mm', locale: app.request.locale) }} ({{ 'in %duration%'|trans({'%duration%': human_time_diff(now, signupList.getCloseDate)}) }})
+                                {% if activity.countPendingSignupLists > 1 %}
+                                    ({{ 'more deadlines'|trans }})
+                                {% endif %}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-squared text-wrap badge-tag">
+                                <span class="fas fa-ticket"></span>
+                                {{ 'Sign-up opens:'|trans }}
+                                {{ signupList.getOpenDate|format_datetime(pattern: 'EEE d MMM. HH:mm', locale: app.request.locale) }} ({{ 'in %duration%'|trans({'%duration%': human_time_diff(now, signupList.getOpenDate)}) }})
+                                {% if activity.countPendingSignupLists > 1 %}
+                                    ({{ 'more deadlines'|trans }})
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-none d-md-flex flex-column align-items-end text-end flex-shrink-0 gap-2">
+                {{ dateMeta }}
+            </div>
+        </div>
+    </div>
+</div>

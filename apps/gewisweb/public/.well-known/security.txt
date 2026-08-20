@@ -1,0 +1,24 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Contact: mailto:security@gewis.nl
+Expires: 2027-09-01T00:00:00.000Z
+Encryption: https://pgp.surfnet.nl/pks/lookup?op=get&search=0x10C778679AEA14D0
+Preferred-Languages: en, nl
+
+# This policy can be found in multiple places, but applies to all applications listed in the policy
+Canonical: https://gewis.nl/.well-known/security.txt
+Canonical: https://database.gewis.nl/.well-known/security.txt
+Canonical: https://sudosos.gewis.nl/.well-known/security.txt
+Canonical: https://latex.gewis.nl/.well-known/security.txt
+Canonical: https://parelpracht.gewis.nl/.well-known/security.txt
+
+# The GEWIS disclosure policy can be found below and is signed with the aforementioned key
+Policy: https://github.com/GEWIS/.github/blob/main/SECURITY.md
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQSCXUrehl0qqJZIP2oQx3hnmuoU0AUCaLdk3AAKCRAQx3hnmuoU
+0L8BAQDtDlPAO5eWQohz9nkfzFAaukfk+pnykK66PjXGOwFVVgD/S/AfioSgOigf
+xJ2F83MFIORMluMWbcxizo3mVji3TQg=
+=FZRe
+-----END PGP SIGNATURE-----

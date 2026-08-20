@@ -1,0 +1,122 @@
+name: PHP Unit Tests
+
+# Only run this action when pushing to main or on pull requests (creation, synchronisation, and reopening).
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+# Cancel running jobs that have become stale through updates to the ref (e.g., pushes to a pull request).
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+    phpunit:
+        name: PHPUnit
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+
+        services:
+            mariadb:
+                image: mariadb:11.8
+                env:
+                    MARIADB_ROOT_PASSWORD: root
+                    MARIADB_DATABASE: gewis
+                    MARIADB_USER: gewis
+                    MARIADB_PASSWORD: gewis
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="healthcheck.sh --connect --innodb_initialized"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=10
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+                with:
+                    persist-credentials: false
+
+            -   name: Install PHP
+                uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: '8.5'
+                    extensions: 'amqp, apcu, gd, intl, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, redis'
+
+            -   name: Setup problem matchers for PHPUnit
+                run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+            -   name: Install dependencies with Composer
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+                with:
+                    composer-options: '--no-scripts'
+
+            -   name: Load environment variables
+                uses: c-py/action-dotenv-to-setenv@925b5d99a3f1e4bd7b4e9928be4e2491e29891d9 # v5
+                with:
+                    env-file: .env.test
+
+            -   name: Create the isolated test database
+                env:
+                    MYSQL_PWD: root
+                # The schema is built by SchemaTool in the test harness, so this only creates the empty `_test`
+                # database (the `when@test` doctrine config targets it) and grants the application user.
+                run: |
+                    mysql --host=127.0.0.1 --port=3306 --user=root \
+                      --execute="CREATE DATABASE IF NOT EXISTS \`gewis_test\` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci; GRANT ALL PRIVILEGES ON \`gewis_test\`.* TO 'gewis'@'%'; FLUSH PRIVILEGES;"
+
+            -   name: Prepare the test database (schema + fixtures)
+                env:
+                    APP_ENV: test
+                # The schema is built from the mapping metadata (no migrations); dama/doctrine-test-bundle then rolls
+                # back each test, so this seed is loaded once for the whole run.
+                run: |
+                    bin/console doctrine:schema:create
+                    bin/console doctrine:fixtures:load --no-interaction
+
+            -   name: Cache the built front-end assets
+                id: assets-cache
+                uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+                with:
+                    path: |
+                        var/sass
+                        var/typescript
+                        assets/vendor
+                        assets/fonts/fontawesome
+                        assets/sprites/fontawesome
+                        assets/js/bootstrap.bundle.min.js
+                    key: assets-${{ hashFiles('assets/**', '.swcrc', 'importmap.php', 'composer.lock') }}
+
+            -   name: Build the front-end assets
+                if: steps.assets-cache.outputs.cache-hit != 'true'
+                env:
+                    APP_ENV: test
+                    SWC_VERSION: v1.15.47
+                # The controller and frontpage tests render full pages, so base.html.twig and app.scss resolve the
+                # Font Awesome fonts/sprites and Bootstrap bundle (copied out of vendor/ by assets:update), the
+                # importmap's vendored JS such as the live-component CSS (importmap:install), and the sass/TypeScript
+                # compiled to var/sass and var/typescript. None of that is committed and composer ran with
+                # --no-scripts, so it is all built here.
+                run: |
+                    composer run-script assets:update
+                    bin/console importmap:install
+                    sudo curl -sSL -o /usr/local/bin/swc "https://github.com/swc-project/swc/releases/download/${SWC_VERSION}/swc-linux-x64-gnu"
+                    sudo chmod +x /usr/local/bin/swc
+                    bin/console sass:build
+                    bin/console typescript:build
+
+            -   name: Install poppler and the watermark font
+                # The course document pipeline shells out to `pdftoppm` and draws its watermark in DejaVu Sans Bold.
+                # Every other environment gets both from the image, but PHPUnit runs on the bare runner here.
+                run: |
+                    sudo apt-get update
+                    sudo apt-get install -y --no-install-recommends fonts-dejavu-core poppler-utils
+
+            -   name: Run PHPUnit
+                run: bin/phpunit

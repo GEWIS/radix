@@ -1,0 +1,79 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ revision.name|localise_text|page_title }}{{ 'Review'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>{{ diff_styles() }}</style>
+{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item active" aria-current="page">
+        <a href="{{ path('admin/activities/index') }}">{{ 'Activities'|trans }}</a>
+    </li>
+    {% if is_granted('ROLE_BOARD') %}
+        <li class="breadcrumb-item active" aria-current="page">
+            <a href="{{ path('admin/activities/approvals/index') }}">{{ 'Review'|trans }}</a>
+        </li>
+    {% endif %}
+    <li class="breadcrumb-item active" aria-current="page">
+        {{ revision.name|localise_text }}
+    </li>
+{% endblock %}
+
+{% block contents %}
+    {% embed 'partials/application/review-screen.html.twig' with {
+        'subjectName': revision.name|localise_text,
+        'revision': revision,
+        'previous': previous,
+        'sections': sections,
+        'comments': comments,
+        'decisionForm': decisionForm,
+        'canDiscard': canDiscard,
+        'showAuthor': true,
+        'firstRevisionNote': 'This is the first revision; nothing to compare against.'|trans,
+        'actionsHeading': 'Actions'|trans,
+        'decideAction': path('admin/activities/approvals/decide', {'revision': revision.getId}),
+        'commentAction': path('admin/activities/approvals/comment', {'revision': revision.getId}),
+        'commentToken': csrf_token('activity_review_comment-' ~ revision.getId),
+        'commentAudienceNote': 'Visible to the organisers and the board. Use it to ask a question or leave a note.'|trans,
+        'discardAction': path('admin/activities/approvals/discard', {'revision': revision.getId}),
+        'discardToken': csrf_token('activity_discard-' ~ revision.getId),
+        'discardBody': 'The changes in this draft will be lost and the activity will return to its live version.'|trans,
+        'signupListDiff': signupListDiff,
+        'activityPassed': activityPassed,
+        'debutMissed': debutMissed,
+        'migrationBlocked': migrationBlocked,
+    } only %}
+        {% block review_body %}
+            {% include 'partials/activity/signup-list-diff.html.twig' with {'signupListDiff': signupListDiff} only %}
+        {% endblock %}
+
+        {% block review_notices %}
+            {% if activityPassed %}
+                <div class="alert alert-warning small">
+                    {% if debutMissed %}
+                        {{ 'The start date of this activity has passed, so it can no longer be published. Move it to a future date before it can be submitted again.'|trans }}
+                    {% else %}
+                        {{ 'This activity has already taken place, so this revision can no longer be submitted or approved.'|trans }}
+                        {% if canDiscard %}
+                            {{ 'Discard this draft to return to the live version.'|trans }}
+                        {% else %}
+                            {{ 'Reject or close it to clear the queue.'|trans }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if migrationBlocked %}
+                <div class="alert alert-warning small">
+                    {{ 'A sign-up list with existing sign-ups was changed in this revision, so the live sign-ups cannot be carried over and it can no longer be submitted or approved.'|trans }}
+                    {% if canDiscard %}
+                        {{ 'Discard this draft to return to the live version, then revise it again without changing that list.'|trans }}
+                    {% else %}
+                        {{ 'Reject it or request changes so it can be revised again from the live version.'|trans }}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{# Render once per page, outside any live component, so a component re-render after the confirmed action can't orphan it. #}
+<div class="modal fade" id="confirm-modal" data-controller="confirm-modal" tabindex="-1"
+     aria-labelledby="confirm-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirm-modal-label" data-confirm-modal-target="title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0" data-confirm-modal-target="message"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                <button type="button" class="btn btn-gewis-primary" data-bs-dismiss="modal"
+                        data-confirm-modal-target="confirm">{{ 'Confirm'|trans }}</button>
+            </div>
+        </div>
+    </div>
+</div>

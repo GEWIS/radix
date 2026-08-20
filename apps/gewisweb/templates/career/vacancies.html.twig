@@ -1,0 +1,22 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ 'Vacancies'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{{ path('career/index') }}">{{ 'Career'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Vacancies'|trans }}</li>
+{% endblock %}
+
+{% block contents %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h2 class="mb-0">{{ 'Vacancies'|trans }}</h2>
+
+        <button type="button" class="btn btn-outline-secondary"
+                data-bs-toggle="collapse" data-bs-target="#vacancy-filters"
+                aria-expanded="false" aria-controls="vacancy-filters">
+            <span class="fas fa-sliders"></span> {{ 'Filters'|trans }}
+        </button>
+    </div>
+
+    {{ component('Career:VacancyOverview') }}
+{% endblock %}

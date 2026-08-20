@@ -1,0 +1,22 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ 'Vacancies'|trans|page_title }}{{ 'Career'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Career'|trans }}</li>
+{% endblock %}
+
+{% block contents %}
+    {% include 'partials/career/admin/overview-tabs.html.twig' with {
+        'active': 'vacancies',
+        'counts': counts,
+        'actionPath': path('admin/career/vacancies/create'),
+        'actionLabel': 'Add a vacancy'|trans,
+    } only %}
+
+    {% include 'partials/career/admin/review-queue-callout.html.twig' with {
+        'awaitingReview': awaitingReview,
+    } only %}
+
+    {{ component('Career:Admin:VacancyOverview') }}
+{% endblock %}

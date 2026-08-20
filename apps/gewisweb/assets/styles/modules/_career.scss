@@ -1,0 +1,68 @@
+// Career landing page
+//
+// The band at the top of the career overview and the three kinds of row underneath it: a vacancy, a company, and an
+// upcoming event. Rows rather than cards, because the page is a set of tastes of longer lists.
+
+.career-hero {
+    background-color: var(--#{$prefix}body-bg);
+    border-bottom: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
+    margin-bottom: map-get($spacers, 2);
+}
+
+.career-hero-search {
+    flex: 1 1 16rem;
+
+    .input-group-text {
+        background-color: transparent;
+        border-right: 0;
+        color: var(--#{$prefix}secondary-color);
+    }
+
+    .form-control {
+        border-left: 0;
+        padding-left: 0;
+    }
+}
+
+// The counts double as the way into each list, so they are links rather than figures.
+.career-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 0.875rem 1rem;
+    border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
+    border-radius: var(--#{$prefix}border-radius-lg);
+    color: var(--#{$prefix}body-color);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        border-color: #{$gewis-red};
+        color: var(--#{$prefix}body-color);
+        text-decoration: none;
+    }
+}
+
+.career-stat-value {
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.career-stat-label {
+    color: var(--#{$prefix}secondary-color);
+    font-size: $font-size-sm;
+}
+
+.career-company-name {
+    display: block;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.career-featured-kicker {
+    color: #{$gewis-red};
+}

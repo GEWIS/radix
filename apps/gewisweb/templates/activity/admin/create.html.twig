@@ -1,0 +1,28 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ 'Create Activity'|trans|page_title }}{{ 'Activities'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/ckeditor5/ckeditor5.css') }}">
+{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item active" aria-current="page">
+        <a href="{{ path('admin/activities/index') }}">
+            {{ 'Activities'|trans }}
+        </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+        {{ 'Create'|trans }}
+    </li>
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mb-3">{{ 'Create activity'|trans }}</h3>
+            {% include 'partials/activity/admin/form.html.twig' with {'form': form, 'submitLabel': 'Save draft'|trans} only %}
+        </div>
+    </div>
+{% endblock %}

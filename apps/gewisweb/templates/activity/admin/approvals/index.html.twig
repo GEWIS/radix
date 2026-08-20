@@ -1,0 +1,30 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ 'Review'|trans|page_title }}{{ 'Activities'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item active" aria-current="page">
+        <a href="{{ path('admin/activities/index') }}">
+            {{ 'Activities'|trans }}
+        </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+        {{ 'Review'|trans }}
+    </li>
+{% endblock %}
+
+{% block contents %}
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h3 class="mb-0">{{ 'Activities awaiting review'|trans }}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% include 'partials/application/review-queue.html.twig' with {
+                'heading': 'Activities'|trans,
+                'rows': rows,
+            } only %}
+        </div>
+    </div>
+{% endblock %}

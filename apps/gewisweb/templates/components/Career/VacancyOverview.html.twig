@@ -1,0 +1,100 @@
+<div {{ attributes }}>
+    {# data-live-ignore: keeps the injected label chips intact across re-renders. #}
+    <div class="collapse mb-3" id="vacancy-filters" data-live-ignore>
+        <div class="panel my-0">
+            <div class="panel-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label" for="vacancy-overview-search">{{ 'Search'|trans }}</label>
+                        <input type="search" class="form-control" id="vacancy-overview-search"
+                               placeholder="{{ 'Search by vacancy name'|trans }}"
+                               data-model="debounce(300)|search"
+                               value="{{ this.search }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="vacancy-overview-category">{{ 'Category'|trans }}</label>
+                        <select class="form-select" id="vacancy-overview-category" data-model="category">
+                            <option value="">{{ 'Any'|trans }}</option>
+                            {% for category in this.categories %}
+                                <option value="{{ category.value }}" {% if this.category == category.value %}selected{% endif %}>
+                                    {{ category.pluralLabel|trans }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="vacancy-overview-company">{{ 'Company'|trans }}</label>
+                        <select class="form-select" id="vacancy-overview-company" data-model="companyFilter">
+                            <option value="">{{ 'Any company'|trans }}</option>
+                            {% for company in this.companies %}
+                                <option value="{{ company.getSlugName }}" {% if this.companyFilter == company.getSlugName %}selected{% endif %}>
+                                    {{ company.getName }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if this.labels is not empty %}
+                        {# See ActivityOverview: the morph is kept out of the subtree Tom Select rewrites. #}
+                        <div class="col-12" data-live-ignore>
+                            <label class="form-label" for="vacancy-overview-labels">{{ 'Labels'|trans }}</label>
+                            <select class="form-select" id="vacancy-overview-labels" multiple
+                                    data-model="labelFilters"
+                                    data-controller="symfony--ux-autocomplete--autocomplete"
+                                    data-placeholder="{{ 'Search labels...'|trans }}">
+                                {% for label in this.labels %}
+                                    <option value="{{ label.id }}" {% if label.id in this.labelFilters %}selected{% endif %}>
+                                        {{ label.getName|localise_text }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% set highlightedIds = this.highlightedIds %}
+
+    {% if this.highlightedVacancies is not empty %}
+        <h3 class="h5 mb-3">
+            <span class="fas fa-star career-featured-kicker small" aria-hidden="true"></span>
+            {{ 'Highlighted'|trans }}
+        </h3>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mb-4">
+            {% for vacancy in this.highlightedVacancies %}
+                {% include 'partials/career/vacancy-card.html.twig' with {
+                    'vacancy': vacancy,
+                    'highlighted': true,
+                } only %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if this.vacancies is empty %}
+        <p class="text-muted text-center py-4">{{ 'No vacancies match the current filters.'|trans }}</p>
+    {% else %}
+        {% if this.highlightedVacancies is not empty %}
+            <h3 class="h5 mb-3">{{ 'All vacancies'|trans }}</h3>
+        {% endif %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+            {% for vacancy in this.vacancies %}
+                {% include 'partials/career/vacancy-card.html.twig' with {
+                    'vacancy': vacancy,
+                    'highlighted': vacancy.getId in highlightedIds,
+                } only %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if this.hasMore %}
+        <div data-controller="infinite-scroll" class="text-center py-3">
+            <button type="button" class="btn btn-outline-secondary"
+                    data-action="live#action" data-live-action-param="loadMore"
+                    data-infinite-scroll-target="button">
+                {{ 'Load more'|trans }}
+            </button>
+            <div data-infinite-scroll-target="sentinel" aria-hidden="true"></div>
+        </div>
+    {% endif %}
+</div>
