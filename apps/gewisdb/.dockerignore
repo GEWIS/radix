@@ -1,0 +1,38 @@
+*~
+*.cache
+*.kate-swp
+*.log
+.*.DS_Store
+.*.sw?
+._*
+.buildpath
+.editorconfig
+.git/
+.gitattributes
+.github/
+.gitignore
+.idea/
+.postgresql/
+.project
+.scannerwork/
+.settings
+.vs/
+.~lock.*
+Makefile
+composer.phar
+coverage/
+Dockerfile
+compose*.yaml
+nbproject
+node_modules/
+tests/
+var/
+vendor/
+
+# `.env` is deliberately *not* ignored: `composer dump-env prod` reads it during the build and fails without it. What
+# is ignored is everything that layers a local value over it, because those hold the secrets `make setuplocalenv`
+# writes and `dump-env` would bake them into the image.
+.env.*.local
+.env.local
+.env.local.php
+.env.test
