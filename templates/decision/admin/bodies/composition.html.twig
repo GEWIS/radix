@@ -1,0 +1,45 @@
+{#
+    Who is installed in a body, as the ledger records it.
+
+    The register's half of the body page. It used to be a page of its own behind /database while the body's own
+    description was written here; they are the same body, so they are one page now, and this is the part of it that
+    is only rendered for a reader who administers the register.
+#}
+<div class="panel">
+    <div class="panel-heading"><h3>{{ 'Members'|trans }}</h3></div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'Name'|trans }}</th>
+                        <th scope="col">{{ 'Function'|trans }}</th>
+                        <th scope="col">{{ 'Installed by'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reference in installations %}
+                        <tr>
+                            <td>
+                                <a class="fw-semibold text-body text-decoration-none"
+                                   href="{{ path('member_show', {lidnr: reference.member.lidnr}) }}">
+                                    {{ reference.member.fullName }}
+                                </a>
+                            </td>
+                            <td>{{ reference.function.getName|trans }}</td>
+                            <td class="font-monospace">
+                                {{ reference.meetingType.value }} {{ reference.meetingNumber }}.{{ reference.decisionPoint }}.{{ reference.decisionNumber }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">
+                                <span class="text-secondary">{{ 'Nobody is installed in this body.'|trans }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

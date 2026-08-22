@@ -1,0 +1,66 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> app/local ###
+# Per-developer editor state, the scratch files desktop environments leave behind, and local coverage runs.
+._*
+.*.sw?
+*~
+*.kate-swp
+*.DS_Store
+.~lock.*
+.buildpath
+.project
+.settings
+/.idea/
+/.vs/
+/.vscode/
+/nbproject/
+/coverage/
+###< app/local ###
+
+###> app/storage ###
+# Stored uploads and the regenerable image-variant cache (the flysystem storage root); see config/packages/flysystem.yaml.
+/data/
+###< app/storage ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> app/phpstan ###
+# `make phpstan-pr` writes a baseline generated against main into the repository root and leaves it there, so the
+# branch it was meant to help analyse would otherwise show it as a new file.
+/phpstan-baseline-pr.neon
+###< app/phpstan ###
+
+###> symfonycasts/sass-bundle ###
+/public/assets/
+###< symfonycasts/sass-bundle ###
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###

@@ -1,0 +1,114 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Entity\Frontpage;
+
+use App\Entity\Application\LocalisedText as LocalisedTextModel;
+use App\Entity\Decision\Member as MemberModel;
+use App\Repository\Frontpage\PollVoteRepository;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\UniqueConstraint;
+
+/**
+ * Poll response
+ * Represents a vote on a poll option.
+ *
+ * @phpstan-import-type LocalisedTextGdprArrayType from LocalisedTextModel as ImportedLocalisedTextGdprArrayType
+ * @phpstan-type PollVoteGdprArrayType = array{
+ *     poll_id: ?int,
+ *     option: ImportedLocalisedTextGdprArrayType,
+ * }
+ */
+#[Entity(repositoryClass: PollVoteRepository::class)]
+#[UniqueConstraint(
+    name: 'vote_idx',
+    columns: [
+        'poll_id',
+        'user_id',
+    ],
+)]
+class PollVote
+{
+    /**
+     * The poll which was voted on.
+     */
+    #[ManyToOne(targetEntity: Poll::class)]
+    #[JoinColumn(
+        name: 'poll_id',
+        referencedColumnName: 'id',
+        nullable: false,
+    )]
+    private Poll $poll;
+
+    /**
+     * The option which was chosen.
+     */
+    #[Id]
+    #[ManyToOne(
+        targetEntity: PollOption::class,
+        inversedBy: 'votes',
+    )]
+    #[JoinColumn(
+        name: 'option_id',
+        referencedColumnName: 'id',
+    )]
+    private PollOption $pollOption;
+
+    /**
+     * The member who submitted this vote. It identifies the row, so there is nothing to null out: a vote that can no
+     * longer be attributed is removed the way {@see \App\Command\Frontpage\AnonymisePollVotesCommand} removes one,
+     * except that the tally is not rolled into {@see PollOption::$anonymousVotes} first — a member who is taken out
+     * of the register is taken out of the counts with it.
+     */
+    #[Id]
+    #[ManyToOne(
+        targetEntity: MemberModel::class,
+        cascade: ['persist'],
+    )]
+    #[JoinColumn(
+        name: 'user_id',
+        referencedColumnName: 'lidnr',
+        onDelete: 'CASCADE',
+    )]
+    private MemberModel $respondent;
+
+    public function getPoll(): Poll
+    {
+        return $this->poll;
+    }
+
+    public function getPollOption(): PollOption
+    {
+        return $this->pollOption;
+    }
+
+    public function setPoll(Poll $poll): void
+    {
+        $this->poll = $poll;
+    }
+
+    public function setPollOption(PollOption $pollOption): void
+    {
+        $this->pollOption = $pollOption;
+    }
+
+    public function setRespondent(MemberModel $respondent): void
+    {
+        $this->respondent = $respondent;
+    }
+
+    /**
+     * @return PollVoteGdprArrayType
+     */
+    public function toGdprArray(): array
+    {
+        return [
+            'poll_id' => $this->getPoll()->getId(),
+            'option' => $this->getPollOption()->getText()->toGdprArray(),
+        ];
+    }
+}

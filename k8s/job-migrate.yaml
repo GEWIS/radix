@@ -1,0 +1,41 @@
+# Migrations, once per release, before the rollout. Under compose the `app` container does this on start because there
+# is one of it; here there are several replicas and they must not race, so they set SKIP_MIGRATIONS and this Job owns
+# it instead.
+#
+# The name has to change with every release or Kubernetes considers the Job already done — kustomization.yaml's
+# `images.newTag` is the thing to bump, and this Job's name carries it. Run it and wait for completion before applying
+# the Deployments; an Argo CD `PreSync` hook or a Helm `pre-upgrade` hook is where that ordering usually lives.
+apiVersion: batch/v1
+kind: Job
+metadata:
+    name: radix-migrate
+    annotations:
+        argocd.argoproj.io/hook: PreSync
+        argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+    backoffLimit: 1
+    # Kept around briefly so the logs of a failed migration can still be read.
+    ttlSecondsAfterFinished: 3600
+    template:
+        spec:
+            restartPolicy: Never
+            containers:
+                - name: migrate
+                  image: abc.docker-registry.gewis.nl/web/radix/app:latest
+                  # `--all-or-nothing` wraps each set in one transaction, so a release either migrates or does not.
+                  # One set per database, each naming its own connection in its configuration.
+                  command:
+                      - sh
+                      - -c
+                      - |
+                          set -e
+                          php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing \
+                            --configuration=config/packages/migrations/default.yaml
+                          php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing \
+                            --configuration=config/packages/migrations/web.yaml
+                  envFrom:
+                      - configMapRef: { name: radix-config }
+                      - secretRef: { name: radix-secrets }
+                  resources:
+                      requests: { cpu: 100m, memory: 256Mi }
+                      limits: { memory: 1Gi }

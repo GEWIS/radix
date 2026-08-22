@@ -1,0 +1,122 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Entity\Decision\SubDecision\Key;
+
+use App\Doctrine\Query\Queryable;
+use App\Entity\Decision\Keyholder;
+use App\Entity\Decision\Member;
+use App\Entity\Decision\SubDecision;
+use App\Entity\Decision\Traits\MemberAwareTrait;
+use App\Repository\Decision\SubDecision\Key\GrantingRepository;
+use DateTime;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\OneToOne;
+
+use function assert;
+
+#[Entity(repositoryClass: GrantingRepository::class)]
+#[Queryable]
+class Granting extends SubDecision
+{
+    use MemberAwareTrait;
+
+    /**
+     * Till when the keycode is granted.
+     */
+    #[Column(type: Types::DATE_MUTABLE)]
+    private DateTime $until;
+
+    /**
+     * Discharges.
+     */
+    #[OneToOne(
+        targetEntity: Withdrawal::class,
+        mappedBy: 'granting',
+    )]
+    private ?Withdrawal $withdrawal = null;
+
+    /**
+     * Keyholder reference.
+     */
+    #[OneToOne(
+        targetEntity: Keyholder::class,
+        mappedBy: 'grantingDec',
+    )]
+    private Keyholder $keyholder;
+
+    /**
+     * Get the member.
+     */
+    public function getMember(): Member
+    {
+        // The trait keeps the association nullable for mapping reasons; this sub-decision always names a member.
+        assert(null !== $this->member);
+
+        return $this->member;
+    }
+
+    /**
+     * Get the date.
+     */
+    public function getUntil(): DateTime
+    {
+        return $this->until;
+    }
+
+    /**
+     * Set the date.
+     */
+    public function setUntil(DateTime $until): void
+    {
+        $this->until = $until;
+    }
+
+    /**
+     * Get the withdrawal decision.
+     */
+    public function getWithdrawal(): ?Withdrawal
+    {
+        return $this->withdrawal;
+    }
+
+    /**
+     * Clears the withdrawal, if it exists.
+     */
+    public function clearWithdrawal(): void
+    {
+        $this->withdrawal = null;
+    }
+
+    /**
+     * Get the keyholder decision.
+     */
+    public function getKeyholder(): Keyholder
+    {
+        return $this->keyholder;
+    }
+
+    /**
+     * Set the keyholder decision.
+     *
+     * Kept in step with the owning side, so that a keyholder only just derived from this granting can be found right
+     * away, without having to go through the database for it.
+     */
+    public function setKeyholder(Keyholder $keyholder): void
+    {
+        $this->keyholder = $keyholder;
+    }
+
+    /**
+     * Forget what was derived from this subdecision, because it no longer exists.
+     *
+     * Leaves the property uninitialised again, which is how the rest of the code recognises that there is nothing.
+     */
+    public function clearKeyholder(): void
+    {
+        unset($this->keyholder);
+    }
+}

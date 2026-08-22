@@ -1,0 +1,5 @@
+# The bundle holds a single flat set, which cannot describe two histories against two platforms, so it names neither.
+# Both live in config/packages/migrations/ and every command names one; without --configuration a command finds no
+# migrations rather than the wrong ones. What is left here belongs to the bundle rather than to a set.
+doctrine_migrations:
+    enable_profiler: false

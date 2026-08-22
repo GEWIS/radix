@@ -1,0 +1,106 @@
+{#
+    The settings menu: a gear in the navbar opening onto segmented controls for the language, the theme and — for a
+    member — the festive cosmetics. Choosing a language navigates away, but a theme or the cosmetics switch should not
+    close the panel from under the reader who is still looking at it, which is what `data-bs-auto-close="outside"` is
+    for.
+
+    A page carries its language in its address, so switching is a matter of rewriting the URL: the current route
+    generated again with the other locale. The exceptions are the renewal form and the pages a payment returns to,
+    which answer where the link that was sent points and have no room for a language; there the choice is remembered
+    on the session.
+#}
+{# The register signs its own accounts in, on their own firewall, so `app.user` on a register page is neither a member
+   nor a company user and answers to none of their accessors. The type is asked for rather than assumed. #}
+{% set user_type = null !== app.user and app.user.getUserType is defined ? app.user.getUserType : null %}
+<li class="nav-item dropdown">
+    <button class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+            role="button" aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Settings'|trans }}"
+    >
+        <span class="fas fa-gear"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+            <h6 class="dropdown-header">{{ 'Language'|trans }}</h6>
+        </li>
+        <li>
+            <div class="nav-menu-segmented">
+                {% for locale in supported_locales %}
+                    {% set is_disabled = locale === app.request.locale %}
+                    {% if null !== app.current_route and app.current_route_parameters._locale is defined %}
+                        {# Use route-based localisation when available. #}
+                        {% set altlang_url = page is not defined ? path(app.current_route, app.current_route_parameters|merge({_locale: locale})) : localised_page_path(page, locale) %}
+                    {% elseif app.current_route_parameters._locale is not defined and null !== app.current_route %}
+                        {# An address with no room for a language: the renewal form and the pages a payment returns
+                           to answer where the link that was sent points, which is one address in either language. The
+                           choice is remembered on the session instead, which is what `application_lang` is for. #}
+                        {% set altlang_url = path('application_lang', {lang: locale}) %}
+                    {% else %}
+                        {# An error state: there is no route to rebuild from, so construct the URL by hand. #}
+                        {% set current_path = app.request.pathinfo %}
+                        {% if current_path starts with '/' ~ app.request.locale ~ '/' %}
+                            {% set stripped_path = current_path|slice((app.request.locale|length + 1)) %}
+                        {% else %}
+                            {% set stripped_path = current_path %}
+                        {% endif %}
+
+                        {% set altlang_url = '/' ~ locale ~ stripped_path %}
+                    {% endif %}
+                    <a lang="{{ locale }}" hreflang="{{ locale }}" translate="no"
+                       class="btn {{ is_disabled ? 'active' : '' }}" href="{{ altlang_url }}">
+                        <span class="flag-icon flag-icon-{{ locale }}"></span>{{ locale|locale_name(locale) }}
+                    </a>
+                {% endfor %}
+            </div>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <h6 class="dropdown-header">{{ 'Theme'|trans }}</h6>
+        </li>
+        <li>
+            <div class="nav-menu-segmented">
+                <button type="button" class="btn" data-bs-theme-value="gewis-day" aria-pressed="false">
+                    <span class="fas fa-sun" aria-hidden="true"></span>
+                    {{ 'Light'|trans }}
+                </button>
+                <button type="button" class="btn" data-bs-theme-value="gewis-night" aria-pressed="false">
+                    <span class="fas fa-moon" aria-hidden="true"></span>
+                    {{ 'Dark'|trans }}
+                </button>
+                <button type="button" class="btn" data-bs-theme-value="auto" aria-pressed="false">
+                    <span class="fas fa-star-half-stroke" aria-hidden="true"></span>
+                    {{ 'Auto'|trans }}
+                </button>
+            </div>
+        </li>
+        {% if enum('App\\Entity\\User\\Enums\\UserTypes').User == user_type %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <h6 class="dropdown-header">{{ 'Cosmetics'|trans }}</h6>
+            </li>
+            <li>
+                {# Outer wrapper keeps the standard dropdown-item padding so the switch lines up with
+                   the Language/Theme items; the inner flex row (with the form-check float/indent reset)
+                   vertically centres the switch against its label. #}
+                <div class="dropdown-item-text"
+                     data-controller="cosmetics-toggle"
+                     data-cosmetics-toggle-url-value="{{ path('user_settings_cosmetics') }}"
+                     data-cosmetics-toggle-csrf-value="{{ csrf_token('cosmetics') }}"
+                >
+                    <div class="form-check form-switch d-flex align-items-center m-0 ps-0">
+                        <input class="form-check-input m-0 me-2" type="checkbox" role="switch"
+                               id="cosmetics-switch" data-cosmetics-toggle-target="input"
+                               data-action="cosmetics-toggle#toggle"
+                               {{ app.user.hasDisabledCosmetics ? '' : 'checked' }}
+                        >
+                        <label class="form-check-label" for="cosmetics-switch">
+                            {{ 'Festive effects'|trans }}
+                            <span class="d-block nav-menu-identity-meta">
+                                {{ 'Balloons and seasonal themes'|trans }}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+        {% endif %}
+    </ul>
+</li>

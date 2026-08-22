@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    #
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: 'argon2id'
+            # Approximately 200ms on GEWIS hardware and close to second recommended option from RFC 9106
+            # NOTE: Symfony does not allow setting number of threads
+            memory_cost: 98304
+            time_cost: 3
+            migrate_from:
+                - bcrypt
+
+    providers:
+        # Both accounts are mapped on `web`, and the declarative provider asks the registry for the manager it is
+        # named rather than for the one that maps the class. Left unnamed it would reach for the default manager,
+        # which is the ledger, and every lookup would fail on a class it does not map.
+        user_provider:
+            entity:
+                class: App\Entity\User\User
+                manager_name: web
+        company_user_provider:
+            entity:
+                class: App\Entity\User\CompanyUser
+                manager_name: web
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Stripe posts the checkout webhook server-to-server: no session, no cookie and no token, authenticated
+        # instead by its signature against STRIPE_WEBHOOK_SIGNING_KEY. It stays outside every secured firewall so
+        # neither the access rules nor the login form can intercept it. Both spellings are live and configured in
+        # Stripe's dashboard, so both have to be excluded.
+        checkout_webhook:
+            pattern: ^/(member/subscribe/)?checkout/webhook
+            security: false
+
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: user_provider
+            # The bearer-token authenticator resolves an ApiPrincipal itself and doubles as the entry point, so the
+            # provider above is never consulted on this firewall.
+            custom_authenticators:
+                - App\Security\Api\ApiTokenAuthenticator
+
+        company:
+            pattern: '^/(%app.locales%)/company'
+            lazy: true
+            login_throttling: true
+            user_checker: App\Security\User\UserChecker
+            provider: company_user_provider
+            form_login:
+                login_path: company_user_login
+                check_path: company_user_login
+                enable_csrf: true
+            remember_me:
+                always_remember_me: true
+                service: app.security.remember_me.company
+                name: GWS_COMPANY_REMEMBERME
+            two_factor:
+                auth_form_path: company_user_mfa_challenge
+                check_path: company_user_mfa_challenge_check
+                enable_csrf: true
+            logout:
+                path: company_user_logout
+                target: frontpage/index
+        main:
+            pattern: ^/
+            lazy: true
+            provider: user_provider
+            login_throttling: true
+            user_checker: App\Security\User\UserChecker
+            form_login:
+                login_path: user_login
+                check_path: user_login
+                enable_csrf: true
+            remember_me:
+                always_remember_me: true
+                service: app.security.remember_me.main
+                name: GWS_USER_REMEMBERME
+            two_factor:
+                auth_form_path: user_mfa_challenge
+                check_path: user_mfa_challenge_check
+                enable_csrf: true
+            logout:
+                path: user_logout
+                target: frontpage/index
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            switch_user: { role: ROLE_ADMIN, parameter: _impersonate }
+
+    role_hierarchy:
+        ROLE_GUEST: [ 'PUBLIC_ACCESS' ]
+        ROLE_TUE_GUEST: [ 'ROLE_GUEST' ]
+        ROLE_USER: [ ]
+        ROLE_COMPANY_USER: [ ]
+        ROLE_API_USER: [ ]
+        ROLE_MEMBER: [ 'ROLE_USER' ]
+        ROLE_GRADUATE: [ 'ROLE_USER' ]
+        ROLE_ACTIVE_MEMBER: [ 'ROLE_MEMBER' ]
+        ROLE_COMPANY_ADMIN: [ 'ROLE_ACTIVE_MEMBER' ]
+        ROLE_BOARD: [ 'ROLE_ACTIVE_MEMBER', 'ROLE_COMPANY_ADMIN' ] # The board is always considered an active member
+        ROLE_ADMIN: [ 'ROLE_BOARD' ]
+        # The register reads with one role and is changed with the other, so the one that may change it inherits the
+        # one that may read it. A page that only shows something therefore asks for the read-only role and lets both
+        # through, and only the paths that write ask for the administrator by name.
+        ROLE_DATABASE_READ_ONLY: [ ]
+        ROLE_DATABASE_ADMIN: [ 'ROLE_DATABASE_READ_ONLY' ]
+
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/logout, role: PUBLIC_ACCESS }
+        - { path: ^/user/mfa/challenge, role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        - { path: '^/(%app.locales%)/company/mfa/challenge', role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        # The register's own subtrees, which no other part of the administration reaches into. Anything that changes
+        # something needs the administrator; everything else needs no more than the reader, which the administrator
+        # inherits. Matching on the method rather than on the path is what keeps a write that forgets to say so from
+        # being reachable by somebody who may only read. Before the rule below, which would otherwise answer first for
+        # a reader who administers the register and nothing else.
+        - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', methods: [POST, PUT, PATCH, DELETE], roles: [ROLE_DATABASE_ADMIN] }
+        - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', roles: [ROLE_DATABASE_READ_ONLY] }
+        # Bearer tokens that read the register over the API. Credentials rather than a page about them, so reading the
+        # list asks for the administrator as much as changing it does.
+        - { path: '^/(%app.locales%)/admin/users/api-principals', roles: [ROLE_DATABASE_ADMIN] }
+        # The rest of the administration. The register's roles are named here as well because the meeting and body
+        # pages are shared with the board: this rule lets a register reader as far as the door, and the controllers
+        # behind it decide what they are shown.
+        - { path: '^/(%app.locales%)/admin', roles: [ROLE_ACTIVE_MEMBER, ROLE_BOARD, ROLE_ADMIN, ROLE_DATABASE_READ_ONLY] }
+        # Everything a representative needs before they have a session, which the rule below would otherwise send them
+        # to the login page for, which is itself one of these paths.
+        - { path: '^/(%app.locales%)/company/(login|logout|forgot-password|reset-password|invite)', role: PUBLIC_ACCESS }
+        - { path: '^/(%app.locales%)/company', roles: [ROLE_COMPANY_USER] }
+        # - { path: ^/profile, roles: ROLE_USER }
+
+        # The API, its own documentation included, is read with a bearer token and nothing else. The endpoints carry
+        # their own permission checks on top of this; the rule is what keeps an endpoint that forgot one from
+        # answering an anonymous request.
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+        # The register's public flows: a visitor to them is nobody yet.
+        - { path: ^/lang, roles: PUBLIC_ACCESS }
+        - { path: ^/join, roles: PUBLIC_ACCESS }
+        - { path: '^/(%app.locales%)/join', roles: PUBLIC_ACCESS }
+        - { path: ^/member/subscribe, roles: PUBLIC_ACCESS }
+        - { path: ^/checkout, roles: PUBLIC_ACCESS }
+        - { path: ^/member/renew, roles: PUBLIC_ACCESS }
+        - { path: ^/renew, roles: PUBLIC_ACCESS }
+
+
+when@dev:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: 'argon2id'
+                memory_cost: 10
+                time_cost: 3
+
+when@test:
+    security:
+        password_hashers:
+            # Secure hashing wastes time in tests, so use the lowest work factor sodium's argon2id allows. Pin argon2id
+            # explicitly, at the same cost as dev and the fixture, so a seeded user's hash is already "current" and
+            # logging in triggers no needless rehash UPDATE; `auto` would resolve to bcrypt, which mismatches the
+            # seeded (argon2id) fixture hash and forces a rehash on every login.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: argon2id
+                memory_cost: 10
+                time_cost: 3

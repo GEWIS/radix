@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+# Enable stateless CSRF protection for forms and logins/logouts
+framework:
+    form:
+        csrf_protection:
+            enabled: true
+            field_name: '_csrf_token'
+            token_id: submit
+
+    csrf_protection:
+        stateless_token_ids:
+            - submit
+            - authenticate
+            - logout
+
+# `/member/subscribe/checkout/webhook` must stay outside CSRF protection and outside any form-login firewall. It is
+# an unauthenticated server-to-server POST from Stripe carrying no session, cookie or token, authenticated instead by
+# the signature check against STRIPE_WEBHOOK_SIGNING_KEY. Protecting it stops payments being recorded, silently.

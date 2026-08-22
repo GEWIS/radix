@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Which proxies are trusted comes from SYMFONY_TRUSTED_PROXIES (see compose.yaml); this is what they
+    # are allowed to tell us. The host and the port matter as much as the protocol: an absolute URL the application
+    # builds -- in mail, in a redirect -- has to name what the visitor typed rather than what the proxy used, and
+    # behind the proxy that only survives in X-Forwarded-Host.
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
+
+    php_errors:
+        log: true
+
+    # Let BinaryFileResponse offload private/large file serving to Caddy: when Caddy injects the X-Sendfile-Type request
+    # header, Symfony emits the matching X-Accel-Redirect instead of streaming the bytes through PHP. Without the header
+    # (dev without the intercept, tests) it degrades to a normal streamed file.
+    trust_x_sendfile_type_header: true
+
+    # The session is started ONLY when it is read from or written to.
+    session:
+        enabled: true
+        cookie_samesite: strict
+        name: GWS_SESSION
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+
+    http_client:
+        scoped_clients:
+            supremum.client:
+                base_uri: '%env(SUPREMUM_API_HOST)%'
+                headers:
+                    X-Api-Key: '%env(SUPREMUM_API_KEY)%'
+                timeout: 2
+                max_duration: 4
+            # The association agenda the option calendar draws behind the days bodies ask for. Only the sync command
+            # ever calls it, never a page render, so the timeouts are for a cron rather than for somebody waiting.
+            google_calendar.client:
+                base_uri: 'https://www.googleapis.com/calendar/v3/'
+                query:
+                    key: '%env(DOCKER_GOOGLE_API_KEY)%'
+                timeout: 5
+                max_duration: 15
+
+when@test:
+    framework:
+        test: true
+        # PHP's own session handler cannot start a session in a process that has already produced output, which is
+        # every console-run test. The mock storage keeps the session in a file of its own instead.
+        session:
+            storage_factory_id: session.storage.factory.mock_file

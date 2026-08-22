@@ -1,0 +1,315 @@
+{#
+    The rows of the administration sidebar, rendered into `layout-admin.html.twig`, which every page under /admin
+    extends -- the register's pages among them, since the register no longer has a section of its own.
+
+    Grouped by subject rather than by which of the two applications a page came from: a body is one thing whether you
+    are editing its description or reading its composition out of the ledger, so it gets one row whose children are
+    gated individually. A group renders nothing at all when the reader may reach none of its rows.
+
+    Which row is highlighted is decided by route name, matched on its prefix so that a detail page keeps its section
+    lit rather than leaving the reader without a place in the tree. The admin routes carry a locale suffix
+    (`admin/meetings/index.en`), which is why they are matched with `starts with` too rather than compared.
+#}
+{% import 'partials/application/sidebar.html.twig' as sidebar %}
+
+{% set route = app.current_route ?? '' %}
+
+{# The sidebar says which hat the reader is wearing, since what it offers below depends on it. #}
+{% if null == app.user %}
+    {% set role = 'Not signed in'|trans %}
+{% elseif is_granted('ROLE_ADMIN') %}
+    {% set role = 'Administrator'|trans %}
+{% elseif is_granted('ROLE_DATABASE_ADMIN') %}
+    {% set role = 'Database administrator'|trans %}
+{% elseif is_granted('ROLE_BOARD') %}
+    {% set role = 'Board member'|trans %}
+{% elseif is_granted('ROLE_DATABASE_READ_ONLY') %}
+    {% set role = 'Database reader'|trans %}
+{% elseif is_granted('ROLE_COMPANY_ADMIN') %}
+    {% set role = 'Company administrator'|trans %}
+{% else %}
+    {% set role = 'Active member'|trans %}
+{% endif %}
+{{ sidebar.context('A', 'Administration'|trans, role) }}
+
+{% if null == app.user %}
+    <ul class="sidebar-list">
+        {{ sidebar.link(path('user_login'), 'fa-right-to-bracket', 'Login'|trans, false) }}
+    </ul>
+{% elseif enum('App\\Entity\\User\\Enums\\UserTypes').User == app.user.getUserType %}
+    <ul class="sidebar-list">
+        {{ sidebar.link(path('admin/index'), 'fa-gauge', 'Dashboard'|trans, route starts with 'admin/index') }}
+    </ul>
+
+    {% set register = is_granted('ROLE_DATABASE_READ_ONLY') %}
+
+    {% if register or is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD') %}
+        <div>
+            {{ sidebar.group('Association'|trans) }}
+            <ul class="sidebar-list">
+                {% if register %}
+                    {{ sidebar.section('members', 'fa-user-group', 'Members'|trans,
+                        route starts with 'member_' or route starts with 'join_prospective_member'
+                        or route starts with 'mailing_', [
+                        {
+                            'href': path('member_index'),
+                            'label': 'Overview'|trans,
+                            'active': route starts with 'member_' and not (
+                                route starts with 'member_attention' or route starts with 'member_update'
+                                or route starts with 'member_bulk_renewal'
+                            ),
+                        },
+                        {
+                            'href': path('member_attention_index'),
+                            'label': 'Attention needed'|trans,
+                            'active': route starts with 'member_attention',
+                        },
+                        {
+                            'href': path('member_update_index'),
+                            'label': 'Pending updates'|trans,
+                            'active': route starts with 'member_update',
+                            'count': member_updates_pending(),
+                        },
+                        {
+                            'href': path('join_prospective_member_index'),
+                            'label': 'Prospective members'|trans,
+                            'active': route starts with 'join_prospective_member',
+                            'count': prospective_awaiting_approval(),
+                        },
+                        {
+                            'href': path('member_bulk_renewal_index'),
+                            'label': 'Bulk renewal'|trans,
+                            'active': route starts with 'member_bulk_renewal',
+                        },
+                        {
+                            'href': path('mailing_list_index'),
+                            'label': 'Mailing lists'|trans,
+                            'active': route starts with 'mailing_',
+                        },
+                    ]) }}
+                {% endif %}
+
+                {# The board reads a meeting; the serving secretary keeps it, and holds a board seat for as long as
+                   they do. A secretary who has been relieved keeps reading the register but has no business here. #}
+                {% if is_granted('ROLE_BOARD') %}
+                    {% set meetingAuthorizations = route starts with 'admin/meetings/authorizations' %}
+                    {% set meetingReference = route starts with 'admin/meetings/reference' %}
+                    {{ sidebar.section('meetings', 'fa-gavel', 'Meetings'|trans,
+                        route starts with 'admin/meetings' or route starts with 'decision_export', [
+                        {
+                            'href': path('admin/meetings/index'),
+                            'label': 'Overview'|trans,
+                            'active': route starts with 'admin/meetings'
+                                and not meetingAuthorizations and not meetingReference,
+                        },
+                        {
+                            'href': path('admin/meetings/authorizations'),
+                            'label': 'Authorizations'|trans,
+                            'active': meetingAuthorizations,
+                        },
+                        {
+                            'href': path('admin/meetings/reference/index'),
+                            'label': 'Reference documents'|trans,
+                            'active': meetingReference,
+                        },
+                        {
+                            'href': path('decision_export_index'),
+                            'label': 'Export'|trans,
+                            'active': route starts with 'decision_export',
+                        },
+                    ]) }}
+                {% endif %}
+
+                {{ sidebar.section('bodies', 'fa-sitemap', 'Bodies'|trans,
+                    route starts with 'admin/bodies' or route starts with 'decision_organ', [
+                    {
+                        'href': path('admin/bodies/index'),
+                        'label': 'Overview'|trans,
+                        'active': (route starts with 'admin/bodies' or route starts with 'decision_organ_')
+                            and not (route starts with 'admin/bodies/approvals')
+                            and 'decision_organ_functions' != route,
+                    },
+                    is_granted('ROLE_BOARD') ? {
+                        'href': path('admin/bodies/approvals/index'),
+                        'label': 'Approvals'|trans,
+                        'active': route starts with 'admin/bodies/approvals',
+                    } : null,
+                    register ? {
+                        'href': path('decision_organ_functions'),
+                        'label': 'Functions'|trans,
+                        'active': 'decision_organ_functions' == route,
+                    } : null,
+                ]|filter(child => child is not null)) }}
+
+                {% if register %}
+                    {{ sidebar.link(path('query_index'), 'fa-terminal', 'Query'|trans, route starts with 'query_') }}
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD') or is_granted('ROLE_COMPANY_ADMIN') %}
+        <div>
+            {{ sidebar.group('Content'|trans) }}
+            <ul class="sidebar-list">
+                {% if is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD') %}
+                    {# The board's option rounds, decisions and exceptions hang off the calendar page itself rather
+                       than getting an entry each: they are all one job, and four entries for one feature crowd out
+                       the module. #}
+                    {{ sidebar.section('activities', 'fa-calendar-days', 'Activities'|trans, is_module_active(['activity']), [
+                        {
+                            'href': path('admin/activities/index'),
+                            'label': 'Overview'|trans,
+                            'active': is_module_active(['activity', 'admin']),
+                        },
+                        is_granted('ROLE_BOARD') ? {
+                            'href': path('admin/activities/approvals/index'),
+                            'label': 'Approvals'|trans,
+                            'active': is_module_active(['activity', 'adminapproval']),
+                        } : null,
+                        is_granted('ROLE_BOARD') ? {
+                            'href': path('admin/activities/labels/index'),
+                            'label': 'Labels'|trans,
+                            'active': is_module_active(['activity', 'adminactivitylabel']),
+                        } : null,
+                        {
+                            'href': path('admin/activities/calendar/index'),
+                            'label': 'Option Calendar'|trans,
+                            'active': is_module_active(['activity', 'adminactivitycalendar'])
+                                or is_module_active(['activity', 'adminproposaldecision'])
+                                or is_module_active(['activity', 'adminoptionperiod'])
+                                or is_module_active(['activity', 'adminproposallimit']),
+                        },
+                    ]|filter(child => child is not null)) }}
+                {% endif %}
+
+                {% if is_granted('ROLE_COMPANY_ADMIN') or is_granted('ROLE_BOARD') %}
+                    {{ sidebar.section('career', 'fa-briefcase', 'Career'|trans, is_module_active(['career']), [
+                        {
+                            'href': path('admin/career/index'),
+                            'label': 'Overview'|trans,
+                            'active': is_module_active(['career', 'admin'])
+                                or is_module_active(['career', 'adminpackage'])
+                                or is_module_active(['career', 'adminvacancy'])
+                                or is_module_active(['career', 'adminrepresentative']),
+                        },
+                        {
+                            'href': path('admin/career/approvals/index'),
+                            'label': 'Approvals'|trans,
+                            'active': is_module_active(['career', 'adminapproval']),
+                        },
+                        {
+                            'href': path('admin/career/vacancies/labels/index'),
+                            'label': 'Labels'|trans,
+                            'active': is_module_active(['career', 'adminvacancylabel']),
+                        },
+                    ]) }}
+                {% endif %}
+
+                {% if is_granted('ROLE_BOARD') %}
+                    {{ sidebar.section('education', 'fa-graduation-cap', 'Education'|trans, is_module_active(['education']), [
+                        {
+                            'href': path('admin/education/index'),
+                            'label': 'Courses'|trans,
+                            'active': is_module_active(['education', 'admin']),
+                        },
+                        {
+                            'href': path('admin/education/documents/upload'),
+                            'label': 'Upload documents'|trans,
+                            'active': is_module_active(['education', 'adminupload']),
+                        },
+                    ]) }}
+
+                    {{ sidebar.section('frontpage', 'fa-house', 'Frontpage'|trans, is_module_active(['frontpage']), [
+                        {
+                            'href': path('admin/frontpage/news/index'),
+                            'label': 'News'|trans,
+                            'active': is_module_active(['frontpage', 'adminnews']),
+                        },
+                        {
+                            'href': path('admin/frontpage/polls/index'),
+                            'label': 'Polls'|trans,
+                            'active': is_module_active(['frontpage', 'adminpoll']),
+                        },
+                        {
+                            'href': path('admin/frontpage/polls/approvals/index'),
+                            'label': 'Poll approvals'|trans,
+                            'active': is_module_active(['frontpage', 'adminpollapproval']),
+                        },
+                        {
+                            'href': path('admin/frontpage/pages/index'),
+                            'label': 'Pages'|trans,
+                            'active': is_module_active(['frontpage', 'adminpage']),
+                        },
+                    ]) }}
+
+                    {% set photoWeekly = is_module_active(['photo', 'admin', 'weekly']) %}
+                    {{ sidebar.section('photos', 'fa-image', 'Photos'|trans, is_module_active(['photo']), [
+                        {
+                            'href': path('admin/photos/index'),
+                            'label': 'Overview'|trans,
+                            'active': is_module_active(['photo', 'admin']) and not photoWeekly,
+                        },
+                        {
+                            'href': path('admin/photos/weekly'),
+                            'label': 'Photo of the Week'|trans,
+                            'active': photoWeekly,
+                        },
+                    ]) }}
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <div>
+            {{ sidebar.group('System'|trans) }}
+            <ul class="sidebar-list">
+                {% set companyUsers = is_module_active(['user', 'admin', 'companyusersindex']) %}
+                {# The API principals row follows the register's administrator rather than this group's: the tokens
+                   it manages read the register. #}
+                {{ sidebar.section('users', 'fa-user-shield', 'Users'|trans,
+                    is_module_active(['user']) or route starts with 'user_api_principal', [
+                    {
+                        'href': path('admin/users/index'),
+                        'label': "Members' accounts"|trans,
+                        'active': is_module_active(['user', 'admin']) and not companyUsers,
+                    },
+                    {
+                        'href': path('admin/users/company-users/index'),
+                        'label': 'Company accounts'|trans,
+                        'active': companyUsers,
+                    },
+                    {
+                        'href': path('admin/users/api/index'),
+                        'label': 'API users'|trans,
+                        'active': is_module_active(['user', 'adminapiuser']),
+                    },
+                    is_granted('ROLE_DATABASE_ADMIN') ? {
+                        'href': path('user_api_principal_index'),
+                        'label': 'API principals'|trans,
+                        'active': route starts with 'user_api_principal',
+                    } : null,
+                    {
+                        'href': path('admin/users/apps/index'),
+                        'label': 'External apps'|trans,
+                        'active': is_module_active(['user', 'adminexternalapp']),
+                    },
+                ]|filter(child => child is not null)) }}
+
+                {{ sidebar.section('application', 'fa-sliders', 'Application'|trans, is_module_active(['application', 'announcement']) or is_module_active(['application', 'maintenance']), [
+                    {
+                        'href': path('admin/announcement'),
+                        'label': 'Announcement'|trans,
+                        'active': is_module_active(['application', 'announcement']),
+                    },
+                    {
+                        'href': path('admin/maintenance'),
+                        'label': 'Maintenance'|trans,
+                        'active': is_module_active(['application', 'maintenance']),
+                    },
+                ]) }}
+            </ul>
+        </div>
+    {% endif %}
+{% endif %}

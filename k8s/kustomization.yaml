@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: radix
+
+# secret.example.yaml is deliberately absent: it is the plaintext input to `kubeseal`, never something to apply. What
+# is applied is sealedsecret.yaml, which the controller in the cluster turns back into a Secret named `radix-secrets`.
+resources:
+    - namespace.yaml
+    - configmap.yaml
+    - sealedsecret.yaml
+    - valkey.yaml
+    - rabbitmq.yaml
+    - job-migrate.yaml
+    - deployment-app.yaml
+    - deployment-workers.yaml
+    - service.yaml
+
+# One place to move the whole stack to a new release. The tag is repeated in the migration Job, which has to run the
+# code it is migrating towards.
+images:
+    - name: abc.docker-registry.gewis.nl/web/radix/app
+      newTag: latest
+
+commonLabels:
+    app.kubernetes.io/part-of: radix

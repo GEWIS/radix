@@ -1,0 +1,10 @@
+{#
+    The register's pages. They are administration pages like any other now, so this adds nothing to `layout-admin`
+    beyond the spacing they have always been laid out with; the sidebar, the title and the breadcrumb root are the
+    administration's own.
+#}
+{% extends 'layout-admin.html.twig' %}
+
+{# The register's pages open with the header band and put a panel straight under it, which is the pairing the
+   page-body rules close the double gap between. #}
+{% block page_body_class %}page-body {{ parent() }}{% endblock %}

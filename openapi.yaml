@@ -1,0 +1,703 @@
+openapi: 3.1.1
+info:
+  title: GEWISDB API
+  description: The GEWIS member database has a few available endpoints
+  termsOfService: 'https://gewis.nl'
+  contact:
+    email: abc@gewis.nl
+  license:
+    name: GNU GENERAL PUBLIC LICENSE Version 3
+    url: 'https://github.com/GEWIS/radix/blob/main/LICENSE.txt'
+  version: 4.3.3
+externalDocs:
+  description: Contribute to this API
+  url: 'https://github.com/GEWIS/radix'
+servers:
+  - url: 'https://test.gewis.nl/api'
+    description: Test environment
+  - url: 'https://gewis.nl/api'
+    description: Production environment
+  - url: 'http://localhost/api'
+    description: Local environment
+tags:
+  - name: basic
+  - name: members
+    description: Obtain information about members
+  - name: board
+    description: Obtain information about board (installations)
+  - name: functions
+    description: Obtain information about board/organ functions (names, translations)
+  - name: organs
+    description: Obtain information about organs of GEWIS
+paths:
+  /:
+    get:
+      summary: Health endpoint
+      description: This endpoint will return the health status of the API
+      deprecated: true
+      tags:
+        - basic
+      responses:
+        '200':
+          $ref: '#/components/responses/health'
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - HealthR
+  /health:
+    get:
+      summary: Health endpoint
+      description: >-
+        This endpoint will return the health status of the API and whether
+        client applications are requested to temporarily pause their
+        synchronisation.
+      operationId: getHealth
+      tags:
+        - basic
+      responses:
+        '200':
+          $ref: '#/components/responses/health'
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - HealthR
+  /members:
+    get:
+      summary: Get members
+      description: Get all members
+      operationId: getMembers
+      tags:
+        - members
+      parameters:
+        - name: includeOrgans
+          in: query
+          required: false
+          description: >-
+            Whether to include organ memberships in the response. By default,
+            organs are not included due to rather long computation time.
+          schema:
+            type:
+            - "boolean"
+            default: false
+      responses:
+        '200':
+          $ref: '#/components/responses/member_list'
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - MembersR
+  '/members/{lidnr}':
+    get:
+      summary: Get a member
+      description: Get a specific member by lidnr
+      operationId: getMemberByLidnr
+      tags:
+        - members
+      parameters:
+        - name: lidnr
+          in: path
+          required: true
+          schema:
+            type:
+            - "integer"
+            examples:
+              - 8000
+      responses:
+        '200':
+          $ref: '#/components/responses/member_single'
+        '204':
+          description: Member not found
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - MembersR
+  /members/active:
+    get:
+      summary: Get active members
+      description: Get all members that are currently installed in at least one organ
+      operationId: getMembersActive
+      tags:
+        - members
+      parameters:
+        - name: includeInactive
+          in: query
+          required: false
+          description: >-
+            Whether to include inactive fraternity members in the response. If a
+            member is both an active member in another type and inactive in a
+            fraternity, they also get returned (including possibly their
+            inactive organ memberships).
+          schema:
+            type:
+            - "boolean"
+            default: false
+      responses:
+        '200':
+          $ref: '#/components/responses/member_list'
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - MembersActiveR
+  /organFunctions:
+    get:
+      summary: Get organ functions
+      description: Get all organ functions including translations
+      operationId: getOrganFunctions
+      tags:
+        - functions
+        - organs
+      parameters:
+        - in: header
+          name: Accept
+          schema:
+            type: string
+          required: true
+          example: "application/vnd.gewis.gewisdb+json;version=4.3.3"
+      responses:
+        '200':
+          $ref: '#/components/responses/organFunction_list'
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '406':
+          $ref: '#/components/responses/not_acceptable'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - OrganFunctionsListR
+  /boardFunctions:
+    get:
+      summary: Get board functions
+      description: Get all board functions including translations
+      operationId: getBoardFunctions
+      tags:
+        - board
+        - functions
+      parameters:
+        - in: header
+          name: Accept
+          schema:
+            type: string
+          required: true
+          example: "application/vnd.gewis.gewisdb+json;version=4.3.3"
+      responses:
+        '200':
+          $ref: '#/components/responses/boardFunction_list'
+        '403':
+          $ref: '#/components/responses/no_permission'
+        '406':
+          $ref: '#/components/responses/not_acceptable'
+        '500':
+          $ref: '#/components/responses/server_error'
+      security:
+        - api_auth:
+            - BoardFunctionsListR
+  /example404:
+    get:
+      summary: Example 404
+      description: This 404 will be returned if there is a mistake in the requested path
+      operationId: test404
+      tags:
+        - errors
+      responses:
+        '404':
+          $ref: '#/components/responses/not_found_route'
+  /example500:
+    get:
+      summary: Example 500
+      description: This 500 will be returned if there is a mistake in the requested path
+      operationId: test500
+      tags:
+        - errors
+      responses:
+        '500':
+          $ref: '#/components/responses/server_error'
+components:
+  schemas:
+    health:
+      type:
+        - "object"
+      required:
+        - status
+        - healthy
+        - sync_paused
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatusEnum'
+        healthy:
+          type:
+            - "boolean"
+        sync_paused:
+          type:
+            - "boolean"
+          default: false
+          description: >-
+            Attribute to indicate that data is currently being modified and that
+            client applications that perform syncs in the background are
+            requested to temporarily suspend this sync.
+    BoardFunction:
+      type:
+        - "object"
+      properties:
+        translations:
+          $ref: '#/components/schemas/TranslationString'
+        isLegacy:
+          type:
+            - "boolean"
+    Member:
+      description: >-
+        Model representing a member. The exact attributes that are visible
+        depend on the permissions of the API token. If the client holds the
+        `OrgansMembershipR` or `MemberProperty*` permissions, a (combination of)
+        MemberExtended object(s), else MemberSimple
+      type:
+        - "object"
+      required:
+        - lidnr
+        - full_name
+        - initials
+        - given_name
+        - middle_name
+        - family_name
+        - generation
+        - hidden
+        - deleted
+        - expiration
+      properties:
+        lidnr:
+          type:
+            - "integer"
+          format: int32
+          examples:
+            - 8000
+          minimum: 0
+          exclusiveMinimum: true
+        full_name:
+          type:
+            - "string"
+          examples:
+            - Timo de Teststudent
+        initials:
+          type:
+            - "string"
+          examples:
+            - T.
+        given_name:
+          type:
+            - "string"
+          examples:
+            - Timo
+        middle_name:
+          type:
+            - "string"
+          examples:
+            - de
+        family_name:
+          type:
+            - "string"
+          examples:
+            - Teststudent
+        generation:
+          type:
+            - "integer"
+          examples:
+            - 2023
+        hidden:
+          type:
+            - "boolean"
+          examples:
+            - false
+        deleted:
+          type:
+            - "boolean"
+          examples:
+            - false
+          description: Always false unless the API principal has MembersDeleted permission
+        expiration:
+          type:
+            - "string"
+          format: date
+          description: 'Date in the Y-m-d\TH:i:sP format'
+          examples:
+            - '2023-07-01T00:00:00+02:00'
+        email:
+          type:
+            - "string"
+            - "null"
+          format: email
+          examples:
+            - example@gewis.nl
+        keyholder:
+          type:
+            - "boolean"
+        organs:
+          type:
+            - "array"
+            - "null"
+          items:
+            $ref: '#/components/schemas/OrganMembership'
+        membership_type:
+          type:
+            - "string"
+            - "null"
+          enum:
+            - ordinary
+            - external
+            - graduate
+            - honorary
+        birthdate:
+          type:
+            - "string"
+            - "null"
+          format: date
+          description: 'Date in the Y-m-d\TH:i:sP format'
+          examples:
+            - '2023-07-01T00:00:00+02:00'
+        is_16_plus:
+          type:
+            - "boolean"
+          description: Whether the member is at least 16 years old
+        is_18_plus:
+          type:
+            - "boolean"
+          description: Whether the member is at least 18 years old
+        is_21_plus:
+          type:
+            - "boolean"
+          description: Whether the member is at least 21 years old
+    OrganMembership:
+      type:
+        - "object"
+      properties:
+        organ:
+          $ref: '#/components/schemas/Organ'
+        function:
+          type:
+            - "string"
+          examples:
+            - Lid
+        installDate:
+          type:
+            - "string"
+          format: date
+          description: 'Date in the Y-m-d\TH:i:sP format'
+          examples:
+            - '0001-01-01T00:00:00+00:00'
+        dischargeDate:
+          type:
+            - "string"
+            - "null"
+          format: date
+          description: 'Date in the Y-m-d\TH:i:sP format'
+          examples:
+            - null
+        current:
+          type:
+            - "boolean"
+    Organ:
+      type:
+        - "object"
+      properties:
+        id:
+          type:
+            - "integer"
+          examples:
+            - 1
+        abbreviation:
+          type:
+            - "string"
+          examples:
+            - Testorgaan
+    OrganFunction:
+      type:
+        - "object"
+      properties:
+        translations:
+          $ref: '#/components/schemas/TranslationString'
+        isAdministrative:
+          type:
+            - "boolean"
+        isLegacy:
+          type:
+            - "boolean"
+    ResponseObject:
+      oneOf:
+        - $ref: '#/components/schemas/ResponseSuccess'
+        - $ref: '#/components/schemas/ResponseError'
+    ResponseStatusEnum:
+      type:
+        - "string"
+      title: ResponseStatusEnum
+      enum:
+        - success
+        - error
+        - forbidden
+        - notfound
+      examples:
+        - success
+    ResponseSuccess:
+      type:
+        - "object"
+      title: ResponseSuccess
+      description: Model that is returned in case of success
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatusEnum'
+        data:
+          type:
+            - "object"
+    ResponseError:
+      type:
+        - "object"
+      title: ResponseError
+      description: Model that is returned in case of an error
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatusEnum'
+        error:
+          type:
+            - "object"
+          properties:
+            type:
+              type:
+                - "string"
+              examples:
+                - error-exception
+            exception:
+              type:
+                - "string"
+              examples:
+                - An example exception was thrown
+    TranslationString:
+      type:
+        - "object"
+      required:
+        - en
+        - nl
+      properties:
+        en:
+          type:
+            - "string"
+          examples:
+            - "Chair"
+        nl:
+          type:
+            - "string"
+          examples:
+            - "Voorzitter"
+  responses:
+    health:
+      description: Successful
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/health'
+    boardFunction_list:
+      description: Succesful response containing zero or more board functions
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ResponseSuccess'
+              - type:
+                  - object
+                properties:
+                  data:
+                    type:
+                      - object
+                    additionalProperties:
+                      $ref: '#/components/schemas/BoardFunction'
+                    examples:
+                      - Voorzitter:
+                          translations:
+                            en: "Chair"
+                            nl: "Voorzitter"
+                          isLegacy: false
+                        Commissaris Kennisbeheer:
+                          translations:
+                            en: "Information Officer"
+                            nl: "Commissaris Kennisbeheer"
+                          isLegacy: true
+    member_single:
+      description: Succesful response containing exactly one member
+      content:
+        application/json:
+          schema:
+            type:
+              - "object"
+            properties:
+              status:
+                type:
+                  - "string"
+                examples:
+                  - success
+              data:
+                $ref: '#/components/schemas/Member'
+    member_list:
+      description: Succesful response containing zero or more members
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ResponseSuccess'
+              - type:
+                  - object
+                properties:
+                  data:
+                    type:
+                      - "array"
+                    items:
+                      $ref: '#/components/schemas/Member'
+          examples:
+            - status: success
+              data:
+                - lidnr: 8000
+                  full_name: Timo de Teststudent
+                  initials: T.
+                  given_name: Timo
+                  middle_name: de
+                  family_name: Teststudent
+                  generation: 2022
+                  hidden: false
+                  deleted: false
+                  expiration: '2023-07-01T00:00:00+02:00'
+                - lidnr: 8000
+                  full_name: Timo de Teststudent
+                  initials: T.
+                  given_name: Timo
+                  middle_name: de
+                  family_name: Teststudent
+                  generation: 2022
+                  hidden: false
+                  deleted: false
+                  expiration: '2023-07-01T00:00:00+02:00'
+                  email: timo@gewis.nl
+                  keyholder: true
+                  organs:
+                    - organ:
+                        id: 1
+                        abbreviation: Testorgaan
+                      function: Lid
+                      installDate: '0001-01-01T00:00:00+02:00'
+                      dischargeDate: null
+                      current: true
+                  membership_type: ordinary
+                  birthdate: '2023-07-01T00:00:00+02:00'
+                  is_16_plus: false
+                  is_18_plus: false
+                  is_21_plus: false
+    organFunction_list:
+      description: Succesful response containing zero or more organ functions
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ResponseSuccess'
+              - type:
+                  - object
+                properties:
+                  data:
+                    type:
+                      - object
+                    additionalProperties:
+                      $ref: '#/components/schemas/OrganFunction'
+                    examples:
+                      - Voorzitter:
+                          translations:
+                            en: "Chair"
+                            nl: "Voorzitter"
+                          isAdministrative: false
+                          isLegacy: false
+                        Inkoper:
+                          translations:
+                            en: "Procurement Officer"
+                            nl: "Inkoper"
+                          isAdministrative: false
+                          isLegacy: true
+                        Inactief Lid:
+                          translations:
+                            en: "Inactive Member"
+                            nl: "Inactief Lid"
+                          isAdministrative: true
+                          isLegacy: false
+    server_error:
+      description: >-
+        There was an error in the server. Most likely, this is a permanent
+        error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'
+          examples:
+            - status: error
+              error:
+                type: error-exception
+                exception: An example exception was thrown
+    not_found_route:
+      description: >-
+        This route does not exist (which is different from not finding a
+        specific resource)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'
+          examples:
+            - status: notfound
+              error:
+                type: error-router-no-match
+                exception: null
+    no_permission:
+      description: The token that was used does not have the required permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'
+          examples:
+            - status: forbidden
+              error:
+                type: User\\Model\\Exception\\NotAllowed
+                exception: Permission `...` is needed but is not currently held.
+    not_acceptable:
+      description: You requested an API version that is not supported or you did not specify an API version
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'
+          examples:
+            - status: error
+              error:
+                type: Database\\Model\\Exception\\VersionIncompatible
+                exception: API version must be at least `...`, but `...` was given.
+            - status: error
+              error:
+                type: Database\\Model\\Exception\\VersionExpected
+                exception: API version expected, but none was given.
+            - status: error
+              error:
+                type: Database\\Model\\Exception\\VersionFormat
+                exception: API version expected, but v4.32 was given
+  securitySchemes:
+    api_auth:
+      type: http
+      description: GEWIS API principal token
+      scheme: bearer
+      bearerFormat: FF

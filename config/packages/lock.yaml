@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+# The store has to be reachable from every container rather than only from the one holding the lock: each schedule is
+# consumed by a worker of its own, and during a rolling deploy the outgoing and the incoming container both run one for
+# a moment. Valkey is already there for the cache, so the locks sit on it instead of on a per-container `flock`, which
+# cannot see across that boundary.
+framework:
+    lock: '%env(LOCK_DSN)%'
+
+when@test:
+    # CI runs no Valkey, and nothing under test contends for a lock.
+    framework:
+        lock: 'flock'

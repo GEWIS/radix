@@ -1,0 +1,194 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.locales: en|nl
+    # Default for the infra-level maintenance flag so an unset variable resolves to "off" rather than null.
+    env(MAINTENANCE): ''
+    # MFA enforcement defaults to `true` so any unrecognised environment fails safe. Overridden per environment in
+    # `when@dev:` (driven by `MFA_ENFORCEMENT` so individual developers can flip enrolment on/off in `.env.local`;
+    # because the parameter is read once at first service instantiation under FrankenPHP's worker mode, the web
+    # container must be restarted after changing the value), `when@test:` (hardcoded false so CI need not set up
+    # TOTP), and `when@prod:` (hardcoded true, immutable, regardless of any environment variable).
+    app.mfa.enforcement_enabled: true
+    # A developer sets the variable in `.env.local`, which is not committed, so anything that compiles the development
+    # container without one — the PHPStan workflow does, to give the Symfony and Doctrine extensions a container and a
+    # mapping to read — has nothing to resolve `when@dev:` against and fails outright. Defaulted to `true` for the
+    # same reason the parameter above is: an environment that says nothing gets enforcement.
+    env(MFA_ENFORCEMENT): 'true'
+    # Fallback contact for board/committee correspondence with no more specific sender/reply-to (e.g. a bulk email to
+    # an activity's sign-ups when the organising organ has no public email).
+    app.email.internal_affairs: 'cib@gewis.nl'
+    # Who a company writes to about its profile, vacancies, banner and package. Read by the company area templates
+    # through the `external_affairs_email` Twig global.
+    app.email.external_affairs: 'ceb@gewis.nl'
+    # The education officer: who a member sends a summary to, and who takes a complaint about a course to the
+    # department. Read by the education pages through the `education_email` Twig global.
+    app.email.education: 'co@gewis.nl'
+    # A university address stops working once somebody graduates, and the association loses touch with them the day it
+    # does. Members on one of these are told to give the board an address that outlives their studies.
+    app.user.student_email_domain: '@student.tue.nl'
+    # Regulations on the members-area dashboard: slug (used in the URL) to the document's path inside the
+    # SFTP-mirrored public archive (`data/public-archive/`), without the `.pdf` extension.
+    app.regulations:
+        activity-policy: 'Policies & Regulations/Activity Policy'
+        alcohol-policy: 'Policies & Regulations/Alcohol Policy'
+        board-policies: 'Policies & Regulations/Board Policies'
+        borrel-policy: 'Policies & Regulations/Borrel Policy'
+        house-rules: 'Policies & Regulations/House rules'
+        ict-policy: 'Policies & Regulations/ICT Policy'
+        key-policy: 'Policies & Regulations/Key Policy'
+        poster-policy: 'Policies & Regulations/Poster Policy'
+        privacy-policy: 'Policies & Regulations/Privacy Policy'
+    # Subnets the TU/e uses. An anonymous visitor coming from one of them may download course material, which is the
+    # arrangement under which the department shares its exams: on campus, or logged in as a member. CIDR notation.
+    env(TUE_IP_RANGES): '131.155.0.0/16,100.64.0.0/10'
+    app.education.tue_ranges: '%env(csv:TUE_IP_RANGES)%'
+    # Written into every watermarked download as machine-readable text, so a copy found on an external platform can be
+    # recognised as ours. Deliberately not a secret: it is meant to be found.
+    env(WATERMARK_TAG): 'GEWIS-EDU'
+    # The names that travel with the addresses below. They read the same on every deployment, so they are defaults
+    # here rather than variables an operator has to remember to set; the addresses themselves are not, and have none.
+    env(MAIL_FROM_NAME): 'Study Association GEWIS'
+    env(MAIL_FROM_SECRETARY_NAME): 'Secretary of GEWIS'
+    env(MAIL_TO_CHECKER_RESULT_NAME): 'Secretary of GEWIS'
+    env(MAIL_TO_REPORT_ERROR_NAME): 'Database Wizards'
+    env(MAIL_TO_SUBSCRIPTION_NAME): 'Secretary of GEWIS'
+    # Stripe sends a `Stripe-Notice` header when the pinned version is behind, and the SDK re-raises it as a PHP
+    # warning, which the dev error handler turns into an exception. It moves when the installed SDK moves, which makes
+    # it a property of this checkout rather than of a deployment. The SDK is built for 2026-06-24.dahlia; both are the
+    # same major, within which Stripe only adds.
+    env(STRIPE_API_VERSION): '2026-07-29.dahlia'
+    # Mailman speaks one REST version. The endpoint differs per deployment; the version does not.
+    env(MAILMAN_API_VERSION): '3.1'
+    # The Supremum's API, which the infimum on the front page and in the footer is drawn from. Without a key the
+    # request is refused and the panel keeps whatever it last had, so an empty key is a working deployment rather than
+    # a broken one.
+    env(SUPREMUM_API_HOST): 'https://supremum.gewis.nl'
+    env(SUPREMUM_API_KEY): ''
+    app.education.watermark_tag: '%env(string:WATERMARK_TAG)%'
+    # The face the red watermark is drawn in. Shipped by `fonts-dejavu-core`, which the Dockerfile installs explicitly.
+    app.education.watermark_font: '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+    # The association's own agenda, which the option calendar draws behind the days bodies ask for. Defaulted so a
+    # machine without a key runs perfectly well with that layer simply absent; production requires both for real
+    # (see compose.yaml).
+    env(DOCKER_GOOGLE_API_KEY): 'unknown'
+    env(DOCKER_GOOGLE_CALENDAR_KEY): 'unknown'
+    # How many activities a body may put forward in one option period when nobody has said otherwise. The board can
+    # set a different number for a single period, and a standing or one-off exception for a single body; this is what
+    # answers when none of those apply, which is the usual case. No row is ever written per body, so a body founded
+    # halfway through a period lands here rather than on nothing.
+    app.activity.default_max_proposals: 3
+    # External tools linked from the members-area dashboard.
+    app.members_area_links:
+        webmail: '/webmail'
+        gewiki: 'https://wiki.gewis.nl'
+        supremum: 'https://supremum.gewis.nl/'
+        corporate_identity: '/corporateidentity'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        # Automatically inject the following values into services.
+        bind:
+            $defaultLocale: '%kernel.default_locale%' # string
+            $supportedLocales: '%kernel.enabled_locales%' # array
+            $enabledLocales: '%kernel.enabled_locales%' # array
+            $mfaEnforcementEnabled: '%app.mfa.enforcement_enabled%' # bool
+            $internalAffairsEmail: '%app.email.internal_affairs%' # string
+            $tueRanges: '%app.education.tue_ranges%' # array
+            $watermarkTag: '%app.education.watermark_tag%' # string
+            $watermarkFontPath: '%app.education.watermark_font%' # string
+            $siteUrl: '%env(string:DEFAULT_URI)%' # string
+            $defaultMaxProposals: '%app.activity.default_max_proposals%' # int
+            $googleCalendarId: '%env(string:DOCKER_GOOGLE_CALENDAR_KEY)%' # string
+            $googleApiKey: '%env(string:DOCKER_GOOGLE_API_KEY)%' # string
+            # The public face of the register: the host mail links back to when there is no request to build a URL
+            # from.
+            $publicUrl: '%env(string:APP_URL)%' # string
+            # Who the register writes as, and who it writes to. The secretary signs off on membership; the checker
+            # results, the error reports and the subscription notices each land with whoever acts on them.
+            $mailFromAddress: '%env(string:MAIL_FROM_ADDRESS)%' # string
+            $mailFromName: '%env(string:MAIL_FROM_NAME)%' # string
+            $mailFromSecretaryAddress: '%env(string:MAIL_FROM_SECRETARY_ADDRESS)%' # string
+            $mailFromSecretaryName: '%env(string:MAIL_FROM_SECRETARY_NAME)%' # string
+            $mailToCheckerResultAddress: '%env(string:MAIL_TO_CHECKER_RESULT_ADDRESS)%' # string
+            $mailToCheckerResultName: '%env(string:MAIL_TO_CHECKER_RESULT_NAME)%' # string
+            $mailToReportErrorAddress: '%env(string:MAIL_TO_REPORT_ERROR_ADDRESS)%' # string
+            $mailToReportErrorName: '%env(string:MAIL_TO_REPORT_ERROR_NAME)%' # string
+            $mailToSubscriptionAddress: '%env(string:MAIL_TO_SUBSCRIPTION_ADDRESS)%' # string
+            $mailToSubscriptionName: '%env(string:MAIL_TO_SUBSCRIPTION_NAME)%' # string
+            # Stripe, which collects the membership fee during sign-up. The API version is pinned because Stripe
+            # announces a mismatch through a header the SDK re-raises as a PHP warning.
+            $stripeApiVersion: '%env(string:STRIPE_API_VERSION)%' # string
+            $stripeSecretKey: '%env(string:STRIPE_SECRET_KEY)%' # string
+            $stripeWebhookSigningKey: '%env(string:STRIPE_WEBHOOK_SIGNING_KEY)%' # string
+            $stripeMembershipPriceId: '%env(string:STRIPE_MEMBERSHIP_PRICE_ID)%' # string
+            $stripeCancelUrl: '%env(string:STRIPE_CANCEL_URL)%' # string
+            $stripeSuccessUrl: '%env(string:STRIPE_SUCCESS_URL)%' # string
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Security/User/HandlerRegistry.php'
+            # Value objects the container has no business constructing: they are built from entities at the point of
+            # use, and their constructors are deliberately not public.
+            - '../src/ViewModel/'
+            # Seeding is a development and test concern, and doctrine/doctrine-fixtures-bundle and fakerphp/faker are
+            # require-dev: the production image is built with `--no-dev`, so registering these there asks the container
+            # for classes and for a `doctrine.fixtures.loader` service that are not in it. Registered again under
+            # `when@dev:` and `when@test:` below.
+            - '../src/DataFixtures/'
+            - '../src/Command/Application/LoadFixturesCommand.php'
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    # The external-application signing service uses the bundle-managed JWS builder and the association's key set. Both
+    # are referenced by their bundle service id because several of each exist and autowiring cannot pick by type.
+    App\Service\User\ExternalAppService:
+        arguments:
+            $jwsBuilder: '@jose.jws_builder.external_app'
+            $signingKeySet: '@jose.key_set.external_app_signing'
+
+when@dev:
+    parameters:
+        app.mfa.enforcement_enabled: '%env(bool:MFA_ENFORCEMENT)%'
+
+    services: &fixture_services
+        # `_defaults` applies per services block, so this one gets none of the block above's: without it the fixtures
+        # are registered untagged and `app:fixtures:load` is not a command at all. The binds are not repeated because
+        # every scalar these take is named by an `#[Autowire]` of its own.
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+        App\Command\Application\LoadFixturesCommand: ~
+
+when@test:
+    parameters:
+        app.mfa.enforcement_enabled: false
+
+    services:
+        <<: *fixture_services
+        # A test builds its own schema, which the least-privileged role production drops to may not do. Dropping the
+        # autoconfiguration drops the `doctrine.middleware` tag with it.
+        App\Doctrine\Middleware\SetRoleMiddleware:
+            autoconfigure: false
+
+when@prod:
+    parameters:
+        app.mfa.enforcement_enabled: true

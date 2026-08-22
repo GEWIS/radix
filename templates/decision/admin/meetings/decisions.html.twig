@@ -1,0 +1,111 @@
+{#
+    The decisions taken at a meeting, and the form that starts a new one.
+
+    The register's half of the meeting page. It used to be a page of its own behind /database while the documents
+    were administered here; they describe the same meeting, so they are one page now, and this is the part of it that
+    is only rendered for a reader who administers the register.
+#}
+{# How a decision is cited: the meeting it was taken at, then the point and the number within it. #}
+{% set meeting_label = ledgerMeeting.type.value ~ ' ' ~ ledgerMeeting.number %}
+
+{% for decision in decisions %}
+    {% set annulled = null is not same as(decision.annulment) %}
+    <div class="panel{{ annulled ? ' decision-annulled' : '' }}">
+        <div class="panel-body">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge badge-gewis-primary font-monospace">
+                    {{ meeting_label }}.{{ decision.point }}.{{ decision.number }}
+                </span>
+                {% if annulled %}
+                    <span class="badge badge-secondary">
+                        {{ 'Annulled by %type% %number%.%point%.%decision%'|trans({
+                            '%type%': decision.annulment.meetingType,
+                            '%number%': decision.annulment.meetingNumber,
+                            '%point%': decision.annulment.point,
+                            '%decision%': decision.annulment.number,
+                        }) }}
+                    </span>
+                {% endif %}
+                <span class="ms-auto d-flex flex-wrap gap-2" data-controller="copy"
+                      data-copy-text-value="{{ decision.copyContent }}">
+                    <button type="button" class="btn btn-sm btn-outline-gewis-primary"
+                            data-action="copy#copy"
+                            data-copy-copied-label="{{ 'Copied'|trans }}">
+                        <span class="fas fa-copy" aria-hidden="true"></span>
+                        <span data-copy-target="label">{{ 'Copy Decision'|trans }}</span>
+                    </button>
+                    {# Copying a decision is reading it; deleting one is keeping the record. #}
+                    {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                        <a class="btn btn-sm btn-outline-danger"
+                           href="{{ path('decision_decision_delete', {
+                               type: ledgerMeeting.type.value,
+                               number: ledgerMeeting.number,
+                               point: decision.point,
+                               decision: decision.number,
+                           }) }}">
+                            {{ 'Delete Decision'|trans }}
+                        </a>
+                    {% endif %}
+                </span>
+            </div>
+
+            <p class="decision-content mb-0">{{ decision.content }}</p>
+        </div>
+    </div>
+{% else %}
+    <div class="panel">
+        <div class="panel-body">
+            {% include 'partials/application/empty-state.html.twig' with {
+                icon: 'fa-gavel',
+                title: 'This meeting has no decisions (yet).'|trans,
+                body: 'Add one below to start recording what was decided.'|trans,
+            } only %}
+        </div>
+    </div>
+{% endfor %}
+
+{% if is_granted('ROLE_DATABASE_ADMIN') %}
+    <div class="panel panel-dashed">
+        <div class="panel-heading"><h3>{{ 'Add New Decision'|trans }}</h3></div>
+        <div class="panel-body">
+            <p class="text-secondary">
+                {{ 'The point and the decision number are combined with the meeting to address the decision.'|trans }}
+            </p>
+            {# Not a form the server ever receives: filling in a point and a decision number navigates to the
+               page that records that decision. The point also suggests the next free number, which the
+               meeting already knows.
+
+               The URL is generated with both numbers set to zero and the controller replaces the last two
+               segments, because the route requires digits there and so cannot be asked to generate a
+               template with named placeholders in them. #}
+            <form class="row row-cols-lg-auto g-2 align-items-start" data-controller="decision-number"
+                  data-decision-number-url-value="{{ path('decision_decision_create', {
+                      type: ledgerMeeting.type.value,
+                      number: ledgerMeeting.number,
+                      point: 0,
+                      decision: 0,
+                  }) }}"
+                  {# Forced to an object: a meeting with no decisions yet has an empty PHP array, which
+                     encodes as `[]`, and the controller's value is declared as an object. #}
+                  data-decision-number-next-value="{{ next_decision_numbers|json_encode(constant('JSON_FORCE_OBJECT')) }}"
+                  data-action="submit->decision-number#open">
+                <div class="col-12">
+                    <label class="visually-hidden" for="create-point">{{ 'Point'|trans }}</label>
+                    <input type="number" min="1" class="form-control" id="create-point" required
+                           placeholder="{{ 'Point'|trans }}"
+                           data-decision-number-target="point"
+                           data-action="input->decision-number#suggest">
+                </div>
+                <div class="col-12">
+                    <label class="visually-hidden" for="create-decision">{{ 'Decision Number'|trans }}</label>
+                    <input type="number" min="1" class="form-control" id="create-decision" required
+                           placeholder="{{ 'Decision Number'|trans }}"
+                           data-decision-number-target="number">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-gewis-primary">{{ 'Add Decision'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endif %}

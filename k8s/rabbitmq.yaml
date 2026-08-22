@@ -1,0 +1,62 @@
+# RabbitMQ, which carries the messenger transports and the schedules. Its credentials come from the same sealed Secret
+# the application's MESSENGER_TRANSPORT_DSN does, so the two cannot drift apart.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: radix-rabbitmq
+spec:
+    serviceName: radix-rabbitmq
+    replicas: 1
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: radix-rabbitmq
+    template:
+        metadata:
+            labels:
+                app.kubernetes.io/name: radix-rabbitmq
+        spec:
+            containers:
+                - name: rabbitmq
+                  image: rabbitmq:4.3-alpine
+                  env:
+                      - name: RABBITMQ_NODENAME
+                        value: rabbit@localhost
+                      - name: RABBITMQ_DEFAULT_USER
+                        valueFrom:
+                            secretKeyRef: { name: radix-secrets, key: RABBITMQ_DEFAULT_USER }
+                      - name: RABBITMQ_DEFAULT_PASS
+                        valueFrom:
+                            secretKeyRef: { name: radix-secrets, key: RABBITMQ_DEFAULT_PASS }
+                  ports:
+                      - containerPort: 5672
+                        name: amqp
+                  volumeMounts:
+                      - name: data
+                        mountPath: /var/lib/rabbitmq
+                  readinessProbe:
+                      exec:
+                          command: ["rabbitmq-diagnostics", "-q", "check_running"]
+                      initialDelaySeconds: 20
+                      periodSeconds: 10
+                  resources:
+                      requests: { cpu: 100m, memory: 256Mi }
+                      limits: { memory: 1Gi }
+    volumeClaimTemplates:
+        - metadata:
+              name: data
+          spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                  requests:
+                      storage: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: radix-rabbitmq
+spec:
+    selector:
+        app.kubernetes.io/name: radix-rabbitmq
+    ports:
+        - port: 5672
+          targetPort: amqp

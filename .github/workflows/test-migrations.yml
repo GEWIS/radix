@@ -1,0 +1,154 @@
+name: Check migrations and seed
+
+# Runs whenever an entity, migration, or fixture changes. On a slim app + databases stack it:
+#  - applies the migrations + seed from the base branch up to the head branch (and back down again), and
+#  - verifies every entity change has a matching migration committed (i.e. no schema drift).
+# Nothing else the application talks to — the broker, the mail catcher, the analytics, the sync-based mail and list
+# services — is needed to exercise migrations or fixtures, so only the app + database containers are started.
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'src/Entity/**/*.php'
+      - 'src/DataFixtures/**/*.php'
+      - 'migrations/**/*.php'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Shared compose file set for the docker compose invocations below. `.env.local` is passed the way the Makefile
+  # passes it: `.env` holds almost nothing, so the values compose.yaml's guards ask for come from that file, which the
+  # "Prepare the local environment file" step below creates.
+  COMPOSE_FILES: --env-file .env --env-file .env.local --file compose.github.yaml --file compose.override.yaml --file compose.yaml
+  # One set per database, each naming its own connection. Mirrors the Makefile.
+  DEFAULT_MIGRATIONS: --configuration=config/packages/migrations/default.yaml
+  WEB_MIGRATIONS: --configuration=config/packages/migrations/web.yaml
+
+permissions: {}
+
+jobs:
+  migration_seed:
+    name: Check migrations and seed
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+
+    steps:
+      - name: Echo
+        run: echo "This job should only run if entities, migrations, or fixtures are updated"
+
+      - name: Checkout base branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          persist-credentials: false
+
+      # `.env.local` is not committed, and it is where the development values live.
+      - name: Prepare the local environment file
+        run: make setuplocalenv
+
+      - name: setup docker buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      # --no-deps keeps this lightweight: only the app + the two databases start, not everything else it depends on.
+      - name: run base
+        run: docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb
+
+      - name: wait for databases (base)
+        run: |
+          for i in $(seq 1 30); do
+            if docker compose $COMPOSE_FILES exec -T postgresql pg_isready -h 127.0.0.1 -p 5432 -q \
+              && docker compose $COMPOSE_FILES exec -T mariadb healthcheck.sh --connect --innodb_initialized; then
+              echo "Both databases are accepting connections."
+              exit 0
+            fi
+            echo "Waiting for the databases to accept connections... ($i/30)"
+            sleep 2
+          done
+          echo "::error::The databases did not become ready in time"
+          docker compose $COMPOSE_FILES logs postgresql mariadb
+          exit 1
+
+      - name: migrate base
+        run: make migrate
+
+      - name: get migration status
+        # `current` prints "<version> - <description>"; only the version is something to migrate back to.
+        run: |
+          MIGRATION_BASE_DEFAULT=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $DEFAULT_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
+          echo "Default is at: $MIGRATION_BASE_DEFAULT"
+          echo "MIGRATION_BASE_DEFAULT=$MIGRATION_BASE_DEFAULT" >> $GITHUB_ENV
+          MIGRATION_BASE_WEB=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $WEB_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
+          echo "Web is at: $MIGRATION_BASE_WEB"
+          echo "MIGRATION_BASE_WEB=$MIGRATION_BASE_WEB" >> $GITHUB_ENV
+
+      - name: seed base
+        run: |
+          docker compose $COMPOSE_FILES exec -T app bin/console app:fixtures:load --no-interaction
+          docker compose $COMPOSE_FILES exec -T app bin/console report:generate:full
+
+      - name: cleanup base
+        run: docker compose $COMPOSE_FILES down
+
+      - name: Checkout head branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+            persist-credentials: false
+
+      - name: Prepare the local environment file
+        run: make setuplocalenv
+
+      - name: run head
+        run: docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb
+
+      - name: wait for databases (head)
+        run: |
+          for i in $(seq 1 30); do
+            if docker compose $COMPOSE_FILES exec -T postgresql pg_isready -h 127.0.0.1 -p 5432 -q \
+              && docker compose $COMPOSE_FILES exec -T mariadb healthcheck.sh --connect --innodb_initialized; then
+              echo "Both databases are accepting connections."
+              exit 0
+            fi
+            echo "Waiting for the databases to accept connections... ($i/30)"
+            sleep 2
+          done
+          echo "::error::The databases did not become ready in time"
+          docker compose $COMPOSE_FILES logs postgresql mariadb
+          exit 1
+
+      - name: migrate head
+        run: make migrate
+
+      - name: ensure migrations are up to date
+        # Regenerate migrations from the current entities; any output here means an
+        # entity changed without a matching migration being committed.
+        run: |
+          make migration-diff
+          if git status --porcelain | grep -q 'migrations/'; then
+            echo "::error::Entity changes detected without a matching migration. Run 'make migration-diff' locally and commit the generated migration(s)."
+            git status --porcelain | grep 'migrations/'
+            exit 1
+          fi
+          echo "All migrations are up to date."
+
+      # Seeds the databases only; `make seed` would also drive the sync-based Mailman and Listmonk services, which
+      # `--no-deps` deliberately never started. Each connection has its own loader and its own fixture group: the
+      # bundle's takes one entity manager at a time, and the website's own drops the foreign key checks its purge
+      # cannot resolve in order.
+      - name: seed head
+        run: |
+          docker compose $COMPOSE_FILES exec -T app bin/console app:fixtures:load --no-interaction
+          docker compose $COMPOSE_FILES exec -T app bin/console report:generate:full
+
+      - name: revert to base migration
+        run: |
+          docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $DEFAULT_MIGRATIONS $MIGRATION_BASE_DEFAULT
+          docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $WEB_MIGRATIONS $MIGRATION_BASE_WEB
+
+      - name: stop
+        run: docker compose $COMPOSE_FILES down
