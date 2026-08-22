@@ -100,13 +100,10 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6">
-                            {# The help is handed over untranslated, with its parameter beside it: the form theme
-                               translates `help` itself, and translating it here first would leave the theme looking
-                               up a sentence that is already in the reader's language. #}
+                            {# `t()`, not a bare string: the extractor cannot see one and `--clean` deletes it. #}
                             {{ form_row(form.studentNumber, {
                                 help_html: true,
-                                help: 'Your student number is a 7-digit number, for example 1234560. You have received this in an email when you enrolled and it is printed on your campus card. Go to <a href="%url%">this page</a> if you need help finding it. Your student number will be used to verify you are studying at the department of M&CS.',
-                                help_translation_parameters: {'%url%': 'https://wiki.gewis.nl/link/495'},
+                                help: t('Your student number is a 7-digit number, for example 1234560. You have received this in an email when you enrolled and it is printed on your campus card. Go to <a href="%url%">this page</a> if you need help finding it. Your student number will be used to verify you are studying at the department of M&CS.', {'%url%': 'https://wiki.gewis.nl/link/495'}),
                             }) }}
                         </div>
                         <div class="col-md-6" data-controller="study-notice">
