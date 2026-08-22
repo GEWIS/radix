@@ -60,8 +60,8 @@ Rules that follow from having two connections:
 - **Doctrine Migrations** — `migrations/database` and `migrations/web`, generated from `migrations/template.tpl`.
 - **FrankenPHP worker mode** behind Caddy. Worker-mode safety is non-negotiable here — see Things to be careful
   about, below.
-- **API Platform** (`config/packages/api_platform.yaml`, all stateless) alongside the hand-written API controllers
-  under `src/Controller/Report`. Both answer under `^/api`; see the API section.
+- **API Platform 4** (`config/packages/api_platform.yaml`, all stateless, JSON only) serves almost all of `^/api`,
+  alongside four hand-written endpoints in `src/Controller/Report`; see the API section.
 - **Symfony Messenger** over RabbitMQ in dev, in-memory in test (`config/packages/messenger.yaml`). **Scheduler** in
   `src/Scheduler/`.
 - **Symfony Workflow** drives the revision/approval lifecycle (`config/packages/workflow.yaml`) — see the Revision
@@ -86,7 +86,7 @@ they serve.
 
 ```
 src/
-  ApiResource/      API Platform resources
+  ApiResource/      API Platform resources, by domain; plain DTOs, excluded from the container
   Command/          #[AsCommand]-tagged console commands
   CommonMark/       Markdown rendering extensions
   Controller/       feature controllers
@@ -99,10 +99,13 @@ src/
   Kernel.php
   Message/          Messenger message classes
   MessageHandler/   #[AsMessageHandler] handlers
+  OpenApi/          decorators completing the generated OpenAPI document
   Repository/       Doctrine repositories
   Scheduler/        Symfony Scheduler providers (flat)
   Security/         user checkers, voters (SudoVoter, RevisionVoter), remember-me handler, API authentication
+  Serializer/       serializer context builders and normalizers
   Service/          domain services
+  State/            API Platform state providers and processors, by domain
   Twig/             Extensions/ for custom Twig extensions; Components/<Namespace>/ for Live components
   Util/             small stateless helpers
   Validator/        custom constraint validators
@@ -208,19 +211,68 @@ Remember-me is a **custom** integration (`App\Security\User\PersistentSignatureR
 
 ## API
 
-Two surfaces, both under `^/api` and both stateless:
+Everything under `^/api` is stateless, is read with `Authorization: Bearer <token>`, and answers the same envelope:
 
-- `src/Controller/Report` serves the endpoints other GEWIS systems already depend on. **The envelope, the status codes
-  and the version negotiation of those endpoints are a contract with other applications**, not an internal detail —
-  changing a field name changes someone else's input. `openapi.yaml` describes them.
-- `src/ApiResource` holds API Platform resources, as attribute-decorated classes, for what is built there.
+```json
+{"status": "success", "data": …, "meta": {"page": 1, "itemsPerPage": 100, "totalItems": 4213, "totalPages": 43}}
+{"status": "forbidden", "error": {"type": "…", "exception": "…"}}
+```
 
-Both read the projection, never the ledger directly.
+`meta` is present on every collection and nowhere else, and `/api/docs.json` is the one path exempt from the
+envelope because an OpenAPI document has to stay one. **The envelope, the status codes, the wire names and the
+version negotiation are a contract with other GEWIS applications** — changing a field name changes someone else's
+input. `openapi.yaml` publishes it and is **generated**: run `make openapi` after touching a resource, never edit it
+by hand. `ApiDocumentationTest` fails on drift.
+
+Almost everything is an **API Platform resource**:
+
+- `src/ApiResource/<Domain>/` — plain `final readonly` DTOs with `#[ApiResource]`. Property declaration order is the
+  JSON key order. The directory is excluded from the service container.
+- `src/State/<Domain>/` — the `ProviderInterface` that builds them from the projection.
+- `src/State/Api/` — the shared plumbing: `EnvelopeProcessor` (the envelope) and `CollectionPagination` (the page).
+- `src/Serializer/Api/` — the serializer context, including the permission-driven groups of the member payload.
+- `src/OpenApi/` — the decorator that completes the generated document with the endpoints that are not resources.
+- `src/EventListener/Api/` — the charset header, and `UnexposedRouteListener`, which hides the routes API Platform
+  mounts under `/api` for its own plumbing so no path there answers outside the contract.
+
+Every operation carries `security:` and `securityMessage:`; the attribute is an `ApiPermissions` wire value and
+`App\Security\Api\ApiPermissionVoter` decides it. Every collection is paged (default 100, maximum 500), and a page
+without a deterministic `ORDER BY` is a bug. A collection provider that returns a plain array instead of a paginator
+silently drops `meta`. Nothing a request asks for is worth refusing it over: a page below 1 is clamped, one past
+the end is an empty page, and every query parameter is read through `App\Util\Application\QueryValue`, which
+never answers 400.
+
+A permission that names people is enforced twice — as the operation gate, and as a row filter for deleted members
+(`ApiPermissions::MembersDeleted`) applied in the query rather than to the page, or the totals stop matching.
+
+**Everything added when the API moved onto API Platform requires a contract version**, declared either as
+`Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` or as `X-Api-Version: 5.0.0` — the second exists because
+OpenAPI requires tooling to ignore an `Accept` parameter, so Swagger UI cannot send the first. A new operation says
+so with `extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT]` and
+`App\State\Api\MinimumVersionProvider` enforces it, after the permission check and before the read. The member
+endpoints that predate the versioned contract keep answering without one; that list is
+`ApiOpenApiFactory::UNVERSIONED_PATHS` and it does not grow.
+
+Swagger UI answers on **`/api-docs`**, deliberately outside `^/api`: a browser cannot send an `Authorization` header
+on the first navigation, so behind the bearer wall the page could never render. It is public, because `openapi.yaml`
+is committed to a public repository and describes the API without containing any of its data.
+
+`src/Controller/Report/ApiController` keeps the four endpoints that are **not** resources, and that is a considered
+escape hatch rather than a leftover: `/health` (no `data` key), the two function lists (their vendor `Accept` header
+carries a `version` parameter that content negotiation answers 406 to before the version can be read), the two
+examples, and the catch-all that makes an unknown `/api` path answer `error-router-no-match`. That catch-all must
+stay the last method in the class.
+
+`GET /api/members/{lidnr}` answers **204 with no body** for a member that does not exist. That is the legacy
+contract, not an oversight, and it is why its provider returns a `Response`.
+
+Both surfaces read the projection, never the ledger directly.
 
 ## Dependency injection
 
 Pure autowire / autoconfigure from `src/`, with scalar bindings in `config/services.yaml` and exclusions for
-`src/DependencyInjection/`, `src/Entity/` and `src/Security/User/HandlerRegistry.php`. There are **no factory
+`src/DependencyInjection/`, `src/Entity/`, `src/ApiResource/`, `src/ViewModel/` and
+`src/Security/User/HandlerRegistry.php`. There are **no factory
 classes** — constructor property promotion does all the wiring, and `readonly` where it holds. If autowire cannot
 resolve a dependency, define the service explicitly in `config/services.yaml`; do not add a factory.
 
@@ -311,6 +363,11 @@ Two extraction traps:
 
   Not `new TranslatableMessage(match ($this) { ... })` — the extractor cannot see through that, and `--clean` then
   deletes every translation for those labels.
+- A bare string handed to the form theme for it to translate — a `help:` on a `form_row()` call — is invisible to
+  the extractor, so `--clean` deletes its translation while the template still uses it. Write `help: t('…')`
+  instead; Twig's `t()` is extracted and yields a `TranslatableMessage` the theme still translates. Put the
+  parameters inside `t()` rather than in `help_translation_parameters`, because the `trans` filter refuses to take
+  its own arguments alongside a `TranslatableMessage`.
 - In form types, wrap user-facing labels and `invalid_message` strings with `t()`
   (`use function Symfony\Component\Translation\t;`). Symfony's PHP extractor does not recurse into `RepeatedType`'s
   `first_options` / `second_options`, so plain `'label' => 'My label'` strings nested there are silently skipped;

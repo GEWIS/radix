@@ -36,6 +36,8 @@
                         <th scope="col">#</th>
                         <th scope="col">{{ 'Description'|trans }}</th>
                         <th scope="col">{{ 'Permissions'|trans }}</th>
+                        <th scope="col">{{ 'Status'|trans }}</th>
+                        <th scope="col">{{ 'Last used'|trans }}</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -52,6 +54,27 @@
                                 </ul>
                             </td>
                             <td>
+                                {% if principal.revoked %}
+                                    <span class="badge text-bg-danger">{{ 'Revoked'|trans }}</span>
+                                {% elseif principal.expired %}
+                                    <span class="badge text-bg-warning">{{ 'Expired'|trans }}</span>
+                                {% else %}
+                                    <span class="badge text-bg-success">{{ 'Active'|trans }}</span>
+                                {% endif %}
+                                {% if principal.expiresAt is not null and not principal.revoked %}
+                                    <div class="small text-body-secondary">
+                                        {{ 'Until %date%'|trans({'%date%': principal.expiresAt|date('Y-m-d')}) }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if principal.lastUsedAt is null %}
+                                    <span class="text-body-secondary">{{ 'Never'|trans }}</span>
+                                {% else %}
+                                    {{ principal.lastUsedAt|date('Y-m-d') }}
+                                {% endif %}
+                            </td>
+                            <td>
                                 <div class="d-flex gap-2 justify-content-end">
                                     <a class="btn btn-sm btn-outline-gewis-primary"
                                        href="{{ path('user_api_principal_edit', {'id': principal.id}) }}">
@@ -59,20 +82,22 @@
                                     </a>
                                     {# An icon-only button carried no accessible name; the actions are spelled out
                                        now that the glyphicon set is gone. #}
-                                    <form method="post"
-                                          action="{{ path('user_api_principal_delete', {'id': principal.id}) }}">
-                                        <input type="hidden" name="_csrf_token"
-                                               value="{{ csrf_token('api_principal_delete-' ~ principal.id) }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            {{ 'Delete'|trans }}
-                                        </button>
-                                    </form>
+                                    {% if not principal.revoked %}
+                                        <form method="post"
+                                              action="{{ path('user_api_principal_revoke', {'id': principal.id}) }}">
+                                            <input type="hidden" name="_csrf_token"
+                                                   value="{{ csrf_token('api_principal_revoke-' ~ principal.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                {{ 'Revoke'|trans }}
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="4">
+                            <td colspan="6">
                                 {% include 'partials/application/empty-state.html.twig' with {
                                     icon: 'fa-key',
                                     title: 'No API principals'|trans,

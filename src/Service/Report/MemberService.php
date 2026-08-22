@@ -66,7 +66,6 @@ class MemberService
     public function generateMember(DatabaseMember $member): void
     {
         $repo = $this->emReport->getRepository(ReportMember::class);
-        // first try to find an existing member
         $reportMember = $repo->find($member->getLidnr());
 
         if (null === $reportMember) {
@@ -90,7 +89,6 @@ class MemberService
         $reportMember->setDeleted($member->getDeleted());
         $reportMember->setAuthenticationKey($member->getAuthenticationKey());
 
-        // go through addresses
         foreach ($member->getAddresses() as $address) {
             $this->generateAddress(
                 $address,
@@ -98,7 +96,6 @@ class MemberService
             );
         }
 
-        // process mailing lists
         $this->generateLists(
             $member,
             $reportMember,
@@ -165,7 +162,6 @@ class MemberService
             foreach ($reportMember->getMailingListMemberships() as $repMLM) {
                 // NOTE: $list is a mailing list name while getMailingList() is a MailingList, so this never matches
                 // and a membership that disappeared from the ledger is never removed from the projection. Left
-                // as-is; correcting it changes what a regeneration writes.
                 if ($repMLM->getMailingList() !== $list) {
                     continue;
                 }
@@ -212,28 +208,20 @@ class MemberService
     /**
      * Take a member out of the projection, because the ledger has taken them out of the register.
      *
-     * Everything on this connection that hangs off the member goes with them, and the database is what takes it: every
-     * association that cannot outlive a member (their account and what hangs off it, their sign-ups, tags, votes,
-     * photo preferences and address) declares `ON DELETE CASCADE` on its join column, and every association that names
-     * a member only for attribution (who created an activity, who asked a poll, who wrote a comment, who reviewed a
-     * revision) declares `ON DELETE SET NULL`. Doing it in the one statement is not merely cheaper than walking the
-     * graph here: it is the only version that stays right, since this service would otherwise have to know about every
-     * corner of the website and would quietly start leaving orphans the day a new one is added. The cost is that the
-     * unit of work does not learn what the database took with the member, which is why this runs at the end of a
-     * removal and nothing reads those rows again afterwards.
+     * The database cascades the rest: what cannot outlive a member declares `ON DELETE CASCADE`, what names one only
+     * for attribution `ON DELETE SET NULL`. Walking the graph here would mean knowing every corner of the website and
+     * leaving orphans the day a new one is added. The unit of work does not learn what the database took, so this
+     * runs at the end of a removal.
      *
-     * What the database will not do is drop a row that records a decision: sub-decisions, organ and board
-     * installations and key grants keep a plain foreign key, so a member the association decided something about
-     * cannot be removed at all. {@see \App\Repository\Database\MemberRepository::canRemove()} is what keeps such a
-     * member out of here — they are stripped of their data instead — and the constraint is the backstop for it.
+     * Rows that record a decision keep a plain foreign key, so a member the association decided something about
+     * cannot be removed at all; {@see \App\Repository\Database\MemberRepository::canRemove()} keeps them out of
+     * here, and the constraint is the backstop.
      */
     public function deleteMember(DatabaseMember $member): void
     {
         $reportMember = $this->emReport->getRepository(ReportMember::class)
             ->find($member->getLidnr());
 
-        // The ledger is free to create and remove a member without the projection ever having seen them, in which
-        // case there is nothing here to take out.
         if (null === $reportMember) {
             return;
         }
@@ -245,13 +233,11 @@ class MemberService
     {
         $repo = $this->emReport->getRepository(ReportAddress::class);
 
-        // first try to find an existing member
         $reportAddress = $repo->find([
             'member' => $address->getMember()->getLidnr(),
             'type' => $address->getType(),
         ]);
 
-        // If the report address has already been deleted, we don't need to do anything here.
         if (null === $reportAddress) {
             return;
         }

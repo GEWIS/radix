@@ -13,6 +13,7 @@ use App\Repository\Frontpage\PageRepository;
 use App\Util\Application\SlugRule;
 use Override;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -102,10 +103,7 @@ class PageType extends AbstractType
             ->add(
                 'requiredRole',
                 EnumType::class,
-                [
-                    'label' => t('Who may read this page'),
-                    'class' => UserRoles::class,
-                ],
+                self::requiredRoleOptions(),
             )
             ->add(
                 'content',
@@ -117,9 +115,50 @@ class PageType extends AbstractType
             );
 
         $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            static function (PreSetDataEvent $event): void {
+                $page = $event->getData();
+
+                if (
+                    $page instanceof Page
+                    && UserRoles::ApiUser === $page->getRequiredRole()
+                ) {
+                    return;
+                }
+
+                $event->getForm()->add(
+                    'requiredRole',
+                    EnumType::class,
+                    self::requiredRoleOptions(static function (?UserRoles $role): bool {
+                        return UserRoles::ApiUser !== $role;
+                    }),
+                );
+            },
+        );
+
+        $builder->addEventListener(
             FormEvents::POST_SUBMIT,
             $this->validateAddress(...),
         );
+    }
+
+    /**
+     * @param callable(UserRoles|null): bool|null $filter
+     *
+     * @return array<string, mixed>
+     */
+    private static function requiredRoleOptions(?callable $filter = null): array
+    {
+        $options = [
+            'label' => t('Who may read this page'),
+            'class' => UserRoles::class,
+        ];
+
+        if (null !== $filter) {
+            $options['choice_filter'] = $filter;
+        }
+
+        return $options;
     }
 
     #[Override]

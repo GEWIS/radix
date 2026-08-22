@@ -16,11 +16,12 @@
        the principal exists. Marking the field rendered keeps form_end() from emitting a stray empty input. #}
     {% if form.token.vars.value is not empty %}
         {{ form_row(form.token, {
-            'help': 'Only the last characters of the token are shown; the token cannot be changed.'|trans,
+            'help': 'Only a hash of the token is stored, so only its last characters can be shown. It cannot be read back or changed; revoke this principal and create another to replace it.'|trans,
         }) }}
     {% else %}
         {% do form.token.setRendered %}
     {% endif %}
+    {{ form_row(form.expiresAt) }}
     {# The footnote marks the permissions whose label carries a ¹. #}
     {{ form_row(form.permissions, {
         'help': '¹ This permission will add more properties to existing entities that can already be requested.'|trans,

@@ -1,0 +1,34 @@
+{# `group_by` alone renders flat: the stock expanded-choice block iterates the child forms, not the grouped view. #}
+{% macro permission(child, choice, choice_translation_domain, parent_label_class, valid) %}
+    <div class="{{ choice.attr['data-wildcard'] is defined
+        ? 'border border-warning-subtle bg-warning-subtle rounded px-2 py-1'
+        : '' }}">
+        {{- form_widget(child, {
+            parent_label_class: parent_label_class,
+            translation_domain: choice_translation_domain,
+            valid: valid,
+        }) -}}
+    </div>
+{% endmacro %}
+
+{% block api_permissions_widget %}
+    {% import _self as helper %}
+    <div {{ block('widget_container_attributes') }}>
+        {% for group_key, group in choices %}
+                        {% if group.choices is not defined %}
+                {{ helper.permission(form[group_key], group, choice_translation_domain, label_attr.class|default(''), valid) }}
+            {% else %}
+                <fieldset class="mb-3">
+                    <legend class="fs-6 fw-semibold text-body-secondary mb-1">
+                        {{- choice_translation_domain is same as(false)
+                            ? group.label
+                            : group.label|trans({}, choice_translation_domain) -}}
+                    </legend>
+                    {% for key, choice in group.choices %}
+                        {{ helper.permission(form[key], choice, choice_translation_domain, label_attr.class|default(''), valid) }}
+                    {% endfor %}
+                </fieldset>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

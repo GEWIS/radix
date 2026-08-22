@@ -1,15 +1,39 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 api_platform:
     title: GEWIS API
-    version: 1.0.0
+    version: 5.0.0
 
-    # `/api` already answers, and its root is the health endpoint. API Platform's entrypoint and documentation would
-    # both sit on top of paths the existing contract owns, so only declared resources get routes; those appear under
-    # /api/<resource> and do not collide.
+    # The entrypoint would answer on a bare `/api`, which is the health endpoint.
     enable_entrypoint: false
-    enable_docs: false
+    # Swagger UI is routed at /api-docs instead: a browser cannot send a bearer token on the first navigation.
+    enable_docs: true
+    enable_swagger_ui: true
+    enable_re_doc: false
+    enable_scalar: false
+    docs_formats:
+        json: ['application/json']
+        jsonopenapi: ['application/vnd.openapi+json']
+        yamlopenapi: ['application/vnd.openapi+yaml']
+        html: ['text/html']
+
+    # Naming the node replaces the default wholesale, dropping the Hydra stack and /api/contexts with it.
+    formats:
+        json: ['application/json']
+    error_formats:
+        json: ['application/problem+json', 'application/json']
+
+    # Without one `#[SerializedName]` is inert, and the member payload's wire names are frozen.
+    name_converter: 'serializer.name_converter.metadata_aware'
 
     defaults:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+        pagination_enabled: true
+        pagination_items_per_page: 100
+        pagination_client_items_per_page: true
+        pagination_maximum_items_per_page: 500
+        # `?pagination=false` would be a request for every member the association has ever had.
+        pagination_client_enabled: false
+        pagination_partial: false
+        pagination_client_partial: false

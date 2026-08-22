@@ -16,6 +16,7 @@ enum UserRoles: string implements TranslatableInterface
 {
     case Guest = 'PUBLIC_ACCESS';
     case TueGuest = 'ROLE_TUE_GUEST';
+
     case ApiUser = 'ROLE_API_USER';
     case Company = 'ROLE_COMPANY_USER';
     case User = 'ROLE_USER';
@@ -80,7 +81,6 @@ enum UserRoles: string implements TranslatableInterface
             self::TueGuest->value => $translator->trans(
                 'TU/e Guest - Anyone who can access the website from within the TU/e',
             ),
-            self::ApiUser->value => $translator->trans('API User - Authenticated automated program'),
             self::Company->value => $translator->trans('Company - Authenticated company representative'),
             self::User->value => $translator->trans('User - Authenticated member or graduate'),
             self::Member->value => $translator->trans('Member - Authenticated member'),

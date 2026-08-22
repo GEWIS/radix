@@ -60,7 +60,7 @@ final class ApiPrincipalController extends AbstractController
             $form->isSubmitted()
             && $form->isValid()
         ) {
-            $this->apiPrincipalService->create($principal);
+            $token = $this->apiPrincipalService->create($principal);
 
             $this->addFlash(
                 'success',
@@ -69,12 +69,11 @@ final class ApiPrincipalController extends AbstractController
                     ['%entity%' => t('API principal')],
                 ),
             );
-            // The only moment the token is readable in full; from here on the principal only hands out a mask.
             $this->addFlash(
                 'info',
                 t(
                     'Your API token is "%token%". This value will NOT be shown again!',
-                    ['%token%' => $principal->getFullToken()],
+                    ['%token%' => $token],
                 ),
             );
 
@@ -136,16 +135,16 @@ final class ApiPrincipalController extends AbstractController
     }
 
     #[Route(
-        path: '/delete/{id}',
-        name: 'user_api_principal_delete',
+        path: '/revoke/{id}',
+        name: 'user_api_principal_revoke',
         requirements: ['id' => '\d+'],
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        new Expression("'api_principal_delete-' ~ args['id']"),
+        new Expression("'api_principal_revoke-' ~ args['id']"),
         tokenKey: '_csrf_token',
     )]
-    public function delete(int $id): Response
+    public function revoke(int $id): Response
     {
         $principal = $this->apiPrincipalService->find($id);
 
@@ -153,12 +152,12 @@ final class ApiPrincipalController extends AbstractController
             return $this->redirectToIndexAsUnknown();
         }
 
-        $this->apiPrincipalService->remove($principal);
+        $this->apiPrincipalService->revoke($principal);
 
         $this->addFlash(
             'success',
             t(
-                'Succesfully deleted %entity%!',
+                'Succesfully revoked %entity%!',
                 ['%entity%' => t('API principal')],
             ),
         );

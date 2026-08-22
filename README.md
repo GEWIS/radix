@@ -77,6 +77,8 @@ The decision and membership database provides the board and other GEWIS systems 
 - **API**:
     - Serves a consistent projection of the ledger, so decisions and membership information can be queried without touching the register itself.
     - Used by most GEWIS systems as a single, reliable source of truth, ensuring consistency and accuracy across all systems.
+    - Covers members, bodies, board and body installations, keyholders, mailing lists, activities and photos, so applications no longer need AD or LDAP for them.
+    - Each token carries only the permissions it was given, down to individual properties of a member.
 
 And there is plenty more!
 
@@ -216,7 +218,19 @@ This will enable cash payment and send the retry email.
 Note: the links in the e-mails do not resolve in the development setup. Replace the host with `http://localhost/` to follow them.
 
 ### Using the API
-To experiment with the API, import the `openapi.yaml` file into your favourite REST client.
+To experiment with the API, import the `openapi.yaml` file into your favourite REST client. That file is generated
+from the application by `make openapi` and is never edited by hand; a running deployment serves the same document at
+`GET /api/docs.json`.
+
+A running deployment also serves Swagger UI at [`/api-docs`](http://localhost/api-docs), where you can paste a token
+and try the endpoints.
+
+Every endpoint is read with the token of an API principal, created under **Users → API principals** in the
+administration, and only answers for the permissions that principal was given. Collections are paged: `?page=` and
+`?itemsPerPage=` (100 by default, 500 at most), with the totals in the response's `meta`.
+
+Everything except the oldest member endpoints needs the contract version, as either
+`Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` or `X-Api-Version: 5.0.0`.
 
 Alternatively, you can use PowerShell, for example:
 

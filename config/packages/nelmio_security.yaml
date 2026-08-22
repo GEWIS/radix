@@ -98,7 +98,9 @@ when@prod:
     nelmio_security:
         csp:
             enforce:
-                script-src: ['self', 'strict-dynamic', 'https://analytics.gewis.nl/'] # strict-dynamic breaks API platform docs
+                # `strict-dynamic` would stop Swagger UI's script tags from running; DocumentationCspListener drops it
+                # for /api-docs alone rather than weakening this.
+                script-src: ['self', 'strict-dynamic', 'https://analytics.gewis.nl/']
                 # `data:` is what draws the checkmark in a checkbox, the dot in a radio, the thumb of a switch and
                 # the chevron of a select: Bootstrap ships each as an inline SVG background image. Without it the
                 # browser blocks them and those controls render as empty boxes, with nothing to show for it server
@@ -117,7 +119,7 @@ when@dev:
                 # injects them as script tags and has no option to serve them itself. Without the host the browser
                 # refuses both, nothing subscribes to the hub, and a file change publishes a reload that no page is
                 # listening for.
-                script-src: ['self', 'http://localhost:82/', 'https://analytics.test.gewis.nl/', 'https://cdn.jsdelivr.net'] # strict-dynamic breaks API platform docs
+                script-src: ['self', 'http://localhost:82/', 'https://analytics.test.gewis.nl/', 'https://cdn.jsdelivr.net']
                 img-src: ['self', 'data:', 'http://localhost:81/', 'https://images.test.gewis.nl']
                 connect-src: ['self', 'http://localhost:82/', 'https://analytics.test.gewis.nl/']
                 child-src: ['self', 'http://localhost:82/', 'https://analytics.test.gewis.nl/', 'https://www.youtube-nocookie.com/embed/', 'https://player.vimeo.com/video/']

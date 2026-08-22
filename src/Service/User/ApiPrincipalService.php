@@ -26,15 +26,13 @@ final readonly class ApiPrincipalService
         return $this->apiPrincipalRepository->find($id);
     }
 
-    /**
-     * The token is minted here and never taken from input; it can be read back in full exactly once, right after
-     * this call.
-     */
-    public function create(ApiPrincipal $principal): void
+    public function create(ApiPrincipal $principal): string
     {
-        $principal->generateToken();
+        $token = $principal->generateToken();
 
         $this->apiPrincipalRepository->persist($principal);
+
+        return $token;
     }
 
     public function save(ApiPrincipal $principal): void
@@ -42,8 +40,10 @@ final readonly class ApiPrincipalService
         $this->apiPrincipalRepository->persist($principal);
     }
 
-    public function remove(ApiPrincipal $principal): void
+    public function revoke(ApiPrincipal $principal): void
     {
-        $this->apiPrincipalRepository->remove($principal);
+        $principal->revoke();
+
+        $this->apiPrincipalRepository->persist($principal);
     }
 }
