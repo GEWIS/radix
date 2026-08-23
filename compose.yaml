@@ -187,6 +187,29 @@ services:
     scheduler-maintenance:
         <<: *worker
         command: [ "php", "bin/console", "messenger:consume", "scheduler_maintenance", "-vv", "--time-limit=3600", "--memory-limit=256M" ]
+    # Analytics, on its own hostname: the proxy sends analytics.gewis.nl to the port below. It is part of this stack
+    # rather than a separate one because the image is built and published beside the application's, and the site's
+    # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name a
+    # schema on the same MariaDB server the website uses.
+    matomo:
+        image: "abc.docker-registry.gewis.nl/web/radix/matomo:${RADIX_VERSION:-latest}"
+        restart: unless-stopped
+        environment:
+            MATOMO_DATABASE_HOST: "${MATOMO_DATABASE_HOST:?MATOMO_DATABASE_HOST must be set}"
+            MATOMO_DATABASE_PORT: "${MATOMO_DATABASE_PORT:?MATOMO_DATABASE_PORT must be set}"
+            MATOMO_DATABASE_USERNAME: "${MATOMO_DATABASE_USERNAME:?MATOMO_DATABASE_USERNAME must be set}"
+            MATOMO_DATABASE_PASSWORD: "${MATOMO_DATABASE_PASSWORD:?MATOMO_DATABASE_PASSWORD must be set}"
+            MATOMO_DATABASE_DBNAME: "${MATOMO_DATABASE_DBNAME:?MATOMO_DATABASE_DBNAME must be set}"
+            # Whether to reach that server over TLS. 1 on anything but a database in the same stack.
+            MATOMO_DATABASE_SSL: "${MATOMO_DATABASE_SSL:-1}"
+        volumes:
+            - matomo:/var/www/html:rw
+        networks:
+            - radix_network
+        ports:
+            - target: 80
+              published: 9202
+              protocol: tcp
     # The application always talks SMTP to this name. Here it hands the message to the real relay; development
     # replaces this with a Mailpit that catches everything instead.
     mailer:
@@ -248,6 +271,7 @@ volumes:
     caddy_data:
     caddy_config:
     data:
+    matomo:
     rabbitmq_data:
     valkey_data:
 
