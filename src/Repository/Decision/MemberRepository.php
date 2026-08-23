@@ -143,9 +143,6 @@ class MemberRepository extends ServiceEntityRepository
                 'integer',
             );
 
-        // This feeds the photo-tag autocomplete only ({@see \App\Controller\Decision\MemberController::search()}), so
-        // members who opted out of being tagged are excluded here. LEFT JOIN + COALESCE because most members
-        // have no UserSettings row; `lidnr` is qualified because both tables carry it.
         $sql = <<<QUERY
             SELECT `Member`.`lidnr` as `lidnr`,
                 CONCAT_WS(' ', `firstName`, IF(LENGTH(`middleName`), `middleName`, NULL), `lastName`) as `fullName`,
@@ -264,9 +261,6 @@ class MemberRepository extends ServiceEntityRepository
 
         $select = $builder->generateSelectClause(['m' => 't1']);
 
-        // LEFT JOIN + COALESCE so members without a UserSettings row are kept; members who hid their birthday from the
-        // home page are dropped entirely (distinct from hiding only their year of birth, which keeps them on
-        // the panel but withholds the age - that is handled at render time via PrivacyService).
         $sql = <<<QUERY
             SELECT $select FROM Member AS t1
             LEFT JOIN UserSettings AS us ON us.lidnr = t1.lidnr
@@ -416,18 +410,14 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all non-hidden and non-deleted members.
-     *
-     * @return array<array-key, Member>
+     * @return Paginator<Member>
      */
-    public function findNormal(): array
-    {
+    public function paginateNormal(
+        int $page,
+        int $pageSize,
+    ): Paginator {
         $qb = $this->createQueryBuilder('m');
 
-        // Ordering is not cosmetic here: combined with the row limit below, an unordered query lets the database
-        // return any 32 of the eligible members, and a different 32 on the next call. Consumers of `GET /api/members`
-        // cannot rely on the order because there was none, so pinning it to lidnr is safe and makes the endpoint
-        // repeatable. The limit itself is still wrong — see GH-575 for replacing it with real pagination.
         $qb->where('m.expiration >= CURRENT_TIMESTAMP()')
             ->andWhere('m.hidden = false')
             ->andWhere('m.deleted = false')
@@ -435,26 +425,32 @@ class MemberRepository extends ServiceEntityRepository
                 'm.lidnr',
                 'ASC',
             )
-            ->setMaxResults(32)
-            ->setFirstResult(0);
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
 
-        return $qb->getQuery()->getResult();
+        return new Paginator(
+            $qb->getQuery(),
+            false,
+        );
     }
 
     /**
-     * Find members that are in at least one organ currently
-     *
-     * @return array<array-key, Member>
+     * @return Paginator<Member>
      */
-    public function findActive(bool $includeInactiveFraternity = false): array
-    {
+    public function paginateActive(
+        bool $includeInactiveFraternity,
+        bool $includeDeleted,
+        int $page,
+        int $pageSize,
+    ): Paginator {
         $qb = $this->createQueryBuilder('m');
-        $qb->leftJoin(
-            OrganMember::class,
-            'om',
-            Join::WITH,
-            'm.lidnr = om.member',
-        )
+        $qb->distinct()
+            ->leftJoin(
+                OrganMember::class,
+                'om',
+                Join::WITH,
+                'm.lidnr = om.member',
+            )
             ->where('om.dischargeDate IS NULL OR om.dischargeDate > CURRENT_DATE()')
             ->andWhere('om.installDate <= CURRENT_DATE()')
             ->andWhere('om.function <> \'\'');
@@ -463,15 +459,21 @@ class MemberRepository extends ServiceEntityRepository
             $qb->andWhere('om.function <> \'Inactief Lid\'');
         }
 
-        // Unlike findNormal() this is not row-limited, so an unordered query returns the whole set either way — but it
-        // returns it in whatever order the rows happen to sit in, which changes after every regeneration of the
-        // projection.
+        if (!$includeDeleted) {
+            $qb->andWhere('m.deleted = false');
+        }
+
         $qb->orderBy(
             'm.lidnr',
             'ASC',
-        );
+        )
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
 
-        return $qb->getQuery()->getResult();
+        return new Paginator(
+            $qb->getQuery(),
+            false,
+        );
     }
 
     /**
@@ -498,9 +500,6 @@ class MemberRepository extends ServiceEntityRepository
         int $page,
         int $pageSize,
     ): Paginator {
-        // The User row is joined for filter predicates (activatedOnly / mfaOnly) but intentionally NOT added to the
-        // select. Adding it would flatten the result into a heterogeneous [Member, User, Member, User, ...] list
-        // (see [[findAllWithUserDetails]] for the same effect). The component hydrates users separately by lidnr.
         $qb = $this->createQueryBuilder('m')
             ->leftJoin(
                 User::class,
@@ -512,8 +511,6 @@ class MemberRepository extends ServiceEntityRepository
         $search = trim($search);
         if ('' !== $search) {
             $needle = '%' . strtolower($search) . '%';
-            // DQL does not have CONCAT_WS, only CONCAT, so combined-field matches use nested CONCAT with explicit
-            // spaces. The two combined forms cover the common "first last" and "first middle last" search shapes.
             $expr = $qb->expr()->orX(
                 $qb->expr()->like(
                     'LOWER(m.firstName)',

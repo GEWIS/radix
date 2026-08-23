@@ -1,237 +1,2743 @@
-openapi: 3.1.1
+openapi: 3.1.0
 info:
-  title: GEWISDB API
-  description: The GEWIS member database has a few available endpoints
+  title: 'GEWIS API'
+  description: "The API of GEWIS: the association's register of members, bodies and decisions, and the activities and photos of its website. Every path is read with a bearer token belonging to an API principal, and what that principal may read is decided per permission."
   termsOfService: 'https://gewis.nl'
   contact:
     email: abc@gewis.nl
   license:
-    name: GNU GENERAL PUBLIC LICENSE Version 3
+    name: 'GNU GENERAL PUBLIC LICENSE Version 3'
     url: 'https://github.com/GEWIS/radix/blob/main/LICENSE.txt'
-  version: 4.3.3
-externalDocs:
-  description: Contribute to this API
-  url: 'https://github.com/GEWIS/radix'
+  version: 5.0.0
 servers:
-  - url: 'https://test.gewis.nl/api'
-    description: Test environment
-  - url: 'https://gewis.nl/api'
-    description: Production environment
-  - url: 'http://localhost/api'
-    description: Local environment
-tags:
-  - name: basic
-  - name: members
-    description: Obtain information about members
-  - name: board
-    description: Obtain information about board (installations)
-  - name: functions
-    description: Obtain information about board/organ functions (names, translations)
-  - name: organs
-    description: Obtain information about organs of GEWIS
+  - url: 'https://gewis.nl'
+    description: 'Production environment'
+  - url: 'https://test.gewis.nl'
+    description: 'Test environment'
+  - url: 'http://localhost'
+    description: 'Local environment'
 paths:
-  /:
+  /api/activities:
     get:
-      summary: Health endpoint
-      description: This endpoint will return the health status of the API
-      deprecated: true
+      operationId: api_activities
       tags:
-        - basic
+        - Activity
       responses:
         '200':
-          $ref: '#/components/responses/health'
+          description: 'Activity collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/Activity' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
-          $ref: '#/components/responses/no_permission'
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
         '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - HealthR
-  /health:
-    get:
-      summary: Health endpoint
-      description: >-
-        This endpoint will return the health status of the API and whether
-        client applications are requested to temporarily pause their
-        synchronisation.
-      operationId: getHealth
-      tags:
-        - basic
-      responses:
-        '200':
-          $ref: '#/components/responses/health'
-        '403':
-          $ref: '#/components/responses/no_permission'
-        '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - HealthR
-  /members:
-    get:
-      summary: Get members
-      description: Get all members
-      operationId: getMembers
-      tags:
-        - members
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get activities'
+      description: 'The publicly visible activities, paged. Upcoming ones by default, the one starting soonest first; `past=true` asks for the ones that have already finished, the most recent first. `category` narrows to a single category and `organ` to the body organising it, by its identifier; a `category` naming no known category is ignored rather than refused. A cancelled activity is listed, with `cancelled` set; an activity the board unpublished is not listed at all.'
       parameters:
-        - name: includeOrgans
+        -
+          name: past
           in: query
+          description: 'Ask for the activities that have already finished, most recent first, instead of the upcoming ones. A value that is not recognisably true is read as false rather than refused.'
           required: false
-          description: >-
-            Whether to include organ memberships in the response. By default,
-            organs are not included due to rather long computation time.
+          deprecated: false
           schema:
-            type:
-            - "boolean"
+            type: boolean
             default: false
-      responses:
-        '200':
-          $ref: '#/components/responses/member_list'
-        '403':
-          $ref: '#/components/responses/no_permission'
-        '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - MembersR
-  '/members/{lidnr}':
-    get:
-      summary: Get a member
-      description: Get a specific member by lidnr
-      operationId: getMemberByLidnr
-      tags:
-        - members
-      parameters:
-        - name: lidnr
-          in: path
-          required: true
+          style: form
+          explode: true
+        -
+          name: category
+          in: query
+          description: 'Narrow the list to a single category, e.g. `social-drink` or `career`, as `category` on an activity states it. A value naming no known category is ignored rather than refused.'
+          required: false
+          deprecated: false
           schema:
-            type:
-            - "integer"
+            type: string
+          style: form
+          explode: true
+        -
+          name: organ
+          in: query
+          description: 'Narrow the list to the body organising the activity, by the id `/bodies/{id}` answers to. A value that is not a whole number is ignored rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
             examples:
-              - 8000
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/activities/{id}':
+    get:
+      operationId: api_activity
+      tags:
+        - Activity
       responses:
         '200':
-          $ref: '#/components/responses/member_single'
-        '204':
-          description: Member not found
+          description: 'Activity resource'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/Activity' }
         '403':
-          $ref: '#/components/responses/no_permission'
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such resource, or none the principal may see.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
         '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - MembersR
-  /members/active:
-    get:
-      summary: Get active members
-      description: Get all members that are currently installed in at least one organ
-      operationId: getMembersActive
-      tags:
-        - members
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get an activity'
+      description: 'A single activity by identifier. An activity that has never been approved, and one the board has unpublished, are both not public and answer 404 — the same as an identifier that names nothing.'
       parameters:
-        - name: includeInactive
-          in: query
-          required: false
-          description: >-
-            Whether to include inactive fraternity members in the response. If a
-            member is both an active member in another type and inactive in a
-            fraternity, they also get returned (including possibly their
-            inactive organ memberships).
-          schema:
-            type:
-            - "boolean"
-            default: false
-      responses:
-        '200':
-          $ref: '#/components/responses/member_list'
-        '403':
-          $ref: '#/components/responses/no_permission'
-        '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - MembersActiveR
-  /organFunctions:
-    get:
-      summary: Get organ functions
-      description: Get all organ functions including translations
-      operationId: getOrganFunctions
-      tags:
-        - functions
-        - organs
-      parameters:
-        - in: header
-          name: Accept
+        -
+          name: id
+          in: path
+          description: 'Activity identifier'
+          required: true
+          deprecated: false
           schema:
             type: string
+          style: simple
+          explode: false
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
-          example: "application/vnd.gewis.gewisdb+json;version=4.3.3"
-      responses:
-        '200':
-          $ref: '#/components/responses/organFunction_list'
-        '403':
-          $ref: '#/components/responses/no_permission'
-        '406':
-          $ref: '#/components/responses/not_acceptable'
-        '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - OrganFunctionsListR
-  /boardFunctions:
-    get:
-      summary: Get board functions
-      description: Get all board functions including translations
-      operationId: getBoardFunctions
-      tags:
-        - board
-        - functions
-      parameters:
-        - in: header
-          name: Accept
+          deprecated: false
           schema:
             type: string
-          required: true
-          example: "application/vnd.gewis.gewisdb+json;version=4.3.3"
-      responses:
-        '200':
-          $ref: '#/components/responses/boardFunction_list'
-        '403':
-          $ref: '#/components/responses/no_permission'
-        '406':
-          $ref: '#/components/responses/not_acceptable'
-        '500':
-          $ref: '#/components/responses/server_error'
-      security:
-        - api_auth:
-            - BoardFunctionsListR
-  /example404:
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/photos/albums/{id}/photos':
     get:
-      summary: Example 404
-      description: This 404 will be returned if there is a mistake in the requested path
-      operationId: test404
+      operationId: api_photos_album_photos
       tags:
-        - errors
+        - AlbumPhoto
       responses:
         '404':
-          $ref: '#/components/responses/not_found_route'
-  /example500:
-    get:
-      summary: Example 500
-      description: This 500 will be returned if there is a mistake in the requested path
-      operationId: test500
-      tags:
-        - errors
-      responses:
+          description: 'No album is stored under that identifier, or it has not been published.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '200':
+          description: 'AlbumPhoto collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/AlbumPhoto' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
         '500':
-          $ref: '#/components/responses/server_error'
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get the photos of an album'
+      description: 'The photos of one published album, oldest first, paged. Photos of a sub-album belong to that sub-album and are read from its own collection. An album that does not exist, or that has not been published, is a missing resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Album identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  /api/boards:
+    get:
+      operationId: api_boards
+      tags:
+        - BoardMember
+      responses:
+        '200':
+          description: 'BoardMember collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/BoardMember' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get board installations'
+      description: 'Every member currently serving on the board, newest installation first, paged. Set `includeFormer` to also get the installations that have been released or discharged; they are told apart by `current`.'
+      parameters:
+        -
+          name: includeFormer
+          in: query
+          description: 'Also list the installations that have been released or discharged; they are told apart by `current`. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  /api/bodies:
+    get:
+      operationId: api_bodies
+      tags:
+        - Body
+      responses:
+        '200':
+          description: 'Body collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/Body' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get bodies'
+      description: 'The bodies of the association, paged and ordered by abbreviation. Only the bodies that still exist, unless `includeAbrogated` asks for the abrogated ones as well; `type` narrows the list to one kind of body, and a value naming no kind is ignored rather than refused.'
+      parameters:
+        -
+          name: type
+          in: query
+          description: 'Narrow the list to one kind of body: `committee`, `avc`, `fraternity`, `kcc`, `avw`, `rva` or `sc`. A value naming no kind of body is ignored rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: true
+        -
+          name: includeAbrogated
+          in: query
+          description: 'Also list the bodies that have been abrogated; they are told apart by `active`. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/bodies/{id}':
+    get:
+      operationId: api_body
+      tags:
+        - Body
+      responses:
+        '200':
+          description: 'Body resource'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/Body' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such resource, or none the principal may see.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get a body'
+      description: 'A single body by id, abrogated or not: a consumer that already holds the id is asking about that body in particular, and whether it still exists is the answer rather than the question. An id no body is stored under is a missing resource: 404.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Body identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/bodies/{id}/members':
+    get:
+      operationId: api_body_members
+      tags:
+        - BodyMember
+      responses:
+        '404':
+          description: 'No body is stored under that identifier.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '200':
+          description: 'BodyMember collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/BodyMember' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get the members of a body'
+      description: 'Everyone currently installed in the body, paged and ordered by membership number. Set `includeDischarged` to also get the installations that have ended; they are told apart by `current`. An id no body is stored under is a missing resource (404) rather than an empty page, so a consumer syncing a group can tell a body nobody sits in from a body that does not exist.'
+      parameters:
+        -
+          name: includeDischarged
+          in: query
+          description: 'Also list the installations that have ended; they are told apart by `current`. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: id
+          in: path
+          description: 'Body identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  /api/example404:
+    get:
+      operationId: example404
+      tags:
+        - Error
+      responses:
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '404':
+          description: 'What any address under `/api` that answers nothing looks like.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Example 404'
+      description: 'Nothing is stored here; it exists so a consumer can see what a wrong address returns.'
+  /api/example500:
+    get:
+      operationId: example500
+      tags:
+        - Error
+      responses:
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '500':
+          description: 'What a failing endpoint looks like.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Example 500'
+      description: 'Always throws, so a consumer can confirm it handles a failure the way it intends to.'
+  /api/boardFunctions:
+    get:
+      operationId: getBoardFunctions
+      tags:
+        - Function
+      responses:
+        '200':
+          description: 'The functions and their translations, keyed by the name the register stores.'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/FunctionList' }
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no API version, named one this endpoint does not serve, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get board functions'
+      description: 'Every function a board member can be installed in, with its Dutch and English name. Requires a client version through the `Accept` header.'
+      parameters:
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. `Accept: application/vnd.gewis.gewisdb+json;version=4.3.3` says the same thing and is what consumers of this endpoint have always sent.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+      security:
+        -
+          api_auth:
+            - boards_functionslist_read
+  /api/organFunctions:
+    get:
+      operationId: getOrganFunctions
+      tags:
+        - Function
+      responses:
+        '200':
+          description: 'The functions and their translations, keyed by the name the register stores.'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/FunctionList' }
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no API version, named one this endpoint does not serve, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get body functions'
+      description: 'Every function a member can be installed in, with its Dutch and English name. Requires a client version through the `Accept` header.'
+      parameters:
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. `Accept: application/vnd.gewis.gewisdb+json;version=4.3.3` says the same thing and is what consumers of this endpoint have always sent.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+      security:
+        -
+          api_auth:
+            - organs_functionslist_read
+  /api:
+    get:
+      operationId: getHealthAtRoot
+      tags:
+        - Health
+      responses:
+        '200':
+          description: 'The API is answering.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Health endpoint'
+      description: 'The same as `/api/health`, at the address it answered on first.'
+      deprecated: true
+      security:
+        -
+          api_auth:
+            - health_read
+  /api/health:
+    get:
+      operationId: getHealth
+      tags:
+        - Health
+      responses:
+        '200':
+          description: 'The API is answering.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Health endpoint'
+      description: 'Whether the API is answering, and whether consumers should pause their synchronisation. The only endpoint whose envelope has no `data`.'
+      security:
+        -
+          api_auth:
+            - health_read
+  /api/keyholders:
+    get:
+      operationId: api_keyholders
+      tags:
+        - Keyholder
+      responses:
+        '200':
+          description: 'Keyholder collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/Keyholder' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get keyholders'
+      description: "Every member who currently holds a key to the association's rooms, paged. Set `includeExpired` to also get the grantings that have expired or been withdrawn; they are told apart by `current`."
+      parameters:
+        -
+          name: includeExpired
+          in: query
+          description: 'Also list the grantings that have expired or been withdrawn; they are told apart by `current`. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  /api/mailing-lists:
+    get:
+      operationId: api_mailing_lists
+      tags:
+        - MailingList
+      responses:
+        '200':
+          description: 'MailingList collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/MailingList' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get mailing lists'
+      description: 'Every mailing list the association keeps, paged and ordered by name.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/mailing-lists/{name}':
+    get:
+      operationId: api_mailing_list
+      tags:
+        - MailingList
+      responses:
+        '200':
+          description: 'MailingList resource'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/MailingList' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such resource, or none the principal may see.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get a mailing list'
+      description: 'A single mailing list by the name that identifies it. A name no list is stored under is a missing resource: 404.'
+      parameters:
+        -
+          name: name
+          in: path
+          description: 'MailingList identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/mailing-lists/{name}/members':
+    get:
+      operationId: api_mailing_list_members
+      tags:
+        - MailingListMember
+      responses:
+        '404':
+          description: 'No mailing list is stored under that name.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '200':
+          description: 'MailingListMember collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/MailingListMember' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get the subscribers of a mailing list'
+      description: 'Everyone currently subscribed to the named mailing list, paged and ordered by membership number. A name no list is stored under is a missing resource (404) rather than an empty page, so a consumer can tell a list nobody is on from a list that does not exist. A subscription belonging to a deleted member is part of the page only for a principal holding `members_deleted`.'
+      parameters:
+        -
+          name: name
+          in: path
+          description: 'MailingList identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  /api/members:
+    get:
+      operationId: api_members
+      tags:
+        - Member
+      responses:
+        '200':
+          description: 'Member collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/Member' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get members'
+      description: 'Every member of the association, paged.'
+      parameters:
+        -
+          name: includeOrgans
+          in: query
+          description: 'Include the bodies the member is currently installed in. Needs the `organs_members_read` permission; expensive, which is why it is off by default. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+  /api/members/active:
+    get:
+      operationId: api_members_active
+      tags:
+        - Member
+      responses:
+        '200':
+          description: 'Member collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/Member' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get active members'
+      description: 'Every member currently installed in at least one body, paged.'
+      parameters:
+        -
+          name: includeInactive
+          in: query
+          description: 'Also list the members whose only installation is as an inactive member of a fraternity. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+  /api/members/birthdays:
+    get:
+      operationId: api_members_birthdays
+      tags:
+        - Member
+      responses:
+        '200':
+          description: 'Member collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/Member' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get members celebrating a birthday'
+      description: 'Members whose birthday falls today, or within the next `days` days. Members who asked for their birthday not to be published are never part of this list.'
+      parameters:
+        -
+          name: days
+          in: query
+          description: 'How many days ahead to look. 0 is today. More than 31 is read as 31; a value that is not a whole number is ignored rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+            maximum: 31
+          style: form
+          explode: true
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/members/{lidnr}':
+    get:
+      operationId: api_member
+      tags:
+        - Member
+      responses:
+        '204':
+          description: 'No such member, or none the principal may see. The body is empty.'
+        '200':
+          description: 'Member resource'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/Member' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get a member'
+      description: 'A single member by membership number. A member that does not exist, or that the principal may not see, is an empty dataset rather than a missing resource: 204, no body.'
+      parameters:
+        -
+          name: lidnr
+          in: path
+          description: 'Member identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+  '/api/members/{lidnr}/bodies':
+    get:
+      operationId: api_member_bodies
+      tags:
+        - MemberBody
+      responses:
+        '404':
+          description: 'No member is stored under that membership number.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '200':
+          description: 'MemberBody collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/MemberBody' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get the bodies a member is installed in'
+      description: 'Every body the member currently sits in, paged and ordered by abbreviation. Set `includeDischarged` to also get the installations that have ended; they are told apart by `current`. A membership number no member is stored under is a missing resource (404) rather than an empty page, so a consumer can tell a member who sits in nothing from one that does not exist.'
+      parameters:
+        -
+          name: includeDischarged
+          in: query
+          description: 'Also list the installations that have ended; they are told apart by `current`. A value that is not recognisably true is read as false rather than refused.'
+          required: false
+          deprecated: false
+          schema:
+            type: boolean
+            default: false
+          style: form
+          explode: true
+        -
+          name: lidnr
+          in: path
+          description: 'Member identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/photos/{id}/image/{variant}':
+    get:
+      operationId: getPhotoImage
+      tags:
+        - Photo
+      responses:
+        '200':
+          description: 'The rendition, as WebP.'
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such photo, no such rendition, or the album it belongs to is not published.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get a rendition of a photo'
+      description: "Album originals are private and are served signed at `/img`, which is outside this API's firewall, so a bearer token cannot fetch one there. This serves the same bytes where the token does authenticate."
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'The photo.'
+          required: true
+          deprecated: false
+          schema:
+            type: integer
+          style: simple
+          explode: false
+        -
+          name: variant
+          in: path
+          description: 'The rendition, e.g. `w320`, `w1920`, `square` or `cover`.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+      security:
+        -
+          api_auth:
+            - photos_albums_read
+  /api/photos/albums:
+    get:
+      operationId: api_photos_albums
+      tags:
+        - PhotoAlbum
+      responses:
+        '200':
+          description: 'PhotoAlbum collection'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { type: array, items: { $ref: '#/components/schemas/PhotoAlbum' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get photo albums'
+      description: 'Every published photo album, sub-albums included, most recent first. An album with no date sorts last.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: true
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 0
+            maximum: 500
+          style: form
+          explode: true
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/photos/albums/{id}':
+    get:
+      operationId: api_photos_album
+      tags:
+        - PhotoAlbum
+      responses:
+        '200':
+          description: 'PhotoAlbum resource'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/PhotoAlbum' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such resource, or none the principal may see.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get a photo album'
+      description: 'A single published photo album with the published albums below it. Its photos are paged, and are read from `/api/photos/albums/{id}/photos`, which `photosUrl` addresses.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'PhotoAlbum identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
+  '/api/photos/albums/{id}/cover/{variant}':
+    get:
+      operationId: getAlbumCover
+      tags:
+        - PhotoAlbum
+      responses:
+        '200':
+          description: 'The rendition, as WebP.'
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such album, no cover generated for it, no such rendition, or the album is not published.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get a rendition of an album cover'
+      description: "A cover is a mosaic generated from the album rather than one of its photos, so it has no address among them. Served here for the same reason the photo renditions are: `/img` is outside this API's firewall."
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'The album.'
+          required: true
+          deprecated: false
+          schema:
+            type: integer
+          style: simple
+          explode: false
+        -
+          name: variant
+          in: path
+          description: 'The rendition, e.g. `cover`, `cover2x`, `square` or `w640`.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+      security:
+        -
+          api_auth:
+            - photos_albums_read
+  /api/photos/photo-of-the-week:
+    get:
+      operationId: api_photos_photo_of_the_week
+      tags:
+        - PhotoOfTheWeek
+      responses:
+        '200':
+          description: 'PhotoOfTheWeek resource'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  data: { $ref: '#/components/schemas/PhotoOfTheWeek' }
+        '403':
+          description: 'The principal does not hold the permission this endpoint needs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: 'No such resource, or none the principal may see.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '401':
+          description: 'No bearer token was given, or it is not known. The body is empty.'
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
+              schema:
+                type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '406':
+          description: 'The `Accept` header named no contract version, named one older than 5.0.0, or could not be parsed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+      summary: 'Get the photo of the week'
+      description: 'The photo that won the vote of the week that just passed, with the address its public copy is served from. A week nobody voted in, and a photo of the week that has been hidden, are both a missing resource.'
+      parameters:
+        -
+          name: X-Api-Version
+          in: header
+          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+            examples:
+              - 5.0.0
+          style: simple
+          explode: false
 components:
   schemas:
-    health:
-      type:
-        - "object"
+    Activity:
+      type: object
+      description: 'An activity, as its live (approved) revision describes it. A cancelled activity is still listed, with `cancelled` set; one the board unpublished is not listed at all. Every human-readable field is an {en, nl} pair, and a value the organiser never filled in is null rather than substituted from the other language.'
+      properties:
+        id:
+          description: 'Identifier of the activity. Stable across every revision of it, so it keeps naming the same activity after an edit is approved.'
+          type: integer
+        name:
+          description: 'The name of the activity, per language.'
+          type: object
+          properties:
+            en:
+              type:
+                - string
+                - 'null'
+            nl:
+              type:
+                - string
+                - 'null'
+        description:
+          description: 'The description of the activity, per language. Markdown, as the organiser wrote it.'
+          type: object
+          properties:
+            en:
+              type:
+                - string
+                - 'null'
+            nl:
+              type:
+                - string
+                - 'null'
+        location:
+          description: 'Where the activity takes place, per language.'
+          type: object
+          properties:
+            en:
+              type:
+                - string
+                - 'null'
+            nl:
+              type:
+                - string
+                - 'null'
+        costs:
+          description: 'What attending costs, per language. Prose rather than an amount: an activity may be free, priced per option, or settled afterwards.'
+          type: object
+          properties:
+            en:
+              type:
+                - string
+                - 'null'
+            nl:
+              type:
+                - string
+                - 'null'
+        beginTime:
+          description: 'When the activity starts, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        endTime:
+          description: 'When the activity ends, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        category:
+          description: 'The single category the activity is filed under, e.g. `social-drink` or `career`. `uncategorised` is only ever carried by activities that predate categories.'
+          type: string
+        organ:
+          description: 'The body organising the activity, or null when no body does.'
+          type:
+            - object
+            - 'null'
+          properties:
+            id:
+              type: integer
+            abbreviation:
+              type: string
+            name:
+              type: string
+        company:
+          description: 'The company organising the activity, or null when no company does. Naming a company is presentation only; it never means the company owns the activity.'
+          type:
+            - object
+            - 'null'
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        requireGEFLITST:
+          description: "Whether the activity needs the association's photography committee present."
+          type: boolean
+        requireZettle:
+          description: 'Whether the activity needs a card terminal.'
+          type: boolean
+        cancelled:
+          description: 'Whether the board has cancelled the activity. A cancelled activity stays announced and keeps its schedule; all sign-up interaction on it is frozen.'
+          type: boolean
+        labels:
+          description: 'The labels the activity carries, e.g. that it is in English or that it is alcohol-free.'
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: object
+                properties:
+                  en: { type: [string, 'null'] }
+                  nl: { type: [string, 'null'] }
+        signupLists:
+          description: 'The sign-up lists of the live revision, with the window each is open for. Empty when the activity is not signed up for. `capacity` is only meaningful with `limitedCapacity`.'
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: object
+                properties:
+                  en: { type: [string, 'null'] }
+                  nl: { type: [string, 'null'] }
+              openDate:
+                type: string
+                format: date-time
+              closeDate:
+                type: string
+                format: date-time
+              onlyGEWIS:
+                type: boolean
+              limitedCapacity:
+                type: boolean
+              capacity:
+                type:
+                  - integer
+                  - 'null'
+    AlbumPhoto:
+      type: object
+      description: 'A photo in a published album. Reached through its album, which is what decides whether it may be seen.'
+      properties:
+        id:
+          type: integer
+        dateTime:
+          description: 'When the photo was taken, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        artist:
+          description: 'Who took the photo, as the camera recorded it.'
+          type:
+            - string
+            - 'null'
+        camera:
+          type:
+            - string
+            - 'null'
+        aspectRatio:
+          description: "The photo's height divided by its width, as measured when it was uploaded."
+          type:
+            - number
+            - 'null'
+        url:
+          description: "Where the image itself is served from, for the same bearer token that read this collection. The last segment of that address is the rendition; swap it for another of the pipeline's variants to be served the photo at a different size."
+          type: string
+        tags:
+          description: 'Who and what is in the photo: a member tag names the member, a body tag the body.'
+          type: array
+          items:
+            oneOf:
+              -
+                type: object
+                properties:
+                  lidnr: { type: integer }
+                  full_name: { type: string }
+              -
+                type: object
+                properties:
+                  organId: { type: integer }
+                  abbreviation: { type: string }
+    BoardMember:
+      type: object
+      description: 'A board installation. Current ones by default; `includeFormer` asks for the boards that came before.'
+      properties:
+        lidnr:
+          description: 'Membership number of the board member.'
+          type: integer
+        full_name:
+          type: string
+        function:
+          description: 'The function held. It is in Dutch because that is the language the decision was made in; `/boardFunctions` lists every value there is with its translations.'
+          type: string
+        installDate:
+          description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        releaseDate:
+          description: 'When the member was relieved of the function, in the `Y-m-d\TH:i:sP` format, or null if they have not been.'
+          type:
+            - string
+            - 'null'
+        dischargeDate:
+          description: 'When the board year was discharged, in the `Y-m-d\TH:i:sP` format, or null if it has not been.'
+          type:
+            - string
+            - 'null'
+        current:
+          description: 'Whether the member is serving in this function today.'
+          type: boolean
+    Body:
+      type: object
+      description: 'A body of the association: a committee, a fraternity, an advisory board, or any other organ a decision founded. The register calls it an organ; the API calls it a body. An abbreviation is reused when a body is founded again years later, so the identifier is the only stable handle on one.'
+      properties:
+        id:
+          description: 'The identifier the register gives the body. An abbreviation is reused when a body is founded again years after the last one was abrogated, so this is the only stable handle on one.'
+          type: integer
+        abbreviation:
+          description: 'What the body is called in short, and what its members call it.'
+          type: string
+        name:
+          type: string
+        type:
+          description: 'The kind of body: one of `committee`, `avc`, `fraternity`, `kcc`, `avw`, `rva` or `sc`.'
+          type: string
+        foundationDate:
+          description: 'When the founding decision took effect, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        abrogationDate:
+          description: 'When the body was abrogated, in the `Y-m-d\TH:i:sP` format, or null if no decision has abrogated it. A date in the future is a body that is still running.'
+          type:
+            - string
+            - 'null'
+        active:
+          description: 'Whether the body exists today, which is what `abrogationDate` says read against the calendar. Stated separately so a consumer does not have to compare dates to find out.'
+          type: boolean
+    BodyMember:
+      type: object
+      description: 'A member installed in a body, seen from the body. A member holding two functions in the same body is two rows.'
+      properties:
+        lidnr:
+          description: 'Membership number of the installed member.'
+          type: integer
+        full_name:
+          type: string
+        function:
+          description: 'The function held in the body. It is in Dutch because that is the language the decision was made in and the register stores it verbatim; `/organFunctions` lists every value there is with its translations.'
+          type: string
+        installDate:
+          description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        dischargeDate:
+          description: 'When the member was discharged from the body, in the `Y-m-d\TH:i:sP` format, or null if no decision has discharged them. A date in the future is an installation that is still running.'
+          type:
+            - string
+            - 'null'
+        current:
+          description: 'Whether the member sits in the body today. Always true unless `includeDischarged` asked for the installations that have ended.'
+          type: boolean
+    Error:
+      type: object
+      description: 'A representation of common errors.'
+      properties:
+        title:
+          readOnly: true
+          description: 'A short, human-readable summary of the problem.'
+          type:
+            - string
+            - 'null'
+        detail:
+          readOnly: true
+          description: 'A human-readable explanation specific to this occurrence of the problem.'
+          type:
+            - string
+            - 'null'
+        status:
+          type:
+            - integer
+            - 'null'
+          examples:
+            - 404
+          default: 400
+        instance:
+          readOnly: true
+          description: 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.'
+          type:
+            - string
+            - 'null'
+        type:
+          readOnly: true
+          description: 'A URI reference that identifies the problem type'
+          type: string
+    Keyholder:
+      type: object
+      description: "A member holding a key to the association's rooms. Currently valid grants by default; `includeExpired` asks for the ones that have run out or been withdrawn."
+      properties:
+        lidnr:
+          description: 'Membership number of the keyholder.'
+          type: integer
+        full_name:
+          type: string
+        expirationDate:
+          description: 'When the granting expires, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        withdrawnDate:
+          description: 'When the key was handed back, in the `Y-m-d\TH:i:sP` format, or null if it never was.'
+          type:
+            - string
+            - 'null'
+        current:
+          description: 'Whether the granting is in force today.'
+          type: boolean
+    MailingList:
+      type: object
+      description: 'A mailing list of the association. The name is its identifier, and it is case-sensitive.'
+      properties:
+        name:
+          description: 'The name the list is known by, on the servers that carry it as much as here.'
+          type: string
+        description:
+          description: 'What the list is for, in English and in Dutch. The association is bilingual and neither description is a translation of the other, so both are always given.'
+          type: object
+          properties:
+            en:
+              type: string
+            nl:
+              type: string
+    MailingListMember:
+      type: object
+      description: 'A subscription to a mailing list. A member subscribed under two addresses is two rows, which is why the membership number does not identify one.'
+      properties:
+        lidnr:
+          description: 'Membership number of the subscriber.'
+          type: integer
+        full_name:
+          type: string
+        email:
+          description: 'The address that is subscribed. A distribution group is not one without it, so `mailinglists_members_read` hands it out on its own; in practice the register projects the address the membership carries, so granting this permission grants sight of it.'
+          type: string
+    Member:
+      type: object
+      description: 'A member of the association. Which fields are present depends on the permissions the token carries: a field it may not see is absent rather than null.'
+      properties:
+        lidnr:
+          description: 'Membership number.'
+          type: integer
+        full_name:
+          type: string
+        family_name:
+          type: string
+        middle_name:
+          type: string
+        initials:
+          type: string
+        given_name:
+          type: string
+        generation:
+          description: 'The calendar year in which the member joined.'
+          type: integer
+        hidden:
+          type: boolean
+        deleted:
+          description: 'Always false unless the principal holds `members_deleted`.'
+          type: boolean
+        expiration:
+          description: 'When the membership expires, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        organs:
+          description: 'The bodies the member is currently installed in. Present only with `organs_members_read`, and on `/members` only when `includeOrgans` asks for it.'
+          type: array
+          items:
+            type: object
+            properties:
+              organ:
+                type: object
+                properties:
+                  id: { type: integer }
+                  abbreviation: { type: string }
+              function:
+                type: string
+              installDate:
+                type: string
+                format: date-time
+              dischargeDate:
+                type:
+                  - string
+                  - 'null'
+                format: date-time
+              current:
+                type: boolean
+        email:
+          type:
+            - string
+            - 'null'
+        birthdate:
+          description: 'Date of birth, in the `Y-m-d\TH:i:sP` format.'
+          type:
+            - string
+            - 'null'
+        is_16_plus:
+          type:
+            - boolean
+            - 'null'
+        is_18_plus:
+          type:
+            - boolean
+            - 'null'
+        is_21_plus:
+          type:
+            - boolean
+            - 'null'
+        keyholder:
+          description: "Whether the member currently holds a key to the association's rooms."
+          type:
+            - boolean
+            - 'null'
+        membership_type:
+          description: 'One of `ordinary`, `external`, `graduate` or `honorary`.'
+          type:
+            - string
+            - 'null'
+    MemberBody:
+      type: object
+      description: 'A member installed in a body, seen from the member.'
+      properties:
+        body:
+          description: 'The body the member is installed in, named by the id `/bodies/{id}` answers to.'
+          type: object
+          properties:
+            id:
+              type: integer
+            abbreviation:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+        function:
+          description: 'The function held in the body. It is in Dutch because that is the language the decision was made in and the register stores it verbatim; `/organFunctions` lists every value there is with its translations.'
+          type: string
+        installDate:
+          description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        dischargeDate:
+          description: 'When the member was discharged from the body, in the `Y-m-d\TH:i:sP` format, or null if no decision has discharged them. A date in the future is an installation that is still running.'
+          type:
+            - string
+            - 'null'
+        current:
+          description: 'Whether the member sits in the body today. Always true unless `includeDischarged` asked for the installations that have ended.'
+          type: boolean
+    PhotoAlbum:
+      type: object
+      description: "A published photo album. Sub-albums are listed alongside their parents and carry their parent's identifier, so a consumer can rebuild the tree from one listing."
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        startDateTime:
+          description: 'When the earliest photo in the album was taken, in the `Y-m-d\TH:i:sP` format. Null for an album that holds no dated photos yet.'
+          type:
+            - string
+            - 'null'
+        endDateTime:
+          description: 'When the last photo in the album was taken, in the `Y-m-d\TH:i:sP` format.'
+          type:
+            - string
+            - 'null'
+        parent:
+          description: 'The album this one sits below, or null for a top-level album.'
+          type:
+            - integer
+            - 'null'
+        photoCount:
+          description: 'The photos in this album itself, which is what `/api/photos/albums/{id}/photos` pages through. Photos of a sub-album count towards that sub-album.'
+          type: integer
+        albumCount:
+          description: 'The number of published albums directly below this one.'
+          type: integer
+        coverUrl:
+          description: "Where the album's cover mosaic is served from, for the same bearer token that read this album. The last segment of that address is the rendition; swap it for another of the pipeline's variants to be served the cover at a different size. Null for an album no cover has been generated for yet."
+          type:
+            - string
+            - 'null'
+        children:
+          description: "The published albums directly below this one, each described as it would be in the listing. Null rather than empty on the listing itself, where `albumCount` says how many there are: a listing that carried every album's children would carry the whole tree twice over."
+          type:
+            - array
+            - 'null'
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              startDateTime:
+                type:
+                  - string
+                  - 'null'
+                format: date-time
+              endDateTime:
+                type:
+                  - string
+                  - 'null'
+                format: date-time
+              photoCount:
+                type: integer
+              albumCount:
+                type: integer
+              coverUrl:
+                type:
+                  - string
+                  - 'null'
+        photosUrl:
+          description: 'Where the photos of this album are read from, paged. Null on the listing, for the same reason `children` is.'
+          type:
+            - string
+            - 'null'
+    PhotoOfTheWeek:
+      type: object
+      description: 'The photo the association voted best of the week that just passed. Its public copy needs no token; a hidden photo of the week is a missing resource.'
+      properties:
+        week:
+          description: 'The first day of the week that was voted on, in the `Y-m-d\TH:i:sP` format.'
+          type: string
+        photo:
+          description: 'The photo itself, and the album it was taken out of.'
+          type: object
+          properties:
+            id:
+              type: integer
+            dateTime:
+              type: string
+              format: date-time
+            artist:
+              type:
+                - string
+                - 'null'
+            camera:
+              type:
+                - string
+                - 'null'
+            aspectRatio:
+              type:
+                - number
+                - 'null'
+            album:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+        url:
+          description: "The public copy of the photo of the week, which needs no credential of any kind: it is the same address the association's own front page serves it from to a visitor who is not logged in. Null while that copy is not on disk, which is what a hidden photo of the week looks like on the filesystem."
+          type:
+            - string
+            - 'null'
+    ResponseStatusEnum:
+      type: string
+      enum:
+        - success
+        - error
+        - forbidden
+        - notfound
+    ResponseError:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatusEnum'
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+              examples:
+                - error-router-no-match
+            exception:
+              type:
+                - string
+                - 'null'
+    PaginationMeta:
+      type: object
+      required:
+        - page
+        - itemsPerPage
+        - totalItems
+        - totalPages
+      properties:
+        page:
+          type: integer
+        itemsPerPage:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+    Health:
+      type: object
       required:
         - status
         - healthy
@@ -240,464 +2746,68 @@ components:
         status:
           $ref: '#/components/schemas/ResponseStatusEnum'
         healthy:
-          type:
-            - "boolean"
+          type: boolean
         sync_paused:
-          type:
-            - "boolean"
-          default: false
-          description: >-
-            Attribute to indicate that data is currently being modified and that
-            client applications that perform syncs in the background are
-            requested to temporarily suspend this sync.
-    BoardFunction:
-      type:
-        - "object"
-      properties:
-        translations:
-          $ref: '#/components/schemas/TranslationString'
-        isLegacy:
-          type:
-            - "boolean"
-    Member:
-      description: >-
-        Model representing a member. The exact attributes that are visible
-        depend on the permissions of the API token. If the client holds the
-        `OrgansMembershipR` or `MemberProperty*` permissions, a (combination of)
-        MemberExtended object(s), else MemberSimple
-      type:
-        - "object"
-      required:
-        - lidnr
-        - full_name
-        - initials
-        - given_name
-        - middle_name
-        - family_name
-        - generation
-        - hidden
-        - deleted
-        - expiration
-      properties:
-        lidnr:
-          type:
-            - "integer"
-          format: int32
-          examples:
-            - 8000
-          minimum: 0
-          exclusiveMinimum: true
-        full_name:
-          type:
-            - "string"
-          examples:
-            - Timo de Teststudent
-        initials:
-          type:
-            - "string"
-          examples:
-            - T.
-        given_name:
-          type:
-            - "string"
-          examples:
-            - Timo
-        middle_name:
-          type:
-            - "string"
-          examples:
-            - de
-        family_name:
-          type:
-            - "string"
-          examples:
-            - Teststudent
-        generation:
-          type:
-            - "integer"
-          examples:
-            - 2023
-        hidden:
-          type:
-            - "boolean"
-          examples:
-            - false
-        deleted:
-          type:
-            - "boolean"
-          examples:
-            - false
-          description: Always false unless the API principal has MembersDeleted permission
-        expiration:
-          type:
-            - "string"
-          format: date
-          description: 'Date in the Y-m-d\TH:i:sP format'
-          examples:
-            - '2023-07-01T00:00:00+02:00'
-        email:
-          type:
-            - "string"
-            - "null"
-          format: email
-          examples:
-            - example@gewis.nl
-        keyholder:
-          type:
-            - "boolean"
-        organs:
-          type:
-            - "array"
-            - "null"
-          items:
-            $ref: '#/components/schemas/OrganMembership'
-        membership_type:
-          type:
-            - "string"
-            - "null"
-          enum:
-            - ordinary
-            - external
-            - graduate
-            - honorary
-        birthdate:
-          type:
-            - "string"
-            - "null"
-          format: date
-          description: 'Date in the Y-m-d\TH:i:sP format'
-          examples:
-            - '2023-07-01T00:00:00+02:00'
-        is_16_plus:
-          type:
-            - "boolean"
-          description: Whether the member is at least 16 years old
-        is_18_plus:
-          type:
-            - "boolean"
-          description: Whether the member is at least 18 years old
-        is_21_plus:
-          type:
-            - "boolean"
-          description: Whether the member is at least 21 years old
-    OrganMembership:
-      type:
-        - "object"
-      properties:
-        organ:
-          $ref: '#/components/schemas/Organ'
-        function:
-          type:
-            - "string"
-          examples:
-            - Lid
-        installDate:
-          type:
-            - "string"
-          format: date
-          description: 'Date in the Y-m-d\TH:i:sP format'
-          examples:
-            - '0001-01-01T00:00:00+00:00'
-        dischargeDate:
-          type:
-            - "string"
-            - "null"
-          format: date
-          description: 'Date in the Y-m-d\TH:i:sP format'
-          examples:
-            - null
-        current:
-          type:
-            - "boolean"
-    Organ:
-      type:
-        - "object"
-      properties:
-        id:
-          type:
-            - "integer"
-          examples:
-            - 1
-        abbreviation:
-          type:
-            - "string"
-          examples:
-            - Testorgaan
-    OrganFunction:
-      type:
-        - "object"
-      properties:
-        translations:
-          $ref: '#/components/schemas/TranslationString'
-        isAdministrative:
-          type:
-            - "boolean"
-        isLegacy:
-          type:
-            - "boolean"
-    ResponseObject:
-      oneOf:
-        - $ref: '#/components/schemas/ResponseSuccess'
-        - $ref: '#/components/schemas/ResponseError'
-    ResponseStatusEnum:
-      type:
-        - "string"
-      title: ResponseStatusEnum
-      enum:
-        - success
-        - error
-        - forbidden
-        - notfound
-      examples:
-        - success
-    ResponseSuccess:
-      type:
-        - "object"
-      title: ResponseSuccess
-      description: Model that is returned in case of success
-      required:
-        - status
-      properties:
-        status:
-          $ref: '#/components/schemas/ResponseStatusEnum'
-        data:
-          type:
-            - "object"
-    ResponseError:
-      type:
-        - "object"
-      title: ResponseError
-      description: Model that is returned in case of an error
-      required:
-        - status
-      properties:
-        status:
-          $ref: '#/components/schemas/ResponseStatusEnum'
-        error:
-          type:
-            - "object"
-          properties:
-            type:
-              type:
-                - "string"
-              examples:
-                - error-exception
-            exception:
-              type:
-                - "string"
-              examples:
-                - An example exception was thrown
-    TranslationString:
-      type:
-        - "object"
-      required:
-        - en
-        - nl
-      properties:
-        en:
-          type:
-            - "string"
-          examples:
-            - "Chair"
-        nl:
-          type:
-            - "string"
-          examples:
-            - "Voorzitter"
-  responses:
-    health:
-      description: Successful
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/health'
-    boardFunction_list:
-      description: Succesful response containing zero or more board functions
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ResponseSuccess'
-              - type:
-                  - object
-                properties:
-                  data:
-                    type:
-                      - object
-                    additionalProperties:
-                      $ref: '#/components/schemas/BoardFunction'
-                    examples:
-                      - Voorzitter:
-                          translations:
-                            en: "Chair"
-                            nl: "Voorzitter"
-                          isLegacy: false
-                        Commissaris Kennisbeheer:
-                          translations:
-                            en: "Information Officer"
-                            nl: "Commissaris Kennisbeheer"
-                          isLegacy: true
-    member_single:
-      description: Succesful response containing exactly one member
-      content:
-        application/json:
-          schema:
-            type:
-              - "object"
+          type: boolean
+          description: 'The register is being modified; consumers that sync in the background are asked to hold off.'
+    FunctionList:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          translations:
+            type: object
+            required:
+              - en
+              - nl
             properties:
-              status:
-                type:
-                  - "string"
-                examples:
-                  - success
-              data:
-                $ref: '#/components/schemas/Member'
-    member_list:
-      description: Succesful response containing zero or more members
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ResponseSuccess'
-              - type:
-                  - object
-                properties:
-                  data:
-                    type:
-                      - "array"
-                    items:
-                      $ref: '#/components/schemas/Member'
-          examples:
-            - status: success
-              data:
-                - lidnr: 8000
-                  full_name: Timo de Teststudent
-                  initials: T.
-                  given_name: Timo
-                  middle_name: de
-                  family_name: Teststudent
-                  generation: 2022
-                  hidden: false
-                  deleted: false
-                  expiration: '2023-07-01T00:00:00+02:00'
-                - lidnr: 8000
-                  full_name: Timo de Teststudent
-                  initials: T.
-                  given_name: Timo
-                  middle_name: de
-                  family_name: Teststudent
-                  generation: 2022
-                  hidden: false
-                  deleted: false
-                  expiration: '2023-07-01T00:00:00+02:00'
-                  email: timo@gewis.nl
-                  keyholder: true
-                  organs:
-                    - organ:
-                        id: 1
-                        abbreviation: Testorgaan
-                      function: Lid
-                      installDate: '0001-01-01T00:00:00+02:00'
-                      dischargeDate: null
-                      current: true
-                  membership_type: ordinary
-                  birthdate: '2023-07-01T00:00:00+02:00'
-                  is_16_plus: false
-                  is_18_plus: false
-                  is_21_plus: false
-    organFunction_list:
-      description: Succesful response containing zero or more organ functions
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ResponseSuccess'
-              - type:
-                  - object
-                properties:
-                  data:
-                    type:
-                      - object
-                    additionalProperties:
-                      $ref: '#/components/schemas/OrganFunction'
-                    examples:
-                      - Voorzitter:
-                          translations:
-                            en: "Chair"
-                            nl: "Voorzitter"
-                          isAdministrative: false
-                          isLegacy: false
-                        Inkoper:
-                          translations:
-                            en: "Procurement Officer"
-                            nl: "Inkoper"
-                          isAdministrative: false
-                          isLegacy: true
-                        Inactief Lid:
-                          translations:
-                            en: "Inactive Member"
-                            nl: "Inactief Lid"
-                          isAdministrative: true
-                          isLegacy: false
-    server_error:
-      description: >-
-        There was an error in the server. Most likely, this is a permanent
-        error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseError'
-          examples:
-            - status: error
-              error:
-                type: error-exception
-                exception: An example exception was thrown
-    not_found_route:
-      description: >-
-        This route does not exist (which is different from not finding a
-        specific resource)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseError'
-          examples:
-            - status: notfound
-              error:
-                type: error-router-no-match
-                exception: null
-    no_permission:
-      description: The token that was used does not have the required permissions
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseError'
-          examples:
-            - status: forbidden
-              error:
-                type: User\\Model\\Exception\\NotAllowed
-                exception: Permission `...` is needed but is not currently held.
-    not_acceptable:
-      description: You requested an API version that is not supported or you did not specify an API version
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseError'
-          examples:
-            - status: error
-              error:
-                type: Database\\Model\\Exception\\VersionIncompatible
-                exception: API version must be at least `...`, but `...` was given.
-            - status: error
-              error:
-                type: Database\\Model\\Exception\\VersionExpected
-                exception: API version expected, but none was given.
-            - status: error
-              error:
-                type: Database\\Model\\Exception\\VersionFormat
-                exception: API version expected, but v4.32 was given
+              en:
+                type: string
+              nl:
+                type: string
+          isAdministrative:
+            type: boolean
+          isLegacy:
+            type: boolean
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
   securitySchemes:
     api_auth:
       type: http
-      description: GEWIS API principal token
+      description: 'The token of a GEWIS API principal.'
       scheme: bearer
-      bearerFormat: FF
+security:
+  -
+    api_auth: []
+tags:
+  - name: Activity
+    description: 'An activity, as its live (approved) revision describes it. A cancelled activity is still listed, with `cancelled` set; one the board unpublished is not listed at all. Every human-readable field is an {en, nl} pair, and a value the organiser never filled in is null rather than substituted from the other language.'
+  - name: BoardMember
+    description: 'A board installation. Current ones by default; `includeFormer` asks for the boards that came before.'
+  - name: Body
+    description: 'A body of the association: a committee, a fraternity, an advisory board, or any other organ a decision founded. The register calls it an organ; the API calls it a body. An abbreviation is reused when a body is founded again years later, so the identifier is the only stable handle on one.'
+  - name: BodyMember
+    description: 'A member installed in a body, seen from the body. A member holding two functions in the same body is two rows.'
+  - name: Keyholder
+    description: "A member holding a key to the association's rooms. Currently valid grants by default; `includeExpired` asks for the ones that have run out or been withdrawn."
+  - name: MailingList
+    description: 'A mailing list of the association. The name is its identifier, and it is case-sensitive.'
+  - name: MailingListMember
+    description: 'A subscription to a mailing list. A member subscribed under two addresses is two rows, which is why the membership number does not identify one.'
+  - name: Member
+    description: 'A member of the association. Which fields are present depends on the permissions the token carries: a field it may not see is absent rather than null.'
+  - name: MemberBody
+    description: 'A member installed in a body, seen from the member.'
+  - name: PhotoAlbum
+    description: "A published photo album. Sub-albums are listed alongside their parents and carry their parent's identifier, so a consumer can rebuild the tree from one listing."
+  - name: AlbumPhoto
+    description: 'A photo in a published album. Reached through its album, which is what decides whether it may be seen.'
+  - name: PhotoOfTheWeek
+    description: 'The photo the association voted best of the week that just passed. Its public copy needs no token; a hidden photo of the week is a missing resource.'
+externalDocs:
+  description: 'Contribute to this API'
+  url: 'https://github.com/GEWIS/radix'
+webhooks: {}

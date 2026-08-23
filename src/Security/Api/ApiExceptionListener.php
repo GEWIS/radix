@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -32,12 +33,8 @@ use function str_starts_with;
  * Renders failures below `/api` as the JSON envelope other GEWIS applications parse:
  * `{"status": "...", "error": {"type": "...", "exception": "..."}}`.
  *
- * Two listeners with different priorities, because the two cases have different neighbours:
- *  - an authorization failure has to be shaped before the firewall's own exception listener (priority 1) turns it
- *    into a bare 403, but a request that never authenticated is left to that listener so it answers with the
- *    bearer challenge instead;
- *  - everything else is shaped after the framework has logged the exception (priority 0) and before the default
- *    error renderer (priority -128) would produce an HTML page.
+ * Setting a response stops propagation, so priority decides who answers: 2 beats the firewall's own listener at 1,
+ * and -95 beats API Platform's at -96 and the HTML error renderer at -128.
  */
 #[AsEventListener(
     event: KernelEvents::EXCEPTION,
@@ -47,7 +44,7 @@ use function str_starts_with;
 #[AsEventListener(
     event: KernelEvents::EXCEPTION,
     method: 'onApiException',
-    priority: -100,
+    priority: -95,
 )]
 final class ApiExceptionListener
 {
@@ -55,6 +52,10 @@ final class ApiExceptionListener
 
     /** A request that matched no route at all. */
     private const string TYPE_NO_ROUTE = 'error-router-no-match';
+
+    private const string TYPE_NOT_FOUND = 'error-resource-not-found';
+
+    private const string TYPE_RATE_LIMITED = 'error-rate-limited';
 
     /**
      * How the API names each failure it can report.
@@ -189,11 +190,14 @@ final class ApiExceptionListener
 
     private function type(Throwable $throwable): string
     {
-        if (
-            $throwable instanceof NotFoundHttpException
-            && $throwable->getPrevious() instanceof ResourceNotFoundException
-        ) {
-            return self::TYPE_NO_ROUTE;
+        if ($throwable instanceof NotFoundHttpException) {
+            return $throwable->getPrevious() instanceof ResourceNotFoundException
+                ? self::TYPE_NO_ROUTE
+                : self::TYPE_NOT_FOUND;
+        }
+
+        if ($throwable instanceof TooManyRequestsHttpException) {
+            return self::TYPE_RATE_LIMITED;
         }
 
         if ($throwable instanceof AccessDeniedException) {

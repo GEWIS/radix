@@ -146,6 +146,8 @@ services:
             # Value objects the container has no business constructing: they are built from entities at the point of
             # use, and their constructors are deliberately not public.
             - '../src/ViewModel/'
+            # Data, like the entities above: registering them would autowire the scalars they are made of.
+            - '../src/ApiResource/'
             # Seeding is a development and test concern, and doctrine/doctrine-fixtures-bundle and fakerphp/faker are
             # require-dev: the production image is built with `--no-dev`, so registering these there asks the container
             # for classes and for a `doctrine.fixtures.loader` service that are not in it. Registered again under

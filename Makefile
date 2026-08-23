@@ -26,7 +26,7 @@ SYMFONY_TEST = $(DOCKER_COMP) exec -T -e APP_ENV=test app bin/console
 
 # Misc
 .DEFAULT_GOAL   = help
-.PHONY          : help seed translations igor lint lint-fix lint-fix-all lint-twig phpstan phpstan-pr \
+.PHONY          : help seed translations igor openapi lint lint-fix lint-fix-all lint-twig phpstan phpstan-pr \
                   test test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
                   buildmatomo buildpgadmin setuplocalenv up upprod start startprod stop logs bash exec composer \
                   sf cc getvendordir migrate migrate-to migration-up \
@@ -71,6 +71,11 @@ translations: ## Extract untranslated text to the XLIFF files (also removes entr
 
 igor: ## Run Igor (static linter to validate Symfony project for the persistent memory model of FrankenPHP)
 	@$(PHP) ./vendor/bin/igor-php .
+
+# Never edit openapi.yaml by hand; ApiDocumentationTest fails on drift.
+openapi: ## Regenerate openapi.yaml from the application
+	@$(SYMFONY) api:openapi:export --yaml --output=openapi.yaml
+	@$(DOCKER) cp "$$($(DOCKER_COMP) ps -q app)":/app/openapi.yaml ./openapi.yaml
 
 lint: ## Linter using PHP_CodeSniffer
 	@$(PHP) ./vendor/bin/phpcs -p

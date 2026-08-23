@@ -12,6 +12,7 @@ use App\Entity\Photo\OrganAlbum;
 use App\Entity\Photo\OrganTag;
 use App\Entity\Photo\Photo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function addcslashes;
@@ -240,5 +241,48 @@ class PhotoRepository extends ServiceEntityRepository
             );
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Paginator<Photo>
+     */
+    public function paginateAlbumPhotos(
+        Album $album,
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        // `weeklyPhoto` is an inverse-side one-to-one, which Doctrine cannot proxy: without the join it costs one
+        // SELECT per row on the page.
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin(
+                'p.tags',
+                'tag',
+            )
+            ->addSelect('tag')
+            ->leftJoin(
+                'p.weeklyPhoto',
+                'weeklyPhoto',
+            )
+            ->addSelect('weeklyPhoto')
+            ->where('p.album = :album')
+            ->setParameter(
+                'album',
+                $album,
+            )
+            ->orderBy(
+                'p.dateTime',
+                'ASC',
+            )
+            ->addOrderBy(
+                'p.id',
+                'ASC',
+            )
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return new Paginator(
+            $qb->getQuery(),
+            true,
+        );
     }
 }

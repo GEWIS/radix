@@ -381,6 +381,11 @@ class ActivityRepository extends ServiceEntityRepository
             );
         }
 
+        $qb->addOrderBy(
+            'a.id',
+            'ASC',
+        );
+
         $search = trim($search);
         if ('' !== $search) {
             $column = 'nl' === $locale
@@ -505,6 +510,47 @@ class ActivityRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         return $paginator;
+    }
+
+    public function findPubliclyVisible(int $id): ?Activity
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect(
+                'lr',
+                'n',
+                'loc',
+                'cost',
+                'descr',
+            )
+            ->join(
+                'a.liveRevision',
+                'lr',
+            )
+            ->join(
+                'lr.name',
+                'n',
+            )
+            ->join(
+                'lr.location',
+                'loc',
+            )
+            ->join(
+                'lr.costs',
+                'cost',
+            )
+            ->join(
+                'lr.description',
+                'descr',
+            )
+            ->where('a.id = :id')
+            ->andWhere('a.unpublishedAt IS NULL')
+            ->setParameter(
+                'id',
+                $id,
+                Types::INTEGER,
+            )
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**

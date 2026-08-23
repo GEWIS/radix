@@ -58,7 +58,10 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
 
         $principal = $this->apiPrincipalRepository->findByToken($token);
 
-        if (null === $principal) {
+        if (
+            null === $principal
+            || !$principal->isUsable()
+        ) {
             throw new BadCredentialsException('The provided bearer token is not known.');
         }
 
@@ -97,6 +100,10 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
         TokenInterface $token,
         string $firewallName,
     ): ?Response {
+        if ($token instanceof ApiToken) {
+            $this->apiPrincipalRepository->stampUsage($token->getApiPrincipal());
+        }
+
         return null;
     }
 

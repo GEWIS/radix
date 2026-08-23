@@ -6,6 +6,7 @@ localised_routes:
     exclude:
         - '../src/Controller/Application/ApplicationController.php'
         - '../src/Controller/Database/'
+        - '../src/Controller/Photo/ApiController.php'
         - '../src/Controller/Report/'
         - '../src/Controller/User/ApiPrincipalController.php'
     type: attribute
@@ -72,9 +73,25 @@ database_api_principal_routes:
 # openapi.yaml publishes. It is also what the stateless `api` firewall is matched on, so a prefix here would take
 # these endpoints out of that firewall and put them behind the login form instead.
 #
-# API Platform mounts on the same /api from config/routes/api_platform.yaml, which is loaded before this file. It
-# contributes no routes of its own — its entrypoint and its documentation are switched off because this contract owns
-# /api — so a resource declared later has to be given a path that is not one of the endpoints below.
+# Order matters below this line. API Platform's resources come from config/routes/api_platform.yaml, which is loaded
+# before this file, so they always answer first. Everything imported here is matched in the order it is imported, and
+# `api_routes` ends in a catch-all that turns an unknown /api path into `error-router-no-match` — so it has to be
+# imported last, or it swallows the ones after it.
+
+# Outside `/api`: a browser cannot send an Authorization header on the first navigation.
+api_documentation:
+    path: /api-docs
+    controller: api_platform.action.documentation
+    methods: [GET]
+    defaults:
+        _format: html
+        _api_respond: true
+
+# /img is outside the API firewall, so a bearer token cannot fetch an album original there.
+api_photo_routes:
+    resource: '../src/Controller/Photo/ApiController.php'
+    type: attribute
+
 api_routes:
     resource: '../src/Controller/Report/ApiController.php'
     type: attribute

@@ -9,12 +9,14 @@ use App\Entity\User\Enums\ApiPermissions;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\PreSetDataEvent;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use function Symfony\Component\Translation\t;
@@ -52,7 +54,42 @@ class ApiPrincipalType extends AbstractType
                 'label' => t('Select API permissions'),
                 'expanded' => true,
                 'multiple' => true,
+                'group_by' => static function (ApiPermissions $permission): string {
+                    return $permission->getGroup()->getName()->getMessage();
+                },
+                'choice_label' => static function (ApiPermissions $permission): TranslatableMessage {
+                    return ApiPermissions::All === $permission
+                        ? new TranslatableMessage(
+                            '* (wildcard) - every permission, including the ones added after this token was issued',
+                        )
+                        : $permission->getName();
+                },
+                'choice_attr' => static function (ApiPermissions $permission): array {
+                    $attributes = [];
+
+                    if (ApiPermissions::All === $permission) {
+                        $attributes['data-wildcard'] = 'true';
+                    }
+
+                    if ($permission->isMemberProperty()) {
+                        $attributes['data-member-property'] = 'true';
+                    }
+
+                    return $attributes;
+                },
+                'block_prefix' => 'api_permissions',
                 'constraints' => [new Assert\NotBlank()],
+            ],
+        );
+
+        $builder->add(
+            'expiresAt',
+            DateType::class,
+            [
+                'label' => t('Expires on'),
+                'help' => t('Leave empty for a token that never expires. It stops working after this day.'),
+                'widget' => 'single_text',
+                'required' => false,
             ],
         );
 

@@ -19,13 +19,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 /**
  * Authorizes viewing a photo {@see Album}.
  *
- * Unpublished albums are never shown through public browsing, not even to the board (a draft mixed in with live albums
- * is confusing); they are managed and previewed only in the photo admin. Published albums are viewable by the board and
- * by API users (the TV screens) and by ordinary/active members. Graduates are gated by the graduate-subtree rule:
- * a graduate may view an album that was made before their membership ended, or any album whose subtree they are
- * tagged in. The recursive
- * subtree check is the fix for the old bug where a graduate tagged in a sub-album could not view the parent. Anonymous
- * and company users cannot browse albums at all.
+ * Unpublished albums are never shown through public browsing, not even to the board, so a draft is never mistaken
+ * for a live album; they are managed and previewed in the photo admin instead. Graduates are gated by the
+ * graduate-subtree rule, which is recursive because a graduate tagged in a sub-album could not view the parent.
  *
  * @extends Voter<string, Album>
  */
@@ -68,17 +64,11 @@ final class AlbumVoter extends Voter
         Album $album,
         TokenInterface $token,
     ): bool {
-        // Unpublished albums are admin-only; public browsing never surfaces them, not even for the board, so a draft is
-        // never confused with a live album. The board manages and previews drafts in the photo admin section.
         if (!$album->isPublished()) {
             return false;
         }
 
-        // Board/admins and API users (TV screens) may view any published album.
-        if (
-            $this->security->isGranted(UserRoles::Board->value)
-            || $this->security->isGranted(UserRoles::ApiUser->value)
-        ) {
+        if ($this->security->isGranted(UserRoles::Board->value)) {
             return true;
         }
 
@@ -101,8 +91,7 @@ final class AlbumVoter extends Voter
     }
 
     /**
-     * The graduate-subtree rule: a graduate may view an album dated before their membership ended, or any album whose
-     * subtree they are tagged in.
+     * An album dated before their membership ended, or any album whose subtree they are tagged in.
      */
     private function graduateMayView(
         Album $album,

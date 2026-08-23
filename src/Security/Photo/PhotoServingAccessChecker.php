@@ -17,11 +17,11 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
  * The serving access check for the members-only album-photo and album-cover namespaces, taking precedence over
  * {@see DefaultServingAccessChecker}. A cover is a mosaic of members-only photos, so it is gated the same way.
  *
- * Full members (and API users / the TV screens) get the fast path: the day-signature the controller already validated
- * proves the URL came from a context where fine-grained authorization ran, so no query is needed. Graduates do not get
- * the fast path: a leaked URL must never bypass their membership cutoff, so their request runs the {@see
- * PhotoVoter} on the photo (originals) or the {@see AlbumVoter} on the album (covers), resolved from the stored path.
- * Everyone else (anonymous, company) is denied.
+ * Full members get the fast path: the day-signature the controller already validated proves the URL came from a
+ * context where fine-grained authorization ran, so no query is needed. Graduates do not get the fast path: a leaked
+ * URL must never bypass their membership cutoff, so their request runs the {@see PhotoVoter} on the photo (originals)
+ * or the {@see AlbumVoter} on the album (covers), resolved from the stored path. Everyone else (anonymous, company) is
+ * denied.
  */
 #[AutoconfigureTag(
     'app.serving_access_checker',
@@ -48,11 +48,7 @@ final readonly class PhotoServingAccessChecker implements ServingAccessCheckerIn
         string $path,
         StorageNamespace $namespace,
     ): bool {
-        // Full members (ROLE_MEMBER excludes graduates) and API users: the validated signature suffices.
-        if (
-            $this->security->isGranted(UserRoles::Member->value)
-            || $this->security->isGranted(UserRoles::ApiUser->value)
-        ) {
+        if ($this->security->isGranted(UserRoles::Member->value)) {
             return true;
         }
 

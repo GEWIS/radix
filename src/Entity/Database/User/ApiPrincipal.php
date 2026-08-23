@@ -7,44 +7,60 @@ namespace App\Entity\Database\User;
 use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\User\Enums\ApiPermissions;
 use App\Repository\User\ApiPrincipalRepository;
+use DateTime;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\UniqueConstraint;
+use SensitiveParameter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use function array_map;
 use function base64_encode;
+use function hash;
 use function in_array;
 use function random_bytes;
 use function str_repeat;
-use function strlen;
 use function substr;
 
 /**
- * A holder of an API token, and the set of permissions that token carries.
+ * A holder of an API token, and the set of permissions that token carries. Only a hash of the token is kept; the
+ * last few characters stay in the clear so an administrator can tell two apart.
  */
 #[Entity(repositoryClass: ApiPrincipalRepository::class)]
 #[HasLifecycleCallbacks]
+#[UniqueConstraint(
+    name: 'apiprincipal_token_hash_unique_idx',
+    columns: ['tokenHash'],
+)]
 class ApiPrincipal
 {
     use TimestampableTrait;
+
+    public const int TOKEN_LENGTH = 128;
+
+    private const int HINT_LENGTH = 5;
 
     #[Id]
     #[Column(type: 'integer')]
     #[GeneratedValue(strategy: 'AUTO')]
     protected ?int $id = null;
 
-    /**
-     * Token.
-     */
-    #[Column(type: 'string')]
-    protected string $token;
+    #[Column(
+        type: 'string',
+        length: 64,
+    )]
+    protected string $tokenHash;
 
-    /**
-     * Description.
-     */
+    #[Column(
+        type: 'string',
+        length: self::HINT_LENGTH,
+    )]
+    protected string $tokenHint;
+
     #[Column(
         type: 'string',
         nullable: true,
@@ -56,7 +72,6 @@ class ApiPrincipal
     protected ?string $description = null;
 
     /**
-     * Permission groups.
      * Column type is necessary here.
      *
      * @var ApiPermissions[] $permissions
@@ -68,6 +83,24 @@ class ApiPrincipal
     )]
     protected ?array $permissions = null;
 
+    #[Column(
+        type: Types::DATE_MUTABLE,
+        nullable: true,
+    )]
+    protected ?DateTime $lastUsedAt = null;
+
+    #[Column(
+        type: Types::DATE_MUTABLE,
+        nullable: true,
+    )]
+    protected ?DateTime $expiresAt = null;
+
+    #[Column(
+        type: Types::DATETIME_MUTABLE,
+        nullable: true,
+    )]
+    protected ?DateTime $revokedAt = null;
+
     /**
      * @psalm-ignore-nullable-return
      */
@@ -76,35 +109,40 @@ class ApiPrincipal
         return $this->id;
     }
 
-    /**
-     * Get the token (hidden and used in the form hydrator)
-     */
+    public static function hash(
+        #[SensitiveParameter]
+        string $token,
+    ): string {
+        return hash(
+            'sha256',
+            $token,
+        );
+    }
+
+    public function getTokenHash(): string
+    {
+        return $this->tokenHash;
+    }
+
     public function getToken(): string
     {
         return str_repeat(
             '*',
-            strlen($this->token) - 5,
-        ) . substr(
-            $this->token,
-            -5,
+            self::TOKEN_LENGTH - self::HINT_LENGTH,
+        ) . $this->tokenHint;
+    }
+
+    public function generateToken(): string
+    {
+        $token = base64_encode(random_bytes(96));
+
+        $this->tokenHash = self::hash($token);
+        $this->tokenHint = substr(
+            $token,
+            -self::HINT_LENGTH,
         );
-    }
 
-    /**
-     * Get the full token
-     */
-    public function getFullToken(): string
-    {
-        return $this->token;
-    }
-
-    /**
-     * Generate a (new) token
-     * We do not provide a way of specifying a token
-     */
-    public function generateToken(): void
-    {
-        $this->token = base64_encode(random_bytes(96));
+        return $token;
     }
 
     public function getDescription(): ?string
@@ -118,8 +156,6 @@ class ApiPrincipal
     }
 
     /**
-     * Get all ApiPermissions for principal
-     *
      * @return ApiPermissions[]
      */
     public function getPermissions(): array
@@ -142,6 +178,53 @@ class ApiPrincipal
             },
             $permissions,
         );
+    }
+
+    public function getLastUsedAt(): ?DateTime
+    {
+        return $this->lastUsedAt;
+    }
+
+    public function markUsedOn(DateTime $day): void
+    {
+        $this->lastUsedAt = $day;
+    }
+
+    public function getExpiresAt(): ?DateTime
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(?DateTime $expiresAt): void
+    {
+        $this->expiresAt = $expiresAt;
+    }
+
+    public function getRevokedAt(): ?DateTime
+    {
+        return $this->revokedAt;
+    }
+
+    public function revoke(): void
+    {
+        $this->revokedAt ??= new DateTime();
+    }
+
+    public function isRevoked(): bool
+    {
+        return null !== $this->revokedAt;
+    }
+
+    public function isExpired(): bool
+    {
+        return null !== $this->expiresAt
+            && $this->expiresAt < new DateTime('today');
+    }
+
+    public function isUsable(): bool
+    {
+        return !$this->isRevoked()
+            && !$this->isExpired();
     }
 
     public function can(ApiPermissions $permission): bool

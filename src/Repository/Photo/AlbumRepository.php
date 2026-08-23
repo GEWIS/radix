@@ -8,6 +8,7 @@ use App\Entity\Photo\Album;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function addcslashes;
@@ -224,6 +225,66 @@ class AlbumRepository extends ServiceEntityRepository
             ->where('a.parent IS NULL')
             ->orderBy(
                 'a.startDateTime',
+                'DESC',
+            )
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Paginator<Album>
+     */
+    public function paginatePublished(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        $qb = $this->createQueryBuilder('a')
+            ->where('a.published = TRUE')
+            ->orderBy(
+                'a.startDateTime',
+                'DESC',
+            )
+            ->addOrderBy(
+                'a.id',
+                'DESC',
+            )
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return new Paginator(
+            $qb->getQuery(),
+            false,
+        );
+    }
+
+    public function findPublished(int $id): ?Album
+    {
+        return $this->findOneBy(
+            [
+                'id' => $id,
+                'published' => true,
+            ],
+        );
+    }
+
+    /**
+     * @return Album[]
+     */
+    public function findPublishedChildren(Album $album): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.parent = :parent')
+            ->andWhere('a.published = TRUE')
+            ->setParameter(
+                'parent',
+                $album,
+            )
+            ->orderBy(
+                'a.startDateTime',
+                'DESC',
+            )
+            ->addOrderBy(
+                'a.id',
                 'DESC',
             )
             ->getQuery()

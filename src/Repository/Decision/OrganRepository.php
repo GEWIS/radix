@@ -12,6 +12,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function array_map;
@@ -53,8 +54,6 @@ class OrganRepository extends ServiceEntityRepository
             );
 
         if (null !== $type) {
-            // A backed enum is converted to its value by Doctrine; naming the enum class as the parameter type would
-            // ask DBAL for a column type by that name, which there is none.
             $qb->andWhere('o.type = :type')
                 ->setParameter(
                     'type',
@@ -63,6 +62,64 @@ class OrganRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Paginator<Organ>
+     */
+    public function paginateBodies(
+        ?OrganTypes $type,
+        bool $includeAbrogated,
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        // `organInformation` is an inverse-side one-to-one, which Doctrine cannot proxy: without the join the
+        // listing costs one SELECT per row on the page.
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin(
+                'o.organInformation',
+                'oi',
+            )
+            ->addSelect('oi');
+
+        if (!$includeAbrogated) {
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->isNull('o.abrogationDate'),
+                $qb->expr()->gt(
+                    'o.abrogationDate',
+                    ':now',
+                ),
+            ))
+                ->setParameter(
+                    'now',
+                    new DateTime(),
+                    Types::DATETIME_MUTABLE,
+                );
+        }
+
+        if (null !== $type) {
+            $qb->andWhere('o.type = :type')
+                ->setParameter(
+                    'type',
+                    $type,
+                );
+        }
+
+        $qb->orderBy(
+            'o.abbr',
+            'ASC',
+        )
+            ->addOrderBy(
+                'o.id',
+                'ASC',
+            )
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return new Paginator(
+            $qb->getQuery(),
+            false,
+        );
     }
 
     /**
@@ -212,8 +269,6 @@ class OrganRepository extends ServiceEntityRepository
             );
 
         if (null !== $type) {
-            // A backed enum is converted to its value by Doctrine; naming the enum class as the parameter type would
-            // ask DBAL for a column type by that name, which there is none.
             $qb->andWhere('o.type = :type')
                 ->setParameter(
                     'type',
@@ -325,8 +380,6 @@ class OrganRepository extends ServiceEntityRepository
             );
 
         if (null !== $type) {
-            // A backed enum is converted to its value by Doctrine; naming the enum class as the parameter type would
-            // ask DBAL for a column type by that name, which there is none.
             $qb->andWhere('o.type = :type')
                 ->setParameter(
                     'type',
@@ -398,8 +451,6 @@ class OrganRepository extends ServiceEntityRepository
             );
 
         if (null !== $type) {
-            // A backed enum is converted to its value by Doctrine; naming the enum class as the parameter type would
-            // ask DBAL for a column type by that name, which there is none.
             $qb->andWhere('o.type = :type')
                 ->setParameter(
                     'type',

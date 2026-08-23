@@ -507,7 +507,7 @@
       </trans-unit>
       <trans-unit id="ACC_oMp" resname="%study%¹">
         <source>%study%¹</source>
-        <target state="translated"><![CDATA[%study%¹]]></target>
+        <target state="translated">%study%¹</target>
       </trans-unit>
       <trans-unit id="lNmxgOz" resname="%type% %membership% member expiring soon">
         <source>%type% %membership% member expiring soon</source>
@@ -520,6 +520,10 @@
       <trans-unit id="r0_Bmcr" resname="(bulk) renew as ordinary OR convert to graduate">
         <source>(bulk) renew as ordinary OR convert to graduate</source>
         <target state="translated">(bulk-)verleng als gewoon OF zet om naar afgestudeerde</target>
+      </trans-unit>
+      <trans-unit id="p4pIrHl" resname="* (wildcard) - every permission, including the ones added after this token was issued">
+        <source>* (wildcard) - every permission, including the ones added after this token was issued</source>
+        <target>* (wildcard) - elke permissie, inclusief de permissies die na het uitgeven van dit token zijn toegevoegd</target>
       </trans-unit>
       <trans-unit id="FSVrLmg" resname="A banner runs between the news items on the GEWIS home page, so the whole association sees it and not only the students browsing vacancies. Ask your contact at GEWIS what a banner package would cost you.">
         <source>A banner runs between the news items on the GEWIS home page, so the whole association sees it and not only the students browsing vacancies. Ask your contact at GEWIS what a banner package would cost you.</source>
@@ -625,17 +629,9 @@
         <source>ALV-Werkgroep</source>
         <target state="translated">ALV-Werkgroep</target>
       </trans-unit>
-      <trans-unit id="6e8o.wA" resname="API">
-        <source>API</source>
-        <target state="translated">API</target>
-      </trans-unit>
       <trans-unit id="gDAicwp" resname="API User">
         <source>API User</source>
         <target state="translated">API-gebruiker</target>
-      </trans-unit>
-      <trans-unit id="sjuuPkr" resname="API User - Authenticated automated program">
-        <source>API User - Authenticated automated program</source>
-        <target state="translated">API-gebruiker - Geauthenticeerd geautomatiseerd programma</target>
       </trans-unit>
       <trans-unit id="6JOarrF" resname="API principal">
         <source>API principal</source>
@@ -643,10 +639,6 @@
       </trans-unit>
       <trans-unit id="dPK53_T" resname="API principals">
         <source>API principals</source>
-        <target state="translated">API-gebruikers</target>
-      </trans-unit>
-      <trans-unit id="IAcj.vf" resname="API users">
-        <source>API users</source>
         <target state="translated">API-gebruikers</target>
       </trans-unit>
       <trans-unit id="KNRiz0N" resname="Abbreviation">
@@ -768,6 +760,10 @@
       <trans-unit id="5UlyZC_" resname="Activities">
         <source>Activities</source>
         <target>Activiteiten</target>
+      </trans-unit>
+      <trans-unit id="VVvcTzS" resname="Activities - List activities">
+        <source>Activities - List activities</source>
+        <target>Activiteiten - Activiteiten tonen</target>
       </trans-unit>
       <trans-unit id="xfUFLDA" resname="Activities awaiting review">
         <source>Activities awaiting review</source>
@@ -1519,7 +1515,7 @@
       </trans-unit>
       <trans-unit id="7UTJsrE" resname="Bachelor Programs">
         <source>Bachelor Programs</source>
-        <target state="translated"><![CDATA[Bacheloropleidingen]]></target>
+        <target state="translated">Bacheloropleidingen</target>
       </trans-unit>
       <trans-unit id=".QFPbFe" resname="Back">
         <source>Back</source>
@@ -1589,6 +1585,10 @@
         <source>Banners</source>
         <target state="translated">Banners</target>
       </trans-unit>
+      <trans-unit id="rWM97hF" resname="Basic">
+        <source>Basic</source>
+        <target>Basis</target>
+      </trans-unit>
       <trans-unit id="6lQYTVL" resname="Be the first to upload">
         <source>Be the first to upload</source>
         <target state="translated">Wees de eerste die iets aanlevert</target>
@@ -1657,6 +1657,14 @@
         <source>Board member</source>
         <target state="translated">Bestuurslid</target>
       </trans-unit>
+      <trans-unit id="qBkkDoZ" resname="Boards">
+        <source>Boards</source>
+        <target>Besturen</target>
+      </trans-unit>
+      <trans-unit id="3ormVAs" resname="Boards - List board installations">
+        <source>Boards - List board installations</source>
+        <target>Besturen - Bestuursinstallaties tonen</target>
+      </trans-unit>
       <trans-unit id="UwyDHXV" resname="Boards - List functions and translations">
         <source>Boards - List functions and translations</source>
         <target state="translated">Bestuur - Functie- en vertalingenlijst bekijken</target>
@@ -1665,13 +1673,17 @@
         <source>Bodies</source>
         <target state="translated">Organen</target>
       </trans-unit>
+      <trans-unit id="akJLUiC" resname="Bodies - List bodies and their details">
+        <source>Bodies - List bodies and their details</source>
+        <target>Organen - Organen en hun gegevens tonen</target>
+      </trans-unit>
       <trans-unit id="5niZzt5" resname="Bodies - List functions and translations">
         <source>Bodies - List functions and translations</source>
         <target state="translated">Organen - Functie- en vertalingenlijst bekijken</target>
       </trans-unit>
-      <trans-unit id="9U0Wrgh" resname="Bodies - Read body membership (per user/body)">
-        <source>Bodies - Read body membership (per user/body)</source>
-        <target state="translated">Organen - Orgaanlidmaatschap ophalen (per gebruiker/orgaan)</target>
+      <trans-unit id="41jspXF" resname="Bodies - List the members installed in a body">
+        <source>Bodies - List the members installed in a body</source>
+        <target>Organen - Leden tonen die in een orgaan geïnstalleerd zijn</target>
       </trans-unit>
       <trans-unit id="HhEEeIT" resname="Bodies awaiting review">
         <source>Bodies awaiting review</source>
@@ -3171,7 +3183,7 @@
       </trans-unit>
       <trans-unit id="3zH2ST_" resname="EngD / PhD Programs">
         <source>EngD / PhD Programs</source>
-        <target state="translated"><![CDATA[EngD- / PhD-opleidingen]]></target>
+        <target state="translated">EngD- / PhD-opleidingen</target>
       </trans-unit>
       <trans-unit id="nJp0lj2" resname="EngD Automotive Systems Design">
         <source>EngD Automotive Systems Design</source>
@@ -3760,6 +3772,10 @@
       <trans-unit id="CXpOcGJ" resname="Get API Health">
         <source>Get API Health</source>
         <target state="translated">API-status ophalen</target>
+      </trans-unit>
+      <trans-unit id="Sw1NRSF" resname="Get Members celebrating their birthday">
+        <source>Get Members celebrating their birthday</source>
+        <target>Jarige leden ophalen</target>
       </trans-unit>
       <trans-unit id="ga4HTaq" resname="Get active Members (members that are in one or more bodies)">
         <source>Get active Members (members that are in one or more bodies)</source>
@@ -4429,6 +4445,14 @@
         <source>Keycode active</source>
         <target>Sleutelcode actief</target>
       </trans-unit>
+      <trans-unit id="uAzOoek" resname="Keys">
+        <source>Keys</source>
+        <target>Sleutels</target>
+      </trans-unit>
+      <trans-unit id="cLYXZvX" resname="Keys - List keyholders">
+        <source>Keys - List keyholders</source>
+        <target>Sleutels - Sleutelhouders tonen</target>
+      </trans-unit>
       <trans-unit id="XQH2Eam" resname="Keyword or meeting reference, for example “budget” or “GMM 214.12.1”">
         <source>Keyword or meeting reference, for example “budget” or “GMM 214.12.1”</source>
         <target state="translated">Zoekterm of vergaderreferentie, bijvoorbeeld “begroting” of “ALV 214.12.1”</target>
@@ -4493,6 +4517,10 @@
         <source>Last type</source>
         <target state="translated">Laatste lidmaatschapstype</target>
       </trans-unit>
+      <trans-unit id="9Y0tKi0" resname="Last used">
+        <source>Last used</source>
+        <target>Laatst gebruikt</target>
+      </trans-unit>
       <trans-unit id="1Zi3rCU" resname="Last used %date%">
         <source>Last used %date%</source>
         <target>Laatst gebruikt op %date%</target>
@@ -4508,6 +4536,10 @@
       <trans-unit id="8AmMJuG" resname="Leaderboard (%width% by %height% pixels)">
         <source>Leaderboard (%width% by %height% pixels)</source>
         <target state="translated">Leaderboard (%width% bij %height% pixels)</target>
+      </trans-unit>
+      <trans-unit id="f7XcLBj" resname="Leave empty for a token that never expires. It stops working after this day.">
+        <source>Leave empty for a token that never expires. It stops working after this day.</source>
+        <target>Laat leeg voor een token dat nooit verloopt. Na deze dag werkt het niet meer.</target>
       </trans-unit>
       <trans-unit id="YD75Vls" resname="Leave empty to keep it on until you turn it off.">
         <source>Leave empty to keep it on until you turn it off.</source>
@@ -4733,6 +4765,14 @@
         <source>Mailing lists</source>
         <target state="translated">Mailinglijsten</target>
       </trans-unit>
+      <trans-unit id="Z3ztIZ0" resname="Mailing lists - List mailing lists">
+        <source>Mailing lists - List mailing lists</source>
+        <target>Mailinglijsten - Mailinglijsten tonen</target>
+      </trans-unit>
+      <trans-unit id="f_J8vEL" resname="Mailing lists - List subscribers of a mailing list, including their e-mail addresses">
+        <source>Mailing lists - List subscribers of a mailing list, including their e-mail addresses</source>
+        <target>Mailinglijsten - Abonnees van een mailinglijst tonen, inclusief hun e-mailadressen</target>
+      </trans-unit>
       <trans-unit id="LQoEY16" resname="Mailman Mailing List">
         <source>Mailman Mailing List</source>
         <target state="translated">Mailman-maillijst</target>
@@ -4839,7 +4879,7 @@
       </trans-unit>
       <trans-unit id="_WDdQ1t" resname="Master Programs">
         <source>Master Programs</source>
-        <target state="translated"><![CDATA[Masteropleidingen]]></target>
+        <target state="translated">Masteropleidingen</target>
       </trans-unit>
       <trans-unit id="BXimblW" resname="Master Science Education">
         <source>Master Science Education</source>
@@ -4928,6 +4968,10 @@
       <trans-unit id="Q.K16.b" resname="Member number">
         <source>Member number</source>
         <target state="translated">Lidmaatschapsnummer</target>
+      </trans-unit>
+      <trans-unit id="JnLG9jG" resname="Member properties">
+        <source>Member properties</source>
+        <target>Ledeneigenschappen</target>
       </trans-unit>
       <trans-unit id="3tYRjpu" resname="Member record">
         <source>Member record</source>
@@ -5036,6 +5080,10 @@
       <trans-unit id="C8pRnZe" resname="Member¹ - Get email address">
         <source>Member¹ - Get email address</source>
         <target state="translated">Lid¹ - E-mailadres inzien</target>
+      </trans-unit>
+      <trans-unit id="QXSlD1q" resname="Member¹ - Read body membership (per user/body)">
+        <source>Member¹ - Read body membership (per user/body)</source>
+        <target>Lid¹ - Orgaanlidmaatschap lezen (per gebruiker/orgaan)</target>
       </trans-unit>
       <trans-unit id="vtsk56f" resname="Message">
         <source>Message</source>
@@ -5921,6 +5969,10 @@
         <source>One membership number per line, or separated by spaces or commas</source>
         <target state="translated">Eén lidmaatschapsnummer per regel, of gescheiden middels spaties of kommas</target>
       </trans-unit>
+      <trans-unit id="dH8Yn7H" resname="Only a hash of the token is stored, so only its last characters can be shown. It cannot be read back or changed; revoke this principal and create another to replace it.">
+        <source>Only a hash of the token is stored, so only its last characters can be shown. It cannot be read back or changed; revoke this principal and create another to replace it.</source>
+        <target>Van het token wordt alleen een hash bewaard, dus alleen de laatste tekens kunnen worden getoond. Het kan niet worden teruggelezen of gewijzigd; trek deze API-principal in en maak een nieuwe aan om het te vervangen.</target>
+      </trans-unit>
       <trans-unit id="zPrdSvC" resname="Only bodies that should get a different number in this round. Anything set here beats that body's standing exception and the number set for the round. Every other body is answered without a row.">
         <source>Only bodies that should get a different number in this round. Anything set here beats that body's standing exception and the number set for the round. Every other body is answered without a row.</source>
         <target state="translated">Alleen organen die in deze ronde een ander aantal moeten krijgen. Wat hier staat gaat voor de vaste uitzondering van dat orgaan en voor het aantal van de ronde. Elk ander orgaan krijgt antwoord zonder dat er iets is vastgelegd.</target>
@@ -5928,10 +5980,6 @@
       <trans-unit id="daKTDU1" resname="Only the first %limit% matches are shown; refine your search to narrow them down.">
         <source>Only the first %limit% matches are shown; refine your search to narrow them down.</source>
         <target state="translated">Alleen de eerste %limit% resultaten worden getoond; verfijn je zoekopdracht.</target>
-      </trans-unit>
-      <trans-unit id="PS6SICs" resname="Only the last characters of the token are shown; the token cannot be changed.">
-        <source>Only the last characters of the token are shown; the token cannot be changed.</source>
-        <target state="translated">Alleen de laatste tekens van het token worden getoond; het token kan niet gewijzigd worden.</target>
       </trans-unit>
       <trans-unit id="jWCEU.u" resname="Only their name is kept, so that the decisions mentioning them stay correct. There is nothing here to edit.">
         <source>Only their name is kept, so that the decisions mentioning them stay correct. There is nothing here to edit.</source>
@@ -6293,6 +6341,14 @@
         <source>Photos</source>
         <target>Foto's</target>
       </trans-unit>
+      <trans-unit id="8iwq.vC" resname="Photos - Read albums and their photos">
+        <source>Photos - Read albums and their photos</source>
+        <target>Foto's - Albums en hun foto's lezen</target>
+      </trans-unit>
+      <trans-unit id="wBc1AZK" resname="Photos - Read the Photo of the Week">
+        <source>Photos - Read the Photo of the Week</source>
+        <target>Foto's - De Foto van de Week lezen</target>
+      </trans-unit>
       <trans-unit id="1ex5LkB" resname="Photos I am tagged in on my photo page">
         <source>Photos I am tagged in on my photo page</source>
         <target>Foto's waarin ik ben getagd op mijn fotopagina</target>
@@ -6483,7 +6539,7 @@
       </trans-unit>
       <trans-unit id="wo8C8Qu" resname="Pre-master Programs">
         <source>Pre-master Programs</source>
-        <target state="translated"><![CDATA[Premasteropleidingen]]></target>
+        <target state="translated">Premasteropleidingen</target>
       </trans-unit>
       <trans-unit id="DT2M6Rn" resname="Preferred">
         <source>Preferred</source>
@@ -7205,6 +7261,10 @@
         <source>Revision %number%: %status%</source>
         <target state="translated">Revisie %number%: %status%</target>
       </trans-unit>
+      <trans-unit id="bgK_XD3" resname="Revoke">
+        <source>Revoke</source>
+        <target>Intrekken</target>
+      </trans-unit>
       <trans-unit id="5EpkYOj" resname="Revoke authorization">
         <source>Revoke authorization</source>
         <target state="translated">Machtiging intrekken</target>
@@ -7855,7 +7915,7 @@
       </trans-unit>
       <trans-unit id="MGMD6gU" resname="Special cases (secretary use only)">
         <source>Special cases (secretary use only)</source>
-        <target state="translated"><![CDATA[Bijzondere gevallen (alleen voor de secretaris)]]></target>
+        <target state="translated">Bijzondere gevallen (alleen voor de secretaris)</target>
       </trans-unit>
       <trans-unit id="U_RKQ4r" resname="Sports">
         <source>Sports</source>
@@ -8028,6 +8088,10 @@
       <trans-unit id="qniSpVB" resname="Succesfully deleted %entity%!">
         <source>Succesfully deleted %entity%!</source>
         <target state="translated">%entity% is verwijderd!</target>
+      </trans-unit>
+      <trans-unit id="TW_enKD" resname="Succesfully revoked %entity%!">
+        <source>Succesfully revoked %entity%!</source>
+        <target>%entity% is succesvol ingetrokken!</target>
       </trans-unit>
       <trans-unit id="jLYkHhI" resname="Success">
         <source>Success</source>

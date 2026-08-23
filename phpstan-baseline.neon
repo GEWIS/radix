@@ -368,18 +368,6 @@ parameters:
 			path: src/Entity/Decision/Meeting.php
 
 		-
-			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
-			identifier: function.strict
-			count: 8
-			path: src/Entity/Decision/Member.php
-
-		-
-			message: '#^Calling in_array\(\) is forbidden, set the third parameter \$strict to `true` to also check the types to prevent type juggling bugs\.$#'
-			identifier: disallowed.function
-			count: 8
-			path: src/Entity/Decision/Member.php
-
-		-
 			message: '#^Property App\\Entity\\Decision\\Organ\:\:\$foundation type mapping mismatch\: database can contain App\\Entity\\Decision\\SubDecision\\Foundation\|null but property expects App\\Entity\\Decision\\SubDecision\\Foundation\.$#'
 			identifier: doctrine.associationType
 			count: 1
@@ -1430,24 +1418,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Service/Database/StripeService.php
-
-		-
-			message: '#^Method App\\Service\\Report\\ApiService\:\:getActiveMembers\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Service/Report/ApiService.php
-
-		-
-			message: '#^Method App\\Service\\Report\\ApiService\:\:getMember\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Service/Report/ApiService.php
-
-		-
-			message: '#^Method App\\Service\\Report\\ApiService\:\:getMembers\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Service/Report/ApiService.php
 
 		-
 			message: '#^Parameter \#1 \$given of class App\\Exception\\Report\\VersionFormat constructor expects string, string\|null given\.$#'

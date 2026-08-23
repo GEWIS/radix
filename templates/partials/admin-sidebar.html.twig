@@ -280,11 +280,6 @@
                         'label': 'Company accounts'|trans,
                         'active': companyUsers,
                     },
-                    {
-                        'href': path('admin/users/api/index'),
-                        'label': 'API users'|trans,
-                        'active': is_module_active(['user', 'adminapiuser']),
-                    },
                     is_granted('ROLE_DATABASE_ADMIN') ? {
                         'href': path('user_api_principal_index'),
                         'label': 'API principals'|trans,

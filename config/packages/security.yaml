@@ -39,7 +39,8 @@ security:
             security: false
 
         api:
-            pattern: ^/api
+            # Anchored on a segment boundary so `/api-docs`, a page a browser reads, stays on the session firewall.
+            pattern: ^/api(/|$)
             stateless: true
             provider: user_provider
             # The bearer-token authenticator resolves an ApiPrincipal itself and doubles as the entry point, so the
@@ -98,6 +99,10 @@ security:
         ROLE_TUE_GUEST: [ 'ROLE_GUEST' ]
         ROLE_USER: [ ]
         ROLE_COMPANY_USER: [ ]
+        # What a bearer token carries. Authorization on the API is decided per permission by ApiPermissionVoter, so
+        # this grants nothing and exists only so the role a token holds is declared like every other.
+        ROLE_API: [ ]
+        # Retired with the GEWISWEB-era API token, and kept only because UserRoles is persisted; see the enum.
         ROLE_API_USER: [ ]
         ROLE_MEMBER: [ 'ROLE_USER' ]
         ROLE_GRADUATE: [ 'ROLE_USER' ]
@@ -138,9 +143,9 @@ security:
         - { path: '^/(%app.locales%)/company', roles: [ROLE_COMPANY_USER] }
         # - { path: ^/profile, roles: ROLE_USER }
 
-        # The API, its own documentation included, is read with a bearer token and nothing else. The endpoints carry
-        # their own permission checks on top of this; the rule is what keeps an endpoint that forgot one from
-        # answering an anonymous request.
+        # `openapi.yaml` is committed to a public repository, so gating the same document buys no secrecy.
+        - { path: ^/api-docs, roles: PUBLIC_ACCESS }
+        # Endpoints carry their own permission checks; this is what catches one that forgot.
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
         # The register's public flows: a visitor to them is nobody yet.
