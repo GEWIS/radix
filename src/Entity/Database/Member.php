@@ -214,15 +214,6 @@ class Member
     private Collection $auditEntries;
 
     /**
-     * A multiple-use authentication key which can be used in linked systems to verify updates
-     */
-    #[Column(
-        type: 'string',
-        nullable: true,
-    )]
-    private ?string $authenticationKey = null;
-
-    /**
      * Determines if a member is deleted. A deleted member is a member whose basic info needs to be retained to ensure
      * that all decisions that mention this member can be kept (i.e., administrative purposes). This value is only set
      * when deleting a member and cannot be altered via the interface.
@@ -690,16 +681,6 @@ class Member
         return $this->auditEntries;
     }
 
-    public function getAuthenticationKey(): ?string
-    {
-        return $this->authenticationKey;
-    }
-
-    public function setAuthenticationKey(?string $authenticationKey): void
-    {
-        $this->authenticationKey = $authenticationKey;
-    }
-
     /**
      * Get if the member is deleted.
      */
@@ -731,7 +712,6 @@ class Member
      *     hidden: bool,
      *     deleted: bool,
      *     expiration: string,
-     *     authenticationKey: ?string,
      * }
      */
     public function toArray(): array
@@ -748,7 +728,6 @@ class Member
             'hidden' => $this->getHidden(),
             'deleted' => $this->getDeleted(),
             'expiration' => $this->getExpiration()->format(DateTimeInterface::ATOM),
-            'authenticationKey' => $this->getAuthenticationKey(),
         ];
     }
 

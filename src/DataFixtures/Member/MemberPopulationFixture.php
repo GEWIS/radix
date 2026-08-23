@@ -27,7 +27,6 @@ use function array_map;
 use function chr;
 use function count;
 use function explode;
-use function hash;
 use function implode;
 use function in_array;
 use function mb_substr;
@@ -446,7 +445,6 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         $member->setHidden($hidden);
         $member->setDeleted($deleted);
         $member->setSupremum('nee');
-        $member->setAuthenticationKey($lapsed ? null : hash('sha256', (string) $lidnr));
 
         $this->chain(
             $member,
@@ -456,11 +454,10 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         );
 
         // What is left of somebody who has been removed is their name and the decisions that named them. Their
-        // address, the mail they were reachable at and the key they signed in with are what "removed" means, so they
-        // are not written in the first place rather than written and then cleared.
+        // address and the mail they were reachable at are what "removed" means, so they are not written in the first
+        // place rather than written and then cleared.
         if ($deleted) {
             $member->setEmail(null);
-            $member->setAuthenticationKey(null);
 
             return $member;
         }
