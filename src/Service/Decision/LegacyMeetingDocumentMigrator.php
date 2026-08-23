@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Decision;
+namespace App\Service\Decision;
 
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Decision\LegacyMeetingDocument;
@@ -18,17 +18,9 @@ use App\Repository\Decision\LegacyMeetingDocumentRepository;
 use App\Repository\Decision\LegacyMeetingMinutesRepository;
 use App\Service\Application\FileStorage;
 use App\Service\Application\FileStorageException;
-use App\Service\Decision\LegacyDocumentNameParser;
-use App\Service\Decision\ParsedLegacyName;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -54,8 +46,7 @@ use function usort;
  * `--dry-run` computes and reports the same migration without writing to the database or the file storage. Files are
  * read from the legacy content-addressed layout, which the storage migration never covered for meeting documents.
  */
-#[AsCommand(name: 'app:decision:migrate-legacy-meeting-documents')]
-class MigrateLegacyMeetingDocumentsCommand extends Command
+class LegacyMeetingDocumentMigrator
 {
     private const array REFERENCE_NAMES = [
         'eternal-memorandum-and-decision-list' => 'Eternal Memorandum and Decision List',
@@ -92,45 +83,18 @@ class MigrateLegacyMeetingDocumentsCommand extends Command
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
     ) {
-        parent::__construct();
     }
 
-    #[Override]
-    protected function configure(): void
-    {
-        $this->addOption(
-            'dry-run',
-            null,
-            InputOption::VALUE_NONE,
-            'Compute and report the migration without writing anything',
-        );
-        $this->addOption(
-            'force',
-            null,
-            InputOption::VALUE_NONE,
-            'Run even when migrated documents already exist',
-        );
-        $this->addOption(
-            'source-dir',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Directory holding the legacy content-addressed files',
-            'public/data',
-        );
-    }
-
-    #[Override]
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
-        $io = new SymfonyStyle(
-            $input,
-            $output,
-        );
-
-        $this->dryRun = true === $input->getOption('dry-run');
-        $sourceDir = strval($input->getOption('source-dir'));
+    /**
+     * Rebuild the agenda-point/version model from the legacy flat rows. Returns false when it refused to run.
+     */
+    public function migrate(
+        SymfonyStyle $io,
+        bool $dryRun,
+        bool $force,
+        string $sourceDir,
+    ): bool {
+        $this->dryRun = $dryRun;
         $this->sourceDir = str_starts_with(
             $sourceDir,
             '/',
@@ -141,14 +105,14 @@ class MigrateLegacyMeetingDocumentsCommand extends Command
         $existing = $this->entityManager->getRepository(MeetingDocument::class)->count();
         if (
             $existing > 0
-            && true !== $input->getOption('force')
+            && !$force
         ) {
             $io->error(sprintf(
                 'There are already %d migrated meeting documents; pass --force to migrate anyway.',
                 $existing,
             ));
 
-            return Command::FAILURE;
+            return false;
         }
 
         $rows = $this->legacyDocuments->findAllOrderedById();
@@ -193,7 +157,7 @@ class MigrateLegacyMeetingDocumentsCommand extends Command
 
         $this->report($io);
 
-        return Command::SUCCESS;
+        return true;
     }
 
     /**

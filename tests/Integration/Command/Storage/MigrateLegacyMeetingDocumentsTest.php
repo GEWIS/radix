@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Command\Decision;
+namespace App\Tests\Integration\Command\Storage;
 
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\LegacyMeetingDocument;
@@ -28,7 +28,7 @@ use function sys_get_temp_dir;
  * selections, minutes become a versioned master, and rows whose file is gone are skipped without creating anything.
  * The seeded fixtures already contain migrated documents, which doubles as coverage for the rerun guard.
  */
-final class MigrateLegacyMeetingDocumentsCommandTest extends DatabaseTestCase
+final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
 {
     private string $sourceDir;
 
@@ -50,7 +50,11 @@ final class MigrateLegacyMeetingDocumentsCommandTest extends DatabaseTestCase
 
     public function testRefusesToRunWhenMigratedDocumentsExist(): void
     {
-        $result = static::runCommand('app:decision:migrate-legacy-meeting-documents');
+        $result = static::runCommand(
+            'app:storage:migrate',
+            ['--meetings' => true],
+            interactive: false,
+        );
 
         $this->assertCommandFailed($result);
         self::assertStringContainsString(
@@ -110,11 +114,13 @@ final class MigrateLegacyMeetingDocumentsCommandTest extends DatabaseTestCase
         $this->entityManager->flush();
 
         $this->assertCommandIsSuccessful(static::runCommand(
-            'app:decision:migrate-legacy-meeting-documents',
+            'app:storage:migrate',
             [
+                '--meetings' => true,
                 '--force' => true,
                 '--source-dir' => $this->sourceDir,
             ],
+            interactive: false,
         ));
 
         // The two version-suffixed rows collapsed into one document under a new point 5.
@@ -216,12 +222,14 @@ final class MigrateLegacyMeetingDocumentsCommandTest extends DatabaseTestCase
         $this->entityManager->flush();
 
         $result = static::runCommand(
-            'app:decision:migrate-legacy-meeting-documents',
+            'app:storage:migrate',
             [
+                '--meetings' => true,
                 '--dry-run' => true,
                 '--force' => true,
                 '--source-dir' => $this->sourceDir,
             ],
+            interactive: false,
         );
 
         $this->assertCommandIsSuccessful($result);
