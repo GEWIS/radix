@@ -70,6 +70,15 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        {% include 'partials/application/pagination.html.twig' with {
+                            'route': 'admin/frontpage/polls/index',
+                            'routeParams': {},
+                            'page': currentPage,
+                            'pageSize': pageSize,
+                            'totalCount': totalCount,
+                            'totalPages': (totalCount / pageSize)|round(0, 'ceil'),
+                        } only %}
                     {% endif %}
                 </div>
             </div>

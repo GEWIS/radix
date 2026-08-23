@@ -104,6 +104,16 @@ class CompanyBannerPackage extends CompanyPackage
         return $this->pendingImage;
     }
 
+    /**
+     * Move the proposal's file without touching who proposed it or when. A proposal is made with
+     * {@see self::proposeImage()}; this is for the storage migration, which changes where a file lives and nothing
+     * about the proposal itself.
+     */
+    public function setPendingImage(string $pendingImage): void
+    {
+        $this->pendingImage = $pendingImage;
+    }
+
     public function getPendingImageSubmittedAt(): ?DateTime
     {
         return $this->pendingImageSubmittedAt;

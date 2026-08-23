@@ -111,6 +111,14 @@
                         </tbody>
                     </table>
                 </div>
+
+                {% include 'partials/application/pagination.html.twig' with {
+                    'page': this.pendingPage,
+                    'totalPages': this.pendingTotalPages,
+                    'totalCount': this.pendingTotalCount,
+                    'pageSize': this.pageSize,
+                    'action': 'gotoPendingPage',
+                } only %}
             {% endif %}
         </div>
     </div>

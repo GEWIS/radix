@@ -10,7 +10,10 @@ use App\Repository\Application\FindsRevisionsForReviewTrait;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+
+use function array_map;
 
 /**
  * @extends ServiceEntityRepository<ActivityRevision>
@@ -67,25 +70,93 @@ class ActivityRevisionRepository extends ServiceEntityRepository
     }
 
     /**
-     * Draft revisions that are still the working head of their activity and have not been touched since the cutoff,
-     * oldest first. These are abandoned drafts eligible for cleanup; submitted/in-review revisions (with the board)
-     * are never returned.
+     * The same queue, one page at a time: what the approvals page lists. The organ and company columns it shows come
+     * from the revision, so those are fetched with it.
+     *
+     * @return Paginator<ActivityRevision>
+     */
+    public function paginateForReview(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        $builder = $this->createQueryBuilder('r')
+            ->addSelect(
+                'n',
+                'a',
+                'au',
+                'lr',
+                'o',
+                'c',
+            )
+            ->join(
+                'r.name',
+                'n',
+            )
+            ->join(
+                'r.activity',
+                'a',
+            )
+            ->leftJoin(
+                'r.author',
+                'au',
+            )
+            ->leftJoin(
+                'a.liveRevision',
+                'lr',
+            )
+            ->leftJoin(
+                'r.organ',
+                'o',
+            )
+            ->leftJoin(
+                'r.company',
+                'c',
+            );
+
+        $this->whereAwaitingReview($builder);
+        $this->orderOldestFirst($builder);
+
+        $paginator = new Paginator(
+            $builder,
+            false,
+        );
+        $paginator->getQuery()
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return $paginator;
+    }
+
+    /**
+     * Revisions in one of the given states that are still the working head of their activity and have not been touched
+     * since the cutoff, oldest first. Approved heads are never eligible whatever is asked for: the live version of an
+     * activity is not abandoned, it is finished.
      *
      * @return ActivityRevision[]
      */
-    public function findStaleDraftHeads(DateTime $cutoff): array
-    {
+    public function findStaleHeads(
+        DateTime $cutoff,
+        RevisionStatus ...$statuses,
+    ): array {
         return $this->createQueryBuilder('r')
             ->join(
                 'r.activity',
                 'a',
             )
-            ->where('r.status = :draft')
+            ->where('r.status IN (:statuses)')
+            ->andWhere('r.status <> :approved')
             ->andWhere('r.updatedAt <= :cutoff')
             ->andWhere('a.currentRevision = r')
             ->setParameter(
-                'draft',
-                RevisionStatus::Draft->value,
+                'statuses',
+                array_map(
+                    static fn (RevisionStatus $status): string => $status->value,
+                    $statuses,
+                ),
+            )
+            ->setParameter(
+                'approved',
+                RevisionStatus::Approved->value,
             )
             ->setParameter(
                 'cutoff',

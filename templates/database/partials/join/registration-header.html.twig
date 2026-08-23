@@ -1,20 +1,20 @@
-{# The registration form and the notice that replaces it in July open with the same banner; only the body differs,
-   which the embedding page fills in through `registration_intro`. The renewal flow shows the same banner under its
-   own name: a graduate renewing their status is not registering. #}
-<div class="p-4 p-md-5 mb-4 bg-body-tertiary rounded-3">
-    <div class="row align-items-center">
-        <div class="col-md-3 mb-4 mb-md-0">
-            <img src="{{ asset('images/gewis.png') }}" class="img-fluid" alt="">
-        </div>
-        <div class="col-md-9">
-            <h1 class="mb-3">
-                <span class="text-primary-emphasis">GEWIS</span> {{ header_title|default('Registration'|trans) }}
-            </h1>
+{# The panel that opens every page of the join flow. The embedding page fills in `registration_intro`, and a page
+   that invites someone to join fills `registration_details` as well.
+
+   `header_title` has no fallback on purpose: a default would be inherited by the renewal and checkout pages, which
+   are not about becoming a member. #}
+<div class="panel">
+    <div class="panel-body p-4 p-md-5">
+        <div class="registration-intro">
+            <h1 class="registration-title mb-3">{{ header_title }}</h1>
             {% block registration_intro %}{% endblock %}
-            <p class="mb-0">
-                {{ 'If you have any questions feel free to contact'|trans }}
-                <a href="mailto:board@gewis.nl">board@gewis.nl</a>.
-            </p>
         </div>
+
+        {% block registration_details %}{% endblock %}
+
+        <p class="registration-intro mt-4 mb-0">
+            {{ 'If you have any questions feel free to contact'|trans }}
+            <a href="mailto:board@gewis.nl">board@gewis.nl</a>.
+        </p>
     </div>
 </div>

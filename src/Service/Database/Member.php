@@ -43,6 +43,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_diff;
@@ -51,10 +52,8 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function assert;
-use function bin2hex;
 use function date;
 use function in_array;
-use function random_bytes;
 use function uasort;
 
 class Member
@@ -72,7 +71,7 @@ class Member
         private readonly RenewalService $renewalService,
         private readonly Security $security,
         private readonly EmailService $emailService,
-        private readonly string $publicUrl,
+        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Audit $auditService,
         private readonly string $mailToSubscriptionAddress,
         private readonly string $mailToSubscriptionName,
@@ -207,7 +206,11 @@ class Member
             'lidnr' => $member->getLidnr(),
             'restartUrl' => null === $paymentLink
                 ? null
-                : $this->publicUrl . '/checkout/restart/' . $paymentLink->getToken(),
+                : $this->urlGenerator->generate(
+                    'join_checkout_restart_short',
+                    ['token' => $paymentLink->getToken()],
+                    UrlGeneratorInterface::ABSOLUTE_URL,
+                ),
         ];
 
         $secretary = new Address(
@@ -252,6 +255,7 @@ class Member
                 'refundId' => $refundId,
                 'refundStatus' => $refundStatus,
             ],
+            $this->emailService->secretary(),
         );
     }
 
@@ -336,9 +340,6 @@ class Member
             // Force cascade by adding to member.
             $member->addList($mailingListMember);
         }
-
-        // Add authentication key to allow external updates.
-        $member->setAuthenticationKey($this->generateAuthenticationKey());
 
         // Set paid automatically.
         $membership->setPaid(20);
@@ -1102,7 +1103,7 @@ class Member
      *     updates: int,
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatusFigures(): array
     {
         $totalInclExpired = $this->memberRepository->countMembers(
             true,
@@ -1135,8 +1136,7 @@ class Member
     /**
      * How many members hold a current membership of each type.
      *
-     * Kept out of the front page data because only the dashboard asks for it, and the front page data is read on
-     * every page for the notification bell.
+     * Kept out of the status figures because only the dashboard asks for it.
      *
      * @return array<string, int>
      */
@@ -1155,8 +1155,8 @@ class Member
     }
 
     /**
-     * Paid prospective members (separately from frontpage data to reduce number
-     * of database queries)
+     * Prospective members who have paid. Counted on its own so the sidebar badge does not have to ask for the whole
+     * state of the register.
      */
     public function getPaidProspectivesCount(): int
     {
@@ -1200,7 +1200,6 @@ class Member
             );
         }
 
-        $member->setAuthenticationKey($this->generateAuthenticationKey());
         $this->memberRepository->persist($member);
         $this->memberUpdateRepository->remove($memberUpdate);
 
@@ -1212,28 +1211,6 @@ class Member
         $this->memberUpdateRepository->remove($memberUpdate);
 
         return true;
-    }
-
-    /**
-     * Generate authentication keys for members whose membership has not expired and who are not hidden.
-     */
-    public function generateAuthenticationKeys(): void
-    {
-        $members = $this->memberRepository->getNonExpiredNonHiddenMembers();
-
-        foreach ($members as $member) {
-            $member->setAuthenticationKey($this->generateAuthenticationKey());
-        }
-
-        $this->memberRepository->persistAll($members);
-    }
-
-    /**
-     * Generate a cryptographically secure pseudo-random string of 64 bytes, encoded as hex.
-     */
-    private function generateAuthenticationKey(): string
-    {
-        return bin2hex(random_bytes(64));
     }
 
     /**

@@ -85,6 +85,28 @@ enum NotificationType: string
         };
     }
 
+    /**
+     * Whether two of these may share a line when they are about different things.
+     *
+     * An album notification is about the album, and rolling several into "3 new photo albums are online" is what the
+     * summary is for. A sign-in is about the device it came from, so rolling two devices into "signed in twice" hides
+     * the one fact the reader opened the centre to check; those only share a line when they say the same thing.
+     */
+    public function groupsAcrossSubjects(): bool
+    {
+        return match ($this) {
+            self::SignIn, self::PasswordChanged, self::MfaEnabled,
+            self::MfaDisabled, self::BackupCodesRegenerated => false,
+            self::AlbumPublished, self::ActivityPublished, self::DataExportReady,
+            self::ActivityAwaitingReview, self::SignupClosing, self::SignupClosingWithFields,
+            self::CompanyRevisionAwaitingReview, self::VacancyRevisionAwaitingReview,
+            self::CompanyBannerAwaitingReview, self::OrganInformationRevisionAwaitingReview,
+            self::PollRevisionAwaitingReview, self::ActivityProposalAwaitingDecision,
+            self::ActivityProposalScheduled, self::ActivityProposalDeclined,
+            self::ActivityProposalBudgetDue, self::ActivityProposalLapsed => true,
+        };
+    }
+
     public function addressing(): NotificationAddressing
     {
         return match ($this) {

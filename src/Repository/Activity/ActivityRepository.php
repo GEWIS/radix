@@ -42,17 +42,20 @@ class ActivityRepository extends ServiceEntityRepository
 
     /**
      * Activities for the admin overview whose working revision is NOT yet approved (drafts, submitted, in-review,
-     * rejected, closed), most recently touched first. Scoped to the member unless $all (the board "show everything").
+     * rejected, closed), most recently touched first, paginated. Scoped to the member unless $all (the board "show
+     * everything").
      *
      * @param int[] $organIds
      *
-     * @return Activity[]
+     * @return Paginator<Activity>
      */
     public function findPendingForAdmin(
         Member $member,
         array $organIds,
         bool $all,
-    ): array {
+        int $page,
+        int $pageSize,
+    ): Paginator {
         $qb = $this->adminOverviewQuery(
             $member,
             $organIds,
@@ -68,7 +71,15 @@ class ActivityRepository extends ServiceEntityRepository
                 'DESC',
             );
 
-        return $qb->getQuery()->getResult();
+        $paginator = new Paginator(
+            $qb,
+            false,
+        );
+        $paginator->getQuery()
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return $paginator;
     }
 
     /**
@@ -109,6 +120,52 @@ class ActivityRepository extends ServiceEntityRepository
             ->setMaxResults($pageSize);
 
         return $paginator;
+    }
+
+    /**
+     * Warm the associations the edit form reads, in one query rather than one per field.
+     *
+     * The route resolver hands the controller a bare Activity, so its working revision and each of that revision's
+     * four localised texts would otherwise be loaded one lazy SELECT at a time. Nothing is returned: the entities land
+     * in the identity map, which is where the form finds them.
+     */
+    public function warmForEditing(Activity $activity): void
+    {
+        $this->createQueryBuilder('a')
+            ->addSelect(
+                'cr',
+                'n',
+                'l',
+                'c',
+                'd',
+            )
+            ->join(
+                'a.currentRevision',
+                'cr',
+            )
+            ->join(
+                'cr.name',
+                'n',
+            )
+            ->join(
+                'cr.location',
+                'l',
+            )
+            ->join(
+                'cr.costs',
+                'c',
+            )
+            ->join(
+                'cr.description',
+                'd',
+            )
+            ->where('a = :activity')
+            ->setParameter(
+                'activity',
+                $activity,
+            )
+            ->getQuery()
+            ->getResult();
     }
 
     /**

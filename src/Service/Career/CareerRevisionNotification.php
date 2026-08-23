@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Service\Career;
 
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\Enums\NotificationType;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\CompanyRevision;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\User\Enums\UserRoles;
+use App\Service\Application\OfficeMailboxes;
 use App\Service\Application\RevisionNotificationInterface;
 use Override;
 use RuntimeException;
@@ -21,6 +23,10 @@ use function sprintf;
  */
 final readonly class CareerRevisionNotification implements RevisionNotificationInterface
 {
+    public function __construct(private OfficeMailboxes $mailboxes)
+    {
+    }
+
     #[Override]
     public function supports(RevisionInterface $revision): bool
     {
@@ -45,5 +51,37 @@ final readonly class CareerRevisionNotification implements RevisionNotificationI
     public function audienceRole(RevisionInterface $revision): UserRoles
     {
         return UserRoles::CompanyAdmin;
+    }
+
+    /**
+     * External affairs and C4 both: the officer answers for the association's dealings with a company, and C4 does
+     * the reviewing.
+     */
+    #[Override]
+    public function reviewerMailboxes(RevisionInterface $revision): array
+    {
+        return [
+            $this->mailboxes->externalAffairs(),
+            $this->mailboxes->c4(),
+        ];
+    }
+
+    #[Override]
+    public function reviewerMailSubject(RevisionInterface $revision): string
+    {
+        return match (true) {
+            $revision instanceof CompanyRevision => sprintf(
+                'Company profile submitted for review: %s',
+                $revision->getCompany()->getName(),
+            ),
+            $revision instanceof VacancyRevision => sprintf(
+                'Vacancy submitted for review: %s',
+                $revision->getName()->getText(Languages::English) ?? $revision->getVacancy()->getSlugName(),
+            ),
+            default => throw new RuntimeException(sprintf(
+                'A career notification cannot be raised for "%s".',
+                $revision::class,
+            )),
+        };
     }
 }

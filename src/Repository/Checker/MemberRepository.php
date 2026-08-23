@@ -28,26 +28,6 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get a list of members who are hidden or whose membership has expired.
-     *
-     * @return Member[]
-     */
-    public function getExpiredOrHiddenMembersWithAuthenticationKey(): array
-    {
-        $qb = $this->createQueryBuilder('m');
-
-        $qb->leftJoin(
-            'm.memberships',
-            'mem',
-        )
-            ->where('m.authenticationKey IS NOT NULL')
-            ->andWhere($qb->expr()->eq('mem.startDate', '(' . $this->lastMembershipQuery()->getDQL() . ')'))
-            ->andWhere('mem.endDate <= CURRENT_TIMESTAMP() OR m.hidden = True');
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
      * Get all expiring graduates for which no renewal link exists
      * The check for hidden is required because hidden members may also expire but should not be emailed
      *
@@ -118,19 +98,5 @@ class MemberRepository extends ServiceEntityRepository
             ->where('lastMem.member = ' . $memberAlias);
 
         return $qb;
-    }
-
-    /**
-     * Persist several member models in a single flush.
-     *
-     * @param Member[] $members
-     */
-    public function persistAll(array $members): void
-    {
-        foreach ($members as $member) {
-            $this->getEntityManager()->persist($member);
-        }
-
-        $this->getEntityManager()->flush();
     }
 }

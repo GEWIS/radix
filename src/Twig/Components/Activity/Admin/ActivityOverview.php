@@ -18,15 +18,20 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
 use function array_map;
 use function assert;
+use function ceil;
+use function iterator_to_array;
+use function max;
+use function min;
 
 /**
- * Admin activity overview, split into a "pending" table (drafts/submitted/in-review/rejected/closed) and a paginated
- * "approved" table. Each member sees the activities they created or that one of their organs organises; a board member
- * can flip {@see self::$showAll} to see every activity.
+ * Admin activity overview, split into a "pending" table (drafts/submitted/in-review/rejected/closed) and an
+ * "approved" table, both paginated. Each member sees the activities they created or that one of their organs
+ * organises; a board member can flip {@see self::$showAll} to see every activity.
  *
  * @extends AbstractPaginatedOverview<Activity>
  */
@@ -40,10 +45,23 @@ final class ActivityOverview extends AbstractPaginatedOverview
     #[LiveProp(writable: true)]
     public bool $showAll = false;
 
+    /**
+     * The pending table pages separately from the approved one, so its own page travels alongside the inherited
+     * `page` rather than sharing it. Both tables read the one page size.
+     */
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
+    public int $pendingPage = 1;
+
     // The approved table can hold thousands of rows, so it is collapsed by default. Driven as a live prop (not a
     // client-side Bootstrap collapse) so the state survives the Ajax re-render that pagination triggers.
     #[LiveProp(writable: true)]
     public bool $expanded = false;
+
+    /** @var Paginator<Activity>|null */
+    private ?Paginator $pending = null;
 
     public function __construct(
         private readonly ActivityRepository $activityRepository,
@@ -63,10 +81,32 @@ final class ActivityOverview extends AbstractPaginatedOverview
     {
         return array_map(
             static fn (Activity $activity): ActivityAdminRow => ActivityAdminRow::fromActivity($activity),
-            $this->activityRepository->findPendingForAdmin(
-                $this->getMember(),
-                $this->getOrganIds(),
-                $this->showingAll(),
+            iterator_to_array($this->pendingPaginator()),
+        );
+    }
+
+    public function getPendingTotalCount(): int
+    {
+        return $this->pendingPaginator()->count();
+    }
+
+    public function getPendingTotalPages(): int
+    {
+        return max(
+            1,
+            (int) ceil($this->getPendingTotalCount() / $this->pageSize()),
+        );
+    }
+
+    #[LiveAction]
+    public function gotoPendingPage(#[LiveArg]
+    int $page,): void
+    {
+        $this->pendingPage = max(
+            1,
+            min(
+                $page,
+                $this->getPendingTotalPages(),
             ),
         );
     }
@@ -112,6 +152,23 @@ final class ActivityOverview extends AbstractPaginatedOverview
             $this->showingAll(),
             $page,
             $pageSize,
+        );
+    }
+
+    /**
+     * @return Paginator<Activity>
+     */
+    private function pendingPaginator(): Paginator
+    {
+        return $this->pending ??= $this->activityRepository->findPendingForAdmin(
+            $this->getMember(),
+            $this->getOrganIds(),
+            $this->showingAll(),
+            max(
+                1,
+                $this->pendingPage,
+            ),
+            $this->pageSize(),
         );
     }
 

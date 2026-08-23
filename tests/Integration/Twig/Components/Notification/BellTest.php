@@ -14,6 +14,7 @@ use Scheb\TwoFactorBundle\Security\Authentication\Token\TwoFactorToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function array_column;
+use function count;
 use function implode;
 
 /**
@@ -97,8 +98,8 @@ final class BellTest extends DatabaseTestCase
     public function testARunOfOneKindIsShownAsOneLine(): void
     {
         $this->signIn('Chrome 124');
-        $this->signIn('Firefox 153');
-        $this->signIn('Safari 18');
+        $this->signIn('Chrome 124');
+        $this->signIn('Chrome 124');
         $this->entityManager->flush();
 
         $entries = $this->bellFor(8025)->getEntries();
@@ -131,7 +132,7 @@ final class BellTest extends DatabaseTestCase
     public function testActingOnALineCoversEverythingBehindIt(): void
     {
         $this->signIn('Chrome 124');
-        $this->signIn('Firefox 153');
+        $this->signIn('Chrome 124');
         $this->entityManager->flush();
 
         $bell = $this->bellFor(8025);
@@ -152,7 +153,7 @@ final class BellTest extends DatabaseTestCase
     public function testALineStandingForSeveralPointsAtTheList(): void
     {
         $this->signIn('Chrome 124');
-        $this->signIn('Firefox 153');
+        $this->signIn('Chrome 124');
         $this->entityManager->flush();
 
         self::assertStringContainsString(
@@ -190,6 +191,40 @@ final class BellTest extends DatabaseTestCase
     }
 
     /**
+     * Which device signed in is the fact the reader opened the centre to check, so folding two of them into "signed
+     * in twice" would answer the wrong question.
+     */
+    public function testSignInsFromDifferentDevicesStayApart(): void
+    {
+        $this->signIn('Chrome 124');
+        $this->signIn('Firefox 153');
+        $this->entityManager->flush();
+
+        self::assertCount(
+            2,
+            $this->bellFor(8025)->getEntries(),
+        );
+    }
+
+    /**
+     * Two of the same kind far enough apart are two things that happened, not one thing that happened repeatedly.
+     */
+    public function testTheSameKindLongApartStaysApart(): void
+    {
+        $this->signIn('Chrome 124');
+        $this->signIn(
+            'Chrome 124',
+            new DateTimeImmutable('-3 days'),
+        );
+        $this->entityManager->flush();
+
+        self::assertCount(
+            2,
+            $this->bellFor(8025)->getEntries(),
+        );
+    }
+
+    /**
      * Different kinds next to each other stay apart, however close together they arrived.
      */
     public function testDifferentKindsAreNotFoldedTogether(): void
@@ -204,8 +239,10 @@ final class BellTest extends DatabaseTestCase
         );
     }
 
-    private function signIn(string $browser): Notification
-    {
+    private function signIn(
+        string $browser,
+        ?DateTimeImmutable $at = null,
+    ): Notification {
         $notification = new Notification();
         $notification->setType(NotificationType::SignIn);
         $notification->setContext(['browser' => $browser]);
@@ -213,7 +250,7 @@ final class BellTest extends DatabaseTestCase
             $this->member(8025),
             null,
         );
-        $notification->setCreatedAt(new DateTimeImmutable());
+        $notification->setCreatedAt($at ?? new DateTimeImmutable());
         $this->entityManager->persist($notification);
 
         return $notification;
@@ -252,6 +289,62 @@ final class BellTest extends DatabaseTestCase
         );
 
         return $user;
+    }
+
+    /**
+     * The register has no notification records of its own, so what it needs doing reaches the member who administers
+     * it through their own bell. Somebody without the role is not shown any of it.
+     */
+    public function testTheRegistersOwnAreShownOnlyToWhoeverAdministersIt(): void
+    {
+        self::assertSame(
+            [],
+            $this->bellFor(8025)->getRegisterNotifications(),
+            'A member who does not administer the register is told nothing about it.',
+        );
+
+        self::assertNotSame(
+            [],
+            $this->registerAdminBellFor(8025)->getRegisterNotifications(),
+            'The seed is expected to leave the register with something to do.',
+        );
+    }
+
+    /**
+     * They have no read state, so marking everything read cannot clear them, and the badge still says so.
+     */
+    public function testTheRegistersOwnAreCountedByTheBadgeButNotByTheReadState(): void
+    {
+        $bell = $this->registerAdminBellFor(8025);
+        $outstanding = count($bell->getRegisterNotifications());
+
+        $bell->markAllRead();
+
+        self::assertSame(
+            0,
+            $bell->getUnreadCount(),
+        );
+        self::assertSame(
+            $outstanding,
+            $bell->getBadgeCount(),
+        );
+    }
+
+    /**
+     * The same bell, read by a member who administers the register.
+     */
+    private function registerAdminBellFor(int $lidnr): Bell
+    {
+        self::getContainer()->get('security.token_storage')->setToken(new UsernamePasswordToken(
+            $this->member($lidnr),
+            'main',
+            [
+                'ROLE_USER',
+                'ROLE_DATABASE_ADMIN',
+            ],
+        ));
+
+        return self::getContainer()->get(Bell::class);
     }
 
     private function bellFor(int $lidnr): Bell

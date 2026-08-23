@@ -1012,10 +1012,10 @@ parameters:
 			path: src/Security/Api/ApiTokenAuthenticator.php
 
 		-
-			message: '#^Method App\\Service\\Application\\FrontPageService\:\:getFrontpageData\(\) should return array\{members\: int, graduates\: int, expired\: int, prospectives\: array\{total\: int, paid\: int\}, updates\: int, syncPaused\: bool, syncPausedUntil\: DateTime\|null, totalCount\: int, \.\.\.\} but returns array\<string, mixed\>\.$#'
+			message: '#^Method App\\Service\\Application\\RegisterStatusService\:\:getStatus\(\) should return array\{members\: int, graduates\: int, expired\: int, prospectives\: array\{total\: int, paid\: int\}, updates\: int, syncPaused\: bool, syncPausedUntil\: DateTime\|null, totalCount\: int, \.\.\.\} but returns array\<string, mixed\>\.$#'
 			identifier: return.type
 			count: 1
-			path: src/Service/Application/FrontPageService.php
+			path: src/Service/Application/RegisterStatusService.php
 
 		-
 			message: '#^Method App\\Service\\Checker\\Checker\:\:checkAnnulments\(\) return type with generic class App\\ViewModel\\Checker\\Error does not specify its types\: T$#'

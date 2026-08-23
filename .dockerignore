@@ -36,7 +36,6 @@
 coverage/
 data/
 docs/
-k8s/
 public/bundles/
 tests/
 var/

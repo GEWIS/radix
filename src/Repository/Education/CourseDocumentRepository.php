@@ -10,6 +10,8 @@ use App\Entity\Education\Enums\DocumentFlattenStatus;
 use App\Entity\Education\Exam;
 use App\Entity\Education\Summary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -81,11 +83,22 @@ class CourseDocumentRepository extends ServiceEntityRepository
      * The queue the education admin leads with: a document nobody can open is the one thing on those pages that needs
      * somebody to do something.
      *
-     * @return CourseDocument[]
+     * @return Paginator<CourseDocument>
      */
-    public function findNotReady(): array
+    public function paginateNotReady(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        $qb = $this->notReadyQueryBuilder()
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return new Paginator($qb);
+    }
+
+    private function notReadyQueryBuilder(): QueryBuilder
     {
-        $qb = $this->createQueryBuilder('d')
+        return $this->createQueryBuilder('d')
             ->innerJoin(
                 'd.course',
                 'c',
@@ -104,8 +117,6 @@ class CourseDocumentRepository extends ServiceEntityRepository
                 'd.id',
                 'DESC',
             );
-
-        return $qb->getQuery()->getResult();
     }
 
     /**

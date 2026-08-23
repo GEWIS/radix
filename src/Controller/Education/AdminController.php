@@ -18,12 +18,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function in_array;
+use function max;
 use function strtoupper;
 
 /**
@@ -43,6 +46,16 @@ class AdminController extends AbstractController
     /** Course codes are five to nine alphanumerics, e.g. 2IL50 or 2WBB0. */
     private const string COURSE_CODE = '[A-Za-z0-9]{5,9}';
 
+    /** The sizes the pagination partial offers; anything else in the query string is not one of them. */
+    private const array PAGE_SIZES = [
+        10,
+        25,
+        50,
+        100,
+    ];
+
+    private const int PAGE_SIZE = 25;
+
     public function __construct(
         private readonly CourseRepository $courseRepository,
         private readonly CourseDocumentRepository $documentRepository,
@@ -57,13 +70,38 @@ class AdminController extends AbstractController
         path: '',
         name: 'index',
     )]
-    public function index(): Response
-    {
+    public function index(
+        #[MapQueryParameter]
+        int $page = 1,
+        #[MapQueryParameter]
+        int $pageSize = self::PAGE_SIZE,
+    ): Response {
+        $page = max(
+            1,
+            $page,
+        );
+        $pageSize = in_array(
+            $pageSize,
+            self::PAGE_SIZES,
+            true,
+        )
+            ? $pageSize
+            : self::PAGE_SIZE;
+
+        $unprocessed = $this->documentRepository->paginateNotReady(
+            $page,
+            $pageSize,
+        );
+
         return $this->render(
             'education/admin/index.html.twig',
             [
                 'counts' => $this->countsProvider->counts(),
-                'unprocessed' => $this->documentRepository->findNotReady(),
+                'unprocessed' => $unprocessed,
+                'currentPage' => $page,
+                'pageSize' => $pageSize,
+                // The tile counts the whole queue, which is no longer what the page below it lists.
+                'unprocessedCount' => $unprocessed->count(),
             ],
         );
     }

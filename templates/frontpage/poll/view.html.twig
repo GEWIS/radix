@@ -55,7 +55,18 @@
                 {% if is_granted('ROLE_USER') %}
                     {{ component('Frontpage:PollComments', {'poll': poll}) }}
                 {% else %}
-                    <p class="text-muted">{{ 'Sign in to read and join the discussion.'|trans }}</p>
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3>{{ 'Discussion'|trans }}</h3>
+                        </div>
+                        <div class="panel-body d-flex flex-wrap align-items-center gap-3">
+                            <span class="fas fa-lock text-muted" aria-hidden="true"></span>
+                            <span class="flex-grow-1">
+                                {{ 'Sign in to read and join the discussion.'|trans }}
+                            </span>
+                            <a href="{{ path('user_login') }}" class="btn btn-gewis-primary">{{ 'Sign in'|trans }}</a>
+                        </div>
+                    </div>
                 {% endif %}
             </div>
 
@@ -69,8 +80,7 @@
                         <div class="panel-body">
                             {% for other in earlier %}
                                 {% set winner = other.leadingOption %}
-                                <a class="d-block py-2 {{ not loop.last ? 'border-bottom' }}"
-                                   href="{{ path('poll/view', {'poll': other.id}) }}">
+                                <a class="link-row" href="{{ path('poll/view', {'poll': other.id}) }}">
                                     <span class="d-block fw-semibold">{{ other.question|localise_text }}</span>
                                     <span class="d-flex gap-2 small">
                                         {% if winner is not null %}

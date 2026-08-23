@@ -10,7 +10,9 @@ use App\Entity\Application\Enums\NotificationType;
 use App\Repository\Activity\ActivityProposalRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Activity\OptionBudgetSchedule;
+use App\Service\Application\Email;
 use App\Service\Application\NotificationPublisher;
+use App\Service\Application\OfficeMailboxes;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Psr\Log\LoggerInterface;
@@ -49,6 +51,8 @@ use function strval;
 final class LapseOverdueOptionsCommand extends Command
 {
     public function __construct(
+        private readonly Email $email,
+        private readonly OfficeMailboxes $mailboxes,
         private readonly ActivityProposalRepository $activityProposalRepository,
         private readonly UserRepository $userRepository,
         private readonly NotificationPublisher $publisher,
@@ -138,6 +142,7 @@ final class LapseOverdueOptionsCommand extends Command
         }
 
         $this->entityManager->flush();
+        $this->tellInternalAffairs($proposals);
 
         $ui->success(sprintf(
             'Released %d reserved day(s).',
@@ -145,6 +150,26 @@ final class LapseOverdueOptionsCommand extends Command
         ));
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * The officer of internal affairs keeps the calendar, so they are told once about the whole sweep rather than
+     * once per body. Each body's own member has already been told about theirs.
+     *
+     * @param ActivityProposal[] $proposals
+     */
+    private function tellInternalAffairs(array $proposals): void
+    {
+        if ([] === $proposals) {
+            return;
+        }
+
+        $this->email->send(
+            $this->mailboxes->internalAffairs(),
+            'Reserved days released from the option calendar',
+            'emails/activity/options-lapsed.html.twig',
+            ['proposals' => $proposals],
+        );
     }
 
     private function tell(ActivityProposal $proposal): void

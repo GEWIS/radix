@@ -21,6 +21,7 @@ import NotificationSettingsController from './controllers/application/notificati
 import NotificationsController from './controllers/application/notifications_controller.ts';
 import PrintController from './controllers/application/print_controller.ts';
 import SortableController from './controllers/application/sortable_controller.ts';
+import SubmitOnceController from './controllers/application/submit_once_controller.ts';
 
 // User-specific controllers.
 import ExternalAppSigningController from './controllers/user/external_app_signing_controller.ts';
@@ -89,6 +90,7 @@ app.register('notification-settings', NotificationSettingsController);
 app.register('notifications', NotificationsController);
 app.register('print', PrintController);
 app.register('sortable', SortableController);
+app.register('submit-once', SubmitOnceController);
 
 app.register('external-app-signing', ExternalAppSigningController);
 

@@ -1,0 +1,23 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block emailTitle %}Reserved days released{% endblock %}
+{% block preheader %}Days&nbsp;nobody&nbsp;settled&nbsp;a&nbsp;budget&nbsp;for&nbsp;are&nbsp;free&nbsp;again{% endblock %}
+{% block heading %}Reserved days released{% endblock %}
+{% block subheading %}From the option calendar{% endblock %}
+{% block body %}
+    <p>L.s.,</p>
+    <p>The days below were being held, but nothing was settled about their budget in time, so they are free again. Whoever handed each one in has been told separately.</p>
+    <ul>
+        {% for proposal in proposals %}
+            <li>
+                {{ proposal.name }}
+                ({{ proposal.organ ? proposal.organ.abbr : 'the board' }})
+                {% if proposal.chosenOption %}
+                    on {{ proposal.chosenOption.beginsAt|date('j F Y') }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    With kind regards,<br> The ApplicatieBeheerCommissie
+{% endblock %}
+{% block footerNote %}You receive this email because you keep the option calendar.{% endblock %}

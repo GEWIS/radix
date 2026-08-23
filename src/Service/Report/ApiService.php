@@ -76,7 +76,7 @@ class ApiService
      *     syncPausedUntil: ?DateTime,
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatusFigures(): array
     {
         return [
             'syncPaused' => $this->isSyncPaused(),

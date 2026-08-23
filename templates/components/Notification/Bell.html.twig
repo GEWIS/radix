@@ -3,9 +3,9 @@
             role="button"
             aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Notifications'|trans }}">
         <span class="fas fa-bell"></span>
-        {% if this.unreadCount > 0 %}
+        {% if this.badgeCount > 0 %}
             <span class="position-absolute translate-middle badge rounded-pill bg-light text-dark">
-                {{ this.unreadCount > 9 ? '9+' : this.unreadCount }}
+                {{ this.badgeCount > 9 ? '9+' : this.badgeCount }}
                 <span class="visually-hidden">{{ 'unread notifications'|trans }}</span>
             </span>
         {% endif %}
@@ -21,6 +21,23 @@
             {% endif %}
         </div>
         <div class="notification-list">
+            {# The register's own, for a member who administers it. No read state and nothing to dismiss: each one
+               stops being shown by dealing with it. #}
+            {% for notification in this.registerNotifications %}
+                <div class="notification-entry d-flex align-items-start border-bottom notification-unread">
+                    <a class="dropdown-item d-flex gap-2 py-2 text-wrap fw-semibold"
+                       href="{{ path(notification.route) }}">
+                        <span class="notification-icon text-{{ notification.tone }}">
+                            <span class="fas {{ notification.icon }}" aria-hidden="true"></span>
+                        </span>
+                        <span class="flex-grow-1">
+                            {{ notification.message|trans }}
+                            <span class="d-block small notification-link">{{ notification.action|trans }}</span>
+                        </span>
+                    </a>
+                </div>
+            {% endfor %}
+
             {% for entry in this.entries %}
                 {% set notification = entry.notification %}
                 <div class="notification-entry d-flex align-items-start border-bottom{{ entry.unread > 0 ? ' notification-unread' : '' }}">
@@ -59,7 +76,9 @@
                         </button>
                     </span>
                 </div>
-            {% else %}
+            {% endfor %}
+
+            {% if this.entries is empty and this.registerNotifications is empty %}
                 <div class="dropdown-item-text text-center px-4 py-4">
                     <span class="far fa-bell-slash fa-lg text-muted" aria-hidden="true"></span>
                     <span class="d-block fw-semibold mt-2">{{ 'You are all caught up'|trans }}</span>
@@ -67,7 +86,7 @@
                         {{ 'Anything that needs you shows up here.'|trans }}
                     </span>
                 </div>
-            {% endfor %}
+            {% endif %}
         </div>
     </div>
 </li>

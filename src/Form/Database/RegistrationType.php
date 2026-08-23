@@ -201,6 +201,10 @@ class RegistrationType extends AbstractType
                 ChoiceType::class,
                 [
                     'label' => t('Mailing lists'),
+                    // `MailingListLabel` stacks the list name above its description, so the choice labels carry
+                    // markup. `ChoiceType` copies this option onto every checkbox it builds; passing it when
+                    // rendering would only reach the parent's label.
+                    'label_html' => true,
                     'mapped' => false,
                     'expanded' => true,
                     'multiple' => true,

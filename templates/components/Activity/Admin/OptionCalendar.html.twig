@@ -65,7 +65,7 @@
                                 </div>
                                 {% for entry in day.entries|slice(0, 4) %}
                                     <div class="option-calendar__entry {{ entry.kind.modifier }}"
-                                         title="{{ entry.title }}{{ entry.by ? ' — ' ~ entry.by : '' }}">
+                                         title="{{ entry.title }}{{ entry.by ? ' - ' ~ entry.by : '' }}">
                                         {% if entry.continuesBefore %}<span aria-hidden="true">&lsaquo;</span>{% endif %}
                                         {% if entry.rank is not null %}
                                             <span class="option-calendar__rank">{{ entry.rank }}</span>

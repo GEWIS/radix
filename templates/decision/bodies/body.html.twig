@@ -77,11 +77,11 @@
             <span class="text-muted small">{{ 'Other bodies by this name:'|trans }}</span>
             {% for iteration in iterations %}
                 {% set label = iteration.sharesItsYear ? iteration.key : iteration.year %}
-                {% set label = iteration.abrogatedIn is not null ? label ~ '–' ~ iteration.abrogatedIn : label %}
+                {% set label = iteration.abrogatedIn is not null ? label ~ ' - ' ~ iteration.abrogatedIn : label %}
                 {% if iteration.current %}
                     <span class="badge badge-secondary">{{ label }}</span>
                 {% else %}
-                    <a class="badge badge-tag text-decoration-none"
+                    <a class="badge badge-tag"
                        href="{{ path('association/body', {
                            'type': organ.getType.value,
                            'abbr': organ.getAbbr,

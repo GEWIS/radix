@@ -1,0 +1,17 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block emailTitle %}A Zettle is needed{% endblock %}
+{% block preheader %}An&nbsp;activity&nbsp;has&nbsp;asked&nbsp;for&nbsp;a&nbsp;Zettle{% endblock %}
+{% block heading %}A Zettle is needed{% endblock %}
+{% block subheading %}{{ name }}{% endblock %}
+{% block body %}
+    <p>L.s.,</p>
+    <p>An activity is being planned on the GEWIS website that needs a Zettle to take payments.</p>
+    <h3>{{ name }}</h3>
+    {% if beginTime %}
+        <p>When: {{ beginTime|date('j F Y, H:i') }}</p>
+    {% endif %}
+    <p>Asked for by <strong>{{ requester }}</strong>.</p>
+    With kind regards,<br> The ApplicatieBeheerCommissie
+{% endblock %}
+{% block footerNote %}You receive this email because an activity asked for a Zettle.{% endblock %}

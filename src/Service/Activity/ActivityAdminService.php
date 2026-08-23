@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class ActivityAdminService
 {
     public function __construct(
+        private readonly ActivityFacilityNotifier $facilityNotifier,
         private EditLockService $editLockService,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
@@ -37,6 +38,13 @@ final readonly class ActivityAdminService
     {
         $this->entityManager->persist($activity);
         $this->entityManager->flush();
+
+        $revision = $activity->getCurrentRevision();
+        if (null === $revision) {
+            return;
+        }
+
+        $this->facilityNotifier->created($revision);
     }
 
     /**
@@ -70,6 +78,9 @@ final readonly class ActivityAdminService
 
         $this->entityManager->persist($activity);
         $this->entityManager->persist($revision);
+        // Read before the flush, which is what lets a facility that was just asked for be told apart from one that
+        // was already on the draft.
+        $this->facilityNotifier->draftSaved($revision);
         $this->entityManager->flush();
 
         $this->editLockService->release(

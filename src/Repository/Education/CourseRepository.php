@@ -74,17 +74,24 @@ class CourseRepository extends ServiceEntityRepository
      * Courses are counted rather than hydrated: a row only shows two totals and a date, and loading every document of
      * every course to derive them would fetch the whole archive on every keystroke of the search box.
      *
+     * @param int|null $limit at most this many rows, for the overview that loads a page at a time
+     *
      * @return CourseOverviewRow[]
      */
     public function findForOverview(
         ?string $query = null,
         CourseFilter $filter = CourseFilter::All,
         CourseSort $sort = CourseSort::Code,
+        ?int $limit = null,
     ): array {
         $qb = $this->overviewQueryBuilder(
             $query,
             $filter,
         );
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit);
+        }
 
         match ($sort) {
             CourseSort::Code => $qb->orderBy(

@@ -55,10 +55,18 @@ parameters:
     # The names that travel with the addresses below. They read the same on every deployment, so they are defaults
     # here rather than variables an operator has to remember to set; the addresses themselves are not, and have none.
     env(MAIL_FROM_NAME): 'Study Association GEWIS'
-    env(MAIL_FROM_SECRETARY_NAME): 'Secretary of GEWIS'
+    env(MAIL_REPLY_TO_SECRETARY_NAME): 'Secretary of GEWIS'
     env(MAIL_TO_CHECKER_RESULT_NAME): 'Secretary of GEWIS'
     env(MAIL_TO_REPORT_ERROR_NAME): 'Database Wizards'
     env(MAIL_TO_SUBSCRIPTION_NAME): 'Secretary of GEWIS'
+    # The officers and bodies the website writes to when something is put in front of them. Who reviews what follows
+    # from the association's own division of labour rather than from anything in here.
+    env(MAIL_TO_INTERNAL_AFFAIRS_NAME): 'Officer of Internal Affairs'
+    env(MAIL_TO_EXTERNAL_AFFAIRS_NAME): 'Officer of External Affairs'
+    env(MAIL_TO_C4_NAME): 'C4'
+    env(MAIL_TO_GEFLITST_NAME): 'GEFLITST'
+    env(MAIL_TO_GEFLITST_PLANKA_NAME): 'GEFLITST (Planka)'
+    env(MAIL_TO_TREASURER_NAME): 'Treasurer of GEWIS'
     # Stripe sends a `Stripe-Notice` header when the pinned version is behind, and the SDK re-raises it as a PHP
     # warning, which the dev error handler turns into an exception. It moves when the installed SDK moves, which makes
     # it a property of this checkout rather than of a deployment. The SDK is built for 2026-06-24.dahlia; both are the
@@ -110,21 +118,31 @@ services:
             $defaultMaxProposals: '%app.activity.default_max_proposals%' # int
             $googleCalendarId: '%env(string:DOCKER_GOOGLE_CALENDAR_KEY)%' # string
             $googleApiKey: '%env(string:DOCKER_GOOGLE_API_KEY)%' # string
-            # The public face of the register: the host mail links back to when there is no request to build a URL
-            # from.
-            $publicUrl: '%env(string:APP_URL)%' # string
             # Who the register writes as, and who it writes to. The secretary signs off on membership; the checker
             # results, the error reports and the subscription notices each land with whoever acts on them.
             $mailFromAddress: '%env(string:MAIL_FROM_ADDRESS)%' # string
             $mailFromName: '%env(string:MAIL_FROM_NAME)%' # string
-            $mailFromSecretaryAddress: '%env(string:MAIL_FROM_SECRETARY_ADDRESS)%' # string
-            $mailFromSecretaryName: '%env(string:MAIL_FROM_SECRETARY_NAME)%' # string
+            $mailReplyToSecretaryAddress: '%env(string:MAIL_REPLY_TO_SECRETARY_ADDRESS)%' # string
+            $mailReplyToSecretaryName: '%env(string:MAIL_REPLY_TO_SECRETARY_NAME)%' # string
             $mailToCheckerResultAddress: '%env(string:MAIL_TO_CHECKER_RESULT_ADDRESS)%' # string
             $mailToCheckerResultName: '%env(string:MAIL_TO_CHECKER_RESULT_NAME)%' # string
             $mailToReportErrorAddress: '%env(string:MAIL_TO_REPORT_ERROR_ADDRESS)%' # string
             $mailToReportErrorName: '%env(string:MAIL_TO_REPORT_ERROR_NAME)%' # string
             $mailToSubscriptionAddress: '%env(string:MAIL_TO_SUBSCRIPTION_ADDRESS)%' # string
             $mailToSubscriptionName: '%env(string:MAIL_TO_SUBSCRIPTION_NAME)%' # string
+            $mailToInternalAffairsAddress: '%env(string:MAIL_TO_INTERNAL_AFFAIRS_ADDRESS)%' # string
+            $mailToInternalAffairsName: '%env(string:MAIL_TO_INTERNAL_AFFAIRS_NAME)%' # string
+            $mailToExternalAffairsAddress: '%env(string:MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS)%' # string
+            $mailToExternalAffairsName: '%env(string:MAIL_TO_EXTERNAL_AFFAIRS_NAME)%' # string
+            $mailToC4Address: '%env(string:MAIL_TO_C4_ADDRESS)%' # string
+            $mailToC4Name: '%env(string:MAIL_TO_C4_NAME)%' # string
+            $mailToGeflitstAddress: '%env(string:MAIL_TO_GEFLITST_ADDRESS)%' # string
+            $mailToGeflitstName: '%env(string:MAIL_TO_GEFLITST_NAME)%' # string
+            $mailToGeflitstPlankaAddress: '%env(string:MAIL_TO_GEFLITST_PLANKA_ADDRESS)%' # string
+            $mailToGeflitstPlankaName: '%env(string:MAIL_TO_GEFLITST_PLANKA_NAME)%' # string
+            $mailToGeflitstPlankaKey: '%env(string:MAIL_TO_GEFLITST_PLANKA_KEY)%' # string
+            $mailToTreasurerAddress: '%env(string:MAIL_TO_TREASURER_ADDRESS)%' # string
+            $mailToTreasurerName: '%env(string:MAIL_TO_TREASURER_NAME)%' # string
             # Stripe, which collects the membership fee during sign-up. The API version is pinned because Stripe
             # announces a mismatch through a header the SDK re-raises as a PHP warning.
             $stripeApiVersion: '%env(string:STRIPE_API_VERSION)%' # string

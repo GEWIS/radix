@@ -398,8 +398,7 @@ missing production variable, and `composer dump-env prod` would bake it into the
   read it, so the containers that have no dotenv chain of their own (the databases, pgadmin, Matomo, the Stripe CLI)
   are configured from the same file.
 - **`.env.test`** — the test suite, which does not read `.env.local` at all. CI loads the same file into the job.
-- **The orchestrator** — production. Portainer's stack environment for the Docker route (`compose.yaml`), the
-  ConfigMap and SealedSecret under `k8s/` for the other.
+- **The orchestrator** — production, which is Portainer's stack environment for `compose.yaml`.
 
 Hot reload covers almost everything in dev: FrankenPHP reloads the workers on source changes, and the dev entrypoint
 (`docker/web/docker-entrypoint.sh`) watches `assets/` to rebuild Sass and the asset map. You should very rarely need
@@ -427,6 +426,21 @@ Messenger is backed by RabbitMQ in dev, in-memory in test. Buses, transports and
 `config/packages/messenger.yaml`. Message classes go in `src/Message/`; handlers in `src/MessageHandler/` with
 `#[AsMessageHandler]`. Recurring work runs through `src/Scheduler/` (Symfony Scheduler), which is also where the
 register's periodic jobs — mailing list synchronisation, expiry sweeps, renewal reminders — are declared.
+
+## File storage
+
+Uploaded and generated files live under `data/`, never under `public/`. `StorageNamespace` maps each domain onto its
+directory and carries the rules with it — whether the namespace is scoped (photos per album, company assets per
+company, meeting documents per meeting), whether serving a file needs an authenticated signed request, which MIME
+types it accepts and how large a file may be. `FileStorage` is the only writer, over a Flysystem adapter rooted at
+`data/` (in-memory under test). Public images are served through `ImageUrlBuilder` as `/img/{variant}/{path}`; nothing
+is linked to by its path on disk.
+
+The application inherits one legacy pool: the flat content-addressed tree GEWISWEB wrote at `public/data`, holding
+every photo, company and organ image, course document, page-embedded image and meeting document. `app:storage:migrate`
+migrates all of it in one run — there is no second source, and GEWISDB never stored files. The run is journalled per
+item and so is resumable, and `--source-dir` names the pool for the production layout, where it arrives as a populated
+volume rather than at `public/data`. See the command's `--help`.
 
 ## Doctrine caching
 

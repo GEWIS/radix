@@ -148,7 +148,7 @@
                     {% if has_correct_installations and organs is not empty %}
                         <div class="d-flex flex-wrap gap-2">
                             {% for organ in organs %}
-                                <a href="{{ organ.url }}" class="badge badge-gewis-primary text-decoration-none">
+                                <a href="{{ organ.url }}" class="badge badge-gewis-primary">
                                     {{ organ.abbr }}
                                 </a>
                             {% endfor %}
@@ -279,7 +279,7 @@
                                into the entry's own format string, which is what carries the markup. #}
                             <p class="mb-1">{{ note.body|raw }}</p>
                             <p class="small text-secondary mb-0">
-                                {{ note.user ? note.user : '—' }} · {{ note.updatedAt|date('j M Y H:i') }}
+                                {{ note.user ? note.user : '-' }} · {{ note.updatedAt|date('j M Y H:i') }}
                             </p>
                         </div>
                     {% else %}

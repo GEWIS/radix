@@ -6,8 +6,8 @@ namespace App\Controller\Application;
 
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Application\AnnouncementRepository;
-use App\Service\Application\FrontPageService;
 use App\Service\Application\MaintenanceStatusProvider;
+use App\Service\Application\RegisterStatusService;
 use App\Service\Application\ReviewQueueProviderInterface;
 use App\ViewModel\Application\Notification;
 use App\ViewModel\Application\ReviewQueueRow;
@@ -52,7 +52,7 @@ class AdminController extends AbstractController
         private readonly iterable $queueProviders,
         private readonly AnnouncementRepository $announcementRepository,
         private readonly MaintenanceStatusProvider $maintenanceStatusProvider,
-        private readonly FrontPageService $frontPageService,
+        private readonly RegisterStatusService $registerStatus,
     ) {
     }
 
@@ -121,11 +121,14 @@ class AdminController extends AbstractController
      */
     private function register(): array
     {
-        $data = $this->frontPageService->getFrontpageViewData();
-        // The same set the notification bell reads, so what the dashboard opens with and what the bell counts cannot
-        // drift apart.
-        $data['notifications'] = Notification::fromFrontPage($data);
-        $data['membership_breakdown'] = $this->frontPageService->getMembershipBreakdown();
+        $data = $this->registerStatus->getStatusViewData();
+        // Every one of these is something to go and do: approve a prospective member, work through the proposed
+        // changes, restart a sync. A reader who may only read the register can act on none of them, so they are not
+        // told to.
+        $data['notifications'] = $this->isGranted(UserRoles::DatabaseAdmin->value)
+            ? Notification::fromRegisterStatus($data)
+            : [];
+        $data['membership_breakdown'] = $this->registerStatus->getMembershipBreakdown();
 
         return $data;
     }

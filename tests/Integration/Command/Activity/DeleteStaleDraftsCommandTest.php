@@ -15,8 +15,9 @@ use Doctrine\DBAL\Types\Types;
 /**
  * The stale-draft cleanup is a GDPR cron, so its branches are pinned end to end against a real database: an abandoned
  * re-edit of an approved activity is reverted to its live revision, an abandoned never-approved draft activity is
- * removed entirely, and a dry run reports without touching anything. Staleness is forced by ageing the draft's
- * (auto-stamped) `updatedAt` past the 30-day cutoff with a DQL update.
+ * removed entirely, and a dry run reports without touching anything. Staleness is forced by ageing the head's
+ * (auto-stamped) `updatedAt` past the cutoff with a DQL update: 30 days for a draft, three months for a head that is
+ * with the board or already decided against.
  *
  * Not covered here: the defensive skip when a never-approved activity already carries sign-ups. That state never
  * arises from the normal flow (sign-ups only exist on an approved revision) and is left to the unit-level guards.
@@ -93,6 +94,95 @@ final class DeleteStaleDraftsCommandTest extends DatabaseTestCase
         );
         self::assertNotNull(
             $this->entityManager->getRepository(ActivityRevision::class)->find($draftId),
+        );
+    }
+
+    /**
+     * A rejected head is nobody's turn any more, so it lapses too, but only after the longer window.
+     */
+    public function testRevertsALongAbandonedRejectedReEditToItsApprovedRevision(): void
+    {
+        $activity = $this->anApprovedActivityWithoutSignupLists();
+        $live = $activity->getLiveRevision();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $live,
+        );
+
+        $rejected = $this->cloner()->cloneAsDraft($live);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $rejected,
+        );
+        $rejected->setStatus(RevisionStatus::Rejected);
+        $this->entityManager->persist($rejected);
+        $this->entityManager->flush();
+        $rejectedId = (int) $rejected->getId();
+
+        // Past the draft cutoff but inside the longer one: a rejection is kept for a while.
+        $this->ageRevision(
+            $rejectedId,
+            '-40 days',
+        );
+        $this->executeCommand();
+        self::assertNotNull(
+            $this->entityManager->getRepository(ActivityRevision::class)->find($rejectedId),
+        );
+
+        $this->ageRevision(
+            $rejectedId,
+            '-100 days',
+        );
+        $this->executeCommand();
+
+        self::assertSame(
+            $live,
+            $activity->getCurrentRevision(),
+        );
+        self::assertNull(
+            $this->entityManager->getRepository(ActivityRevision::class)->find($rejectedId),
+        );
+    }
+
+    /**
+     * A submitted head is with the board, so a slow queue must not lose anyone's work; only months of silence do.
+     */
+    public function testASubmittedHeadSurvivesTheDraftCutoffButNotTheLongerOne(): void
+    {
+        $activity = $this->anApprovedActivityWithoutSignupLists();
+        $live = $activity->getLiveRevision();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $live,
+        );
+
+        $submitted = $this->cloner()->cloneAsDraft($live);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $submitted,
+        );
+        $submitted->setStatus(RevisionStatus::Submitted);
+        $this->entityManager->persist($submitted);
+        $this->entityManager->flush();
+        $submittedId = (int) $submitted->getId();
+
+        $this->ageRevision(
+            $submittedId,
+            '-40 days',
+        );
+        $this->executeCommand();
+        self::assertNotNull(
+            $this->entityManager->getRepository(ActivityRevision::class)->find($submittedId),
+            'A revision the board has not got to yet is not abandoned.',
+        );
+
+        $this->ageRevision(
+            $submittedId,
+            '-100 days',
+        );
+        $this->executeCommand();
+        self::assertNull(
+            $this->entityManager->getRepository(ActivityRevision::class)->find($submittedId),
         );
     }
 

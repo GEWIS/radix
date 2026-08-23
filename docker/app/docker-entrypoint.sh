@@ -51,11 +51,10 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	if [ -n "$DATABASE_DSN" ]; then
 		wait_for_database default
 		wait_for_database web
-
-		# Kubernetes migrates from a Job before the rollout, so the replicas set SKIP_MIGRATIONS and only wait for the
-		# databases above. Under compose, `app` is the single container that migrates and nothing sets this.
 	fi
 
+	# `app` is the single container that migrates. SKIP_MIGRATIONS is left as a way to start one that does not, for
+	# an operator who needs the application up while the schema is being dealt with by hand; nothing sets it.
 	if [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then
 		# One set per database, each naming its own connection; a command given no configuration finds none.
 		for set in database web; do

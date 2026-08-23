@@ -541,6 +541,10 @@
         <source>A company cannot change one while it sits with you.</source>
         <target state="translated">Een bedrijf kan er niets aan veranderen zolang die bij jou ligt.</target>
       </trans-unit>
+      <trans-unit id="JTXPpqj" resname="A contact point for education quality">
+        <source>A contact point for education quality</source>
+        <target state="translated">Een aanspreekpunt voor de onderwijskwaliteit</target>
+      </trans-unit>
       <trans-unit id="YRW2Q5p" resname="A decision can only annul a decision taken before it.">
         <source>A decision can only annul a decision taken before it.</source>
         <target state="translated">Een besluit kan alleen een eerder genomen besluit vernietigen.</target>
@@ -556,6 +560,10 @@
       <trans-unit id="ii1C5FZ" resname="A draft only goes to GEWIS once you submit it for review.">
         <source>A draft only goes to GEWIS once you submit it for review.</source>
         <target state="translated">Een concept gaat pas naar GEWIS zodra je het ter beoordeling indient.</target>
+      </trans-unit>
+      <trans-unit id="_pU.X4C" resname="A few hours a week, on your own schedule.">
+        <source>A few hours a week, on your own schedule.</source>
+        <target state="translated">Een paar uur per week, op je eigen tijden.</target>
       </trans-unit>
       <trans-unit id="o8mlHI1" resname="A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.">
         <source>A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.</source>
@@ -616,6 +624,10 @@
       <trans-unit id="9NmRvbs" resname="A vacancy that closes, or that you take down, drops off the career page on its own.">
         <source>A vacancy that closes, or that you take down, drops off the career page on its own.</source>
         <target state="translated">Een vacature die sluit, of die je offline haalt, verdwijnt vanzelf van de carrièrepagina.</target>
+      </trans-unit>
+      <trans-unit id="pLS2dV0" resname="A wide variety of activities">
+        <source>A wide variety of activities</source>
+        <target state="translated">Een breed scala aan activiteiten</target>
       </trans-unit>
       <trans-unit id="2DI0bbS" resname="ALV">
         <source>ALV</source>
@@ -1601,6 +1613,10 @@
         <source>Become a member</source>
         <target state="translated">Lid worden</target>
       </trans-unit>
+      <trans-unit id="yJ4O54j" resname="Become a member of GEWIS">
+        <source>Become a member of GEWIS</source>
+        <target state="translated">Word lid van GEWIS</target>
+      </trans-unit>
       <trans-unit id="HPVMGyh" resname="Become a tutor">
         <source>Become a tutor</source>
         <target state="translated">Word tutor</target>
@@ -2076,6 +2092,10 @@
       <trans-unit id="nsc_D63" resname="Commissie">
         <source>Commissie</source>
         <target state="translated">Commissie</target>
+      </trans-unit>
+      <trans-unit id="ag8ottU" resname="Committee work">
+        <source>Committee work</source>
+        <target state="translated">Commissiewerk</target>
       </trans-unit>
       <trans-unit id="8PCvE1G" resname="Committees">
         <source>Committees</source>
@@ -2713,6 +2733,10 @@
         <source>Details and committees</source>
         <target state="translated">Gegevens en commissies</target>
       </trans-unit>
+      <trans-unit id=".jLMxIH" resname="Development">
+        <source>Development</source>
+        <target state="translated">Ontwikkeling</target>
+      </trans-unit>
       <trans-unit id="7chmnoI" resname="Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.">
         <source>Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.</source>
         <target state="translated">Apparaten waarop je momenteel bent ingelogd. Als je een onbekend apparaat of een onbekende locatie opmerkt, beëindig dan onmiddellijk die sessie af en overweeg om je wachtwoord te wijzigen.</target>
@@ -2813,6 +2837,10 @@
         <source>Disclaimer</source>
         <target state="translated">Disclaimer</target>
       </trans-unit>
+      <trans-unit id="dupDnly" resname="Discounts on books">
+        <source>Discounts on books</source>
+        <target state="translated">Korting op boeken</target>
+      </trans-unit>
       <trans-unit id="NPw9WPH" resname="Discussion">
         <source>Discussion</source>
         <target state="translated">Discussie</target>
@@ -2825,9 +2853,9 @@
         <source>Do not allow others to tag me in photos</source>
         <target>Anderen mogen mij niet taggen in foto's</target>
       </trans-unit>
-      <trans-unit id="qK6mnpS" resname="Do these in that order, before the first of July. A membership cannot be renewed twice, and every change takes effect at the end of the membership it renews — to change one now or in the past, go to the member.">
-        <source>Do these in that order, before the first of July. A membership cannot be renewed twice, and every change takes effect at the end of the membership it renews — to change one now or in the past, go to the member.</source>
-        <target state="translated">Doe dit in die volgorde, vóór 1 juli. Een lidmaatschap kan niet twee keer verlengd worden, en elke wijziging gaat in aan het eind van het lidmaatschap dat verlengd wordt — om er nu of in het verleden één te wijzigen, ga naar het lid zelf.</target>
+      <trans-unit id="BXAx0aM" resname="Do these in that order, before the first of July. A membership cannot be renewed twice, and every change takes effect at the end of the membership it renews. To change one now or in the past, go to the member.">
+        <source>Do these in that order, before the first of July. A membership cannot be renewed twice, and every change takes effect at the end of the membership it renews. To change one now or in the past, go to the member.</source>
+        <target state="translated">Doe dit in die volgorde, vóór 1 juli. Een lidmaatschap kan niet twee keer verlengd worden, en elke wijziging gaat in aan het eind van het lidmaatschap dat verlengd wordt. Om er nu of in het verleden één te wijzigen, ga naar het lid zelf.</target>
       </trans-unit>
       <trans-unit id="9uS1kR." resname="Do you have a GEWIS account?">
         <source>Do you have a GEWIS account?</source>
@@ -3377,6 +3405,10 @@
         <source>Exam</source>
         <target state="translated">Tentamen</target>
       </trans-unit>
+      <trans-unit id="wzswCHT" resname="Exam archives and course summaries">
+        <source>Exam archives and course summaries</source>
+        <target state="translated">Tentamenarchieven en samenvattingen</target>
+      </trans-unit>
       <trans-unit id="3.Cgl5Q" resname="Exam type">
         <source>Exam type</source>
         <target state="translated">Soort tentamen</target>
@@ -3672,6 +3704,10 @@
       <trans-unit id="i9.ArB8" resname="Full name">
         <source>Full name</source>
         <target>Volledige naam</target>
+      </trans-unit>
+      <trans-unit id="7Ig99MO" resname="Fun">
+        <source>Fun</source>
+        <target state="translated">Gezelligheid</target>
       </trans-unit>
       <trans-unit id="erv1cYm" resname="Functie">
         <source>Functie</source>
@@ -4129,9 +4165,9 @@
         <source>If you are reading this, the secretary has not done their job.</source>
         <target state="translated">Als je dit leest, heeft de secretaris zijn/haar werk niet gedaan.</target>
       </trans-unit>
-      <trans-unit id="Wxx7FGg" resname="If you are studying at TU/e again, do not fill this in — tell the secretary instead, and send your student number if you want your membership renewed automatically.">
-        <source>If you are studying at TU/e again, do not fill this in — tell the secretary instead, and send your student number if you want your membership renewed automatically.</source>
-        <target state="translated">Als je weer aan de TU/e studeert, vul dit dan niet in — laat het de secretaris weten en stuur je studentnummer mee als je je lidmaatschap automatisch verlengd wilt hebben.</target>
+      <trans-unit id="9bglTuh" resname="If you are studying at TU/e again, do not fill this in. Tell the secretary instead, and send your student number if you want your membership renewed automatically.">
+        <source>If you are studying at TU/e again, do not fill this in. Tell the secretary instead, and send your student number if you want your membership renewed automatically.</source>
+        <target state="translated">Als je weer aan de TU/e studeert, vul dit dan niet in. Laat het de secretaris weten en stuur je studentnummer mee als je je lidmaatschap automatisch verlengd wilt hebben.</target>
       </trans-unit>
       <trans-unit id="IBCUP7U" resname="If you entered a backup code, try the next unused one from your saved list. Each backup code works only once.">
         <source>If you entered a backup code, try the next unused one from your saved list. Each backup code works only once.</source>
@@ -4388,6 +4424,10 @@
       <trans-unit id="ZMKVhSD" resname="It was declared, but never initialised.">
         <source>It was declared, but never initialised.</source>
         <target state="translated">Het werd gedeclareerd, maar nooit geïnitialiseerd.</target>
+      </trans-unit>
+      <trans-unit id="g3edG8x" resname="It was either used already or it has expired.">
+        <source>It was either used already or it has expired.</source>
+        <target state="translated">Hij is al gebruikt of hij is verlopen.</target>
       </trans-unit>
       <trans-unit id="gHrThPP" resname="Item">
         <source>Item</source>
@@ -4720,6 +4760,10 @@
       <trans-unit id="7enjbhR" resname="Lunch break">
         <source>Lunch break</source>
         <target state="translated">Lunchpauze</target>
+      </trans-unit>
+      <trans-unit id="qqPrzj." resname="Lunch lectures and business cases">
+        <source>Lunch lectures and business cases</source>
+        <target state="translated">Lunchlezingen en business cases</target>
       </trans-unit>
       <trans-unit id="Tej.Egk" resname="MFA">
         <source>MFA</source>
@@ -6221,10 +6265,6 @@
         <source>Paid for current/last membership (Amount)</source>
         <target state="translated">Betaald voor huidige/laatste lidmaatschap (bedrag)</target>
       </trans-unit>
-      <trans-unit id="U_QJfxO" resname="Paid, a few hours a week, on your own schedule.">
-        <source>Paid, a few hours a week, on your own schedule.</source>
-        <target state="translated">Betaald, een paar uur per week, op je eigen tijden.</target>
-      </trans-unit>
       <trans-unit id="zDglnri" resname="Part of the day">
         <source>Part of the day</source>
         <target state="translated">Dagdeel</target>
@@ -6612,6 +6652,10 @@
       <trans-unit id="V227xJS" resname="Processing failed">
         <source>Processing failed</source>
         <target state="translated">Verwerken mislukt</target>
+      </trans-unit>
+      <trans-unit id="641t3eO" resname="Processing...">
+        <source>Processing...</source>
+        <target state="translated">Bezig...</target>
       </trans-unit>
       <trans-unit id="5Y34z39" resname="Profile">
         <source>Profile</source>
@@ -7088,6 +7132,10 @@
       <trans-unit id="uFV2Qy8" resname="Renew until">
         <source>Renew until</source>
         <target state="translated">Verleng tot en met</target>
+      </trans-unit>
+      <trans-unit id="AYzap1E" resname="Renew your graduate status">
+        <source>Renew your graduate status</source>
+        <target state="translated">Verleng je status als afgestudeerde</target>
       </trans-unit>
       <trans-unit id="C8mSced" resname="Renew/Type">
         <source>Renew/Type</source>
@@ -8033,6 +8081,10 @@
         <source>Study Association GEWIS</source>
         <target>Studievereniging GEWIS</target>
       </trans-unit>
+      <trans-unit id=".ElBgaP" resname="Study trips">
+        <source>Study trips</source>
+        <target state="translated">Studiereizen</target>
+      </trans-unit>
       <trans-unit id="QWpfKJT" resname="Sub-albums">
         <source>Sub-albums</source>
         <target state="translated">Subalbums</target>
@@ -8185,9 +8237,9 @@
         <source>Taken back. The day can be chased and released again.</source>
         <target state="translated">Ingetrokken. De dag kan weer nagejaagd en vrijgegeven worden.</target>
       </trans-unit>
-      <trans-unit id="O0ABwE4" resname="Takes effect the moment it is recorded — there is no draft to review first.">
-        <source>Takes effect the moment it is recorded — there is no draft to review first.</source>
-        <target state="translated">Gaat in op het moment dat het vastgelegd wordt — er is geen concept om eerst na te kijken.</target>
+      <trans-unit id="WxKrJst" resname="Takes effect the moment it is recorded; there is no draft to review first.">
+        <source>Takes effect the moment it is recorded; there is no draft to review first.</source>
+        <target state="translated">Gaat in op het moment dat het vastgelegd wordt; er is geen concept om eerst na te kijken.</target>
       </trans-unit>
       <trans-unit id="0Na.CeY" resname="Taking proposals">
         <source>Taking proposals</source>
@@ -8221,9 +8273,9 @@
         <source>Thank you %name%!</source>
         <target state="translated">Bedankt, %name%!</target>
       </trans-unit>
-      <trans-unit id="0_cKFc5" resname="Thank you %name%! Your graduate status has been renewed and we have sent you a confirmation by e-mail.">
-        <source>Thank you %name%! Your graduate status has been renewed and we have sent you a confirmation by e-mail.</source>
-        <target state="translated">Bedankt, %name%! Je afgestudeerdenstatus is verlengd en we hebben je een bevestiging gemaild.</target>
+      <trans-unit id="ZsDl6p9" resname="Thank you %name%! We have sent you a confirmation by e-mail.">
+        <source>Thank you %name%! We have sent you a confirmation by e-mail.</source>
+        <target state="translated">Bedankt %name%! We hebben je een bevestiging gestuurd per e-mail.</target>
       </trans-unit>
       <trans-unit id="3UcLqDl" resname="That action is not available for this revision.">
         <source>That action is not available for this revision.</source>
@@ -8489,9 +8541,9 @@
         <source>The draw can be run once sign-up has closed.</source>
         <target>De loting kan worden uitgevoerd zodra de inschrijving is gesloten.</target>
       </trans-unit>
-      <trans-unit id="bdi6_Rs" resname="The draw could not be run — the list may have changed or was already drawn.">
-        <source>The draw could not be run — the list may have changed or was already drawn.</source>
-        <target state="translated">De loting kon niet worden uitgevoerd — de lijst is mogelijk gewijzigd of was al geloot.</target>
+      <trans-unit id="mnULCFC" resname="The draw could not be run; the list may have changed or was already drawn.">
+        <source>The draw could not be run; the list may have changed or was already drawn.</source>
+        <target state="translated">De loting kon niet worden uitgevoerd; de lijst is mogelijk gewijzigd of was al geloot.</target>
       </trans-unit>
       <trans-unit id="FrK7hHw" resname="The draw will be performed automatically on %date%.">
         <source>The draw will be performed automatically on %date%.</source>
@@ -8941,6 +8993,10 @@
         <source>Thesis projects</source>
         <target>Afstudeerprojecten</target>
       </trans-unit>
+      <trans-unit id="GoS4ssK" resname="Thesis projects at companies">
+        <source>Thesis projects at companies</source>
+        <target state="translated">Afstudeerprojecten bij bedrijven</target>
+      </trans-unit>
       <trans-unit id="ecpVw4m" resname="This activity cannot be cancelled.">
         <source>This activity cannot be cancelled.</source>
         <target state="translated">Deze activiteit kan niet worden geannuleerd.</target>
@@ -9257,9 +9313,9 @@
         <source>This removes “%name%” with all its versions.</source>
         <target state="translated">Dit verwijdert “%name%” met al zijn versies.</target>
       </trans-unit>
-      <trans-unit id="RvZCAE1" resname="This renewal link no longer works. It was either used already or it has expired.">
-        <source>This renewal link no longer works. It was either used already or it has expired.</source>
-        <target state="translated">Deze verlengingslink werkt niet meer. Hij is al gebruikt of verlopen.</target>
+      <trans-unit id="1GVDgFq" resname="This renewal link no longer works">
+        <source>This renewal link no longer works</source>
+        <target state="translated">Deze verlengingslink werkt niet meer</target>
       </trans-unit>
       <trans-unit id="YXcXf9u" resname="This revision was changed elsewhere; reload the page and try again.">
         <source>This revision was changed elsewhere; reload the page and try again.</source>
@@ -9388,6 +9444,10 @@
       <trans-unit id="vryUIet" resname="Traineeships">
         <source>Traineeships</source>
         <target>Traineeships</target>
+      </trans-unit>
+      <trans-unit id="gAcg.9u" resname="Trainings for hard and soft skills">
+        <source>Trainings for hard and soft skills</source>
+        <target state="translated">Trainingen voor hard en soft skills</target>
       </trans-unit>
       <trans-unit id="fhVR..D" resname="Try a different filter, or clear the search.">
         <source>Try a different filter, or clear the search.</source>
@@ -9636,6 +9696,10 @@
       <trans-unit id="2qlC8EK" resname="Vacancies to highlight">
         <source>Vacancies to highlight</source>
         <target state="translated">Vacatures om uit te lichten</target>
+      </trans-unit>
+      <trans-unit id="LA0K3kO" resname="Vacancies, internships and student jobs">
+        <source>Vacancies, internships and student jobs</source>
+        <target state="translated">Vacatures, stages en bijbanen</target>
       </trans-unit>
       <trans-unit id="8mI7.1n" resname="Vacancy">
         <source>Vacancy</source>
@@ -9913,9 +9977,17 @@
         <source>Weekend</source>
         <target>Weekend</target>
       </trans-unit>
+      <trans-unit id="sXZpZ8b" resname="Weekends organised by committees">
+        <source>Weekends organised by committees</source>
+        <target state="translated">Weekenden georganiseerd door commissies</target>
+      </trans-unit>
       <trans-unit id="y1POd5z" resname="Weekly">
         <source>Weekly</source>
         <target>Wekelijks</target>
+      </trans-unit>
+      <trans-unit id="jmFnIxp" resname="Weekly social drinks">
+        <source>Weekly social drinks</source>
+        <target state="translated">Wekelijkse borrels</target>
       </trans-unit>
       <trans-unit id="pBWX65Q" resname="Welcome back, %name%">
         <source>Welcome back, %name%</source>
@@ -10345,6 +10417,10 @@
         <source>Your API token is "%token%". This value will NOT be shown again!</source>
         <target state="translated">Je API-token is "%token%". Deze waarde wordt NIET nog een keer getoond!</target>
       </trans-unit>
+      <trans-unit id="kn4AnO9" resname="Your GEWIS registration">
+        <source>Your GEWIS registration</source>
+        <target state="translated">Je GEWIS-inschrijving</target>
+      </trans-unit>
       <trans-unit id="7dplKZg" resname="Your account is ready, but your company has no running contract with GEWIS. You can sign in once the board has entered it.">
         <source>Your account is ready, but your company has no running contract with GEWIS. You can sign in once the board has entered it.</source>
         <target state="translated">Je account is klaar, maar je bedrijf heeft geen lopend contract met GEWIS. Je kunt inloggen zodra het bestuur dit heeft ingevoerd.</target>
@@ -10440,6 +10516,10 @@
       <trans-unit id="nyZTzfw" resname="Your email address will expire">
         <source>Your email address will expire</source>
         <target state="translated">Je e-mailadres komt te vervallen</target>
+      </trans-unit>
+      <trans-unit id="yQfmyCY" resname="Your graduate status has been renewed">
+        <source>Your graduate status has been renewed</source>
+        <target state="translated">Je status als afgestudeerde is verlengd</target>
       </trans-unit>
       <trans-unit id="C3pbkFh" resname="Your highlighted vacancies are saved.">
         <source>Your highlighted vacancies are saved.</source>

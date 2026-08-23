@@ -29,11 +29,16 @@ export default class extends Controller {
         this.valueTargets.forEach((target) => {
             const text = this.read(target);
 
-            target.textContent = '' !== text ? text : (target.dataset.empty ?? '—');
+            target.textContent = '' !== text ? text : (target.dataset.empty ?? '-');
             target.classList.toggle('registration-review-empty', '' === text);
         });
 
         if (!this.hasCheckoutTarget) {
+            return;
+        }
+
+        // Do not enable a button `submit-once` locked; the form has already been submitted.
+        if (undefined !== this.checkoutTarget.dataset.locked) {
             return;
         }
 

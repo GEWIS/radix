@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ViewModel\Activity\Admin;
 
 use App\Entity\Activity\Activity;
+use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\Enums\RevisionStatus;
 use DateTime;
 use DateTimeImmutable;
@@ -46,12 +47,34 @@ final readonly class ActivityAdminRow
 
     public static function fromActivity(Activity $activity): self
     {
-        $id = $activity->getId();
-        assert(null !== $id);
-
         // The admin overview queries inner-join the current revision, so it is always present here.
         $revision = $activity->getCurrentRevision();
         assert(null !== $revision);
+
+        return self::build(
+            $activity,
+            $revision,
+        );
+    }
+
+    /**
+     * The row for one named revision rather than for whichever one is currently the working head: what the review
+     * queue lists, where the revision under review is the subject and not the activity around it.
+     */
+    public static function fromRevision(ActivityRevision $revision): self
+    {
+        return self::build(
+            $revision->getActivity(),
+            $revision,
+        );
+    }
+
+    private static function build(
+        Activity $activity,
+        ActivityRevision $revision,
+    ): self {
+        $id = $activity->getId();
+        assert(null !== $id);
 
         $revisionId = $revision->getId();
         assert(null !== $revisionId);

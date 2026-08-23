@@ -14,6 +14,7 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Form\Activity\ActivityType;
 use App\Form\Activity\SignupType;
+use App\Repository\Activity\ActivityRepository;
 use App\Repository\Activity\ActivityRevisionCommentRepository;
 use App\Repository\Activity\ExternalSignupRepository;
 use App\Security\Application\RevisionVoter;
@@ -53,6 +54,7 @@ class AdminController extends AbstractController
     public function __construct(
         private readonly ActivityAdminService $activityAdminService,
         private readonly ActivityDraftFactory $activityDraftFactory,
+        private readonly ActivityRepository $activityRepository,
         private readonly ActivityRevisionCommentRepository $commentRepository,
         private readonly RevisionReviewService $revisionReviewService,
         private readonly RevisionReviser $reviser,
@@ -128,6 +130,8 @@ class AdminController extends AbstractController
             RevisionVoter::SUBMIT,
             $activity,
         );
+
+        $this->activityRepository->warmForEditing($activity);
 
         $current = $activity->getCurrentRevision();
         if (null === $current) {

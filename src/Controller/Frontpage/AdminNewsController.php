@@ -15,10 +15,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function in_array;
+use function max;
 
 /**
  * The news the association puts out. Written directly rather than through the review workflow: what the board says is
@@ -31,7 +35,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted(UserRoles::Board->value)]
 class AdminNewsController extends AbstractController
 {
-    private const int PAGE_SIZE = 15;
+    /** The sizes the pagination partial offers; anything else in the query string is not one of them. */
+    private const array PAGE_SIZES = [
+        10,
+        25,
+        50,
+        100,
+    ];
+
+    private const int PAGE_SIZE = 25;
 
     public function __construct(
         private readonly NewsItemRepository $newsItemRepository,
@@ -41,16 +53,30 @@ class AdminNewsController extends AbstractController
     }
 
     #[Route(
-        path: '/{page}',
+        path: '',
         name: 'index',
-        requirements: ['page' => '\d+'],
-        defaults: ['page' => 1],
     )]
-    public function index(int $page): Response
-    {
+    public function index(
+        #[MapQueryParameter]
+        int $page = 1,
+        #[MapQueryParameter]
+        int $pageSize = self::PAGE_SIZE,
+    ): Response {
+        $page = max(
+            1,
+            $page,
+        );
+        $pageSize = in_array(
+            $pageSize,
+            self::PAGE_SIZES,
+            true,
+        )
+            ? $pageSize
+            : self::PAGE_SIZE;
+
         $paginator = $this->newsItemRepository->getPaginatorAdapter(
             $page,
-            self::PAGE_SIZE,
+            $pageSize,
         );
 
         return $this->render(
@@ -58,7 +84,7 @@ class AdminNewsController extends AbstractController
             [
                 'items' => $paginator,
                 'currentPage' => $page,
-                'pageSize' => self::PAGE_SIZE,
+                'pageSize' => $pageSize,
                 'totalCount' => $paginator->count(),
             ],
         );

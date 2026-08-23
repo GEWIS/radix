@@ -16,18 +16,18 @@ x-app-environment: &app_environment
     # `prod` there.
     APP_ENV: "${APP_ENV:-prod}"
     APP_SECRET: "${APP_SECRET:?APP_SECRET must be set}"
-    SYMFONY_TRUSTED_PROXIES: "private_ranges"
+    # Which proxies may be believed about the visitor. Production is reached through a proxy that terminates TLS and
+    # forwards to the port below, so `X-Forwarded-Proto` is the only thing saying the visitor is on HTTPS; believing
+    # the wrong sender of that header is how a redirect ends up on http://. `private_ranges` covers a proxy on the
+    # host itself, which is what the stack is deployed behind; one reached from anywhere else needs its address here.
+    SYMFONY_TRUSTED_PROXIES: "${SYMFONY_TRUSTED_PROXIES:-private_ranges}"
     SERVER_NAME: "${SERVER_NAME:?SERVER_NAME must be set}, app:80"
     DEFAULT_URI: "${DEFAULT_URI:?DEFAULT_URI must be set}"
-    # The public face of the register: the host mail links back to when it cannot link into the request it was sent
-    # from.
-    APP_URL: "${APP_URL:?APP_URL must be set}"
     CORS_ALLOW_ORIGIN: "${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN must be set}"
     # Set to any non-empty value to serve the maintenance page to everyone, admins included, for work done before the
     # application can serve properly. App-level maintenance is set through the admin interface instead.
     MAINTENANCE: "${MAINTENANCE:-}"
     # The domain the mailing lists are created under on Mailman, which is what it reports back when asked for a list.
-    SERVER_HOSTNAME: "${SERVER_HOSTNAME:?SERVER_HOSTNAME must be set}"
 
     # The ledger, on PostgreSQL: the `default` connection. `role` is not a driver parameter —
     # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it, so the
@@ -36,7 +36,7 @@ x-app-environment: &app_environment
     # Everything else, on MariaDB: the `web` connection. The charset and the collation belong in the DSN because they
     # have to match what the tables were created with; a mismatch makes a schema comparison report every string column
     # as changed.
-    WEB_DATABASE_DSN: "pdo-mysql://${DOCKER_DB_USERNAME:?DOCKER_DB_USERNAME must be set}:${DOCKER_DB_PASSWORD:?DOCKER_DB_PASSWORD must be set}@${DOCKER_DB_HOST:?DOCKER_DB_HOST must be set}:${DOCKER_DB_PORT:?DOCKER_DB_PORT must be set}/${DOCKER_DB_DATABASE:?DOCKER_DB_DATABASE must be set}?serverVersion=${DOCKER_DB_VERSION:?DOCKER_DB_VERSION must be set}&charset=${DOCKER_DB_CHARSET:?DOCKER_DB_CHARSET must be set}&collation=${DOCKER_DB_COLLATION:?DOCKER_DB_COLLATION must be set}"
+    WEB_DATABASE_DSN: "pdo-mysql://${DOCTRINE_WEB_USER:?DOCTRINE_WEB_USER must be set}:${DOCTRINE_WEB_PASSWORD:?DOCTRINE_WEB_PASSWORD must be set}@${DOCTRINE_WEB_HOST:?DOCTRINE_WEB_HOST must be set}:${DOCTRINE_WEB_PORT:?DOCTRINE_WEB_PORT must be set}/${DOCTRINE_WEB_DATABASE:?DOCTRINE_WEB_DATABASE must be set}?serverVersion=${DOCTRINE_WEB_VERSION:?DOCTRINE_WEB_VERSION must be set}&charset=${DOCTRINE_WEB_CHARSET:?DOCTRINE_WEB_CHARSET must be set}&collation=${DOCTRINE_WEB_COLLATION:?DOCTRINE_WEB_COLLATION must be set}"
 
     MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER must be set}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS must be set}@${RABBITMQ_HOST:-rabbitmq}:${RABBITMQ_PORT:-5672}"
     # The cache, Doctrine's second-level cache and symfony/lock all sit on this one Valkey. The locks have to be
@@ -95,10 +95,17 @@ x-app-environment: &app_environment
     # Who the register writes as, and who it writes to. The display names that go with these are defaulted in
     # config/services.yaml and are not repeated here.
     MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:?MAIL_FROM_ADDRESS must be set}"
-    MAIL_FROM_SECRETARY_ADDRESS: "${MAIL_FROM_SECRETARY_ADDRESS:?MAIL_FROM_SECRETARY_ADDRESS must be set}"
+    MAIL_REPLY_TO_SECRETARY_ADDRESS: "${MAIL_REPLY_TO_SECRETARY_ADDRESS:?MAIL_REPLY_TO_SECRETARY_ADDRESS must be set}"
     MAIL_TO_CHECKER_RESULT_ADDRESS: "${MAIL_TO_CHECKER_RESULT_ADDRESS:?MAIL_TO_CHECKER_RESULT_ADDRESS must be set}"
     MAIL_TO_REPORT_ERROR_ADDRESS: "${MAIL_TO_REPORT_ERROR_ADDRESS:?MAIL_TO_REPORT_ERROR_ADDRESS must be set}"
     MAIL_TO_SUBSCRIPTION_ADDRESS: "${MAIL_TO_SUBSCRIPTION_ADDRESS:?MAIL_TO_SUBSCRIPTION_ADDRESS must be set}"
+    MAIL_TO_INTERNAL_AFFAIRS_ADDRESS: "${MAIL_TO_INTERNAL_AFFAIRS_ADDRESS:?MAIL_TO_INTERNAL_AFFAIRS_ADDRESS must be set}"
+    MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS: "${MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS:?MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS must be set}"
+    MAIL_TO_C4_ADDRESS: "${MAIL_TO_C4_ADDRESS:?MAIL_TO_C4_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_ADDRESS: "${MAIL_TO_GEFLITST_ADDRESS:?MAIL_TO_GEFLITST_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_PLANKA_ADDRESS: "${MAIL_TO_GEFLITST_PLANKA_ADDRESS:?MAIL_TO_GEFLITST_PLANKA_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_PLANKA_KEY: "${MAIL_TO_GEFLITST_PLANKA_KEY:?MAIL_TO_GEFLITST_PLANKA_KEY must be set}"
+    MAIL_TO_TREASURER_ADDRESS: "${MAIL_TO_TREASURER_ADDRESS:?MAIL_TO_TREASURER_ADDRESS must be set}"
 
 x-app: &app
     image: "abc.docker-registry.gewis.nl/web/radix/app:${RADIX_VERSION:-latest}"
@@ -149,6 +156,8 @@ services:
             - caddy_data:/data
             - caddy_config:/config
             - data:/app/data
+        # The proxy in front of the Docker host terminates TLS and forwards gewis.nl here; analytics.gewis.nl goes to
+        # Matomo on 9202. Nothing else is published, so the application is only ever reached through that proxy.
         ports:
             - target: 80
               published: 9200
@@ -178,6 +187,29 @@ services:
     scheduler-maintenance:
         <<: *worker
         command: [ "php", "bin/console", "messenger:consume", "scheduler_maintenance", "-vv", "--time-limit=3600", "--memory-limit=256M" ]
+    # Analytics, on its own hostname: the proxy sends analytics.gewis.nl to the port below. It is part of this stack
+    # rather than a separate one because the image is built and published beside the application's, and the site's
+    # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name a
+    # schema on the same MariaDB server the website uses.
+    matomo:
+        image: "abc.docker-registry.gewis.nl/web/radix/matomo:${RADIX_VERSION:-latest}"
+        restart: unless-stopped
+        environment:
+            MATOMO_DATABASE_HOST: "${MATOMO_DATABASE_HOST:?MATOMO_DATABASE_HOST must be set}"
+            MATOMO_DATABASE_PORT: "${MATOMO_DATABASE_PORT:?MATOMO_DATABASE_PORT must be set}"
+            MATOMO_DATABASE_USERNAME: "${MATOMO_DATABASE_USERNAME:?MATOMO_DATABASE_USERNAME must be set}"
+            MATOMO_DATABASE_PASSWORD: "${MATOMO_DATABASE_PASSWORD:?MATOMO_DATABASE_PASSWORD must be set}"
+            MATOMO_DATABASE_DBNAME: "${MATOMO_DATABASE_DBNAME:?MATOMO_DATABASE_DBNAME must be set}"
+            # Whether to reach that server over TLS. 1 on anything but a database in the same stack.
+            MATOMO_DATABASE_SSL: "${MATOMO_DATABASE_SSL:-1}"
+        volumes:
+            - matomo:/var/www/html:rw
+        networks:
+            - radix_network
+        ports:
+            - target: 80
+              published: 9202
+              protocol: tcp
     # The application always talks SMTP to this name. Here it hands the message to the real relay; development
     # replaces this with a Mailpit that catches everything instead.
     mailer:
@@ -239,6 +271,7 @@ volumes:
     caddy_data:
     caddy_config:
     data:
+    matomo:
     rabbitmq_data:
     valkey_data:
 

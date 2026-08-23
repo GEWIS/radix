@@ -3,7 +3,7 @@
 {% set meeting = view.meeting %}
 {% set abbr = meeting.type.getName|trans %}
 {% set statuses = enum('App\\ViewModel\\Decision\\MeetingStatus') %}
-{# Virtual meetings repair the record: no documents, no minutes, no lifecycle — just their decisions. #}
+{# Virtual meetings repair the record: no documents, no minutes, no lifecycle, just their decisions. #}
 {% set isVirtual = meeting.type is same as(enum('App\\Entity\\Database\\Enums\\MeetingTypes').VIRT) %}
 {% set isUpcoming = not isVirtual and view.status is same as(statuses.Upcoming) %}
 {% set isProcessing = not isVirtual and view.status is same as(statuses.HeldProcessing) %}
@@ -63,11 +63,11 @@
                     <span class="page-header-stat-label">{{ 'Documents'|trans }}</span>
                 </div>
                 <div class="page-header-stat">
-                    <span class="page-header-stat-value">{{ decisionCount > 0 ? decisionCount : '–' }}</span>
+                    <span class="page-header-stat-value">{{ decisionCount > 0 ? decisionCount : '-' }}</span>
                     <span class="page-header-stat-label">{{ 'Decisions'|trans }}</span>
                 </div>
                 <div class="page-header-stat">
-                    <span class="page-header-stat-value">{{ minutesLatest ? 'Available'|trans : '–' }}</span>
+                    <span class="page-header-stat-value">{{ minutesLatest ? 'Available'|trans : '-' }}</span>
                     <span class="page-header-stat-label">{{ 'Minutes'|trans }}</span>
                 </div>
             {% endif %}

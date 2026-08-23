@@ -250,12 +250,6 @@ class Member
     )]
     private Collection $keyGrantings;
 
-    #[Column(
-        type: Types::STRING,
-        nullable: true,
-    )]
-    private ?string $authenticationKey = null;
-
     /**
      * Determines if a member is deleted. A deleted member is a member whose basic info needs to be retained to ensure
      * that all decisions that mention this member can be kept (i.e., administrative purposes). This value is only set
@@ -557,16 +551,6 @@ class Member
         return $this->organInstallations;
     }
 
-    public function getAuthenticationKey(): ?string
-    {
-        return $this->authenticationKey;
-    }
-
-    public function setAuthenticationKey(?string $authenticationKey): void
-    {
-        $this->authenticationKey = $authenticationKey;
-    }
-
     /**
      * Member is at least 16 years old on the given date.
      */
@@ -643,7 +627,6 @@ class Member
      *     is_21_plus: bool,
      *     membershipEndsOn: ?string,
      *     expiration: string,
-     *     authenticationKey: ?string,
      * }
      */
     public function toArray(): array
@@ -665,7 +648,6 @@ class Member
             'is_21_plus' => $this->hasReached21(),
             'membershipEndsOn' => $this->getMembershipEndsOn()?->format(DateTimeInterface::ATOM) ?? null,
             'expiration' => $this->getExpiration()->format(DateTimeInterface::ATOM),
-            'authenticationKey' => $this->getAuthenticationKey(),
         ];
     }
 

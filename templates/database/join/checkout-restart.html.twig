@@ -4,7 +4,7 @@
 {% block page_title %}{{ 'GEWIS Registration - Checkout'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block contents %}
-    {% include 'database/partials/join/registration-header.html.twig' %}
+    {% include 'database/partials/join/registration-header.html.twig' with {header_title: 'Your GEWIS registration'|trans} only %}
 
     {% if error %}
         <div class="alert alert-danger" role="alert">

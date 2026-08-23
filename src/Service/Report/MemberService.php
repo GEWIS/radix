@@ -87,7 +87,6 @@ class MemberService
         $reportMember->setSupremum($member->getSupremum());
         $reportMember->setHidden($member->getHidden());
         $reportMember->setDeleted($member->getDeleted());
-        $reportMember->setAuthenticationKey($member->getAuthenticationKey());
 
         foreach ($member->getAddresses() as $address) {
             $this->generateAddress(

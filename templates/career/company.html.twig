@@ -65,23 +65,19 @@
                     <div class="panel-heading">
                         <h3>{{ 'Open positions'|trans }}</h3>
                     </div>
-                    <div class="list-group list-group-flush">
+                    <div class="panel-body">
                         {% for category in vacancy_categories() %}
                             {% set vacancies = company.getActiveVacancies(category) %}
                             {% if vacancies is not empty %}
                                 {% set vacancy = vacancies|first %}
-                                <div class="list-group-item">
-                                    <h6 class="mb-1">{{ category.pluralLabel|trans }}</h6>
-                                    <p class="mb-0">
-                                        <a href="{{ path('career/vacancy', {
-                                            companySlug: company.getSlugName,
-                                            category: vacancy.getCategory.value,
-                                            vacancySlug: vacancy.getSlugName,
-                                        }) }}">
-                                            {{ vacancy.getName|localise_text }}
-                                        </a>
-                                    </p>
-                                </div>
+                                <a class="link-row" href="{{ path('career/vacancy', {
+                                    companySlug: company.getSlugName,
+                                    category: vacancy.getCategory.value,
+                                    vacancySlug: vacancy.getSlugName,
+                                }) }}">
+                                    <span class="d-block fw-semibold">{{ vacancy.getName|localise_text }}</span>
+                                    <span class="d-block small text-body-secondary">{{ category.pluralLabel|trans }}</span>
+                                </a>
                             {% endif %}
                         {% endfor %}
                     </div>

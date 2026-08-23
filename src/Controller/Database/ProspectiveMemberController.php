@@ -9,6 +9,7 @@ use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Form\Database\MemberApproveType;
 use App\Form\Database\MemberRenewalType;
 use App\Form\Database\RegistrationType;
+use App\Security\User\SudoVoter;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\ProspectiveMemberRemoval;
 use App\Service\Database\RegistrationService;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_map;
@@ -168,6 +170,7 @@ final class ProspectiveMemberController extends AbstractController
         );
     }
 
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/members/prospective',
         name: 'join_prospective_member_index',
@@ -181,6 +184,7 @@ final class ProspectiveMemberController extends AbstractController
     /**
      * The overview searches while typing; `type` picks which of its three tables is being filled.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/members/prospective/search',
         name: 'join_prospective_member_search',
@@ -213,6 +217,7 @@ final class ProspectiveMemberController extends AbstractController
         ));
     }
 
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/members/prospective/{id}',
         name: 'join_prospective_member_show',
@@ -241,6 +246,7 @@ final class ProspectiveMemberController extends AbstractController
         );
     }
 
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/members/prospective/{id}/finalize',
         name: 'join_prospective_member_finalize',
@@ -295,6 +301,7 @@ final class ProspectiveMemberController extends AbstractController
         );
     }
 
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/members/prospective/{id}/delete',
         name: 'join_prospective_member_delete',

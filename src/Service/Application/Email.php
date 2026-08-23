@@ -15,6 +15,10 @@ use Symfony\Component\Mime\Address;
  * message cannot go out without it. The template is named here and rendered by the mailer, rather than rendered to a
  * string first and handed to a wrapper — that arrangement let a caller send a body on its own, which is how five of
  * these went out unbranded.
+ *
+ * A message carries no reply-to unless the caller asks for one. The register's mail about a member or a prospective
+ * member does, {@see self::secretary()} being the secretary who answers for it; everything else is the association
+ * writing, and a reply to it belongs wherever the message itself says.
  */
 class Email
 {
@@ -22,13 +26,15 @@ class Email
         private readonly MailerInterface $mailer,
         private readonly string $mailFromAddress,
         private readonly string $mailFromName,
-        private readonly string $mailFromSecretaryAddress,
-        private readonly string $mailFromSecretaryName,
+        private readonly string $mailReplyToSecretaryAddress,
+        private readonly string $mailReplyToSecretaryName,
     ) {
     }
 
     /**
-     * @param array<string, mixed> $context
+     * @param array<string, mixed>  $context
+     * @param Address[]             $alsoTo  further recipients of the same message, addressed openly
+     * @param array<string, string> $headers
      */
     public function send(
         Address $recipient,
@@ -37,18 +43,33 @@ class Email
         array $context = [],
         ?Address $replyTo = null,
         bool $bccReplyTo = false,
+        array $alsoTo = [],
+        array $headers = [],
     ): void {
-        $replyTo ??= new Address(
-            $this->mailFromSecretaryAddress,
-            $this->mailFromSecretaryName,
-        );
-
         $message = new TemplatedEmail()
             ->from(new Address($this->mailFromAddress, $this->mailFromName))
-            ->to($recipient)
-            ->replyTo($replyTo)
+            ->to(
+                $recipient,
+                ...$alsoTo,
+            )
             ->subject($subject)
-            ->htmlTemplate($template)
+            ->htmlTemplate($template);
+
+        foreach ($headers as $name => $value) {
+            $message->getHeaders()->addTextHeader(
+                $name,
+                $value,
+            );
+        }
+
+        if (null === $replyTo) {
+            $this->mailer->send($message->context($context));
+
+            return;
+        }
+
+        // The footer of the register's base template offers this address as the way to reach a person.
+        $message->replyTo($replyTo)
             ->context($context + ['secretary_email' => $replyTo->getAddress()]);
 
         if ($bccReplyTo) {
@@ -58,11 +79,15 @@ class Email
         $this->mailer->send($message);
     }
 
+    /**
+     * The secretary, who answers for what the register sends about a member, and the only reply-to the application
+     * has: every other message is the association writing, and says in its own words where an answer belongs.
+     */
     public function secretary(): Address
     {
         return new Address(
-            $this->mailFromSecretaryAddress,
-            $this->mailFromSecretaryName,
+            $this->mailReplyToSecretaryAddress,
+            $this->mailReplyToSecretaryName,
         );
     }
 }

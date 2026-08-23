@@ -14,7 +14,6 @@ use App\Service\Checker\Annulment as AnnulmentService;
 use App\Service\Checker\Installation as InstallationService;
 use App\Service\Checker\Key as KeyService;
 use App\Service\Checker\Meeting as MeetingService;
-use App\Service\Checker\Member as MemberService;
 use App\Service\Checker\Organ as OrganService;
 use App\ViewModel\Checker\Error as ErrorModel;
 use DateInterval;
@@ -34,7 +33,6 @@ class Checker
         private readonly InstallationService $installationService,
         private readonly KeyService $keyService,
         private readonly MeetingService $meetingService,
-        private readonly MemberService $memberService,
         private readonly OrganService $organService,
         private readonly MailerInterface $mailer,
         private readonly string $mailFromAddress,
@@ -488,23 +486,5 @@ class Checker
         }
 
         return $errors;
-    }
-
-    /**
-     * Make sure that members who are hidden or whose membership has expired do not have an authentication key.
-     *
-     * @return int the number of members whose key was revoked
-     */
-    public function checkAuthenticationKeys(): int
-    {
-        $members = $this->memberService->getExpiredOrHiddenMembersWithAuthenticationKey();
-
-        foreach ($members as $member) {
-            $member->setAuthenticationKey(null);
-        }
-
-        $this->memberService->persistAll($members);
-
-        return count($members);
     }
 }

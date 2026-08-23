@@ -395,7 +395,7 @@ final class SignupOverview
 
         $this->setFeedback(
             AlertTypes::Warning,
-            $this->translator->trans('The draw could not be run — the list may have changed or was already drawn.'),
+            $this->translator->trans('The draw could not be run; the list may have changed or was already drawn.'),
         );
     }
 

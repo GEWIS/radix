@@ -1,0 +1,46 @@
+// The panel that opens every page of the join flow: its introduction, its title, and the membership benefits.
+
+.registration-intro {
+    color: var(--#{$prefix}secondary-color);
+}
+
+.registration-title {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    text-wrap: balance;
+}
+
+.registration-benefit-title {
+    display: flex;
+    align-items: center;
+    gap: map-get($spacers, 2);
+    font-size: $font-size-sm;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.registration-benefit-icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: var(--#{$prefix}border-radius);
+    background-color: rgba($gewis-red, 0.1);
+    color: $gewis-red;
+    font-size: 0.75rem;
+}
+
+.registration-benefit-list {
+    margin-block-end: 0;
+    padding-inline-start: map-get($spacers, 3);
+    color: var(--#{$prefix}secondary-color);
+    font-size: $font-size-sm;
+
+    > li + li {
+        margin-block-start: map-get($spacers, 1);
+    }
+}

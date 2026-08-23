@@ -16,6 +16,10 @@ fiction.
   regenerated from the ledger.
 * Moved the decision and membership database's interface under `/{_locale}/database`, giving it the website's
   bilingual routing. The website's own URLs are unchanged.
+* Replaced the two legacy storage migrations with a single resumable command, `app:storage:migrate`, which moves every
+  inherited file out of the flat content-addressed pool and into the `data/` layout: photos, company and organ images,
+  course documents, the images embedded in custom pages, and the flat meeting documents. It journals each item as it
+  commits, so an interrupted run continues where it stopped rather than starting over.
 
 ---
 
