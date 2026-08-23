@@ -252,7 +252,7 @@ class Member
                 'refundId' => $refundId,
                 'refundStatus' => $refundStatus,
             ],
-            $this->emailService->replyTo(),
+            $this->emailService->secretary(),
         );
     }
 

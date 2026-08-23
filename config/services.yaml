@@ -55,7 +55,7 @@ parameters:
     # The names that travel with the addresses below. They read the same on every deployment, so they are defaults
     # here rather than variables an operator has to remember to set; the addresses themselves are not, and have none.
     env(MAIL_FROM_NAME): 'Study Association GEWIS'
-    env(MAIL_REPLY_TO_NAME): 'Secretary of GEWIS'
+    env(MAIL_REPLY_TO_SECRETARY_NAME): 'Secretary of GEWIS'
     env(MAIL_TO_CHECKER_RESULT_NAME): 'Secretary of GEWIS'
     env(MAIL_TO_REPORT_ERROR_NAME): 'Database Wizards'
     env(MAIL_TO_SUBSCRIPTION_NAME): 'Secretary of GEWIS'
@@ -124,8 +124,8 @@ services:
             # results, the error reports and the subscription notices each land with whoever acts on them.
             $mailFromAddress: '%env(string:MAIL_FROM_ADDRESS)%' # string
             $mailFromName: '%env(string:MAIL_FROM_NAME)%' # string
-            $mailReplyToAddress: '%env(string:MAIL_REPLY_TO_ADDRESS)%' # string
-            $mailReplyToName: '%env(string:MAIL_REPLY_TO_NAME)%' # string
+            $mailReplyToSecretaryAddress: '%env(string:MAIL_REPLY_TO_SECRETARY_ADDRESS)%' # string
+            $mailReplyToSecretaryName: '%env(string:MAIL_REPLY_TO_SECRETARY_NAME)%' # string
             $mailToCheckerResultAddress: '%env(string:MAIL_TO_CHECKER_RESULT_ADDRESS)%' # string
             $mailToCheckerResultName: '%env(string:MAIL_TO_CHECKER_RESULT_NAME)%' # string
             $mailToReportErrorAddress: '%env(string:MAIL_TO_REPORT_ERROR_ADDRESS)%' # string

@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Address;
  * these went out unbranded.
  *
  * A message carries no reply-to unless the caller asks for one. The register's mail about a member or a prospective
- * member does, {@see self::replyTo()} being the secretary who answers for it; everything else is the association
+ * member does, {@see self::secretary()} being the secretary who answers for it; everything else is the association
  * writing, and a reply to it belongs wherever the message itself says.
  */
 class Email
@@ -26,8 +26,8 @@ class Email
         private readonly MailerInterface $mailer,
         private readonly string $mailFromAddress,
         private readonly string $mailFromName,
-        private readonly string $mailReplyToAddress,
-        private readonly string $mailReplyToName,
+        private readonly string $mailReplyToSecretaryAddress,
+        private readonly string $mailReplyToSecretaryName,
     ) {
     }
 
@@ -66,13 +66,14 @@ class Email
     }
 
     /**
-     * The secretary, who answers for what the register sends about a member.
+     * The secretary, who answers for what the register sends about a member, and the only reply-to the application
+     * has: every other message is the association writing, and says in its own words where an answer belongs.
      */
-    public function replyTo(): Address
+    public function secretary(): Address
     {
         return new Address(
-            $this->mailReplyToAddress,
-            $this->mailReplyToName,
+            $this->mailReplyToSecretaryAddress,
+            $this->mailReplyToSecretaryName,
         );
     }
 }

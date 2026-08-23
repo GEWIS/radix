@@ -95,7 +95,7 @@ x-app-environment: &app_environment
     # Who the register writes as, and who it writes to. The display names that go with these are defaulted in
     # config/services.yaml and are not repeated here.
     MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:?MAIL_FROM_ADDRESS must be set}"
-    MAIL_REPLY_TO_ADDRESS: "${MAIL_REPLY_TO_ADDRESS:?MAIL_REPLY_TO_ADDRESS must be set}"
+    MAIL_REPLY_TO_SECRETARY_ADDRESS: "${MAIL_REPLY_TO_SECRETARY_ADDRESS:?MAIL_REPLY_TO_SECRETARY_ADDRESS must be set}"
     MAIL_TO_CHECKER_RESULT_ADDRESS: "${MAIL_TO_CHECKER_RESULT_ADDRESS:?MAIL_TO_CHECKER_RESULT_ADDRESS must be set}"
     MAIL_TO_REPORT_ERROR_ADDRESS: "${MAIL_TO_REPORT_ERROR_ADDRESS:?MAIL_TO_REPORT_ERROR_ADDRESS must be set}"
     MAIL_TO_SUBSCRIPTION_ADDRESS: "${MAIL_TO_SUBSCRIPTION_ADDRESS:?MAIL_TO_SUBSCRIPTION_ADDRESS must be set}"
