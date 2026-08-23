@@ -5,14 +5,14 @@
     {% include 'partials/activity/agenda-item.html.twig' with {'activity': activity} only %}
 #}
 {% set dateBadge = activity_date_badge(activity.getBeginTime, activity.getEndTime) %}
-<a class="agenda-item" href="{{ path('activity/view', {'activity': activity.getId}) }}">
+<a class="link-row link-row-media" href="{{ path('activity/view', {'activity': activity.getId}) }}">
     {# aria-hidden: the date range below already announces the full date to assistive tech. #}
     <span class="activity-date-badge{{ dateBadge.range ? ' activity-date-badge-range' : '' }}" aria-hidden="true">
         <span class="activity-date-badge-month">{{ dateBadge.month }}</span>
         <span class="activity-date-badge-day">{{ dateBadge.day }}</span>
         <span class="activity-date-badge-weekday">{{ dateBadge.weekday }}</span>
     </span>
-    <span class="agenda-item-body">
+    <span class="link-row-body">
         <span class="fw-semibold d-block">{{ activity.getName|localise_text }}</span>
         <span class="small text-body-secondary">
             {{ activity_date_range(activity.getBeginTime, activity.getEndTime) }}

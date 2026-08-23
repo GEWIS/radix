@@ -24,8 +24,8 @@
     }
 }
 
-// Neutral "tag" variant: transparent fill with a visible border and muted text. Reads as a quiet, secondary chip — use
-// it for labels and similar tags. Subtle in both `gewis-day` and `gewis-night` because it is built from surface tokens.
+// Neutral "tag" variant: transparent fill with a visible border and muted text. Use it for labels and similar tags.
+// Subtle in both `gewis-day` and `gewis-night` because it is built from surface tokens.
 .badge-tag {
     --#{$prefix}badge-color: var(--#{$prefix}secondary-color);
 
@@ -69,4 +69,17 @@
 label.badge {
     cursor: pointer;
     user-select: none;
+}
+
+// A link styled as a badge must not pick up the global hover underline. A ring in `currentcolor` replaces it and
+// works for every variant in both themes without a hover token per fill.
+a.badge {
+    text-decoration: none;
+    transition: box-shadow $transition-duration ease;
+
+    &:hover,
+    &:focus-visible {
+        box-shadow: 0 0 0 var(--#{$prefix}border-width) currentcolor;
+        text-decoration: none;
+    }
 }

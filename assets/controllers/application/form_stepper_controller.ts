@@ -94,7 +94,11 @@ export default class extends Controller {
             // Hidden AND disabled on non-final steps: a hidden submit button is still the form's default button for
             // implicit submission (Enter), so disabling it keeps an earlier step from POSTing the form prematurely.
             this.submitTarget.hidden = this.current !== last;
-            this.submitTarget.disabled = this.current !== last;
+
+            // Do not enable a button `submit-once` locked; the form has already been submitted.
+            if (undefined === this.submitTarget.dataset.locked) {
+                this.submitTarget.disabled = this.current !== last;
+            }
         }
 
         // Scroll back to the step header on navigation, but leave the initial paint where the user is.

@@ -4,10 +4,10 @@
 {% block page_title %}{{ 'Graduate renewal'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block contents %}
-    {% embed 'database/partials/join/registration-header.html.twig' with {header_title: 'Graduate renewal'|trans} %}
+    {% embed 'database/partials/join/registration-header.html.twig' with {header_title: 'Your graduate status has been renewed'|trans} %}
         {% block registration_intro %}
             <p>
-                {{ 'Thank you %name%! Your graduate status has been renewed and we have sent you a confirmation by e-mail.'|trans({
+                {{ 'Thank you %name%! We have sent you a confirmation by e-mail.'|trans({
                     '%name%': member.firstName,
                 }) }}
             </p>

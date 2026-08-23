@@ -88,7 +88,11 @@
                                 </h5>
                                 <span class="d-block small text-body-secondary">
                                     {{ 'summary' == type.value ? type.label|trans : document.getExamType.label|trans }}
-                                    {% if 'summary' == type.value and document.getAuthor is not null %}
+                                    {# Do not disclose the author to viewers who may not download the summary. #}
+                                    {% if 'summary' == type.value
+                                        and document.getAuthor is not null
+                                        and is_granted('COURSE_DOCUMENT_DOWNLOAD', document)
+                                    %}
                                         {{ 'by %author%'|trans({'%author%': document.getAuthor}) }}
                                     {% endif %}
                                 </span>
@@ -160,7 +164,7 @@
                         {% for link in [
                             {'icon': 'fa-book-open', 'url': 'https://gewis.nl/boeken', 'title': 'Books via GEWIS'|trans, 'meta': 'Order your course books at a discount. Deadlines are mailed each quartile.'|trans},
                             {'icon': 'fa-user-graduate', 'url': 'https://gew.is/requesttutor', 'title': 'Request tutoring'|trans, 'meta': 'We match you with a member who already passed the course.'|trans},
-                            {'icon': 'fa-chalkboard-user', 'url': 'https://gew.is/becometutor', 'title': 'Become a tutor'|trans, 'meta': 'Paid, a few hours a week, on your own schedule.'|trans},
+                            {'icon': 'fa-chalkboard-user', 'url': 'https://gew.is/becometutor', 'title': 'Become a tutor'|trans, 'meta': 'A few hours a week, on your own schedule.'|trans},
                         ] %}
                             <li class="d-flex gap-3 {{ loop.last ? '' : 'mb-3' }}">
                                 <span class="education-doc-icon" aria-hidden="true">

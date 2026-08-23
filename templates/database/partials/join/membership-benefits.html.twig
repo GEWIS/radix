@@ -1,0 +1,44 @@
+{#
+    The membership benefits, taken from the association's own "become a member" page. Rendered into the registration
+    panel's `registration_details` block, so it has no panel or heading of its own.
+#}
+{% macro pillar(icon, title, points) %}
+    <div class="col">
+        <h2 class="registration-benefit-title">
+            <span class="registration-benefit-icon" aria-hidden="true">
+                <span class="fas {{ icon }}"></span>
+            </span>
+            {{ title }}
+        </h2>
+        <ul class="registration-benefit-list">
+            {% for point in points %}
+                <li>{{ point }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{% import _self as membership %}
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-4 mt-0">
+    {{ membership.pillar('fa-graduation-cap', 'Education'|trans, [
+        'Discounts on books'|trans,
+        'Exam archives and course summaries'|trans,
+        'A contact point for education quality'|trans,
+    ]) }}
+    {{ membership.pillar('fa-seedling', 'Development'|trans, [
+        'Trainings for hard and soft skills'|trans,
+        'Committee work'|trans,
+        'Study trips'|trans,
+    ]) }}
+    {{ membership.pillar('fa-briefcase', 'Career'|trans, [
+        'Lunch lectures and business cases'|trans,
+        'Thesis projects at companies'|trans,
+        'Vacancies, internships and student jobs'|trans,
+    ]) }}
+    {{ membership.pillar('fa-champagne-glasses', 'Fun'|trans, [
+        'A wide variety of activities'|trans,
+        'Weekly social drinks'|trans,
+        'Weekends organised by committees'|trans,
+    ]) }}
+</div>

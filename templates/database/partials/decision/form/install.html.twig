@@ -25,7 +25,7 @@
      data-action="organ-lookup:selected->install-editor#organSelected
                   member-lookup:selected->install-editor#memberSelected"
      data-organ-lookup-url-value="{{ path('decision_organ_search') }}"
-     {# The route constrains every one of these — the type to the meeting types, the rest to digits — so it cannot
+     {# The route constrains every one of these (the type to the meeting types, the rest to digits), so it cannot
         generate a template with named placeholders in them. A valid address is generated instead and the controller
         replaces the last five segments, which is what the route says they are. #}
      data-organ-lookup-info-url-value="{{ path('decision_organ_info', {

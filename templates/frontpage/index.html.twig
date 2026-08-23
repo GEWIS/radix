@@ -29,14 +29,11 @@
                     <a href="{{ path('activity/index') }}" class="btn btn-gewis-primary">
                         <span class="far fa-calendar"></span> {{ 'Upcoming activities'|trans }}
                     </a>
-                    <a href="{{ page_path(
-                        category: 'vereniging',
-                        categoryEn: 'association',
-                        sub_category: 'lid-worden',
-                        sub_categoryEn: 'become-member',
-                    ) }}" class="btn btn-outline-light">
-                        <span class="fas fa-door-open"></span> {{ 'Become a member'|trans }}
-                    </a>
+                    {% if null === app.user %}
+                        <a href="{{ path('join_index') }}" class="btn btn-outline-light">
+                            <span class="fas fa-door-open"></span> {{ 'Become a member'|trans }}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@
       checkboxes) are not single controls, so `.form-floating` has nothing to float over and would fold the label on
       top of the first option. Those rows keep a label above them.
     - `form_help` is rendered on every branch. Dropping it loses every `help` a form type declares, which is the only
-      place some fields explain themselves — the student number, for one.
+      place some fields explain themselves, the student number for one.
 #}
 {% block form_row %}
     {% if compound and form.children is not empty and form.children|filter(child => 'hidden' not in child.vars.block_prefixes)|length == 0 %}

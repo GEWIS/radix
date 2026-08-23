@@ -86,7 +86,7 @@ export function spriteIcon(spriteUrl: string, name: string): { isCustomSVG: true
 
 /**
  * The tag, vote and profile-photo layer of the album viewer. It hangs off the PhotoSwipe lightbox the gallery owns and
- * shows, for every slide, a panel to the side: who is tagged (with links and — where allowed — a remove control and an
+ * shows, for every slide, a panel to the side: who is tagged (with links and, where allowed, a remove control and an
  * add form), a vote button, and a set-as-profile-photo button when the viewer is tagged. Every action posts to the
  * backend and re-reads the details, so the panel always reflects the server's answer, including the graduate rule.
  *

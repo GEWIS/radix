@@ -13,7 +13,8 @@
             </span>
             <span class="d-block small text-body-secondary">
                 {% if summary %}
-                    {{ document.getAuthor is not null
+                    {# Do not disclose the author to viewers who may not download the summary. #}
+                    {{ downloadable and document.getAuthor is not null
                         ? 'Written by %author%'|trans({'%author%': document.getAuthor})
                         : 'Shared by a member'|trans }}
                 {% else %}
