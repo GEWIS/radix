@@ -97,8 +97,8 @@ final class BellTest extends DatabaseTestCase
     public function testARunOfOneKindIsShownAsOneLine(): void
     {
         $this->signIn('Chrome 124');
-        $this->signIn('Firefox 153');
-        $this->signIn('Safari 18');
+        $this->signIn('Chrome 124');
+        $this->signIn('Chrome 124');
         $this->entityManager->flush();
 
         $entries = $this->bellFor(8025)->getEntries();
@@ -131,7 +131,7 @@ final class BellTest extends DatabaseTestCase
     public function testActingOnALineCoversEverythingBehindIt(): void
     {
         $this->signIn('Chrome 124');
-        $this->signIn('Firefox 153');
+        $this->signIn('Chrome 124');
         $this->entityManager->flush();
 
         $bell = $this->bellFor(8025);
@@ -152,7 +152,7 @@ final class BellTest extends DatabaseTestCase
     public function testALineStandingForSeveralPointsAtTheList(): void
     {
         $this->signIn('Chrome 124');
-        $this->signIn('Firefox 153');
+        $this->signIn('Chrome 124');
         $this->entityManager->flush();
 
         self::assertStringContainsString(
@@ -190,6 +190,40 @@ final class BellTest extends DatabaseTestCase
     }
 
     /**
+     * Which device signed in is the fact the reader opened the centre to check, so folding two of them into "signed
+     * in twice" would answer the wrong question.
+     */
+    public function testSignInsFromDifferentDevicesStayApart(): void
+    {
+        $this->signIn('Chrome 124');
+        $this->signIn('Firefox 153');
+        $this->entityManager->flush();
+
+        self::assertCount(
+            2,
+            $this->bellFor(8025)->getEntries(),
+        );
+    }
+
+    /**
+     * Two of the same kind far enough apart are two things that happened, not one thing that happened repeatedly.
+     */
+    public function testTheSameKindLongApartStaysApart(): void
+    {
+        $this->signIn('Chrome 124');
+        $this->signIn(
+            'Chrome 124',
+            new DateTimeImmutable('-3 days'),
+        );
+        $this->entityManager->flush();
+
+        self::assertCount(
+            2,
+            $this->bellFor(8025)->getEntries(),
+        );
+    }
+
+    /**
      * Different kinds next to each other stay apart, however close together they arrived.
      */
     public function testDifferentKindsAreNotFoldedTogether(): void
@@ -204,8 +238,10 @@ final class BellTest extends DatabaseTestCase
         );
     }
 
-    private function signIn(string $browser): Notification
-    {
+    private function signIn(
+        string $browser,
+        ?DateTimeImmutable $at = null,
+    ): Notification {
         $notification = new Notification();
         $notification->setType(NotificationType::SignIn);
         $notification->setContext(['browser' => $browser]);
@@ -213,7 +249,7 @@ final class BellTest extends DatabaseTestCase
             $this->member(8025),
             null,
         );
-        $notification->setCreatedAt(new DateTimeImmutable());
+        $notification->setCreatedAt($at ?? new DateTimeImmutable());
         $this->entityManager->persist($notification);
 
         return $notification;

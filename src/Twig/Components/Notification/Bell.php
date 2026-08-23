@@ -15,6 +15,7 @@ use App\Repository\User\UserSettingsRepository;
 use App\Security\User\Firewall;
 use App\Service\Application\NotificationContextResolver;
 use App\Service\Application\NotificationSubjectResolver;
+use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -67,6 +68,12 @@ class Bell
      */
     private const string WINDOW = '-30 days';
 
+    /**
+     * How far a line may reach back from its newest notification while still collapsing the ones behind it. Measured
+     * against the newest rather than the one before, so a steady trickle cannot chain into a line spanning weeks.
+     */
+    private const string GROUP_WINDOW = 'P1D';
+
     /** @var list<array{notification: Notification, name: string, href: string, unread: int, ids: list<int>}>|null */
     private ?array $entries = null;
 
@@ -97,7 +104,9 @@ class Bell
      * component only ever renders for members, so that is always the main one.
      *
      * A run of the same kind is shown as one line, since ten separate lines saying an activity was submitted is a
-     * worse answer to "what happened" than one saying ten were.
+     * worse answer to "what happened" than one saying ten were. Only a run that happened at about the same time,
+     * though, and for the kinds where what the notification is about is not the point of it; see
+     * {@see \App\Entity\Application\Enums\NotificationType::groupsAcrossSubjects()} and {@see self::GROUP_WINDOW}.
      *
      * @return list<array{notification: Notification, name: string, href: string, unread: int, ids: list<int>}>
      */
@@ -129,7 +138,8 @@ class Bell
 
         $entries = [];
         $current = null;
-        $currentType = null;
+        $currentKey = null;
+        $currentSince = null;
 
         foreach ($notifications as $notification) {
             $id = $notification->getId();
@@ -160,10 +170,15 @@ class Bell
             $unread = (null === $readAt || $notification->getCreatedAt() > $readAt)
                 && null === ($interactions[$id] ?? null)?->getReadAt();
             $type = $notification->getType();
+            $key = $type->groupsAcrossSubjects()
+                ? $type->value
+                : $type->value . "\0" . $name;
 
             if (
                 null !== $current
-                && $type === $currentType
+                && $key === $currentKey
+                && null !== $currentSince
+                && $notification->getCreatedAt() >= $currentSince
             ) {
                 $current['ids'][] = $id;
                 $current['unread'] += $unread
@@ -177,7 +192,8 @@ class Bell
                 $entries[] = $current;
             }
 
-            $currentType = $type;
+            $currentKey = $key;
+            $currentSince = $notification->getCreatedAt()->sub(new DateInterval(self::GROUP_WINDOW));
             $current = [
                 'notification' => $notification,
                 'name' => $name,
