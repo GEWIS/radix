@@ -47,10 +47,16 @@ class DecisionRepository extends ServiceEntityRepository
         }
 
         $qb = $this->createQueryBuilder('d');
-        $qb->addSelect('m, meetingMinutes, localDetails, decisionMinutes')
+        // `annulledBy` is an inverse-side one-to-one, which Doctrine cannot proxy: without the join a full page of
+        // results costs a hundred extra queries, one per decision, for something most of them do not have.
+        $qb->addSelect('m, meetingMinutes, localDetails, decisionMinutes, annulledBy')
             ->join(
                 'd.meeting',
                 'm',
+            )
+            ->leftJoin(
+                'd.annulledBy',
+                'annulledBy',
             )
             ->leftJoin(
                 'm.meetingMinutes',

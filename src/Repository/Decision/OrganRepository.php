@@ -39,7 +39,14 @@ class OrganRepository extends ServiceEntityRepository
      */
     public function findActive(?OrganTypes $type = null): array
     {
-        $qb = $this->createQueryBuilder('o');
+        // `organInformation` is an inverse-side one-to-one, which Doctrine cannot proxy: without the join every
+        // organ costs a SELECT of its own, whether or not the caller looks at the page.
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin(
+                'o.organInformation',
+                'oi',
+            )
+            ->addSelect('oi');
         $qb->where($qb->expr()->orX(
             $qb->expr()->isNull('o.abrogationDate'),
             $qb->expr()->gt(
@@ -361,7 +368,14 @@ class OrganRepository extends ServiceEntityRepository
      */
     public function findAbrogated(?OrganTypes $type = null): array
     {
-        $qb = $this->createQueryBuilder('o');
+        // `organInformation` is an inverse-side one-to-one, which Doctrine cannot proxy: without the join every
+        // organ costs a SELECT of its own, whether or not the caller looks at the page.
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin(
+                'o.organInformation',
+                'oi',
+            )
+            ->addSelect('oi');
         $qb->where($qb->expr()->andX(
             $qb->expr()->isNotNull('o.abrogationDate'),
             $qb->expr()->lte(

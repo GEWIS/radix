@@ -123,6 +123,52 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
+     * Warm the associations the edit form reads, in one query rather than one per field.
+     *
+     * The route resolver hands the controller a bare Activity, so its working revision and each of that revision's
+     * four localised texts would otherwise be loaded one lazy SELECT at a time. Nothing is returned: the entities land
+     * in the identity map, which is where the form finds them.
+     */
+    public function warmForEditing(Activity $activity): void
+    {
+        $this->createQueryBuilder('a')
+            ->addSelect(
+                'cr',
+                'n',
+                'l',
+                'c',
+                'd',
+            )
+            ->join(
+                'a.currentRevision',
+                'cr',
+            )
+            ->join(
+                'cr.name',
+                'n',
+            )
+            ->join(
+                'cr.location',
+                'l',
+            )
+            ->join(
+                'cr.costs',
+                'c',
+            )
+            ->join(
+                'cr.description',
+                'd',
+            )
+            ->where('a = :activity')
+            ->setParameter(
+                'activity',
+                $activity,
+            )
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Base query for the admin overview: fetch-join the working revision (and its name text, organ, company and
      * author) so the row columns hydrate in one query, and scope to the member's own + their organs' activities (by the
      * working revision's organ) unless `$all`.
