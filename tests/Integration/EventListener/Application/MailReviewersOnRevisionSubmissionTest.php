@@ -11,6 +11,7 @@ use App\Entity\Decision\Member;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityRevisionRepository;
 use App\Security\User\MfaEnforcementSwitch;
+use App\Service\Application\OfficeMailboxes;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTime;
 use Override;
@@ -46,7 +47,7 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
 
         self::assertNotSame(
             [],
-            $this->messagesTo('internal@example.com'),
+            $this->messagesTo($this->internalAffairs()),
             'An activity is the internal affairs officer\'s to look at.',
         );
     }
@@ -72,8 +73,16 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
 
         self::assertSame(
             [],
-            $this->messagesTo('internal@example.com'),
+            $this->messagesTo($this->internalAffairs()),
         );
+    }
+
+    /**
+     * The mailbox an activity's reviewers read, as this deployment names it.
+     */
+    private function internalAffairs(): string
+    {
+        return self::getContainer()->get(OfficeMailboxes::class)->internalAffairs()->getAddress();
     }
 
     /**

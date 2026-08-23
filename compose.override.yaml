@@ -330,8 +330,8 @@ configs:
         content: |
             mysql_note "Creating the isolated PHPUnit test database"
             docker_process_sql <<'EOF'
-                CREATE DATABASE IF NOT EXISTS `${DOCKER_DB_DATABASE:-gewis}_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;
-                GRANT ALL PRIVILEGES ON `${DOCKER_DB_DATABASE:-gewis}_test`.* TO '${DOCKER_DB_USERNAME:-gewis}'@'%';
+                CREATE DATABASE IF NOT EXISTS `${DOCTRINE_WEB_DATABASE:-gewis}_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;
+                GRANT ALL PRIVILEGES ON `${DOCTRINE_WEB_DATABASE:-gewis}_test`.* TO '${DOCTRINE_WEB_USER:-gewis}'@'%';
             EOF
     # The databases Mailman and Listmonk keep beside the ledger. The ledger's own database is the one the image
     # creates from `POSTGRES_DB`; the test database is made by `make test-prepare`, which owns the schema in it.

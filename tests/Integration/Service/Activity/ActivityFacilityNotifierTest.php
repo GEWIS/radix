@@ -8,6 +8,7 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Repository\Activity\ActivityRevisionRepository;
 use App\Service\Activity\ActivityFacilityNotifier;
+use App\Service\Application\OfficeMailboxes;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\Mime\Email;
 
@@ -27,11 +28,15 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
 
         self::getContainer()->get(ActivityFacilityNotifier::class)->created($revision);
 
+        $mailboxes = self::getContainer()->get(OfficeMailboxes::class);
         $message = $this->onlyMessage();
+
+        // Against the configured mailboxes rather than literal addresses: what matters is that both are written to,
+        // and a deployment is free to name them anything.
         self::assertEqualsCanonicalizing(
             [
-                'geflitst@example.com',
-                'planka@example.com',
+                $mailboxes->geflitst()->getAddress(),
+                $mailboxes->geflitstPlanka()->getAddress(),
             ],
             array_map(
                 static fn (object $address): string => $address->getAddress(),
@@ -39,7 +44,7 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
             ),
         );
         self::assertSame(
-            'board-1234',
+            $mailboxes->geflitstPlankaKey(),
             $message->getHeaders()->get('X-Planka-Board-Id')?->getBodyAsString(),
         );
     }

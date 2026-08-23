@@ -36,7 +36,7 @@ x-app-environment: &app_environment
     # Everything else, on MariaDB: the `web` connection. The charset and the collation belong in the DSN because they
     # have to match what the tables were created with; a mismatch makes a schema comparison report every string column
     # as changed.
-    WEB_DATABASE_DSN: "pdo-mysql://${DOCKER_DB_USERNAME:?DOCKER_DB_USERNAME must be set}:${DOCKER_DB_PASSWORD:?DOCKER_DB_PASSWORD must be set}@${DOCKER_DB_HOST:?DOCKER_DB_HOST must be set}:${DOCKER_DB_PORT:?DOCKER_DB_PORT must be set}/${DOCKER_DB_DATABASE:?DOCKER_DB_DATABASE must be set}?serverVersion=${DOCKER_DB_VERSION:?DOCKER_DB_VERSION must be set}&charset=${DOCKER_DB_CHARSET:?DOCKER_DB_CHARSET must be set}&collation=${DOCKER_DB_COLLATION:?DOCKER_DB_COLLATION must be set}"
+    WEB_DATABASE_DSN: "pdo-mysql://${DOCTRINE_WEB_USER:?DOCTRINE_WEB_USER must be set}:${DOCTRINE_WEB_PASSWORD:?DOCTRINE_WEB_PASSWORD must be set}@${DOCTRINE_WEB_HOST:?DOCTRINE_WEB_HOST must be set}:${DOCTRINE_WEB_PORT:?DOCTRINE_WEB_PORT must be set}/${DOCTRINE_WEB_DATABASE:?DOCTRINE_WEB_DATABASE must be set}?serverVersion=${DOCTRINE_WEB_VERSION:?DOCTRINE_WEB_VERSION must be set}&charset=${DOCTRINE_WEB_CHARSET:?DOCTRINE_WEB_CHARSET must be set}&collation=${DOCTRINE_WEB_COLLATION:?DOCTRINE_WEB_COLLATION must be set}"
 
     MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER must be set}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS must be set}@${RABBITMQ_HOST:-rabbitmq}:${RABBITMQ_PORT:-5672}"
     # The cache, Doctrine's second-level cache and symfony/lock all sit on this one Valkey. The locks have to be
