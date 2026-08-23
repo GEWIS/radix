@@ -35,4 +35,15 @@
             </div>
         {% endfor %}
     {% endif %}
+
+    {% if this.hasMore %}
+        <div data-controller="infinite-scroll" class="text-center py-3">
+            <button type="button" class="btn btn-outline-secondary"
+                    data-action="live#action" data-live-action-param="loadMore"
+                    data-infinite-scroll-target="button">
+                {{ 'Load more'|trans }}
+            </button>
+            <div data-infinite-scroll-target="sentinel" aria-hidden="true"></div>
+        </div>
+    {% endif %}
 </div>
