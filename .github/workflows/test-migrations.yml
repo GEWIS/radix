@@ -142,7 +142,7 @@ jobs:
       - name: seed base
         run: |
           docker compose $COMPOSE_FILES exec -T app bin/console app:fixtures:load --no-interaction
-          docker compose $COMPOSE_FILES exec -T app bin/console report:generate:full
+          docker compose $COMPOSE_FILES exec -T app bin/console app:decision:generate
 
       - name: cleanup base
         run: docker compose $COMPOSE_FILES down
@@ -212,7 +212,7 @@ jobs:
       - name: seed head
         run: |
           docker compose $COMPOSE_FILES exec -T app bin/console app:fixtures:load --no-interaction
-          docker compose $COMPOSE_FILES exec -T app bin/console report:generate:full
+          docker compose $COMPOSE_FILES exec -T app bin/console app:decision:generate
 
       - name: revert to base migration
         run: |

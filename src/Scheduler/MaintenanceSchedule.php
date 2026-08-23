@@ -46,7 +46,7 @@ final readonly class MaintenanceSchedule implements ScheduleProviderInterface
             ->add(
                 RecurringMessage::cron(
                     '0 1 * * *',
-                    new RunCommandMessage('report:generate:full'),
+                    new RunCommandMessage('app:decision:generate'),
                 ),
                 RecurringMessage::cron(
                     '*/30 * * * *',

@@ -82,6 +82,37 @@
     .btn {
         pointer-events: auto;
     }
+
+    // Below `md` the band is a fixed 30vh (see `.jumbotron` above), which on a short phone is less than the content
+    // laid over it needs; the surplus grows upward out of the hero and over the navigation. The content cannot make
+    // room for itself, being out of flow, so scale the type and its spacing down with the viewport, drop the
+    // heading's 20ch measure so it wraps to the full width rather than into four short lines, and give the band a
+    // floor so that even the shortest viewport has somewhere to put the result. Placed after the rules it narrows,
+    // because a media query adds no specificity of its own.
+    @include media-breakpoint-down(md) {
+        min-height: 15rem;
+
+        &__content {
+            padding-bottom: .75rem;
+        }
+
+        h1 {
+            max-width: none;
+            margin-bottom: .35rem;
+            font-size: clamp(1.05rem, 4.4vw, 1.5rem);
+        }
+
+        // The kicker is a `p` of its own, and a descendant selector would outrank its own class and resize it too.
+        p:not(.home-hero__kicker) {
+            margin-bottom: .6rem;
+            font-size: clamp(.8rem, 3.2vw, .95rem);
+        }
+
+        .btn {
+            padding: .25rem .625rem;
+            font-size: .8125rem;
+        }
+    }
 }
 
 // A news row leads with the date it carries, in a column narrow enough to read as a stamp rather than a heading.

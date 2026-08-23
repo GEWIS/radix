@@ -206,7 +206,7 @@ services:
         command: [ "php", "bin/console", "messenger:consume", "scheduler_gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     # The register's housekeeping is one schedule consumed by one worker, so its jobs run one after another: a nightly
     # report regeneration that overruns delays the hourly mailing list sync behind it rather than running alongside it.
-    # No `--limit`, because a run of `report:generate:full` is one message that takes the better part of an hour.
+    # No `--limit`, because a run of `app:decision:generate` is one message that takes the better part of an hour.
     scheduler-maintenance:
         <<: *worker
         command: [ "php", "bin/console", "messenger:consume", "scheduler_maintenance", "-vv", "--time-limit=3600", "--memory-limit=256M" ]

@@ -45,12 +45,12 @@ class MaintenanceScheduleTest extends TestCase
 
         self::assertSame(
             [
+                'app:decision:generate',
                 'check:membership:renewal:graduate',
                 'database:mailinglist:fetch all',
                 'database:mailinglist:maintenance -f -vv',
                 'database:mailinglist:sync-membership -f -vv all',
                 'database:prospective-members:delete-expired',
-                'report:generate:full',
             ],
             $commands,
         );
@@ -94,7 +94,7 @@ class MaintenanceScheduleTest extends TestCase
                     $message,
                 );
 
-                if ('report:generate:full' !== (string) $message) {
+                if ('app:decision:generate' !== (string) $message) {
                     continue;
                 }
 

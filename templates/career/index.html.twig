@@ -92,6 +92,14 @@
             <div class="mb-4">
                 {% for vacancy in latestVacancies %}
                     {% set company = vacancy.getCompany %}
+                    {% set deadline = vacancy.getEndDate %}
+                    {% set deadlineMeta %}
+                        {% if deadline is not null %}
+                            <span class="text-muted small">
+                                {{ 'Open until %date%'|trans({'%date%': deadline|date('j M Y')}) }}
+                            </span>
+                        {% endif %}
+                    {% endset %}
                     <div class="panel panel-surface {{ loop.first ? 'mt-0' : '' }}">
                         <div class="panel-body d-flex gap-3">
                             {% include 'partials/career/logo.html.twig' with {
@@ -99,31 +107,36 @@
                                 'name': company.getName,
                                 'class': 'career-logo-sm',
                             } only %}
-                            <div class="flex-grow-1 overflow-hidden">
-                                <h5 class="mb-0">
-                                    <a class="stretched-link" href="{{ path('career/vacancy', {
-                                        companySlug: company.getSlugName,
-                                        category: vacancy.getCategory.value,
-                                        vacancySlug: vacancy.getSlugName,
-                                    }) }}">{{ vacancy.getName|localise_text }}</a>
-                                </h5>
-                                <span class="d-block small text-body-secondary">
-                                    {{ company.getName }}
-                                    {% set location = vacancy.getLocation|localise_text %}
-                                    {% if location is not empty %}&middot; {{ location }}{% endif %}
-                                </span>
-                                <div class="d-flex flex-wrap gap-1 mt-2">
-                                    <span class="badge {{ vacancy.getCategory.badgeClass }}">{{ vacancy.getCategory.label|trans }}</span>
-                                    {% for label in vacancy.getLabels %}
-                                        <span class="badge badge-tag">{{ label.getName|localise_text }}</span>
-                                    {% endfor %}
+                            <div class="flex-grow-1 overflow-hidden d-flex flex-column flex-md-row justify-content-between gap-3">
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <h5 class="mb-0">
+                                        <a class="stretched-link" href="{{ path('career/vacancy', {
+                                            companySlug: company.getSlugName,
+                                            category: vacancy.getCategory.value,
+                                            vacancySlug: vacancy.getSlugName,
+                                        }) }}">{{ vacancy.getName|localise_text }}</a>
+                                    </h5>
+                                    <span class="d-block small text-body-secondary">
+                                        {{ company.getName }}
+                                        {% set location = vacancy.getLocation|localise_text %}
+                                        {% if location is not empty %}&middot; {{ location }}{% endif %}
+                                    </span>
+                                    <div class="d-flex flex-wrap gap-1 mt-2">
+                                        <span class="badge {{ vacancy.getCategory.badgeClass }}">{{ vacancy.getCategory.label|trans }}</span>
+                                        {% for label in vacancy.getLabels %}
+                                            <span class="badge badge-tag">{{ label.getName|localise_text }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% if deadline is not null %}
+                                        <div class="d-flex d-md-none flex-wrap align-items-center gap-2 mt-2">{{ deadlineMeta }}</div>
+                                    {% endif %}
                                 </div>
+                                {% if deadline is not null %}
+                                    <div class="d-none d-md-flex flex-column align-items-end text-end flex-shrink-0 gap-2">
+                                        {{ deadlineMeta }}
+                                    </div>
+                                {% endif %}
                             </div>
-                            {% if vacancy.getEndDate is not null %}
-                                <div class="flex-shrink-0 text-end small text-body-secondary">
-                                    {{ 'Open until %date%'|trans({'%date%': vacancy.getEndDate|date('j M Y')}) }}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                 {% else %}
