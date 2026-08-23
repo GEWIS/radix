@@ -12,6 +12,7 @@ use App\Form\Database\DeleteMemberType;
 use App\Form\Database\MemberEditType;
 use App\Form\Database\MemberListsType;
 use App\Form\SubmitButtons;
+use App\Security\User\SudoVoter;
 use App\Service\Database\Member as MemberService;
 use App\ViewModel\Database\MemberProfile;
 use App\ViewModel\Database\MemberSearchResult;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_map;
@@ -52,6 +54,7 @@ final class MemberController extends AbstractMemberController
      * The overview is a table the browser fills in while the secretary types, so the page itself is static and the two
      * searches below answer in JSON.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '',
         name: 'member_index',
@@ -74,6 +77,10 @@ final class MemberController extends AbstractMemberController
 
     /**
      * The members that can still be picked for a decision.
+     *
+     * No sudo here, nor on the search above it: the decision forms call these from pages that hold no grant of their
+     * own, and a secretary composing a decision would lose the member picker as soon as the grant ran out. Both
+     * already ask for a register role and answer with a search result rather than a record.
      */
     #[Route(
         path: '/searchFiltered',
@@ -88,6 +95,7 @@ final class MemberController extends AbstractMemberController
     /**
      * The members whose membership is about to run out or whose record is incomplete, and what to do about each.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/attention-needed',
         name: 'member_attention_index',
@@ -108,6 +116,7 @@ final class MemberController extends AbstractMemberController
      * button carries them out. The shortcuts on the attention overview link here with both already filled in, which
      * previews them without a submission of its own.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/bulk-renewal',
         name: 'member_bulk_renewal_index',
@@ -148,6 +157,7 @@ final class MemberController extends AbstractMemberController
         );
     }
 
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{lidnr}',
         name: 'member_show',
@@ -231,6 +241,7 @@ final class MemberController extends AbstractMemberController
         );
     }
 
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{lidnr}/edit',
         name: 'member_edit',
@@ -292,6 +303,7 @@ final class MemberController extends AbstractMemberController
      * The confirmation and the removal are one route, so the confirmation is a form: it is the form that carries the
      * token, which a bare POST on a page that is also reachable by GET could not.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{lidnr}/delete',
         name: 'member_delete',
@@ -359,6 +371,7 @@ final class MemberController extends AbstractMemberController
      * Whether a member receives the Supremum. The three answers -- yes, no, and "not stated" -- are three routes
      * rather than a value in the path, so that the member page can post to each of them directly.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{lidnr}/supremum',
         name: 'member_supremum_reset',
@@ -408,6 +421,7 @@ final class MemberController extends AbstractMemberController
     /**
      * The mailing lists one member is subscribed to.
      */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{lidnr}/edit/lists',
         name: 'member_lists_edit',

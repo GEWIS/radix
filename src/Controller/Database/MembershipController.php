@@ -7,15 +7,18 @@ namespace App\Controller\Database;
 use App\Form\Database\MemberExpirationType;
 use App\Form\Database\MembershipTypeType;
 use App\Form\SubmitButtons;
+use App\Security\User\SudoVoter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function Symfony\Component\Translation\t;
 
 /**
  * The membership of one member: which type they hold, and how long it still runs.
  */
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(
     path: '/members/{lidnr}/edit',
     requirements: ['lidnr' => '\d+'],
