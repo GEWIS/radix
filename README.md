@@ -122,18 +122,12 @@ During development, several other services are accessible on your local machine:
 - **Matomo** - Analytics platform at [`http://localhost:82/`](http://localhost:82/).
 
 ### Deployment
-There are two routes to production, running the same image (`abc.docker-registry.gewis.nl/web/radix/app`) and reading
-the same environment variables. What differs is where those variables come from and how migrations are ordered.
-
-- **Docker, through Portainer.** `compose.yaml` *is* the production stack; `compose.override.yaml` is what turns it
-  into the development one, and `docker compose up` in a checkout loads both. Portainer names `compose.yaml` on its
-  own, which is also what stops compose merging the development override. Every variable is guarded with
-  `${VAR:?...}`, so one that Portainer's stack environment is missing aborts the deploy rather than falling back to a
-  development default. The single `app` container runs the migrations on start.
-- **Kubernetes, with sealed secrets.** `k8s/`, applied with `kubectl apply -k`. Configuration is split by
-  sensitivity — a ConfigMap for what may be read, a SealedSecret for what may not — and migrations move to a Job that
-  runs before the rollout, because the replicas would otherwise race each other for them. See its
-  [README](k8s/README.md) for how to seal the secrets.
+Production runs the image `abc.docker-registry.gewis.nl/web/radix/app` through Docker, deployed with Portainer.
+`compose.yaml` *is* the production stack; `compose.override.yaml` is what turns it into the development one, and
+`docker compose up` in a checkout loads both. Portainer names `compose.yaml` on its own, which is also what stops
+compose merging the development override. Every variable is guarded with `${VAR:?...}`, so one that Portainer's stack
+environment is missing aborts the deploy rather than falling back to a development default. The single `app` container
+runs the migrations on start.
 
 Values that are the same on every deployment are in neither: they are `env(NAME): default` parameters in
 `config/services.yaml`, and changing one is a code change.

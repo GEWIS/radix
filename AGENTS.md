@@ -398,8 +398,7 @@ missing production variable, and `composer dump-env prod` would bake it into the
   read it, so the containers that have no dotenv chain of their own (the databases, pgadmin, Matomo, the Stripe CLI)
   are configured from the same file.
 - **`.env.test`** — the test suite, which does not read `.env.local` at all. CI loads the same file into the job.
-- **The orchestrator** — production. Portainer's stack environment for the Docker route (`compose.yaml`), the
-  ConfigMap and SealedSecret under `k8s/` for the other.
+- **The orchestrator** — production, which is Portainer's stack environment for `compose.yaml`.
 
 Hot reload covers almost everything in dev: FrankenPHP reloads the workers on source changes, and the dev entrypoint
 (`docker/web/docker-entrypoint.sh`) watches `assets/` to rebuild Sass and the asset map. You should very rarely need
