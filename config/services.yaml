@@ -118,9 +118,6 @@ services:
             $defaultMaxProposals: '%app.activity.default_max_proposals%' # int
             $googleCalendarId: '%env(string:DOCKER_GOOGLE_CALENDAR_KEY)%' # string
             $googleApiKey: '%env(string:DOCKER_GOOGLE_API_KEY)%' # string
-            # The public face of the register: the host mail links back to when there is no request to build a URL
-            # from.
-            $publicUrl: '%env(string:APP_URL)%' # string
             # Who the register writes as, and who it writes to. The secretary signs off on membership; the checker
             # results, the error reports and the subscription notices each land with whoever acts on them.
             $mailFromAddress: '%env(string:MAIL_FROM_ADDRESS)%' # string

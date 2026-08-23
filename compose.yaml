@@ -16,20 +16,18 @@ x-app-environment: &app_environment
     # `prod` there.
     APP_ENV: "${APP_ENV:-prod}"
     APP_SECRET: "${APP_SECRET:?APP_SECRET must be set}"
-    # Which proxies may be believed about the visitor. `private_ranges` covers a proxy on the same network, which is
-    # what a compose stack behind Portainer has; a deployment reached through one that is not needs its address here.
+    # Which proxies may be believed about the visitor. Production is reached through a proxy that terminates TLS and
+    # forwards to the port below, so `X-Forwarded-Proto` is the only thing saying the visitor is on HTTPS; believing
+    # the wrong sender of that header is how a redirect ends up on http://. `private_ranges` covers a proxy on the
+    # host itself, which is what the stack is deployed behind; one reached from anywhere else needs its address here.
     SYMFONY_TRUSTED_PROXIES: "${SYMFONY_TRUSTED_PROXIES:-private_ranges}"
     SERVER_NAME: "${SERVER_NAME:?SERVER_NAME must be set}, app:80"
     DEFAULT_URI: "${DEFAULT_URI:?DEFAULT_URI must be set}"
-    # The public face of the register: the host mail links back to when it cannot link into the request it was sent
-    # from.
-    APP_URL: "${APP_URL:?APP_URL must be set}"
     CORS_ALLOW_ORIGIN: "${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN must be set}"
     # Set to any non-empty value to serve the maintenance page to everyone, admins included, for work done before the
     # application can serve properly. App-level maintenance is set through the admin interface instead.
     MAINTENANCE: "${MAINTENANCE:-}"
     # The domain the mailing lists are created under on Mailman, which is what it reports back when asked for a list.
-    SERVER_HOSTNAME: "${SERVER_HOSTNAME:?SERVER_HOSTNAME must be set}"
 
     # The ledger, on PostgreSQL: the `default` connection. `role` is not a driver parameter —
     # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it, so the
@@ -158,6 +156,8 @@ services:
             - caddy_data:/data
             - caddy_config:/config
             - data:/app/data
+        # The proxy in front of the Docker host terminates TLS and forwards gewis.nl here; analytics.gewis.nl goes to
+        # Matomo on 9202. Nothing else is published, so the application is only ever reached through that proxy.
         ports:
             - target: 80
               published: 9200

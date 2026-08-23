@@ -43,6 +43,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_diff;
@@ -70,7 +71,7 @@ class Member
         private readonly RenewalService $renewalService,
         private readonly Security $security,
         private readonly EmailService $emailService,
-        private readonly string $publicUrl,
+        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Audit $auditService,
         private readonly string $mailToSubscriptionAddress,
         private readonly string $mailToSubscriptionName,
@@ -205,7 +206,11 @@ class Member
             'lidnr' => $member->getLidnr(),
             'restartUrl' => null === $paymentLink
                 ? null
-                : $this->publicUrl . '/checkout/restart/' . $paymentLink->getToken(),
+                : $this->urlGenerator->generate(
+                    'join_checkout_restart_short',
+                    ['token' => $paymentLink->getToken()],
+                    UrlGeneratorInterface::ABSOLUTE_URL,
+                ),
         ];
 
         $secretary = new Address(

@@ -12,6 +12,7 @@ use App\Repository\Decision\MemberRepository as ReportMemberRepository;
 use App\Service\Application\Email as EmailService;
 use DateInterval;
 use DateTime;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Throwable;
 
 /**
@@ -25,7 +26,7 @@ class Renewal
         private readonly MemberRepository $memberRepository,
         private readonly ReportMemberRepository $reportMemberRepository,
         private readonly EmailService $emailService,
-        private readonly string $publicUrl,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -74,7 +75,11 @@ class Renewal
                 'isInstalled' => $isInstalled,
                 'currentExpiration' => $link->getCurrentExpiration(),
                 'newExpiration' => $link->getNewExpiration(),
-                'url' => $this->publicUrl . '/renew/' . $link->getToken(),
+                'url' => $this->urlGenerator->generate(
+                    'join_renew_short',
+                    ['token' => $link->getToken()],
+                    UrlGeneratorInterface::ABSOLUTE_URL,
+                ),
             ],
             $this->emailService->secretary(),
             // The secretary keeps a copy of both renewal messages, as they did when every templated e-mail was
