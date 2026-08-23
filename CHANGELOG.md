@@ -1,25 +1,194 @@
 # Changelog
 
-radix is the merger of two applications, and this file is the merger of their release histories. The `Unreleased`
-section is radix; below it, the releases of GEWISWEB and of GEWISDB are kept apart, each under its own heading,
-because they were made by separate applications on separate schedules and reading them as one timeline would be a
-fiction.
+radix is the merger of two applications, and this file is the merger of their release histories. Its own releases come
+first; below them, the releases of GEWISWEB and of GEWISDB are kept apart, each under its own heading, because they
+were made by separate applications on separate schedules and reading them as one timeline would be a fiction.
 
-## Unreleased
+## radix
 
-* Merged GEWISWEB and GEWISDB into a single Symfony application, radix: the website and the decision and membership
-  database now share one codebase and one deployment.
+The releases of the merged application. Tags and links point at this repository.
+
+### [v5.0.0](https://github.com/GEWIS/radix/tree/v5.0.0) (2026-08-23)
+
+The first release of radix, and the largest either application has ever had. Both were rewritten from Laminas MVC onto
+Symfony, and then merged: the website and the register now share one codebase, one deployment and one kernel, and the
+twice-hourly synchronisation between them is gone. The number is 5.0.0 because GEWISWEB stood at 4.9.1 and GEWISDB at
+4.7.0, and neither of them is the one that continues here.
+
+Nothing was tagged on either side after those two versions, so this entry covers the whole of the rewrite as well as
+the merge. It is long because two applications' worth of rewriting arrives at once.
+
+#### The merger
+
+* Merged GEWISWEB and GEWISDB into a single Symfony application, radix: one `src/`, one `config/`, one `templates/`,
+  one `composer.json`.
 * Replaced the twice-hourly synchronisation between the two applications with two entity managers in one kernel: the
   ledger on PostgreSQL, and everything else — the website's own data and the projection of the ledger it renders — on
   MariaDB.
 * Retired the separate report database. The projection lives alongside the rest of the website's data and is
   regenerated from the ledger.
-* Moved the decision and membership database's interface under `/{_locale}/database`, giving it the website's
-  bilingual routing. The website's own URLs are unchanged.
+* Moved the register into the administration, answering under `/{_locale}/admin` with the rest of it, and grouped the
+  sidebar by subject rather than by application. A meeting used to be described twice — by its decisions in one place
+  and by its documents in the other — and a body likewise had its composition in one and its page in the other. Each
+  is one record now, with one owner. The website's own URLs are unchanged.
+* Gave the register two roles of its own, worked out from the board's own decisions rather than written down against
+  an account: `ROLE_DATABASE_ADMIN` for whoever is secretary right now, and `ROLE_DATABASE_READ_ONLY` for one who has
+  been relieved but whose year is not yet discharged, so the questions their report raises can still be asked. Neither
+  is granted before multi-factor authentication is enrolled.
+* Put the sign-up, checkout and renewal pages on the site's own navigation bar and footer, and gave them the language
+  in their address like every other page. `/join` still answers, and sends the visitor into whichever language they
+  are already reading.
 * Replaced the two legacy storage migrations with a single resumable command, `app:storage:migrate`, which moves every
   inherited file out of the flat content-addressed pool and into the `data/` layout: photos, company and organ images,
   course documents, the images embedded in custom pages, and the flat meeting documents. It journals each item as it
   commits, so an interrupted run continues where it stopped rather than starting over.
+
+#### The rewrite
+
+* Migrated both applications from Laminas MVC to Symfony 8.1. Laminas MVC could not be maintained sustainably after
+  the decline in upstream contributions.
+* Rebuilt the frontend on Bootstrap 5 with Symfony UX, Stimulus and Live Components. jQuery is gone, SCSS is compiled
+  with `dart-sass` and TypeScript with `swc`, and the website finally has a dark theme.
+* Serve the application from FrankenPHP rather than NGINX with PHP-FPM, alongside Mercure, RabbitMQ for messages and
+  scheduled tasks — `high_priority`, `normal_priority` and `bulk` workers, plus `default` and `gdpr` schedulers — and
+  Valkey for caching.
+* Upgraded to Doctrine ORM 3, and wrote seeders and fixtures that produce a register the checker passes.
+* Moved the translations to XLIFF.
+* Rebuilt authentication and account security on Symfony's security components: per-device remember-me tokens that are
+  signed and rotate, every active session listed under `/security` and terminable on its own, TOTP two-factor
+  authentication with single-use backup codes stored encrypted, and a sudo mode in front of anything sensitive. Board
+  members and administrators are stripped of their roles until they enrol.
+
+#### Review and approval
+
+* Replaced the legacy "unapproved" copies of activities, companies and vacancies with one immutable revision lifecycle
+  on `symfony/workflow`: draft, submitted, in review, changes requested, rejected, approved, closed. An approved
+  revision is live and is never edited; editing writes the next one.
+* Put a body's own page through the same workflow, and polls with it. A poll is never edited — a question members have
+  started answering cannot be rewritten underneath them — so asking again after a rejection writes a new revision that
+  carries the previous wording over, for the board to read side by side. Approving a question is also scheduling it,
+  so the closing date is filled in on the decision screen; taking a poll down early moves that date to today, and
+  nothing that was asked is thrown away.
+* Write to the office that reviews a revision when it is handed in: internal affairs for an activity, a poll or a
+  body's page, external affairs and C4 together for a company profile or a vacancy. Nothing is sent when the person
+  who handed it in holds the role that reviews it, which is what made the old website's version easy to ignore.
+
+#### Activities
+
+* Rebuilt the overview as a live component: search by name, filter by category, labels, organising body, open sign-up
+  and date range, loading more on scroll instead of paginating, with a year selector and a search that looks across
+  every association year at once.
+* Redesigned the listing around a stacked date badge, month dividers, and a sign-up deadline that always names the
+  next list still to close, so a deadline no longer disappears once an earlier list has closed.
+* Made a category mandatory on every activity, replacing the `isMyFuture` flag with a `career` category that the
+  MyFuture logo now follows.
+* Let an organiser drag sign-up questions, and the options of a choice question, into the order they want, and mark
+  one option as the default.
+* Rebuilt the option calendar so that nothing is written down per body. How many activities a body may propose is
+  worked out when it is asked for, so a body founded after a period was opened is no longer shut out of it by a row
+  nobody wrote. A period keeps its two windows apart — when proposals may be handed in, and which days they may fall
+  on — and limits are exceptions, either standing for a body or for one period.
+* Ask GEFLITST and the treasurer for a facility as soon as the box is ticked on a draft rather than when the activity
+  is submitted, because both have people and equipment to arrange and the board may take days to decide.
+* Let an activity abandoned with the board or already decided against lapse after three months, the way a draft lapses
+  after thirty days. An activity whose sign-up lists carry sign-ups is still never deleted.
+
+#### Photos
+
+* Rebuilt the photo module on namespaced file storage and a `libvips` image pipeline. Variants are pre-generated
+  asynchronously over Messenger and served with day-signed URLs and `X-Sendfile`. Glide is gone; the application
+  authorises every image itself.
+* Read EXIF metadata from uploads, and derive the album's date range from it.
+* Let a member hide the photos they are tagged in from their own photo page — none of them, the ones they pick, or all
+  of them — alongside their other privacy preferences.
+* Gave the album manage view a masonry grid, and album search a pass across every association year.
+
+#### Career
+
+* Rebuilt the public career pages: a companies overview with a featured spotlight, a company page with its open
+  positions and its upcoming activities in a sidebar, and a vacancies overview whose filters sync to the query string.
+* Replaced the free-form vacancy categories with a fixed set — jobs, internships, traineeships, student jobs and
+  thesis projects — each carrying its own labels and badge colour.
+* Gave the Career menu its own Companies entry, so a company stays reachable when it has no active vacancies.
+* Ask a company for two logos, one square-ish and one rectangular-ish, and fit each whole into the box where it
+  belongs, with a monogram fallback that lands in exactly the same box so lists line up either way.
+* Gave every company representative their own account and identity instead of one shared login. Invitations carry a
+  hashed split token valid for a week, an address can belong to only one representative, and administrators can
+  reissue or withdraw an invite, assign the primary contact, invalidate sessions, and suspend or remove an account.
+
+#### Education
+
+* Rebuilt the exam and summary archive. An uploaded document is rasterised once, into a JPEG per page, and downloads
+  are built from those pages: the old site rasterised on every single download, which is how it ran out of time and
+  memory on a long exam.
+* Restored both kinds of watermarking, now built off the request thread at around 50 ms per page.
+* Paginated the queue of documents waiting to become downloadable, and stopped naming a summary's author to a reader
+  who may not download it.
+
+#### Meetings, documents and the members area
+
+* Added the members area, and reworked meeting documents into a master document with versioned files, filed under
+  free-form numbered agenda points. Minutes are versioned the same way.
+* Moved recurring documents into an association-wide reference library that a meeting selects from, and gave meetings
+  a local time and place and an audit log of their own.
+
+#### Members, accounts and privacy
+
+* Redesigned the member profile into panels that adapt to who is looking: your own information and a link to your
+  security settings for you, the membership end date and keycode status for the board, and the public committee
+  history and photos for everyone else.
+* Turned the administration's full-red sidebar into a white surface on a soft grey page, opened its dropdowns to the
+  side rather than over the items beneath them, and made it stick to the top of the viewport the way the breadcrumbs
+  already did.
+* Added member settings for privacy and cosmetics.
+* Added self-service data export: a member asks for their data and is e-mailed a link when it is ready, with the
+  notification centre saying so as well.
+* Let external applications authenticate members, and give every one of them the `sub` claim whatever their signature
+  scheme, ahead of the deprecated `lidnr` claim being removed before the end of 2026.
+* Put the member records and the query tool behind sudo. A member's record carries their address, telephone number,
+  date of birth, student number and mailing list subscriptions, and the query tool reads the register directly; both
+  were reachable for as long as a session lasted.
+
+#### The register
+
+* Rebuilt the register's own screens: a paginated and filterable member list, the member record laid out as panels, an
+  overview and a readable detail page for registrations, a five-step registration flow, a dashboard built around what
+  needs someone, and a query console built around its editor. A decision reads as one text rather than a line per
+  subdecision.
+* Made annulment propagate. Annulling a decision reverts or removes each subdecision it made, so a body founded at a
+  board switch and later annulled no longer lingers in the projection because the entity behind it was never removed.
+* Fixed the replay where it walks into the parts of the ledger the old per-type generation never looked at. A decision
+  put right by turning the original into a textual one and taking it again is now replaced by what the register
+  actually says, and what it brought about is reverted first, so the organ member it discharged is a member again.
+* Gave the register's status one reader and one home. The admin sidebar's two badges ran a dozen queries on every page
+  of the administration to print two numbers; they are counted on their own now, cached for a minute, and what the
+  register needs doing is shown in the member notification centre to whoever may act on it.
+
+#### Notifications, announcements and the interface
+
+* Added a real-time layer over Mercure: one application-wide connection, a private per-session topic, a private
+  per-user topic and a public broadcast topic, with toasts rendered by cloning the existing markup so server flashes
+  keep working unchanged.
+* Added site-wide announcements and an application-level maintenance mode, so everyone currently online can be
+  reached.
+* Made the notification centre group on what a notification says and when it happened, rather than collapsing every
+  consecutive notification of one kind. Two sign-ins from different devices are two lines, and a line reaches back at
+  most a day from its newest notification.
+* Restored submenus on dropdowns, lost in the move from Bootstrap 3 to 5.
+* Paginated the overviews that listed everything they could find — polls, news, education and pending activities — and
+  gave the course and album overviews the infinite scroll the career, activity, body and news overviews already use.
+
+#### The API
+
+* Moved the API onto API Platform. Almost every endpoint is a resource in `src/ApiResource` fed by a state provider in
+  `src/State`; the legacy endpoints are byte-identical, with the member payload's key order and wire names frozen on
+  the DTO.
+* Versioned the contract. New endpoints ask for version 5.0.0, named either in the `Accept` header or in
+  `X-Api-Version`.
+* An unknown `/api` path finally answers the `error-router-no-match` that `openapi.yaml` has always documented and
+  that the catch-all was swallowing.
+* Gave `GET /api/members` a deterministic order. It carries a limit of 32 and had no `ORDER BY`, so it returned an
+  arbitrary 32 of the eligible members, and a different arbitrary 32 on the next call.
 
 ---
 

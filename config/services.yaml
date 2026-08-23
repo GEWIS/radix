@@ -52,27 +52,28 @@ parameters:
     # Written into every watermarked download as machine-readable text, so a copy found on an external platform can be
     # recognised as ours. Deliberately not a secret: it is meant to be found.
     env(WATERMARK_TAG): 'GEWIS-EDU'
-    # The names that travel with the addresses below. They read the same on every deployment, so they are defaults
-    # here rather than variables an operator has to remember to set; the addresses themselves are not, and have none.
+    # The names that travel with the addresses below. Defaulted here so a run outside the stack — a test, a container
+    # compiled for static analysis — has one, and passed as variables in compose.yaml like the addresses themselves,
+    # so a deployment that wants to sign its mail differently can say so without a code change.
     env(MAIL_FROM_NAME): 'Study Association GEWIS'
-    env(MAIL_REPLY_TO_SECRETARY_NAME): 'Secretary of GEWIS'
-    env(MAIL_TO_CHECKER_RESULT_NAME): 'Secretary of GEWIS'
+    env(MAIL_REPLY_TO_SECRETARY_NAME): 'Secretary'
+    env(MAIL_TO_CHECKER_RESULT_NAME): 'Secretary'
     env(MAIL_TO_REPORT_ERROR_NAME): 'Database Wizards'
-    env(MAIL_TO_SUBSCRIPTION_NAME): 'Secretary of GEWIS'
-    # The officers and bodies the website writes to when something is put in front of them. Who reviews what follows
-    # from the association's own division of labour rather than from anything in here.
-    env(MAIL_TO_INTERNAL_AFFAIRS_NAME): 'Officer of Internal Affairs'
-    env(MAIL_TO_EXTERNAL_AFFAIRS_NAME): 'Officer of External Affairs'
+    env(MAIL_TO_SUBSCRIPTION_NAME): 'Secretary'
+    env(MAIL_TO_INTERNAL_AFFAIRS_NAME): 'Internal Affairs Officer'
+    env(MAIL_TO_EXTERNAL_AFFAIRS_NAME): 'External Affairs Officer'
     env(MAIL_TO_C4_NAME): 'C4'
     env(MAIL_TO_GEFLITST_NAME): 'GEFLITST'
     env(MAIL_TO_GEFLITST_PLANKA_NAME): 'GEFLITST (Planka)'
-    env(MAIL_TO_TREASURER_NAME): 'Treasurer of GEWIS'
+    env(MAIL_TO_TREASURER_NAME): 'Treasurer'
     # Stripe sends a `Stripe-Notice` header when the pinned version is behind, and the SDK re-raises it as a PHP
-    # warning, which the dev error handler turns into an exception. It moves when the installed SDK moves, which makes
-    # it a property of this checkout rather than of a deployment. The SDK is built for 2026-06-24.dahlia; both are the
+    # warning, which the dev error handler turns into an exception. It moves when the installed SDK moves, so the
+    # default below follows this checkout; a deployment that has to pin elsewhere — testing a newer version against
+    # the live account before the SDK catches up — overrides it. The SDK is built for 2026-06-24.dahlia; both are the
     # same major, within which Stripe only adds.
     env(STRIPE_API_VERSION): '2026-07-29.dahlia'
-    # Mailman speaks one REST version. The endpoint differs per deployment; the version does not.
+    # Which REST version Mailman is spoken to on. It follows the Mailman a deployment points at, so it is a variable
+    # like the endpoint and the credentials; 3.1 is what the versions we run answer on.
     env(MAILMAN_API_VERSION): '3.1'
     # The Supremum's API, which the infimum on the front page and in the footer is drawn from. Without a key the
     # request is refused and the panel keeps whatever it last had, so an empty key is a working deployment rather than
@@ -85,8 +86,8 @@ parameters:
     # The association's own agenda, which the option calendar draws behind the days bodies ask for. Defaulted so a
     # machine without a key runs perfectly well with that layer simply absent; production requires both for real
     # (see compose.yaml).
-    env(DOCKER_GOOGLE_API_KEY): 'unknown'
-    env(DOCKER_GOOGLE_CALENDAR_KEY): 'unknown'
+    env(GOOGLE_API_KEY): 'unknown'
+    env(GOOGLE_CALENDAR_KEY): 'unknown'
     # How many activities a body may put forward in one option period when nobody has said otherwise. The board can
     # set a different number for a single period, and a standing or one-off exception for a single body; this is what
     # answers when none of those apply, which is the usual case. No row is ever written per body, so a body founded
@@ -116,8 +117,8 @@ services:
             $watermarkFontPath: '%app.education.watermark_font%' # string
             $siteUrl: '%env(string:DEFAULT_URI)%' # string
             $defaultMaxProposals: '%app.activity.default_max_proposals%' # int
-            $googleCalendarId: '%env(string:DOCKER_GOOGLE_CALENDAR_KEY)%' # string
-            $googleApiKey: '%env(string:DOCKER_GOOGLE_API_KEY)%' # string
+            $googleCalendarId: '%env(string:GOOGLE_CALENDAR_KEY)%' # string
+            $googleApiKey: '%env(string:GOOGLE_API_KEY)%' # string
             # Who the register writes as, and who it writes to. The secretary signs off on membership; the checker
             # results, the error reports and the subscription notices each land with whoever acts on them.
             $mailFromAddress: '%env(string:MAIL_FROM_ADDRESS)%' # string

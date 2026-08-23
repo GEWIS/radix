@@ -21,6 +21,7 @@ use App\Service\Activity\ProposalLimitResolver;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,6 +60,7 @@ class AdminActivityCalendarController extends AbstractController
         private readonly ProposalLimitResolver $limitResolver,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
+        #[Target('activityProposalStateMachine')]
         private readonly WorkflowInterface $activityProposalStateMachine,
     ) {
     }

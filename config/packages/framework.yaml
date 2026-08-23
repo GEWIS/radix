@@ -37,7 +37,7 @@ framework:
             google_calendar.client:
                 base_uri: 'https://www.googleapis.com/calendar/v3/'
                 query:
-                    key: '%env(DOCKER_GOOGLE_API_KEY)%'
+                    key: '%env(GOOGLE_API_KEY)%'
                 timeout: 5
                 max_duration: 15
 

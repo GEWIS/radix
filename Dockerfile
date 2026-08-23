@@ -139,7 +139,13 @@ RUN <<-EOF
     mkdir -p var/cache var/log var/share
     composer dump-autoload --classmap-authoritative --no-dev
     composer dump-env prod
-    composer run-script --no-dev post-install-cmd
+    # `post-install-cmd` is inlined rather than run: the `cache:clear` in its `auto-scripts` runs the optional cache
+    # warmers, and Doctrine's instantiates both entity managers, which resolves DATABASE_DSN, WEB_DATABASE_DSN and
+    # VALKEY_DSN against a build that has none of those services. The entrypoint warms them at startup instead, where
+    # the variables do exist.
+    php bin/console cache:clear --no-optional-warmers
+    php bin/console assets:install public
+    composer run-script --no-dev assets:update
     php bin/console sass:build
     php bin/console importmap:install
     php bin/console asset-map:compile
@@ -219,6 +225,12 @@ EOF
 COPY --link --exclude=var --from=radix_app_builder /app /app
 COPY --chown=www-data:0 --from=radix_app_builder /app/var /app/var
 RUN chmod g=u /app/var
+
+# `data/` is excluded by .dockerignore, so nothing above creates this path. Docker would then create the mountpoint
+# for the `data` volume itself, as root, and the application could not write the uploads, the private files served
+# through X-Accel or the Halite key. Creating it here means a volume seeded from this image is writable; an existing
+# one keeps whatever ownership it already has.
+RUN mkdir -p /app/data && chown www-data:0 /app/data && chmod g=u /app/data
 
 COPY --link --chmod=755 docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 

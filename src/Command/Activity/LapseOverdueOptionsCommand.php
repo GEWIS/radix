@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Workflow\WorkflowInterface;
 
@@ -60,6 +61,7 @@ final class LapseOverdueOptionsCommand extends Command
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
         private readonly OptionBudgetSchedule $schedule,
+        #[Target('activityProposalStateMachine')]
         private readonly WorkflowInterface $activityProposalStateMachine,
     ) {
         parent::__construct();

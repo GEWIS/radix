@@ -129,8 +129,10 @@ compose merging the development override. Every variable is guarded with `${VAR:
 environment is missing aborts the deploy rather than falling back to a development default. The single `app` container
 runs the migrations on start.
 
-Values that are the same on every deployment are in neither: they are `env(NAME): default` parameters in
-`config/services.yaml`, and changing one is a code change.
+Values that rarely differ between deployments are passed the same way, but with a default instead of a guard: the mail
+display names, the pinned Stripe and Mailman API versions, the watermark tag, the TU/e subnets. `config/services.yaml`
+defaults each of them as well, which is what a run outside the stack falls back to, so setting one in the stack
+environment is all it takes to change it.
 
 ### Contributing
 We welcome contributions from the community, especially GEWIS members! To contribute:

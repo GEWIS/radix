@@ -15,6 +15,7 @@ use App\Repository\Activity\OptionPeriodRepository;
 use App\Service\Activity\ActivityProposalManager;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +51,7 @@ class AdminProposalDecisionController extends AbstractController
         private readonly ActivityProposalRepository $activityProposalRepository,
         private readonly OptionPeriodRepository $optionPeriodRepository,
         private readonly TranslatorInterface $translator,
+        #[Target('activityProposalStateMachine')]
         private readonly WorkflowInterface $activityProposalStateMachine,
     ) {
     }

@@ -53,6 +53,13 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		wait_for_database web
 	fi
 
+	# The image is built with `cache:clear --no-optional-warmers` (see Dockerfile): the optional warmers instantiate
+	# both entity managers and the cache pools, none of which the build has the environment for. It does exist here,
+	# so the caches are built once at startup rather than by whichever request happens to need them first.
+	if [ "$APP_ENV" = "prod" ]; then
+		php bin/console cache:warmup
+	fi
+
 	# `app` is the single container that migrates. SKIP_MIGRATIONS is left as a way to start one that does not, for
 	# an operator who needs the application up while the schema is being dealt with by hand; nothing sets it.
 	if [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then

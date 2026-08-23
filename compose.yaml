@@ -8,9 +8,11 @@
 # adds the build definitions, the databases, the administration tools and the published ports, and it supplies the
 # values these guards ask for from `.env.local`. Naming this file with `-f`, as Portainer does, suppresses that file.
 #
-# Values that are the same on every deployment are not variables at all: they are `env(NAME): default` parameters in
-# config/services.yaml — the mail display names, the pinned Stripe and Mailman API versions, the watermark tag, the
-# TU/e subnets.
+# Everything the application reads is passed below, including what rarely changes: the mail display names, the pinned
+# Stripe and Mailman API versions, the watermark tag and the TU/e subnets are variables like the rest, because rarely
+# is not never. Those carry a default here rather than a `${VAR:?...}` guard, since a deployment that says nothing
+# about them should still come up. `config/services.yaml` defaults them again, which is what a run outside this stack
+# falls back to — a test, or a container compiled for static analysis — so the two are kept in step.
 x-app-environment: &app_environment
     # Overridden to `dev` by compose.override.yaml. A Portainer stack has no `.env` to read, so this resolves to
     # `prod` there.
@@ -60,9 +62,9 @@ x-app-environment: &app_environment
     # fails loudly rather than signing with an empty key set.
     EXTERNAL_APP_JWKSET: "${EXTERNAL_APP_JWKSET:?EXTERNAL_APP_JWKSET must be set}"
 
-
     # Mailing lists (App\Service\Database\MailmanService, App\Service\Database\ListmonkService).
     MAILMAN_API_ENDPOINT: "${MAILMAN_API_ENDPOINT:?MAILMAN_API_ENDPOINT must be set}"
+    MAILMAN_API_VERSION: "${MAILMAN_API_VERSION:-3.1}"
     MAILMAN_API_USERNAME: "${MAILMAN_API_USERNAME:?MAILMAN_API_USERNAME must be set}"
     MAILMAN_API_PASSWORD: "${MAILMAN_API_PASSWORD:?MAILMAN_API_PASSWORD must be set}"
     LISTMONK_API_ENDPOINT: "${LISTMONK_API_ENDPOINT:?LISTMONK_API_ENDPOINT must be set}"
@@ -72,6 +74,9 @@ x-app-environment: &app_environment
     # Stripe, which settles the membership fee during sign-up. The secret key must be a restricted key; see
     # .env.local.dist for the permissions it needs. Development ships placeholders rather than leaving these empty, so
     # that a checkout without a Stripe account still satisfies the guards.
+    # Pinned because Stripe announces a mismatch through a header the SDK re-raises as a PHP warning. The default
+    # follows the installed SDK; override it to put a deployment on a different version of the API.
+    STRIPE_API_VERSION: "${STRIPE_API_VERSION:-2026-07-29.dahlia}"
     STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY:?STRIPE_SECRET_KEY must be set}"
     STRIPE_WEBHOOK_SIGNING_KEY: "${STRIPE_WEBHOOK_SIGNING_KEY:?STRIPE_WEBHOOK_SIGNING_KEY must be set}"
     STRIPE_MEMBERSHIP_PRICE_ID: "${STRIPE_MEMBERSHIP_PRICE_ID:?STRIPE_MEMBERSHIP_PRICE_ID must be set}"
@@ -85,27 +90,45 @@ x-app-environment: &app_environment
 
     MATOMO_DOMAIN: "${MATOMO_DOMAIN:?MATOMO_DOMAIN must be set}"
     # The association's own agenda, drawn behind the days bodies ask for in the option calendar. Both fall back to
-    # `unknown` in config/services.yaml, which runs with that layer simply absent.
-    DOCKER_GOOGLE_API_KEY: "${DOCKER_GOOGLE_API_KEY:-unknown}"
-    DOCKER_GOOGLE_CALENDAR_KEY: "${DOCKER_GOOGLE_CALENDAR_KEY:-unknown}"
+    # `unknown`, which runs with that layer simply absent.
+    GOOGLE_API_KEY: "${GOOGLE_API_KEY:-unknown}"
+    GOOGLE_CALENDAR_KEY: "${GOOGLE_CALENDAR_KEY:-unknown}"
     # The Supremum's API, which the infimum is drawn from. Without a key the request is refused and the panel keeps
-    # whatever it last had, so this is optional.
+    # whatever it last had, so the key is optional.
+    SUPREMUM_API_HOST: "${SUPREMUM_API_HOST:-https://supremum.gewis.nl}"
     SUPREMUM_API_KEY: "${SUPREMUM_API_KEY:-}"
 
-    # Who the register writes as, and who it writes to. The display names that go with these are defaulted in
-    # config/services.yaml and are not repeated here.
+    # Course material. The subnets are the arrangement under which the department shares its exams — on campus, or
+    # signed in as a member — and the tag is written into every watermarked download so a copy found elsewhere can be
+    # recognised as ours. Deliberately not a secret: it is meant to be found.
+    TUE_IP_RANGES: "${TUE_IP_RANGES:-131.155.0.0/16,100.64.0.0/10}"
+    WATERMARK_TAG: "${WATERMARK_TAG:-GEWIS-EDU}"
+
+    # Who the application writes as, and who it writes to. An address has to be named by the deployment; the display
+    # name beside it is defaulted, because a deployment that says nothing should still sign its mail readably.
     MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:?MAIL_FROM_ADDRESS must be set}"
+    MAIL_FROM_NAME: "${MAIL_FROM_NAME:-Study Association GEWIS}"
     MAIL_REPLY_TO_SECRETARY_ADDRESS: "${MAIL_REPLY_TO_SECRETARY_ADDRESS:?MAIL_REPLY_TO_SECRETARY_ADDRESS must be set}"
+    MAIL_REPLY_TO_SECRETARY_NAME: "${MAIL_REPLY_TO_SECRETARY_NAME:-Secretary of GEWIS}"
     MAIL_TO_CHECKER_RESULT_ADDRESS: "${MAIL_TO_CHECKER_RESULT_ADDRESS:?MAIL_TO_CHECKER_RESULT_ADDRESS must be set}"
+    MAIL_TO_CHECKER_RESULT_NAME: "${MAIL_TO_CHECKER_RESULT_NAME:-Secretary of GEWIS}"
     MAIL_TO_REPORT_ERROR_ADDRESS: "${MAIL_TO_REPORT_ERROR_ADDRESS:?MAIL_TO_REPORT_ERROR_ADDRESS must be set}"
+    MAIL_TO_REPORT_ERROR_NAME: "${MAIL_TO_REPORT_ERROR_NAME:-Database Wizards}"
     MAIL_TO_SUBSCRIPTION_ADDRESS: "${MAIL_TO_SUBSCRIPTION_ADDRESS:?MAIL_TO_SUBSCRIPTION_ADDRESS must be set}"
+    MAIL_TO_SUBSCRIPTION_NAME: "${MAIL_TO_SUBSCRIPTION_NAME:-Secretary of GEWIS}"
     MAIL_TO_INTERNAL_AFFAIRS_ADDRESS: "${MAIL_TO_INTERNAL_AFFAIRS_ADDRESS:?MAIL_TO_INTERNAL_AFFAIRS_ADDRESS must be set}"
+    MAIL_TO_INTERNAL_AFFAIRS_NAME: "${MAIL_TO_INTERNAL_AFFAIRS_NAME:-Officer of Internal Affairs}"
     MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS: "${MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS:?MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS must be set}"
+    MAIL_TO_EXTERNAL_AFFAIRS_NAME: "${MAIL_TO_EXTERNAL_AFFAIRS_NAME:-Officer of External Affairs}"
     MAIL_TO_C4_ADDRESS: "${MAIL_TO_C4_ADDRESS:?MAIL_TO_C4_ADDRESS must be set}"
+    MAIL_TO_C4_NAME: "${MAIL_TO_C4_NAME:-C4}"
     MAIL_TO_GEFLITST_ADDRESS: "${MAIL_TO_GEFLITST_ADDRESS:?MAIL_TO_GEFLITST_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_NAME: "${MAIL_TO_GEFLITST_NAME:-GEFLITST}"
     MAIL_TO_GEFLITST_PLANKA_ADDRESS: "${MAIL_TO_GEFLITST_PLANKA_ADDRESS:?MAIL_TO_GEFLITST_PLANKA_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_PLANKA_NAME: "${MAIL_TO_GEFLITST_PLANKA_NAME:-GEFLITST (Planka)}"
     MAIL_TO_GEFLITST_PLANKA_KEY: "${MAIL_TO_GEFLITST_PLANKA_KEY:?MAIL_TO_GEFLITST_PLANKA_KEY must be set}"
     MAIL_TO_TREASURER_ADDRESS: "${MAIL_TO_TREASURER_ADDRESS:?MAIL_TO_TREASURER_ADDRESS must be set}"
+    MAIL_TO_TREASURER_NAME: "${MAIL_TO_TREASURER_NAME:-Treasurer of GEWIS}"
 
 x-app: &app
     image: "abc.docker-registry.gewis.nl/web/radix/app:${RADIX_VERSION:-latest}"
@@ -157,10 +180,10 @@ services:
             - caddy_config:/config
             - data:/app/data
         # The proxy in front of the Docker host terminates TLS and forwards gewis.nl here; analytics.gewis.nl goes to
-        # Matomo on 9202. Nothing else is published, so the application is only ever reached through that proxy.
+        # Matomo on 9212. Nothing else is published, so the application is only ever reached through that proxy.
         ports:
             - target: 80
-              published: 9200
+              published: 9210
               protocol: tcp
     messenger-high-priority:
         <<: *worker
@@ -208,7 +231,7 @@ services:
             - radix_network
         ports:
             - target: 80
-              published: 9202
+              published: 9212
               protocol: tcp
     # The application always talks SMTP to this name. Here it hands the message to the real relay; development
     # replaces this with a Mailpit that catches everything instead.

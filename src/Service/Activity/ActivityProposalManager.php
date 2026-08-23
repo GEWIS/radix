@@ -17,6 +17,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 use function sprintf;
@@ -45,6 +46,7 @@ final readonly class ActivityProposalManager
         private EntityManagerInterface $entityManager,
         private ProposalLimitResolver $limitResolver,
         private NotificationPublisher $publisher,
+        #[Target('activityProposalStateMachine')]
         private WorkflowInterface $activityProposalStateMachine,
     ) {
     }

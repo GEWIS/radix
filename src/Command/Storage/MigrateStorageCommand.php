@@ -716,6 +716,13 @@ final class MigrateStorageCommand extends Command
         $processed = 0;
 
         foreach ($this->migratableRows() as $row) {
+            // Read-only pass: periodically detach managed entities so memory stays flat over a large photo set.
+            // Counted over every row the generator yields rather than only the ones that do work, because a resumed
+            // run settles almost all of them and a counter below the skip would never be reached at all.
+            if (0 === ++$processed % self::CLEAR_EVERY) {
+                $this->entityManager->clear();
+            }
+
             $source = $this->legacyRoot() . '/' . $row['legacy'];
             $destination = $this->newRoot() . '/' . $row['new'];
 
@@ -764,19 +771,14 @@ final class MigrateStorageCommand extends Command
                 );
             }
 
-            if (count($sample) < self::SAMPLE_SIZE) {
-                $sample[] = [
-                    $row['legacy'],
-                    $row['new'],
-                ];
-            }
-
-            // Read-only pass: periodically detach managed entities so memory stays flat over a large photo set.
-            if (0 !== ++$processed % self::CLEAR_EVERY) {
+            if (count($sample) >= self::SAMPLE_SIZE) {
                 continue;
             }
 
-            $this->entityManager->clear();
+            $sample[] = [
+                $row['legacy'],
+                $row['new'],
+            ];
         }
 
         $this->entityManager->clear();
@@ -824,8 +826,20 @@ final class MigrateStorageCommand extends Command
             ? null
             : $this->newLogFile();
         $processed = 0;
+        $scanned = 0;
 
         foreach ($this->migratableRows() as $row) {
+            // The batch counter below only advances on rows that are actually rewritten, so a resumed run — which
+            // settles almost every row at the skip below — would never reach its clear. Count the scan separately.
+            // Never while a batch is in flight: those entities carry changes that have not been flushed yet, and
+            // clearing would drop them.
+            if (
+                0 === ++$scanned % self::CLEAR_EVERY
+                && [] === $batchItems
+            ) {
+                $this->entityManager->clear();
+            }
+
             $item = $this->itemKey(
                 'paths',
                 $row['key'],
