@@ -4,7 +4,8 @@ name: Check migrations and seed
 #  - applies the migrations + seed from the base branch up to the head branch (and back down again), and
 #  - verifies every entity change has a matching migration committed (i.e. no schema drift).
 # Nothing else the application talks to — the broker, the mail catcher, the analytics, the sync-based mail and list
-# services — is needed to exercise migrations or fixtures, so only the app + database containers are started.
+# services — is needed to exercise migrations or fixtures, so only the app, the databases, and the cache the ORM's
+# second level reads and writes through are started.
 on:
   pull_request:
     types:
@@ -23,8 +24,10 @@ concurrency:
 env:
   # Shared compose file set for the docker compose invocations below. `.env.local` is passed the way the Makefile
   # passes it: `.env` holds almost nothing, so the values compose.yaml's guards ask for come from that file, which the
-  # "Prepare the local environment file" step below creates.
-  COMPOSE_FILES: --env-file .env --env-file .env.local --file compose.github.yaml --file compose.override.yaml --file compose.yaml
+  # "Prepare the local environment file" step below creates. The order is the one compose itself loads them in --
+  # production, then the development layer over it, then this one -- because the last file wins: named the other way
+  # round, compose.yaml puts the production volume back over `/app/data` and the application starts without its keys.
+  COMPOSE_FILES: --env-file .env --env-file .env.local --file compose.yaml --file compose.override.yaml --file compose.github.yaml
   # One set per database, each naming its own connection. Mirrors the Makefile.
   DEFAULT_MIGRATIONS: --configuration=config/packages/migrations/default.yaml
   WEB_MIGRATIONS: --configuration=config/packages/migrations/web.yaml
@@ -55,23 +58,35 @@ jobs:
       - name: setup docker buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
-      # --no-deps keeps this lightweight: only the app + the two databases start, not everything else it depends on.
+      # --no-deps keeps this lightweight: only what the console needs starts, not everything else it depends on.
       - name: run base
-        run: docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb
-
-      - name: wait for databases (base)
+        # Both are what `make up` does for a developer: `var/` is not committed and a missing bind-mount source is
+        # created as root, and the entrypoint installs `vendor/` into the checkout as a container user that is uid
+        # 1000 unless told otherwise. Through `env` because bash makes `UID` readonly.
         run: |
-          for i in $(seq 1 30); do
-            if docker compose $COMPOSE_FILES exec -T postgresql pg_isready -h 127.0.0.1 -p 5432 -q \
-              && docker compose $COMPOSE_FILES exec -T mariadb healthcheck.sh --connect --innodb_initialized; then
-              echo "Both databases are accepting connections."
+          mkdir -p var
+          env UID="$(id -u)" GID="$(id -g)" docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb valkey
+
+      # The entrypoint installs `vendor/`, waits for both databases and migrates before printing this marker, and
+      # `up -d` returns long before it does; exec'ing in between is what failed the next step on "Dependencies are
+      # missing". Ten minutes because a cold runner installs without a composer cache.
+      - name: wait for the app (base)
+        run: |
+          for i in $(seq 1 120); do
+            if docker compose $COMPOSE_FILES logs app 2>/dev/null | grep -q 'PHP app ready!'; then
+              echo "The application has finished starting."
               exit 0
             fi
-            echo "Waiting for the databases to accept connections... ($i/30)"
-            sleep 2
+            if [ -z "$(docker compose $COMPOSE_FILES ps --quiet --status running app)" ]; then
+              echo "::error::The app container stopped before it finished starting"
+              docker compose $COMPOSE_FILES logs app
+              exit 1
+            fi
+            echo "Waiting for the application to finish starting... ($i/120)"
+            sleep 5
           done
-          echo "::error::The databases did not become ready in time"
-          docker compose $COMPOSE_FILES logs postgresql mariadb
+          echo "::error::The application did not become ready in time"
+          docker compose $COMPOSE_FILES logs app
           exit 1
 
       - name: migrate base
@@ -104,21 +119,33 @@ jobs:
         run: make setuplocalenv
 
       - name: run head
-        run: docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb
-
-      - name: wait for databases (head)
+        # Both are what `make up` does for a developer: `var/` is not committed and a missing bind-mount source is
+        # created as root, and the entrypoint installs `vendor/` into the checkout as a container user that is uid
+        # 1000 unless told otherwise. Through `env` because bash makes `UID` readonly.
         run: |
-          for i in $(seq 1 30); do
-            if docker compose $COMPOSE_FILES exec -T postgresql pg_isready -h 127.0.0.1 -p 5432 -q \
-              && docker compose $COMPOSE_FILES exec -T mariadb healthcheck.sh --connect --innodb_initialized; then
-              echo "Both databases are accepting connections."
+          mkdir -p var
+          env UID="$(id -u)" GID="$(id -g)" docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb valkey
+
+      # The entrypoint installs `vendor/`, waits for both databases and migrates before printing this marker, and
+      # `up -d` returns long before it does; exec'ing in between is what failed the next step on "Dependencies are
+      # missing". Ten minutes because a cold runner installs without a composer cache.
+      - name: wait for the app (head)
+        run: |
+          for i in $(seq 1 120); do
+            if docker compose $COMPOSE_FILES logs app 2>/dev/null | grep -q 'PHP app ready!'; then
+              echo "The application has finished starting."
               exit 0
             fi
-            echo "Waiting for the databases to accept connections... ($i/30)"
-            sleep 2
+            if [ -z "$(docker compose $COMPOSE_FILES ps --quiet --status running app)" ]; then
+              echo "::error::The app container stopped before it finished starting"
+              docker compose $COMPOSE_FILES logs app
+              exit 1
+            fi
+            echo "Waiting for the application to finish starting... ($i/120)"
+            sleep 5
           done
-          echo "::error::The databases did not become ready in time"
-          docker compose $COMPOSE_FILES logs postgresql mariadb
+          echo "::error::The application did not become ready in time"
+          docker compose $COMPOSE_FILES logs app
           exit 1
 
       - name: migrate head
@@ -132,6 +159,11 @@ jobs:
           if git status --porcelain | grep -q 'migrations/'; then
             echo "::error::Entity changes detected without a matching migration. Run 'make migration-diff' locally and commit the generated migration(s)."
             git status --porcelain | grep 'migrations/'
+            git status --porcelain | grep 'migrations/' | awk '{ print $2 }' | while read -r migration; do
+              echo "::group::$migration"
+              cat "$migration"
+              echo "::endgroup::"
+            done
             exit 1
           fi
           echo "All migrations are up to date."
