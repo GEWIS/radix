@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Report;
+namespace App\Command\Decision;
 
 use App\Service\Report\ApiService;
 use App\Service\Report\MeetingService;
@@ -19,10 +19,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(
-    name: 'report:generate:full',
+    name: 'app:decision:generate',
     description: 'Rebuild the projection from scratch by replaying the whole ledger.',
 )]
-class GenerateFullCommand extends Command
+class GenerateCommand extends Command
 {
     /**
      * How long the API is kept from syncing while the projection is being rebuilt.

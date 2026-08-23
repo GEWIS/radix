@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Command\Report;
+namespace App\Tests\Integration\Command\Decision;
 
-use App\Command\Report\GenerateFullCommand;
+use App\Command\Decision\GenerateCommand;
 use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Decision\Address;
 use App\Entity\Decision\BoardMember;
@@ -31,13 +31,13 @@ use function array_keys;
 use function sprintf;
 
 /**
- * `report:generate:full` rebuilds the projection by replaying the ledger, and is what repairs it when it has
+ * `app:decision:generate` rebuilds the projection by replaying the ledger, and is what repairs it when it has
  * drifted. Two things have to hold for that to be a repair rather than a second kind of drift: replaying must not
  * change a projection that is already correct, and a projection rebuilt from nothing must come out the same as the
  * one the listeners wrote as the ledger was written.
  */
-#[CoversClass(GenerateFullCommand::class)]
-class GenerateFullCommandTest extends KernelTestCase
+#[CoversClass(GenerateCommand::class)]
+class GenerateCommandTest extends KernelTestCase
 {
     /**
      * What the replay owns. The web connection carries the whole site besides, and the decision entities that are
@@ -145,7 +145,7 @@ class GenerateFullCommandTest extends KernelTestCase
         $kernel = self::$kernel;
         self::assertNotNull($kernel);
 
-        $tester = new CommandTester(new Application($kernel)->find('report:generate:full'));
+        $tester = new CommandTester(new Application($kernel)->find('app:decision:generate'));
 
         self::assertSame(
             0,

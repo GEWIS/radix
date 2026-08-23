@@ -112,7 +112,7 @@ jobs:
                     bin/console doctrine:schema:create --em=default
                     bin/console doctrine:schema:create --em=web
                     bin/console app:fixtures:load --no-interaction
-                    bin/console report:generate:full
+                    bin/console app:decision:generate
 
             -   name: Cache the built front-end assets
                 id: assets-cache

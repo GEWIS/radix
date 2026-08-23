@@ -24,7 +24,7 @@ use function sprintf;
  * Seeds both databases in the order they depend on one another, with the projection rebuilt in between:
  *
  *   1. the ledger, which is where the members, the meetings and the decisions about them are written;
- *   2. `report:generate:full`, which replays that into the decision projection the website reads -- the members,
+ *   2. `app:decision:generate`, which replays that into the decision projection the website reads -- the members,
  *      their addresses and list memberships, and the organs, organ members, board members and keyholders the
  *      decisions imply;
  *   3. the web database, whose fixtures hang activities, photos, accounts and the rest off what step 2 produced.
@@ -105,10 +105,10 @@ final class LoadFixturesCommand extends Command
         SymfonyStyle $ui,
         OutputInterface $output,
     ): ?int {
-        $generate = $this->getApplication()?->find('report:generate:full');
+        $generate = $this->getApplication()?->find('app:decision:generate');
 
         if (null === $generate) {
-            $ui->error('The projection cannot be rebuilt: report:generate:full is not registered.');
+            $ui->error('The projection cannot be rebuilt: app:decision:generate is not registered.');
 
             return Command::FAILURE;
         }

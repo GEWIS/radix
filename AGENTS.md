@@ -28,7 +28,7 @@ Two connections, and the distinction governs anything that touches data:
 
 The projection is not a cache you may bypass, and it is not a copy you may let drift. `App\Service\Report` writes it,
 `App\EventListener\Report\DatabaseUpdateListener` and `DatabaseDeletionListener` keep it level with the ledger as the
-ledger is written, and `report:generate:full` rebuilds it from the ledger — that is what to run after a bulk change.
+ledger is written, and `app:decision:generate` rebuilds it from the ledger — that is what to run after a bulk change.
 The listeners stand down while fixtures load (`BulkLoadListener`), for exactly that reason.
 
 A change to a ledger entity therefore usually needs the matching change on the projection side and in the projection

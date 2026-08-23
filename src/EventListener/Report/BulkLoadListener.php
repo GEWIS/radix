@@ -19,7 +19,7 @@ use function in_array;
  * chooses within that flush is its own business — a decision can reach the projection before the subdecisions it is
  * assembled from, and what gets written is a decision that reads as nothing.
  *
- * Nothing is lost by standing down: `report:generate:full` rebuilds the projection from the finished ledger, and
+ * Nothing is lost by standing down: `app:decision:generate` rebuilds the projection from the finished ledger, and
  * `make seed` runs it immediately after the fixtures for exactly that reason.
  */
 #[AsEventListener(event: ConsoleEvents::COMMAND)]

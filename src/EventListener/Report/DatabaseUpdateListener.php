@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * Keeps the projection level with the ledger as the ledger is written.
  *
  * The projection is derived state, not a copy taken on a schedule: writing a member, a decision or a list here
- * writes the corresponding row there in the same request. `report:generate:full` rebuilds the whole projection from
+ * writes the corresponding row there in the same request. `app:decision:generate` rebuilds the whole projection from
  * scratch and is for a first fill or a repair, not for keeping it current.
  */
 #[AsDoctrineListener(
