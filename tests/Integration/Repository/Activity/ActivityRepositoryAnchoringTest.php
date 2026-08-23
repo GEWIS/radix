@@ -60,6 +60,8 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             $this->member(8025),
             [],
             true,
+            1,
+            100,
         );
 
         // The "pending" list anchors on the working revision: exactly the activities whose head is not yet approved.
@@ -91,6 +93,8 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             $this->member(8013),
             [],
             false,
+            1,
+            100,
         );
         $ids = $this->ids($pending);
 
@@ -121,6 +125,8 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             $this->member(8005),
             [$getest],
             false,
+            1,
+            100,
         );
 
         self::assertEqualsCanonicalizing(
@@ -138,11 +144,15 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             $this->member(8005),
             [$getest],
             false,
+            1,
+            100,
         ));
         $viaKeur = $this->ids($this->repository()->findPendingForAdmin(
             $this->member(8025),
             [$keur],
             false,
+            1,
+            100,
         ));
 
         // Each organ's member sees their own organ's drafts ...
@@ -169,6 +179,8 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             $this->member(8005),
             [],
             false,
+            1,
+            100,
         )));
     }
 

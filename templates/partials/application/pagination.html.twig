@@ -4,8 +4,11 @@
     Inside a live component (the default) the controls call the component's `gotoPage` action and the dropdown
     writes the `pageSize` model. Pass `route` (and optionally `routeParams`) to render plain links instead, with
     `page` and `pageSize` as query parameters.
+
+    A component with more than one paginated table passes `action` to name the one this control drives, since both
+    would otherwise call `gotoPage`.
 #}
-{% macro control(label, targetPage, disabled, active, route, routeParams, pageSize) %}
+{% macro control(label, targetPage, disabled, active, route, routeParams, pageSize, action) %}
     <li class="page-item{% if disabled %} disabled{% endif %}{% if active %} active{% endif %}">
         {% if route %}
             <a class="page-link"
@@ -14,7 +17,7 @@
         {% else %}
             <button type="button" class="page-link"
                     data-action="live#action"
-                    data-live-action-param="gotoPage"
+                    data-live-action-param="{{ action }}"
                     data-live-page-param="{{ targetPage }}"
                     {% if disabled %}disabled{% endif %}>{{ label }}</button>
         {% endif %}
@@ -22,6 +25,7 @@
 {% endmacro %}
 
 {% set route = route|default(null) %}
+{% set action = action|default('gotoPage') %}
 {% set routeParams = routeParams|default({}) %}
 {% set pageSizes = pageSizes|default([10, 25, 50, 100]) %}
 {% set pageSize = pageSize|default(pageSizes|first) %}
@@ -63,27 +67,27 @@
 
             {% if totalPages > 1 %}
                 <ul class="pagination pagination-sm mb-0">
-                    {{ _self.control('Previous'|trans, page - 1, page <= 1, false, route, routeParams, pageSize) }}
+                    {{ _self.control('Previous'|trans, page - 1, page <= 1, false, route, routeParams, pageSize, action) }}
 
                     {% if windowStart > 1 %}
-                        {{ _self.control(1, 1, false, false, route, routeParams, pageSize) }}
+                        {{ _self.control(1, 1, false, false, route, routeParams, pageSize, action) }}
                         {% if windowStart > 2 %}
                             <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
                         {% endif %}
                     {% endif %}
 
                     {% for p in windowStart..windowEnd %}
-                        {{ _self.control(p, p, false, p == page, route, routeParams, pageSize) }}
+                        {{ _self.control(p, p, false, p == page, route, routeParams, pageSize, action) }}
                     {% endfor %}
 
                     {% if windowEnd < totalPages %}
                         {% if windowEnd < totalPages - 1 %}
                             <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
                         {% endif %}
-                        {{ _self.control(totalPages, totalPages, false, false, route, routeParams, pageSize) }}
+                        {{ _self.control(totalPages, totalPages, false, false, route, routeParams, pageSize, action) }}
                     {% endif %}
 
-                    {{ _self.control('Next'|trans, page + 1, page >= totalPages, false, route, routeParams, pageSize) }}
+                    {{ _self.control('Next'|trans, page + 1, page >= totalPages, false, route, routeParams, pageSize, action) }}
                 </ul>
             {% endif %}
         </div>

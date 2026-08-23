@@ -42,17 +42,20 @@ class ActivityRepository extends ServiceEntityRepository
 
     /**
      * Activities for the admin overview whose working revision is NOT yet approved (drafts, submitted, in-review,
-     * rejected, closed), most recently touched first. Scoped to the member unless $all (the board "show everything").
+     * rejected, closed), most recently touched first, paginated. Scoped to the member unless $all (the board "show
+     * everything").
      *
      * @param int[] $organIds
      *
-     * @return Activity[]
+     * @return Paginator<Activity>
      */
     public function findPendingForAdmin(
         Member $member,
         array $organIds,
         bool $all,
-    ): array {
+        int $page,
+        int $pageSize,
+    ): Paginator {
         $qb = $this->adminOverviewQuery(
             $member,
             $organIds,
@@ -68,7 +71,15 @@ class ActivityRepository extends ServiceEntityRepository
                 'DESC',
             );
 
-        return $qb->getQuery()->getResult();
+        $paginator = new Paginator(
+            $qb,
+            false,
+        );
+        $paginator->getQuery()
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return $paginator;
     }
 
     /**

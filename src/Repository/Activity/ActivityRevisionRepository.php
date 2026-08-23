@@ -10,6 +10,7 @@ use App\Repository\Application\FindsRevisionsForReviewTrait;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -64,6 +65,64 @@ class ActivityRevisionRepository extends ServiceEntityRepository
 
         return $builder->getQuery()
             ->getResult();
+    }
+
+    /**
+     * The same queue, one page at a time: what the approvals page lists. The organ and company columns it shows come
+     * from the revision, so those are fetched with it.
+     *
+     * @return Paginator<ActivityRevision>
+     */
+    public function paginateForReview(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        $builder = $this->createQueryBuilder('r')
+            ->addSelect(
+                'n',
+                'a',
+                'au',
+                'lr',
+                'o',
+                'c',
+            )
+            ->join(
+                'r.name',
+                'n',
+            )
+            ->join(
+                'r.activity',
+                'a',
+            )
+            ->leftJoin(
+                'r.author',
+                'au',
+            )
+            ->leftJoin(
+                'a.liveRevision',
+                'lr',
+            )
+            ->leftJoin(
+                'r.organ',
+                'o',
+            )
+            ->leftJoin(
+                'r.company',
+                'c',
+            );
+
+        $this->whereAwaitingReview($builder);
+        $this->orderOldestFirst($builder);
+
+        $paginator = new Paginator(
+            $builder,
+            false,
+        );
+        $paginator->getQuery()
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return $paginator;
     }
 
     /**
