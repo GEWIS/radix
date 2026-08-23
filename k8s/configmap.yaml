@@ -44,7 +44,12 @@ data:
 
 
     MAIL_FROM_ADDRESS: "noreply@gewis.nl"
-    MAIL_FROM_SECRETARY_ADDRESS: "secretary@gewis.nl"
+    MAIL_REPLY_TO_ADDRESS: "secretary@gewis.nl"
     MAIL_TO_CHECKER_RESULT_ADDRESS: "secretary@gewis.nl"
     MAIL_TO_REPORT_ERROR_ADDRESS: "abc@gewis.nl"
     MAIL_TO_SUBSCRIPTION_ADDRESS: "secretary@gewis.nl"
+    MAIL_TO_INTERNAL_AFFAIRS_ADDRESS: "cib@gewis.nl"
+    MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS: "ceb@gewis.nl"
+    MAIL_TO_C4_ADDRESS: "c4@gewis.nl"
+    MAIL_TO_GEFLITST_ADDRESS: "geflitst@gewis.nl"
+    MAIL_TO_TREASURER_ADDRESS: "penningmeester@gewis.nl"

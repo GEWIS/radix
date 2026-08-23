@@ -76,6 +76,7 @@ class Renewal
                 'newExpiration' => $link->getNewExpiration(),
                 'url' => $this->publicUrl . '/renew/' . $link->getToken(),
             ],
+            $this->emailService->replyTo(),
             // The secretary keeps a copy of both renewal messages, as they did when every templated e-mail was
             // blind-copied to the reply-to address. Unlike the registration e-mails there is no separate send here.
             bccReplyTo: true,
@@ -93,6 +94,7 @@ class Renewal
                 'oldExpiration' => $link->getCurrentExpiration(),
                 'newExpiration' => $link->getNewExpiration(),
             ],
+            $this->emailService->replyTo(),
             bccReplyTo: true,
         );
     }

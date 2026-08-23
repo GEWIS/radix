@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\NotificationType;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\User\Enums\UserRoles;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\Mime\Address;
 
 /**
  * Who a domain wants told that one of its revisions is waiting for a reviewer, and under which kind of notification.
@@ -31,4 +32,19 @@ interface RevisionNotificationInterface
      * from current installations rather than stored, and one row per submission beats one per reviewer either way.
      */
     public function audienceRole(RevisionInterface $revision): UserRoles;
+
+    /**
+     * The mailboxes told that a submission is waiting, which is a different question from the role above: the
+     * notification reaches whoever holds the role in the website, and this reaches the office that answers for it
+     * whether or not anybody has signed in lately.
+     *
+     * @return Address[]
+     */
+    public function reviewerMailboxes(RevisionInterface $revision): array;
+
+    /**
+     * The subject line of that mail. English, as all outgoing mail is, and naming the thing rather than the kind, so
+     * a mailbox with several waiting can tell them apart without opening them.
+     */
+    public function reviewerMailSubject(RevisionInterface $revision): string;
 }

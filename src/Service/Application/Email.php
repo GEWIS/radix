@@ -15,6 +15,10 @@ use Symfony\Component\Mime\Address;
  * message cannot go out without it. The template is named here and rendered by the mailer, rather than rendered to a
  * string first and handed to a wrapper — that arrangement let a caller send a body on its own, which is how five of
  * these went out unbranded.
+ *
+ * A message carries no reply-to unless the caller asks for one. The register's mail about a member or a prospective
+ * member does, {@see self::replyTo()} being the secretary who answers for it; everything else is the association
+ * writing, and a reply to it belongs wherever the message itself says.
  */
 class Email
 {
@@ -22,8 +26,8 @@ class Email
         private readonly MailerInterface $mailer,
         private readonly string $mailFromAddress,
         private readonly string $mailFromName,
-        private readonly string $mailFromSecretaryAddress,
-        private readonly string $mailFromSecretaryName,
+        private readonly string $mailReplyToAddress,
+        private readonly string $mailReplyToName,
     ) {
     }
 
@@ -38,17 +42,20 @@ class Email
         ?Address $replyTo = null,
         bool $bccReplyTo = false,
     ): void {
-        $replyTo ??= new Address(
-            $this->mailFromSecretaryAddress,
-            $this->mailFromSecretaryName,
-        );
-
         $message = new TemplatedEmail()
             ->from(new Address($this->mailFromAddress, $this->mailFromName))
             ->to($recipient)
-            ->replyTo($replyTo)
             ->subject($subject)
-            ->htmlTemplate($template)
+            ->htmlTemplate($template);
+
+        if (null === $replyTo) {
+            $this->mailer->send($message->context($context));
+
+            return;
+        }
+
+        // The footer of the register's base template offers this address as the way to reach a person.
+        $message->replyTo($replyTo)
             ->context($context + ['secretary_email' => $replyTo->getAddress()]);
 
         if ($bccReplyTo) {
@@ -58,11 +65,14 @@ class Email
         $this->mailer->send($message);
     }
 
-    public function secretary(): Address
+    /**
+     * The secretary, who answers for what the register sends about a member.
+     */
+    public function replyTo(): Address
     {
         return new Address(
-            $this->mailFromSecretaryAddress,
-            $this->mailFromSecretaryName,
+            $this->mailReplyToAddress,
+            $this->mailReplyToName,
         );
     }
 }

@@ -14,6 +14,7 @@ use Scheb\TwoFactorBundle\Security\Authentication\Token\TwoFactorToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function array_column;
+use function count;
 use function implode;
 
 /**
