@@ -7,6 +7,8 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
+use function sprintf;
+
 /**
  * Revision/approval workflow for activities and the careers portal (consolidated feature migration).
  *
@@ -404,6 +406,26 @@ final class Version20260529150000 extends AbstractMigration
         // creation.
         $this->addSql('ALTER TABLE Signup ADD verifiedAt DATETIME DEFAULT NULL');
         $this->addSql("UPDATE Signup SET verifiedAt = createdAt WHERE type = 'external'");
+
+        // Unfortunately, external sign-ups were never unique. So we have some of those in the production database.
+        // Therefore we drop any duplicate and keep the earliest variant.
+        $duplicates = <<<'SQL'
+            INNER JOIN Signup earlier
+                ON earlier.signuplist_id = s.signuplist_id
+               AND earlier.%1$s = s.%1$s
+               AND (earlier.createdAt < s.createdAt
+                    OR (earlier.createdAt = s.createdAt AND earlier.id < s.id))
+            WHERE s.%1$s IS NOT NULL
+            SQL;
+
+        // SignupFieldValue.signup_id is ON DELETE RESTRICT, so the answers go before the sign-up that gave them.
+        foreach (['user_lidnr', 'email'] as $column) {
+            $this->addSql(sprintf(
+                'DELETE fv FROM SignupFieldValue fv INNER JOIN Signup s ON s.id = fv.signup_id %s',
+                sprintf($duplicates, $column),
+            ));
+            $this->addSql(sprintf('DELETE s FROM Signup s %s', sprintf($duplicates, $column)));
+        }
 
         // Guard against duplicate sign-ups at the database level: one member per list (user_lidnr) and one external
         // email per list (email). Each constraint applies only to its subclass; the other's column is NULL for these
