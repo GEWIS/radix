@@ -13,6 +13,7 @@ use App\Service\Frontpage\PollService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,7 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * rather than deleting it, so what was asked and how it was answered stays on the website.
  */
 use function array_values;
+use function in_array;
 use function iterator_to_array;
+use function max;
 
 #[Route(
     path: '/admin/polls',
@@ -32,6 +35,14 @@ use function iterator_to_array;
 #[IsGranted(UserRoles::Board->value)]
 class AdminPollController extends AbstractController
 {
+    /** The sizes the pagination partial offers; anything else in the query string is not one of them. */
+    private const array PAGE_SIZES = [
+        10,
+        25,
+        50,
+        100,
+    ];
+
     private const int PAGE_SIZE = 25;
 
     public function __construct(
@@ -43,16 +54,30 @@ class AdminPollController extends AbstractController
     }
 
     #[Route(
-        path: '/{page}',
+        path: '',
         name: 'index',
-        requirements: ['page' => '\\d+'],
-        defaults: ['page' => 1],
     )]
-    public function index(int $page): Response
-    {
+    public function index(
+        #[MapQueryParameter]
+        int $page = 1,
+        #[MapQueryParameter]
+        int $pageSize = self::PAGE_SIZE,
+    ): Response {
+        $page = max(
+            1,
+            $page,
+        );
+        $pageSize = in_array(
+            $pageSize,
+            self::PAGE_SIZES,
+            true,
+        )
+            ? $pageSize
+            : self::PAGE_SIZE;
+
         $paginator = $this->pollRepository->paginateForAdmin(
             $page,
-            self::PAGE_SIZE,
+            $pageSize,
         );
         $polls = array_values(iterator_to_array($paginator));
         // The rows show what each question was answered, which is a query per poll unless the page is warmed at once.
@@ -63,7 +88,7 @@ class AdminPollController extends AbstractController
             [
                 'polls' => $polls,
                 'currentPage' => $page,
-                'pageSize' => self::PAGE_SIZE,
+                'pageSize' => $pageSize,
                 'totalCount' => $paginator->count(),
                 'awaitingReview' => $this->revisionRepository->countForReview(),
             ],
