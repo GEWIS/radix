@@ -22,6 +22,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * The polls the board has agreed to, with how far each one has got. Taking one down moves its closing date to today
  * rather than deleting it, so what was asked and how it was answered stays on the website.
  */
+use function array_values;
+use function iterator_to_array;
+
 #[Route(
     path: '/admin/polls',
     name: 'admin/frontpage/polls/',
@@ -29,7 +32,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted(UserRoles::Board->value)]
 class AdminPollController extends AbstractController
 {
-    private const int OVERVIEW_LIMIT = 100;
+    private const int PAGE_SIZE = 25;
 
     public function __construct(
         private readonly PollRepository $pollRepository,
@@ -40,15 +43,28 @@ class AdminPollController extends AbstractController
     }
 
     #[Route(
-        path: '',
+        path: '/{page}',
         name: 'index',
+        requirements: ['page' => '\\d+'],
+        defaults: ['page' => 1],
     )]
-    public function index(): Response
+    public function index(int $page): Response
     {
+        $paginator = $this->pollRepository->paginateForAdmin(
+            $page,
+            self::PAGE_SIZE,
+        );
+        $polls = array_values(iterator_to_array($paginator));
+        // The rows show what each question was answered, which is a query per poll unless the page is warmed at once.
+        $this->pollRepository->primeResults($polls);
+
         return $this->render(
             'frontpage/admin/polls/index.html.twig',
             [
-                'polls' => $this->pollRepository->findRecentApproved(self::OVERVIEW_LIMIT),
+                'polls' => $polls,
+                'currentPage' => $page,
+                'pageSize' => self::PAGE_SIZE,
+                'totalCount' => $paginator->count(),
                 'awaitingReview' => $this->revisionRepository->countForReview(),
             ],
         );

@@ -145,26 +145,25 @@ class PollRepository extends ServiceEntityRepository
     }
 
     /**
-     * The most recently scheduled questions the board has agreed to, newest closing date first, results loaded: what
-     * the admin overview lists. Anything older is found through the public archive.
+     * The questions the board has agreed to, newest closing date first, results loaded: what the admin overview lists,
+     * one page at a time.
      *
-     * @return Poll[]
+     * @return Paginator<Poll>
      */
-    public function findRecentApproved(int $limit): array
-    {
-        $polls = $this->createQueryBuilder('p')
+    public function paginateForAdmin(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        $qb = $this->createQueryBuilder('p')
             ->where('p.liveRevision IS NOT NULL')
             ->orderBy(
                 'p.expiryDate',
                 'DESC',
             )
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
 
-        $this->primeResults($polls);
-
-        return $polls;
+        return new Paginator($qb);
     }
 
     /**
