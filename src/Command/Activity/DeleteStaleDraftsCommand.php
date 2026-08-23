@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command\Activity;
 
 use App\Entity\Activity\Activity;
+use App\Entity\Application\Enums\RevisionStatus;
 use App\Repository\Activity\ActivityRevisionRepository;
 use App\Service\Application\EditLockService;
 use App\Service\Application\RevisionDiscarder;
@@ -24,14 +25,19 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use function sprintf;
 
 /**
- * Removes abandoned activity drafts. A Draft revision that is still the working head of its activity and has not been
- * touched for {@see self::STALE_AFTER_DAYS} days is considered abandoned:
- *  - if the activity already has a live (approved) revision, only the stale draft is discarded and the activity falls
+ * Removes abandoned activities. A revision that is still the working head of its activity and has not been touched
+ * for long enough is considered abandoned, and either way:
+ *  - if the activity already has a live (approved) revision, only the stale head is discarded and the activity falls
  *    back to its live version (an abandoned re-edit);
  *  - if the activity was never approved, the whole activity is removed.
  *
- * Submitted / in-review revisions (which are with the board) are never touched, and an activity whose sign-up lists
- * carry sign-ups is never deleted.
+ * How long "long enough" is depends on whose turn it is. A Draft is the author's to finish, so it lapses after
+ * {@see self::STALE_AFTER_DAYS} days. Everything else is either with the board (Submitted, InReview) or already
+ * decided against (Rejected, Closed), and none of those lapse for {@see self::ABANDONED_AFTER_DAYS} days: a queue the
+ * board is slow to work through is not the same thing as an author walking away, and a rejection is a record worth
+ * keeping for a while.
+ *
+ * An approved head is never touched, and an activity whose sign-up lists carry sign-ups is never deleted.
  */
 #[AsCommand(
     name: 'app:activity:delete-stale-drafts',
@@ -45,6 +51,8 @@ use function sprintf;
 final class DeleteStaleDraftsCommand extends Command
 {
     private const int STALE_AFTER_DAYS = 30;
+
+    private const int ABANDONED_AFTER_DAYS = 90;
 
     public function __construct(
         private readonly ActivityRevisionRepository $activityRevisionRepository,
@@ -78,19 +86,35 @@ final class DeleteStaleDraftsCommand extends Command
             $output,
         );
         $dryRun = true === $input->getOption('dry-run');
-        $cutoff = new DateTime(sprintf('-%d days', self::STALE_AFTER_DAYS));
+        $draftCutoff = new DateTime(sprintf('-%d days', self::STALE_AFTER_DAYS));
+        $abandonedCutoff = new DateTime(sprintf('-%d days', self::ABANDONED_AFTER_DAYS));
 
         $reverted = 0;
         $deleted = 0;
         $skipped = 0;
 
         $this->logger->info(sprintf(
-            'Cleaning up activity drafts untouched since %s.%s',
-            $cutoff->format('Y-m-d'),
+            'Cleaning up activity drafts untouched since %s, and anything else still open since %s.%s',
+            $draftCutoff->format('Y-m-d'),
+            $abandonedCutoff->format('Y-m-d'),
             $dryRun ? ' (dry-run)' : '',
         ));
 
-        foreach ($this->activityRevisionRepository->findStaleDraftHeads($cutoff) as $revision) {
+        $heads = [
+            ...$this->activityRevisionRepository->findStaleHeads(
+                $draftCutoff,
+                RevisionStatus::Draft,
+            ),
+            ...$this->activityRevisionRepository->findStaleHeads(
+                $abandonedCutoff,
+                RevisionStatus::Submitted,
+                RevisionStatus::InReview,
+                RevisionStatus::Rejected,
+                RevisionStatus::Closed,
+            ),
+        ];
+
+        foreach ($heads as $revision) {
             $activity = $revision->getActivity();
 
             if (null !== $activity->getLiveRevision()) {
@@ -100,8 +124,9 @@ final class DeleteStaleDraftsCommand extends Command
 
                 ++$reverted;
                 $this->logger->info(sprintf(
-                    'Activity #%d: discarded stale draft (revision #%d); reverted to the live version.',
+                    'Activity #%d: discarded abandoned %s revision #%d; reverted to the live version.',
                     $activity->getId(),
+                    $revision->getStatus()->value,
                     $revision->getId(),
                 ));
 
@@ -111,8 +136,9 @@ final class DeleteStaleDraftsCommand extends Command
             if ($this->hasSignUps($activity)) {
                 ++$skipped;
                 $this->logger->warning(sprintf(
-                    'Activity #%d: stale draft kept because a sign-up list already has sign-ups.',
+                    'Activity #%d: abandoned %s revision kept because a sign-up list already has sign-ups.',
                     $activity->getId(),
+                    $revision->getStatus()->value,
                 ));
 
                 continue;
@@ -124,8 +150,9 @@ final class DeleteStaleDraftsCommand extends Command
 
             ++$deleted;
             $this->logger->info(sprintf(
-                'Activity #%d: deleted entirely (never approved, abandoned draft).',
+                'Activity #%d: deleted entirely (never approved, abandoned as %s).',
                 $activity->getId(),
+                $revision->getStatus()->value,
             ));
         }
 

@@ -13,6 +13,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
+use function array_map;
+
 /**
  * @extends ServiceEntityRepository<ActivityRevision>
  */
@@ -126,25 +128,35 @@ class ActivityRevisionRepository extends ServiceEntityRepository
     }
 
     /**
-     * Draft revisions that are still the working head of their activity and have not been touched since the cutoff,
-     * oldest first. These are abandoned drafts eligible for cleanup; submitted/in-review revisions (with the board)
-     * are never returned.
+     * Revisions in one of the given states that are still the working head of their activity and have not been touched
+     * since the cutoff, oldest first. Approved heads are never eligible whatever is asked for: the live version of an
+     * activity is not abandoned, it is finished.
      *
      * @return ActivityRevision[]
      */
-    public function findStaleDraftHeads(DateTime $cutoff): array
-    {
+    public function findStaleHeads(
+        DateTime $cutoff,
+        RevisionStatus ...$statuses,
+    ): array {
         return $this->createQueryBuilder('r')
             ->join(
                 'r.activity',
                 'a',
             )
-            ->where('r.status = :draft')
+            ->where('r.status IN (:statuses)')
+            ->andWhere('r.status <> :approved')
             ->andWhere('r.updatedAt <= :cutoff')
             ->andWhere('a.currentRevision = r')
             ->setParameter(
-                'draft',
-                RevisionStatus::Draft->value,
+                'statuses',
+                array_map(
+                    static fn (RevisionStatus $status): string => $status->value,
+                    $statuses,
+                ),
+            )
+            ->setParameter(
+                'approved',
+                RevisionStatus::Approved->value,
             )
             ->setParameter(
                 'cutoff',
