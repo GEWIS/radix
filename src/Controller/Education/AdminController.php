@@ -43,6 +43,8 @@ class AdminController extends AbstractController
     /** Course codes are five to nine alphanumerics, e.g. 2IL50 or 2WBB0. */
     private const string COURSE_CODE = '[A-Za-z0-9]{5,9}';
 
+    private const int PAGE_SIZE = 25;
+
     public function __construct(
         private readonly CourseRepository $courseRepository,
         private readonly CourseDocumentRepository $documentRepository,
@@ -54,16 +56,27 @@ class AdminController extends AbstractController
     }
 
     #[Route(
-        path: '',
+        path: '/{page}',
         name: 'index',
+        requirements: ['page' => '\\d+'],
+        defaults: ['page' => 1],
     )]
-    public function index(): Response
+    public function index(int $page): Response
     {
+        $unprocessed = $this->documentRepository->paginateNotReady(
+            $page,
+            self::PAGE_SIZE,
+        );
+
         return $this->render(
             'education/admin/index.html.twig',
             [
                 'counts' => $this->countsProvider->counts(),
-                'unprocessed' => $this->documentRepository->findNotReady(),
+                'unprocessed' => $unprocessed,
+                'currentPage' => $page,
+                'pageSize' => self::PAGE_SIZE,
+                // The tile counts the whole queue, which is no longer what the page below it lists.
+                'unprocessedCount' => $unprocessed->count(),
             ],
         );
     }

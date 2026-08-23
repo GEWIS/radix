@@ -26,7 +26,7 @@
         {% for tile in [
             {'value': counts.courses, 'label': 'Courses tracked'|trans},
             {'value': counts.documents, 'label': 'Published documents'|trans},
-            {'value': unprocessed|length, 'label': 'Not downloadable yet'|trans},
+            {'value': unprocessedCount, 'label': 'Not downloadable yet'|trans},
             {'value': counts.coursesWithoutMaterial, 'label': 'Courses with nothing'|trans},
         ] %}
             <div class="col">
@@ -40,7 +40,7 @@
         {% endfor %}
     </div>
 
-    {% if unprocessed is not empty %}
+    {% if unprocessedCount > 0 %}
         <div class="panel">
             <div class="panel-heading">
                 <h3>{{ 'Waiting to become downloadable'|trans }}</h3>
@@ -90,6 +90,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                {% include 'partials/application/pagination.html.twig' with {
+                    'route': 'admin/education/index',
+                    'routeParams': {},
+                    'page': currentPage,
+                    'pageSize': pageSize,
+                    'totalCount': unprocessedCount,
+                    'totalPages': (unprocessedCount / pageSize)|round(0, 'ceil'),
+                } only %}
             </div>
         </div>
     {% endif %}
