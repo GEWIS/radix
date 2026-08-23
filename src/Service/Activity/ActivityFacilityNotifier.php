@@ -25,8 +25,9 @@ use function sprintf;
  * Only the flip from off to on sends: a draft cloned from a revision that already asked for a photographer is not a
  * new request, and neither is saving the same draft again.
  *
- * The GEFLITST message is read by their Planka board, which keys on the subject line and answers by replying, so the
- * subject format and the reply-to are kept exactly as the old website sent them.
+ * The GEFLITST message is addressed to their Planka board as well as to themselves, carrying the board id in an
+ * `X-Planka-Board-Id` header, which is what files it as a card. The subject format, the reply-to and that header are
+ * kept exactly as the old website sent them, the board keying on all three.
  */
 final readonly class ActivityFacilityNotifier
 {
@@ -119,7 +120,8 @@ final readonly class ActivityFacilityNotifier
             ),
             'emails/activity/facility-zettle.html.twig',
             [
-                'activity' => $revision,
+                'name' => $this->title($revision),
+                'beginTime' => $revision->getBeginTime(),
                 'requester' => $this->requester($revision),
             ],
         );
@@ -163,15 +165,22 @@ final readonly class ActivityFacilityNotifier
             default => null,
         };
 
+        // The Planka board is addressed on the same message rather than sent a copy: it files the card and GEFLITST
+        // answer by replying to all, which only works while both are recipients of the one message.
         $this->email->send(
             $this->mailboxes->geflitst(),
             $subject,
             'emails/activity/facility-geflitst.html.twig',
             [
-                'activity' => $revision,
+                'nameNL' => $revision->getName()->getText(Languages::Dutch),
+                'nameEN' => $revision->getName()->getText(Languages::English),
+                'descriptionNL' => $revision->getDescription()->getText(Languages::Dutch),
+                'descriptionEN' => $revision->getDescription()->getText(Languages::English),
                 'requester' => $requester,
             ],
             $replyTo,
+            alsoTo: [$this->mailboxes->geflitstPlanka()],
+            headers: ['X-Planka-Board-Id' => $this->mailboxes->geflitstPlankaKey()],
         );
     }
 

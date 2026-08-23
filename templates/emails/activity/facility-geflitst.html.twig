@@ -3,15 +3,16 @@
 {% block emailTitle %}A photographer is needed{% endblock %}
 {% block preheader %}An&nbsp;activity&nbsp;has&nbsp;asked&nbsp;for&nbsp;GEFLITST{% endblock %}
 {% block heading %}A photographer is needed{% endblock %}
-{% block subheading %}{{ activity.name.getText('en') ?? activity.name.getText('nl') }}{% endblock %}
+{% block subheading %}{{ nameEN ?? nameNL }}{% endblock %}
 {% block body %}
     <p>L.s.,</p>
-    <p>An activity is being planned on the GEWIS website that needs a photographer from GEFLITST.</p>
-    <h3>{{ activity.name.getText('nl') }}</h3>
-    <p>{{ activity.description.getText('nl') }}</p>
+    <p>Er is een activiteit in de maak op de GEWIS-website waarvoor een fotograaf van GEFLITST nodig is.</p>
+    <h3>{{ nameNL }}</h3>
+    <p>{{ descriptionNL }}</p>
     <hr>
-    <h3>{{ activity.name.getText('en') }}</h3>
-    <p>{{ activity.description.getText('en') }}</p>
+    <p>An activity is being planned on the GEWIS website that needs a photographer from GEFLITST.</p>
+    <h3>{{ nameEN }}</h3>
+    <p>{{ descriptionEN }}</p>
     <p><strong>{{ requester }}</strong> would like to hear back from you. You can answer by replying to this email.</p>
     With kind regards,<br> The ApplicatieBeheerCommissie
 {% endblock %}

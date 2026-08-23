@@ -16,7 +16,9 @@ x-app-environment: &app_environment
     # `prod` there.
     APP_ENV: "${APP_ENV:-prod}"
     APP_SECRET: "${APP_SECRET:?APP_SECRET must be set}"
-    SYMFONY_TRUSTED_PROXIES: "private_ranges"
+    # Which proxies may be believed about the visitor. `private_ranges` covers a proxy on the same network, which is
+    # what a compose stack behind Portainer has; a deployment reached through one that is not needs its address here.
+    SYMFONY_TRUSTED_PROXIES: "${SYMFONY_TRUSTED_PROXIES:-private_ranges}"
     SERVER_NAME: "${SERVER_NAME:?SERVER_NAME must be set}, app:80"
     DEFAULT_URI: "${DEFAULT_URI:?DEFAULT_URI must be set}"
     # The public face of the register: the host mail links back to when it cannot link into the request it was sent
@@ -103,6 +105,8 @@ x-app-environment: &app_environment
     MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS: "${MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS:?MAIL_TO_EXTERNAL_AFFAIRS_ADDRESS must be set}"
     MAIL_TO_C4_ADDRESS: "${MAIL_TO_C4_ADDRESS:?MAIL_TO_C4_ADDRESS must be set}"
     MAIL_TO_GEFLITST_ADDRESS: "${MAIL_TO_GEFLITST_ADDRESS:?MAIL_TO_GEFLITST_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_PLANKA_ADDRESS: "${MAIL_TO_GEFLITST_PLANKA_ADDRESS:?MAIL_TO_GEFLITST_PLANKA_ADDRESS must be set}"
+    MAIL_TO_GEFLITST_PLANKA_KEY: "${MAIL_TO_GEFLITST_PLANKA_KEY:?MAIL_TO_GEFLITST_PLANKA_KEY must be set}"
     MAIL_TO_TREASURER_ADDRESS: "${MAIL_TO_TREASURER_ADDRESS:?MAIL_TO_TREASURER_ADDRESS must be set}"
 
 x-app: &app

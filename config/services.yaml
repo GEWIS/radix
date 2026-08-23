@@ -65,6 +65,7 @@ parameters:
     env(MAIL_TO_EXTERNAL_AFFAIRS_NAME): 'Officer of External Affairs'
     env(MAIL_TO_C4_NAME): 'C4'
     env(MAIL_TO_GEFLITST_NAME): 'GEFLITST'
+    env(MAIL_TO_GEFLITST_PLANKA_NAME): 'GEFLITST (Planka)'
     env(MAIL_TO_TREASURER_NAME): 'Treasurer of GEWIS'
     # Stripe sends a `Stripe-Notice` header when the pinned version is behind, and the SDK re-raises it as a PHP
     # warning, which the dev error handler turns into an exception. It moves when the installed SDK moves, which makes
@@ -140,6 +141,9 @@ services:
             $mailToC4Name: '%env(string:MAIL_TO_C4_NAME)%' # string
             $mailToGeflitstAddress: '%env(string:MAIL_TO_GEFLITST_ADDRESS)%' # string
             $mailToGeflitstName: '%env(string:MAIL_TO_GEFLITST_NAME)%' # string
+            $mailToGeflitstPlankaAddress: '%env(string:MAIL_TO_GEFLITST_PLANKA_ADDRESS)%' # string
+            $mailToGeflitstPlankaName: '%env(string:MAIL_TO_GEFLITST_PLANKA_NAME)%' # string
+            $mailToGeflitstPlankaKey: '%env(string:MAIL_TO_GEFLITST_PLANKA_KEY)%' # string
             $mailToTreasurerAddress: '%env(string:MAIL_TO_TREASURER_ADDRESS)%' # string
             $mailToTreasurerName: '%env(string:MAIL_TO_TREASURER_NAME)%' # string
             # Stripe, which collects the membership fee during sign-up. The API version is pinned because Stripe

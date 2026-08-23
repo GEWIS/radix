@@ -3,13 +3,13 @@
 {% block emailTitle %}A Zettle is needed{% endblock %}
 {% block preheader %}An&nbsp;activity&nbsp;has&nbsp;asked&nbsp;for&nbsp;a&nbsp;Zettle{% endblock %}
 {% block heading %}A Zettle is needed{% endblock %}
-{% block subheading %}{{ activity.name.getText('en') ?? activity.name.getText('nl') }}{% endblock %}
+{% block subheading %}{{ name }}{% endblock %}
 {% block body %}
     <p>L.s.,</p>
     <p>An activity is being planned on the GEWIS website that needs a Zettle to take payments.</p>
-    <h3>{{ activity.name.getText('en') ?? activity.name.getText('nl') }}</h3>
-    {% if activity.beginTime %}
-        <p>When: {{ activity.beginTime|date('j F Y, H:i') }}</p>
+    <h3>{{ name }}</h3>
+    {% if beginTime %}
+        <p>When: {{ beginTime|date('j F Y, H:i') }}</p>
     {% endif %}
     <p>Asked for by <strong>{{ requester }}</strong>.</p>
     With kind regards,<br> The ApplicatieBeheerCommissie

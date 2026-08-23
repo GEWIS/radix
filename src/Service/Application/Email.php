@@ -32,7 +32,9 @@ class Email
     }
 
     /**
-     * @param array<string, mixed> $context
+     * @param array<string, mixed>  $context
+     * @param Address[]             $alsoTo  further recipients of the same message, addressed openly
+     * @param array<string, string> $headers
      */
     public function send(
         Address $recipient,
@@ -41,12 +43,24 @@ class Email
         array $context = [],
         ?Address $replyTo = null,
         bool $bccReplyTo = false,
+        array $alsoTo = [],
+        array $headers = [],
     ): void {
         $message = new TemplatedEmail()
             ->from(new Address($this->mailFromAddress, $this->mailFromName))
-            ->to($recipient)
+            ->to(
+                $recipient,
+                ...$alsoTo,
+            )
             ->subject($subject)
             ->htmlTemplate($template);
+
+        foreach ($headers as $name => $value) {
+            $message->getHeaders()->addTextHeader(
+                $name,
+                $value,
+            );
+        }
 
         if (null === $replyTo) {
             $this->mailer->send($message->context($context));

@@ -24,6 +24,9 @@ final readonly class OfficeMailboxes
         private string $mailToC4Name,
         private string $mailToGeflitstAddress,
         private string $mailToGeflitstName,
+        private string $mailToGeflitstPlankaAddress,
+        private string $mailToGeflitstPlankaName,
+        private string $mailToGeflitstPlankaKey,
         private string $mailToTreasurerAddress,
         private string $mailToTreasurerName,
     ) {
@@ -59,6 +62,25 @@ final readonly class OfficeMailboxes
             $this->mailToGeflitstAddress,
             $this->mailToGeflitstName,
         );
+    }
+
+    /**
+     * GEFLITST's Planka board, which takes the same message as a second recipient and files it as a card.
+     */
+    public function geflitstPlanka(): Address
+    {
+        return new Address(
+            $this->mailToGeflitstPlankaAddress,
+            $this->mailToGeflitstPlankaName,
+        );
+    }
+
+    /**
+     * Which board the card belongs on, carried in the `X-Planka-Board-Id` header.
+     */
+    public function geflitstPlankaKey(): string
+    {
+        return $this->mailToGeflitstPlankaKey;
     }
 
     public function treasurer(): Address

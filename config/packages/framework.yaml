@@ -3,7 +3,7 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # Which proxies are trusted comes from SYMFONY_TRUSTED_PROXIES (see compose.yaml); this is what they
+    # Which proxies are trusted comes from SYMFONY_TRUSTED_PROXIES, which a deployment sets; this is what they
     # are allowed to tell us. The host and the port matter as much as the protocol: an absolute URL the application
     # builds -- in mail, in a redirect -- has to name what the visitor typed rather than what the proxy used, and
     # behind the proxy that only survives in X-Forwarded-Host.
