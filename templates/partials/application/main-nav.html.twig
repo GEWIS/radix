@@ -41,9 +41,8 @@
 
 {% import _self as menu %}
 
-{# The register signs its own accounts in, on their own firewall, so `app.user` on a register page is neither a member
-   nor a company user and answers to none of their accessors. The type is asked for rather than assumed; a ledger
-   account has none, and falls to the last branch below. #}
+{# Which of the two kinds of account is signed in, or null for nobody. Asked for rather than assumed, so an account
+   class that answers to neither accessor cannot fatal the navigation. #}
 {% set user_type = null !== app.user and app.user.getUserType is defined ? app.user.getUserType : null %}
 
 <nav class="navbar navbar-expand navbar-gewis rainbow">
@@ -438,9 +437,6 @@
                     enum('App\\Entity\\User\\Enums\\UserTypes').User == user_type
                 %}
                     {{ component('Notification:Bell') }}
-                {% elseif null !== app.user and null === user_type %}
-                    {# Nothing is addressed to a ledger account, so its bell counts the state of the register instead. #}
-                    {{ component('Application:NotificationBell') }}
                 {% endif %}
                 {% include 'partials/application/language-switcher.html.twig' %}
             </ul>

@@ -9,11 +9,10 @@ use Symfony\Component\Translation\TranslatableMessage;
 use function Symfony\Component\Translation\t;
 
 /**
- * One thing that needs someone, as the bell and the dashboard both state it.
+ * One thing about the register that needs someone, as the administration dashboard states it.
  *
- * Assembled from the front page's figures rather than stored: each of these is a question about the register or an
- * integration that is answered fresh every time it is asked. The bell shows `$message` on its own; the dashboard puts
- * `$title` above it and offers `$action` as the way in, so both read the same set without either restating it.
+ * Assembled from the register's figures rather than stored: each of these is a question about the register or an
+ * integration that is answered fresh every time it is asked.
  */
 final readonly class Notification
 {
@@ -33,7 +32,7 @@ final readonly class Notification
      *
      * @return self[]
      */
-    public static function fromFrontPage(array $data): array
+    public static function fromRegisterStatus(array $data): array
     {
         $notifications = [];
         $approval = t('Approval');

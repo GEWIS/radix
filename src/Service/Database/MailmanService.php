@@ -341,7 +341,7 @@ class MailmanService
      *     mailmanLastSync: ?DateTime,
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatusFigures(): array
     {
         $lastFetch = $this->getLastFetchTime();
 

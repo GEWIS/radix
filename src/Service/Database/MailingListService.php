@@ -247,7 +247,7 @@ class MailingListService
      *     },
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatusFigures(): array
     {
         return [
             'mailingListChangesPending' => [

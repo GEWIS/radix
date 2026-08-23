@@ -15,6 +15,8 @@ use App\Repository\User\UserSettingsRepository;
 use App\Security\User\Firewall;
 use App\Service\Application\NotificationContextResolver;
 use App\Service\Application\NotificationSubjectResolver;
+use App\Service\Application\RegisterStatusService;
+use App\ViewModel\Application\Notification as RegisterNotification;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -92,7 +94,26 @@ class Bell
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly RoleHierarchyInterface $roleHierarchy,
         private readonly Security $security,
+        private readonly RegisterStatusService $registerStatus,
     ) {
+    }
+
+    /**
+     * What the register needs somebody to do, for a member who administers it.
+     *
+     * These are not notification records and have no read state: each one is a question about the register answered
+     * fresh, and it stops being asked by dealing with it rather than by looking at it. The register used to have an
+     * account and a bell of its own; it is administered from a membership now, so this is where they belong.
+     *
+     * @return RegisterNotification[]
+     */
+    public function getRegisterNotifications(): array
+    {
+        if (!$this->security->isGranted(UserRoles::DatabaseAdmin->value)) {
+            return [];
+        }
+
+        return RegisterNotification::fromRegisterStatus($this->registerStatus->getStatusViewData());
     }
 
     /**
@@ -231,6 +252,15 @@ class Bell
             $this->getEntries(),
             'unread',
         ));
+    }
+
+    /**
+     * What the badge shows. The register's own have no read state, so they are counted here but not by
+     * {@see self::getUnreadCount()}, which is what "mark all as read" acts on.
+     */
+    public function getBadgeCount(): int
+    {
+        return $this->getUnreadCount() + count($this->getRegisterNotifications());
     }
 
     /**

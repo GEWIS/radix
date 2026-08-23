@@ -340,7 +340,7 @@ class ListmonkService
      *     listmonkLastSync: ?DateTime,
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatusFigures(): array
     {
         $lastFetch = $this->getLastFetchTime();
 

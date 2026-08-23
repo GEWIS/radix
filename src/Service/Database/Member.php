@@ -1102,7 +1102,7 @@ class Member
      *     updates: int,
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatusFigures(): array
     {
         $totalInclExpired = $this->memberRepository->countMembers(
             true,
@@ -1135,8 +1135,7 @@ class Member
     /**
      * How many members hold a current membership of each type.
      *
-     * Kept out of the front page data because only the dashboard asks for it, and the front page data is read on
-     * every page for the notification bell.
+     * Kept out of the status figures because only the dashboard asks for it.
      *
      * @return array<string, int>
      */
@@ -1155,8 +1154,8 @@ class Member
     }
 
     /**
-     * Paid prospective members (separately from frontpage data to reduce number
-     * of database queries)
+     * Prospective members who have paid. Counted on its own so the sidebar badge does not have to ask for the whole
+     * state of the register.
      */
     public function getPaidProspectivesCount(): int
     {

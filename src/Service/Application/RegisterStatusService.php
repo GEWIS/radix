@@ -11,18 +11,33 @@ use App\Service\Database\Member as MemberService;
 use App\Service\Report\ApiService;
 use DateTime;
 use Override;
+use Psr\Cache\CacheItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 use function array_merge;
 
-class FrontPageService implements ResetInterface
+/**
+ * The state of the register and its integrations right now: how many members and prospective members there are, what
+ * is waiting for the secretary, and whether the mailing list and API syncs are keeping up.
+ *
+ * Nothing here belongs to the website's front page: it is what the register's section of the administration dashboard
+ * opens with.
+ */
+class RegisterStatusService implements ResetInterface
 {
     /**
-     * What the figures were this request.
+     * How long a set of figures is reused across requests.
      *
-     * The bell reads them on every page and the dashboard reads them again, and each of the five services behind
-     * them runs its own queries, so without this a page pays for the same counts several times over. Cleared
-     * between requests because the application runs in a worker, where the service outlives the request.
+     * The notification bell carries these on every page the secretary opens, so without this a dozen queries run to
+     * decide whether the bell has anything to say. None of them is a number anyone acts on within the minute: a
+     * membership approved now shows up on the page after next.
+     */
+    private const int TTL = 60;
+
+    /**
+     * What the figures were this request, so that asking twice costs once even when they come from the cache.
+     * Cleared between requests because the application runs in a worker, where the service outlives the request.
      *
      * @var array<string, mixed>|null
      */
@@ -34,6 +49,7 @@ class FrontPageService implements ResetInterface
         private readonly MailingListService $mailingListService,
         private readonly MailmanService $mailmanService,
         private readonly MemberService $memberService,
+        private readonly CacheInterface $cache,
     ) {
     }
 
@@ -62,27 +78,36 @@ class FrontPageService implements ResetInterface
      *   }
      * }
      */
-    public function getFrontpageData(): array
+    public function getStatus(): array
     {
         if (null !== $this->data) {
             return $this->data;
         }
 
-        $data = array_merge(
-            $this->memberService->getFrontpageData(),
-            $this->apiService->getFrontpageData(),
-            $this->mailmanService->getFrontpageData(),
-            $this->listmonkService->getFrontpageData(),
-            $this->mailingListService->getFrontpageData(),
-        );
+        $data = $this->cache->get(
+            'register_status',
+            function (CacheItemInterface $item): array {
+                $item->expiresAfter(self::TTL);
 
-        // Counted from the figures rather than asked for again: the bell and the dashboard then cannot state
-        // different numbers, and it saves running every one of those queries a second time.
-        $data['totalCount'] = $data['updates']
-            + $data['prospectives']['paid']
-            + (int) $data['syncPaused']
-            + (int) $data['mailmanLastFetchOverdue']
-            + (int) $data['listmonkLastFetchOverdue'];
+                $figures = array_merge(
+                    $this->memberService->getStatusFigures(),
+                    $this->apiService->getStatusFigures(),
+                    $this->mailmanService->getStatusFigures(),
+                    $this->listmonkService->getStatusFigures(),
+                    $this->mailingListService->getStatusFigures(),
+                );
+
+                // Counted from the figures rather than asked for again: the bell and the dashboard then cannot state
+                // different numbers, and it saves running every one of those queries a second time.
+                $figures['totalCount'] = $figures['updates']
+                    + $figures['prospectives']['paid']
+                    + (int) $figures['syncPaused']
+                    + (int) $figures['mailmanLastFetchOverdue']
+                    + (int) $figures['listmonkLastFetchOverdue'];
+
+                return $figures;
+            },
+        );
 
         return $this->data = $data;
     }
@@ -94,13 +119,13 @@ class FrontPageService implements ResetInterface
     }
 
     /**
-     * The same data under the names the dashboard template uses.
+     * The same figures under the names the dashboard template uses.
      *
      * @return array<string, mixed>
      */
-    public function getFrontpageViewData(): array
+    public function getStatusViewData(): array
     {
-        $data = $this->getFrontpageData();
+        $data = $this->getStatus();
 
         return [
             'members' => $data['members'],
@@ -126,13 +151,5 @@ class FrontPageService implements ResetInterface
     public function getMembershipBreakdown(): array
     {
         return $this->memberService->getMembershipBreakdown();
-    }
-
-    /**
-     * How many things need someone, which is what the bell shows.
-     */
-    public function getNotificationCount(): int
-    {
-        return $this->getFrontpageData()['totalCount'];
     }
 }

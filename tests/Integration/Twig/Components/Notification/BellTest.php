@@ -290,6 +290,62 @@ final class BellTest extends DatabaseTestCase
         return $user;
     }
 
+    /**
+     * The register has no notification records of its own, so what it needs doing reaches the member who administers
+     * it through their own bell. Somebody without the role is not shown any of it.
+     */
+    public function testTheRegistersOwnAreShownOnlyToWhoeverAdministersIt(): void
+    {
+        self::assertSame(
+            [],
+            $this->bellFor(8025)->getRegisterNotifications(),
+            'A member who does not administer the register is told nothing about it.',
+        );
+
+        self::assertNotSame(
+            [],
+            $this->registerAdminBellFor(8025)->getRegisterNotifications(),
+            'The seed is expected to leave the register with something to do.',
+        );
+    }
+
+    /**
+     * They have no read state, so marking everything read cannot clear them, and the badge still says so.
+     */
+    public function testTheRegistersOwnAreCountedByTheBadgeButNotByTheReadState(): void
+    {
+        $bell = $this->registerAdminBellFor(8025);
+        $outstanding = count($bell->getRegisterNotifications());
+
+        $bell->markAllRead();
+
+        self::assertSame(
+            0,
+            $bell->getUnreadCount(),
+        );
+        self::assertSame(
+            $outstanding,
+            $bell->getBadgeCount(),
+        );
+    }
+
+    /**
+     * The same bell, read by a member who administers the register.
+     */
+    private function registerAdminBellFor(int $lidnr): Bell
+    {
+        self::getContainer()->get('security.token_storage')->setToken(new UsernamePasswordToken(
+            $this->member($lidnr),
+            'main',
+            [
+                'ROLE_USER',
+                'ROLE_DATABASE_ADMIN',
+            ],
+        ));
+
+        return self::getContainer()->get(Bell::class);
+    }
+
     private function bellFor(int $lidnr): Bell
     {
         self::getContainer()->get('security.token_storage')->setToken(new UsernamePasswordToken(
