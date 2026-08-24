@@ -21,13 +21,11 @@ messageblocks:
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
       title: "Your contact at GEWIS has looked at what you submitted"
-      contentHTML: "</p>
-
-      <p>Dear {{FULL_NAME}},</p>
+      contentHTML: "<p>Dear {{FULL_NAME}},</p>
 
       <p>Your contact at GEWIS has reached a decision on what you submitted for {{COMPANY_NAME}}. What is currently on the website is unchanged unless it was approved.</p>
 
       <p>You can read the outcome, and their feedback, on the career portal:<br><a href='{{PORTAL_URL}}'>{{PORTAL_URL}}</a></p>
 
-      With kind regards,<br/>
-      The External Affairs Officer"
+      <p>With kind regards,<br/>
+      The External Affairs Officer</p>"

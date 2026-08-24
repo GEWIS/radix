@@ -21,11 +21,9 @@ messageblocks:
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
       title: "Granted authorisation for {{MEETING_NUMBER}} GMM revoked"
-      contentHTML: "</p>
-
-      <p>Dear {{GRANTEE_FULL_NAME}},</p>
+      contentHTML: "<p>Dear {{GRANTEE_FULL_NAME}},</p>
 
       <p>The authorisation granted to you by <i>{{GRANTOR_FULL_NAME}}</i> for the <strong>{{MEETING_NUMBER}} GMM</strong> ({{MEETING_DATE}}) has been revoked and is therefore not valid during the GMM.</p>
 
-      With kind regards,<br/>
-      The ApplicatieBeheerCommissie"
+      <p>With kind regards,<br/>
+      The ApplicatieBeheerCommissie</p>"

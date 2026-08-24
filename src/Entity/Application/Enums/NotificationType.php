@@ -7,6 +7,8 @@ namespace App\Entity\Application\Enums;
 use App\Security\User\Firewall;
 use Symfony\Component\Translation\TranslatableMessage;
 
+use function sprintf;
+
 /**
  * The kind of event a persisted {@see \App\Entity\Application\Notification} records. Drives the icon shown in the
  * notification centre and, as a category, the per-member email opt-in. It also holds everything the notification says:
@@ -454,5 +456,42 @@ enum NotificationType: string
             self::MfaDisabled => 'Two-factor authentication disabled on your GEWIS account',
             self::BackupCodesRegenerated => 'New backup codes for your GEWIS account',
         };
+    }
+
+    /**
+     * The opening sentence of an emailed security notice, naming the account it is about. Null for the same kinds
+     * {@see self::emailSubject()} returns null for.
+     *
+     * Where {@see self::message()} names the device inline, this leaves it out: the email sets the same facts out
+     * below it as a labelled block, and a reader checking whether a sign-in was theirs should not have to find the
+     * browser and the address halfway through a sentence.
+     *
+     * Plain English rather than a translatable message, because outgoing mail is always English.
+     */
+    public function emailSummary(string $account): ?string
+    {
+        $sentence = match ($this) {
+            self::AlbumPublished, self::ActivityPublished, self::DataExportReady,
+            self::ActivityAwaitingReview, self::SignupClosing, self::SignupClosingWithFields,
+            self::CompanyRevisionAwaitingReview, self::VacancyRevisionAwaitingReview,
+            self::CompanyBannerAwaitingReview, self::OrganInformationRevisionAwaitingReview,
+            self::PollRevisionAwaitingReview, self::ActivityProposalAwaitingDecision,
+            self::ActivityProposalScheduled, self::ActivityProposalDeclined,
+            self::ActivityProposalBudgetDue, self::ActivityProposalLapsed => null,
+            self::SignIn => 'Your GEWIS account (%s) was used to sign in to the GEWIS website.',
+            self::PasswordChanged => 'The password of your GEWIS account (%s) was changed.',
+            self::MfaEnabled => 'Two-factor authentication was enabled on your GEWIS account (%s).',
+            self::MfaDisabled => 'Two-factor authentication was disabled on your GEWIS account (%s).',
+            self::BackupCodesRegenerated => 'New backup codes were generated for your GEWIS account (%s).',
+        };
+
+        if (null === $sentence) {
+            return null;
+        }
+
+        return sprintf(
+            $sentence,
+            $account,
+        );
     }
 }

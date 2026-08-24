@@ -21,9 +21,7 @@ messageblocks:
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
       title: "Set a password to start using the GEWIS career portal"
-      contentHTML: "</p>
-
-      <p>Dear {{FULL_NAME}},</p>
+      contentHTML: "<p>Dear {{FULL_NAME}},</p>
 
       <p>You have been invited to represent {{COMPANY_NAME}} on the GEWIS website. Through the career portal you can keep the company profile up to date, post vacancies, and follow what your contact at GEWIS makes of them.</p>
 
@@ -31,5 +29,5 @@ messageblocks:
 
       <p>If you were not expecting this invitation, you can ignore this email. Without the link above no account is created.</p>
 
-      With kind regards,<br/>
-      The External Affairs Officer"
+      <p>With kind regards,<br/>
+      The External Affairs Officer</p>"

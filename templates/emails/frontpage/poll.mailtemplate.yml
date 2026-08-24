@@ -21,13 +21,11 @@ messageblocks:
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
       title: "A new poll has been requested"
-      contentHTML: "</p>
-
-      <p>Dear board member,</p>
+      contentHTML: "<p>Dear board member,</p>
 
       <p><i>{{CREATOR_FULL_NAME}}</i> has created a new poll. It requires your review before it will appear on the website.</p>
 
       <p><a href='{{POLL_ADMIN_URL}}'>Click here</a> to view this poll. The question of this poll is <i>\"{{POLL_QUESTION_ENGLISH}}\"</i>.</p>
 
-      With kind regards,<br/>
-      The ApplicatieBeheerCommissie"
+      <p>With kind regards,<br/>
+      The ApplicatieBeheerCommissie</p>"

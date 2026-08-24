@@ -15,25 +15,32 @@ messageblocks:
 
     # Each mailing must have a header to make the template shine! It contains the title and the date.
     - type: "header"
-      title: "{{HEADLINE}}"
-      date: 2026-07-31 # Note that this date needs to be updated
+      title: "Account security"
+      date: 2026-08-24 # Note that this date needs to be updated
 
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
-      title: "A security notice about your GEWIS account"
-      contentHTML: "</p>
-
-      <p>Dear {{FULL_NAME}},</p>
+      title: "{{HEADLINE}}"
+      contentHTML: "<p>Dear {{FULL_NAME}},</p>
 
       <p>{{SUMMARY}}</p>
 
-      <p>When: {{OCCURRED_AT}}</p>
+      <table width='100%' style='background-color: #FFFFFF; border-left: 4px solid #C40000;'>
+      <tr><td style='padding: 16px 20px;'>
+      <table width='100%'>
+      <tr><th align='left' width='40%' style='padding: 4px 12px 4px 0; text-align: left; vertical-align: top;'>Date and time</th><td width='60%' style='padding: 4px 0; vertical-align: top;'>{{DATE_AND_TIME}}</td></tr>
+      <tr><th align='left' width='40%' style='padding: 4px 12px 4px 0; text-align: left; vertical-align: top;'>Browser</th><td width='60%' style='padding: 4px 0; vertical-align: top;'>{{BROWSER}}</td></tr>
+      <tr><th align='left' width='40%' style='padding: 4px 12px 4px 0; text-align: left; vertical-align: top;'>Operating system</th><td width='60%' style='padding: 4px 0; vertical-align: top;'>{{OPERATING_SYSTEM}}</td></tr>
+      <tr><th align='left' width='40%' style='padding: 4px 12px 4px 0; text-align: left; vertical-align: top;'>IP address</th><td width='60%' style='padding: 4px 0; vertical-align: top;'>{{IP_ADDRESS}}</td></tr>
+      </table>
+      </td></tr>
+      </table>
 
-      <p>If this was you, there is nothing to do.</p>
+      <p>If the details above look familiar, there is nothing to do and you can ignore this email.</p>
 
-      <p>If not, request a new password:<br><a href='{{RESET_URL}}'>{{RESET_URL}}</a></p>
+      <p>If they do not, somebody else may have access to your account. Change your password as soon as you can, which also signs out every device that is signed in right now:<br/><a href='{{RESET_URL}}'>{{RESET_URL}}</a></p>
 
-      <p>If that does not get you back into your account, write to <a href='mailto:gewisweb@gewis.nl'>gewisweb@gewis.nl</a>.</p>
+      <p>If a new password does not get you back into your account, write to <a href='mailto:gewisweb@gewis.nl'>gewisweb@gewis.nl</a>.</p>
 
-      With kind regards,<br/>
-      The ApplicatieBeheerCommissie"
+      <p>With kind regards,<br/>
+      The ApplicatieBeheerCommissie</p>"
