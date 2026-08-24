@@ -107,6 +107,11 @@ x-app-environment: &app_environment
     TUE_IP_RANGES: "${TUE_IP_RANGES:-131.155.0.0/16,100.64.0.0/10}"
     WATERMARK_TAG: "${WATERMARK_TAG:-GEWIS-EDU}"
 
+    # The subnets `ROLE_DATABASE_ADMIN` and `ROLE_DATABASE_READ_ONLY` are granted on, comma separated, CIDR notation.
+    # Never the same list as TUE_IP_RANGES above: that one is as wide as a university, and a value that wide restricts
+    # nothing here. Addresses in SYMFONY_TRUSTED_PROXIES are refused whatever this says. Empty restricts nothing.
+    REGISTER_IP_RANGES: "${REGISTER_IP_RANGES:-}"
+
     # Who the application writes as, and who it writes to. An address has to be named by the deployment; the display
     # name beside it is defaulted, because a deployment that says nothing should still sign its mail readably.
     MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:?MAIL_FROM_ADDRESS must be set}"

@@ -201,6 +201,13 @@ secretary (installed, their installation date passed, not relieved) and `ROLE_DA
 been relieved but whose year is not yet discharged. Both are derived in `User::getRoles()` from board installations
 rather than written against an account, and both require MFA before they are granted at all.
 
+Both are also withheld from a request that did not arrive from one of the subnets in `REGISTER_IP_RANGES`:
+`App\Security\Database\RegisterNetworkRoleHierarchy` filters them out of the reachable role set, so every
+`access_control` rule, `#[IsGranted]` and `is_granted()` naming them fails at once and the register's links disappear
+from the menus with them. An empty list places the register nowhere and restricts nothing, which is what development
+and the tests run with. The check refuses an address belonging to a trusted proxy, so getting `SYMFONY_TRUSTED_PROXIES`
+wrong shuts the register rather than opening it.
+
 `App\Security\User\UserChecker` blocks `User` login for deleted, hidden or expired members and members without an
 email. Authorization beyond roles lives in voters under `src/Security/`; notably
 `App\Security\User\SudoVoter` gates destructive actions behind a 10-minute time-bounded `SUDO` grant (see `SudoMode`).

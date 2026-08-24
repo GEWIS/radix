@@ -9,8 +9,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Only ever used to widen access to course material. Nothing else in the application decides anything on the strength
- * of a client address, and this should not become the exception.
+ * Only ever used to widen access to course material, and this should stay the exception: an address is a weak thing to
+ * grant on. The two other places that read one -- {@see \App\Service\Database\RegistrationService} for the July
+ * sign-up window and {@see \App\Security\Database\RegisterNetworkChecker} for the register -- only ever take
+ * something away with it, which is why they refuse what they cannot establish and this refuses nothing.
  */
 final readonly class CampusNetworkChecker
 {

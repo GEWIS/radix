@@ -49,6 +49,12 @@ parameters:
     # arrangement under which the department shares its exams: on campus, or logged in as a member. CIDR notation.
     env(TUE_IP_RANGES): '131.155.0.0/16,100.64.0.0/10'
     app.education.tue_ranges: '%env(csv:TUE_IP_RANGES)%'
+    # Where the register may be reached from: outside these subnets `ROLE_DATABASE_ADMIN` and `ROLE_DATABASE_READ_ONLY`
+    # are not granted at all, however the person is signed in. Never the same list as TUE_IP_RANGES above. CIDR
+    # notation. Empty restricts nothing, which is what development and the tests run with; production states it in
+    # `compose.yaml`.
+    env(REGISTER_IP_RANGES): ''
+    app.database.register_ranges: '%env(csv:REGISTER_IP_RANGES)%'
     # Written into every watermarked download as machine-readable text, so a copy found on an external platform can be
     # recognised as ours. Deliberately not a secret: it is meant to be found.
     env(WATERMARK_TAG): 'GEWIS-EDU'
@@ -113,6 +119,7 @@ services:
             $mfaEnforcementEnabled: '%app.mfa.enforcement_enabled%' # bool
             $internalAffairsEmail: '%app.email.internal_affairs%' # string
             $tueRanges: '%app.education.tue_ranges%' # array
+            $registerRanges: '%app.database.register_ranges%' # array
             $watermarkTag: '%app.education.watermark_tag%' # string
             $watermarkFontPath: '%app.education.watermark_font%' # string
             $siteUrl: '%env(string:DEFAULT_URI)%' # string

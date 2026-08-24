@@ -12,8 +12,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * The half of the download rule that is not about being logged in: anyone on the TU/e campus network may fetch course
- * material. It is the only place in the application where a client address decides anything, so what counts as being on
- * campus is pinned here rather than left to a subnet list nobody reads.
+ * material. It is the only place where a client address hands something out rather than takes it away, so what counts
+ * as being on campus is pinned here rather than left to a subnet list nobody reads.
  */
 final class CampusNetworkCheckerTest extends TestCase
 {
