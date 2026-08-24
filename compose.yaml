@@ -18,11 +18,14 @@ x-app-environment: &app_environment
     # `prod` there.
     APP_ENV: "${APP_ENV:-prod}"
     APP_SECRET: "${APP_SECRET:?APP_SECRET must be set}"
-    # Which proxies may be believed about the visitor. Production is reached through a proxy that terminates TLS and
-    # forwards to the port below, so `X-Forwarded-Proto` is the only thing saying the visitor is on HTTPS; believing
-    # the wrong sender of that header is how a redirect ends up on http://. `private_ranges` covers a proxy on the
-    # host itself, which is what the stack is deployed behind; one reached from anywhere else needs its address here.
-    SYMFONY_TRUSTED_PROXIES: "${SYMFONY_TRUSTED_PROXIES:-private_ranges}"
+    # Which proxies may be believed about the visitor: the addresses or CIDR ranges the proxy in front reaches this
+    # container from, comma separated. It terminates TLS and forwards to the port below, so `X-Forwarded-For` is the
+    # only thing saying who the visitor is and `X-Forwarded-Proto` the only thing saying they are on HTTPS. A sender
+    # that is not named here is believed about neither and the application records the proxy as the visitor, which
+    # is why this is guarded rather than defaulted: no value is right everywhere and a wrong one says nothing.
+    # Naming more than the proxies is the worse mistake, since anything inside the range may then dictate its own
+    # address. Never include TUE_IP_RANGES below, which decides who reaches course material.
+    SYMFONY_TRUSTED_PROXIES: "${SYMFONY_TRUSTED_PROXIES:?SYMFONY_TRUSTED_PROXIES must be set to the addresses the proxy forwards from}"
     SERVER_NAME: "${SERVER_NAME:?SERVER_NAME must be set}, app:80"
     DEFAULT_URI: "${DEFAULT_URI:?DEFAULT_URI must be set}"
     CORS_ALLOW_ORIGIN: "${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN must be set}"

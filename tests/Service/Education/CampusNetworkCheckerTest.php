@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Service\Education;
 
 use App\Service\Education\CampusNetworkChecker;
+use Override;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -76,6 +77,30 @@ final class CampusNetworkCheckerTest extends TestCase
     public function testWithoutARequestNothingIsOnCampus(): void
     {
         self::assertFalse($this->checker()->isOnCampus());
+    }
+
+    /**
+     * The proxy sits inside the ranges above, and its address is what arrives when a request carries no forwarded one.
+     */
+    public function testATrustedProxyIsNeverOnCampus(): void
+    {
+        Request::setTrustedProxies(
+            ['131.155.69.202'],
+            Request::HEADER_X_FORWARDED_FOR,
+        );
+
+        self::assertFalse($this->checker()->matches('131.155.69.202'));
+        // Somebody genuinely on campus still is.
+        self::assertTrue($this->checker()->matches('131.155.10.7'));
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        Request::setTrustedProxies(
+            [],
+            0,
+        );
     }
 
     private function checker(): CampusNetworkChecker

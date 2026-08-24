@@ -12,6 +12,7 @@ use App\Service\Database\Member as MemberService;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * The public sign-up flow: everything between the registration form and a prospective member who is on their way to
@@ -43,11 +44,25 @@ class RegistrationService
             return true;
         }
 
-        return null !== $clientIp
-            && IpUtils::checkIp(
+        if (null === $clientIp) {
+            return false;
+        }
+
+        // The proxy in front stands on the department's network, so believing its own address would hold the form
+        // open for everybody for the month it is meant to be shut.
+        if (
+            IpUtils::checkIp(
                 $clientIp,
-                self::MCS_NETWORK,
-            );
+                Request::getTrustedProxies(),
+            )
+        ) {
+            return false;
+        }
+
+        return IpUtils::checkIp(
+            $clientIp,
+            self::MCS_NETWORK,
+        );
     }
 
     /**
