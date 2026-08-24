@@ -174,9 +174,11 @@
                                                         <td style="padding-top:25px;padding-bottom:25px;">
                                                             <div style="font-family: sans-serif">
                                                                 <div style="font-size: 18px; color: #333333; line-height: 1.4; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif;">
-                                                                    <p style="margin: 0; font-size: 18px;">
+                                                                    {# No wrapper element: every body opens with its
+                                                                       own block-level tags, and a paragraph around
+                                                                       them would be closed by the first one anyway,
+                                                                       leaving the rest of the body outside it. #}
                                                                     {% block body %}{% endblock %}
-                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         </td>

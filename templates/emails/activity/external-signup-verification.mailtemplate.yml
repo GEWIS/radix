@@ -21,8 +21,7 @@ messageblocks:
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
       title: "Confirm your sign-up"
-      contentHTML: "</p>
-        <p>Dear {{FULL_NAME}},</p>
+      contentHTML: "<p>Dear {{FULL_NAME}},</p>
 
         <p>To complete your sign-up for <em>{{ACTIVITY_NAME}}</em> ({{SIGNUPLIST_NAME}}), please verify your email address by clicking the link below within 24 hours:</p>
 
@@ -30,8 +29,8 @@ messageblocks:
 
         <p>If you do not click the link within 24 hours, your details will not be saved. If you did not sign up for this activity, you can safely ignore this email.</p>
 
-        With kind regards,<br/>
-        The ApplicatieBeheerCommissie"
+        <p>With kind regards,<br/>
+        The ApplicatieBeheerCommissie</p>"
 
     - type: tinyfooter
       contentHTML: >

@@ -15,10 +15,9 @@ use App\Message\User\SecurityNotificationMessage;
 use App\MessageHandler\User\SecurityNotificationHandler;
 use App\Repository\User\CompanyUserRepository;
 use App\Repository\User\UserRepository;
-use App\Service\Application\DeviceDescription;
-use App\Service\Application\NotificationContextResolver;
 use App\Service\Application\NotificationPublisher;
 use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -27,12 +26,11 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function array_column;
 use function array_fill;
 use function array_map;
 use function count;
-use function strtr;
 
 final class SecurityNotificationHandlerTest extends TestCase
 {
@@ -41,7 +39,6 @@ final class SecurityNotificationHandlerTest extends TestCase
         'system' => 'Windows 11',
         'address' => '192.0.2.1',
     ];
-    private const string DEVICE = 'Chrome 124 on Windows 11 (192.0.2.1)';
 
     /** @var list<Notification> */
     private array $published = [];
@@ -109,13 +106,63 @@ final class SecurityNotificationHandlerTest extends TestCase
         );
     }
 
-    public function testTheEmailSpellsOutWhatHappened(): void
+    public function testTheEmailSpellsOutWhatHappenedToWhichAccount(): void
     {
         $this->handler()($this->message());
 
         self::assertSame(
-            'Your account was signed in from ' . self::DEVICE . '.',
+            'Your GEWIS account (ada@example.com) was used to sign in to the GEWIS website.',
             $this->sent[0]->getContext()['summary'],
+        );
+    }
+
+    /**
+     * The sentence says what happened and the block below it says where from, each fact on its own line. Somebody
+     * deciding whether a sign-in was theirs reads a browser and an address, not a paragraph.
+     */
+    public function testTheEmailSetsOutWhereItHappenedAsLabelledFacts(): void
+    {
+        $this->handler()($this->message());
+
+        self::assertSame(
+            [
+                [
+                    'label' => 'Date and time',
+                    'value' => '31 July 2026, 12:00 CEST',
+                ],
+                [
+                    'label' => 'Browser',
+                    'value' => 'Chrome 124',
+                ],
+                [
+                    'label' => 'Operating system',
+                    'value' => 'Windows 11',
+                ],
+                [
+                    'label' => 'IP address',
+                    'value' => '192.0.2.1',
+                ],
+            ],
+            $this->sent[0]->getContext()['details'],
+        );
+    }
+
+    /**
+     * A row reading "Browser: Unknown" tells the reader nothing and makes the rest of them look less trustworthy.
+     */
+    public function testAFactThatWasNeverRecognisedIsLeftOutRatherThanShownEmpty(): void
+    {
+        $this->handler()($this->message(origin: ['address' => '192.0.2.1']));
+
+        self::assertSame(
+            [
+                'Date and time',
+                'IP address',
+            ],
+            array_column(
+                $this->sent[0]->getContext()['details'],
+                'label',
+            ),
         );
     }
 
@@ -200,17 +247,24 @@ final class SecurityNotificationHandlerTest extends TestCase
         );
     }
 
+    /**
+     * @param array{browser?: string, system?: string, address?: string}|null $origin
+     */
     private function message(
         string $firewallName = 'main',
         string $userIdentifier = '8025',
         NotificationType $type = NotificationType::SignIn,
+        ?array $origin = null,
     ): SecurityNotificationMessage {
         return new SecurityNotificationMessage(
             $firewallName,
             $userIdentifier,
             $type,
-            self::ORIGIN,
-            new DateTimeImmutable('2026-07-31 12:00:00'),
+            $origin ?? self::ORIGIN,
+            new DateTimeImmutable(
+                '2026-07-31 12:00:00',
+                new DateTimeZone('Europe/Amsterdam'),
+            ),
         );
     }
 
@@ -241,14 +295,6 @@ final class SecurityNotificationHandlerTest extends TestCase
             static fn (string $route): string => 'https://gewis.nl/' . $route,
         );
 
-        $translator = self::createStub(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(
-            static fn (string $id, array $parameters = []): string => strtr(
-                $id,
-                $parameters,
-            ),
-        );
-
         return new SecurityNotificationHandler(
             new NotificationPublisher(
                 $entityManager,
@@ -259,8 +305,6 @@ final class SecurityNotificationHandlerTest extends TestCase
             $this->companyUsers(),
             $mailer,
             $urlGenerator,
-            new NotificationContextResolver(new DeviceDescription($translator)),
-            $translator,
             new NullLogger(),
         );
     }

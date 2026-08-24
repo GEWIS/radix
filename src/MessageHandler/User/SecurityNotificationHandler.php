@@ -12,9 +12,8 @@ use App\Message\User\SecurityNotificationMessage;
 use App\Repository\User\CompanyUserRepository;
 use App\Repository\User\UserRepository;
 use App\Security\User\Firewall;
-use App\Service\Application\NotificationContextResolver;
 use App\Service\Application\NotificationPublisher;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -22,7 +21,8 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function trim;
 
 /**
  * Tells whoever an account belongs to that something happened to it: in the notification centre, as a toast to whatever
@@ -45,8 +45,6 @@ class SecurityNotificationHandler
         private readonly CompanyUserRepository $companyUserRepository,
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly NotificationContextResolver $contextResolver,
-        private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -88,12 +86,6 @@ class SecurityNotificationHandler
             return;
         }
 
-        $device = $this->contextResolver->resolve(
-            $type,
-            $origin,
-            Languages::English,
-        ) ?? '';
-
         try {
             $this->mailer->send(
                 new TemplatedEmail()
@@ -103,11 +95,11 @@ class SecurityNotificationHandler
                     ->context([
                         'fullName' => $recipient['name'],
                         'headline' => $subject,
-                        'summary' => $type->message($device)->trans(
-                            $this->translator,
-                            Languages::English->getLangParam(),
+                        'summary' => $type->emailSummary($recipient['email']),
+                        'details' => self::details(
+                            $message->getOccurredAt(),
+                            $origin,
                         ),
-                        'occurredAt' => $message->getOccurredAt()->format(DateTimeInterface::ATOM),
                         'resetUrl' => $this->urlGenerator->generate(
                             $firewall->forgotPasswordRoute(),
                             ['_locale' => Languages::English->getLangParam()],
@@ -124,6 +116,53 @@ class SecurityNotificationHandler
                 ],
             );
         }
+    }
+
+    /**
+     * What the email sets out under its opening sentence, as rows of a label and a value.
+     *
+     * Whatever was not recognised is left out rather than shown empty, the same way
+     * {@see \App\Service\Application\DeviceDescription} handles it: a row reading "Browser: Unknown" tells the reader
+     * nothing and makes the rest of them look less trustworthy.
+     *
+     * The time is written out the way somebody reads a date, with the zone named, since a notice whose whole purpose
+     * is "was this you at that moment" is worth nothing in a format that has to be decoded first.
+     *
+     * @param array{browser?: string, system?: string, address?: string} $origin
+     *
+     * @return list<array{label: string, value: string}>
+     */
+    private static function details(
+        DateTimeImmutable $occurredAt,
+        array $origin,
+    ): array {
+        $details = [
+            [
+                'label' => 'Date and time',
+                'value' => $occurredAt->format('j F Y, H:i T'),
+            ],
+        ];
+
+        $labels = [
+            'browser' => 'Browser',
+            'system' => 'Operating system',
+            'address' => 'IP address',
+        ];
+
+        foreach ($labels as $key => $label) {
+            $value = trim($origin[$key] ?? '');
+
+            if ('' === $value) {
+                continue;
+            }
+
+            $details[] = [
+                'label' => $label,
+                'value' => $value,
+            ];
+        }
+
+        return $details;
     }
 
     private function account(

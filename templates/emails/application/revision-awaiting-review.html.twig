@@ -1,13 +1,16 @@
 {% extends 'emails/_base.html.twig' %}
+{% import 'emails/_partials/blocks.html.twig' as blocks %}
 
 {% block emailTitle %}{{ subject }}{% endblock %}
 {% block preheader %}{{ subject|replace({' ': '&nbsp;'})|raw }}{% endblock %}
-{% block heading %}Something is waiting for you{% endblock %}
+{% block heading %}Awaiting review{% endblock %}
 {% block subheading %}{{ subject }}{% endblock %}
 {% block body %}
     <p>L.s.,</p>
-    <p>{{ author }} submitted revision #{{ revisionNumber }} for review. Nothing about it is public until somebody decides on it.</p>
-    <p>You can read it and reach a decision here:<br><a href="{{ url }}" style="color: #C40000; text-decoration: none;" target="_blank" rel="noopener nofollow">{{ url }}</a></p>
-    With kind regards,<br> The ApplicatieBeheerCommissie
+    <p>{{ author }} submitted revision #{{ revisionNumber }} for review. Nothing about it is public until somebody has reviewed it.</p>
+    <p>You can read it and reach a decision here:</p>
+    {{ blocks.button(url, 'Review the submission') }}
+    {{ blocks.fallback(url) }}
+    <p>With kind regards,<br/>The ApplicatieBeheerCommissie</p>
 {% endblock %}
-{% block footerNote %}You receive this email because your office reviews what is submitted here.{% endblock %}
+{% block footerNote %}You receive this email because you are responsible for these reviews.{% endblock %}

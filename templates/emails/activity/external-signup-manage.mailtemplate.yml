@@ -21,8 +21,7 @@ messageblocks:
     # This is the first block which is shown on top of the message. Recommended for most messages
     - type: topblock
       title: "Manage your sign-up"
-      contentHTML: "</p>
-        <p>Dear {{FULL_NAME}},</p>
+      contentHTML: "<p>Dear {{FULL_NAME}},</p>
 
         <p>Your details have been successfully added to the sign-up list for <em>{{ACTIVITY_NAME}}</em> ({{SIGNUPLIST_NAME}}). As long as the list remains open, you can review your details or remove your name using the link below:</p>
 
@@ -30,8 +29,8 @@ messageblocks:
 
         <p>Please keep this email safe, as this link is the only way to access and manage your sign-up.</p>
 
-        With kind regards,<br/>
-        The ApplicatieBeheerCommissie"
+        <p>With kind regards,<br/>
+        The ApplicatieBeheerCommissie</p>"
 
     - type: tinyfooter
       contentHTML: >
