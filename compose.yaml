@@ -50,8 +50,8 @@ x-app-environment: &app_environment
     VALKEY_DSN: &valkey_dsn "valkey://${VALKEY_HOST:-valkey}:${VALKEY_PORT:-6379}"
     LOCK_DSN: *valkey_dsn
     # The `mailer` service below: it relays to the real SMTP server here and catches everything in development, so the
-    # application talks to the same name either way.
-    MAILER_DSN: "smtp://mailer:1025"
+    # application talks to the same address either way.
+    MAILER_DSN: "smtp://mailer:25"
 
     # The Caddyfile's Mercure hub always wants a key, even where nothing publishes: development uses it for hot
     # reload, production leaves the hub closed (no `anonymous`) and idle.
@@ -236,24 +236,33 @@ services:
             - target: 80
               published: 9212
               protocol: tcp
-    # The application always talks SMTP to this name. Here it hands the message to the real relay; development
-    # replaces this with a Mailpit that catches everything instead.
+    # The application always talks SMTP to this name. Here it is a Postfix that accepts the message into a local
+    # queue and relays it on to the real SMTP server; development replaces this with a Mailpit that catches
+    # everything instead. The queue is what a relay outage costs us: Postfix holds the mail and retries rather than
+    # handing the failure back to whoever sent it.
     mailer:
-        image: axllent/mailpit
+        image: juanluisbaptiste/postfix
         restart: unless-stopped
-        hostname: mailpit
         environment:
-            MP_SMTP_RELAY_HOST: "${SMTP_SERVER:?SMTP_SERVER must be set}"
-            MP_SMTP_RELAY_PORT: "${SMTP_PORT:?SMTP_PORT must be set}"
-            MP_SMTP_RELAY_TLS: "true"
-            MP_SMTP_RELAY_AUTH: "login"
-            MP_SMTP_RELAY_USERNAME: "${SMTP_USERNAME:?SMTP_USERNAME must be set}"
-            MP_SMTP_RELAY_PASSWORD: "${SMTP_PASSWORD:?SMTP_PASSWORD must be set}"
+            SMTP_SERVER: "${SMTP_SERVER:?SMTP_SERVER must be set}"
+            SMTP_PORT: "${SMTP_PORT:?SMTP_PORT must be set}"
+            SMTP_USERNAME: "${SMTP_USERNAME:?SMTP_USERNAME must be set}"
+            SMTP_PASSWORD: "${SMTP_PASSWORD:?SMTP_PASSWORD must be set}"
+            # What Postfix calls itself when it greets the relay, and what an unqualified address gets completed
+            # with, so a message is attributable to the deployment that sent it rather than to a container id.
+            SERVER_HOSTNAME: "${SERVER_HOSTNAME:?SERVER_HOSTNAME must be set}"
+            TZ: "${TZ:-Europe/Amsterdam}"
+            # The image asks for opportunistic TLS, which a relay that answers without `STARTTLS` silently gets away
+            # with. The credentials above are sent on this connection, so require it instead. `POSTFIX_`-prefixed
+            # variables are written to `main.cf` under the name that follows.
+            POSTFIX_smtp_tls_security_level: "encrypt"
         ports:
-            - target: 1025
+            - target: 25
               protocol: tcp
         networks:
             - radix_network
+        # Long enough for Postfix to hand over what it has already accepted before the container goes away.
+        stop_grace_period: 60s
     valkey:
         image: valkey/valkey:9.1-alpine
         restart: unless-stopped
