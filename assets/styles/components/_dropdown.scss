@@ -1,0 +1,54 @@
+// Dropdown and select element styling for dark mode support.
+// Ensures that select dropdowns, year selectors, and other dropdown menus maintain
+// proper contrast and readability in both light and dark themes.
+
+@include color-mode(gewis-night) {
+    select,
+    .form-select {
+        background-color: var(--#{$prefix}body-bg);
+        border-color: var(--#{$prefix}border-color);
+        color: var(--#{$prefix}body-color);
+
+        &:focus {
+            background-color: var(--#{$prefix}body-bg);
+            border-color: var(--#{$prefix}border-color);
+            color: var(--#{$prefix}body-color);
+        }
+
+        &:disabled {
+            background-color: var(--#{$prefix}secondary-bg);
+            color: var(--#{$prefix}secondary-color);
+        }
+    }
+
+    .dropdown-menu {
+        background-color: var(--#{$prefix}body-bg);
+        border-color: var(--#{$prefix}border-color);
+    }
+
+    .dropdown-item {
+        color: var(--#{$prefix}body-color);
+
+        &:hover,
+        &:focus {
+            background-color: var(--#{$prefix}secondary-bg);
+            color: var(--#{$prefix}body-color);
+        }
+
+        &:active {
+            background-color: lighten($body-bg-dark, 5%);
+            color: var(--#{$prefix}body-color);
+        }
+
+        &.active {
+            background-color: lighten($body-bg-dark, 10%);
+            color: var(--#{$prefix}body-color);
+        }
+
+        &.disabled,
+        &:disabled {
+            color: var(--#{$prefix}secondary-color);
+            background-color: transparent;
+        }
+    }
+}
