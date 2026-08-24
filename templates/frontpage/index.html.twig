@@ -42,7 +42,7 @@
 
 {% block contents %}
     <div class="row">
-        <main class="col-sm-7 col-md-8">
+        <main class="col-12 col-lg-8">
             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                 <h2 class="h5 text-uppercase text-primary-emphasis mb-0">{{ 'News'|trans }}</h2>
                 <a href="{{ path('news/index') }}" class="ms-auto small fw-bold">
@@ -93,7 +93,7 @@
             {% endif %}
         </main>
 
-        <aside class="col-sm-5 col-md-4 ps-md-5">
+        <aside class="col-12 col-lg-4 ps-lg-5 mt-4 mt-lg-0">
             <div class="panel">
                 <div class="panel-heading">
                     <h3>{{ 'Agenda'|trans }}</h3>
@@ -168,3 +168,4 @@
         </aside>
     </div>
 {% endblock %}
+
