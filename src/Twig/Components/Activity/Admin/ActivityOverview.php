@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Activity\Admin;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Activity\Activity;
 use App\Entity\Decision\Member;
 use App\Entity\User\Enums\UserRoles;
@@ -99,6 +100,7 @@ final class ActivityOverview extends AbstractPaginatedOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function gotoPendingPage(#[LiveArg]
     int $page,): void
     {
@@ -133,6 +135,7 @@ final class ActivityOverview extends AbstractPaginatedOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function toggleApproved(): void
     {
         $this->expanded = !$this->expanded;

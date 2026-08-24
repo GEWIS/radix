@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Frontpage;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Frontpage\Enums\NewsCategory;
 use App\Entity\Frontpage\NewsItem;
 use App\Repository\Frontpage\NewsItemRepository;
@@ -60,6 +61,7 @@ final class NewsOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;

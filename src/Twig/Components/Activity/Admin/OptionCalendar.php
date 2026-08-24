@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Activity\Admin;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Decision\Organ;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Decision\OrganRepository;
@@ -92,6 +93,7 @@ final class OptionCalendar
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function previousMonth(): void
     {
         $this->assertAccess();
@@ -99,6 +101,7 @@ final class OptionCalendar
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function nextMonth(): void
     {
         $this->assertAccess();
@@ -106,6 +109,7 @@ final class OptionCalendar
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function today(): void
     {
         $this->assertAccess();

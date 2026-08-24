@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Career;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Career\Company;
 use App\Repository\Career\CompanyRepository;
 use Random\Engine\Mt19937;
@@ -71,6 +72,7 @@ final class CompanyOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;

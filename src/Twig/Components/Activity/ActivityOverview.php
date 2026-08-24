@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Activity;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\Enums\ActivityCategories;
@@ -156,6 +157,7 @@ final class ActivityOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;

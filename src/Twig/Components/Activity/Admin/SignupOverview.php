@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Activity\Admin;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\Enums\AllocationMethod;
 use App\Entity\Activity\Enums\RecipientScope;
@@ -437,6 +438,7 @@ final class SignupOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function selectAll(#[LiveArg]
     int $listId,): void
     {
@@ -469,6 +471,7 @@ final class SignupOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function clearSelection(#[LiveArg]
     int $listId,): void
     {
@@ -514,6 +517,7 @@ final class SignupOverview
      * so the hidden set is effectively per-list. A field absent from the set is shown (the default).
      */
     #[LiveAction]
+    #[ReadOnlySafe]
     public function toggleFieldColumn(#[LiveArg]
     int $fieldId,): void
     {
@@ -539,6 +543,7 @@ final class SignupOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function openComposer(
         #[LiveArg]
         int $listId,
@@ -554,12 +559,14 @@ final class SignupOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function closeComposer(): void
     {
         $this->composingListId = null;
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function enterAttendance(#[LiveArg]
     int $listId,): void
     {
@@ -574,6 +581,7 @@ final class SignupOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function exitAttendance(): void
     {
         $this->assertAccess();

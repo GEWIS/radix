@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Career;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Career\Company;
 use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
@@ -144,6 +145,7 @@ final class VacancyOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;

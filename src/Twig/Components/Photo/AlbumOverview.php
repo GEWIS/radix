@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Photo;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Photo\Album;
 use App\Service\Photo\AlbumService;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -61,6 +62,7 @@ final class AlbumOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;
