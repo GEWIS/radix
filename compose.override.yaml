@@ -210,7 +210,7 @@ services:
             HYPERKITTY_API_KEY: somerandomapikeythatiobviouslydidnotcreatemyself
             MAILMAN_DOMAIN: "${SERVER_HOSTNAME}"
             SMTP_HOST: mailer
-            SMTP_PORT: 1025
+            SMTP_PORT: 25
             SMTP_SECURE_MODE: smtp
         networks:
             - radix_network
@@ -242,7 +242,7 @@ services:
             DJANGO_SUPERUSER_EMAIL: "${DEV_TOOLS_ADMIN_USERNAME:-admin}@${SERVER_HOSTNAME}"
             DJANGO_SUPERUSER_PASSWORD: "${DEV_TOOLS_ADMIN_PASSWORD:-gewisdbgewis}"
             SMTP_HOST: mailer
-            SMTP_PORT: 1025
+            SMTP_PORT: 25
         networks:
             - radix_network
         ports:
@@ -293,16 +293,18 @@ services:
             - app
         networks:
             - radix_network
-    # Catches instead of relaying: an empty relay host is what stops Mailpit forwarding, and the web interface on
-    # http://localhost:8025 is where the mail ends up. Nothing leaves the machine.
+    # Catches instead of relaying: Mailpit takes the place of the Postfix that production runs, and the web interface
+    # on http://localhost:8025 is where the mail ends up. Nothing leaves the machine. It listens on the port Postfix
+    # would, so `MAILER_DSN` is one value for both stacks.
     mailer:
         image: axllent/mailpit
+        hostname: mailpit
         ports:
             - target: 8025
               published: 8025
               protocol: tcp
         environment:
-            MP_SMTP_RELAY_HOST: ""
+            MP_SMTP_BIND_ADDR: "0.0.0.0:25"
             MP_SMTP_AUTH_ACCEPT_ANY: 1
             MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
