@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Education;
 
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -37,6 +38,17 @@ final readonly class CampusNetworkChecker
         if (
             null === $clientIp
             || [] === $this->tueRanges
+        ) {
+            return false;
+        }
+
+        // The proxy in front stands on TU/e space, inside the ranges below, so believing its own address would put
+        // every visitor on campus as soon as a request arrives without a forwarded one.
+        if (
+            IpUtils::checkIp(
+                $clientIp,
+                Request::getTrustedProxies(),
+            )
         ) {
             return false;
         }

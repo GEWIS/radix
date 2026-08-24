@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * The public sign-up flow, where a registration turns into money and an e-mail that is the only way back into it.
@@ -49,6 +50,29 @@ class RegistrationServiceTest extends TestCase
             $open,
             $this->service($now)->isOpen($clientIp),
         );
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        Request::setTrustedProxies(
+            [],
+            0,
+        );
+    }
+
+    /**
+     * The proxy stands on the department's network, and its address is what arrives when nothing is forwarded.
+     */
+    public function testTheProxyItselfDoesNotHoldTheFormOpen(): void
+    {
+        Request::setTrustedProxies(
+            ['131.155.69.202'],
+            Request::HEADER_X_FORWARDED_FOR,
+        );
+
+        self::assertFalse($this->service('2026-07-15')->isOpen('131.155.69.202'));
+        self::assertTrue($this->service('2026-07-15')->isOpen('131.155.68.1'));
     }
 
     /**
