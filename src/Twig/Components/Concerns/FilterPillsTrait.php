@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Concerns;
 
+use App\Attribute\Application\ReadOnlySafe;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 
@@ -20,6 +21,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveArg;
 trait FilterPillsTrait
 {
     #[LiveAction]
+    #[ReadOnlySafe]
     public function filterBy(#[LiveArg]
         string $filter,): void
     {

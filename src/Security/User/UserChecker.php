@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security\User;
 
+use App\Entity\Application\Enums\MaintenanceStatus;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
@@ -74,15 +75,22 @@ readonly class UserChecker implements UserCheckerInterface
     }
 
     /**
-     * While maintenance is in effect, only admins may sign in. This runs during authentication, ahead of the
-     * {@see \App\EventListener\Application\MaintenanceListener}, which the firewall would otherwise bypass for a login.
+     * While the site is fully down for maintenance, only admins may sign in. This runs during authentication, ahead of
+     * the {@see \App\EventListener\Application\MaintenanceListener}, which the firewall would otherwise bypass for a
+     * login.
+     *
+     * A read-only window is not a reason to refuse anybody: it leaves everyone reading, and what somebody may read is
+     * decided by who they are signed in as. Refusing here meant the login form answered every submission with the same
+     * failure, and Symfony's failure redirect names an address of its own -- built from a scheme the proxy only
+     * carries in `X-Forwarded-Proto` -- so a visitor on HTTPS was sent to `http://` and bounced back to the form they
+     * had just come from.
      */
     #[Override]
     public function checkPostAuth(
         UserInterface $user,
         ?TokenInterface $token = null,
     ): void {
-        if (null === $this->maintenanceStatus->activeWindow()) {
+        if (MaintenanceStatus::Full !== $this->maintenanceStatus->status()) {
             return;
         }
 

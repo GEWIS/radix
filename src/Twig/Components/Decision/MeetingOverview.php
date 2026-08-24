@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Decision;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Meeting;
 use App\Entity\User\Enums\UserRoles;
@@ -130,6 +131,7 @@ final class MeetingOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function filterType(#[LiveArg]
     ?string $type,): void
     {
@@ -144,6 +146,7 @@ final class MeetingOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function gotoPage(#[LiveArg]
     int $page,): void
     {

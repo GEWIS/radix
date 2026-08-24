@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\User\Admin;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Decision\Member;
 use App\Entity\User\Enums\UserRoles;
@@ -172,6 +173,7 @@ final class UsersOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function toggleSort(#[LiveArg]
     string $column,): void
     {
@@ -198,6 +200,7 @@ final class UsersOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function gotoPage(#[LiveArg]
     int $page,): void
     {

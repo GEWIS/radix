@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Frontpage;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Decision\Member;
 use App\Entity\Frontpage\Enums\PollCommentReactionType;
 use App\Entity\Frontpage\Poll;
@@ -116,6 +117,7 @@ final class PollComments
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function startReply(
         #[LiveArg]
         int $comment,
@@ -125,6 +127,7 @@ final class PollComments
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function cancelReply(): void
     {
         $this->replyTo = null;

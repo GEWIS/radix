@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Application;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Twig\Components\Concerns\PageSizeTrait;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -81,6 +82,7 @@ abstract class AbstractPaginatedOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function gotoPage(#[LiveArg]
     int $page,): void
     {

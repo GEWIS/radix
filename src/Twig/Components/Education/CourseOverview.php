@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Education;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Education\Enums\CourseFilter;
 use App\Entity\Education\Enums\CourseSort;
 use App\Repository\Education\CourseRepository;
@@ -71,6 +72,7 @@ final class CourseOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;

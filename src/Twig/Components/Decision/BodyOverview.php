@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Decision;
 
+use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Decision\Organ;
 use App\Repository\Decision\OrganRepository;
@@ -112,6 +113,7 @@ final class BodyOverview
     }
 
     #[LiveAction]
+    #[ReadOnlySafe]
     public function loadMore(): void
     {
         $this->limit += self::PAGE_SIZE;

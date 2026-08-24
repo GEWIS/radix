@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Security\User;
 
+use App\Entity\Application\Enums\MaintenanceStatus;
 use App\Entity\Application\MaintenanceWindow;
 use App\Entity\User\CompanyUser;
 use App\Repository\Application\MaintenanceWindowRepository;
@@ -36,7 +37,7 @@ final class UserCheckerTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $this->checker(
-            new MaintenanceWindow(),
+            $this->window(MaintenanceStatus::Full),
             [
                 'ROLE_ADMIN',
                 'ROLE_USER',
@@ -44,12 +45,25 @@ final class UserCheckerTest extends TestCase
         )->checkPostAuth(self::createStub(UserInterface::class));
     }
 
-    public function testNonAdminsCannotSignInDuringMaintenance(): void
+    public function testNonAdminsCannotSignInWhileTheSiteIsFullyDown(): void
     {
         $this->expectException(CustomUserMessageAccountStatusException::class);
 
         $this->checker(
-            new MaintenanceWindow(),
+            $this->window(MaintenanceStatus::Full),
+            ['ROLE_USER'],
+        )->checkPostAuth(self::createStub(UserInterface::class));
+    }
+
+    /**
+     * A read-only window leaves everyone reading, and what somebody may read is decided by who they are signed in as.
+     */
+    public function testAnyoneMayStillSignInWhileTheSiteIsReadOnly(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $this->checker(
+            $this->window(MaintenanceStatus::ReadOnly),
             ['ROLE_USER'],
         )->checkPostAuth(self::createStub(UserInterface::class));
     }
@@ -74,6 +88,14 @@ final class UserCheckerTest extends TestCase
             ['ROLE_COMPANY_USER'],
             allowed: false,
         )->checkPreAuth(self::createStub(CompanyUser::class));
+    }
+
+    private function window(MaintenanceStatus $status): MaintenanceWindow
+    {
+        $window = new MaintenanceWindow();
+        $window->setStatus($status);
+
+        return $window;
     }
 
     /**
