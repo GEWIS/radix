@@ -43,6 +43,13 @@ interface RevisionInterface
     public function getPreviousRevision(): ?RevisionInterface;
 
     /**
+     * Forget which revision this one supersedes, for the same reason and the same caller as
+     * {@see RevisableInterface::detachRevisions()}: the link is a foreign key within the chain, and a chain cannot be
+     * removed while its own rows still name each other.
+     */
+    public function detachPreviousRevision(): void;
+
+    /**
      * The member who authored this revision, if it was authored by a member (null when authored by a company).
      */
     public function getAuthor(): ?Member;

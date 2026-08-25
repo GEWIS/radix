@@ -85,7 +85,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
     public function testDiscardIsRefusedWhenThereIsNoLiveVersionToRevertTo(): void
     {
         // A brand-new (never-approved) draft has nothing to revert to; discarding it would delete the whole activity,
-        // which is deliberately left to the stale-draft cleanup. The controller refuses and keeps the draft.
+        // which is deliberately left to the stale-revision cleanup. The controller refuses and keeps the draft.
         $draft = $this->aNeverApprovedDraft();
         $draftId = (int) $draft->getId();
 

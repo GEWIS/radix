@@ -283,6 +283,12 @@ class ActivityRevision extends AbstractRevision
         $this->previousRevision = $previousRevision;
     }
 
+    #[Override]
+    public function detachPreviousRevision(): void
+    {
+        $this->previousRevision = null;
+    }
+
     public function getName(): ActivityLocalisedText
     {
         return $this->name;

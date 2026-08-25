@@ -5,15 +5,10 @@ declare(strict_types=1);
 namespace App\Repository\Activity;
 
 use App\Entity\Activity\ActivityRevision;
-use App\Entity\Application\Enums\RevisionStatus;
 use App\Repository\Application\FindsRevisionsForReviewTrait;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-
-use function array_map;
 
 /**
  * @extends ServiceEntityRepository<ActivityRevision>
@@ -125,49 +120,5 @@ class ActivityRevisionRepository extends ServiceEntityRepository
             ->setMaxResults($pageSize);
 
         return $paginator;
-    }
-
-    /**
-     * Revisions in one of the given states that are still the working head of their activity and have not been touched
-     * since the cutoff, oldest first. Approved heads are never eligible whatever is asked for: the live version of an
-     * activity is not abandoned, it is finished.
-     *
-     * @return ActivityRevision[]
-     */
-    public function findStaleHeads(
-        DateTime $cutoff,
-        RevisionStatus ...$statuses,
-    ): array {
-        return $this->createQueryBuilder('r')
-            ->join(
-                'r.activity',
-                'a',
-            )
-            ->where('r.status IN (:statuses)')
-            ->andWhere('r.status <> :approved')
-            ->andWhere('r.updatedAt <= :cutoff')
-            ->andWhere('a.currentRevision = r')
-            ->setParameter(
-                'statuses',
-                array_map(
-                    static fn (RevisionStatus $status): string => $status->value,
-                    $statuses,
-                ),
-            )
-            ->setParameter(
-                'approved',
-                RevisionStatus::Approved->value,
-            )
-            ->setParameter(
-                'cutoff',
-                $cutoff,
-                Types::DATETIME_MUTABLE,
-            )
-            ->orderBy(
-                'r.updatedAt',
-                'ASC',
-            )
-            ->getQuery()
-            ->getResult();
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *
  * Only ever used on a draft that has a live version behind it — discarding the very first draft would take the
  * aggregate with it, which is a deletion rather than a discard. The caller flushes, so an on-demand discard commits
- * with whatever else it undid and the stale-draft cleanup can keep batching its removals into one flush.
+ * with whatever else it undid and the stale-revision cleanup can keep batching its removals into one flush.
  */
 final readonly class RevisionDiscarder
 {

@@ -23,8 +23,8 @@ use function spl_object_id;
 /**
  * Appends an {@see ActivityRevisionEdit} audit row for every member-driven in-place edit of an activity revision, so a
  * change can always be attributed to the member who made it. It runs inside the same flush, so the audit row commits
- * together with the edit. System flushes (fixtures, the stale-draft cron, an approval) leave `lastEditedBy` unset and
- * are skipped.
+ * together with the edit. System flushes (fixtures, the stale-revision cron, an approval) leave `lastEditedBy` unset
+ * and are skipped.
  *
  * A single edit can touch the revision's own columns, its localised texts, its sign-up lists (their fields and options)
  * and its label assignments; all of these are folded into one audit row per revision per flush, with the union of the
@@ -131,7 +131,8 @@ final readonly class RevisionAuditListener
         foreach ($perRevision as ['revision' => $revision, 'fields' => $fields]) {
             $editor = $revision->getLastEditedBy();
             if (null === $editor) {
-                // Not a member-driven in-place edit (a fixture, the stale-draft cron or an approval): nothing to log.
+                // Not a member-driven in-place edit (a fixture, the stale-revision cron or an approval): nothing to
+                // log.
                 continue;
             }
 

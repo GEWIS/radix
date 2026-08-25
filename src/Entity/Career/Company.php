@@ -193,6 +193,13 @@ class Company implements RevisableInterface
         $this->setCurrentRevision($this->getLiveRevision());
     }
 
+    #[Override]
+    public function detachRevisions(): void
+    {
+        $this->setCurrentRevision(null);
+        $this->setLiveRevision(null);
+    }
+
     /**
      * The revision whose content is shown for this company: the live (approved) one when present, otherwise the
      * working head. Only ever null for a company with no revisions at all, which never occurs once persisted.
