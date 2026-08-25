@@ -8769,6 +8769,10 @@
         <source>The query ran and matched nothing.</source>
         <target state="translated">The query ran and matched nothing.</target>
       </trans-unit>
+      <trans-unit id="SLOOP0O" resname="The register can only be read and changed from the association's own network. Everything else on your account is unaffected.">
+        <source>The register can only be read and changed from the association's own network. Everything else on your account is unaffected.</source>
+        <target state="translated">The register can only be read and changed from the association's own network. Everything else on your account is unaffected.</target>
+      </trans-unit>
       <trans-unit id="A8gwsuy" resname="The representative can no longer sign in.">
         <source>The representative can no longer sign in.</source>
         <target state="translated">The representative can no longer sign in.</target>
