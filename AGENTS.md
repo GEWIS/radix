@@ -449,6 +449,14 @@ migrates all of it in one run — there is no second source, and GEWISDB never s
 item and so is resumable, and `--source-dir` names the pool for the production layout, where it arrives as a populated
 volume rather than at `public/data`. See the command's `--help`.
 
+Its `--meetings` phase is the odd one out and the one to be careful with. Everything else is hardlinked into place by
+`--files` and switched over by `--paths`, so those files survive the pool being removed; the flat meeting documents and
+minutes are touched by neither, and are carried over only by `--meetings`, which rebuilds them into the
+agenda-point/version model and *copies* their files. Until it has run, the pool is the only copy of every set of
+minutes on the site. It skips per row what the new model already has — an earlier run's work, or the board's own — so
+it can be run again at any time, and every run of the command ends by saying how many legacy rows still have no
+counterpart.
+
 ## Doctrine caching
 
 The projection's `Member` is the only entity in Doctrine's second-level cache (`config/packages/doctrine.yaml`, region

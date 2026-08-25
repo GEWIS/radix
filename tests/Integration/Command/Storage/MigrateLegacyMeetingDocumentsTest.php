@@ -9,11 +9,14 @@ use App\Entity\Decision\LegacyMeetingDocument;
 use App\Entity\Decision\LegacyMeetingMinutes;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingDocument;
+use App\Entity\Decision\MeetingMinutes;
+use App\Entity\Decision\MeetingMinutesVersion;
 use App\Entity\Decision\MeetingPoint;
 use App\Entity\Decision\MeetingReferenceSelection;
 use App\Entity\Decision\ReferenceDocument;
 use App\Tests\Integration\DatabaseTestCase;
 use Override;
+use Symfony\Component\Console\Tester\ExecutionResult;
 use Symfony\Component\Filesystem\Filesystem;
 
 use function bin2hex;
@@ -26,7 +29,9 @@ use function sys_get_temp_dir;
  * End-to-end run of the legacy document migrator against seeded meetings: version suffixes collapse into one document
  * under a freshly created agenda point, a recurring document becomes a library document with per-meeting pinned
  * selections, minutes become a versioned master, and rows whose file is gone are skipped without creating anything.
- * The seeded fixtures already contain migrated documents, which doubles as coverage for the rerun guard.
+ *
+ * The migration is idempotent per row, which is what lets it be run long after the launch it was written for: a
+ * second run adds nothing, and whatever the board has made in the new model in the meantime is left alone.
  */
 final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
 {
@@ -48,17 +53,17 @@ final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
         parent::tearDown();
     }
 
-    public function testRefusesToRunWhenMigratedDocumentsExist(): void
+    /**
+     * Without the pool there is nothing to read, and every row would otherwise be reported as a missing file, which
+     * reads like a phase that had nothing left to do.
+     */
+    public function testRefusesToRunWithoutALegacyPool(): void
     {
-        $result = static::runCommand(
-            'app:storage:migrate',
-            ['--meetings' => true],
-            interactive: false,
-        );
+        $result = $this->migrateMeetings();
 
         $this->assertCommandFailed($result);
         self::assertStringContainsString(
-            '--force',
+            '--source-dir',
             $result->getDisplay(),
         );
     }
@@ -107,21 +112,13 @@ final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
             'aa/missing.pdf',
         );
 
-        $minutes = new LegacyMeetingMinutes();
-        $minutes->setMeeting($firstMeeting);
-        $minutes->setPath('aa/notulen.pdf');
-        $this->entityManager->persist($minutes);
+        $this->legacyMinutes(
+            $firstMeeting,
+            'aa/notulen.pdf',
+        );
         $this->entityManager->flush();
 
-        $this->assertCommandIsSuccessful(static::runCommand(
-            'app:storage:migrate',
-            [
-                '--meetings' => true,
-                '--force' => true,
-                '--source-dir' => $this->sourceDir,
-            ],
-            interactive: false,
-        ));
+        $this->assertCommandIsSuccessful($this->migrateMeetings());
 
         // The two version-suffixed rows collapsed into one document under a new point 5.
         $document = $this->entityManager->getRepository(MeetingDocument::class)->findOneBy([
@@ -221,16 +218,7 @@ final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
         );
         $this->entityManager->flush();
 
-        $result = static::runCommand(
-            'app:storage:migrate',
-            [
-                '--meetings' => true,
-                '--dry-run' => true,
-                '--force' => true,
-                '--source-dir' => $this->sourceDir,
-            ],
-            interactive: false,
-        );
+        $result = $this->migrateMeetings(dryRun: true);
 
         $this->assertCommandIsSuccessful($result);
         self::assertStringContainsString(
@@ -240,6 +228,129 @@ final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
         self::assertNull($this->entityManager->getRepository(MeetingDocument::class)->findOneBy([
             'name' => 'Begrotingswijziging',
         ]));
+    }
+
+    /**
+     * The phase has to survive being run twice: it is the only thing that carries the meeting files out of the pool,
+     * and whoever runs it has no way of knowing what an earlier run settled.
+     */
+    public function testASecondRunAddsNothing(): void
+    {
+        $meeting = $this->oldestAlvMeetings()[0];
+
+        $this->legacyFile('aa/begroting-v1.pdf');
+        $this->legacyFile('aa/notulen.pdf');
+        $this->legacyFile('aa/scenarios.pdf');
+        $this->legacyDocument(
+            $meeting,
+            '5.1 Begrotingswijziging (v1.0)',
+            'aa/begroting-v1.pdf',
+        );
+        $this->legacyDocument(
+            $meeting,
+            'Scenarios and procedures',
+            'aa/scenarios.pdf',
+        );
+        $this->legacyMinutes(
+            $meeting,
+            'aa/notulen.pdf',
+        );
+        $this->entityManager->flush();
+
+        $this->assertCommandIsSuccessful($this->migrateMeetings());
+
+        $documents = $this->entityManager->getRepository(MeetingDocument::class)->count(['meeting' => $meeting]);
+        $points = $this->entityManager->getRepository(MeetingPoint::class)->count(['meeting' => $meeting]);
+        $selections = $this->entityManager->getRepository(MeetingReferenceSelection::class)
+            ->count(['meeting' => $meeting]);
+
+        $result = $this->migrateMeetings();
+
+        $this->assertCommandIsSuccessful($result);
+        self::assertStringContainsString(
+            'documents already present',
+            $result->getDisplay(),
+        );
+        self::assertStringContainsString(
+            'minutes already present',
+            $result->getDisplay(),
+        );
+        self::assertStringContainsString(
+            'reference selections already present',
+            $result->getDisplay(),
+        );
+        self::assertSame(
+            $documents,
+            $this->entityManager->getRepository(MeetingDocument::class)->count(['meeting' => $meeting]),
+        );
+        self::assertSame(
+            $points,
+            $this->entityManager->getRepository(MeetingPoint::class)->count(['meeting' => $meeting]),
+        );
+        self::assertSame(
+            $selections,
+            $this->entityManager->getRepository(MeetingReferenceSelection::class)->count(['meeting' => $meeting]),
+        );
+        self::assertCount(
+            1,
+            $meeting->getMinutes()?->getVersions() ?? [],
+        );
+    }
+
+    /**
+     * Minutes are one per meeting on their primary key, so a meeting the board has since given minutes of its own
+     * cannot take the legacy set as well; the newer of the two is the one that is there.
+     */
+    public function testLeavesMinutesTheBoardUploadedItself(): void
+    {
+        $meeting = $this->oldestAlvMeetings()[0];
+
+        $this->legacyFile('aa/notulen.pdf');
+        $this->legacyMinutes(
+            $meeting,
+            'aa/notulen.pdf',
+        );
+
+        $minutes = new MeetingMinutes();
+        $minutes->setMeeting($meeting);
+        $this->entityManager->persist($minutes);
+
+        $version = new MeetingMinutesVersion();
+        $version->setMinutes($minutes);
+        $version->setVersionLabel('v2.0');
+        $version->setPath('meetings/minutes/aa/uploaded.pdf');
+        $this->entityManager->persist($version);
+        $this->entityManager->flush();
+
+        $this->assertCommandIsSuccessful($this->migrateMeetings());
+
+        $versions = $meeting->getMinutes()?->getVersions()->getValues() ?? [];
+        self::assertCount(
+            1,
+            $versions,
+        );
+        self::assertSame(
+            'v2.0',
+            $versions[0]->getVersionLabel(),
+        );
+    }
+
+    private function migrateMeetings(bool $dryRun = false): ExecutionResult
+    {
+        $input = [
+            '--meetings' => true,
+            '--source-dir' => $this->sourceDir,
+        ];
+
+        if ($dryRun) {
+            $input['--dry-run'] = true;
+        }
+
+        return static::runCommand(
+            'app:storage:migrate',
+            $input,
+            interactive: false,
+        );
     }
 
     /**
@@ -280,6 +391,17 @@ final class MigrateLegacyMeetingDocumentsTest extends DatabaseTestCase
         $document->setPath($path);
 
         $this->entityManager->persist($document);
+    }
+
+    private function legacyMinutes(
+        Meeting $meeting,
+        string $path,
+    ): void {
+        $minutes = new LegacyMeetingMinutes();
+        $minutes->setMeeting($meeting);
+        $minutes->setPath($path);
+
+        $this->entityManager->persist($minutes);
     }
 
     private function legacyFile(string $path): void

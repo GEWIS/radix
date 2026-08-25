@@ -6,6 +6,7 @@ namespace App\Service\Decision;
 
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Decision\LegacyMeetingDocument;
+use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingDocument;
 use App\Entity\Decision\MeetingDocumentVersion;
 use App\Entity\Decision\MeetingMinutes;
@@ -16,6 +17,8 @@ use App\Entity\Decision\ReferenceDocument;
 use App\Entity\Decision\ReferenceDocumentVersion;
 use App\Repository\Decision\LegacyMeetingDocumentRepository;
 use App\Repository\Decision\LegacyMeetingMinutesRepository;
+use App\Repository\Decision\MeetingReferenceSelectionRepository;
+use App\Repository\Decision\ReferenceDocumentRepository;
 use App\Service\Application\FileStorage;
 use App\Service\Application\FileStorageException;
 use DateTime;
@@ -24,12 +27,15 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function count;
 use function intval;
+use function is_dir;
 use function is_file;
 use function ksort;
+use function max;
 use function sprintf;
 use function str_starts_with;
 use function strval;
@@ -42,6 +48,13 @@ use function usort;
  * or date suffix collapse into one document with multiple versions, and known recurring documents move into the
  * reference library with a per-meeting pinned version. Anything unparseable stays a meeting-level document under its
  * original name.
+ *
+ * The migration is idempotent per row rather than all-or-nothing: a legacy row whose counterpart is already there —
+ * because an earlier run made it, or because the board made it by hand afterwards — is skipped and counted, and the
+ * rest is migrated around it. A meeting that already has agenda points and minutes therefore still receives the
+ * legacy documents it is missing, and running the phase twice creates nothing twice. That matters because the phase
+ * is the only thing that carries meeting files out of the legacy pool, so it has to stay runnable long after the
+ * other phases have settled.
  *
  * `--dry-run` computes and reports the same migration without writing to the database or the file storage. Files are
  * read from the legacy content-addressed layout, which the storage migration never covered for meeting documents.
@@ -78,6 +91,8 @@ class LegacyMeetingDocumentMigrator
         private readonly EntityManagerInterface $entityManager,
         private readonly LegacyMeetingDocumentRepository $legacyDocuments,
         private readonly LegacyMeetingMinutesRepository $legacyMinutes,
+        private readonly ReferenceDocumentRepository $referenceDocuments,
+        private readonly MeetingReferenceSelectionRepository $referenceSelections,
         private readonly FileStorage $fileStorage,
         private readonly LegacyDocumentNameParser $parser,
         #[Autowire('%kernel.project_dir%')]
@@ -91,7 +106,6 @@ class LegacyMeetingDocumentMigrator
     public function migrate(
         SymfonyStyle $io,
         bool $dryRun,
-        bool $force,
         string $sourceDir,
     ): bool {
         $this->dryRun = $dryRun;
@@ -102,14 +116,12 @@ class LegacyMeetingDocumentMigrator
             ? $sourceDir
             : $this->projectDir . '/' . $sourceDir;
 
-        $existing = $this->entityManager->getRepository(MeetingDocument::class)->count();
-        if (
-            $existing > 0
-            && !$force
-        ) {
+        // Without the pool every row would report its file as missing and the phase would look like it had nothing
+        // to do, which is exactly how the meeting files came to be left behind.
+        if (!is_dir($this->sourceDir)) {
             $io->error(sprintf(
-                'There are already %d migrated meeting documents; pass --force to migrate anyway.',
-                $existing,
+                'The legacy pool "%s" is not a directory; name where it is mounted with --source-dir.',
+                $this->sourceDir,
             ));
 
             return false;
@@ -161,6 +173,39 @@ class LegacyMeetingDocumentMigrator
     }
 
     /**
+     * The legacy rows the new model has nothing for: minutes on a meeting that has none, and documents on a meeting
+     * that has none at all. Whoever is deciding whether the legacy pool can go needs a number that is zero before it
+     * can, and these files are copied out of the pool rather than hardlinked, so the pool is their only other copy.
+     *
+     * @return array{documents: int, minutes: int}
+     */
+    public function pending(): array
+    {
+        $documents = 0;
+        foreach ($this->legacyDocuments->findAllOrderedById() as $row) {
+            if (!$row->getMeeting()->getDocuments()->isEmpty()) {
+                continue;
+            }
+
+            $documents++;
+        }
+
+        $minutes = 0;
+        foreach ($this->legacyMinutes->findAll() as $row) {
+            if (null !== $row->getMeeting()->getMinutes()) {
+                continue;
+            }
+
+            $minutes++;
+        }
+
+        return [
+            'documents' => $documents,
+            'minutes' => $minutes,
+        ];
+    }
+
+    /**
      * Every meeting that shipped a recurring document gets a selection pinned to the exact version it shipped. The
      * legacy paths are content addressed, so identical paths are identical files and become one library version,
      * attributed to the first meeting that shipped them.
@@ -183,7 +228,6 @@ class LegacyMeetingDocumentMigrator
             );
 
             $storedByPath = [];
-            $survivors = 0;
             foreach ($rows as [$row]) {
                 $legacyPath = $row->getPath();
                 if (
@@ -200,33 +244,45 @@ class LegacyMeetingDocumentMigrator
                     StorageNamespace::ReferenceDocument,
                     $row->getName(),
                 );
-                if (null === $storedByPath[$legacyPath]) {
-                    continue;
-                }
-
-                $survivors++;
             }
 
+            $survivors = count(array_filter(
+                $storedByPath,
+                static fn (?string $storedPath): bool => null !== $storedPath,
+            ));
             if (0 === $survivors) {
                 $this->count('reference documents without surviving files');
                 continue;
             }
 
-            $document = new ReferenceDocument();
-            $document->setName(self::REFERENCE_NAMES[$key]);
-            $this->persist($document);
-            $this->count('reference documents');
-
+            // The library is not per meeting, so its document is matched by the name the migration gives it. Its
+            // versions are content addressed, which makes the stored path the identity of a version.
+            $document = $this->referenceDocuments->findOneBy(['name' => self::REFERENCE_NAMES[$key]]);
             $versionByPath = [];
+
+            if (null === $document) {
+                $document = new ReferenceDocument();
+                $document->setName(self::REFERENCE_NAMES[$key]);
+                $this->persist($document);
+                $this->count('reference documents');
+            } else {
+                $this->count('reference documents already present');
+
+                foreach ($document->getVersions() as $version) {
+                    $versionByPath[$version->getPath()] = $version;
+                }
+            }
+
             $selectionByMeeting = [];
-            $sequence = 0;
+            $keptSelections = $this->existingSelectionKeys($document);
+            $sequence = count($versionByPath);
             foreach ($rows as [$row, $parsed]) {
                 $storedPath = $storedByPath[$row->getPath()];
                 if (null === $storedPath) {
                     continue;
                 }
 
-                if (!isset($versionByPath[$row->getPath()])) {
+                if (!isset($versionByPath[$storedPath])) {
                     $sequence++;
                     $version = new ReferenceDocumentVersion();
                     $version->setReferenceDocument($document);
@@ -239,21 +295,29 @@ class LegacyMeetingDocumentMigrator
                     $this->persist($version);
                     $this->count('reference document versions');
 
-                    $versionByPath[$row->getPath()] = $version;
+                    $versionByPath[$storedPath] = $version;
+                }
+
+                $meeting = $row->getMeeting();
+                $meetingKey = $meeting->getType()->value . '|' . $meeting->getNumber();
+
+                // A selection that is already there is the board's own choice of version; the migration leaves it
+                // alone rather than pinning the version the meeting once shipped over it.
+                if (isset($keptSelections[$meetingKey])) {
+                    $this->count('reference selections already present');
+                    continue;
                 }
 
                 // A meeting can have shipped the document twice; the newest shipment wins the pin.
-                $meeting = $row->getMeeting();
-                $meetingKey = $meeting->getType()->value . '|' . $meeting->getNumber();
                 if (isset($selectionByMeeting[$meetingKey])) {
-                    $selectionByMeeting[$meetingKey]->setPinnedVersion($versionByPath[$row->getPath()]);
+                    $selectionByMeeting[$meetingKey]->setPinnedVersion($versionByPath[$storedPath]);
                     continue;
                 }
 
                 $selection = new MeetingReferenceSelection();
                 $selection->setMeeting($meeting);
                 $selection->setReferenceDocument($document);
-                $selection->setPinnedVersion($versionByPath[$row->getPath()]);
+                $selection->setPinnedVersion($versionByPath[$storedPath]);
                 $this->persist($selection);
                 $this->count('reference selections');
 
@@ -277,12 +341,27 @@ class LegacyMeetingDocumentMigrator
                     $groups[($entry[1]->pointNumber ?? '~') . '|' . $entry[1]->groupKey][] = $entry;
                 }
 
+                // What the meeting already holds: an earlier run of this phase, or the board working in the new model
+                // since. Both are kept, and the migration fills in around them rather than doubling them.
+                $points = $this->existingPoints($meeting);
+                $pointPosition = $this->nextPosition($points);
+                $taken = $this->existingDocumentKeys($meeting);
+                $meetingLevelPosition = $this->nextPosition($this->meetingLevelDocuments($meeting));
+
                 $survivingGroups = [];
                 foreach ($groups as $entries) {
                     usort(
                         $entries,
                         static fn (array $a, array $b): int => $a[0]->getId() <=> $b[0]->getId(),
                     );
+
+                    // Checked twice: once on the name the newest row carries, so a group that is already there is
+                    // not hashed and copied for nothing, and once on the name the document actually ends up with,
+                    // which is the newest row whose file survived.
+                    if (isset($taken[$this->keyOf($entries[count($entries) - 1][1])])) {
+                        $this->count('documents already present');
+                        continue;
+                    }
 
                     $stored = [];
                     foreach ($entries as [$row, $parsed]) {
@@ -308,6 +387,13 @@ class LegacyMeetingDocumentMigrator
                         continue;
                     }
 
+                    $key = $this->keyOf($stored[count($stored) - 1][1]);
+                    if (isset($taken[$key])) {
+                        $this->count('documents already present');
+                        continue;
+                    }
+
+                    $taken[$key] = true;
                     $survivingGroups[] = $stored;
                 }
 
@@ -325,22 +411,23 @@ class LegacyMeetingDocumentMigrator
 
                 ksort($pointNumbers);
 
-                $points = [];
-                $position = 0;
                 foreach (array_keys($pointNumbers) as $pointNumber) {
+                    if (isset($points[$pointNumber])) {
+                        continue;
+                    }
+
                     $point = new MeetingPoint();
                     $point->setMeeting($meeting);
                     $point->setNumber(strval($pointNumber));
                     $point->setTitle('');
-                    $point->setDisplayPosition($position);
-                    $position++;
+                    $point->setDisplayPosition($pointPosition);
+                    $pointPosition++;
 
                     $this->persist($point);
                     $this->count('agenda points');
                     $points[$pointNumber] = $point;
                 }
 
-                $meetingLevelPosition = 0;
                 foreach ($survivingGroups as $stored) {
                     $newest = $stored[count($stored) - 1];
                     $pointNumber = $newest[1]->pointNumber;
@@ -386,6 +473,14 @@ class LegacyMeetingDocumentMigrator
 
         foreach ($rows as $row) {
             $meeting = $row->getMeeting();
+
+            // Minutes are one per meeting on their primary key, so a meeting that already has them cannot receive
+            // the legacy set as well; whatever is there is newer than what is being migrated.
+            if (null !== $meeting->getMinutes()) {
+                $this->count('minutes already present');
+                continue;
+            }
+
             $described = sprintf(
                 'Minutes %s %d',
                 $meeting->getType()->value,
@@ -418,6 +513,129 @@ class LegacyMeetingDocumentMigrator
             $this->persist($version);
             $this->count('minutes');
         }
+    }
+
+    /**
+     * The agenda points a meeting already has, by their number. A number PHP reads as an integer becomes an integer
+     * key, which is how a point this migration numbered is found again by {@see intval()} of a parsed prefix.
+     *
+     * @return array<int|string, MeetingPoint>
+     */
+    private function existingPoints(Meeting $meeting): array
+    {
+        $points = [];
+
+        foreach ($meeting->getPoints() as $point) {
+            $points[$point->getNumber()] = $point;
+        }
+
+        return $points;
+    }
+
+    /**
+     * The documents a meeting already has, keyed the way {@see documentKey()} identifies them.
+     *
+     * @return array<string, true>
+     */
+    private function existingDocumentKeys(Meeting $meeting): array
+    {
+        $taken = [];
+
+        foreach ($meeting->getDocuments() as $document) {
+            $taken[$this->documentKey(
+                $document->getPoint()?->getNumber(),
+                $document->getName(),
+            )] = true;
+        }
+
+        return $taken;
+    }
+
+    /**
+     * The documents a meeting already has that hang under no agenda point; they are the ones whose display position
+     * this migration hands out.
+     *
+     * @return list<MeetingDocument>
+     */
+    private function meetingLevelDocuments(Meeting $meeting): array
+    {
+        $documents = [];
+
+        foreach ($meeting->getDocuments() as $document) {
+            if (null !== $document->getPoint()) {
+                continue;
+            }
+
+            $documents[] = $document;
+        }
+
+        return $documents;
+    }
+
+    /**
+     * The display position something added now would take, after everything already ordered.
+     *
+     * @param iterable<MeetingDocument|MeetingPoint> $ordered
+     */
+    private function nextPosition(iterable $ordered): int
+    {
+        $position = 0;
+
+        foreach ($ordered as $item) {
+            $position = max(
+                $position,
+                $item->getDisplayPosition() + 1,
+            );
+        }
+
+        return $position;
+    }
+
+    /**
+     * The meetings that already have a selection of a library document, by the key the migration matches them on. A
+     * document this run has just made has none, and cannot be asked for them before it has an identifier.
+     *
+     * @return array<string, true>
+     */
+    private function existingSelectionKeys(ReferenceDocument $document): array
+    {
+        if (null === $document->getId()) {
+            return [];
+        }
+
+        $keys = [];
+        foreach ($this->referenceSelections->findBy(['referenceDocument' => $document]) as $selection) {
+            $meeting = $selection->getMeeting();
+            $keys[$meeting->getType()->value . '|' . $meeting->getNumber()] = true;
+        }
+
+        return $keys;
+    }
+
+    /**
+     * The key of the document one parsed legacy name would produce.
+     */
+    private function keyOf(ParsedLegacyName $parsed): string
+    {
+        return $this->documentKey(
+            $parsed->pointNumber,
+            $parsed->baseName,
+        );
+    }
+
+    /**
+     * How a document is recognised as one this migration would produce again: its agenda point, numbered the way the
+     * migration numbers points, and the name it is displayed under.
+     */
+    private function documentKey(
+        ?string $pointNumber,
+        string $name,
+    ): string {
+        $point = null === $pointNumber
+            ? '~'
+            : strval(intval($pointNumber));
+
+        return $point . '|' . $name;
     }
 
     private function store(
@@ -547,7 +765,22 @@ class LegacyMeetingDocumentMigrator
             return;
         }
 
-        $io->success('Migration complete.');
+        // Meeting files are copied out of the legacy pool rather than hardlinked into place like the other phases,
+        // so until this reports nothing left behind the pool is still the only copy of them.
+        $leftBehind = count($this->missingFiles) + count($this->rejectedFiles);
+        if ($leftBehind > 0) {
+            $io->warning(sprintf(
+                'Migration complete, but %d legacy rows could not be read from "%s" and have no counterpart. '
+                . 'Keep the legacy pool and run this phase again once they can be read.',
+                $leftBehind,
+                $this->sourceDir,
+            ));
+
+            return;
+        }
+
+        $io->success('Migration complete; every legacy meeting document and set of minutes now has a copy of its '
+            . 'file in the data/ layout.');
     }
 
     /**
