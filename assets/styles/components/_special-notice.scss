@@ -51,7 +51,7 @@ body {
 
     &.admin-notice {
         background-color: var(--#{$prefix}primary-bg-subtle);
-        color: #{$admin-notice-color};
+        color: var(--#{$prefix}primary-text-emphasis);
     }
 
     &.impersonator-notice {
@@ -94,13 +94,5 @@ body:has(.navbar-breadcrumb) .announcement-banner {
 
     .toast-container {
         top: calc((#{$breadcrumb-padding-y} * 2) + 1.5rem);
-    }
-}
-
-// The subtle background flips with the theme on its own; the text colour is a fixed value rather than a custom
-// property, so its dark counterpart is named here.
-@include color-mode(gewis-night) {
-    .special-notice.admin-notice {
-        color: #{$admin-notice-color-dark};
     }
 }

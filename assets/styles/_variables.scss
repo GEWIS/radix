@@ -28,9 +28,8 @@ $body-bg-dark: #0E0E11;
 $body-color: $gewis-gray-dark;
 $body-color-dark: $gewis-gray-light;
 
-// Bootstrap derives the dark one from `$primary`, which is deliberately its own blue here, so it is set as well.
-$primary-text-emphasis: $gewis-red;
-$primary-text-emphasis-dark: $gewis-red;
+// `$primary` stays Bootstrap's blue, so its emphasis colour does too: components pair the two, and red on that blue
+// fill reads as danger. The brand red is asked for by name instead (`.text-`/`.badge-`/`.btn-gewis-primary`).
 $secondary-text-emphasis: #959595;
 
 $body-secondary-color-dark: #acacac;
@@ -83,12 +82,6 @@ $dropdown-link-hover-bg: $gray-200;
 $dropdown-link-hover-bg-dark: $gray-900;
 
 $navbar-dropdown-spacer: 0;
-
-// The admin notice is blue so it is told apart at a glance from the three notices beside it. `$primary-text-emphasis`
-// is GEWIS red site-wide, which would pair red text with that blue and read as the danger notice, so the notice keeps
-// the blue emphasis Bootstrap derives from `$primary` -- the same value `$primary-text-emphasis` held before.
-$admin-notice-color: shade-color($primary, 60%);
-$admin-notice-color-dark: tint-color($primary, 40%);
 
 // Stacked date beside an activity, tinted with the brand red so it reads as GEWIS on any panel.
 $activity-date-badge-bg: rgba($gewis-red, 0.08);

@@ -15,3 +15,8 @@ blockquote {
         --#{$prefix}blockquote-border-color: var(--#{$prefix}border-color);
     }
 }
+
+// Bootstrap's `primary` is its own blue here, so the brand red is a colour of its own.
+.text-gewis-primary {
+    color: #{$gewis-red} !important;
+}

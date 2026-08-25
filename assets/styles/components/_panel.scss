@@ -70,13 +70,6 @@
     .panel-heading {
         padding: var(--#{$prefix}panel-spacer-y) var(--#{$prefix}panel-spacer-x);
 
-        > h3 {
-            color: var(--#{$prefix}panel-header-color);
-            font-size: var(--#{$prefix}panel-header-font-size);
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
         + .panel-body {
             padding-top: 0;
         }
@@ -112,6 +105,16 @@
             }
         }
     }
+}
+
+// Also a class of its own, for a heading that leads a section standing among panels. The custom properties are
+// declared on `.panel`, hence the fallbacks.
+.panel-title,
+.panel .panel-heading > h3 {
+    color: var(--#{$prefix}panel-header-color, #{$panel-header-color});
+    font-size: var(--#{$prefix}panel-header-font-size, #{$panel-header-font-size});
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 // Collapse toggle on a `.panel-heading`: rotate the chevron when open. Bootstrap sets `.collapsed` while hidden.

@@ -4,6 +4,11 @@
 // Colours come from Bootstrap's own custom properties so the grid follows the theme, including dark mode, instead of
 // hard-coding a second palette that would drift from the rest of the site.
 .option-calendar {
+    // Not `--bs-tertiary-bg`: the night theme leaves it at its light value and it would paint the day white. A tint
+    // of the body colour darkens the day theme and lightens the night one on its own.
+    --option-calendar-shade-weak: rgba(var(--bs-body-color-rgb), 0.04);
+    --option-calendar-shade: rgba(var(--bs-body-color-rgb), 0.08);
+
     &__grid {
         --option-calendar-day-min-height: 7rem;
 
@@ -26,7 +31,7 @@
         font-weight: 600;
         text-transform: uppercase;
         color: var(--bs-secondary-color);
-        background-color: var(--bs-tertiary-bg);
+        background-color: var(--bs-secondary-bg);
         border-bottom: 1px solid var(--bs-border-color);
     }
 
@@ -44,7 +49,7 @@
         // A day of a neighbouring month still carries its blocks: a week runs across the turn of a month, and a body
         // asking for the 31st has to see it from both sides. Only the emphasis changes.
         &--outside {
-            background-color: var(--bs-tertiary-bg);
+            background-color: var(--option-calendar-shade-weak);
 
             .option-calendar__daynumber {
                 color: var(--bs-secondary-color);
@@ -52,7 +57,7 @@
         }
 
         &--weekend {
-            background-color: var(--bs-secondary-bg);
+            background-color: var(--option-calendar-shade);
         }
 
         &--today {
@@ -71,13 +76,22 @@
         margin-bottom: 0.2rem;
     }
 
+    // A border of the same width whether or not it shows, so kinds line up. Declared before the modifiers, which set
+    // `border-color` alone and would lose to this shorthand on source order.
+    &__entry,
+    &__swatch {
+        border: 1px solid transparent;
+        border-radius: var(--bs-border-radius-sm);
+    }
+
     &__entry {
+        --option-calendar-rank-bg: rgba(0, 0, 0, 0.08);
+
         display: flex;
         align-items: center;
         gap: 0.2rem;
         margin-bottom: 0.15rem;
         padding: 0.1rem 0.3rem;
-        border-radius: var(--bs-border-radius-sm);
         font-size: 0.75rem;
         line-height: 1.3;
         white-space: nowrap;
@@ -90,31 +104,34 @@
             text-overflow: ellipsis;
         }
 
-        // Already in the agenda: settled, and drawn in the association's own red.
-        &--fixed {
-            background-color: var(--bs-primary);
-            color: #FFFFFF;
-        }
-
-        // On the association's agenda but not held here: an exam week, the intro week, somebody else's booking. Drawn
-        // quieter than our own activities, because nobody can act on it from this page.
+        // From the association's own agenda and not ours to move, in GEWIS red as every version before this drew it.
         &--agenda {
-            background-color: var(--bs-secondary-bg);
-            color: var(--bs-secondary-color);
-            border: 1px dashed var(--bs-border-color);
-        }
+            --option-calendar-rank-bg: rgba(255, 255, 255, 0.25);
 
-        // A day a body has been given.
-        &--reserved {
-            background-color: var(--bs-info);
+            background-color: $gewis-red;
             color: #FFFFFF;
         }
 
-        // A day a body is still asking for.
+        // The rest are coloured by how far an option got. The end of the road: it became an activity.
+        &--fixed {
+            --option-calendar-rank-bg: rgba(255, 255, 255, 0.25);
+
+            background-color: var(--bs-success);
+            color: #FFFFFF;
+        }
+
+        // The board gave the day to a body.
+        &--reserved {
+            background-color: var(--bs-info-bg-subtle);
+            color: var(--bs-info-text-emphasis);
+            border-color: var(--bs-info-border-subtle);
+        }
+
+        // Still being asked for.
         &--requested {
-            background-color: var(--bs-secondary-bg);
-            color: var(--bs-body-color);
-            border: 1px solid var(--bs-border-color);
+            background-color: var(--bs-warning-bg-subtle);
+            color: var(--bs-warning-text-emphasis);
+            border-color: var(--bs-warning-border-subtle);
         }
     }
 
@@ -123,12 +140,8 @@
         min-width: 1rem;
         text-align: center;
         border-radius: var(--bs-border-radius-sm);
-        background-color: rgba(255, 255, 255, 0.25);
+        background-color: var(--option-calendar-rank-bg);
         font-variant-numeric: tabular-nums;
-    }
-
-    &__entry--requested &__rank {
-        background-color: var(--bs-tertiary-bg);
     }
 
     &__more {
@@ -154,6 +167,5 @@
         display: inline-block;
         width: 0.75rem;
         height: 0.75rem;
-        border-radius: var(--bs-border-radius-sm);
     }
 }

@@ -65,3 +65,9 @@
 .page-content .ck-editor__editable_inline {
     min-height: 24rem;
 }
+
+// The page's own background rather than the panel's, so an author sees the content as it will be read. The extra
+// `.ck` outranks the bundle's rule, which the page loads after this stylesheet.
+.page-content .ck.ck-editor__main > .ck-editor__editable {
+    background: var(--bs-page-bg);
+}
