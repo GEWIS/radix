@@ -2189,9 +2189,9 @@
         <source>Conference</source>
         <target>Conference</target>
       </trans-unit>
-      <trans-unit id="stB18m_" resname="Confidential Contact Person (CCP)">
-        <source>Confidential Contact Person (CCP)</source>
-        <target state="translated">Confidential Contact Person (CCP)</target>
+      <trans-unit id="z0sirbE" resname="Confidential Peer Support (CPS)">
+        <source>Confidential Peer Support (CPS)</source>
+        <target state="translated">Confidential Peer Support (CPS)</target>
       </trans-unit>
       <trans-unit id="pl9ndg." resname="Confirm">
         <source>Confirm</source>
