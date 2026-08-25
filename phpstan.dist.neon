@@ -54,6 +54,14 @@ parameters:
         return_type: 99
         constant_type: 100
     disallowedFunctionCalls:
+        # Redefined rather than ignored by message: the insecure-calls list forbids SHA-1 through `sha1()` and through
+        # `hash()` alike, and the pwned-passwords service is keyed by it. There the hash is a lookup key on a list of
+        # passwords that have already leaked, not a hash anything is stored under or trusted, so that one file may.
+        -
+            function: 'sha1()'
+            message: 'use hash() with at least SHA-256 for secure hash, or password_hash() for passwords'
+            allowIn:
+                - src/Validator/User/NotCompromisedPasswordValidator.php
         -
             function:
                 - 'dd()'

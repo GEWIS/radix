@@ -30,6 +30,10 @@ parameters:
     # The education officer: who a member sends a summary to, and who takes a complaint about a course to the
     # department. Read by the education pages through the `education_email` Twig global.
     app.email.education: 'co@gewis.nl'
+    # Whether a new password is held against the association's own pwned-passwords lookup. On in production and off
+    # in `when@dev:` and `when@test:` below: the service is not something a development machine or the test suite
+    # should be calling, and a failed lookup deliberately refuses the password rather than letting it through.
+    app.user.compromised_password_check_enabled: true
     # A university address stops working once somebody graduates, and the association loses touch with them the day it
     # does. Members on one of these are told to give the board an address that outlives their studies.
     app.user.student_email_domain: '@student.tue.nl'
@@ -200,6 +204,7 @@ services:
 when@dev:
     parameters:
         app.mfa.enforcement_enabled: '%env(bool:MFA_ENFORCEMENT)%'
+        app.user.compromised_password_check_enabled: false
 
     services: &fixture_services
         # `_defaults` applies per services block, so this one gets none of the block above's: without it the fixtures
@@ -216,6 +221,7 @@ when@dev:
 when@test:
     parameters:
         app.mfa.enforcement_enabled: false
+        app.user.compromised_password_check_enabled: false
 
     services:
         <<: *fixture_services
@@ -227,3 +233,4 @@ when@test:
 when@prod:
     parameters:
         app.mfa.enforcement_enabled: true
+        app.user.compromised_password_check_enabled: true
