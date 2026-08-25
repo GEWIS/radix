@@ -27,7 +27,7 @@ use function usort;
  * recorded in the activity feed and flushed immediately, so the management page's inline edits persist one by one.
  *
  * Editing stays allowed after the meeting has taken place: renumbering points afterwards is how the board corrects a
- * shifted agenda so the synced decisions match up again.
+ * shifted agenda so the register's decisions match up again.
  */
 final readonly class MeetingDocumentService
 {

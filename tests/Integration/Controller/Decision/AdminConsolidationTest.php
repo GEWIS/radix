@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function count;
+use function substr_count;
 
 /**
  * The meeting and body pages after the register and the administration were folded into one section.
@@ -74,6 +75,19 @@ final class AdminConsolidationTest extends DatabaseTestCase
             'Minutes',
             $content,
             'What is decided and what is filed alongside it are one record, kept by one pair of hands.',
+        );
+        self::assertStringContainsString(
+            'manage-decisions-tab',
+            $content,
+            'The decisions are a tab of the management component, next to the agenda and the minutes.',
+        );
+        self::assertSame(
+            1,
+            substr_count(
+                $content,
+                'Add New Decision',
+            ),
+            'The decision list appears once, inside the component, and not a second time on the page around it.',
         );
     }
 

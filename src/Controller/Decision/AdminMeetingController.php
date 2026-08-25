@@ -223,11 +223,11 @@ class AdminMeetingController extends AbstractController
                 'meeting' => $meeting,
                 'type' => $type,
                 'number' => $number,
-                // Read out of the ledger rather than out of the projection the rest of the page is drawn from.
-                ...$this->decisions(
+                // Only the read-only list needs the ledger's decisions here; the component asks the ledger itself.
+                ...($this->isGranted(UserRoles::DatabaseAdmin->value) ? [] : $this->decisions(
                     $type,
                     $number,
-                ),
+                )),
             ],
         );
     }

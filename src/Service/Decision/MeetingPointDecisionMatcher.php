@@ -13,9 +13,9 @@ use function strval;
 use function trim;
 
 /**
- * Matches synced decisions to locally-managed agenda points at render time. Nothing is ever stored: agenda points can
- * shift during the actual meeting, and the board corrects a mismatch afterwards by renumbering the points, which
- * instantly re-attributes the decisions.
+ * Matches the register's decisions to locally-managed agenda points at render time. Nothing is ever stored: agenda
+ * points can shift during the actual meeting, and the board corrects a mismatch afterwards by renumbering the
+ * points, which instantly re-attributes the decisions.
  *
  * A decision's point matches the agenda point whose free-form number has the same leading integer. An exact match
  * ("7") beats lettered variants ("7a"); when only lettered variants exist, the first by display order wins. Decisions

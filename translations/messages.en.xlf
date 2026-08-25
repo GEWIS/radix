@@ -2641,6 +2641,10 @@
         <source>Decisions</source>
         <target state="translated">Decisions</target>
       </trans-unit>
+      <trans-unit id="TkNPeht" resname="Decisions can be recorded once the register knows the meeting.">
+        <source>Decisions can be recorded once the register knows the meeting.</source>
+        <target state="translated">Decisions can be recorded once the register knows the meeting.</target>
+      </trans-unit>
       <trans-unit id="otJlv1i" resname="Decisions here">
         <source>Decisions here</source>
         <target state="translated">Decisions here</target>
@@ -4960,10 +4964,6 @@
       <trans-unit id="breVjcd" resname="Meeting Type">
         <source>Meeting Type</source>
         <target state="translated">Meeting Type</target>
-      </trans-unit>
-      <trans-unit id="XUbLhn2" resname="Meeting date">
-        <source>Meeting date</source>
-        <target state="translated">Meeting date</target>
       </trans-unit>
       <trans-unit id="9EpNpeD" resname="Meeting number, for example “214” or “GMM 214”">
         <source>Meeting number, for example “214” or “GMM 214”</source>
@@ -8177,14 +8177,6 @@
         <source>Sync in progress</source>
         <target state="translated">Sync in progress</target>
       </trans-unit>
-      <trans-unit id="L2_cH0m" resname="Synced after the meeting">
-        <source>Synced after the meeting</source>
-        <target state="translated">Synced after the meeting</target>
-      </trans-unit>
-      <trans-unit id="A8Qm99J" resname="Synced, not editable here">
-        <source>Synced, not editable here</source>
-        <target state="translated">Synced, not editable here</target>
-      </trans-unit>
       <trans-unit id="6mYMHiN" resname="Synchronisation is paused">
         <source>Synchronisation is paused</source>
         <target state="translated">Synchronisation is paused</target>
@@ -9184,6 +9176,10 @@
       <trans-unit id="VCJ2Vk7" resname="This meeting has not taken place yet">
         <source>This meeting has not taken place yet</source>
         <target state="translated">This meeting has not taken place yet</target>
+      </trans-unit>
+      <trans-unit id="0y_5P1s" resname="This meeting is not in the register (yet).">
+        <source>This meeting is not in the register (yet).</source>
+        <target state="translated">This meeting is not in the register (yet).</target>
       </trans-unit>
       <trans-unit id="fhYpN1b" resname="This member already represents the maximum number of other members.">
         <source>This member already represents the maximum number of other members.</source>
