@@ -16,6 +16,7 @@ use ReflectionProperty;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -47,8 +48,15 @@ final class SignupTypeTest extends TypeTestCase
     {
         $translator = self::createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
+        $urlGenerator = self::createStub(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturnArgument(0);
 
-        return [new SignupType($translator)];
+        return [
+            new SignupType(
+                $translator,
+                $urlGenerator,
+            ),
+        ];
     }
 
     public function testTwoOptionsSharingALabelStayDistinctSubmittableChoices(): void

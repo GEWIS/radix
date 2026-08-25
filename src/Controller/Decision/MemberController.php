@@ -13,7 +13,6 @@ use App\Repository\Decision\MemberRepository;
 use App\Repository\Frontpage\NewsItemRepository;
 use App\Repository\Photo\ProfilePhotoRepository;
 use App\Service\Application\FileDownloadHelper;
-use App\Service\Application\FileStorage;
 use App\Service\Decision\MemberInfoService;
 use App\Service\Decision\PublicArchiveBrowser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,7 +42,6 @@ use function trim;
 class MemberController extends AbstractController
 {
     /**
-     * @param array<string, string> $regulations
      * @param array<string, string> $membersAreaLinks
      */
     public function __construct(
@@ -52,11 +50,8 @@ class MemberController extends AbstractController
         private readonly NewsItemRepository $newsItemRepository,
         private readonly MemberInfoService $memberInfoService,
         private readonly ProfilePhotoRepository $profilePhotoRepository,
-        private readonly FileStorage $fileStorage,
         private readonly FileDownloadHelper $fileDownloadHelper,
         private readonly PublicArchiveBrowser $publicArchiveBrowser,
-        #[Autowire('%app.regulations%')]
-        private readonly array $regulations,
         #[Autowire('%app.members_area_links%')]
         private readonly array $membersAreaLinks,
     ) {
@@ -146,36 +141,6 @@ class MemberController extends AbstractController
             ],
             $this->memberRepository->searchDirectory($query),
         ));
-    }
-
-    /**
-     * Serves a regulation from the SFTP-mirrored public archive by its dashboard slug.
-     */
-    #[Route(
-        path: '/regulations/{regulation}',
-        name: 'regulations',
-        requirements: ['regulation' => '[a-z0-9-]+'],
-        methods: ['GET'],
-    )]
-    public function downloadRegulation(string $regulation): Response
-    {
-        $archivePath = $this->regulations[$regulation] ?? null;
-
-        if (null === $archivePath) {
-            throw $this->createNotFoundException();
-        }
-
-        $storedPath = 'public-archive/' . $archivePath . '.pdf';
-
-        if (!$this->fileStorage->exists($storedPath)) {
-            throw $this->createNotFoundException();
-        }
-
-        return $this->fileDownloadHelper->download(
-            $storedPath,
-            basename($archivePath) . '.pdf',
-            'application/pdf',
-        );
     }
 
     /**

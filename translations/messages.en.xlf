@@ -1505,6 +1505,10 @@
         <source>Awesome!</source>
         <target state="translated">Awesome!</target>
       </trans-unit>
+      <trans-unit id="VnKO5MD" resname="BBQ Policy">
+        <source>BBQ Policy</source>
+        <target state="translated">BBQ Policy</target>
+      </trans-unit>
       <trans-unit id="XuB5Xor" resname="BM (Board Meeting)">
         <source>BM (Board Meeting)</source>
         <target state="translated">BM (Board Meeting)</target>
@@ -1664,10 +1668,6 @@
       <trans-unit id="cROG02b" resname="Board Member(s) to Relieve">
         <source>Board Member(s) to Relieve</source>
         <target state="translated">Board Member(s) to Relieve</target>
-      </trans-unit>
-      <trans-unit id="47tYjOq" resname="Board Policies">
-        <source>Board Policies</source>
-        <target state="translated">Board Policies</target>
       </trans-unit>
       <trans-unit id="JG_49I8" resname="Board member">
         <source>Board member</source>

@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
@@ -54,11 +55,10 @@ class SignupType extends AbstractType
     /** An external editing their own sign-up via the emailed manage link: name + answers, no editable email. */
     public const string MODE_MANAGE = 'manage';
 
-    private const string ACTIVITY_POLICY_URL = 'https://gewis.nl/data/regulations/activity-policy.pdf';
-    private const string ALCOHOL_POLICY_URL = 'https://gewis.nl/data/regulations/alcohol-policy.pdf';
-
-    public function __construct(private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {
     }
 
     /**
@@ -201,14 +201,23 @@ class SignupType extends AbstractType
         );
     }
 
+    /** Both links have to open for somebody without an account, which is why the two are public regulations. */
     private function agreementLabel(): string
     {
         return $this->translator->trans('I agree to the')
-            . ' <a href="' . self::ACTIVITY_POLICY_URL . '" target="_blank" rel="noopener">'
+            . ' <a href="' . $this->regulationUrl('activity-policy') . '" target="_blank" rel="noopener">'
             . $this->translator->trans('Activity Policy') . '</a> '
             . $this->translator->trans('and')
-            . ' <a href="' . self::ALCOHOL_POLICY_URL . '" target="_blank" rel="noopener">'
+            . ' <a href="' . $this->regulationUrl('alcohol-policy') . '" target="_blank" rel="noopener">'
             . $this->translator->trans('Alcohol Policy') . '</a>.';
+    }
+
+    private function regulationUrl(string $regulation): string
+    {
+        return $this->urlGenerator->generate(
+            'regulations',
+            ['regulation' => $regulation],
+        );
     }
 
     /**

@@ -33,18 +33,25 @@ parameters:
     # A university address stops working once somebody graduates, and the association loses touch with them the day it
     # does. Members on one of these are told to give the board an address that outlives their studies.
     app.user.student_email_domain: '@student.tue.nl'
-    # Regulations on the members-area dashboard: slug (used in the URL) to the document's path inside the
-    # SFTP-mirrored public archive (`data/public-archive/`), without the `.pdf` extension.
+    # Regulations on the members-area dashboard: slug (used in the URL) to the folder holding the document inside the
+    # SFTP-mirrored public archive (`data/public-archive/`). The board keeps the current version of a policy in that
+    # folder as `<slug>-latest.pdf`, so a new version replaces the old one without the link having to change.
     app.regulations:
         activity-policy: 'Policies & Regulations/Activity Policy'
         alcohol-policy: 'Policies & Regulations/Alcohol Policy'
-        board-policies: 'Policies & Regulations/Board Policies'
+        bbq-policy: 'Policies & Regulations/BBQ Policy'
         borrel-policy: 'Policies & Regulations/Borrel Policy'
         house-rules: 'Policies & Regulations/House rules'
         ict-policy: 'Policies & Regulations/ICT Policy'
         key-policy: 'Policies & Regulations/Key Policy'
         poster-policy: 'Policies & Regulations/Poster Policy'
         privacy-policy: 'Policies & Regulations/Privacy Policy'
+    # The regulations anyone may download without an account. The sign-up form for an activity makes an external agree
+    # to these two before it lets them sign up, and somebody who has no account cannot be asked to agree to something
+    # they are not allowed to read.
+    app.regulations.public:
+        - 'activity-policy'
+        - 'alcohol-policy'
     # Subnets the TU/e uses. An anonymous visitor coming from one of them may download course material, which is the
     # arrangement under which the department shares its exams: on campus, or logged in as a member. CIDR notation.
     env(TUE_IP_RANGES): '131.155.0.0/16,100.64.0.0/10'
@@ -101,9 +108,9 @@ parameters:
     app.activity.default_max_proposals: 3
     # External tools linked from the members-area dashboard.
     app.members_area_links:
-        webmail: '/webmail'
+        webmail: 'https://webmail.gewis.nl'
         gewiki: 'https://wiki.gewis.nl'
-        supremum: 'https://supremum.gewis.nl/'
+        supremum: 'https://supremum.gewis.nl'
         corporate_identity: '/corporateidentity'
 
 services:
