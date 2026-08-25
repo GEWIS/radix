@@ -123,6 +123,12 @@ framework:
             'App\Message\Education\BuildWatermarkedDocumentMessage': images
             'App\Message\User\CompanyUserInviteEmail': high_priority
             'App\Message\Career\CareerReviewDecisionEmail': normal_priority
+            # The register's transactional mail: the registration confirmation, the approval, and everything Stripe
+            # reports back about a membership fee. Raised from the Stripe webhook and from the secretary's approval
+            # request, where a blocking SMTP round-trip buys the sender nothing and costs a webhook redelivery (which
+            # Stripe answers with a repeat of the same event) or a page that hangs on the MTA.
+            'App\Message\Database\RegistrationUpdateEmail': high_priority
+            'App\Message\Database\RefundProblemEmail': high_priority
             'App\Message\User\ExportUserDataMessage': bulk
             'App\Message\User\RevokeSessionsRealtimeMessage': high_priority
             # A security notice is worth little late, and it must not hold up whatever raised it.

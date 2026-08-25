@@ -1258,18 +1258,6 @@ parameters:
 			path: src/Service/Database/MailmanService.php
 
 		-
-			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
-			identifier: function.strict
-			count: 1
-			path: src/Service/Database/Member.php
-
-		-
-			message: '#^Calling in_array\(\) is forbidden, set the third parameter \$strict to `true` to also check the types to prevent type juggling bugs\.$#'
-			identifier: disallowed.function
-			count: 1
-			path: src/Service/Database/Member.php
-
-		-
 			message: '#^Cannot call method getEmail\(\) on App\\Entity\\Database\\MailingListMember\|null\.$#'
 			identifier: method.nonObject
 			count: 1
@@ -1356,12 +1344,6 @@ parameters:
 		-
 			message: '#^Method App\\Service\\Database\\Member\:\:subscribeLists\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
 			identifier: missingType.generics
-			count: 1
-			path: src/Service/Database/Member.php
-
-		-
-			message: '#^Parameter \#1 \$address of class Symfony\\Component\\Mime\\Address constructor expects string, string\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/Service/Database/Member.php
 

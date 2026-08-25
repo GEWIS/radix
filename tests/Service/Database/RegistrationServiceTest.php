@@ -7,6 +7,7 @@ namespace App\Tests\Service\Database;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\ProspectiveMember;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
+use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\CheckoutSessionRepository;
 use App\Repository\Database\MailingListRepository;
@@ -140,7 +141,7 @@ class RegistrationServiceTest extends TestCase
             ->method('sendRegistrationUpdateEmail')
             ->with(
                 $prospectiveMember,
-                'registration',
+                RegistrationUpdate::Registration,
             )
             ->willReturnCallback(static function () use (&$order): void {
                 $order[] = 'mail';
