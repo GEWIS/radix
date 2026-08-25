@@ -1,38 +1,8 @@
 name: "✨ Feature Request"
-description: Suggest a feature or enhancement to improve the GEWIS website or the GEWIS database.
+description: Suggest a feature or enhancement to improve the GEWIS website.
 labels: ["Type: Idea"]
 type: "Feature"
 body:
-    -   type: dropdown
-        id: application
-        attributes:
-            label: What would this be for?
-            description: The website is everything under `gewis.nl`; the database is the member administration under `/database`.
-            options:
-                - The website (GEWISWEB)
-                - The member database (GEWISDB)
-                - Both
-                - I am not sure
-        validations:
-            required: true
-    -   type: dropdown
-        id: module
-        attributes:
-            label: Which part of the application does this concern?
-            description: Leave this empty if you do not know; it is triaged for you.
-            multiple: true
-            options:
-                - Activity
-                - Application
-                - Career
-                - Checker
-                - Database
-                - Decision
-                - Education
-                - Frontpage
-                - Photo
-                - Report
-                - User
     -   type: textarea
         id: feature
         attributes:
@@ -47,6 +17,12 @@ body:
             label: Why is this needed?
             description: A clear description of why this would be useful to have.
             placeholder: I want this because...
+    -   type: input
+        id: url
+        attributes:
+            label: Which page does this concern?
+            description: Paste the full URL of the page this feature or enhancement relates to. Leave this empty if it does not apply.
+            placeholder: ex. https://gewis.nl/en/association/committees
     -   type: textarea
         id: other
         attributes:
