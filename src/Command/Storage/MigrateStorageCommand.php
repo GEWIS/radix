@@ -85,13 +85,19 @@ use const LOCK_EX;
  *    `data/education/courses/{courseCode}/`.
  *
  * The migration keeps the existing (sha1) filenames (it never re-hashes), so it is instant and adds no disk. It runs
- * in two independent, re-runnable phases:
+ * in four independent, re-runnable phases:
  *  - `--files` hardlinks each legacy file into its new location (both layouts stay live; nothing is ever deleted).
  *  - `--paths` rewrites the DB path columns to the new layout (the actual switch-over), recording a rollback log.
+ *  - `--pages` rewrites the legacy image sources embedded in custom page content.
+ *  - `--meetings` rebuilds the flat meeting documents and minutes into the agenda-point/version model
+ *    ({@see LegacyMeetingDocumentMigrator}). Meeting files are not hardlinked by `--files` and are not rewritten by
+ *    `--paths`: this phase is the only thing that carries them out of the pool, and it copies them rather than
+ *    linking them, so nothing may remove the pool before it has run. Every run says whether anything is still only
+ *    there.
  *
- * Both phases derive the new location from the legacy value with the exact same mapping ({@see mapLegacyPath()}), so a
- * row's rewritten path always points at a file `--files` created. `--dry-run` reports without changing anything, and
- * `--rollback` restores the DB paths from a `--paths` run's log.
+ * `--files` and `--paths` derive the new location from the legacy value with the exact same mapping
+ * ({@see mapLegacyPath()}), so a row's rewritten path always points at a file `--files` created. `--dry-run` reports
+ * without changing anything, and `--rollback` restores the DB paths from a `--paths` run's log.
  *
  * @phpstan-type StorageTarget = array{
  *     key: string,
@@ -185,7 +191,12 @@ final class MigrateStorageCommand extends Command
                 Naming no phase runs all four, in the order they depend on each other: <info>--files</info> puts the
                 files in place, <info>--paths</info> switches the stored path columns over to them, <info>--pages</info>
                 rewrites the sources embedded in page content, and <info>--meetings</info> rebuilds the flat meeting
-                documents into the agenda-point and version model.
+                documents and minutes into the agenda-point and version model.
+
+                <info>--meetings</info> is the only phase that carries the meeting files out of the pool, and it copies
+                them instead of linking them, so the pool has to stay until it has run. It skips whatever the new model
+                already has -- an earlier run's work, or the board's own -- and can be run again at any time. Every run
+                of this command ends by saying whether anything is still only in the pool.
 
                 The run is resumable. Each item is journalled as it commits, so a run that is interrupted can simply be
                 started again and will skip what it settled; <info>--retry-failed</info> returns to the failures alone.
@@ -216,7 +227,7 @@ final class MigrateStorageCommand extends Command
                 'meetings',
                 null,
                 InputOption::VALUE_NONE,
-                'Rebuild the legacy flat meeting documents into the agenda-point/version model.',
+                'Rebuild the legacy flat meeting documents and minutes into the agenda-point/version model.',
             )
             ->addOption(
                 'rollback',
@@ -236,12 +247,6 @@ final class MigrateStorageCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Attempt the items the journal records as failed again, instead of skipping everything it recorded.',
-            )
-            ->addOption(
-                'force',
-                null,
-                InputOption::VALUE_NONE,
-                'With --meetings: run even when migrated meeting documents already exist.',
             )
             ->addOption(
                 'source-dir',
@@ -412,15 +417,15 @@ final class MigrateStorageCommand extends Command
             $refused = !$this->meetingMigrator->migrate(
                 $ui,
                 $dryRun,
-                true === $input->getOption('force'),
                 $this->legacyRoot,
             );
         }
 
         $this->reportJournal($ui);
+        $this->reportPendingMeetings($ui);
 
-        // The meeting rebuild refuses to run over documents it has already made, which is a reason to stop rather
-        // than a phase that quietly did nothing.
+        // The meeting rebuild refuses to run without a legacy pool to read, which is a reason to stop rather than a
+        // phase that quietly did nothing.
         return $refused
             ? Command::FAILURE
             : Command::SUCCESS;
@@ -585,6 +590,31 @@ final class MigrateStorageCommand extends Command
         }
 
         $ui->warning('Run again with --retry-failed to attempt the failed items once more.');
+    }
+
+    /**
+     * Whether the legacy pool can go. Every other phase hardlinks, so its files survive the pool being removed; the
+     * meeting files are copied by the meeting rebuild, and until that has run they exist nowhere else.
+     */
+    private function reportPendingMeetings(SymfonyStyle $ui): void
+    {
+        $pending = $this->meetingMigrator->pending();
+        if (
+            0 === $pending['documents']
+            && 0 === $pending['minutes']
+        ) {
+            $ui->writeln('Every legacy meeting document and set of minutes has a counterpart in the new model.');
+
+            return;
+        }
+
+        $ui->warning(sprintf(
+            '%d legacy meeting document(s) and %d set(s) of minutes have no counterpart in the new model. Their '
+            . 'files exist only in the legacy pool at "%s" -- keep it, and run this command with --meetings.',
+            $pending['documents'],
+            $pending['minutes'],
+            $this->legacyRoot,
+        ));
     }
 
     /**
