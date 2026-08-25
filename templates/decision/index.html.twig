@@ -202,7 +202,7 @@
                         {% for slug, label in {
                             'activity-policy': 'Activity Policy'|trans,
                             'alcohol-policy': 'Alcohol Policy'|trans,
-                            'board-policies': 'Board Policies'|trans,
+                            'bbq-policy': 'BBQ Policy'|trans,
                             'borrel-policy': 'Borrel Policy'|trans,
                             'house-rules': 'House Rules'|trans,
                             'ict-policy': 'ICT Policy'|trans,
@@ -211,7 +211,7 @@
                             'privacy-policy': 'Privacy Policy'|trans,
                         } %}
                             <div class="col">
-                                <a href="{{ path('members/regulations', {'regulation': slug}) }}"
+                                <a href="{{ path('regulations', {'regulation': slug}) }}"
                                    class="d-flex align-items-center gap-2 py-1 text-body fw-semibold">
                                     <span class="far fa-file-lines text-muted" aria-hidden="true"></span>
                                     {{ label }}
