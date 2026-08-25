@@ -8,7 +8,7 @@
 
 <article class="news-item d-flex gap-3">
     <div class="news-item__date text-center flex-shrink-0">
-        <span class="d-block text-uppercase small fw-bold text-primary-emphasis">{{ item.date|format_date(pattern: 'MMM', locale: app.request.locale) }}</span>
+        <span class="d-block text-uppercase small fw-bold text-gewis-primary">{{ item.date|format_date(pattern: 'MMM', locale: app.request.locale) }}</span>
         <span class="d-block fs-4 fw-bold lh-1">{{ item.date|format_date(pattern: 'dd', locale: app.request.locale) }}</span>
         <span class="d-block small text-muted">{{ item.date|format_date(pattern: 'yyyy', locale: app.request.locale) }}</span>
     </div>
