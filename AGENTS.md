@@ -443,6 +443,13 @@ types it accepts and how large a file may be. `FileStorage` is the only writer, 
 `data/` (in-memory under test). Public images are served through `ImageUrlBuilder` as `/img/{variant}/{path}`; nothing
 is linked to by its path on disk.
 
+**A web request never encodes an image.** Serving reads the pre-generated variant cache only; a miss on an existing
+original queues one `GenerateImageVariantMessage` on the `images` transport (deduplicated through a shared-cache
+marker) and answers 503 with `Retry-After` (`ImageVariantResponder`). The variants exist because uploads queue them
+(`ProcessImageVariantsMessage`) and because `app:image:pregenerate` backfills the rest at a bounded pace — run it
+after clearing the variant cache or changing the variant set or encoding. Synchronous encode-on-miss is what once
+saturated the production host; do not reintroduce it.
+
 The application inherits one legacy pool: the flat content-addressed tree GEWISWEB wrote at `public/data`, holding
 every photo, company and organ image, course document, page-embedded image and meeting document. `app:storage:migrate`
 migrates all of it in one run — there is no second source, and GEWISDB never stored files. The run is journalled per

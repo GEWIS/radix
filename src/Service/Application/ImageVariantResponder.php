@@ -6,25 +6,53 @@ namespace App\Service\Application;
 
 use App\Entity\Application\Enums\ImageVariant;
 use App\Entity\Application\Enums\StorageNamespace;
+use App\Message\Application\GenerateImageVariantMessage;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function fpassthru;
+use function hash;
 use function is_file;
+use function sprintf;
 
+/**
+ * A web worker never encodes an image. It used to, synchronously on a miss, and a page of uncached thumbnails was
+ * enough to saturate the host; a miss now queues one message and answers 503.
+ */
 final readonly class ImageVariantResponder
 {
-    private const int FALLBACK_QUALITY = 85;
+    /** Long enough to cover a backlogged queue, short enough that a message lost with the broker costs minutes. */
+    private const int PENDING_TTL = 900;
+
+    private const int RETRY_AFTER_SECONDS = 60;
 
     public function __construct(
-        private FilePathResolver $pathResolver,
         private VariantGenerator $variantGenerator,
         private FileStorage $fileStorage,
+        private MessageBusInterface $messageBus,
+        private CacheItemPoolInterface $cache,
         #[Autowire('%kernel.project_dir%/data')]
         private string $storageRootDir,
     ) {
+    }
+
+    public static function pendingCacheKey(
+        string $path,
+        ImageVariant $variant,
+    ): string {
+        // Hashed because a stored path contains characters PSR-6 reserves.
+        return 'image_variant_pending.' . hash(
+            'sha256',
+            sprintf(
+                '%s|%s',
+                $variant->value,
+                $path,
+            ),
+        );
     }
 
     public function respond(
@@ -37,28 +65,69 @@ final readonly class ImageVariantResponder
             $variant,
         );
 
-        if (!$this->fileStorage->exists($cachePath)) {
-            $quality = $this->pathResolver->profileForPath(
-                $path,
-                $variant,
-            )?->webpQuality() ?? self::FALLBACK_QUALITY;
-
-            if (
-                !$this->variantGenerator->generateVariant(
-                    $path,
-                    $variant,
-                    $quality,
-                    skipUpscale: false,
-                )
-            ) {
-                return null;
-            }
+        if ($this->fileStorage->exists($cachePath)) {
+            return $this->serveVariant(
+                $cachePath,
+                $namespace,
+            );
         }
 
-        return $this->serveVariant(
-            $cachePath,
-            $namespace,
+        if (!$this->fileStorage->exists($path)) {
+            return null;
+        }
+
+        $this->requestGeneration(
+            $path,
+            $variant,
         );
+
+        return $this->retryLater();
+    }
+
+    /** The marker is never cleaned up: its expiry is what re-opens the door after a failed generation. */
+    private function requestGeneration(
+        string $path,
+        ImageVariant $variant,
+    ): void {
+        $marker = $this->cache->getItem(self::pendingCacheKey(
+            $path,
+            $variant,
+        ));
+        if ($marker->isHit()) {
+            return;
+        }
+
+        // Check-then-mark, not an atomic reservation: a duplicate message is a no-op in the handler anyway.
+        $marker->set(true);
+        $marker->expiresAfter(self::PENDING_TTL);
+        $this->cache->save($marker);
+
+        $this->messageBus->dispatch(new GenerateImageVariantMessage(
+            $path,
+            $variant,
+        ));
+    }
+
+    private function retryLater(): Response
+    {
+        $response = new Response(
+            'Image variant is being generated.',
+            Response::HTTP_SERVICE_UNAVAILABLE,
+        );
+        $response->headers->set(
+            'Content-Type',
+            'text/plain',
+        );
+        $response->headers->set(
+            'Retry-After',
+            (string) self::RETRY_AFTER_SECONDS,
+        );
+        $response->headers->set(
+            'Cache-Control',
+            'no-store',
+        );
+
+        return $response;
     }
 
     private function serveVariant(

@@ -14,7 +14,7 @@ use function str_starts_with;
 /**
  * Maps a stored source path back onto the {@see StorageNamespace} it belongs to (which decides whether serving it needs
  * a signature and session) and, for the image namespaces, together with the requested variant onto the
- * {@see ImageProfile} that governs its encoding, so both the serving gate and the synchronous generate-on-miss encode
+ * {@see ImageProfile} that governs its encoding, so both the serving gate and the miss handler's queued encode
  * agree on the same rules. Not every namespace holds images: attachments and meeting files are PDFs, which resolve to a
  * namespace but never to a profile.
  */

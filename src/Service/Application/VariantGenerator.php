@@ -52,9 +52,10 @@ final readonly class VariantGenerator
      * exists for it: false when the source is missing or (during pre-generation, `$skipUpscale` true) the width-fit
      * variant was skipped because the original is narrower than the target.
      *
-     * Pre-generation skips upscales so no redundant larger-than-original variant is stored; the synchronous
-     * generate-on-miss path passes `$skipUpscale = false`, capping at the original width (`scaleDown` never upscales)
-     * so a valid original always yields something to serve rather than a 404.
+     * Pre-generation skips upscales so no redundant larger-than-original variant is stored; the serving path's miss
+     * handler ({@see \App\MessageHandler\Application\GenerateImageVariantHandler}) passes `$skipUpscale = false`,
+     * capping at the original width (`scaleDown` never upscales) so a valid original always yields something to
+     * serve rather than an eternal miss.
      */
     public function generateVariant(
         string $sourcePath,

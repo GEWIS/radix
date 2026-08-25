@@ -177,18 +177,20 @@ final readonly class FileStorage
     }
 
     /**
-     * The stored paths of the files directly inside a directory. Returns an empty list when the directory does not
-     * exist yet.
+     * The stored paths of the files directly inside a directory, or, when $deep, anywhere below it. Returns an empty
+     * list when the directory does not exist yet.
      *
      * @return list<string>
      */
-    public function listFiles(string $directory): array
-    {
+    public function listFiles(
+        string $directory,
+        bool $deep = false,
+    ): array {
         $paths = [];
         foreach (
             $this->defaultStorage->listContents(
                 $directory,
-                false,
+                $deep,
             ) as $item
         ) {
             if (!$item->isFile()) {

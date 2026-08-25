@@ -1813,6 +1813,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+        '503':
+          description: 'The rendition exists but is not generated yet; its generation has been queued. Retry after the number of seconds in the `Retry-After` header.'
+          content:
+            text/plain:
+              schema:
+                type: string
       summary: 'Get a rendition of a photo'
       description: "Album originals are private and are served signed at `/img`, which is outside this API's firewall, so a bearer token cannot fetch one there. This serves the same bytes where the token does authenticate."
       parameters:
@@ -2041,6 +2047,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+        '503':
+          description: 'The rendition exists but is not generated yet; its generation has been queued. Retry after the number of seconds in the `Retry-After` header.'
+          content:
+            text/plain:
+              schema:
+                type: string
       summary: 'Get a rendition of an album cover'
       description: "A cover is a mosaic generated from the album rather than one of its photos, so it has no address among them. Served here for the same reason the photo renditions are: `/img` is outside this API's firewall."
       parameters:
