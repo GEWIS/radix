@@ -25,6 +25,9 @@ use App\Entity\Database\PaymentLink;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Entity\Database\RenewalLink as RenewalLinkModel;
 use App\Entity\User\User;
+use App\Message\Database\RefundProblemEmail;
+use App\Message\Database\RegistrationUpdate;
+use App\Message\Database\RegistrationUpdateEmail;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\AuditEntryRepository;
 use App\Repository\Database\MailingListMemberRepository;
@@ -32,18 +35,15 @@ use App\Repository\Database\MailingListRepository;
 use App\Repository\Database\MemberRepository;
 use App\Repository\Database\MemberUpdateRepository;
 use App\Repository\Database\ProspectiveMemberRepository;
-use App\Service\Application\Email as EmailService;
 use App\Service\Checker\Renewal as RenewalService;
 use App\Validator\Database\BulkMemberIds;
 use DateTime;
-use InvalidArgumentException;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_diff;
@@ -70,11 +70,8 @@ class Member
         private readonly MailingListService $mailingListService,
         private readonly RenewalService $renewalService,
         private readonly Security $security,
-        private readonly EmailService $emailService,
-        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly MessageBusInterface $bus,
         private readonly Audit $auditService,
-        private readonly string $mailToSubscriptionAddress,
-        private readonly string $mailToSubscriptionName,
     ) {
     }
 
@@ -138,105 +135,22 @@ class Member
     }
 
     /**
-     * Send an e-mail to the (prospective) member and the secretary with an update on the (prospective) member's
+     * Queue an e-mail to the (prospective) member and the secretary with an update on the (prospective) member's
      * registration.
      *
-     * @psalm-param "registration"|"welcome"|"checkout-expired"|"checkout-failed"|"refund-created" $type
+     * Only the membership number travels; the record is read back and rendered from by
+     * {@see \App\MessageHandler\Database\RegistrationUpdateEmailHandler}. Every caller has flushed by the time it
+     * gets here, so there is something left to read back.
      */
     public function sendRegistrationUpdateEmail(
         MemberModel|ProspectiveMemberModel $member,
-        string $type,
+        RegistrationUpdate $type,
     ): void {
-        if (
-            !in_array(
+        $this->bus->dispatch(
+            new RegistrationUpdateEmail(
                 $type,
-                [
-                    'registration',
-                    'welcome',
-                    'checkout-expired',
-                    'checkout-failed',
-                    'refund-created',
-                ],
-            )
-        ) {
-            throw new InvalidArgumentException('Unknown email type for prospective member.');
-        }
-
-        switch ($type) {
-            case 'registration':
-                $template = 'database/email/member-registration.html.twig';
-                $subjectProspectiveMember = 'GEWIS registration';
-                $subjectSecretary = 'New member registration: ' . $member->getFullName();
-
-                break;
-            case 'welcome':
-                $template = 'database/email/member-welcome.html.twig';
-                $subjectProspectiveMember = 'Your GEWIS membership has been confirmed';
-                $subjectSecretary = 'Membership confirmed: ' . $member->getFullName();
-
-                break;
-            case 'checkout-expired':
-                $template = 'database/email/checkout-expired.html.twig';
-                $subjectProspectiveMember = 'Complete your GEWIS registration';
-                $subjectSecretary = 'Membership payment expired: ' . $member->getFullName();
-
-                break;
-            case 'checkout-failed':
-                $template = 'database/email/checkout-failed.html.twig';
-                $subjectProspectiveMember = 'Your GEWIS membership fee payment has failed';
-                $subjectSecretary = 'Membership payment failed: ' . $member->getFullName();
-
-                break;
-            case 'refund-created':
-                $template = 'database/email/refund-created.html.twig';
-                $subjectProspectiveMember = 'Your GEWIS membership fee is being refunded';
-                $subjectSecretary = 'Membership payment refund started: ' . $member->getFullName();
-
-                break;
-        }
-
-        // What the templates say, rather than the record they say it about: the name to greet, the number that has
-        // just been assigned, and the link back into a checkout that did not finish.
-        $paymentLink = $member instanceof ProspectiveMemberModel
-            ? $member->getPaymentLink()
-            : null;
-        $context = [
-            'member' => $member,
-            'firstName' => $member->getFirstName(),
-            'lidnr' => $member->getLidnr(),
-            'restartUrl' => null === $paymentLink
-                ? null
-                : $this->urlGenerator->generate(
-                    'join_checkout_restart_short',
-                    ['token' => $paymentLink->getToken()],
-                    UrlGeneratorInterface::ABSOLUTE_URL,
-                ),
-        ];
-
-        $secretary = new Address(
-            $this->mailToSubscriptionAddress,
-            $this->mailToSubscriptionName,
-        );
-
-        // Always try to send the e-mail to the prospective member before sending to the secretary. The secretary can
-        // look in the database, the prospective member cannot.
-        $this->emailService->send(
-            new Address(
-                $member->getEmail(),
-                $member->getFullName(),
+                $member->getLidnr(),
             ),
-            $subjectProspectiveMember,
-            $template,
-            $context,
-            $secretary,
-        );
-
-        $this->emailService->send(
-            $secretary,
-            $subjectSecretary,
-            $template,
-            $context,
-            $secretary,
         );
     }
 
@@ -244,18 +158,11 @@ class Member
         string $refundId,
         string $refundStatus,
     ): void {
-        $this->emailService->send(
-            new Address(
-                $this->mailToSubscriptionAddress,
-                $this->mailToSubscriptionName,
+        $this->bus->dispatch(
+            new RefundProblemEmail(
+                $refundId,
+                $refundStatus,
             ),
-            'Problem while processing membership refund',
-            'database/email/refund-problem.html.twig',
-            [
-                'refundId' => $refundId,
-                'refundStatus' => $refundStatus,
-            ],
-            $this->emailService->secretary(),
         );
     }
 
@@ -351,7 +258,7 @@ class Member
 
         $this->sendRegistrationUpdateEmail(
             $member,
-            'welcome',
+            RegistrationUpdate::Welcome,
         );
 
         return $member;

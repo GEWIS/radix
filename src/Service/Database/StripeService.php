@@ -8,6 +8,7 @@ use App\Entity\Database\CheckoutSession as CheckoutSessionModel;
 use App\Entity\Database\Enums\CheckoutSessionStates;
 use App\Entity\Database\PaymentLink as PaymentLinkModel;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
+use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\CheckoutSessionRepository;
 use App\Service\Database\Member as MemberService;
@@ -253,7 +254,7 @@ class StripeService
             // Send e-mail.
             $this->memberService->sendRegistrationUpdateEmail(
                 $prospectiveMember,
-                'refund-created',
+                RegistrationUpdate::RefundCreated,
             );
 
             return true;
@@ -459,7 +460,7 @@ class StripeService
                     // in e-mails for the prospective member.
                     $this->memberService->sendRegistrationUpdateEmail(
                         $storedCheckoutSession->getProspectiveMember(),
-                        'checkout-expired',
+                        RegistrationUpdate::CheckoutExpired,
                     );
                 }
 
@@ -496,7 +497,7 @@ class StripeService
                 // Send e-mail.
                 $this->memberService->sendRegistrationUpdateEmail(
                     $storedCheckoutSession->getProspectiveMember(),
-                    'checkout-failed',
+                    RegistrationUpdate::CheckoutFailed,
                 );
 
                 break;

@@ -6,6 +6,7 @@ namespace App\Service\Database;
 
 use App\Entity\Database\MailingList;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
+use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\MailingListRepository;
 use App\Repository\Database\ProspectiveMemberRepository;
 use App\Service\Database\Member as MemberService;
@@ -93,7 +94,7 @@ class RegistrationService
         // only way back into the flow if the checkout does not come up.
         $this->memberService->sendRegistrationUpdateEmail(
             $prospectiveMember,
-            'registration',
+            RegistrationUpdate::Registration,
         );
 
         return $this->stripeService->getCheckoutLink($prospectiveMember);
