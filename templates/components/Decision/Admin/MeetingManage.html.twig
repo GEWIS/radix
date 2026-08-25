@@ -3,6 +3,7 @@
     {% set meeting = view.meeting %}
     {% set readiness = this.readiness %}
     {% set minutesLatest = view.minutes ? view.minutes.latestVersion : null %}
+    {% set ledgerView = this.ledgerView %}
 
     {% macro admin_document_row(document, this) %}
         {% set latest = document.latestVersion %}
@@ -148,6 +149,14 @@
                         aria-controls="manage-reference-pane" aria-selected="false">
                     {{ 'Reference selection'|trans }}
                     <span class="badge ms-1">{{ readiness.referenceCount }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="manage-decisions-tab" data-bs-toggle="pill"
+                        data-bs-target="#manage-decisions-pane" type="button" role="tab"
+                        aria-controls="manage-decisions-pane" aria-selected="false">
+                    {{ 'Decisions'|trans }}
+                    <span class="badge ms-1">{{ ledgerView ? ledgerView.decisions|length : 0 }}</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -334,6 +343,28 @@
                     </div>
                 </div>
 
+                <div class="tab-pane fade" id="manage-decisions-pane" role="tabpanel"
+                     aria-labelledby="manage-decisions-tab" tabindex="0">
+                    {% if ledgerView %}
+                        {% include 'decision/admin/meetings/decisions.html.twig' with {
+                            'ledgerMeeting': ledgerView.meeting,
+                            'decisions': ledgerView.decisions,
+                            'next_decision_numbers': ledgerView.nextDecisionNumbers,
+                            'flush': true,
+                        } only %}
+                    {% else %}
+                        <div class="panel my-0">
+                            <div class="panel-body">
+                                {% include 'partials/application/empty-state.html.twig' with {
+                                    icon: 'fa-gavel',
+                                    title: 'This meeting is not in the register (yet).'|trans,
+                                    body: 'Decisions can be recorded once the register knows the meeting.'|trans,
+                                } only %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
                 <div class="tab-pane fade" id="manage-minutes-pane" role="tabpanel"
                      aria-labelledby="manage-minutes-tab" tabindex="0">
                     <div class="panel my-0">
@@ -437,28 +468,6 @@
                                            placeholder="{{ 'Room or building'|trans }}">
                                     <div class="form-text">{{ 'Shown on the member page while the meeting is upcoming.'|trans }}</div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <h3>{{ 'Synced, not editable here'|trans }}</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="d-flex align-items-center gap-2 py-1">
-                                <span class="fas fa-lock text-muted small" aria-hidden="true"></span>
-                                <span class="text-muted small" style="width: 8rem;">{{ 'Meeting date'|trans }}</span>
-                                <span>{{ meeting.date|format_date('full') }}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 py-1 border-top">
-                                <span class="fas fa-lock text-muted small" aria-hidden="true"></span>
-                                <span class="text-muted small" style="width: 8rem;">{{ 'Meeting'|trans }}</span>
-                                <span>{{ meeting.type.getName|trans }} {{ meeting.number }}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 py-1 border-top">
-                                <span class="fas fa-lock text-muted small" aria-hidden="true"></span>
-                                <span class="text-muted small" style="width: 8rem;">{{ 'Decisions'|trans }}</span>
-                                <span>{{ 'Synced after the meeting'|trans }}</span>
                             </div>
                         </div>
                     </div>

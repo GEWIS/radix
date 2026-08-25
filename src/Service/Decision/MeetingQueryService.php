@@ -132,7 +132,7 @@ final readonly class MeetingQueryService
     }
 
     /**
-     * A meeting is complete once decisions have been synced or minutes have been uploaded; between the meeting date
+     * A meeting is complete once decisions have been recorded or minutes have been uploaded; between the meeting date
      * and that moment it is shown as "being processed".
      */
     public function getStatus(Meeting $meeting): MeetingStatus

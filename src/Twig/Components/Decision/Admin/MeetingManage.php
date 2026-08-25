@@ -18,12 +18,14 @@ use App\Repository\Decision\MeetingDocumentRepository;
 use App\Repository\Decision\MeetingPointRepository;
 use App\Repository\Decision\ReferenceDocumentRepository;
 use App\Security\User\SudoVoter;
+use App\Service\Database\Meeting as DatabaseMeetingService;
 use App\Service\Decision\MeetingDocumentService;
 use App\Service\Decision\MeetingLocalDetailsService;
 use App\Service\Decision\MeetingMinutesService;
 use App\Service\Decision\MeetingQueryService;
 use App\Service\Decision\ReferenceDocumentService;
 use App\Service\Decision\VersionLabelSuggester;
+use App\ViewModel\Database\MeetingView as LedgerMeetingView;
 use App\ViewModel\Decision\MeetingReadiness;
 use App\ViewModel\Decision\MeetingView;
 use DateTime;
@@ -109,6 +111,7 @@ final class MeetingManage
 
     public function __construct(
         private readonly Security $security,
+        private readonly DatabaseMeetingService $databaseMeetingService,
         private readonly MeetingQueryService $meetingQueryService,
         private readonly MeetingPointRepository $meetingPointRepository,
         private readonly MeetingDocumentRepository $meetingDocumentRepository,
@@ -145,6 +148,21 @@ final class MeetingManage
         return $options;
     }
 
+    /**
+     * The ledger's side of this meeting, for the decisions tab: what was decided, in the language being read, and
+     * the numbers a new decision would get, which the projection does not carry. Null when the ledger does not
+     * know the meeting, in which case there is nothing to record a decision against either.
+     */
+    public function getLedgerView(): ?LedgerMeetingView
+    {
+        $this->assertAccess();
+
+        return $this->databaseMeetingService->getMeetingView(
+            MeetingTypes::tryFromSearch(strtoupper($this->type)),
+            $this->number,
+        );
+    }
+
     public function getView(): MeetingView
     {
         $this->assertAccess();
@@ -171,7 +189,7 @@ final class MeetingManage
     /**
      * Fill the pending-edit arrays with what is on screen.
      *
-     * The inline inputs bind to a path inside one of them -- `pointEdits.<id>.title` and the like -- and a model path
+     * The inline inputs bind to a path inside one of them, `pointEdits.<id>.title` and the like, and a model path
      * is only valid to the client if every level of it already exists among the component's props. Left empty, as
      * they are before anything has been edited and again after {@see syncEdits()} clears them, the first keystroke
      * in any of those inputs fails with "Invalid model name".

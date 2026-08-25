@@ -75,8 +75,8 @@ final class ReferenceLibrary
         $rows = $this->referenceDocumentRepository->findAllWithUsageCounts();
 
         // The rename input binds to `nameEdits.<id>.name`, and a model path is only valid to the client if every
-        // level of it already exists among this component's props. Left empty -- as it is before anything has been
-        // renamed, and again after syncEdits() clears it -- the first keystroke fails with "Invalid model name".
+        // level of it already exists among this component's props. Left empty, as it is before anything has been
+        // renamed and again after syncEdits() clears it, the first keystroke fails with "Invalid model name".
         // Only missing keys are filled: on a re-render the array comes back carrying what the reader typed.
         foreach ($rows as [$document]) {
             $this->nameEdits[(string) $document->getId()]['name'] ??= $document->getName();

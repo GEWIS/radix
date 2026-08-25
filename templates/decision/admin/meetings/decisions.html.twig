@@ -1,16 +1,15 @@
 {#
-    The decisions taken at a meeting, and the form that starts a new one.
-
-    The register's half of the meeting page. It used to be a page of its own behind /database while the documents
-    were administered here; they describe the same meeting, so they are one page now, and this is the part of it that
-    is only rendered for a reader who administers the register.
+    The decisions taken at a meeting, and the form that starts a new one. Included from the decisions tab of the
+    management component for whoever administers the register, and from the meeting page itself for a board reader
+    who has no component to find them in. Expects the ledger's view of the meeting; `flush` strips the first
+    panel's top margin so the tab starts where its siblings do.
 #}
 {# How a decision is cited: the meeting it was taken at, then the point and the number within it. #}
 {% set meeting_label = ledgerMeeting.type.value ~ ' ' ~ ledgerMeeting.number %}
 
 {% for decision in decisions %}
     {% set annulled = null is not same as(decision.annulment) %}
-    <div class="panel{{ annulled ? ' decision-annulled' : '' }}">
+    <div class="panel{{ loop.first and flush|default(false) ? ' mt-0' : '' }}{{ annulled ? ' decision-annulled' : '' }}">
         <div class="panel-body">
             <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                 <span class="badge badge-gewis-primary font-monospace">
@@ -53,12 +52,12 @@
         </div>
     </div>
 {% else %}
-    <div class="panel">
+    <div class="panel{{ flush|default(false) ? ' mt-0' : '' }}">
         <div class="panel-body">
             {% include 'partials/application/empty-state.html.twig' with {
                 icon: 'fa-gavel',
                 title: 'This meeting has no decisions (yet).'|trans,
-                body: 'Add one below to start recording what was decided.'|trans,
+                body: is_granted('ROLE_DATABASE_ADMIN') ? 'Add one below to start recording what was decided.'|trans : null,
             } only %}
         </div>
     </div>

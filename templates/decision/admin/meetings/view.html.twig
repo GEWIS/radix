@@ -27,11 +27,10 @@
     </div>
     <p class="text-muted mb-3">{{ meeting.date|format_date('full') }}</p>
 
-    {# One page about one meeting, in the order it is kept in: what was decided, then what was filed alongside it.
-       Both belong to whoever keeps the register, so neither is a half of the page that appears for somebody else --
-       a reader who may not change the record simply has no management panel to be shown. #}
+    {# Whoever keeps the register gets the whole record as the component below, decisions included; a board
+       reader who may not change it gets the decision list by itself. #}
     {# A meeting the projection knows and the ledger does not has no decisions to show; it still has its documents. #}
-    {% if decisions is defined %}
+    {% if decisions is defined and not is_granted('ROLE_DATABASE_ADMIN') %}
         {% include 'decision/admin/meetings/decisions.html.twig' %}
     {% endif %}
 
