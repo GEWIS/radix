@@ -183,7 +183,7 @@ final readonly class WeeklyPhotoService
             $this->fileStorage->readStream($photo->getPath()),
         );
 
-        // Pre-generate the frontpage variants; generate-on-miss would otherwise do it on the first visitor.
+        // Pre-generate the frontpage variants; the first visitor would otherwise get a 503.
         $this->messageBus->dispatch(new ProcessImageVariantsMessage($publicPath, ImageProfile::AlbumPhoto));
     }
 

@@ -26,20 +26,6 @@
 
 	root /app/public
 
-	# TEMPORARY, REVERT WHEN THE VARIANT PIPELINE IS FIXED. Serving an image variant is the one request that encodes
-	# on a miss, synchronously, inside the FrankenPHP worker (App\Service\Application\ImageVariantResponder), with
-	# nothing bounding how many run at once and nothing deduplicating two requests for the same missing variant. A
-	# page of uncached thumbnails is enough to saturate the host, so the whole path is refused here, before the
-	# rewrite below can hand it to PHP.
-	#
-	# The three patterns are every route that reaches that encode: `image_serve` in config/routes.yaml, and the two
-	# photo API endpoints. `path` ORs its arguments.
-	@imageVariants path /img/* /api/photos/*/image/* /api/photos/albums/*/cover/*
-	# 503 rather than 404, so a crawler retries later instead of dropping the URL from its index, and so the pages
-	# themselves keep working with the images broken rather than reading as gone.
-	header @imageVariants Retry-After "3600"
-	respond @imageVariants "Image serving is temporarily unavailable." 503
-
 	mercure {
 		transport bolt {
 			path /data/caddy/mercure.db
@@ -74,7 +60,6 @@
 
 	@phpRoute {
 	    not path /.well-known/mercure*
-		not path /img/* /api/photos/*/image/* /api/photos/albums/*/cover/*
 		not file {path}
 	}
 	rewrite @phpRoute index.php

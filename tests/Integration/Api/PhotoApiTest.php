@@ -16,6 +16,7 @@ use App\Entity\Photo\Photo as PhotoEntity;
 use App\Entity\User\Enums\ApiPermissions;
 use App\Repository\Photo\WeeklyPhotoRepository;
 use App\Service\Application\FileStorage;
+use App\Service\Application\VariantGenerator;
 use App\Service\Photo\WeeklyPhotoService;
 use App\State\Photo\AlbumPhotoProvider;
 use App\State\Photo\AlbumProvider;
@@ -590,6 +591,10 @@ final class PhotoApiTest extends ApiTestCase
     {
         $photo = $this->aPhotoInAPublishedAlbum();
         $this->store($photo->getPath());
+        $this->pregenerate(
+            $photo->getPath(),
+            ImageVariant::W320,
+        );
 
         $response = $this->get(
             $this->imagePath($photo),
@@ -616,6 +621,10 @@ final class PhotoApiTest extends ApiTestCase
         $album = $this->aPublishedAlbumWithSeveralPhotos();
         $path = StorageNamespace::PhotoCover->directory((string) $album) . '/mosaic.jpg';
         $this->store($path);
+        $this->pregenerate(
+            $path,
+            ImageVariant::Cover,
+        );
         $this->entityManager->find(
             AlbumEntity::class,
             $album,
@@ -756,6 +765,19 @@ final class PhotoApiTest extends ApiTestCase
         $response->sendContent();
 
         return (string) ob_get_clean();
+    }
+
+    /** Serving never encodes: a variant must exist before the request, or the endpoint answers 503. */
+    private function pregenerate(
+        string $path,
+        ImageVariant $variant,
+    ): void {
+        self::getContainer()->get(VariantGenerator::class)->generateVariant(
+            $path,
+            $variant,
+            85,
+            skipUpscale: false,
+        );
     }
 
     private function store(string $path): void

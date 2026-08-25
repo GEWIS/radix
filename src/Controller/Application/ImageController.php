@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Serves a pre-generated (or, on a cache miss, freshly generated) image variant.
+ * Serves a pre-generated image variant; a cache miss queues generation and answers 503.
  *
  * Private namespaces (album photos) require a valid day-signature and pass the pluggable per-namespace access check
  * (default: an authenticated session; the photos checker additionally runs the album voter for graduates). Public

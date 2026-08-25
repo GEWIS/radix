@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller\Application;
 
 use App\Controller\Application\ImageController;
+use App\Entity\Application\Enums\ImageVariant;
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Service\Application\FileStorage;
 use App\Service\Application\ImageSigner;
+use App\Service\Application\ImageVariantResponder;
+use App\Service\Application\VariantGenerator;
 use App\Tests\Integration\DatabaseTestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function dirname;
@@ -23,8 +28,9 @@ use function time;
 /**
  * The serving security matrix, invoked directly (the codebase has no WebTestCase). Private album originals require a
  * valid day-signature and an authenticated session; public namespaces (covers) are served unsigned and immutably
- * cacheable. Generate-on-miss produces the variant; only a missing original is a 404. Storage is the in-memory adapter,
- * so responses stream rather than X-Sendfile, which does not affect the status/headers under test.
+ * cacheable. A miss on an existing original queues one generation message and answers 503, and only a missing
+ * original is a 404. Storage is the in-memory adapter, so responses stream rather than X-Sendfile,
+ * which does not affect the status/headers under test.
  */
 final class ImageControllerTest extends DatabaseTestCase
 {
@@ -32,6 +38,7 @@ final class ImageControllerTest extends DatabaseTestCase
     {
         // Company images are public (covers are now members-only, so no longer a valid "public" example here).
         $path = $this->storeSource(StorageNamespace::CompanyImage);
+        $this->pregenerate($path);
 
         $response = $this->controller()->serve(
             new Request(),
@@ -71,6 +78,7 @@ final class ImageControllerTest extends DatabaseTestCase
     public function testPrivateNamespaceWithValidSignatureAndAuthenticatedMemberIsServed(): void
     {
         $path = $this->storeSource(StorageNamespace::PhotoOriginal);
+        $this->pregenerate($path);
         $this->authenticate();
 
         $response = $this->controller()->serve(
@@ -152,8 +160,7 @@ final class ImageControllerTest extends DatabaseTestCase
 
     public function testMissingOriginalIsNotFound(): void
     {
-        // A signed, authenticated request for a photo whose original was never stored: generate-on-miss finds no
-        // source and the response is a 404 (not an empty 200).
+        // Nothing is queued for a file that does not exist.
         $path = 'photos/albums/ab/does-not-exist.jpg';
         $this->authenticate();
 
@@ -166,6 +173,83 @@ final class ImageControllerTest extends DatabaseTestCase
             'w320',
             $path,
         );
+    }
+
+    public function testMissingVariantIsQueuedOnceAndAnswers503(): void
+    {
+        $path = $this->storeSource(StorageNamespace::CompanyImage);
+        $this->forgetPendingMarker($path);
+
+        $response = $this->controller()->serve(
+            new Request(),
+            'w320',
+            $path,
+        );
+
+        self::assertSame(
+            Response::HTTP_SERVICE_UNAVAILABLE,
+            $response->getStatusCode(),
+        );
+        self::assertSame(
+            '60',
+            $response->headers->get('Retry-After'),
+        );
+        self::assertTrue($response->headers->hasCacheControlDirective('no-store'));
+        self::assertCount(
+            1,
+            $this->imagesTransport()->getSent(),
+        );
+
+        // A second miss inside the pending window must not queue the same variant again.
+        $response = $this->controller()->serve(
+            new Request(),
+            'w320',
+            $path,
+        );
+
+        self::assertSame(
+            Response::HTTP_SERVICE_UNAVAILABLE,
+            $response->getStatusCode(),
+        );
+        self::assertCount(
+            1,
+            $this->imagesTransport()->getSent(),
+        );
+    }
+
+    private function pregenerate(string $path): void
+    {
+        self::getContainer()->get(VariantGenerator::class)->generateVariant(
+            $path,
+            ImageVariant::W320,
+            85,
+            skipUpscale: false,
+        );
+    }
+
+    /** The app cache is filesystem-backed under test and the path is content-addressed, so the marker outlives a run. */
+    private function forgetPendingMarker(string $path): void
+    {
+        $pool = self::getContainer()->get('cache.app');
+        self::assertInstanceOf(
+            CacheItemPoolInterface::class,
+            $pool,
+        );
+        $pool->deleteItem(ImageVariantResponder::pendingCacheKey(
+            $path,
+            ImageVariant::W320,
+        ));
+    }
+
+    private function imagesTransport(): InMemoryTransport
+    {
+        $transport = self::getContainer()->get('messenger.transport.images');
+        self::assertInstanceOf(
+            InMemoryTransport::class,
+            $transport,
+        );
+
+        return $transport;
     }
 
     private function controller(): ImageController

@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\ImageProfile;
 
 /**
  * Requests asynchronous pre-generation of every {@see ImageProfile} variant for a stored source image, so the variants
- * are ready before anyone requests them (the synchronous generate-on-miss path is only a safety net).
+ * are ready before anyone requests them (anything not pre-generated is briefly unavailable, answering 503).
  */
 class ProcessImageVariantsMessage
 {

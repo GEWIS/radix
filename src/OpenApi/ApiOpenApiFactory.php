@@ -412,6 +412,20 @@ final readonly class ApiOpenApiFactory implements OpenApiFactoryInterface
         );
     }
 
+    /** Plain text rather than the envelope: the 200 is raw WebP, so these consumers already handle both. */
+    private function pendingRenditionResponse(): Response
+    {
+        return new Response(
+            description: 'The rendition exists but is not generated yet; its generation has been queued. '
+                . 'Retry after the number of seconds in the `Retry-After` header.',
+            content: new ArrayObject([
+                'text/plain' => new MediaType(new ArrayObject([
+                    'type' => 'string',
+                ])),
+            ]),
+        );
+    }
+
     private function addControllerPaths(OpenApi $openApi): void
     {
         $paths = $openApi->getPaths();
@@ -543,6 +557,7 @@ final readonly class ApiOpenApiFactory implements OpenApiFactoryInterface
                     404 => $this->errorResponse(
                         'No such photo, no such rendition, or the album it belongs to is not published.',
                     ),
+                    503 => $this->pendingRenditionResponse(),
                 ],
                 summary: 'Get a rendition of a photo',
                 description: 'Album originals are private and are served signed at `/img`, which is outside this '
@@ -588,6 +603,7 @@ final readonly class ApiOpenApiFactory implements OpenApiFactoryInterface
                     404 => $this->errorResponse(
                         'No such album, no cover generated for it, no such rendition, or the album is not published.',
                     ),
+                    503 => $this->pendingRenditionResponse(),
                 ],
                 summary: 'Get a rendition of an album cover',
                 description: 'A cover is a mosaic generated from the album rather than one of its photos, so it has '
