@@ -34,13 +34,13 @@ class MainScheduleTest extends KernelTestCase
      */
     private const array EXPECTED = [
         'app:activity:delete-old-signups' => 'gdpr',
-        'app:activity:delete-stale-drafts' => 'gdpr',
         'app:activity:lapse-overdue-options' => 'cron',
         'app:activity:prune-unverified-signups' => 'gdpr',
         'app:activity:remind-closing-signups' => 'cron',
         'app:activity:remind-option-budget' => 'cron',
         'app:activity:run-due-draws' => 'cron',
         'app:activity:sync-agenda' => 'cron',
+        'app:application:delete-stale-revisions' => 'gdpr',
         'app:decision:generate' => 'maintenance',
         'app:education:prune-expired-downloads' => 'cron',
         'app:infimum:rotate' => 'cron',

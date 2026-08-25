@@ -223,6 +223,12 @@ class OrganInformationRevision extends AbstractRevision
         $this->previousRevision = $previousRevision;
     }
 
+    #[Override]
+    public function detachPreviousRevision(): void
+    {
+        $this->previousRevision = null;
+    }
+
     public function getShortDescription(): DecisionLocalisedText
     {
         return $this->shortDescription;

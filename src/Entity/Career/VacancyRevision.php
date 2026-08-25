@@ -301,6 +301,12 @@ class VacancyRevision extends AbstractRevision
         $this->previousRevision = $previousRevision;
     }
 
+    #[Override]
+    public function detachPreviousRevision(): void
+    {
+        $this->previousRevision = null;
+    }
+
     public function getName(): CareerLocalisedText
     {
         return $this->name;

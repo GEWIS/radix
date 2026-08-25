@@ -188,6 +188,13 @@ class Poll implements RevisableInterface
     }
 
     #[Override]
+    public function detachRevisions(): void
+    {
+        $this->setCurrentRevision(null);
+        $this->setLiveRevision(null);
+    }
+
+    #[Override]
     public function getResourceId(): string
     {
         return 'poll';

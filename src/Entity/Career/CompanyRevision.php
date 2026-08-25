@@ -204,6 +204,12 @@ class CompanyRevision extends AbstractRevision
         $this->previousRevision = $previousRevision;
     }
 
+    #[Override]
+    public function detachPreviousRevision(): void
+    {
+        $this->previousRevision = null;
+    }
+
     public function getSlogan(): CareerLocalisedText
     {
         return $this->slogan;

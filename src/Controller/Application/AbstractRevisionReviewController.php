@@ -240,7 +240,7 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
         );
 
         // There must be something live to fall back to. The first draft of a brand-new aggregate has nothing behind
-        // it, so discarding it would be a deletion, which is left to the stale-draft cleanup instead.
+        // it, so discarding it would be a deletion, which is left to the stale-revision cleanup instead.
         if (!$this->revisionActions($revision)->isDiscardable) {
             $this->addFlash(
                 AlertTypes::Warning->value,

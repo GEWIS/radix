@@ -87,4 +87,11 @@ interface RevisableInterface
      * must have established that there is a live revision to fall back to.
      */
     public function restoreLiveRevision(): void;
+
+    /**
+     * Point the aggregate at no revision at all. Both pointers are foreign keys into the chain, so they have to be
+     * nulled and committed before the revisions they name may be removed; only the cleanup that takes a
+     * never-approved aggregate away whole has any business calling this.
+     */
+    public function detachRevisions(): void;
 }

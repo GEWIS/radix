@@ -236,6 +236,13 @@ class Activity implements RevisableInterface
         $this->setCurrentRevision($this->getLiveRevision());
     }
 
+    #[Override]
+    public function detachRevisions(): void
+    {
+        $this->setCurrentRevision(null);
+        $this->setLiveRevision(null);
+    }
+
     /**
      * The revision whose content is shown for this activity: the live (approved) one when present, otherwise the
      * working head. Only ever null for an activity with no revisions at all, which never occurs once persisted.
