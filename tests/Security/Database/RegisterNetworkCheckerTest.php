@@ -21,6 +21,26 @@ final class RegisterNetworkCheckerTest extends TestCase
         '10.0.0.0/8',
     ];
 
+    /** @var string[] */
+    private array $originalTrustedProxies;
+
+    /** @var int<0, 63> */
+    private int $originalTrustedHeaderSet;
+
+    /** Trusted proxies are process-global: booting any kernel sets them, and in dev that list covers 10.0.0.0/8. */
+    #[Override]
+    protected function setUp(): void
+    {
+        $this->originalTrustedProxies = Request::getTrustedProxies();
+        // The getter is typed plain int while the setter demands the six header bits; masking loses nothing.
+        $this->originalTrustedHeaderSet = Request::getTrustedHeaderSet() & 0b111111;
+
+        Request::setTrustedProxies(
+            [],
+            0,
+        );
+    }
+
     public function testAnAddressInsideAConfiguredRangeMayReachTheRegister(): void
     {
         self::assertTrue($this->checker()->matches('131.155.68.69'));
@@ -90,8 +110,8 @@ final class RegisterNetworkCheckerTest extends TestCase
     protected function tearDown(): void
     {
         Request::setTrustedProxies(
-            [],
-            0,
+            $this->originalTrustedProxies,
+            $this->originalTrustedHeaderSet,
         );
     }
 

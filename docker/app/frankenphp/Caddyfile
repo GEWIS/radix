@@ -21,6 +21,10 @@
 			request>uri query {
 				replace authorization REDACTED
 			}
+
+			resp_headers>Permissions-Policy delete
+			resp_headers>Content-Security-Policy delete
+			resp_headers>Content-Security-Policy-Report-Only delete
 		}
 	}
 
