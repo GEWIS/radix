@@ -8,6 +8,11 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.1.1](https://github.com/GEWIS/radix/tree/v5.1.1) (2026-08-25)
+
+* Fixed an issue where (re)setting passwords was not possible due to incorrect pwned passwords API call.
+* Fixed an issue where the birthday picture carousel did not update its links.
+
 ### [v5.1.0](https://github.com/GEWIS/radix/tree/v5.1.0) (2026-08-25)
 
 * Added restriction of the register to the association's own network; `ROLE_DATABASE_ADMIN` and `ROLE_DATABASE_READ_ONLY` are only granted to requests coming from `REGISTER_IP_RANGES`.
