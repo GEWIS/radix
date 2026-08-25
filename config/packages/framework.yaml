@@ -32,6 +32,13 @@ framework:
                     X-Api-Key: '%env(SUPREMUM_API_KEY)%'
                 timeout: 2
                 max_duration: 4
+            # The association's own pwned-passwords lookup, which takes the whole SHA-1 hash of a password (in
+            # capitals) as its path and answers with a bare `0` or `1`. Somebody is waiting on the form that asks,
+            # hence the short timeouts.
+            pwned_passwords.client:
+                base_uri: 'https://pwned-passwords.gewis.nl/api/'
+                timeout: 2
+                max_duration: 4
             # The association agenda the option calendar draws behind the days bodies ask for. Only the sync command
             # ever calls it, never a page render, so the timeouts are for a cron rather than for somebody waiting.
             google_calendar.client:
