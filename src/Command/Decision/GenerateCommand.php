@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Decision;
 
+use App\Command\HoldsRunLockTrait;
 use App\Service\Report\ApiService;
 use App\Service\Report\MeetingService;
 use App\Service\Report\MemberService;
@@ -17,13 +18,20 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 #[AsCommand(
     name: 'app:decision:generate',
     description: 'Rebuild the projection from scratch by replaying the whole ledger.',
 )]
+#[AsCronTask(
+    expression: '0 1 * * *',
+    transports: 'maintenance',
+)]
 class GenerateCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     /**
      * How long the API is kept from syncing while the projection is being rebuilt.
      *
@@ -45,6 +53,19 @@ class GenerateCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

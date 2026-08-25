@@ -82,8 +82,20 @@ services:
     messenger-bulk: *worker_dev
     messenger-images: *worker_dev
     scheduler-default: *worker_dev
-    scheduler-gdpr: *worker_dev
-    scheduler-maintenance: *worker_dev
+    # Development runs one of each: the point here is that a job fires and reaches its handler, and a second consumer
+    # only makes the logs harder to read. Production's counts are in compose.yaml.
+    cron-worker:
+        <<: *worker_dev
+        deploy:
+            replicas: 1
+    gdpr-worker:
+        <<: *worker_dev
+        deploy:
+            replicas: 1
+    maintenance-worker:
+        <<: *worker_dev
+        deploy:
+            replicas: 1
     rabbitmq:
         image: rabbitmq:4.3-management-alpine
         ports:

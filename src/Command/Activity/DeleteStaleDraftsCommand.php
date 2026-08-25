@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Activity\Activity;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Repository\Activity\ActivityRevisionRepository;
@@ -46,10 +47,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '15 3 * * *',
     jitter: 900,
-    schedule: 'gdpr',
+    transports: 'gdpr',
 )]
 final class DeleteStaleDraftsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     private const int STALE_AFTER_DAYS = 30;
 
     private const int ABANDONED_AFTER_DAYS = 90;
@@ -78,6 +81,19 @@ final class DeleteStaleDraftsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

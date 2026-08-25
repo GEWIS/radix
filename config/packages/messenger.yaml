@@ -51,6 +51,49 @@ framework:
                     queues:
                         images_queue: ~
 
+            # The queues the schedule dispatches to. Only one worker ever advances a schedule (see scheduler.yaml), so
+            # anything run there runs serially. `#[AsCronTask(transports: ...)]` redispatches here instead, where
+            # consumers scale.
+            #
+            # Three queues because minute-cadence work must not queue behind runs of tens of minutes, and
+            # personal-data deletion is kept separate so it can be audited on its own.
+            #
+            # The schedule is itself the retry and these commands recompute what the previous run would have done,
+            # so retries add little: one for a transient failure, and none on `maintenance`, where a failure would
+            # cost another hour of `app:decision:generate`. Failures reach `failed` either way.
+            cron:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 1
+                    delay: 30000
+                options:
+                    exchange:
+                        name: cron
+                        type: direct
+                    queues:
+                        cron_queue: ~
+            gdpr:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 1
+                    delay: 30000
+                options:
+                    exchange:
+                        name: gdpr
+                        type: direct
+                    queues:
+                        gdpr_queue: ~
+            maintenance:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 0
+                options:
+                    exchange:
+                        name: maintenance
+                        type: direct
+                    queues:
+                        maintenance_queue: ~
+
         default_bus: messenger.bus.default
 
         buses:
@@ -95,4 +138,10 @@ when@test:
                 bulk:
                     dsn: 'in-memory://'
                 images:
+                    dsn: 'in-memory://'
+                cron:
+                    dsn: 'in-memory://'
+                gdpr:
+                    dsn: 'in-memory://'
+                maintenance:
                     dsn: 'in-memory://'

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Repository\Activity\SignupListRepository;
 use App\Service\Activity\DrawManager;
 use DateTime;
@@ -30,9 +31,14 @@ use function sprintf;
     name: 'app:activity:run-due-draws',
     description: 'Perform the automated admission draw for sign-up lists whose draw moment has passed.',
 )]
-#[AsCronTask(expression: '* * * * *')]
+#[AsCronTask(
+    expression: '* * * * *',
+    transports: 'cron',
+)]
 final class RunDueDrawsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     private const int LATE_DRAW_WARNING_MINUTES = 5;
 
     public function __construct(
@@ -45,6 +51,19 @@ final class RunDueDrawsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

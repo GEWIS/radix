@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Database;
 
+use App\Command\HoldsRunLockTrait;
 use App\Service\Database\ListmonkService;
 use App\Service\Database\MailmanService;
 use Override;
@@ -12,13 +13,21 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 #[AsCommand(
     name: 'database:mailinglist:fetch',
     description: 'Fetch mailing lists from mailman and listmonk and store references in the register.',
 )]
+#[AsCronTask(
+    expression: '50 * * * *',
+    arguments: 'all',
+    transports: 'maintenance',
+)]
 class MailingListFetchListsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     private const string ARGUMENT_BACKEND = 'backend';
 
     public function __construct(
@@ -46,6 +55,19 @@ class MailingListFetchListsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

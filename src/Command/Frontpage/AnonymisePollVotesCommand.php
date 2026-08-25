@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Frontpage;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Frontpage\Poll;
 use App\Repository\Frontpage\PollCommentReactionRepository;
 use App\Repository\Frontpage\PollRepository;
@@ -38,10 +39,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '30 4 * * *',
     jitter: 900,
-    schedule: 'gdpr',
+    transports: 'gdpr',
 )]
 final class AnonymisePollVotesCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly PollRepository $pollRepository,
         private readonly PollVoteRepository $voteRepository,
@@ -55,6 +58,19 @@ final class AnonymisePollVotesCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

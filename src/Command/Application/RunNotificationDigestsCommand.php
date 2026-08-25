@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Application;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Application\Enums\Languages;
 use App\Message\Application\SendNotificationDigestMessage;
 use App\Repository\User\NotificationEmailSubscriptionRepository;
@@ -41,9 +42,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '*/5 * * * *',
     jitter: 60,
+    transports: 'cron',
 )]
 final class RunNotificationDigestsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly PendingNotificationEmailRepository $pendingRepository,
         private readonly NotificationEmailSubscriptionRepository $subscriptionRepository,
@@ -70,6 +74,19 @@ final class RunNotificationDigestsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Checker;
 
+use App\Command\HoldsRunLockTrait;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,12 +21,27 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 #[AsCronTask(
     expression: '47 6 * * 1',
     jitter: 900,
-    schedule: 'maintenance',
+    transports: 'maintenance',
 )]
 class CheckDatabaseCommand extends AbstractCheckerCommand
 {
+    use HoldsRunLockTrait;
+
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

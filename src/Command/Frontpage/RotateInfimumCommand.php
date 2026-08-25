@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Frontpage;
 
+use App\Command\HoldsRunLockTrait;
 use App\Service\Application\RealtimeNotifier;
 use App\Service\Frontpage\InfimumService;
 use Override;
@@ -29,9 +30,12 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 #[AsCronTask(
     expression: '*/5 * * * *',
     jitter: 60,
+    transports: 'cron',
 )]
 final class RotateInfimumCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly InfimumService $infimumService,
         private readonly RealtimeNotifier $realtimeNotifier,
@@ -42,6 +46,19 @@ final class RotateInfimumCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

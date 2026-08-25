@@ -156,6 +156,17 @@ x-app: &app
 x-worker-volumes: &worker_volumes
     - data:/app/data
 
+# Restated per worker below so each can carry its own replica count while keeping one rollout policy. How many of
+# each is a deployment decision rather than a property of the code, so every count is an environment variable; the
+# defaults are what a single four-core host supports. Raising one costs the host a whole container, so they are
+# budgeted against the resource limits, not chosen independently of them.
+x-worker-deploy: &worker_deploy
+    replicas: 1
+    update_config:
+        parallelism: 1
+        delay: 15s
+        order: start-first
+
 x-worker: &worker
     <<: *app
     entrypoint: []
@@ -171,12 +182,7 @@ x-worker: &worker
             condition: service_healthy
         app:
             condition: service_healthy
-    deploy:
-        replicas: 1
-        update_config:
-            parallelism: 1
-            delay: 15s
-            order: start-first
+    deploy: *worker_deploy
     healthcheck:
         disable: true
 
@@ -195,29 +201,66 @@ services:
               protocol: tcp
     messenger-high-priority:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${HIGH_PRIORITY_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "high_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-normal-priority:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${NORMAL_PRIORITY_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "normal_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-bulk:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${BULK_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "bulk", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-images:
         <<: *worker
         # Image encoding is heavier and more memory-hungry, so recycle the worker sooner and give it more headroom.
+        deploy:
+            <<: *worker_deploy
+            replicas: ${IMAGE_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "images", "-vv", "--time-limit=600", "--limit=16", "--memory-limit=512M" ]
+    # The dispatcher, and the one worker in the stack that must stay at a single replica. A schedule is generated
+    # rather than queued, and MainSchedule's lock lets exactly one consumer advance it, so a second replica would
+    # generate nothing and sit idle. It never runs a command -- every task redispatches onto one of the three queues
+    # below -- so one is also all it needs.
     scheduler-default:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: 1
         command: [ "php", "bin/console", "messenger:consume", "scheduler_default", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
-    scheduler-gdpr:
+    # Minute- and hour-cadence jobs, which are the ones that are worth little late. Two consumers by default so a job
+    # that runs long does not hold up the every-minute ones behind it; the commands lock themselves, so a second
+    # consumer never means a second run of the same command.
+    cron-worker:
         <<: *worker
-        command: [ "php", "bin/console", "messenger:consume", "scheduler_gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
-    # The register's housekeeping is one schedule consumed by one worker, so its jobs run one after another: a nightly
-    # report regeneration that overruns delays the hourly mailing list sync behind it rather than running alongside it.
-    # No `--limit`, because a run of `app:decision:generate` is one message that takes the better part of an hour.
-    scheduler-maintenance:
+        deploy:
+            <<: *worker_deploy
+            replicas: ${CRON_WORKER_REPLICAS:-2}
+        command: [ "php", "bin/console", "messenger:consume", "cron", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    # Deleting personal data, on a queue and a worker log of its own so what was deleted and when can be read off one
+    # stream. The work is short and nightly, so one consumer is enough.
+    gdpr-worker:
         <<: *worker
-        command: [ "php", "bin/console", "messenger:consume", "scheduler_maintenance", "-vv", "--time-limit=3600", "--memory-limit=256M" ]
+        deploy:
+            <<: *worker_deploy
+            replicas: ${GDPR_WORKER_REPLICAS:-1}
+        command: [ "php", "bin/console", "messenger:consume", "gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    # The long runs. No `--limit`, and an hour of `--time-limit`, because `app:decision:generate` is one message that
+    # takes the better part of an hour. Two consumers by default because it is not the only thing on this queue: the
+    # half-hourly graduate check and both hourly mailing list jobs fall inside its nightly run, and with one consumer
+    # they would queue behind it exactly as they did when this was a schedule of its own.
+    maintenance-worker:
+        <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${MAINTENANCE_WORKER_REPLICAS:-2}
+        command: [ "php", "bin/console", "messenger:consume", "maintenance", "-vv", "--time-limit=3600", "--memory-limit=512M" ]
     # Analytics, on its own hostname: the proxy sends analytics.gewis.nl to the port below. It is part of this stack
     # rather than a separate one because the image is built and published beside the application's, and the site's
     # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name a

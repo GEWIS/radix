@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\User;
 
+use App\Command\HoldsRunLockTrait;
 use App\MessageHandler\User\ExportUserDataHandler;
 use App\Service\Application\FileStorage;
 use DateTimeImmutable;
@@ -24,10 +25,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '36 * * * *',
     jitter: 300,
-    schedule: 'gdpr',
+    transports: 'gdpr',
 )]
 final class PruneExpiredDataExportsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly FileStorage $fileStorage,
     ) {
@@ -36,6 +39,19 @@ final class PruneExpiredDataExportsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {
