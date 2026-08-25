@@ -17,7 +17,6 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
-        "ext-ldap": "*",
         "ext-pdo_mysql": "*",
         "ext-pdo_pgsql": "*",
         "api-platform/doctrine-orm": "^4.3.17",
