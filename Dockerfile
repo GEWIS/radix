@@ -15,10 +15,9 @@ VOLUME /app/data/
 VOLUME /app/var/
 
 # The `pcntl` extension is required for Symfony Messenger to perform graceful shutdowns. Both database stacks are
-# present: `pdo_pgsql` for the ledger and `pdo_mysql` for everything else. `libldap-common` carries the OpenLDAP client
-# defaults the `ldap` extension reads when it opens a StartTLS connection for a login. `gmp` is what `brick/math`
-# detects for the big-integer arithmetic behind the external-application RSA signatures; it falls back to a pure-PHP
-# calculator when neither `gmp` nor `bcmath` is loaded, which takes seconds per RS512 token and minutes per PS512 one.
+# present: `pdo_pgsql` for the ledger and `pdo_mysql` for everything else. `gmp` is what `brick/math` detects for the
+# big-integer arithmetic behind the external-application RSA signatures; it falls back to a pure-PHP calculator when
+# neither `gmp` nor `bcmath` is loaded, which takes seconds per RS512 token and minutes per PS512 one.
 RUN <<-EOF
     apt-get update
     apt-get install -y --no-install-recommends \
@@ -27,7 +26,6 @@ RUN <<-EOF
         fonts-dejavu-core \
         git \
         libicu-dev \
-        libldap-common \
         libvips42t64 \
         poppler-utils
     install-php-extensions \
@@ -40,7 +38,6 @@ RUN <<-EOF
         gd \
         gmp \
         intl \
-        ldap \
         opcache \
         pcntl \
         pdo_mysql \
@@ -72,9 +69,6 @@ EOF
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
-
-ARG GIT_COMMIT
-ENV GIT_COMMIT=${GIT_COMMIT}
 
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
@@ -117,6 +111,9 @@ RUN <<-EOF
 EOF
 
 COPY --link docker/app/frankenphp/conf.d/20-radix.dev.ini $PHP_INI_DIR/app.conf.d/
+
+ARG GIT_COMMIT
+ENV GIT_COMMIT=${GIT_COMMIT}
 
 USER nonroot
 
@@ -213,12 +210,9 @@ EOF
 # a subprocess rather than linked, so it has to be installed here too. `fonts-dejavu-core` supplies the face the
 # watermark is drawn in; fontconfig already pulls it in, but the watermark would silently stop rendering if that ever
 # changed, so it is named here as well.
-#
-# `libldap-common` is here for the same reason: it is a set of configuration files rather than a linked library, so
-# nothing collects it, and without it an LDAP login negotiates TLS against no client defaults at all.
 RUN <<-EOF
     apt-get update
-    apt-get install -y --no-install-recommends fonts-dejavu-core libldap-common libvips42t64 poppler-utils
+    apt-get install -y --no-install-recommends fonts-dejavu-core libvips42t64 poppler-utils
     rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -233,6 +227,9 @@ RUN chmod g=u /app/var
 RUN mkdir -p /app/data && chown www-data:0 /app/data && chmod g=u /app/data
 
 COPY --link --chmod=755 docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+
+ARG GIT_COMMIT
+ENV GIT_COMMIT=${GIT_COMMIT}
 
 USER www-data
 
