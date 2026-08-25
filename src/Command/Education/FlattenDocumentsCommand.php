@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Command\Education;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Education\Enums\DocumentFlattenStatus;
-use App\Message\Education\FlattenCourseDocumentMessage;
 use App\Repository\Education\CourseDocumentRepository;
+use App\Service\Education\CourseDocumentFlattener;
+use App\Service\Education\PdfRasterizerException;
+use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -14,26 +17,32 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Throwable;
 
 use function count;
+use function intval;
+use function max;
 use function sprintf;
+use function usleep;
 
 /**
- * The archive predates the pipeline: what is in it was uploaded when a download meant handing over the file itself, so
- * none of it is downloadable until this has run. It is also the way back after a batch fails, since a failed document
- * stays failed until something asks for it again. `--limit` paces it: the archive is thousands of documents at roughly
- * a second each.
+ * Walks in-process on purpose: queueing thousands of documents onto the `images` transport would starve the variant
+ * generation the serving path waits on. Fresh uploads still go through the queue one at a time.
  */
 #[AsCommand(
     name: 'app:education:flatten-documents',
-    description: 'Queue course documents that have not been rasterized yet.',
+    description: 'Rasterize course documents that have not been flattened yet, at a gentle pace.',
 )]
 final class FlattenDocumentsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly CourseDocumentRepository $documentRepository,
-        private readonly MessageBusInterface $messageBus,
+        private readonly CourseDocumentFlattener $flattener,
+        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
     }
@@ -43,16 +52,24 @@ final class FlattenDocumentsCommand extends Command
     {
         $this
             ->addOption(
+                'delay',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Milliseconds to pause after each document, the knob that keeps the host responsive.',
+                '1000',
+            )
+            ->addOption(
                 'limit',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'How many documents to queue at most.',
+                'Stop after this many documents (0 means no limit), for bounded off-peak batches.',
+                '0',
             )
             ->addOption(
                 'retry-failed',
                 null,
                 InputOption::VALUE_NONE,
-                'Also queue documents that failed, rather than only ones never tried.',
+                'Also process documents that failed, rather than only ones never tried.',
             );
     }
 
@@ -61,31 +78,131 @@ final class FlattenDocumentsCommand extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $io = new SymfonyStyle(
-            $input,
+        return $this->runExclusively(
             $output,
+            fn (): int => $this->flattenPending(
+                new SymfonyStyle(
+                    $input,
+                    $output,
+                ),
+                max(
+                    0,
+                    intval($input->getOption('delay')),
+                ),
+                max(
+                    0,
+                    intval($input->getOption('limit')),
+                ),
+                (bool) $input->getOption('retry-failed'),
+            ),
         );
+    }
 
-        $limit = $input->getOption('limit');
-        $statuses = true === $input->getOption('retry-failed')
+    private function flattenPending(
+        SymfonyStyle $io,
+        int $delayMs,
+        int $limit,
+        bool $retryFailed,
+    ): int {
+        $statuses = $retryFailed
             ? [
                 DocumentFlattenStatus::Pending,
                 DocumentFlattenStatus::Failed,
             ]
             : [DocumentFlattenStatus::Pending];
 
-        $documents = $this->documentRepository->findByFlattenStatus(
-            $statuses,
-            null !== $limit ? (int) $limit : null,
-        );
-
-        foreach ($documents as $document) {
-            $this->messageBus->dispatch(new FlattenCourseDocumentMessage($document->getId() ?? 0));
+        // Ids up front, re-found per turn: the identity map is cleared between documents, detaching anything held.
+        $documentIds = [];
+        foreach (
+            $this->documentRepository->findByFlattenStatus(
+                $statuses,
+                0 !== $limit ? $limit : null,
+            ) as $document
+        ) {
+            $documentIds[] = (int) $document->getId();
         }
 
-        $queued = count($documents);
-        $io->success(sprintf('Queued %d document%s.', $queued, 1 !== $queued ? 's' : ''));
+        $this->entityManager->clear();
 
-        return Command::SUCCESS;
+        $flattened = 0;
+        $failed = 0;
+
+        foreach ($documentIds as $documentId) {
+            $document = $this->documentRepository->find($documentId);
+            if (null === $document) {
+                // Deleted since the list was taken.
+                continue;
+            }
+
+            try {
+                $this->flattener->flatten($document);
+                $flattened++;
+
+                if ($io->isVerbose()) {
+                    $io->writeln(sprintf(
+                        'Flattened document %d',
+                        $documentId,
+                    ));
+                }
+            } catch (PdfRasterizerException $e) {
+                // Unreadable by poppler is a bad upload; record it so an administrator can replace the file.
+                $this->flattener->markFailed(
+                    $document,
+                    $e->getMessage(),
+                );
+                $failed++;
+
+                $io->warning(sprintf(
+                    'Could not flatten document %d: %s',
+                    $documentId,
+                    $e->getMessage(),
+                ));
+            } catch (Throwable $e) {
+                // Not the document's fault (missing file, say), so its status is left alone rather than marked bad.
+                $failed++;
+
+                $io->warning(sprintf(
+                    'Could not process document %d: %s',
+                    $documentId,
+                    $e->getMessage(),
+                ));
+            }
+
+            $this->entityManager->clear();
+
+            if ($delayMs <= 0) {
+                continue;
+            }
+
+            usleep($delayMs * 1000);
+        }
+
+        $io->listing([
+            sprintf(
+                'Documents processed: %d',
+                count($documentIds),
+            ),
+            sprintf(
+                'Flattened: %d',
+                $flattened,
+            ),
+            sprintf(
+                'Failed (marked on the document): %d',
+                $failed,
+            ),
+        ]);
+
+        if (
+            0 !== $limit
+            && count($documentIds) === $limit
+        ) {
+            $io->note('Stopped at --limit; run again to continue with the next batch.');
+        } elseif (0 === count($documentIds)) {
+            $io->success('Nothing left to flatten.');
+        }
+
+        return $failed > 0
+            ? Command::FAILURE
+            : Command::SUCCESS;
     }
 }
