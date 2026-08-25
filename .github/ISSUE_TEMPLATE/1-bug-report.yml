@@ -1,38 +1,8 @@
 name: "🐛 Bug Report"
-description: Report a bug found while using the GEWIS website or the GEWIS database.
+description: Report a bug found while using the GEWIS website.
 labels: ["Type: Bug", "Status: Triage"]
 type: "Bug"
 body:
-    -   type: dropdown
-        id: application
-        attributes:
-            label: Where did you run into this?
-            description: The website is everything under `gewis.nl`; the database is the member administration under `/database`.
-            options:
-                - The website (GEWISWEB)
-                - The member database (GEWISDB)
-                - Both
-                - I am not sure
-        validations:
-            required: true
-    -   type: dropdown
-        id: module
-        attributes:
-            label: Which part of the application does this concern?
-            description: Leave this empty if you do not know; it is triaged for you.
-            multiple: true
-            options:
-                - Activity
-                - Application
-                - Career
-                - Checker
-                - Database
-                - Decision
-                - Education
-                - Frontpage
-                - Photo
-                - Report
-                - User
     -   type: textarea
         id: current-behavior
         attributes:
@@ -56,10 +26,16 @@ body:
         validations:
             required: true
     -   type: input
+        id: url
+        attributes:
+            label: On which page did you run into this?
+            description: Paste the full URL of the page where the problem occurs. Leave this empty if it does not apply.
+            placeholder: ex. https://gewis.nl/en/association/committees
+    -   type: input
         id: version
         attributes:
             label: Application version
-            description: Check [the website](https://gewis.nl/admin) to determine the version and short commit hash.
+            description: Check [the website](https://gewis.nl/en/admin) to determine the version and short commit hash.
             placeholder: ex. v2.8.2 (3dde2979b)
         validations:
             required: true
