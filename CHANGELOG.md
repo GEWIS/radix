@@ -8,6 +8,56 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.1.0](https://github.com/GEWIS/radix/tree/v5.1.0) (2026-08-25)
+
+* Added restriction of the register to the association's own network; `ROLE_DATABASE_ADMIN` and `ROLE_DATABASE_READ_ONLY` are only granted to requests coming from `REGISTER_IP_RANGES`.
+* Added a 'Decisions' tab to the meeting management component, which reads the decisions of a meeting straight from the ledger and knows the next free numbers.
+* Added `app:image:pregenerate` to fill the image variant cache ahead of time, at a paced rate.
+* Added lapsing of abandoned revisions for companies, vacancies, bodies, and polls, instead of only for activities.
+* Added cleanup of the files a lapsed revision named, such as company logos and body images, once the removal is committed.
+* Improved serving of image variants by moving the encoding off the request path onto a bounded queue, which re-enables the images that were disabled in v5.0.3.
+* Improved scheduling of recurring work by merging the three schedules into one and dispatching every task onto the `cron`, `gdpr`, or `maintenance` transport, so that consumers can be scaled and a failed run is kept.
+* Improved the safety of scheduled commands by giving each of them a lock that is shared between containers, rather than relying on there being a single worker.
+* Improved resource usage by bounding what each container may take from the host and by sizing FrankenPHP's threads and workers explicitly.
+* Improved `app:education:flatten-documents`, which now rasterises in its own process at a bounded pace (`--delay`, `--limit`) instead of queueing the whole backlog at once.
+* Improved the migration of legacy meeting documents, which now rebuilds them into the agenda point and version model, skips what has already been migrated, and reports how many rows are left after every run.
+* Improved the serving of regulations from the Public Archive by reading the current version from the folder of the policy itself, so approving a new version no longer changes the address it is downloaded from.
+* Improved access to regulations for visitors who are not logged in, such as those signing up for a public activity.
+* Improved the e-mail a prospective member receives when the secretary approves them, which still described the membership number and activation link of GEWISWEB.
+* Improved the responsiveness of the register by queueing its e-mails instead of sending them during the request, which could cause Stripe to send the same event again.
+* Improved the GitHub issue templates.
+* Changed when a revision lapses: everything that is not approved now lapses after thirty days, and only once the activity, vacancy, or poll it belongs to is in the past.
+* Changed `app:activity:delete-stale-drafts` to `app:application:delete-stale-revisions`, as it is no longer an activity command.
+* Removed the panel that spoke of synchronising a meeting, as the projection follows the ledger within the same request.
+* Removed the requirement on the LDAP extension, which is no longer used.
+* Fixed an issue where the commit hash was not available in production.
+* Fixed an issue where the link to the Confidential Peer Support page still used the old term (CCP).
+* Fixed an issue where the editor for custom pages did not use the background of the page itself, so an author did not see the content as it would be read.
+* Fixed an issue where the option calendar painted a day white in the dark theme.
+* Fixed an issue where the brand red was used as the emphasis colour of Bootstrap's `primary`, resulting in red text on a blue fill.
+* Fixed an issue where the tests for the register's network check were not isolated from the trusted proxy setting.
+* Fixed an issue where the access log recorded the full `Permissions-Policy` and `Content-Security-Policy` header on every single response.
+
+### [v5.0.3](https://github.com/GEWIS/radix/tree/v5.0.3) (2026-08-24)
+
+* Temporarily disabled the serving of image variants, as a page of uncached thumbnails was enough to saturate the host.
+
+### [v5.0.2](https://github.com/GEWIS/radix/tree/v5.0.2) (2026-08-24)
+
+* Improved the transactional e-mails by setting the facts of a notice out as a labelled block and by giving every e-mail the same button and fallback link.
+* Changed production mail to be relayed through Postfix instead of Mailpit, so that a message is accepted into a local queue and retried.
+* Fixed an issue where the proxies the deployment is reached through were not named, so every visitor was recorded as the proxy. This left the exam archive open to everyone, kept the July registration window open, and made the rate limiters share a single bucket.
+* Fixed an issue where read-only maintenance refused everything that was not a safe HTTP method, which refused signing in and stopped live components from paging, filtering, sorting, and loading more.
+* Fixed an issue where the dropdown menus in dark mode used the styling of the light mode.
+* Fixed an issue where the panels on the frontpage were too narrow on semi-large mobile devices.
+
+### [v5.0.1](https://github.com/GEWIS/radix/tree/v5.0.1) (2026-08-23)
+
+* Improved the layout of the career overview, where the closing date of a vacancy now sits below the vacancy on narrow screens instead of beside it.
+* Changed `report:generate:full` to `app:decision:generate`, so that it carries the `app:` prefix every other command has.
+* Fixed an issue where the read-only maintenance banner could not be closed, hiding the page behind it.
+* Fixed an issue where the hero on the frontpage grew out over the navigation bar on short phones.
+
 ### [v5.0.0](https://github.com/GEWIS/radix/tree/v5.0.0) (2026-08-23)
 
 The first release of radix, and the largest either application has ever had. Both were rewritten from Laminas MVC onto
