@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Education;
 
+use App\Command\HoldsRunLockTrait;
 use App\Service\Education\CourseDocumentDownloadService;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -19,9 +20,14 @@ use function sprintf;
     name: 'app:education:prune-expired-downloads',
     description: 'Remove watermarked course documents that were built but never collected, or have gone stale.',
 )]
-#[AsCronTask(expression: '* * * * *')]
+#[AsCronTask(
+    expression: '* * * * *',
+    transports: 'cron',
+)]
 final class PruneExpiredDownloadsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly CourseDocumentDownloadService $downloadService,
     ) {
@@ -30,6 +36,19 @@ final class PruneExpiredDownloadsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

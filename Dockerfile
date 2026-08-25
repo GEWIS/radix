@@ -174,6 +174,9 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
 ENV APP_ENV=prod
 ENV PHP_INI_SCAN_DIR=":/usr/local/etc/php/app.conf.d"
+# Set by the FrankenPHP image, which this bare Debian stage copies binaries from but inherits no environment from.
+# Disables Go's pointer checks on the cgo boundary, which every call into PHP crosses.
+ENV GODEBUG=cgocheck=0
 
 COPY --from=radix_app_builder /usr/local/bin/frankenphp /usr/local/bin/frankenphp
 COPY --from=radix_app_builder /usr/local/bin/php /usr/local/bin/php

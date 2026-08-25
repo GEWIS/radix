@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Repository\Activity\SignupFieldValueRepository;
 use App\Repository\Activity\SignupRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,10 +27,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '0 4 * * *',
     jitter: 900,
-    schedule: 'gdpr',
+    transports: 'gdpr',
 )]
 final class DeleteOldSignupsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly SignupRepository $signupRepository,
         private readonly SignupFieldValueRepository $signupFieldValueRepository,
@@ -42,6 +45,19 @@ final class DeleteOldSignupsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Command\Application;
 
+use App\Command\HoldsRunLockTrait;
 use Override;
 use phpseclib3\Net\SFTP;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -30,10 +30,11 @@ use function sprintf;
 #[AsCronTask(
     expression: '7 * * * *',
     jitter: 300,
+    transports: 'cron',
 )]
 final class SyncPublicArchiveCommand extends Command
 {
-    use LockableTrait;
+    use HoldsRunLockTrait;
 
     private const string REMOTE_ROOT = '/datas/Public Archive';
     private const int CONNECT_TIMEOUT_SECONDS = 30;
@@ -70,17 +71,10 @@ final class SyncPublicArchiveCommand extends Command
             $output,
         );
 
-        if (!$this->lock()) {
-            $io->writeln('Another instance of this command is already running, skipping.');
-
-            return Command::SUCCESS;
-        }
-
-        try {
-            return $this->doSync($io);
-        } finally {
-            $this->release();
-        }
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->doSync($io),
+        );
     }
 
     private function doSync(SymfonyStyle $io): int

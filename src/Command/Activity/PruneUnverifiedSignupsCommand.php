@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Repository\Activity\ExternalSignupVerificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -31,10 +32,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '50 3 * * *',
     jitter: 900,
-    schedule: 'gdpr',
+    transports: 'gdpr',
 )]
 final class PruneUnverifiedSignupsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly ExternalSignupVerificationRepository $verificationRepository,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
@@ -46,6 +49,19 @@ final class PruneUnverifiedSignupsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

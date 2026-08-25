@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\User;
 
+use App\Command\HoldsRunLockTrait;
 use App\Repository\User\SessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -24,10 +25,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '30 3 * * *',
     jitter: 900,
-    schedule: 'gdpr',
+    transports: 'gdpr',
 )]
 final class PurgeExpiredSessionsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly SessionRepository $repository,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
@@ -38,6 +41,19 @@ final class PurgeExpiredSessionsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

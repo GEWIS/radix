@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Service\Activity\AgendaFeed;
 use Override;
 use Psr\Log\LoggerInterface;
@@ -33,9 +34,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '*/15 * * * *',
     jitter: 60,
+    transports: 'cron',
 )]
 final class SyncAgendaCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly AgendaFeed $agendaFeed,
         private readonly LoggerInterface $logger,
@@ -45,6 +49,19 @@ final class SyncAgendaCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

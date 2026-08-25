@@ -31,10 +31,25 @@ x-worker-dev-volumes: &worker_dev_volumes
     - ./data:/app/data
     - ./var:/app/var
 
+# Docker refuses a `cpus` above the host's core count, so production's limits would prevent a smaller machine from
+# starting. `0` removes a limit. A service setting its own `deploy` must merge this in, or it falls back to
+# production's.
+x-worker-dev-deploy: &worker_dev_deploy
+    resources:
+        limits:
+            cpus: "${WORKER_CPU_LIMIT:-0}"
+            memory: "${WORKER_MEMORY_LIMIT:-0}"
+
 services:
     app:
         <<: *app_development
         restart: always
+        # Production's `cpus` would exceed a smaller host's core count and refuse to start.
+        deploy:
+            resources:
+                limits:
+                    cpus: "${APP_CPU_LIMIT:-0}"
+                    memory: "${APP_MEMORY_LIMIT:-0}"
         volumes:
             - ./:/app
             - ./data:/app/data
@@ -78,12 +93,35 @@ services:
     messenger-high-priority: &worker_dev
         <<: *app_development
         volumes: *worker_dev_volumes
+        deploy: *worker_dev_deploy
     messenger-normal-priority: *worker_dev
     messenger-bulk: *worker_dev
-    messenger-images: *worker_dev
+    messenger-images:
+        <<: *app_development
+        volumes: *worker_dev_volumes
+        deploy:
+            resources:
+                limits:
+                    cpus: "${IMAGE_WORKER_CPU_LIMIT:-0}"
+                    memory: "${IMAGE_WORKER_MEMORY_LIMIT:-0}"
     scheduler-default: *worker_dev
-    scheduler-gdpr: *worker_dev
-    scheduler-maintenance: *worker_dev
+    # One of each: a second consumer only makes the logs harder to follow. Production's counts are in compose.yaml.
+    cron-worker:
+        <<: *worker_dev
+        deploy:
+            <<: *worker_dev_deploy
+            replicas: 1
+    gdpr-worker:
+        <<: *worker_dev
+        deploy:
+            <<: *worker_dev_deploy
+            replicas: 1
+    # Also removes the maintenance-specific limit set in compose.yaml.
+    maintenance-worker:
+        <<: *worker_dev
+        deploy:
+            <<: *worker_dev_deploy
+            replicas: 1
     rabbitmq:
         image: rabbitmq:4.3-management-alpine
         ports:
@@ -94,6 +132,11 @@ services:
               protocol: tcp
     matomo:
         image: abc.docker-registry.gewis.nl/web/radix/matomo:latest
+        deploy:
+            resources:
+                limits:
+                    cpus: "${MATOMO_CPU_LIMIT:-0}"
+                    memory: "${MATOMO_MEMORY_LIMIT:-0}"
         build:
             context: docker/matomo
             dockerfile: Dockerfile

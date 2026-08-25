@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\Languages;
@@ -45,9 +46,12 @@ use function strval;
 #[AsCronTask(
     expression: '17 * * * *',
     jitter: 300,
+    transports: 'cron',
 )]
 final class RemindClosingSignupsCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     /**
      * How far ahead of closing the reminder goes out.
      */
@@ -65,6 +69,19 @@ final class RemindClosingSignupsCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

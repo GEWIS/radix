@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Photo;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Photo\WeeklyPhoto;
 use App\Repository\Photo\PhotoRepository;
 use App\Service\Photo\WeeklyPhotoService;
@@ -39,9 +40,12 @@ use function sprintf;
 #[AsCronTask(
     expression: '0 3 * * 1',
     jitter: 900,
+    transports: 'cron',
 )]
 final class GenerateWeeklyPhotoCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly WeeklyPhotoService $weeklyPhotoService,
         private readonly PhotoRepository $photoRepository,
@@ -69,6 +73,19 @@ final class GenerateWeeklyPhotoCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

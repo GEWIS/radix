@@ -138,6 +138,31 @@ x-app-environment: &app_environment
     MAIL_TO_TREASURER_ADDRESS: "${MAIL_TO_TREASURER_ADDRESS:?MAIL_TO_TREASURER_ADDRESS must be set}"
     MAIL_TO_TREASURER_NAME: "${MAIL_TO_TREASURER_NAME:-Treasurer}"
 
+    # Unset, each of these sizes itself to the host's core count, which on a shared machine means the whole machine:
+    # threads, workers and a libvips pool per encode all multiply. Sized for a four-core share. Threads and GOMAXPROCS
+    # move with the CPU limit, workers with the memory one, since every worker holds a booted kernel.
+    FRANKENPHP_CONFIG: |
+        num_threads ${FRANKENPHP_NUM_THREADS:-12}
+        max_threads ${FRANKENPHP_MAX_THREADS:-24}
+    # `num` leaves the remaining `num_threads` for requests served outside worker mode. Without
+    # `max_consecutive_failures`, a worker that fatals on boot is restarted indefinitely. Instead the process stops
+    # and the healthcheck reports it.
+    FRANKENPHP_WORKER_CONFIG: |
+        num ${FRANKENPHP_WORKER_NUM:-8}
+        max_consecutive_failures 10
+    # Only recent Go versions read the cgroup CPU limit, so name it rather than depend on the image's.
+    GOMAXPROCS: "${GOMAXPROCS:-4}"
+    # Go sizes its heap against the machine, not the cgroup, so without this the collector does not react before the
+    # container is killed at APP_MEMORY_LIMIT. Set below that limit, since it bounds the Go heap only.
+    GOMEMLIMIT: "${GOMEMLIMIT:-1600MiB}"
+    # libvips defaults its pool to the core count, which costs a core per encode with no gain on a single web-sized
+    # image. Scale IMAGE_WORKER_REPLICAS instead, which the container limits can bound.
+    VIPS_CONCURRENCY: "${VIPS_CONCURRENCY:-1}"
+    # A worker thread keeps whatever a request leaves behind, so it is retired after this many. Request count is
+    # only a proxy for memory, and the only bound on a slow leak below APP_MEMORY_LIMIT, so it is set under the
+    # default of 500. Lower it if that limit is ever reached; each retirement costs one kernel boot.
+    FRANKENPHP_LOOP_MAX: "${FRANKENPHP_LOOP_MAX:-250}"
+
 x-app: &app
     image: "abc.docker-registry.gewis.nl/web/radix/app:${RADIX_VERSION:-latest}"
     restart: unless-stopped
@@ -156,6 +181,26 @@ x-app: &app
 x-worker-volumes: &worker_volumes
     - data:/app/data
 
+# Merged per worker below so each carries its own replica count under one rollout policy. Counts are a deployment
+# decision, so each is an environment variable.
+#
+# The limit is per container, so total host usage is replicas times limit. Raising MAINTENANCE_WORKER_REPLICAS
+# costs the same as raising WORKER_MEMORY_LIMIT by the same factor. Ten containers at the defaults.
+#
+# 512m suffices because these run with `opcache.enable_cli` unset, so unlike the application container they hold no
+# opcode cache, only their own `--memory-limit` plus a baseline. The container limit catches a run that overshoots
+# before PHP stops it.
+x-worker-deploy: &worker_deploy
+    replicas: 1
+    resources:
+        limits:
+            cpus: "${WORKER_CPU_LIMIT:-1.0}"
+            memory: "${WORKER_MEMORY_LIMIT:-512m}"
+    update_config:
+        parallelism: 1
+        delay: 15s
+        order: start-first
+
 x-worker: &worker
     <<: *app
     entrypoint: []
@@ -171,18 +216,19 @@ x-worker: &worker
             condition: service_healthy
         app:
             condition: service_healthy
-    deploy:
-        replicas: 1
-        update_config:
-            parallelism: 1
-            delay: 15s
-            order: start-first
+    deploy: *worker_deploy
     healthcheck:
         disable: true
 
 services:
     app:
         <<: *app
+        # Without a limit the out-of-memory killer selects across the whole host rather than this container.
+        deploy:
+            resources:
+                limits:
+                    cpus: "${APP_CPU_LIMIT:-4.0}"
+                    memory: "${APP_MEMORY_LIMIT:-2g}"
         volumes:
             - caddy_data:/data
             - caddy_config:/config
@@ -195,29 +241,78 @@ services:
               protocol: tcp
     messenger-high-priority:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${HIGH_PRIORITY_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "high_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-normal-priority:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${NORMAL_PRIORITY_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "normal_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-bulk:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: ${BULK_WORKER_REPLICAS:-1}
         command: [ "php", "bin/console", "messenger:consume", "bulk", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-images:
         <<: *worker
+        # Above the shared limit: libvips allocates outside PHP's limit, so the `--memory-limit` below does not bound
+        # this worker's peak. Each replica adds a libvips pool, so scaling costs CPU as well as memory.
         # Image encoding is heavier and more memory-hungry, so recycle the worker sooner and give it more headroom.
+        deploy:
+            <<: *worker_deploy
+            replicas: ${IMAGE_WORKER_REPLICAS:-1}
+            resources:
+                limits:
+                    cpus: "${IMAGE_WORKER_CPU_LIMIT:-2.0}"
+                    memory: "${IMAGE_WORKER_MEMORY_LIMIT:-1536m}"
         command: [ "php", "bin/console", "messenger:consume", "images", "-vv", "--time-limit=600", "--limit=16", "--memory-limit=512M" ]
+    # Must stay at one replica: a schedule is generated rather than queued, and MainSchedule's lock lets only one
+    # consumer advance it, so a second replica would do nothing. It only dispatches onto the queues below, so one
+    # is also enough.
     scheduler-default:
         <<: *worker
+        deploy:
+            <<: *worker_deploy
+            replicas: 1
+            # Only dispatches; never boots a command.
+            resources:
+                limits:
+                    cpus: "${SCHEDULER_CPU_LIMIT:-0.5}"
+                    memory: "${SCHEDULER_MEMORY_LIMIT:-256m}"
         command: [ "php", "bin/console", "messenger:consume", "scheduler_default", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
-    scheduler-gdpr:
+    # Jobs that must run close to their due time. Two consumers so a long run does not delay the every-minute ones.
+    # The commands lock themselves, so a second consumer never causes a second run of the same command.
+    cron-worker:
         <<: *worker
-        command: [ "php", "bin/console", "messenger:consume", "scheduler_gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
-    # The register's housekeeping is one schedule consumed by one worker, so its jobs run one after another: a nightly
-    # report regeneration that overruns delays the hourly mailing list sync behind it rather than running alongside it.
-    # No `--limit`, because a run of `app:decision:generate` is one message that takes the better part of an hour.
-    scheduler-maintenance:
+        deploy:
+            <<: *worker_deploy
+            replicas: ${CRON_WORKER_REPLICAS:-2}
+        command: [ "php", "bin/console", "messenger:consume", "cron", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    # Personal-data deletion on its own queue and worker log, so deletions can be audited from one log. Short and
+    # nightly, so one consumer.
+    gdpr-worker:
         <<: *worker
-        command: [ "php", "bin/console", "messenger:consume", "scheduler_maintenance", "-vv", "--time-limit=3600", "--memory-limit=256M" ]
+        deploy:
+            <<: *worker_deploy
+            replicas: ${GDPR_WORKER_REPLICAS:-1}
+        command: [ "php", "bin/console", "messenger:consume", "gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+    # No `--limit` and an hour of `--time-limit`, because `app:decision:generate` is one message running most of an
+    # hour. Two consumers because the half-hourly and hourly jobs here fall inside that run and would queue behind it.
+    maintenance-worker:
+        <<: *worker
+        # Twice the short-job workers' `--memory-limit`, because the projection rebuild loads the ledger it replays.
+        deploy:
+            <<: *worker_deploy
+            replicas: ${MAINTENANCE_WORKER_REPLICAS:-2}
+            resources:
+                limits:
+                    cpus: "${MAINTENANCE_WORKER_CPU_LIMIT:-1.0}"
+                    memory: "${MAINTENANCE_WORKER_MEMORY_LIMIT:-768m}"
+        command: [ "php", "bin/console", "messenger:consume", "maintenance", "-vv", "--time-limit=3600", "--memory-limit=512M" ]
     # Analytics, on its own hostname: the proxy sends analytics.gewis.nl to the port below. It is part of this stack
     # rather than a separate one because the image is built and published beside the application's, and the site's
     # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name a
@@ -233,6 +328,11 @@ services:
             MATOMO_DATABASE_DBNAME: "${MATOMO_DATABASE_DBNAME:?MATOMO_DATABASE_DBNAME must be set}"
             # Whether to reach that server over TLS. 1 on anything but a database in the same stack.
             MATOMO_DATABASE_SSL: "${MATOMO_DATABASE_SSL:-1}"
+        deploy:
+            resources:
+                limits:
+                    cpus: "${MATOMO_CPU_LIMIT:-2.0}"
+                    memory: "${MATOMO_MEMORY_LIMIT:-768m}"
         volumes:
             - matomo:/var/www/html:rw
         networks:

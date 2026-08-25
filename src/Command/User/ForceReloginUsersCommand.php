@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\User;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\User;
@@ -30,9 +31,14 @@ use function sprintf;
     name: 'app:users:force-relogin',
     description: 'Refresh the relogin timestamp for users so remember-me cookies become invalid.',
 )]
-#[AsCronTask('0 6 1 7 *')]
+#[AsCronTask(
+    expression: '0 6 1 7 *',
+    transports: 'cron',
+)]
 final class ForceReloginUsersCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
@@ -60,6 +66,19 @@ final class ForceReloginUsersCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

@@ -1,15 +1,18 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
-# Symfony Scheduler takes over from the container crontab. Each schedule declared in src/Scheduler/ gets a transport
-# of its own named after it, and is dispatched by a long-running worker rather than by crond. compose.yaml starts one
-# per schedule:
+# Symfony Scheduler replaced the container crontab. One schedule, `default` (src/Scheduler/MainSchedule.php); each
+# job states its own due times with `#[AsCronTask]` on the command.
 #
-#     bin/console messenger:consume scheduler_default      (scheduler-default)
-#     bin/console messenger:consume scheduler_gdpr         (scheduler-gdpr)
-#     bin/console messenger:consume scheduler_maintenance  (scheduler-maintenance)
+# A schedule is generated rather than queued: every consumer computes what is due and would run it in-process, so
+# MainSchedule's lock limits it to one. Scaling that worker adds failover but no throughput, which comes from
+# `transports:` on each task, which redispatches onto a queue whose consumers do scale. compose.yaml starts one
+# dispatcher and a consumer per queue:
 #
-# Command output no longer goes to a per-job file under /data/logs; it is captured by the worker and reaches the
-# monolog handlers along with everything else.
+#     bin/console messenger:consume scheduler_default  (scheduler-default, exactly one)
+#     bin/console messenger:consume cron               (cron-worker)
+#     bin/console messenger:consume gdpr               (gdpr-worker)
+#     bin/console messenger:consume maintenance        (maintenance-worker)
 #
-# Each schedule holds its own lock (see src/Scheduler/), which is what keeps a rolling deploy from dispatching the
-# same run twice while the outgoing and the incoming container overlap. That only works if the store is shared, so it
-# is left to config/packages/lock.yaml rather than pinned per schedule.
+# Since those consumers scale, the serial worker no longer provides mutual exclusion, so every scheduled command
+# locks its own run through `App\Command\HoldsRunLockTrait`.
+#
+# Command output reaches the monolog handlers through the worker rather than a per-job file under /data/logs.

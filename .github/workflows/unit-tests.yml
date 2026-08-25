@@ -55,6 +55,17 @@ jobs:
                     --health-timeout=5s
                     --health-retries=10
 
+            # symfony/lock points at Valkey in every environment, including this one; see config/packages/lock.yaml.
+            valkey:
+                image: valkey/valkey:8-alpine
+                ports:
+                    - 6379:6379
+                options: >-
+                    --health-cmd="valkey-cli ping"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=10
+
         steps:
             -   name: Checkout
                 uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

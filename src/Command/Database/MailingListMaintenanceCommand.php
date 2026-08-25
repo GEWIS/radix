@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Database;
 
+use App\Command\HoldsRunLockTrait;
 use App\Service\Database\MailingListService;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -11,13 +12,21 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 #[AsCommand(
     name: 'database:mailinglist:maintenance',
     description: 'Do administrative maintenance for unusual situations (expired/hidden members).',
 )]
+#[AsCronTask(
+    expression: '40 2 * * *',
+    arguments: '-f -vv',
+    transports: 'maintenance',
+)]
 class MailingListMaintenanceCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     private const string OPTION_FORCE = 'force';
 
     public function __construct(private readonly MailingListService $mailingListService)
@@ -38,6 +47,19 @@ class MailingListMaintenanceCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {

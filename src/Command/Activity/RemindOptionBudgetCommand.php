@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Activity;
 
+use App\Command\HoldsRunLockTrait;
 use App\Entity\Activity\ActivityProposal;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\NotificationType;
@@ -45,9 +46,12 @@ use function strval;
 #[AsCronTask(
     expression: '25 8 * * *',
     jitter: 600,
+    transports: 'cron',
 )]
 final class RemindOptionBudgetCommand extends Command
 {
+    use HoldsRunLockTrait;
+
     public function __construct(
         private readonly ActivityProposalRepository $activityProposalRepository,
         private readonly UserRepository $userRepository,
@@ -72,6 +76,19 @@ final class RemindOptionBudgetCommand extends Command
 
     #[Override]
     protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        return $this->runExclusively(
+            $output,
+            fn (): int => $this->executeExclusively(
+                $input,
+                $output,
+            ),
+        );
+    }
+
+    private function executeExclusively(
         InputInterface $input,
         OutputInterface $output,
     ): int {
