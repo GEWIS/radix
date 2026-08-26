@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\Meeting;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\MinutesRepository;
@@ -24,7 +25,7 @@ use function strval;
  * Decisions on minutes.
  */
 #[Entity(repositoryClass: MinutesRepository::class)]
-class Minutes extends SubDecision
+class Minutes extends SubDecision implements NamesMember
 {
     use MemberAwareTrait;
 

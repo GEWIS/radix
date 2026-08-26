@@ -31,14 +31,17 @@ export default class extends Controller<HTMLFormElement> {
             return;
         }
 
-        // The point and the decision number are the last two segments of the route, which is why they can be
-        // substituted positionally rather than by matching on a value that also occurs elsewhere in the path.
+        // The route ends in `points/{point}/decisions/{decision}`, and both were generated as a zero, so the tail
+        // is rewritten as a whole rather than by counting segments back from the end -- `decisions` sits between the
+        // two numbers, so the last two segments are not the two that have to change.
         const url = new URL(this.urlValue, window.location.origin);
-        const segments = url.pathname.split('/');
+        const point = encodeURIComponent(this.pointTarget.value);
+        const number = encodeURIComponent(this.numberTarget.value);
 
-        segments[segments.length - 2] = encodeURIComponent(this.pointTarget.value);
-        segments[segments.length - 1] = encodeURIComponent(this.numberTarget.value);
-        url.pathname = segments.join('/');
+        url.pathname = url.pathname.replace(
+            /\/points\/\d+\/decisions\/\d+$/,
+            `/points/${point}/decisions/${number}`,
+        );
 
         window.location.assign(url.toString());
     }

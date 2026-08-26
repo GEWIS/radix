@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Form\Database;
 
+use App\Entity\Database\Meeting;
 use App\Form\Database\DataMapper\BudgetMapper;
+use DateTimeInterface;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -12,9 +14,12 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function Symfony\Component\Translation\t;
 
@@ -67,7 +72,10 @@ class BudgetType extends AbstractType
                 [
                     'label' => t('Date of Budget/Statement'),
                     'widget' => 'single_text',
-                    'constraints' => [new NotNull()],
+                    'constraints' => [
+                        new NotNull(),
+                        new Callback([self::class, 'validateNotAfterMeeting']),
+                    ],
                 ],
             )
             ->add(
@@ -135,5 +143,32 @@ class BudgetType extends AbstractType
     public function getParent(): string
     {
         return BaseDecisionType::class;
+    }
+
+    /**
+     * A budget and a financial statement are approved as they stand at the meeting, so neither can be dated after it.
+     * The date they carry is the version's own date, not when it takes effect.
+     */
+    public static function validateNotAfterMeeting(
+        mixed $value,
+        ExecutionContextInterface $context,
+    ): void {
+        $root = $context->getRoot();
+
+        if (!$root instanceof FormInterface) {
+            return;
+        }
+
+        $meeting = $root->get('meeting')->getData();
+
+        if (
+            !$value instanceof DateTimeInterface
+            || !$meeting instanceof Meeting
+            || $value <= $meeting->getDate()
+        ) {
+            return;
+        }
+
+        $context->buildViolation('A budget or financial statement cannot be dated after the meeting.')->addViolation();
     }
 }

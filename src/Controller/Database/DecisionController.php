@@ -8,24 +8,25 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\User\Enums\UserRoles;
 use App\Exception\Database\AnnulmentNotPossible;
-use App\Exception\Database\DecisionStillReferenced;
 use App\Form\Database\AbolishType;
 use App\Form\Database\AnnulmentType;
+use App\Form\Database\Board\CandidacyType as BoardCandidacyType;
 use App\Form\Database\Board\DischargeType as BoardDischargeType;
 use App\Form\Database\Board\InstallType as BoardInstallType;
 use App\Form\Database\Board\ReleaseType as BoardReleaseType;
 use App\Form\Database\BudgetType;
-use App\Form\Database\DeleteDecisionType;
+use App\Form\Database\ContinuationType;
 use App\Form\Database\FoundationType;
 use App\Form\Database\InstallType;
 use App\Form\Database\Key\GrantType as KeyGrantType;
 use App\Form\Database\Key\WithdrawType as KeyWithdrawType;
+use App\Form\Database\Member\SuspensionType as MemberSuspensionType;
+use App\Form\Database\Member\WarningType as MemberWarningType;
 use App\Form\Database\MemberFunctionType;
 use App\Form\Database\MinutesType;
 use App\Form\Database\OrganRegulationType;
 use App\Form\Database\OtherType;
 use App\Form\Report\ExportType;
-use App\Form\SubmitButtons;
 use App\Service\Database\Meeting as MeetingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -53,13 +54,17 @@ final class DecisionController extends AbstractController
         'budget' => BudgetType::class,
         'organ_regulation' => OrganRegulationType::class,
         'foundation' => FoundationType::class,
+        'continuation' => ContinuationType::class,
         'abolish' => AbolishType::class,
         'install' => InstallType::class,
         'board_install' => BoardInstallType::class,
         'board_release' => BoardReleaseType::class,
         'board_discharge' => BoardDischargeType::class,
+        'board_candidacy' => BoardCandidacyType::class,
         'key_grant' => KeyGrantType::class,
         'key_withdraw' => KeyWithdrawType::class,
+        'member_warning' => MemberWarningType::class,
+        'member_suspension' => MemberSuspensionType::class,
         'annulment' => AnnulmentType::class,
         'minutes' => MinutesType::class,
         'other' => OtherType::class,
@@ -91,6 +96,9 @@ final class DecisionController extends AbstractController
             null === $meetingNumber ? null : (int) $meetingNumber,
             $request->query->getInt('point'),
             $request->query->getInt('decision'),
+            // Asked for by the lookup that picks a virtual counterpart: only a virtual decision is one, and one
+            // that is already somebody's counterpart is spoken for.
+            $request->query->getBoolean('only_virtual'),
         ));
     }
 
@@ -242,101 +250,6 @@ final class DecisionController extends AbstractController
                 'grants' => $options->keyGrants,
                 'member_function_form' => $this->memberFunctionForm(),
             ],
-        );
-    }
-
-    #[Route(
-        path: '/meetings/{type}/{number}/points/{point}/decisions/{decision}/delete',
-        name: 'decision_decision_delete',
-        requirements: [
-            'type' => 'ALV|BV|VV|Virt',
-            'number' => '-?\d+',
-            'point' => '\d+',
-            'decision' => '\d+',
-        ],
-        methods: [
-            'GET',
-            'POST',
-        ],
-    )]
-    #[IsGranted(UserRoles::DatabaseAdmin->value)]
-    public function delete(
-        Request $request,
-        MeetingTypes $type,
-        int $number,
-        int $point,
-        int $decision,
-    ): Response {
-        $form = $this->createForm(DeleteDecisionType::class);
-        $form->handleRequest($request);
-
-        $parameters = [
-            'type' => $type,
-            'number' => $number,
-            'point' => $point,
-            'decision' => $decision,
-        ];
-
-        if (
-            $form->isSubmitted()
-            && $form->isValid()
-        ) {
-            // Both answers submit the form, so the decision is only deleted when the confirming button was clicked.
-            if (
-                SubmitButtons::clicked(
-                    $form,
-                    'submit_yes',
-                )
-            ) {
-                try {
-                    $deleted = $this->meetingService->deleteDecision(
-                        $type,
-                        $number,
-                        $point,
-                        $decision,
-                    );
-                } catch (DecisionStillReferenced) {
-                    return $this->render(
-                        'database/decision/decision/delete.html.twig',
-                        $parameters + ['error' => true],
-                    );
-                } catch (AnnulmentNotPossible) {
-                    return $this->render(
-                        'database/decision/decision/delete.html.twig',
-                        $parameters + [
-                            'error' => true,
-                            'annulment' => true,
-                        ],
-                    );
-                }
-
-                // Two secretaries can hold this confirmation open at once, and the second one to answer it deletes
-                // nothing. Reporting success either way would have them believe they removed something they did not.
-                if ($deleted) {
-                    $this->addFlash(
-                        'success',
-                        'The decision has been deleted.',
-                    );
-                } else {
-                    $this->addFlash(
-                        'warning',
-                        'This decision no longer exists.',
-                    );
-                }
-            }
-
-            return $this->redirectToRoute(
-                'admin/meetings/view',
-                [
-                    'type' => $type->urlToken(),
-                    'number' => $number,
-                ],
-            );
-        }
-
-        return $this->render(
-            'database/decision/decision/delete.html.twig',
-            $parameters + ['form' => $form],
         );
     }
 

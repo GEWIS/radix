@@ -19,7 +19,10 @@
 
 {% block collection_widget %}
     {% import _self as helper %}
-    {% set has_prototype = allow_add and prototype is defined and prototype is not null %}
+    {# `rendered` as well as defined: a form may render the prototype itself, to hand the markup to a controller
+       of its own, and a FormView can only be rendered once. Symfony's own collection theme guards on the same
+       thing; without it the second render throws "Field ... has already been rendered". #}
+    {% set has_prototype = allow_add and prototype is defined and prototype is not null and not prototype.rendered %}
     {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__name__' %}
     {% set add_label = add_label|default('Add'|trans) %}
     {% set remove_label = remove_label|default('Remove'|trans) %}

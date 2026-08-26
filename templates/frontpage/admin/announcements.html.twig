@@ -1,5 +1,7 @@
 {% extends 'layout-admin.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
 {% block page_title %}{{ 'Announcements'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
@@ -64,32 +66,15 @@
                 </div>
 
                 {% for announcement in announcements %}
-                    <div class="modal fade" id="delete-announcement-{{ announcement.id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">{{ 'Remove announcement'|trans }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="{{ 'Close'|trans }}"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="mb-0">
-                                        {{ 'Remove this announcement? If it is still active, its banner disappears for everyone.'|trans }}
-                                    </p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">
-                                        {{ 'Cancel'|trans }}
-                                    </button>
-                                    <form method="post" class="mb-0"
-                                          action="{{ path('admin/announcement/delete', {id: announcement.id}) }}">
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('announcement_delete') }}">
-                                        <button type="submit" class="btn btn-danger">{{ 'Remove'|trans }}</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {{ modals.confirm_modal(
+                        'delete-announcement-' ~ announcement.id,
+                        path('admin/announcement/delete', {id: announcement.id}),
+                        csrf_token('announcement_delete'),
+                        'Remove announcement'|trans,
+                        'Remove this announcement? If it is still active, its banner disappears for everyone.'|trans,
+                        'Remove'|trans,
+                        'danger',
+                    ) }}
                 {% endfor %}
             {% endif %}
         </div>

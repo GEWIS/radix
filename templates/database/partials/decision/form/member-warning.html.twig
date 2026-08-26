@@ -1,0 +1,9 @@
+{{ form_start(form, {'action': path('decision_decision_form', {'form': 'member_warning'})}) }}
+    {% include 'database/partials/decision/member-lookup.html.twig' with {
+        'field': form.member,
+        'label': 'Lid'|trans,
+    } only %}
+    <div class="decision-form-actions">
+        {{ form_widget(form.submit, {'attr': {'class': 'btn-gewis-primary'}}) }}
+    </div>
+{{ form_end(form) }}

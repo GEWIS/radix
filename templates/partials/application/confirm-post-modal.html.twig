@@ -13,8 +13,12 @@
         'Discard draft'|trans,
         'gewis-primary',
     ) }}
+
+    `body` and `label` may be more than a sentence: capture them with `{% set %}` first, which yields markup that is
+    not escaped again, and a warning or an icon can go in them. `fields` are extra hidden inputs the action needs
+    beyond the token, as a map of name to value.
 #}
-{% macro confirm_modal(id, action, token, title, body, label, variant) %}
+{% macro confirm_modal(id, action, token, title, body, label, variant, fields = {}) %}
     <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -28,6 +32,9 @@
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" name="_csrf_token" value="{{ token }}">
+                        {% for name, value in fields %}
+                            <input type="hidden" name="{{ name }}" value="{{ value }}">
+                        {% endfor %}
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
                         <button type="submit" class="btn btn-{{ variant }}">{{ label }}</button>
                     </div>

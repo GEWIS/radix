@@ -36,7 +36,6 @@ use function ceil;
 use function in_array;
 use function max;
 use function mb_strlen;
-use function strtoupper;
 use function trim;
 
 /**
@@ -59,12 +58,17 @@ use function trim;
 )]
 class AdminMeetingController extends AbstractController
 {
-    private const array MANAGEABLE_TYPE_TOKENS = [
-        'gmm',
-        'bm',
-        'cm',
-        // The register minutes virtual meetings too, and this is the only overview of them there is now.
-        'virt',
+    /**
+     * The kinds of meeting the register minutes, named the way a decision names them.
+     *
+     * Virtual meetings are among them: the register minutes those too, and this is the only overview of them there
+     * is now.
+     */
+    private const array MANAGEABLE_TYPES = [
+        MeetingTypes::ALV,
+        MeetingTypes::BV,
+        MeetingTypes::VV,
+        MeetingTypes::VIRT,
     ];
 
     public function __construct(
@@ -107,16 +111,19 @@ class AdminMeetingController extends AbstractController
             $pageSize = 10;
         }
 
-        $typeFilter = null;
+        $typeFilter = null === $type
+            ? null
+            : MeetingTypes::tryFrom($type);
+
         if (
-            null !== $type
-            && in_array(
-                $type,
-                self::MANAGEABLE_TYPE_TOKENS,
+            null !== $typeFilter
+            && !in_array(
+                $typeFilter,
+                self::MANAGEABLE_TYPES,
                 true,
             )
         ) {
-            $typeFilter = MeetingTypes::tryFromSearch(strtoupper($type));
+            $typeFilter = null;
         }
 
         $page = max(
@@ -149,7 +156,7 @@ class AdminMeetingController extends AbstractController
             'decision/admin/meetings/index.html.twig',
             [
                 'rows' => $rows,
-                'type' => $typeFilter?->urlToken(),
+                'type' => $typeFilter?->value,
                 'currentPage' => $page,
                 'pageSize' => $pageSize,
                 'totalPages' => max(
@@ -157,7 +164,7 @@ class AdminMeetingController extends AbstractController
                     (int) ceil($result['total'] / $pageSize),
                 ),
                 'totalCount' => $result['total'],
-                'typeTokens' => self::MANAGEABLE_TYPE_TOKENS,
+                'types' => self::MANAGEABLE_TYPES,
             ],
         );
     }
@@ -203,13 +210,13 @@ class AdminMeetingController extends AbstractController
         path: '/{type}/{number}',
         name: 'view',
         requirements: [
-            'type' => 'gmm|bm|cm|virt',
+            'type' => 'ALV|BV|VV|Virt',
             'number' => '\d+',
         ],
     )]
     #[IsGranted(UserRoles::Board->value)]
     public function view(
-        string $type,
+        MeetingTypes $type,
         int $number,
     ): Response {
         $meeting = $this->resolveMeeting(
@@ -238,11 +245,11 @@ class AdminMeetingController extends AbstractController
      * @return array<string, mixed>
      */
     private function decisions(
-        string $type,
+        MeetingTypes $type,
         int $number,
     ): array {
         $view = $this->meetingService->getMeetingView(
-            MeetingTypes::tryFromSearch(strtoupper($type)),
+            $type,
             $number,
         );
 
@@ -263,7 +270,7 @@ class AdminMeetingController extends AbstractController
         path: '/{type}/{number}/documents/upload',
         name: 'document_upload',
         requirements: [
-            'type' => 'gmm|bm|cm',
+            'type' => 'ALV|BV|VV|Virt',
             'number' => '\d+',
         ],
         methods: ['POST'],
@@ -271,7 +278,7 @@ class AdminMeetingController extends AbstractController
     #[IsGranted(UserRoles::DatabaseAdmin->value)]
     public function uploadDocument(
         Request $request,
-        string $type,
+        MeetingTypes $type,
         int $number,
     ): JsonResponse {
         $meeting = $this->resolveMeeting(
@@ -356,7 +363,7 @@ class AdminMeetingController extends AbstractController
         path: '/{type}/{number}/minutes',
         name: 'minutes_upload',
         requirements: [
-            'type' => 'gmm|bm|cm',
+            'type' => 'ALV|BV|VV|Virt',
             'number' => '\d+',
         ],
         methods: ['POST'],
@@ -364,7 +371,7 @@ class AdminMeetingController extends AbstractController
     #[IsGranted(UserRoles::DatabaseAdmin->value)]
     public function uploadMinutes(
         Request $request,
-        string $type,
+        MeetingTypes $type,
         int $number,
     ): JsonResponse {
         $meeting = $this->resolveMeeting(
@@ -392,11 +399,11 @@ class AdminMeetingController extends AbstractController
     }
 
     private function resolveMeeting(
-        string $type,
+        MeetingTypes $type,
         int $number,
     ): Meeting {
         $meeting = $this->meetingRepository->findMeeting(
-            MeetingTypes::tryFromSearch(strtoupper($type)),
+            $type,
             $number,
         );
 

@@ -43,6 +43,33 @@
                                 {% if decision.isAnnulled %}
                                     <span class="badge text-bg-danger ms-1">{{ 'Annulled'|trans }}</span>
                                 {% endif %}
+
+                                {# A virtual meeting says again what this meeting decided, and answering with both is
+                                   what made the same decision turn up twice. The search answers with this one and
+                                   folds its virtual counterparts away underneath, so they are still there to read. #}
+                                {% set virtual = this.getVirtualCounterpartsOf(decision) %}
+                                {% if virtual is not empty %}
+                                    {% set virtual_id = 'search-virtual-' ~ decision.meetingType.value ~ '-' ~ decision.meetingNumber ~ '-' ~ decision.point ~ '-' ~ decision.number %}
+                                    <div class="mt-1">
+                                        <button class="btn btn-link btn-sm p-0 collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#{{ virtual_id }}"
+                                                aria-expanded="false" aria-controls="{{ virtual_id }}">
+                                            {{ 'Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings'|trans({'%count%': virtual|length}) }}
+                                            <span class="fas fa-chevron-down panel-collapse-chevron ms-1"
+                                                  aria-hidden="true"></span>
+                                        </button>
+                                        <div class="collapse" id="{{ virtual_id }}">
+                                            {% for counterpart in virtual %}
+                                                <div class="d-flex gap-3 small text-muted mt-1">
+                                                    <span class="flex-shrink-0 decision-reference text-nowrap">
+                                                        {{ counterpart.meetingType.getName|trans }} {{ counterpart.meetingNumber }}.{{ counterpart.point }}.{{ counterpart.number }}
+                                                    </span>
+                                                    <span>{{ counterpart.getLocalisedContent(app.request.locale) }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}

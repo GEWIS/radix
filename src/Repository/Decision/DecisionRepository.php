@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function addcslashes;
+use function assert;
 use function implode;
 use function is_numeric;
 use function preg_match;
@@ -57,6 +58,12 @@ class DecisionRepository extends ServiceEntityRepository
             ->leftJoin(
                 'd.annulledBy',
                 'annulledBy',
+            )
+            // Joined rather than asked for with `d.counterpart IS NULL`: the association is keyed on the decision's
+            // four columns, and DQL refuses a single-valued path expression to a composite key.
+            ->leftJoin(
+                'd.counterpart',
+                'counterpart',
             )
             ->leftJoin(
                 'm.meetingMinutes',
@@ -116,6 +123,13 @@ class DecisionRepository extends ServiceEntityRepository
         }
 
         if ([] !== $textParts) {
+            // A virtual decision that names the decision it belongs to is that decision said a second time, and
+            // showing both is what made the same organ membership turn up twice. The one taken in a real meeting is
+            // the one that answers, so the other is left out of the text match. Added inside this branch, because on
+            // its own it would match every decision there is; a prompt that names a virtual decision by its own
+            // reference still finds it, through the condition below.
+            $textParts[] = 'counterpart.number IS NULL';
+
             $conditions[] = '(' . implode(
                 ' AND ',
                 $textParts,
@@ -140,6 +154,100 @@ class DecisionRepository extends ServiceEntityRepository
         ));
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * The virtual counterparts of any of the given decisions, keyed by the decision they belong to.
+     *
+     * A query of its own rather than a join on the search: the search caps its results, and a limit over a fetch-
+     * joined collection truncates the wrong thing. One decision can be given more than one, so the values are lists.
+     *
+     * @param list<Decision> $decisions
+     *
+     * @return array<string, list<Decision>>
+     */
+    public function findVirtualCounterpartsOf(array $decisions): array
+    {
+        if ([] === $decisions) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('r');
+        $qb->addSelect('c')
+            ->join(
+                'r.counterpart',
+                'c',
+            );
+
+        $clauses = [];
+        foreach ($decisions as $index => $decision) {
+            $clauses[] = sprintf(
+                '(c.meeting_type = :type%1$d AND c.meeting_number = :meeting%1$d'
+                . ' AND c.point = :point%1$d AND c.number = :number%1$d)',
+                $index,
+            );
+            $qb->setParameter(
+                'type' . $index,
+                $decision->getMeetingType()->value,
+            )
+                ->setParameter(
+                    'meeting' . $index,
+                    $decision->getMeetingNumber(),
+                )
+                ->setParameter(
+                    'point' . $index,
+                    $decision->getPoint(),
+                )
+                ->setParameter(
+                    'number' . $index,
+                    $decision->getNumber(),
+                );
+        }
+
+        $qb->where(implode(
+            ' OR ',
+            $clauses,
+        ))
+            ->orderBy(
+                'r.meeting_number',
+                'ASC',
+            )
+            ->addOrderBy(
+                'r.point',
+                'ASC',
+            )
+            ->addOrderBy(
+                'r.number',
+                'ASC',
+            );
+
+        $counterparts = [];
+        foreach ($qb->getQuery()->getResult() as $virtual) {
+            assert($virtual instanceof Decision);
+            $counterpart = $virtual->getCounterpart();
+
+            if (null === $counterpart) {
+                continue;
+            }
+
+            $counterparts[self::key($counterpart)][] = $virtual;
+        }
+
+        return $counterparts;
+    }
+
+    /**
+     * How a decision is addressed in the map {@see self::findVirtualCounterpartsOf()} answers with.
+     */
+    public static function key(Decision $decision): string
+    {
+        return sprintf(
+            '%s %d.%d.%d',
+            $decision->getMeetingType()->value,
+            $decision->getMeetingNumber(),
+            $decision->getPoint(),
+            $decision->getNumber(),
+        );
     }
 
     /**

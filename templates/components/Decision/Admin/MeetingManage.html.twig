@@ -250,7 +250,7 @@
                                         {% endfor %}
                                     </div>
                                     <div class="mt-2 ms-4">
-                                        {{ _self.upload_dropzone(this, path('admin/meetings/document_upload', {'type': this.type, 'number': this.number}), {'point': point.id}, true, 'point-upload-' ~ point.id) }}
+                                        {{ _self.upload_dropzone(this, path('admin/meetings/document_upload', {'type': this.type.value, 'number': this.number}), {'point': point.id}, true, 'point-upload-' ~ point.id) }}
                                     </div>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@
                                 {% endfor %}
                             </div>
                             <div class="mt-2">
-                                {{ _self.upload_dropzone(this, path('admin/meetings/document_upload', {'type': this.type, 'number': this.number}), {}, true, 'meeting-upload') }}
+                                {{ _self.upload_dropzone(this, path('admin/meetings/document_upload', {'type': this.type.value, 'number': this.number}), {}, true, 'meeting-upload') }}
                             </div>
                         </div>
                     </div>
@@ -396,7 +396,7 @@
                                         <span class="fas fa-download" aria-hidden="true"></span>
                                     </a>
                                     <div class="d-inline-block" data-controller="document-upload"
-                                         data-document-upload-url-value="{{ path('admin/meetings/minutes_upload', {'type': this.type, 'number': this.number}) }}"
+                                         data-document-upload-url-value="{{ path('admin/meetings/minutes_upload', {'type': this.type.value, 'number': this.number}) }}"
                                          data-document-upload-suggested-label-value="{{ this.suggestLabel(minutesLatest.versionLabel) }}"
                                          data-action="decision-upload:success->live#$render">
                                         <input type="file" accept="application/pdf" class="d-none"
@@ -440,7 +440,7 @@
                                     } only %}
                                 {% endif %}
                             {% else %}
-                                {{ _self.upload_dropzone(this, path('admin/meetings/minutes_upload', {'type': this.type, 'number': this.number}), {}, false, 'minutes-upload') }}
+                                {{ _self.upload_dropzone(this, path('admin/meetings/minutes_upload', {'type': this.type.value, 'number': this.number}), {}, false, 'minutes-upload') }}
                             {% endif %}
                         </div>
                     </div>

@@ -46,6 +46,13 @@ final class DecisionSearch
     /** @var list<Decision>|null */
     private ?array $results = null;
 
+    /**
+     * The virtual counterparts of the results, keyed as {@see DecisionRepository::key()} addresses them.
+     *
+     * @var array<string, list<Decision>>|null
+     */
+    private ?array $virtualCounterparts = null;
+
     private ?DecisionSearchQuery $parsedQuery = null;
 
     public function __construct(
@@ -79,6 +86,22 @@ final class DecisionSearch
         }
 
         return array_values($groups);
+    }
+
+    /**
+     * The virtual decisions that are this one's counterpart.
+     *
+     * A virtual meeting says again what a real meeting decided, and the search answers with the real decision rather
+     * than with both. What the virtual meeting made of it is still worth reaching, so it hangs off the decision it
+     * belongs to instead of standing beside it.
+     *
+     * @return list<Decision>
+     */
+    public function getVirtualCounterpartsOf(Decision $decision): array
+    {
+        $this->virtualCounterparts ??= $this->decisionRepository->findVirtualCounterpartsOf($this->getResults());
+
+        return $this->virtualCounterparts[DecisionRepository::key($decision)] ?? [];
     }
 
     public function getResultCount(): int

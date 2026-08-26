@@ -1,5 +1,7 @@
 {% extends 'layout-admin.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
 {% block page_title %}{{ 'Photo of the Week'|trans|page_title }}{{ 'Photos'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
@@ -60,28 +62,14 @@
     </div>
 
     {% if weeklyPhoto is not null and not weeklyPhoto.hidden and canHide %}
-        <div class="modal fade" id="hide-weekly" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ 'Hide photo of the week'|trans }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="{{ 'Close'|trans }}"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="mb-0">
-                            {{ 'Anonymous visitors will no longer see this photo on the front page. Logged-in members still see it.'|trans }}
-                        </p>
-                    </div>
-                    <form method="post" action="{{ path('admin/photos/weekly_hide') }}">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('photo_weekly_hide') }}">
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                            <button type="submit" class="btn btn-danger">{{ 'Hide'|trans }}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        {{ modals.confirm_modal(
+            'hide-weekly',
+            path('admin/photos/weekly_hide'),
+            csrf_token('photo_weekly_hide'),
+            'Hide photo of the week'|trans,
+            'Anonymous visitors will no longer see this photo on the front page. Logged-in members still see it.'|trans,
+            'Hide'|trans,
+            'danger',
+        ) }}
     {% endif %}
 {% endblock %}

@@ -1,0 +1,40 @@
+{#
+    A confirmation that posts to whichever row opened it. One modal serves a whole table: the trigger carries the
+    address, the token and the name of what it is about, and `modal-form-target` copies all three in as the modal
+    opens. Use this over confirm-post-modal.html.twig wherever a page would otherwise render one confirmation per row.
+
+    {% import 'partials/application/confirm-target-modal.html.twig' as modals %}
+
+    {% set body %}
+        {{ 'You are about to sign this device out:'|trans }}
+        <strong data-modal-form-target-target="name"></strong>
+    {% endset %}
+
+    {{ modals.confirm_modal('modal-terminate-one', 'Terminate session?'|trans, body, 'Terminate'|trans, 'gewis-primary') }}
+
+    The trigger names what it acts on, and nothing about it is known until it is clicked:
+
+    <button type="button" data-bs-toggle="modal" data-bs-target="#modal-terminate-one"
+            data-action="{{ path('...') }}" data-csrf-token="{{ csrf_token('...') }}" data-name="{{ session.device }}">
+#}
+{% macro confirm_modal(id, title, body, label, variant) %}
+    <div class="modal fade" id="{{ id }}" data-controller="modal-form-target" tabindex="-1"
+         aria-labelledby="{{ id }}-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="{{ id }}-label">{{ title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <form data-modal-form-target-target="form" method="post" action="">
+                    <div class="modal-body">{{ body }}</div>
+                    <div class="modal-footer">
+                        <input type="hidden" name="_csrf_token" value="" data-modal-form-target-target="csrfToken">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-{{ variant }}">{{ label }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

@@ -23,8 +23,10 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Meeting>
  */
+use function array_map;
 use function array_values;
 use function implode;
+use function sprintf;
 use function str_replace;
 use function strtolower;
 
@@ -474,10 +476,24 @@ class MeetingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Search for a decision.
+     * How many decisions a lookup may put forward.
+     *
+     * What this feeds is a dropdown someone picks from while typing, not a list they read, and the cap is what keeps
+     * a broad prompt from costing the whole archive: without it the query below matched, sorted and loaded every
+     * decision whose reference contained what was typed, along with all of their sub-decisions.
+     */
+    private const int SEARCH_LIMIT = 25;
+
+    /**
+     * Search for a decision by the reference it is cited with.
      *
      * Decisions that annul another decision are never returned: annulling an annulment has no well-defined meaning,
      * because an annulment has no effects of its own to revert.
+     *
+     * Two steps rather than one query: which decisions match is settled first, over their identity alone and under a
+     * cap, and only the handful that survive are then loaded with the sub-decisions that make up their text. The
+     * matching query has no predicate an index can serve -- a reference is matched by writing it out and comparing
+     * it with LIKE -- so anything it loads per row it loads for the whole table.
      *
      * @param Meeting|null $before when given, only decisions taken before this meeting are returned, and within that
      *                             meeting only those before $beforePoint and $beforeNumber.
@@ -490,39 +506,84 @@ class MeetingRepository extends ServiceEntityRepository
         ?Meeting $before = null,
         ?int $beforePoint = null,
         ?int $beforeNumber = null,
+        bool $onlyUnlinkedVirtual = false,
     ): array {
+        return $this->findDecisionsAt($this->addressesMatchingReference(
+            $query,
+            $includeAnnulled,
+            $before,
+            $beforePoint,
+            $beforeNumber,
+            $onlyUnlinkedVirtual,
+        ));
+    }
+
+    /**
+     * The addresses of the decisions that may be offered and whose reference contains what was typed.
+     *
+     * Nothing but the four numbers that identify a decision is selected, and nothing is joined that only the text
+     * needs, so the cap bounds the work rather than only the answer.
+     *
+     * @return list<array{meeting_type: string, meeting_number: int, point: int, number: int}>
+     */
+    private function addressesMatchingReference(
+        string $query,
+        bool $includeAnnulled,
+        ?Meeting $before,
+        ?int $beforePoint,
+        ?int $beforeNumber,
+        bool $onlyUnlinkedVirtual,
+    ): array {
+        $reference = 'CONCAT(' . implode(
+            ', ',
+            [
+                'LOWER(d.meeting_type)',
+                "' '",
+                'd.meeting_number',
+                "'.'",
+                'd.point',
+                "'.'",
+                'd.number',
+                "' '",
+            ],
+        ) . ')';
+
         $qb = $this->getEntityManager()->createQueryBuilder();
 
-        $fields = [];
-        $fields[] = 'LOWER(d.meeting_type)';
-        $fields[] = "' '";
-        $fields[] = 'd.meeting_number';
-        $fields[] = "'.'";
-        $fields[] = 'd.point';
-        $fields[] = "'.'";
-        $fields[] = 'd.number';
-        $fields[] = "' '";
-        $fields = implode(
-            ', ',
-            $fields,
-        );
-        $fields = 'CONCAT(' . $fields . ')';
-
-        $qb->select('d, s, m')
+        $qb->select(
+            'd.meeting_type AS meeting_type',
+            'd.meeting_number AS meeting_number',
+            'd.point AS point',
+            'd.number AS number',
+        )
             ->from(
                 Decision::class,
                 'd',
-            )
-            ->where($fields . ' LIKE :search')
-            ->leftJoin(
-                'd.subdecisions',
-                's',
             )
             ->innerJoin(
                 'd.meeting',
                 'm',
             )
-            ->orderBy('s.sequence');
+            ->where($reference . ' LIKE :search')
+            ->setParameter(
+                'search',
+                '%' . strtolower($query) . '%',
+            )
+            // A stable order, so the same prompt offers the same decisions in the same places; the newest meeting
+            // first, because that is the one somebody is most likely to be looking for.
+            ->orderBy(
+                'm.date',
+                'DESC',
+            )
+            ->addOrderBy(
+                'd.point',
+                'ASC',
+            )
+            ->addOrderBy(
+                'd.number',
+                'ASC',
+            )
+            ->setMaxResults(self::SEARCH_LIMIT);
 
         if (!$includeAnnulled) {
             // we want to leave out decisions that have been annulled
@@ -564,6 +625,26 @@ class MeetingRepository extends ServiceEntityRepository
             ),
         ));
 
+        if ($onlyUnlinkedVirtual) {
+            // Asked for by the lookup that picks a virtual counterpart: only a virtual decision is one, and one that
+            // is already somebody's counterpart is spoken for. Left-joined rather than asked with
+            // `d.counterpart IS NULL`, because the association is keyed on four columns and DQL refuses a
+            // single-valued path expression to a composite key.
+            $qb->leftJoin(
+                'd.counterpart',
+                'counterpart',
+            )
+                ->andWhere($qb->expr()->eq(
+                    'm.type',
+                    ':virtual_meeting',
+                ))
+                ->andWhere('counterpart.number IS NULL')
+                ->setParameter(
+                    'virtual_meeting',
+                    MeetingTypes::VIRT,
+                );
+        }
+
         if (null !== $before) {
             // A decision can only be annulled by a later one; the ledger cannot be rewritten from the past.
             $qb->andWhere($qb->expr()->orX(
@@ -600,31 +681,111 @@ class MeetingRepository extends ServiceEntityRepository
             ));
 
             $qb->setParameter(
-                ':before_date',
+                'before_date',
                 $before->getDate(),
-            );
-            $qb->setParameter(
-                ':before_type',
-                $before->getType(),
-            );
-            $qb->setParameter(
-                ':before_number',
-                $before->getNumber(),
-            );
-            $qb->setParameter(
-                ':before_point',
-                $beforePoint,
-            );
-            $qb->setParameter(
-                ':before_decision',
-                $beforeNumber,
-            );
+            )
+                ->setParameter(
+                    'before_type',
+                    $before->getType(),
+                )
+                ->setParameter(
+                    'before_number',
+                    $before->getNumber(),
+                )
+                ->setParameter(
+                    'before_point',
+                    $beforePoint,
+                )
+                ->setParameter(
+                    'before_decision',
+                    $beforeNumber,
+                );
         }
 
-        $qb->setParameter(
-            ':search',
-            '%' . strtolower($query) . '%',
+        /** @var list<array{meeting_type: MeetingTypes, meeting_number: int, point: int, number: int}> $rows */
+        $rows = $qb->getQuery()->getArrayResult();
+
+        return array_map(
+            static fn (array $row): array => [
+                'meeting_type' => $row['meeting_type']->value,
+                'meeting_number' => $row['meeting_number'],
+                'point' => $row['point'],
+                'number' => $row['number'],
+            ],
+            $rows,
         );
+    }
+
+    /**
+     * The decisions at the given addresses, with the sub-decisions their text is made of.
+     *
+     * @param list<array{meeting_type: string, meeting_number: int, point: int, number: int}> $addresses
+     *
+     * @return Decision[]
+     */
+    private function findDecisionsAt(array $addresses): array
+    {
+        if ([] === $addresses) {
+            return [];
+        }
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('d, s, m')
+            ->from(
+                Decision::class,
+                'd',
+            )
+            ->leftJoin(
+                'd.subdecisions',
+                's',
+            )
+            ->innerJoin(
+                'd.meeting',
+                'm',
+            )
+            ->orderBy(
+                'm.date',
+                'DESC',
+            )
+            ->addOrderBy(
+                'd.point',
+                'ASC',
+            )
+            ->addOrderBy(
+                'd.number',
+                'ASC',
+            );
+
+        $clauses = [];
+
+        foreach ($addresses as $index => $address) {
+            $clauses[] = sprintf(
+                '(d.meeting_type = :at_type%1$d AND d.meeting_number = :at_meeting%1$d'
+                . ' AND d.point = :at_point%1$d AND d.number = :at_number%1$d)',
+                $index,
+            );
+            $qb->setParameter(
+                'at_type' . $index,
+                $address['meeting_type'],
+            )
+                ->setParameter(
+                    'at_meeting' . $index,
+                    $address['meeting_number'],
+                )
+                ->setParameter(
+                    'at_point' . $index,
+                    $address['point'],
+                )
+                ->setParameter(
+                    'at_number' . $index,
+                    $address['number'],
+                );
+        }
+
+        $qb->where(implode(
+            ' OR ',
+            $clauses,
+        ));
 
         return $qb->getQuery()->getResult();
     }

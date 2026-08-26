@@ -1,0 +1,43 @@
+{# The candidates the board puts forward, in constitutional order. Each row names a member: the name is typed and the
+   membership number beside it is what the form reads back, so a row needs the lookup controller of its own that the
+   shared partial gives it. Add and remove are the generic `form-collection` controller, and the order of the rows is
+   the order the candidates are recorded in, which is why nothing here reorders them. #}
+{% macro board_candidate_entry(child, remove_label) %}
+    <div class="d-flex align-items-start gap-2 mb-2" data-form-collection-target="entry">
+        <div class="flex-grow-1">
+            {% include 'database/partials/decision/member-lookup.html.twig' with {
+                'field': child,
+                'label': 'Lid'|trans,
+            } only %}
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-gewis-primary"
+                data-action="form-collection#remove" aria-label="{{ remove_label }}">
+            <span class="fas fa-trash" aria-hidden="true"></span>
+        </button>
+    </div>
+{% endmacro %}
+
+{% block board_candidate_collection_widget %}
+    {% import _self as helper %}
+    {% set has_prototype = allow_add and prototype is defined and prototype is not null and not prototype.rendered %}
+    {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__candidate__' %}
+    {% set add_label = add_label|default('Add candidate'|trans) %}
+    {% set remove_label = remove_label|default('Remove candidate'|trans) %}
+    <div id="{{ id }}" data-controller="form-collection"
+         data-form-collection-prototype-name-value="{{ placeholder }}"
+         {% if has_prototype %}
+             data-form-collection-prototype-value="{{ helper.board_candidate_entry(prototype, remove_label)|e('html_attr') }}"
+         {% endif %}>
+        <div data-form-collection-target="entries">
+            {% for child in form %}
+                {{ helper.board_candidate_entry(child, remove_label) }}
+            {% endfor %}
+        </div>
+        {% if allow_add %}
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                    data-form-collection-target="add" data-action="form-collection#add">
+                <span class="fas fa-plus" aria-hidden="true"></span> {{ add_label }}
+            </button>
+        {% endif %}
+    </div>
+{% endblock %}

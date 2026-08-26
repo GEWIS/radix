@@ -18,10 +18,12 @@ use App\Entity\Database\SubDecision\Annulment;
 use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Database\SubDecision\Board\Release as BoardRelease;
 use App\Entity\Database\SubDecision\Discharge;
+use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation;
 use App\Entity\Database\SubDecision\Key\Granting;
 use App\Entity\Database\SubDecision\Key\Withdrawal;
+use App\Entity\Database\SubDecision\OrganRegulation;
 use App\Entity\Database\SubDecision\Reappointment;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -257,6 +259,48 @@ final class LedgerBuilder
         $annulment->setDecision($this->decision($meeting));
 
         return $this->persist($annulment);
+    }
+
+    /**
+     * A budget approved by a meeting. `$date` is the date the version itself carries, which is not the meeting's.
+     */
+    public function approveBudget(
+        Meeting $meeting,
+        string $date,
+        string $name = 'Begroting',
+    ): Budget {
+        $budget = new Budget();
+        $budget->setName($name);
+        $budget->setVersion('1.0');
+        $budget->setDate(new DateTime($date));
+        $budget->setApproval(true);
+        $budget->setChanges(false);
+        $budget->setSequence(1);
+        $budget->setDecision($this->decision($meeting));
+
+        return $this->persist($budget);
+    }
+
+    /**
+     * A body regulation approved by a meeting, with the same distinction between its own date and the meeting's.
+     */
+    public function approveOrganRegulation(
+        Meeting $meeting,
+        string $date,
+        string $abbreviation = 'TC',
+    ): OrganRegulation {
+        $regulation = new OrganRegulation();
+        $regulation->setAbbr($abbreviation);
+        $regulation->setOrganType(OrganTypes::Committee);
+        $regulation->setVersion('1.0');
+        $regulation->setDate(new DateTime($date));
+        $regulation->setApproval(true);
+        $regulation->setChanges(false);
+        $regulation->setMember($this->member());
+        $regulation->setSequence(1);
+        $regulation->setDecision($this->decision($meeting));
+
+        return $this->persist($regulation);
     }
 
     public function decision(Meeting $meeting): Decision

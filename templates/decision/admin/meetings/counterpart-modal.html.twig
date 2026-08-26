@@ -1,0 +1,52 @@
+{# Which virtual decision is a decision's counterpart. One modal for the whole meeting: the button that opens it says
+   which decision it was opened for, and the lookup here says which virtual decision belongs to that one.
+
+   Rendered once per page, outside any live component, so the re-render that follows the action cannot orphan it. #}
+<div class="modal fade" id="counterpart-modal" tabindex="-1"
+     aria-labelledby="counterpart-modal-label" aria-hidden="true"
+     data-controller="counterpart-modal decision-counterpart"
+     data-decision-counterpart-url-value="{{ path('decision_decision_search') }}">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="counterpart-modal-label">{{ 'Link a virtual counterpart'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">
+                    {{ 'A virtual meeting puts on the record what this meeting decided. Naming that decision keeps the two from being read as two, and hides it from the decision search in favour of this one.'|trans }}
+                </p>
+                <div class="position-relative mb-2">
+                    <label class="visually-hidden" for="counterpart-search">{{ 'Virtual decision'|trans }}</label>
+                    <input type="text" class="form-control" id="counterpart-search" autocomplete="off"
+                           placeholder="{{ 'Virtual decision'|trans }}"
+                           data-decision-counterpart-target="input"
+                           data-counterpart-modal-target="input"
+                           data-action="input->decision-counterpart#search keydown->decision-counterpart#navigate">
+                    <div class="dropdown-menu w-100" role="listbox" data-decision-counterpart-target="results"></div>
+                </div>
+
+                {# What the lookup fills in, and what the modal reads back when the link is confirmed. #}
+                <input type="hidden" data-decision-counterpart-target="meetingType"
+                       data-counterpart-modal-target="meetingType">
+                <input type="hidden" data-decision-counterpart-target="meetingNumber"
+                       data-counterpart-modal-target="meetingNumber">
+                <input type="hidden" data-decision-counterpart-target="point"
+                       data-counterpart-modal-target="point">
+                <input type="hidden" data-decision-counterpart-target="number"
+                       data-counterpart-modal-target="number">
+
+                <p class="d-none small mb-0" data-decision-counterpart-target="preview"
+                   data-counterpart-modal-target="preview">
+                    <strong data-decision-counterpart-target="previewNumber"></strong>:
+                    <span data-decision-counterpart-target="previewContent"></span>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
+                <button type="button" class="btn btn-gewis-primary" data-bs-dismiss="modal"
+                        data-counterpart-modal-target="confirm">{{ 'Link counterpart'|trans }}</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -8,9 +8,12 @@ use App\Doctrine\Query\Queryable;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\SubDecision\Abrogation;
 use App\Entity\Decision\SubDecision\Annulment;
+use App\Entity\Decision\SubDecision\Board\Candidacy as BoardCandidacy;
+use App\Entity\Decision\SubDecision\Board\Candidate as BoardCandidate;
 use App\Entity\Decision\SubDecision\Board\Discharge as BoardDischarge;
 use App\Entity\Decision\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Decision\SubDecision\Board\Release as BoardRelease;
+use App\Entity\Decision\SubDecision\Continuation;
 use App\Entity\Decision\SubDecision\Discharge;
 use App\Entity\Decision\SubDecision\Financial\Budget;
 use App\Entity\Decision\SubDecision\Financial\Statement;
@@ -19,6 +22,8 @@ use App\Entity\Decision\SubDecision\FoundationReference;
 use App\Entity\Decision\SubDecision\Installation;
 use App\Entity\Decision\SubDecision\Key\Granting as KeyGranting;
 use App\Entity\Decision\SubDecision\Key\Withdrawal as KeyWithdrawal;
+use App\Entity\Decision\SubDecision\Member\Suspension as MemberSuspension;
+use App\Entity\Decision\SubDecision\Member\Warning as MemberWarning;
 use App\Entity\Decision\SubDecision\Minutes;
 use App\Entity\Decision\SubDecision\OrganRegulation;
 use App\Entity\Decision\SubDecision\Other;
@@ -59,6 +64,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
         'organ_regulation' => OrganRegulation::class,
         'foundation' => Foundation::class,
         'abrogation' => Abrogation::class,
+        'continuation' => Continuation::class,
         'installation' => Installation::class,
         'reappointment' => Reappointment::class,
         'discharge' => Discharge::class,
@@ -70,9 +76,13 @@ use Doctrine\ORM\Mapping\ManyToOne;
         'board_installation' => BoardInstallation::class,
         'board_release' => BoardRelease::class,
         'board_discharge' => BoardDischarge::class,
+        'board_candidacy' => BoardCandidacy::class,
+        'board_candidate' => BoardCandidate::class,
         'foundationreference' => FoundationReference::class,
         'key_granting' => KeyGranting::class,
         'key_withdraw' => KeyWithdrawal::class,
+        'member_warning' => MemberWarning::class,
+        'member_suspension' => MemberSuspension::class,
     ],
 )]
 #[Queryable]

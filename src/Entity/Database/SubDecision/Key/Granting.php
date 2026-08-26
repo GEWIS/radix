@@ -7,6 +7,7 @@ namespace App\Entity\Database\SubDecision\Key;
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Key\GrantingRepository;
@@ -18,7 +19,7 @@ use Override;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Entity(repositoryClass: GrantingRepository::class)]
-class Granting extends SubDecision
+class Granting extends SubDecision implements NamesMember
 {
     use FormattableDateTrait;
     use MemberAwareTrait;

@@ -211,22 +211,10 @@ parameters:
 			path: src/Entity/Database/SubDecision/Board/Discharge.php
 
 		-
-			message: '#^Method App\\Entity\\Database\\SubDecision\\Board\\Installation\:\:formatDate\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Entity/Database/SubDecision/Board/Installation.php
-
-		-
 			message: '#^Method App\\Entity\\Database\\SubDecision\\Board\\Installation\:\:getMember\(\) should return App\\Entity\\Database\\Member but returns App\\Entity\\Database\\Member\|null\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Entity/Database/SubDecision/Board/Installation.php
-
-		-
-			message: '#^Method App\\Entity\\Database\\SubDecision\\Board\\Release\:\:formatDate\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Entity/Database/SubDecision/Board/Release.php
 
 		-
 			message: '#^Property App\\Entity\\Database\\SubDecision\\Board\\Release\:\:\$installation type mapping mismatch\: database can contain App\\Entity\\Database\\SubDecision\\Board\\Installation\|null but property expects App\\Entity\\Database\\SubDecision\\Board\\Installation\.$#'
@@ -239,12 +227,6 @@ parameters:
 			identifier: doctrine.associationType
 			count: 1
 			path: src/Entity/Database/SubDecision/Discharge.php
-
-		-
-			message: '#^Method App\\Entity\\Database\\SubDecision\\Financial\\Budget\:\:formatDate\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Entity/Database/SubDecision/Financial/Budget.php
 
 		-
 			message: '#^Parameter \#2 \$replacements of method App\\Entity\\Database\\SubDecision\:\:replaceContentPlaceholders\(\) expects array\<string, string\>, array\<string, int\|string\|null\> given\.$#'
@@ -265,22 +247,10 @@ parameters:
 			path: src/Entity/Database/SubDecision/Installation.php
 
 		-
-			message: '#^Method App\\Entity\\Database\\SubDecision\\Key\\Granting\:\:formatDate\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Entity/Database/SubDecision/Key/Granting.php
-
-		-
 			message: '#^Method App\\Entity\\Database\\SubDecision\\Key\\Granting\:\:getMember\(\) should return App\\Entity\\Database\\Member but returns App\\Entity\\Database\\Member\|null\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Entity/Database/SubDecision/Key/Granting.php
-
-		-
-			message: '#^Method App\\Entity\\Database\\SubDecision\\Key\\Withdrawal\:\:formatDate\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Entity/Database/SubDecision/Key/Withdrawal.php
 
 		-
 			message: '#^Property App\\Entity\\Database\\SubDecision\\Key\\Withdrawal\:\:\$granting type mapping mismatch\: database can contain App\\Entity\\Database\\SubDecision\\Key\\Granting\|null but property expects App\\Entity\\Database\\SubDecision\\Key\\Granting\.$#'
@@ -299,12 +269,6 @@ parameters:
 			identifier: doctrine.associationType
 			count: 1
 			path: src/Entity/Database/SubDecision/Minutes.php
-
-		-
-			message: '#^Method App\\Entity\\Database\\SubDecision\\OrganRegulation\:\:formatDate\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Entity/Database/SubDecision/OrganRegulation.php
 
 		-
 			message: '#^Method App\\Entity\\Database\\SubDecision\\OrganRegulation\:\:getMember\(\) should return App\\Entity\\Database\\Member but returns App\\Entity\\Database\\Member\|null\.$#'
@@ -596,18 +560,6 @@ parameters:
 			path: src/Form/Database/DataMapper/AbstractDecisionMapper.php
 
 		-
-			message: '#^Method App\\Form\\Database\\DataMapper\\AbstractDecisionMapper\:\:mapSubDecisions\(\) has parameter \$forms with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Form/Database/DataMapper/AbstractDecisionMapper.php
-
-		-
-			message: '#^PHPDoc tag @var for variable \$children contains generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Form/Database/DataMapper/AbstractDecisionMapper.php
-
-		-
 			message: '#^Method App\\Form\\Database\\DataMapper\\AnnulmentMapper\:\:mapSubDecisions\(\) has parameter \$forms with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
@@ -690,12 +642,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: src/Form/Database/DeleteAddressType.php
-
-		-
-			message: '#^Class App\\Form\\Database\\DeleteDecisionType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Form/Database/DeleteDecisionType.php
 
 		-
 			message: '#^Class App\\Form\\Database\\DeleteListType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'

@@ -13,6 +13,10 @@ use App\Entity\Decision\MeetingReferenceSelection;
 use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
+use App\Exception\Database\AnnulmentNotPossible;
+use App\Exception\Database\CounterpartNotPossible;
+use App\Exception\Database\DecisionNamesDeletedMember;
+use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Decision\MeetingActivityLogRepository;
 use App\Repository\Decision\MeetingDocumentRepository;
 use App\Repository\Decision\MeetingPointRepository;
@@ -33,6 +37,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -43,7 +49,6 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 use function array_map;
 use function array_values;
 use function assert;
-use function strtoupper;
 use function strval;
 use function trim;
 
@@ -65,7 +70,7 @@ final class MeetingManage
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $type;
+    public MeetingTypes $type;
 
     #[LiveProp]
     public int $number;
@@ -111,6 +116,7 @@ final class MeetingManage
 
     public function __construct(
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
         private readonly DatabaseMeetingService $databaseMeetingService,
         private readonly MeetingQueryService $meetingQueryService,
         private readonly MeetingPointRepository $meetingPointRepository,
@@ -158,7 +164,7 @@ final class MeetingManage
         $this->assertAccess();
 
         return $this->databaseMeetingService->getMeetingView(
-            MeetingTypes::tryFromSearch(strtoupper($this->type)),
+            $this->type,
             $this->number,
         );
     }
@@ -172,7 +178,7 @@ final class MeetingManage
         }
 
         $view = $this->meetingQueryService->getMeetingView(
-            MeetingTypes::tryFromSearch(strtoupper($this->type)),
+            $this->type,
             $this->number,
         );
 
@@ -447,6 +453,140 @@ final class MeetingManage
         $this->markSaved();
     }
 
+    /**
+     * Remove one decision of this meeting from the ledger, along with everything it recorded.
+     *
+     * The ledger turns down a decision that a later one builds on, which is the whole reason this is worth an answer
+     * rather than a redirect: the reader stays on the meeting and is told why nothing was removed.
+     */
+    #[LiveAction]
+    public function deleteDecision(
+        #[LiveArg]
+        int $point,
+        #[LiveArg]
+        int $number,
+    ): void {
+        $this->assertAccess();
+
+        try {
+            $deleted = $this->databaseMeetingService->deleteDecision(
+                $this->type,
+                $this->number,
+                $point,
+                $number,
+            );
+        } catch (DecisionStillReferenced) {
+            $this->feedback = new TranslatableMessage('Other decisions still refer to this one.')
+                ->trans($this->translator);
+
+            return;
+        } catch (DecisionNamesDeletedMember) {
+            $this->feedback = new TranslatableMessage(
+                'This decision names a member who has been deleted, and is what their record is kept for.',
+            )->trans($this->translator);
+
+            return;
+        } catch (AnnulmentNotPossible) {
+            $this->feedback = new TranslatableMessage(
+                'Removing this annulment would restore a decision that later decisions have since overtaken.',
+            )->trans($this->translator);
+
+            return;
+        }
+
+        // Two secretaries can hold this open at once, and the second one to answer it deletes nothing. Reporting
+        // success either way would have them believe they removed something they did not.
+        if (!$deleted) {
+            $this->feedback = new TranslatableMessage('This decision no longer exists.')->trans($this->translator);
+
+            return;
+        }
+
+        $this->markSaved();
+    }
+
+    /**
+     * Say that a virtual decision is the counterpart of one of this meeting's decisions.
+     *
+     * The virtual decision is named by its four coordinates rather than looked up here, because that is what the
+     * search it is picked from answers with.
+     */
+    #[LiveAction]
+    public function linkVirtualCounterpart(
+        #[LiveArg]
+        int $point,
+        #[LiveArg]
+        int $number,
+        #[LiveArg]
+        string $virtualType,
+        #[LiveArg]
+        int $virtualMeeting,
+        #[LiveArg]
+        int $virtualPoint,
+        #[LiveArg]
+        int $virtualDecision,
+    ): void {
+        $this->assertAccess();
+
+        $type = MeetingTypes::tryFrom($virtualType);
+
+        if (null === $type) {
+            $this->feedback = $this->cannotBeCounterparts();
+
+            return;
+        }
+
+        try {
+            $linked = $this->databaseMeetingService->linkVirtualCounterpart(
+                $this->type,
+                $this->number,
+                $point,
+                $number,
+                $type,
+                $virtualMeeting,
+                $virtualPoint,
+                $virtualDecision,
+            );
+        } catch (CounterpartNotPossible) {
+            // The button is only offered on a meeting that is not virtual and the lookup answers with virtual
+            // decisions only, so the one way to arrive here is a decision removed between picking it and confirming.
+            $this->feedback = $this->cannotBeCounterparts();
+
+            return;
+        }
+
+        $this->reportWritten($linked);
+    }
+
+    #[LiveAction]
+    public function unlinkVirtualCounterpart(
+        #[LiveArg]
+        string $virtualType,
+        #[LiveArg]
+        int $virtualMeeting,
+        #[LiveArg]
+        int $virtualPoint,
+        #[LiveArg]
+        int $virtualDecision,
+    ): void {
+        $this->assertAccess();
+
+        $type = MeetingTypes::tryFrom($virtualType);
+
+        if (null === $type) {
+            $this->feedback = $this->cannotBeCounterparts();
+
+            return;
+        }
+
+        $this->reportWritten($this->databaseMeetingService->unlinkVirtualCounterpart(
+            $type,
+            $virtualMeeting,
+            $virtualPoint,
+            $virtualDecision,
+        ));
+    }
+
     #[LiveAction]
     public function deleteMinutes(): void
     {
@@ -545,6 +685,29 @@ final class MeetingManage
     private function meeting(): Meeting
     {
         return $this->getView()->meeting;
+    }
+
+    private function cannotBeCounterparts(): string
+    {
+        return new TranslatableMessage('These two decisions cannot be one another\'s counterpart.')
+            ->trans($this->translator);
+    }
+
+    /**
+     * What a write to the ledger's side of this meeting answers with.
+     *
+     * Two secretaries can have this page open at once, and the second one to act on a decision the first has removed
+     * changes nothing. Reporting success either way would have them believe otherwise.
+     */
+    private function reportWritten(bool $written): void
+    {
+        if (!$written) {
+            $this->feedback = new TranslatableMessage('This decision no longer exists.')->trans($this->translator);
+
+            return;
+        }
+
+        $this->markSaved();
     }
 
     private function markSaved(): void

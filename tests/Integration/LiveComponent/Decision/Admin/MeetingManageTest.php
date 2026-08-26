@@ -391,7 +391,7 @@ final class MeetingManageTest extends DatabaseTestCase
     private function manageFor(int $offset = 0): MeetingManage
     {
         $component = self::getContainer()->get(MeetingManage::class);
-        $component->type = 'gmm';
+        $component->type = MeetingTypes::ALV;
         $component->number = $this->completeGmmNumber() + $offset;
 
         return $component;

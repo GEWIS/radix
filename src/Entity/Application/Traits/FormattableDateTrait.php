@@ -29,6 +29,13 @@ trait FormattableDateTrait
             date_default_timezone_get(),
         );
 
-        return $formatter->format($date);
+        $formatted = $formatter->format($date);
+
+        // `IntlDateFormatter::format()` answers `false` when it cannot format what it was given. A `DateTime` and one
+        // of the two locales the application has are never that, but a decision has to read as something either way,
+        // so the date falls back to the way it is written down rather than to a type error.
+        return false === $formatted
+            ? $date->format('Y-m-d')
+            : $formatted;
     }
 }

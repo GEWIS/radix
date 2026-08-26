@@ -104,6 +104,55 @@ class Decision
     private Collection $subdecisions;
 
     /**
+     * The decision this one is the counterpart of.
+     *
+     * A virtual meeting exists to put on the record something a real meeting decided, most often an organ membership
+     * that started or ended on a date of its own rather than on the day it was decided. Naming that decision here is
+     * what keeps the two from reading as two separate decisions: the register can show what the virtual one belongs
+     * to, and the search shows the decision it belongs to rather than both.
+     *
+     * Said from the meeting rather than while the decision is entered, so that neither of the two has to be on the
+     * record before the other. Null on every decision that has no such counterpart, which is all of them outside a
+     * virtual meeting.
+     */
+    #[ManyToOne(
+        targetEntity: self::class,
+        inversedBy: 'virtualCounterparts',
+    )]
+    #[JoinColumn(
+        name: 'c_meeting_type',
+        referencedColumnName: 'meeting_type',
+    )]
+    #[JoinColumn(
+        name: 'c_meeting_number',
+        referencedColumnName: 'meeting_number',
+    )]
+    #[JoinColumn(
+        name: 'c_point',
+        referencedColumnName: 'point',
+    )]
+    #[JoinColumn(
+        name: 'c_number',
+        referencedColumnName: 'number',
+    )]
+    private ?Decision $counterpart = null;
+
+    /**
+     * The virtual decisions that are this one's counterpart.
+     *
+     * The reference itself sits on the virtual decision, because one decision can be given more than one -- an
+     * installation decided once and recorded twice, for two dates of its own. Saying which virtual decision belongs
+     * to this one is done from here, which is where a reader comes across it.
+     *
+     * @var Collection<array-key, Decision>
+     */
+    #[OneToMany(
+        targetEntity: self::class,
+        mappedBy: 'counterpart',
+    )]
+    private Collection $virtualCounterparts;
+
+    /**
      * Annulled by.
      */
     #[OneToOne(
@@ -111,6 +160,16 @@ class Decision
         mappedBy: 'target',
     )]
     private ?Annulment $annulledBy = null;
+
+    /**
+     * A decision that was just made has no counterpart either way; Doctrine fills both in for one that was loaded.
+     * Only `virtualCounterparts` is initialised here, because {@see self::setMeeting()} owns the other collection and
+     * deliberately empties it.
+     */
+    public function __construct()
+    {
+        $this->virtualCounterparts = new ArrayCollection();
+    }
 
     /**
      * Set the meeting.
@@ -215,6 +274,32 @@ class Decision
         foreach ($subdecisions as $subdecision) {
             $this->addSubdecision($subdecision);
         }
+    }
+
+    /**
+     * Get the virtual decisions that are this one's counterpart.
+     *
+     * @return Collection<array-key, Decision>
+     */
+    public function getVirtualCounterparts(): Collection
+    {
+        return $this->virtualCounterparts;
+    }
+
+    /**
+     * Get the decision this one is the counterpart of, if it is one.
+     */
+    public function getCounterpart(): ?Decision
+    {
+        return $this->counterpart;
+    }
+
+    /**
+     * Set the decision this one is the counterpart of.
+     */
+    public function setCounterpart(?Decision $counterpart): void
+    {
+        $this->counterpart = $counterpart;
     }
 
     /**

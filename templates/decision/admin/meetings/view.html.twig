@@ -19,7 +19,7 @@
                 <span class="fas fa-file-arrow-down" aria-hidden="true"></span>
                 {{ 'Export a decision list'|trans }}
             </a>
-            <a href="{{ path('meetings/view', {'type': type, 'number': number}) }}" class="btn btn-outline-secondary">
+            <a href="{{ path('meetings/view', {'type': type.urlToken, 'number': number}) }}" class="btn btn-outline-secondary">
                 <span class="fas fa-eye" aria-hidden="true"></span>
                 {{ 'View as member'|trans }}
             </a>
@@ -39,4 +39,8 @@
     {% endif %}
 
     {% include 'partials/application/confirm-modal.html.twig' %}
+    {# A virtual decision has no virtual counterpart of its own, so a virtual meeting has no use for the lookup. #}
+    {% if meeting.type != enum('App\\Entity\\Database\\Enums\\MeetingTypes').VIRT %}
+        {% include 'decision/admin/meetings/counterpart-modal.html.twig' %}
+    {% endif %}
 {% endblock %}

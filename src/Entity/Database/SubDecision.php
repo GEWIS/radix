@@ -8,9 +8,12 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\SubDecision\Abrogation;
 use App\Entity\Database\SubDecision\Annulment;
+use App\Entity\Database\SubDecision\Board\Candidacy as BoardCandidacy;
+use App\Entity\Database\SubDecision\Board\Candidate as BoardCandidate;
 use App\Entity\Database\SubDecision\Board\Discharge as BoardDischarge;
 use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Database\SubDecision\Board\Release as BoardRelease;
+use App\Entity\Database\SubDecision\Continuation;
 use App\Entity\Database\SubDecision\Discharge;
 use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Financial\Statement;
@@ -19,6 +22,8 @@ use App\Entity\Database\SubDecision\FoundationReference;
 use App\Entity\Database\SubDecision\Installation;
 use App\Entity\Database\SubDecision\Key\Granting as KeyGranting;
 use App\Entity\Database\SubDecision\Key\Withdrawal as KeyWithdrawal;
+use App\Entity\Database\SubDecision\Member\Suspension as MemberSuspension;
+use App\Entity\Database\SubDecision\Member\Warning as MemberWarning;
 use App\Entity\Database\SubDecision\Minutes;
 use App\Entity\Database\SubDecision\OrganRegulation;
 use App\Entity\Database\SubDecision\Other;
@@ -52,6 +57,7 @@ use function str_replace;
         'organ_regulation' => OrganRegulation::class,
         'foundation' => Foundation::class,
         'abrogation' => Abrogation::class,
+        'continuation' => Continuation::class,
         'installation' => Installation::class,
         'reappointment' => Reappointment::class,
         'discharge' => Discharge::class,
@@ -62,10 +68,14 @@ use function str_replace;
         'board_installation' => BoardInstallation::class,
         'board_release' => BoardRelease::class,
         'board_discharge' => BoardDischarge::class,
+        'board_candidacy' => BoardCandidacy::class,
+        'board_candidate' => BoardCandidate::class,
         'foundationreference' => FoundationReference::class,
         'key_granting' => KeyGranting::class,
         'key_withdraw' => KeyWithdrawal::class,
         'minutes' => Minutes::class,
+        'member_warning' => MemberWarning::class,
+        'member_suspension' => MemberSuspension::class,
     ],
 )]
 abstract class SubDecision

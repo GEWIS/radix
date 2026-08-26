@@ -20,4 +20,20 @@ class DecisionRepository extends ServiceEntityRepository
             Decision::class,
         );
     }
+
+    /**
+     * Every decision that names another one it repeats.
+     *
+     * @return Decision[]
+     */
+    public function findRepeats(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->join(
+                'd.counterpart',
+                'c',
+            )
+            ->getQuery()
+            ->getResult();
+    }
 }

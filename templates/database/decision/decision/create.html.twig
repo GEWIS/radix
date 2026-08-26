@@ -7,7 +7,7 @@
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('admin/meetings/index') }}">{{ 'Meetings'|trans }}</a></li>
     <li class="breadcrumb-item">
-        <a href="{{ path('admin/meetings/view', {type: meeting.type.urlToken, number: meeting.number}) }}">
+        <a href="{{ path('admin/meetings/view', {type: meeting.type.value, number: meeting.number}) }}">
             {{ meeting.type.value }} {{ meeting.number }}
         </a>
     </li>
@@ -41,7 +41,7 @@
                 } only %}
                 <div class="text-center">
                     <a class="btn btn-gewis-primary"
-                       href="{{ path('admin/meetings/view', {type: meeting.type.urlToken, number: meeting.number}) }}">
+                       href="{{ path('admin/meetings/view', {type: meeting.type.value, number: meeting.number}) }}">
                         {{ 'Back to %type% %number%'|trans({
                             '%type%': meeting.type.value,
                             '%number%': meeting.number,
@@ -73,6 +73,9 @@
                     'tab-organ-install': {'icon': 'fa-user-plus', 'label': 'Installation / Discharge'|trans,
                         'hint': 'Install members in a body, or end an installation.'|trans,
                         'template': 'install', 'context': {'form': forms.install, 'member_function_form': member_function_form}},
+                    'tab-organ-continuation': {'icon': 'fa-arrows-rotate', 'label': 'Continuation'|trans,
+                        'hint': 'Let a body continue to exist.'|trans,
+                        'template': 'continuation', 'context': {'form': forms.continuation}},
                     'tab-organ-abolish': {'icon': 'fa-ban', 'label': 'Abolition'|trans,
                         'hint': 'Abolish a body and end its installations.'|trans,
                         'template': 'abolish', 'context': {'form': forms.abolish}},
@@ -90,6 +93,9 @@
                     'tab-board-discharge': {'icon': 'fa-user-check', 'label': 'Discharge'|trans,
                         'hint': 'Discharge a board member.'|trans,
                         'template': 'board-discharge', 'context': {'form': forms.board_discharge, 'installs': installs}},
+                    'tab-board-candidacy': {'icon': 'fa-user-group', 'label': 'Candidates'|trans,
+                        'hint': 'Put candidates forward for a coming board.'|trans,
+                        'template': 'board-candidacy', 'context': {'form': forms.board_candidacy}},
                 },
             },
             'finances': {
@@ -109,6 +115,17 @@
                     'tab-key-withdraw': {'icon': 'fa-key', 'label': 'Withdraw Key Code'|trans,
                         'hint': 'Withdraw a key code that was granted.'|trans,
                         'template': 'key-withdraw', 'context': {'form': forms.key_withdraw, 'grants': grants}},
+                },
+            },
+            'member': {
+                'label': 'Members'|trans,
+                'items': {
+                    'tab-member-warning': {'icon': 'fa-triangle-exclamation', 'label': 'Official Warning'|trans,
+                        'hint': 'Hand a member an official warning.'|trans,
+                        'template': 'member-warning', 'context': {'form': forms.member_warning}},
+                    'tab-member-suspension': {'icon': 'fa-user-slash', 'label': 'Suspension'|trans,
+                        'hint': 'Suspend a member for a period.'|trans,
+                        'template': 'member-suspension', 'context': {'form': forms.member_suspension}},
                 },
             },
             'meeting': {

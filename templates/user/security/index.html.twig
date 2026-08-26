@@ -1,5 +1,8 @@
 {% extends 'layout-sidebar.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+{% import 'partials/application/confirm-target-modal.html.twig' as targetModals %}
+
 {% block page_title %}{{ 'Security'|trans }}{% endblock %}
 
 {% block sidebar %}
@@ -238,121 +241,59 @@
 </div>
 {# Modals #}
 {% if mfaEnabled %}
-<div class="modal fade" id="modal-mfa-regenerate-backup-codes" tabindex="-1" aria-labelledby="modal-mfa-regenerate-backup-codes-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-mfa-regenerate-backup-codes-label">{{ 'Regenerate backup codes?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form method="POST" action="{{ path(routePrefix ~ 'mfa_regenerate_backup_codes') }}">
-                <div class="modal-body">
-                    <p class="mb-0">
-                        {{ 'Regenerate backup codes? Any codes you previously saved will stop working.'|trans }}
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('mfa_regenerate_backup_codes') }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-outline-warning">
-                        <span class="fas fa-rotate"></span> {{ 'Regenerate backup codes'|trans }}
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="modal-mfa-disable" tabindex="-1" aria-labelledby="modal-mfa-disable-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-mfa-disable-label">{{ 'Disable MFA?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form method="POST" action="{{ path(routePrefix ~ 'mfa_disable') }}">
-                <div class="modal-body">
-                    <p class="mb-0">
-                        {{ 'Disable MFA on your account? Your existing TOTP secret and backup codes will be discarded.'|trans }}
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('mfa_disable') }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-outline-gewis-primary">
-                        <span class="fas fa-ban"></span> {{ 'Disable MFA'|trans }}
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{% set regenerate_label %}
+    <span class="fas fa-rotate" aria-hidden="true"></span> {{ 'Regenerate backup codes'|trans }}
+{% endset %}
+{{ modals.confirm_modal(
+    'modal-mfa-regenerate-backup-codes',
+    path(routePrefix ~ 'mfa_regenerate_backup_codes'),
+    csrf_token('mfa_regenerate_backup_codes'),
+    'Regenerate backup codes?'|trans,
+    'Regenerate backup codes? Any codes you previously saved will stop working.'|trans,
+    regenerate_label,
+    'outline-warning',
+) }}
+{% set disable_label %}
+    <span class="fas fa-ban" aria-hidden="true"></span> {{ 'Disable MFA'|trans }}
+{% endset %}
+{{ modals.confirm_modal(
+    'modal-mfa-disable',
+    path(routePrefix ~ 'mfa_disable'),
+    csrf_token('mfa_disable'),
+    'Disable MFA?'|trans,
+    'Disable MFA on your account? Your existing TOTP secret and backup codes will be discarded.'|trans,
+    disable_label,
+    'outline-gewis-primary',
+) }}
 {% endif %}
-<div class="modal fade" id="modal-terminate-one" data-controller="modal-form-target" tabindex="-1" aria-labelledby="modal-terminate-one-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-terminate-one-label">{{ 'Terminate session?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form data-modal-form-target-target="form" method="POST" action="">
-                <div class="modal-body">
-                    <p class="mb-2">
-                        {{ 'Are you sure you want to terminate the session on this device?'|trans }}
-                    </p>
-                    <p class="mb-0"><strong data-modal-form-target-target="name"></strong></p>
-                    <p class="text-muted small mb-0 mt-2">
-                        {{ 'That device will be signed out immediately.'|trans }}
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="" data-modal-form-target-target="csrfToken">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-gewis-primary">{{ 'Terminate'|trans }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="modal-terminate-others" tabindex="-1" aria-labelledby="modal-terminate-others-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-terminate-others-label">{{ 'Log out other devices?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form method="POST" action="{{ path(routePrefix ~ 'session_terminate_others') }}">
-                <div class="modal-body">
-                    <p class="mb-0">{{ 'All sessions except this one will be signed out immediately.'|trans }}</p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('session_guard_terminate_others') }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-outline-gewis-primary">{{ 'Log out other devices'|trans }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="modal-terminate-all" tabindex="-1" aria-labelledby="modal-terminate-all-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-terminate-all-label">{{ 'Log out everywhere?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form method="POST" action="{{ path(routePrefix ~ 'session_terminate_all') }}">
-                <div class="modal-body">
-                    <p class="mb-0">
-                        {{ 'All sessions - including this one - will be terminated immediately. You will be redirected to the login page.'|trans }}
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('session_guard_terminate_all') }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-gewis-primary">{{ 'Log out everywhere'|trans }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{% set terminate_one_body %}
+    <p class="mb-2">{{ 'Are you sure you want to terminate the session on this device?'|trans }}</p>
+    <p class="mb-0"><strong data-modal-form-target-target="name"></strong></p>
+    <p class="text-muted small mb-0 mt-2">{{ 'That device will be signed out immediately.'|trans }}</p>
+{% endset %}
+{{ targetModals.confirm_modal(
+    'modal-terminate-one',
+    'Terminate session?'|trans,
+    terminate_one_body,
+    'Terminate'|trans,
+    'gewis-primary',
+) }}
+{{ modals.confirm_modal(
+    'modal-terminate-others',
+    path(routePrefix ~ 'session_terminate_others'),
+    csrf_token('session_guard_terminate_others'),
+    'Log out other devices?'|trans,
+    'All sessions except this one will be signed out immediately.'|trans,
+    'Log out other devices'|trans,
+    'outline-gewis-primary',
+) }}
+{{ modals.confirm_modal(
+    'modal-terminate-all',
+    path(routePrefix ~ 'session_terminate_all'),
+    csrf_token('session_guard_terminate_all'),
+    'Log out everywhere?'|trans,
+    'All sessions - including this one - will be terminated immediately. You will be redirected to the login page.'|trans,
+    'Log out everywhere'|trans,
+    'gewis-primary',
+) }}
 {% endblock %}

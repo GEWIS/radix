@@ -1,5 +1,8 @@
 {% extends 'layout-admin.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+{% import 'partials/application/confirm-target-modal.html.twig' as targetModals %}
+
 {% block page_title %}{{ 'Sessions'|trans|page_title }}{{ subjectLabel|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
@@ -102,47 +105,26 @@
     </div>
 </div>
 
-<div class="modal fade" id="modal-admin-terminate-one" data-controller="modal-form-target" tabindex="-1" aria-labelledby="modal-admin-terminate-one-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-admin-terminate-one-label">{{ 'Terminate session?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form data-modal-form-target-target="form" method="POST" action="">
-                <div class="modal-body">
-                    <p class="mb-2">{{ 'Are you sure you want to terminate the session on this device?'|trans }}</p>
-                    <p class="mb-0"><strong data-modal-form-target-target="name"></strong></p>
-                    <p class="text-muted small mb-0 mt-2">{{ 'That device will be signed out immediately.'|trans }}</p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="" data-modal-form-target-target="csrfToken">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-gewis-primary">{{ 'Terminate'|trans }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{% set terminate_one_body %}
+    <p class="mb-2">{{ 'Are you sure you want to terminate the session on this device?'|trans }}</p>
+    <p class="mb-0"><strong data-modal-form-target-target="name"></strong></p>
+    <p class="text-muted small mb-0 mt-2">{{ 'That device will be signed out immediately.'|trans }}</p>
+{% endset %}
+{{ targetModals.confirm_modal(
+    'modal-admin-terminate-one',
+    'Terminate session?'|trans,
+    terminate_one_body,
+    'Terminate'|trans,
+    'gewis-primary',
+) }}
 
-<div class="modal fade" id="modal-admin-terminate-all" tabindex="-1" aria-labelledby="modal-admin-terminate-all-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-admin-terminate-all-label">{{ 'Terminate all sessions?'|trans }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-            </div>
-            <form method="POST" action="{{ path(terminateAllRoute, routeParams) }}">
-                <div class="modal-body">
-                    <p class="mb-0">{{ 'Every active session for this user will be terminated immediately.'|trans }}</p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('admin_session_terminate_all') }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="submit" class="btn btn-gewis-primary">{{ 'Terminate all'|trans }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{{ modals.confirm_modal(
+    'modal-admin-terminate-all',
+    path(terminateAllRoute, routeParams),
+    csrf_token('admin_session_terminate_all'),
+    'Terminate all sessions?'|trans,
+    'Every active session for this user will be terminated immediately.'|trans,
+    'Terminate all'|trans,
+    'gewis-primary',
+) }}
 {% endblock %}

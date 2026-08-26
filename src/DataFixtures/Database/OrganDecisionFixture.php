@@ -28,6 +28,12 @@ use function sprintf;
 
 final class OrganDecisionFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    /**
+     * The board decision a virtual meeting says again further down, which is what the two halves of this fixture
+     * hand between themselves.
+     */
+    private const string REPEATED_DECISION = 'ledger-decision-repeated';
+
     #[Override]
     public function load(ObjectManager $manager): void
     {
@@ -332,6 +338,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         ];
 
         $annulmentTarget = null;
+
         foreach ($texts as [$meetingReference, $point, $number, $content]) {
             $decision = $this->createTextDecision(
                 $manager,
@@ -340,6 +347,14 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
                 $number,
                 $content,
             );
+
+            // Said again by a virtual meeting further down, which is what the counterpart there points back at.
+            if ('ledger-meeting-BV-1805' === $meetingReference) {
+                $this->addReference(
+                    self::REPEATED_DECISION,
+                    $decision,
+                );
+            }
 
             if ('ledger-meeting-BV-1801' !== $meetingReference) {
                 continue;
@@ -414,6 +429,20 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             'Rectificatie: de in BV 1805.1.1 genoemde begroting betreft het introductieweekend van het komende'
             . ' verenigingsjaar.',
         );
+
+        // A virtual meeting saying again what a board meeting decided, and naming the decision it repeats. Without
+        // that link the two are two answers to the same search, which is what the seed is here to show.
+        $repeat = $this->createTextDecision(
+            $manager,
+            'ledger-meeting-Virt-1',
+            1,
+            1,
+            'Het bestuur besluit de begroting van het introductieweekend ter hoogte van € 1.250,00 goed te keuren.',
+        );
+        $repeat->setCounterpart($this->getReference(
+            self::REPEATED_DECISION,
+            Decision::class,
+        ));
 
         $manager->flush();
     }

@@ -17,18 +17,6 @@
         <source> met genoemde wijzigingen</source>
         <target state="translated"> met genoemde wijzigingen</target>
       </trans-unit>
-      <trans-unit id="AoY3XHY" resname="&quot;%name%&quot; has been given a day. The activity has been started for you and still needs filling in.">
-        <source>"%name%" has been given a day. The activity has been started for you and still needs filling in.</source>
-        <target state="translated">"%name%" heeft een dag gekregen. De activiteit is voor je aangemaakt en moet nog ingevuld worden.</target>
-      </trans-unit>
-      <trans-unit id="FPSBTz3" resname="&quot;%name%&quot; has been put forward and is waiting for a day.">
-        <source>"%name%" has been put forward and is waiting for a day.</source>
-        <target state="translated">"%name%" is ingediend en wacht op een dag.</target>
-      </trans-unit>
-      <trans-unit id="3WCdvsC" resname="&quot;%name%&quot; has been turned down; its days are free again.">
-        <source>"%name%" has been turned down; its days are free again.</source>
-        <target state="translated">"%name%" is afgewezen; de dagen zijn weer vrij.</target>
-      </trans-unit>
       <trans-unit id="Uvxq3WQ" resname="%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.">
         <source>%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.</source>
         <target state="translated">%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.</target>
@@ -40,6 +28,10 @@
       <trans-unit id="dqOql01" resname="%MEMBER% wordt gedechargeerd als %FUNCTION% van %ORGAN_ABBR%.">
         <source>%MEMBER% wordt gedechargeerd als %FUNCTION% van %ORGAN_ABBR%.</source>
         <target state="translated">%MEMBER% wordt gedechargeerd als %FUNCTION% van %ORGAN_ABBR%.</target>
+      </trans-unit>
+      <trans-unit id="m43S9_g" resname="%MEMBER% wordt geschorst van %SINCE% tot en met %UNTIL%.">
+        <source>%MEMBER% wordt geschorst van %SINCE% tot en met %UNTIL%.</source>
+        <target state="translated">%MEMBER% wordt geschorst van %SINCE% tot en met %UNTIL%.</target>
       </trans-unit>
       <trans-unit id="ud5TMBu" resname="%MEMBER% wordt geïnstalleerd als %FUNCTION% van %ORGAN_ABBR%.">
         <source>%MEMBER% wordt geïnstalleerd als %FUNCTION% van %ORGAN_ABBR%.</source>
@@ -56,6 +48,14 @@
       <trans-unit id="jwniV8a" resname="%MEMBER% wordt per %DATE% ontheven uit de functie van %FUNCTION% der s.v. GEWIS.">
         <source>%MEMBER% wordt per %DATE% ontheven uit de functie van %FUNCTION% der s.v. GEWIS.</source>
         <target state="translated">%MEMBER% wordt per %DATE% ontheven uit de functie van %FUNCTION% der s.v. GEWIS.</target>
+      </trans-unit>
+      <trans-unit id="ea_G8Nb" resname="%MEMBER%.">
+        <source>%MEMBER%.</source>
+        <target state="translated">%MEMBER%.</target>
+      </trans-unit>
+      <trans-unit id="QBX9Cwt" resname="%ORGAN_TYPE% %ORGAN_ABBR% mag blijven voortbestaan.">
+        <source>%ORGAN_TYPE% %ORGAN_ABBR% mag blijven voortbestaan.</source>
+        <target state="translated">%ORGAN_TYPE% %ORGAN_ABBR% mag blijven voortbestaan.</target>
       </trans-unit>
       <trans-unit id="3i5Tv.K" resname="%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.">
         <source>%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.</source>
@@ -517,6 +517,18 @@
         <source>%valid% changes, %issues% issues</source>
         <target state="translated">%valid% wijzigingen, %issues% problemen</target>
       </trans-unit>
+      <trans-unit id="AoY3XHY" resname="&quot;%name%&quot; has been given a day. The activity has been started for you and still needs filling in.">
+        <source>"%name%" has been given a day. The activity has been started for you and still needs filling in.</source>
+        <target state="translated">"%name%" heeft een dag gekregen. De activiteit is voor je aangemaakt en moet nog ingevuld worden.</target>
+      </trans-unit>
+      <trans-unit id="FPSBTz3" resname="&quot;%name%&quot; has been put forward and is waiting for a day.">
+        <source>"%name%" has been put forward and is waiting for a day.</source>
+        <target state="translated">"%name%" is ingediend en wacht op een dag.</target>
+      </trans-unit>
+      <trans-unit id="3WCdvsC" resname="&quot;%name%&quot; has been turned down; its days are free again.">
+        <source>"%name%" has been turned down; its days are free again.</source>
+        <target state="translated">"%name%" is afgewezen; de dagen zijn weer vrij.</target>
+      </trans-unit>
       <trans-unit id="r0_Bmcr" resname="(bulk) renew as ordinary OR convert to graduate">
         <source>(bulk) renew as ordinary OR convert to graduate</source>
         <target state="translated">(bulk-)verleng als gewoon OF zet om naar afgestudeerde</target>
@@ -628,6 +640,10 @@
       <trans-unit id="9NmRvbs" resname="A vacancy that closes, or that you take down, drops off the career page on its own.">
         <source>A vacancy that closes, or that you take down, drops off the career page on its own.</source>
         <target state="translated">Een vacature die sluit, of die je offline haalt, verdwijnt vanzelf van de carrièrepagina.</target>
+      </trans-unit>
+      <trans-unit id="KD6UD0B" resname="A virtual meeting puts on the record what this meeting decided. Naming that decision keeps the two from being read as two, and hides it from the decision search in favour of this one.">
+        <source>A virtual meeting puts on the record what this meeting decided. Naming that decision keeps the two from being read as two, and hides it from the decision search in favour of this one.</source>
+        <target state="translated">Een virtuele vergadering legt vast wat deze vergadering besloten heeft. Door dat besluit te noemen worden de twee niet als twee gelezen, en wordt het in de besluitenzoeker verborgen ten gunste van dit besluit.</target>
       </trans-unit>
       <trans-unit id="pLS2dV0" resname="A wide variety of activities">
         <source>A wide variety of activities</source>
@@ -925,6 +941,10 @@
         <source>Add answer</source>
         <target state="translated">Antwoord toevoegen</target>
       </trans-unit>
+      <trans-unit id="UQBdpih" resname="Add candidate">
+        <source>Add candidate</source>
+        <target state="translated">Kandidaat toevoegen</target>
+      </trans-unit>
       <trans-unit id="9gQ_xmi" resname="Add documents">
         <source>Add documents</source>
         <target>Documenten toevoegen</target>
@@ -1164,6 +1184,10 @@
       <trans-unit id="CrcKB8q" resname="Already in the agenda">
         <source>Already in the agenda</source>
         <target state="translated">Staat al in de agenda</target>
+      </trans-unit>
+      <trans-unit id="E1I5elk" resname="Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings">
+        <source>Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings</source>
+        <target state="translated">Ook vastgelegd in %count% virtuele vergadering|Ook vastgelegd in %count% virtuele vergaderingen</target>
       </trans-unit>
       <trans-unit id="qh2PXfe" resname="Alternative">
         <source>Alternative</source>
@@ -1677,6 +1701,10 @@
         <source>Board Member(s) to Relieve</source>
         <target state="translated">Bestuurder(s) om te ontheffen</target>
       </trans-unit>
+      <trans-unit id="25jXj14" resname="Board Year">
+        <source>Board Year</source>
+        <target state="translated">Bestuursjaar</target>
+      </trans-unit>
       <trans-unit id="JG_49I8" resname="Board member">
         <source>Board member</source>
         <target state="translated">Bestuurslid</target>
@@ -1736,6 +1764,10 @@
       <trans-unit id="I02HUu6" resname="Borrel Policy">
         <source>Borrel Policy</source>
         <target state="translated">Borrelbeleid</target>
+      </trans-unit>
+      <trans-unit id="E.zb501" resname="Both decisions stay on the record, and %type% %number%.%point%.%decision% is answered with in the decision search again.">
+        <source>Both decisions stay on the record, and %type% %number%.%point%.%decision% is answered with in the decision search again.</source>
+        <target state="translated">Beide besluiten blijven vastgelegd, en %type% %number%.%point%.%decision% komt weer terug in de besluitenzoeker.</target>
       </trans-unit>
       <trans-unit id="pg8.RVR" resname="Brand Manager">
         <source>Brand Manager</source>
@@ -1816,6 +1848,10 @@
       <trans-unit id="uULlIlE" resname="Cancelled">
         <source>Cancelled</source>
         <target state="translated">Geannuleerd</target>
+      </trans-unit>
+      <trans-unit id="WJJE4q_" resname="Candidates">
+        <source>Candidates</source>
+        <target state="translated">Kandidaten</target>
       </trans-unit>
       <trans-unit id="X4vyX.I" resname="Cannot Delete Prospective Member">
         <source>Cannot Delete Prospective Member</source>
@@ -2269,9 +2305,17 @@
         <source>Content</source>
         <target state="translated">Inhoud</target>
       </trans-unit>
+      <trans-unit id="ZLvZpFx" resname="Continuation">
+        <source>Continuation</source>
+        <target state="translated">Voortbestaan</target>
+      </trans-unit>
       <trans-unit id="Xj30MRg" resname="Continue">
         <source>Continue</source>
         <target state="translated">Doorgaan</target>
+      </trans-unit>
+      <trans-unit id="_GXgKds" resname="Continue Body">
+        <source>Continue Body</source>
+        <target state="translated">Orgaan voortzetten</target>
       </trans-unit>
       <trans-unit id="0kOeFqp" resname="Continue your draft">
         <source>Continue your draft</source>
@@ -2344,6 +2388,10 @@
       <trans-unit id="kDhOoV8" resname="Could not save change(s) of %entity%!">
         <source>Could not save change(s) of %entity%!</source>
         <target state="translated">Kon wijziging(en) van %entity% niet opslaan!</target>
+      </trans-unit>
+      <trans-unit id="dA6J4om" resname="Counterpart of %type% %number%.%point%.%decision%">
+        <source>Counterpart of %type% %number%.%point%.%decision%</source>
+        <target state="translated">Tegenhanger van %type% %number%.%point%.%decision%</target>
       </trans-unit>
       <trans-unit id="imSItxK" resname="Country">
         <source>Country</source>
@@ -2704,6 +2752,10 @@
       <trans-unit id="7PFOWds" resname="Delete selected">
         <source>Delete selected</source>
         <target state="translated">Selectie verwijderen</target>
+      </trans-unit>
+      <trans-unit id="JeaCB9H" resname="Delete this decision?">
+        <source>Delete this decision?</source>
+        <target state="translated">Dit besluit verwijderen?</target>
       </trans-unit>
       <trans-unit id="P21LgGI" resname="Delete this news item?">
         <source>Delete this news item?</source>
@@ -3645,6 +3697,10 @@
         <source>Finish it</source>
         <target state="translated">Afmaken</target>
       </trans-unit>
+      <trans-unit id=".3YvpAU" resname="First Day">
+        <source>First Day</source>
+        <target state="translated">Eerste dag</target>
+      </trans-unit>
       <trans-unit id="BQjGS3q" resname="First Name">
         <source>First Name</source>
         <target state="translated">Voornaam</target>
@@ -3957,6 +4013,10 @@
         <source>HS512 (shared secret, legacy)</source>
         <target>HS512 (gedeeld geheim, verouderd)</target>
       </trans-unit>
+      <trans-unit id="rxGcg5d" resname="Hand a member an official warning.">
+        <source>Hand a member an official warning.</source>
+        <target state="translated">Deel een lid een officiële waarschuwing uit.</target>
+      </trans-unit>
       <trans-unit id="HBZe6l1" resname="Hand it in">
         <source>Hand it in</source>
         <target state="translated">Indienen</target>
@@ -3996,6 +4056,14 @@
       <trans-unit id="8ozef1V" resname="Het %DOCUMENTTYPE% van %NAME% door %AUTHOR%, versie %VERSION% van %DATE% wordt %APPROVAL%%CHANGES%.">
         <source>Het %DOCUMENTTYPE% van %NAME% door %AUTHOR%, versie %VERSION% van %DATE% wordt %APPROVAL%%CHANGES%.</source>
         <target state="translated">Het %DOCUMENTTYPE% van %NAME% door %AUTHOR%, versie %VERSION% van %DATE% wordt %APPROVAL%%CHANGES%.</target>
+      </trans-unit>
+      <trans-unit id="TpMENtB" resname="Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.">
+        <source>Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.</source>
+        <target state="translated">Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.</target>
+      </trans-unit>
+      <trans-unit id="70N7Dti" resname="Het bestuur stelt, op constitutievolgorde, de volgende kandidaten voor het bestuur %BOARD_YEAR%:">
+        <source>Het bestuur stelt, op constitutievolgorde, de volgende kandidaten voor het bestuur %BOARD_YEAR%:</source>
+        <target state="translated">Het bestuur stelt, op constitutievolgorde, de volgende kandidaten voor het bestuur %BOARD_YEAR%:</target>
       </trans-unit>
       <trans-unit id="bMJFh5R" resname="Hidden">
         <source>Hidden</source>
@@ -4557,6 +4625,10 @@
         <source>Lapsed</source>
         <target state="translated">Vervallen</target>
       </trans-unit>
+      <trans-unit id="kMjMOLe" resname="Last Day">
+        <source>Last Day</source>
+        <target state="translated">Laatste dag</target>
+      </trans-unit>
       <trans-unit id="0jsx_LN" resname="Last Name">
         <source>Last Name</source>
         <target state="translated">Achternaam</target>
@@ -4637,6 +4709,10 @@
         <source>Leave the start empty to begin at once, and the end empty to keep it on until you turn it off. Windows may not overlap.</source>
         <target>Laat de starttijd leeg om direct te beginnen, en de eindtijd leeg om het aan te houden totdat je het uitzet. Vensters mogen niet overlappen.</target>
       </trans-unit>
+      <trans-unit id="7ZkZcT2" resname="Let a body continue to exist.">
+        <source>Let a body continue to exist.</source>
+        <target state="translated">Laat een orgaan blijven voortbestaan.</target>
+      </trans-unit>
       <trans-unit id="psSCy6w" resname="Let back in">
         <source>Let back in</source>
         <target state="translated">Weer toelaten</target>
@@ -4672,6 +4748,22 @@
       <trans-unit id="k.FfKzl" resname="Limited capacity (%capacity%)">
         <source>Limited capacity (%capacity%)</source>
         <target>Beperkte capaciteit (%capacity%)</target>
+      </trans-unit>
+      <trans-unit id="bUwX1fD" resname="Link a virtual counterpart">
+        <source>Link a virtual counterpart</source>
+        <target state="translated">Een virtuele tegenhanger koppelen</target>
+      </trans-unit>
+      <trans-unit id="TebsUJp" resname="Link counterpart">
+        <source>Link counterpart</source>
+        <target state="translated">Tegenhanger koppelen</target>
+      </trans-unit>
+      <trans-unit id="KcWa0hQ" resname="Link virtual counterpart">
+        <source>Link virtual counterpart</source>
+        <target state="translated">Virtuele tegenhanger koppelen</target>
+      </trans-unit>
+      <trans-unit id="Nlj5zvt" resname="Link virtual decision">
+        <source>Link virtual decision</source>
+        <target state="translated">Virtueel besluit koppelen</target>
       </trans-unit>
       <trans-unit id="Dz0Nyiu" resname="Links">
         <source>Links</source>
@@ -5673,7 +5765,7 @@
         <source>No open vacancies</source>
         <target>Geen openstaande vacatures</target>
       </trans-unit>
-      <trans-unit id="0upPDPu" resname="No organising body">
+      <trans-unit id="rN5UfRc" resname="No organising body">
         <source>No organising body</source>
         <target state="translated">Geen organiserend orgaan</target>
       </trans-unit>
@@ -5804,6 +5896,10 @@
       <trans-unit id="chuO6G_" resname="Not downloadable yet">
         <source>Not downloadable yet</source>
         <target state="translated">Nog niet te downloaden</target>
+      </trans-unit>
+      <trans-unit id="RsA0_Lz" resname="Not filled in">
+        <source>Not filled in</source>
+        <target state="translated">Niet ingevuld</target>
       </trans-unit>
       <trans-unit id="9i49VgK" resname="Not found in a known data breach.">
         <source>Not found in a known data breach.</source>
@@ -6004,6 +6100,10 @@
       <trans-unit id="wBbSi_k" resname="Off">
         <source>Off</source>
         <target state="translated">Uit</target>
+      </trans-unit>
+      <trans-unit id="z2Dcgex" resname="Official Warning">
+        <source>Official Warning</source>
+        <target state="translated">Officiële waarschuwing</target>
       </trans-unit>
       <trans-unit id="fm8k4L1" resname="Oh no! Something went wrong :(">
         <source>Oh no! Something went wrong :(</source>
@@ -6221,13 +6321,17 @@
         <source>Organisers</source>
         <target state="translated">Organisatoren</target>
       </trans-unit>
-      <trans-unit id="PK.ewBR" resname="Organising body">
+      <trans-unit id="_R1iLbW" resname="Organising body">
         <source>Organising body</source>
         <target state="translated">Organiserend orgaan</target>
       </trans-unit>
       <trans-unit id="xer5g4K" resname="Organising company">
         <source>Organising company</source>
         <target state="translated">Organiserend bedrijf</target>
+      </trans-unit>
+      <trans-unit id="PK.ewBR" resname="Organising organ">
+        <source>Organising organ</source>
+        <target state="translated">Organiserend orgaan</target>
       </trans-unit>
       <trans-unit id="zvvKAKp" resname="Organising party">
         <source>Organising party</source>
@@ -6805,6 +6909,14 @@
         <source>Purpose</source>
         <target state="translated">Doel</target>
       </trans-unit>
+      <trans-unit id="wLO7geI" resname="Put Candidates Forward">
+        <source>Put Candidates Forward</source>
+        <target state="translated">Kandidaten stellen</target>
+      </trans-unit>
+      <trans-unit id="TcJFiAL" resname="Put candidates forward for a coming board.">
+        <source>Put candidates forward for a coming board.</source>
+        <target state="translated">Stel kandidaten voor een komend bestuur.</target>
+      </trans-unit>
       <trans-unit id="IE0v1jr" resname="Put the day you would rather have first. The board picks one of them.">
         <source>Put the day you would rather have first. The board picks one of them.</source>
         <target state="translated">Zet de dag van je voorkeur bovenaan. Het bestuur kiest er één.</target>
@@ -7065,6 +7177,10 @@
         <source>Remove answer</source>
         <target state="translated">Antwoord verwijderen</target>
       </trans-unit>
+      <trans-unit id="qwixbPF" resname="Remove candidate">
+        <source>Remove candidate</source>
+        <target state="translated">Kandidaat verwijderen</target>
+      </trans-unit>
       <trans-unit id=".6NMI10" resname="Remove course">
         <source>Remove course</source>
         <target state="translated">Vak verwijderen</target>
@@ -7212,6 +7328,14 @@
       <trans-unit id="0GpRD.b" resname="Repeat password">
         <source>Repeat password</source>
         <target state="translated">Wachtwoord herhalen</target>
+      </trans-unit>
+      <trans-unit id=".0FEbsd" resname="Repeated by %type% %number%.%point%.%decision%">
+        <source>Repeated by %type% %number%.%point%.%decision%</source>
+        <target state="translated">Herhaald door %type% %number%.%point%.%decision%</target>
+      </trans-unit>
+      <trans-unit id="DvFM3dn" resname="Repeats %type% %number%.%point%.%decision%">
+        <source>Repeats %type% %number%.%point%.%decision%</source>
+        <target state="translated">Herhaalt %type% %number%.%point%.%decision%</target>
       </trans-unit>
       <trans-unit id="FcC7urS" resname="Reply">
         <source>Reply</source>
@@ -7665,11 +7789,11 @@
         <source>Select a body</source>
         <target state="translated">Kies een orgaan</target>
       </trans-unit>
-      <trans-unit id="Ub2kZ9c" resname="Select a category">
+      <trans-unit id="Ag80cSu" resname="Select a category">
         <source>Select a category</source>
         <target state="translated">Kies een categorie</target>
       </trans-unit>
-      <trans-unit id="Qm4vT1x" resname="Select a company">
+      <trans-unit id="McFnbou" resname="Select a company">
         <source>Select a company</source>
         <target state="translated">Kies een bedrijf</target>
       </trans-unit>
@@ -8001,6 +8125,10 @@
         <source>Some of the entered information appears to be missing or incorrect. Please check your data and submit again.</source>
         <target state="translated">Een deel van de ingevoerde informatie lijkt te missen of is onjuist. Controleer de data en verstuur het formulier opnieuw.</target>
       </trans-unit>
+      <trans-unit id="eKw5uFX" resname="Some of the entered information is missing or incorrect.">
+        <source>Some of the entered information is missing or incorrect.</source>
+        <target state="translated">Een deel van de ingevulde gegevens ontbreekt of klopt niet.</target>
+      </trans-unit>
       <trans-unit id="LTyr6e2" resname="Somebody else is editing %subject% right now.">
         <source>Somebody else is editing %subject% right now.</source>
         <target state="translated">Iemand anders is %subject% op dit moment aan het bewerken.</target>
@@ -8127,7 +8255,7 @@
       </trans-unit>
       <trans-unit id="d0B5Saa" resname="Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.">
         <source>Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.</source>
-        <target state="translated">Sterk: we tellen hoe moeilijk het te raden is, niet of er een hoofdletter, cijfer en symbool in zit. Gewone woorden, namen, datums en reeksen zoals &lt;code&gt;qwerty&lt;/code&gt; of &lt;code&gt;Passw0rd!&lt;/code&gt; scoren laag.</target>
+        <target state="translated"><![CDATA[Sterk: we tellen hoe moeilijk het te raden is, niet of er een hoofdletter, cijfer en symbool in zit. Gewone woorden, namen, datums en reeksen zoals <code>qwerty</code> of <code>Passw0rd!</code> scoren laag.]]></target>
       </trans-unit>
       <trans-unit id="Z3JKRRe" resname="Student Address">
         <source>Student Address</source>
@@ -8240,6 +8368,18 @@
       <trans-unit id="R34wcDm" resname="Supremum">
         <source>Supremum</source>
         <target state="translated">Supremum</target>
+      </trans-unit>
+      <trans-unit id="TLbWfSB" resname="Suspend Member">
+        <source>Suspend Member</source>
+        <target state="translated">Lid schorsen</target>
+      </trans-unit>
+      <trans-unit id="hYdj4Oh" resname="Suspend a member for a period.">
+        <source>Suspend a member for a period.</source>
+        <target state="translated">Schors een lid voor een periode.</target>
+      </trans-unit>
+      <trans-unit id="kpIW36G" resname="Suspension">
+        <source>Suspension</source>
+        <target state="translated">Schorsing</target>
       </trans-unit>
       <trans-unit id="aVW9SPQ" resname="Sync in progress">
         <source>Sync in progress</source>
@@ -8657,6 +8797,10 @@
         <source>The external subscriber has been added.</source>
         <target>De externe inschrijver is toegevoegd.</target>
       </trans-unit>
+      <trans-unit id="yObrSwo" resname="The first of the two years, so 2026 for the board of 2026 - 2027.">
+        <source>The first of the two years, so 2026 for the board of 2026 - 2027.</source>
+        <target state="translated">Het eerste van de twee jaren, dus 2026 voor het bestuur van 2026 - 2027.</target>
+      </trans-unit>
       <trans-unit id="o3N.0Uq" resname="The image to crop">
         <source>The image to crop</source>
         <target state="translated">De afbeelding om bij te snijden</target>
@@ -9049,6 +9193,10 @@
         <source>These lose their day if the financial side is not settled in time. Record an approved budget, or that there is no budget to approve.</source>
         <target state="translated">Deze verliezen hun dag als het financiële deel niet op tijd geregeld is. Leg een goedgekeurde begroting vast, of dat er geen begroting goed te keuren is.</target>
       </trans-unit>
+      <trans-unit id="EoPLYae" resname="These two decisions cannot be one another's counterpart.">
+        <source>These two decisions cannot be one another's counterpart.</source>
+        <target state="translated">Deze twee besluiten kunnen niet elkaars tegenhanger zijn.</target>
+      </trans-unit>
       <trans-unit id="MvzWOfp" resname="Thesis project">
         <source>Thesis project</source>
         <target>Afstudeerproject</target>
@@ -9165,9 +9313,21 @@
         <source>This course is listed but empty. If you kept your notes, sending them in takes a minute and saves the next cohort a weekend.</source>
         <target state="translated">Dit vak staat in de lijst maar is leeg. Heb je je aantekeningen bewaard, dan kost opsturen een minuut en scheelt het volgende cohort een weekend.</target>
       </trans-unit>
+      <trans-unit id="jUse04l" resname="This decision cannot be said to repeat that one.">
+        <source>This decision cannot be said to repeat that one.</source>
+        <target state="translated">Van dit besluit kan niet gezegd worden dat het dat besluit herhaalt.</target>
+      </trans-unit>
       <trans-unit id="I6hgvcK" resname="This decision has already been annulled.">
         <source>This decision has already been annulled.</source>
         <target state="translated">Dit besluit is al vernietigd.</target>
+      </trans-unit>
+      <trans-unit id="FoiA9X1" resname="This decision names a member who has been deleted, and is what their record is kept for.">
+        <source>This decision names a member who has been deleted, and is what their record is kept for.</source>
+        <target state="translated">Dit besluit noemt een lid dat verwijderd is, en is waarvoor hun gegevens bewaard worden.</target>
+      </trans-unit>
+      <trans-unit id="G1w32hn" resname="This decision no longer exists.">
+        <source>This decision no longer exists.</source>
+        <target state="translated">Dit besluit bestaat niet meer.</target>
       </trans-unit>
       <trans-unit id="pvQxQCC" resname="This deletes %name% and everything on record about them.">
         <source>This deletes %name% and everything on record about them.</source>
@@ -9629,6 +9789,14 @@
         <source>Unknown reason</source>
         <target state="translated">Reden onbekend</target>
       </trans-unit>
+      <trans-unit id="_c9YbkL" resname="Unlink">
+        <source>Unlink</source>
+        <target state="translated">Ontkoppelen</target>
+      </trans-unit>
+      <trans-unit id="hGeuCbc" resname="Unlink this counterpart?">
+        <source>Unlink this counterpart?</source>
+        <target state="translated">Deze tegenhanger ontkoppelen?</target>
+      </trans-unit>
       <trans-unit id="tTYXtrf" resname="Unpublish">
         <source>Unpublish</source>
         <target state="translated">Depubliceren</target>
@@ -9885,6 +10053,14 @@
         <source>Virtual Meeting</source>
         <target state="translated">Virtuele Vergadering</target>
       </trans-unit>
+      <trans-unit id="CdmbeoM" resname="Virtual counterpart %type% %number%.%point%.%decision%">
+        <source>Virtual counterpart %type% %number%.%point%.%decision%</source>
+        <target state="translated">Virtuele tegenhanger %type% %number%.%point%.%decision%</target>
+      </trans-unit>
+      <trans-unit id="DLPKSqP" resname="Virtual decision">
+        <source>Virtual decision</source>
+        <target state="translated">Virtueel besluit</target>
+      </trans-unit>
       <trans-unit id="e489ss4" resname="Visibility">
         <source>Visibility</source>
         <target state="translated">Zichtbaarheid</target>
@@ -9980,6 +10156,10 @@
       <trans-unit id="8WNxAmi" resname="Wants to receive the Supremum.">
         <source>Wants to receive the Supremum.</source>
         <target state="translated">Wil de Supremum ontvangen.</target>
+      </trans-unit>
+      <trans-unit id="iMtvGkN" resname="Warn Member">
+        <source>Warn Member</source>
+        <target state="translated">Lid waarschuwen</target>
       </trans-unit>
       <trans-unit id="V9XnrRt" resname="Warning">
         <source>Warning</source>
@@ -10228,6 +10408,10 @@
       <trans-unit id="klYLh_k" resname="Which is basically the same thing.">
         <source>Which is basically the same thing.</source>
         <target state="translated">Wat in feite hetzelfde is.</target>
+      </trans-unit>
+      <trans-unit id="kv89K6a" resname="Which virtual decision repeats this?">
+        <source>Which virtual decision repeats this?</source>
+        <target state="translated">Welk virtueel besluit herhaalt dit besluit?</target>
       </trans-unit>
       <trans-unit id="WRiNbfh" resname="Who and when">
         <source>Who and when</source>
