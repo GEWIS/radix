@@ -32,11 +32,11 @@
                             <div class="form-floating mb-2">
                                 <input type="text" value="{{ last_username }}" placeholder="{{ 'jane.doe@example.com'|trans }}" name="_username" id="username" class="form-control{% if error %} is-invalid{% endif %}" autocomplete="username" required autofocus>
                                 <label class="required" for="username">
-                                    {% if 'user' === type %}
+                                    {%- if 'user' === type -%}
                                         {{ 'Email address or membership number'|trans }}
-                                    {% else %}
+                                    {%- else -%}
                                         {{ 'Email address'|trans }}
-                                    {% endif %}
+                                    {%- endif -%}
                                 </label>
                             </div>
                             <div class="form-floating mb-2">
