@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Form\Database\MemberApproveType;
 use App\Form\Database\MemberRenewalType;
-use App\Form\Database\RegistrationType;
+use App\Form\Database\Registration\RegistrationData;
+use App\Form\Database\Registration\RegistrationFlowType;
 use App\Security\User\SudoVoter;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\ProspectiveMemberRemoval;
+use App\Service\Database\RegistrationFailure;
 use App\Service\Database\RegistrationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -22,6 +25,8 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function assert;
+
 /**
  * Everyone who has registered but whose membership the secretary has not confirmed yet, from the public sign-up form
  * that creates them to the moment they become a member or are removed again.
@@ -32,6 +37,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class ProspectiveMemberController extends AbstractController
 {
+    use HandlesFormFlowTrait;
+
     public function __construct(
         private readonly MemberService $memberService,
         private readonly RegistrationService $registrationService,
@@ -66,43 +73,61 @@ final class ProspectiveMemberController extends AbstractController
             return $this->render('database/join/subscribe-disabled.html.twig');
         }
 
-        $form = $this->createForm(
-            RegistrationType::class,
-            null,
-            [
-                'mailing_lists' => $this->registrationService->getMailingListsOnForm(),
-            ],
+        $mailingLists = $this->registrationService->getMailingListsOnForm();
+        $flow = $this->createFlow(
+            RegistrationFlowType::class,
+            RegistrationData::subscribedByDefault($mailingLists),
+            ['mailing_lists' => $mailingLists],
         );
-        $form->handleRequest($request);
+        $flow->handleRequest($request);
 
-        if (
-            $form->isSubmitted()
-            && $form->isValid()
-        ) {
-            $checkoutUrl = $this->registrationService->register($form);
+        if ($flow->isFinished()) {
+            $data = $flow->getData();
+            assert($data instanceof RegistrationData);
 
-            if (null !== $checkoutUrl) {
-                // Rendered rather than answered with a 303, because the Chromium CSP enforcer does not allow a
-                // redirect after a POST.
-                return $this->render(
-                    'database/application/redirect.html.twig',
-                    [
-                        'destination' => $this->translator->trans('our payment provider'),
-                        'url' => $checkoutUrl,
-                    ],
+            $result = $this->registrationService->register($data);
+
+            if (RegistrationFailure::EmailTaken === $result) {
+                // Taken while the rest of the form was being filled in. Nothing was stored, so the flow keeps what
+                // was entered and reopens at the step that has to be corrected.
+                $flow->movePrevious(RegistrationData::STEP_PERSONAL);
+                $this->addFlash(
+                    'error',
+                    $this->translator->trans('There already is a member with this e-mail address.'),
+                );
+
+                return $this->redirectToRoute(
+                    'join_index',
+                    ['_locale' => $request->getLocale()],
                 );
             }
 
-            // A registration that is rejected leaves its reason on the form; one that is still valid was stored and
-            // only lacks a checkout page, which the e-mail that just went out can restart.
-            if ($form->isValid()) {
+            $flow->reset();
+
+            // Stored, but without a checkout page; the e-mail that just went out can restart it.
+            if (RegistrationFailure::CheckoutUnavailable === $result) {
                 return $this->redirectToRoute('join_checkout_error');
             }
+
+            // Rendered rather than answered with a 303, because the Chromium CSP enforcer does not allow a
+            // redirect after a POST.
+            return $this->render(
+                'database/application/redirect.html.twig',
+                [
+                    'destination' => $this->translator->trans('our payment provider'),
+                    'url' => $result,
+                ],
+            );
         }
+
+        $this->flashRejectedStep(
+            $flow,
+            $this->translator,
+        );
 
         return $this->render(
             'database/join/subscribe.html.twig',
-            ['form' => $form],
+            ['form' => $flow->getStepForm()],
         );
     }
 

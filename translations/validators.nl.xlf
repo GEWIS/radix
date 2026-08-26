@@ -57,6 +57,18 @@
         <source>At least one language must be used.</source>
         <target>Er moet ten minste één taal worden gebruikt.</target>
       </trans-unit>
+      <trans-unit id="Kq2sBvA" resname="Choose a category.">
+        <source>Choose a category.</source>
+        <target state="translated">Kies een categorie.</target>
+      </trans-unit>
+      <trans-unit id="Lp7dRc2" resname="Choose an organising body, or say there is none.">
+        <source>Choose an organising body, or say there is none.</source>
+        <target state="translated">Kies een organiserend orgaan, of geef aan dat er geen is.</target>
+      </trans-unit>
+      <trans-unit id="Mz3hWq8" resname="Choose an organising company, or say there is none.">
+        <source>Choose an organising company, or say there is none.</source>
+        <target state="translated">Kies een organiserend bedrijf, of geef aan dat er geen is.</target>
+      </trans-unit>
       <trans-unit id="O2fBMa4" resname="Choose an image to upload.">
         <source>Choose an image to upload.</source>
         <target state="translated">Kies een afbeelding om te uploaden.</target>

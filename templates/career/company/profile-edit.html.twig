@@ -32,7 +32,7 @@
                  data-edit-lock-lost-message-value="{{ 'You no longer hold the edit lock; it was taken over or expired. Reload the page to continue editing.'|trans }}">
                 {% include 'partials/career/company-form.html.twig' with {
                     'form': form,
-                    'submitLabel': 'Save draft'|trans,
+                    'revision': company.currentRevision,
                     'cancelUrl': path('company/profile'),
                 } only %}
             </div>

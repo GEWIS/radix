@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Frontpage;
 
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ImageProfile;
 use App\Entity\Application\Enums\ImageVariant;
@@ -12,7 +13,8 @@ use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Frontpage\FrontpageLocalisedText;
 use App\Entity\Frontpage\Page;
 use App\Entity\User\Enums\UserRoles;
-use App\Form\Frontpage\PageType;
+use App\Form\Frontpage\Page\PageData;
+use App\Form\Frontpage\Page\PageFlowType;
 use App\Message\Photo\ProcessImageVariantsMessage;
 use App\Repository\Frontpage\PageRepository;
 use App\Service\Application\FileStorage;
@@ -23,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -31,6 +34,7 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function assert;
 use function strval;
 use function usort;
 
@@ -47,6 +51,8 @@ use function usort;
 #[IsGranted(UserRoles::Board->value)]
 class AdminPageController extends AbstractController
 {
+    use HandlesFormFlowTrait;
+
     public function __construct(
         private readonly PageRepository $pageRepository,
         private readonly PageAdminService $pageAdminService,
@@ -87,29 +93,44 @@ class AdminPageController extends AbstractController
         $page->setContent(new FrontpageLocalisedText());
         $page->setRequiredRole(UserRoles::Guest);
 
-        $form = $this->createForm(
-            PageType::class,
-            $page,
-        )->handleRequest($request);
+        $run = $this->flowRun($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
-            return $this->render(
-                'frontpage/admin/pages/create.html.twig',
-                ['form' => $form],
-            );
+        if ($run instanceof RedirectResponse) {
+            return $run;
         }
 
-        $this->pageAdminService->save($page);
+        $flow = $this->createFlow(
+            PageFlowType::class,
+            new PageData(),
+            ['flow_key' => $run],
+        );
+        $flow->handleRequest($request);
 
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('The page was created.'),
+        if ($flow->isFinished()) {
+            $data = $flow->getData();
+            assert($data instanceof PageData);
+
+            $data->applyTo($page);
+            $this->pageAdminService->save($page);
+            $flow->reset();
+
+            $this->addFlash(
+                AlertTypes::Success->value,
+                $this->translator->trans('The page was created.'),
+            );
+
+            return $this->redirectToRoute('admin/frontpage/pages/index');
+        }
+
+        $this->flashRejectedStep(
+            $flow,
+            $this->translator,
         );
 
-        return $this->redirectToRoute('admin/frontpage/pages/index');
+        return $this->render(
+            'frontpage/admin/pages/create.html.twig',
+            ['form' => $flow->getStepForm()],
+        );
     }
 
     #[Route(
@@ -125,32 +146,50 @@ class AdminPageController extends AbstractController
         Request $request,
         Page $page,
     ): Response {
-        $form = $this->createForm(
-            PageType::class,
-            $page,
-        )->handleRequest($request);
+        $run = $this->flowRun($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
-            return $this->render(
-                'frontpage/admin/pages/edit.html.twig',
-                [
-                    'form' => $form,
-                    'customPage' => $page,
-                ],
-            );
+        if ($run instanceof RedirectResponse) {
+            return $run;
         }
 
-        $this->pageAdminService->save($page);
+        $flow = $this->createFlow(
+            PageFlowType::class,
+            PageData::fromEntity($page),
+            [
+                'flow_key' => $run,
+                'role_editable' => UserRoles::ApiUser !== $page->getRequiredRole(),
+            ],
+        );
+        $flow->handleRequest($request);
 
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('The page was saved.'),
+        if ($flow->isFinished()) {
+            $data = $flow->getData();
+            assert($data instanceof PageData);
+
+            $data->applyTo($page);
+            $this->pageAdminService->save($page);
+            $flow->reset();
+
+            $this->addFlash(
+                AlertTypes::Success->value,
+                $this->translator->trans('The page was saved.'),
+            );
+
+            return $this->redirectToRoute('admin/frontpage/pages/index');
+        }
+
+        $this->flashRejectedStep(
+            $flow,
+            $this->translator,
         );
 
-        return $this->redirectToRoute('admin/frontpage/pages/index');
+        return $this->render(
+            'frontpage/admin/pages/edit.html.twig',
+            [
+                'form' => $flow->getStepForm(),
+                'customPage' => $page,
+            ],
+        );
     }
 
     #[Route(

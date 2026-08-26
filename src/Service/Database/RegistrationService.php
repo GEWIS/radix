@@ -6,12 +6,12 @@ namespace App\Service\Database;
 
 use App\Entity\Database\MailingList;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
+use App\Form\Database\Registration\RegistrationData;
 use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\MailingListRepository;
 use App\Repository\Database\ProspectiveMemberRepository;
 use App\Service\Database\Member as MemberService;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -77,17 +77,14 @@ class RegistrationService
     }
 
     /**
-     * Register a prospective member from the submitted registration form and return the URL of their checkout page.
-     *
-     * Returns `null` when the registration was rejected (the form carries the reason) or when no checkout page could
-     * be created for it.
+     * Register a prospective member from what the sign-up flow collected and return the URL of their checkout page.
      */
-    public function register(FormInterface $form): ?string
+    public function register(RegistrationData $data): string|RegistrationFailure
     {
-        $prospectiveMember = $this->memberService->subscribe($form);
+        $prospectiveMember = $this->memberService->subscribe($data);
 
         if (null === $prospectiveMember) {
-            return null;
+            return RegistrationFailure::EmailTaken;
         }
 
         // Always sent, and sent before the checkout is created: it contains a payment link of its own, which is the
@@ -97,7 +94,8 @@ class RegistrationService
             RegistrationUpdate::Registration,
         );
 
-        return $this->stripeService->getCheckoutLink($prospectiveMember);
+        return $this->stripeService->getCheckoutLink($prospectiveMember)
+            ?? RegistrationFailure::CheckoutUnavailable;
     }
 
     /**

@@ -8,7 +8,6 @@ import DescriptionToggleController from './controllers/application/description_t
 import DismissibleController from './controllers/application/dismissible_controller.ts';
 import EditLockController from './controllers/application/edit_lock_controller.ts';
 import FormCollectionController from './controllers/application/form_collection_controller.ts';
-import FormStepperController from './controllers/application/form_stepper_controller.ts';
 import ImageCropController from './controllers/application/image_crop_controller.ts';
 import InfiniteScrollController from './controllers/application/infinite_scroll_controller.ts';
 import LocalisedFieldsController from './controllers/application/localised_fields_controller.ts';
@@ -53,7 +52,6 @@ import SubDecisionChoiceController from './controllers/decision/subdecision_choi
 
 // Join-specific controllers.
 import InitialsController from './controllers/join/initials_controller.ts';
-import RegistrationReviewController from './controllers/join/registration_review_controller.ts';
 import StudyNoticeController from './controllers/join/study_notice_controller.ts';
 
 // Photo-specific controllers.
@@ -67,8 +65,8 @@ import QueryEditorController from './controllers/query/query_editor_controller.t
 
 const app = startStimulusApp();
 
-// Registered with flat identifiers so the templates keep using `data-controller="form-stepper"` etc. despite the
-// subdirectories -- the path-based autoload would otherwise namespace them (e.g. `application--form-stepper`). The
+// Registered with flat identifiers so the templates keep using `data-controller="localised-fields"` etc. despite the
+// subdirectories -- the path-based autoload would otherwise namespace them (e.g. `application--localised-fields`). The
 // framework-scaffolded csrf_protection controller stays at the controllers/ root and autoloads as `csrf-protection`.
 app.register('confirm-modal', ConfirmModalController);
 app.register('copy', CopyController);
@@ -77,7 +75,6 @@ app.register('description-toggle', DescriptionToggleController);
 app.register('dismissible', DismissibleController);
 app.register('edit-lock', EditLockController);
 app.register('form-collection', FormCollectionController);
-app.register('form-stepper', FormStepperController);
 app.register('image-crop', ImageCropController);
 app.register('infinite-scroll', InfiniteScrollController);
 app.register('localised-fields', LocalisedFieldsController);
@@ -117,7 +114,6 @@ app.register('revision-filter', RevisionFilterController);
 app.register('subdecision-choice', SubDecisionChoiceController);
 
 app.register('initials', InitialsController);
-app.register('registration-review', RegistrationReviewController);
 app.register('study-notice', StudyNoticeController);
 
 app.register('album-search', AlbumSearchController);

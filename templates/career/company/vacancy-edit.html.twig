@@ -34,14 +34,12 @@
                      data-edit-lock-lost-message-value="{{ 'You no longer hold the edit lock; it was taken over or expired. Reload the page to continue editing.'|trans }}">
                     {% include 'partials/career/vacancy-form.html.twig' with {
                         'form': form,
-                        'submitLabel': 'Save draft'|trans,
                         'cancelUrl': path('company/vacancies'),
                     } only %}
                 </div>
             {% else %}
                 {% include 'partials/career/vacancy-form.html.twig' with {
                     'form': form,
-                    'submitLabel': 'Save draft'|trans,
                     'cancelUrl': path('company/vacancies'),
                 } only %}
             {% endif %}

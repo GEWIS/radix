@@ -30,16 +30,23 @@ export default class extends Controller {
     }
 
     apply(): void {
-        this.dutchTargets.forEach((field) => { field.disabled = !this.dutchEnabled(); });
-        this.englishTargets.forEach((field) => { field.disabled = !this.englishEnabled(); });
+        this.dutchTargets.forEach((field) => { this.enable(field, this.dutchEnabled()); });
+        this.englishTargets.forEach((field) => { this.enable(field, this.englishEnabled()); });
     }
 
     dutchTargetConnected(field: LocalisedField): void {
-        field.disabled = !this.dutchEnabled();
+        this.enable(field, this.dutchEnabled());
     }
 
     englishTargetConnected(field: LocalisedField): void {
-        field.disabled = !this.englishEnabled();
+        this.enable(field, this.englishEnabled());
+    }
+
+    // An enabled language has to be filled in, which the label says with the same asterisk every other required field
+    // carries. The server marks nothing here, because a disabled variant is never submitted.
+    enable(field: LocalisedField, enabled: boolean): void {
+        field.disabled = !enabled;
+        Array.from(field.labels ?? []).forEach((label) => { label.classList.toggle('required', enabled); });
     }
 
     dutchEnabled(): boolean {

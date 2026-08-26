@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\Event\GuardEvent;
  *    form). Recovery: reject/close the in-flight revision, or discard it back to the live version.
  *  - a *brand-new* activity awaiting its first publication (no live revision yet) is blocked once its own *start*
  *    has passed: one that has already started can never debut, since its sign-up lists close before it begins.
- *    Recovery: its start stays editable ({@see \App\Form\Activity\ActivityRevisionType}), so the organiser
+ *    Recovery: its start stays editable ({@see \App\Form\Activity\ActivityFlow\GeneralStepType}), so the organiser
  *    re-dates the draft into the future and resubmits.
  *
  * The controller already refuses to open a passed live activity for editing

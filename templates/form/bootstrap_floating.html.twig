@@ -72,3 +72,15 @@
     {% set attr = attr|merge({class: attr.class|default('btn-gewis-primary')|trim}) %}
     {{ parent() }}
 {% endblock %}
+
+{#
+    An option of an expanded choice inherits the group's `required`, so leaving it set puts the asterisk on every
+    radio in the list instead of once on the group. The group's own label keeps it; a standalone checkbox, which has
+    no group label, keeps its own.
+#}
+{% block checkbox_radio_label %}
+    {% if parent_label_class is defined %}
+        {% set required = false %}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

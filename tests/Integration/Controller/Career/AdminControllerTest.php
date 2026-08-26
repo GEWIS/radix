@@ -77,7 +77,7 @@ final class AdminControllerTest extends DatabaseTestCase
         $this->entityManager->flush();
 
         $response = $this->controller()->edit(
-            new Request(),
+            new Request(query: ['flow' => 'testing']),
             $company,
             $this->user(),
         );
@@ -206,7 +206,7 @@ final class AdminControllerTest extends DatabaseTestCase
     private function renderEdit(Company $company): string
     {
         return (string) $this->controller()->edit(
-            new Request(),
+            new Request(query: ['flow' => 'testing']),
             $company,
             $this->user(),
         )->getContent();

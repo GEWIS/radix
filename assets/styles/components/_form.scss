@@ -94,6 +94,14 @@
     }
 }
 
+// A required field says so in its label. Symfony puts `required` on the label of every row it marks required, the
+// floating ones included.
+label.required::after,
+legend.required::after {
+    content: "*";
+    color: $gewis-red;
+}
+
 // Brand the selection controls (checkboxes, radios, switches) with the GEWIS red instead of Bootstrap's primary blue,
 // and keep the switch legible on the night theme -- there its off-state thumb, a near-black circle, disappears against
 // the dark track. Bootstrap exposes that thumb as the `--#{$prefix}form-switch-bg` custom property (an inline SVG), so

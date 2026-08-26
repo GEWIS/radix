@@ -36,7 +36,7 @@
                                minlength="6" maxlength="6"
                                autocomplete="one-time-code"
                                required autofocus>
-                        <label for="mfa_code">{{ 'auth_code'|trans({}, 'SchebTwoFactorBundle') }}</label>
+                        <label class="required" for="mfa_code">{{ 'auth_code'|trans({}, 'SchebTwoFactorBundle') }}</label>
                         {{ form_errors(form.code) }}
                     </div>
 

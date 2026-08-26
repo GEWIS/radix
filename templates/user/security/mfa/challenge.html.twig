@@ -29,7 +29,7 @@
                                pattern="\d{6}|[0-9a-f]{16}"
                                title="{{ 'Enter a 6-digit authenticator code or a 16-character lowercase-hex backup code.'|trans }}"
                                required autofocus>
-                        <label for="_auth_code">{{ 'auth_code'|trans({}, 'SchebTwoFactorBundle') }}</label>
+                        <label class="required" for="_auth_code">{{ 'auth_code'|trans({}, 'SchebTwoFactorBundle') }}</label>
                         {% if authenticationError %}
                             <div class="invalid-feedback d-block">
                                 {{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}

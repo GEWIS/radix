@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Career;
 
 use App\Controller\Application\AbstractRevisionReviewController;
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ReviseRefusal;
@@ -13,7 +14,8 @@ use App\Entity\Career\Company;
 use App\Entity\Career\CompanyRevision;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\UserRoles;
-use App\Form\Career\CompanyType;
+use App\Form\Career\CompanyProfile\CompanyProfileData;
+use App\Form\Career\CompanyProfile\CompanyProfileFlowType;
 use App\Repository\Career\CompanyAuditLogRepository;
 use App\Repository\Career\CompanyRevisionCommentRepository;
 use App\Security\Application\RevisionVoter;
@@ -24,6 +26,7 @@ use Override;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -50,6 +53,7 @@ use function assert;
 )]
 class CompanyProfileController extends AbstractRevisionReviewController
 {
+    use HandlesFormFlowTrait;
     use HoldsEditLockTrait;
 
     public function __construct(
@@ -131,28 +135,54 @@ class CompanyProfileController extends AbstractRevisionReviewController
             );
         }
 
-        $form = $this->createForm(
-            CompanyType::class,
-            $company,
-        )->handleRequest($request);
+        $run = $this->flowRun($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
+        $flow = $this->createFlow(
+            CompanyProfileFlowType::class,
+            CompanyProfileData::fromCompany(
+                $company,
+                $current,
+            ),
+            [
+                'flow_key' => $run,
+                'finish_label' => $this->translator->trans('Save draft'),
+                'has_square_logo' => null !== $current->getSquareLogo(),
+                'has_banner_logo' => null !== $current->getBannerLogo(),
+            ],
+        );
+        $flow->handleRequest($request);
+
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/company/profile-edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'company' => $company,
                     'comments' => $this->commentRepository->findThreadForCompany($company),
                 ],
             );
         }
 
-        $revisionForm = $form->get('currentRevision');
-        $square = $revisionForm->get('squareLogoFile')->getData();
-        $banner = $revisionForm->get('bannerLogoFile')->getData();
+        $data = $flow->getData();
+        assert($data instanceof CompanyProfileData);
+        $data->applyTo(
+            $company,
+            $current,
+            false,
+        );
+
+        $logoForm = $flow->get(CompanyProfileData::STEP_LOGO);
+        $square = $logoForm->get('squareLogoFile')->getData();
+        $banner = $logoForm->get('bannerLogoFile')->getData();
 
         $stored = $this->companyDraftService->saveDraft(
             $company,
@@ -161,6 +191,7 @@ class CompanyProfileController extends AbstractRevisionReviewController
             $square instanceof UploadedFile ? $square : null,
             $banner instanceof UploadedFile ? $banner : null,
         );
+        $flow->reset();
 
         if (!$stored) {
             $this->addFlash(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ReviseRefusal;
@@ -11,16 +12,19 @@ use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
-use App\Form\Career\VacancyType;
+use App\Form\Career\VacancyProfile\VacancyData;
+use App\Form\Career\VacancyProfile\VacancyFlowType;
 use App\Repository\Career\VacancyRevisionCommentRepository;
 use App\Repository\Career\VacancyRevisionRepository;
 use App\Security\Application\RevisionVoter;
 use App\Service\Application\RevisionReviewService;
 use App\Service\Career\CareerOverviewCountsProvider;
 use App\Service\Career\VacancyDraftService;
+use App\Service\Career\VacancyFormMapper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,6 +32,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function assert;
 
 /**
  * Vacancies across every company, from the board's side. Like a company profile, a vacancy is revised rather than
@@ -43,6 +49,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class AdminVacancyController extends AbstractController
 {
+    use HandlesFormFlowTrait;
     use HoldsEditLockTrait;
 
     public function __construct(
@@ -51,6 +58,7 @@ class AdminVacancyController extends AbstractController
         private readonly VacancyRevisionCommentRepository $commentRepository,
         private readonly RevisionReviewService $revisionReviewService,
         private readonly TranslatorInterface $translator,
+        private readonly VacancyFormMapper $vacancyFormMapper,
         private readonly VacancyDraftService $vacancyDraftService,
     ) {
     }
@@ -91,26 +99,50 @@ class AdminVacancyController extends AbstractController
         $vacancy->addRevision($revision);
         $vacancy->setCurrentRevision($revision);
 
-        $form = $this->createForm(
-            VacancyType::class,
-            $vacancy,
-            ['admin' => true],
-        )->handleRequest($request);
+        $run = $this->flowRun($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
+        $flow = $this->createFlow(
+            VacancyFlowType::class,
+            new VacancyData(),
+            [
+                'admin' => true,
+                'flow_key' => $run,
+                'finish_label' => $this->translator->trans('Save draft'),
+            ],
+        );
+        $flow->handleRequest($request);
+
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/admin/vacancies/create.html.twig',
-                ['form' => $form],
+                ['form' => $flow->getStepForm()],
             );
         }
+
+        $data = $flow->getData();
+        assert($data instanceof VacancyData);
+        $this->vacancyFormMapper->apply(
+            $data,
+            $vacancy,
+            $revision,
+            true,
+            true,
+        );
 
         $this->vacancyDraftService->createDraft(
             $vacancy,
             $revision,
         );
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -216,34 +248,60 @@ class AdminVacancyController extends AbstractController
 
         // A vacancy belongs to whichever company sold the package it hangs off, so leaving the choice open would let
         // an edit hand the posting to somebody else. Creating one is where that choice is actually made.
-        $form = $this->createForm(
-            VacancyType::class,
-            $vacancy,
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
+        $flow = $this->createFlow(
+            VacancyFlowType::class,
+            VacancyData::fromVacancy(
+                $vacancy,
+                $current,
+            ),
             [
                 'admin' => true,
                 'company' => $vacancy->getCompany(),
+                'current_package_id' => $vacancy->getPackage()->getId(),
+                'flow_key' => $run,
+                'finish_label' => $this->translator->trans('Save changes'),
             ],
-        )->handleRequest($request);
+        );
+        $flow->handleRequest($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/admin/vacancies/edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'vacancy' => $vacancy,
                     'comments' => $this->commentRepository->findThreadForVacancy($vacancy),
                 ],
             );
         }
 
+        $data = $flow->getData();
+        assert($data instanceof VacancyData);
+        $this->vacancyFormMapper->apply(
+            $data,
+            $vacancy,
+            $current,
+            true,
+            true,
+        );
+
         $this->vacancyDraftService->saveDraft(
             $vacancy,
             $current,
             $user,
         );
+        $flow->reset();
         $this->editLockService->release(
             $vacancy,
             $user,

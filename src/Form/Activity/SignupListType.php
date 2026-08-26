@@ -431,7 +431,7 @@ class SignupListType extends AbstractType
      * Whether the live activity this list belongs to has already started. "Started" is read from the *live* revision
      * (the real schedule): a brand-new list whose activity has never been published has no live revision and so is
      * never considered started, keeping it editable so a stale draft can be re-dated. Mirrors
-     * {@see \App\Form\Activity\ActivityRevisionType} locking the start once the live activity has begun.
+     * {@see \App\Form\Activity\ActivityFlow\GeneralStepType} locking the start once the live activity has begun.
      */
     private function activityStarted(?SignupList $list): bool
     {

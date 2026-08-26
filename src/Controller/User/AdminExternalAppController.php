@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\ExternalApp;
-use App\Form\User\ExternalAppType;
+use App\Form\User\ExternalApp\ExternalAppData;
+use App\Form\User\ExternalApp\ExternalAppFlowType;
 use App\Repository\User\ExternalAppRepository;
 use App\Service\User\ExternalAppService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function assert;
 
 /**
  * Manage the external applications that may authenticate members. An application is retired by disabling it or setting
@@ -31,6 +36,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class AdminExternalAppController extends AbstractController
 {
+    use HandlesFormFlowTrait;
+
     public function __construct(
         private readonly ExternalAppService $externalAppService,
         private readonly TranslatorInterface $translator,
@@ -65,33 +72,48 @@ class AdminExternalAppController extends AbstractController
     )]
     public function create(Request $request): Response
     {
-        $externalApp = new ExternalApp();
-        $form = $this->createForm(
-            ExternalAppType::class,
-            $externalApp,
-        )->handleRequest($request);
+        $run = $this->flowRun($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
-            return $this->render(
-                'user/admin/external-app/form.html.twig',
-                [
-                    'form' => $form,
-                    'externalApp' => null,
-                ],
-            );
+        if ($run instanceof RedirectResponse) {
+            return $run;
         }
 
-        $this->externalAppService->save($externalApp);
+        $flow = $this->createFlow(
+            ExternalAppFlowType::class,
+            new ExternalAppData(),
+            ['flow_key' => $run],
+        );
+        $flow->handleRequest($request);
 
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('The external application has been created.'),
+        if ($flow->isFinished()) {
+            $data = $flow->getData();
+            assert($data instanceof ExternalAppData);
+
+            $externalApp = new ExternalApp();
+            $data->applyTo($externalApp);
+            $this->externalAppService->save($externalApp);
+            $flow->reset();
+
+            $this->addFlash(
+                AlertTypes::Success->value,
+                $this->translator->trans('The external application has been created.'),
+            );
+
+            return $this->redirectToRoute('admin/users/apps/index');
+        }
+
+        $this->flashRejectedStep(
+            $flow,
+            $this->translator,
         );
 
-        return $this->redirectToRoute('admin/users/apps/index');
+        return $this->render(
+            'user/admin/external-app/form.html.twig',
+            [
+                'form' => $flow->getStepForm(),
+                'externalApp' => null,
+            ],
+        );
     }
 
     #[Route(
@@ -107,31 +129,46 @@ class AdminExternalAppController extends AbstractController
         Request $request,
         ExternalApp $externalApp,
     ): Response {
-        $form = $this->createForm(
-            ExternalAppType::class,
-            $externalApp,
-        )->handleRequest($request);
+        $run = $this->flowRun($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
-            return $this->render(
-                'user/admin/external-app/form.html.twig',
-                [
-                    'form' => $form,
-                    'externalApp' => $externalApp,
-                ],
-            );
+        if ($run instanceof RedirectResponse) {
+            return $run;
         }
 
-        $this->externalAppService->save($externalApp);
+        $flow = $this->createFlow(
+            ExternalAppFlowType::class,
+            ExternalAppData::fromEntity($externalApp),
+            ['flow_key' => $run],
+        );
+        $flow->handleRequest($request);
 
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('The external application has been updated.'),
+        if ($flow->isFinished()) {
+            $data = $flow->getData();
+            assert($data instanceof ExternalAppData);
+
+            $data->applyTo($externalApp);
+            $this->externalAppService->save($externalApp);
+            $flow->reset();
+
+            $this->addFlash(
+                AlertTypes::Success->value,
+                $this->translator->trans('The external application has been updated.'),
+            );
+
+            return $this->redirectToRoute('admin/users/apps/index');
+        }
+
+        $this->flashRejectedStep(
+            $flow,
+            $this->translator,
         );
 
-        return $this->redirectToRoute('admin/users/apps/index');
+        return $this->render(
+            'user/admin/external-app/form.html.twig',
+            [
+                'form' => $flow->getStepForm(),
+                'externalApp' => $externalApp,
+            ],
+        );
     }
 }

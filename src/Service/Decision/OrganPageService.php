@@ -8,7 +8,7 @@ use App\Entity\Decision\Organ;
 use App\Entity\Decision\OrganInformation;
 use App\Entity\Decision\OrganInformationRevision;
 use App\Entity\User\User;
-use App\Form\Decision\OrganInformationRevisionType;
+use App\Form\Decision\OrganPage\ImagesStepType;
 use App\Service\Application\EditLockService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -75,14 +75,14 @@ final readonly class OrganPageService
         $bannerCropped = $this->applyCrop(
             $bannerCrop,
             $revision->getBannerSource(),
-            OrganInformationRevisionType::BANNER_MINIMUM_WIDTH,
+            ImagesStepType::BANNER_MINIMUM_WIDTH,
             $revision->setBannerCrop(...),
             $revision->setBannerPath(...),
         );
         $logoCropped = $this->applyCrop(
             $logoCrop,
             $revision->getLogoSource(),
-            OrganInformationRevisionType::LOGO_MINIMUM_WIDTH,
+            ImagesStepType::LOGO_MINIMUM_WIDTH,
             $revision->setLogoCrop(...),
             $revision->setLogoPath(...),
         );
