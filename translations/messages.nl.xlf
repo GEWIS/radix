@@ -3673,13 +3673,13 @@
         <source>Focal length</source>
         <target>Brandpuntsafstand</target>
       </trans-unit>
-      <trans-unit id="8KTGDx6" resname="For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 10 minutes.">
-        <source>For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 10 minutes.</source>
-        <target state="translated">Voor jouw veiligheid moet je bij gevoelige handelingen opnieuw je wachtwoord en een verificatiecode invoeren. Deze bevestiging blijft 10 minuten geldig.</target>
+      <trans-unit id="E7k20Y1" resname="For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 30 minutes.">
+        <source>For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 30 minutes.</source>
+        <target state="translated">Voor jouw veiligheid moet je bij gevoelige handelingen opnieuw je wachtwoord en een verificatiecode invoeren. Deze bevestiging blijft 30 minuten geldig.</target>
       </trans-unit>
-      <trans-unit id="umW8Rcp" resname="For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 10 minutes.">
-        <source>For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 10 minutes.</source>
-        <target state="translated">Voor jouw veiligheid moet je bij gevoelige handelingen opnieuw je wachtwoord invoeren. Deze bevestiging blijft 10 minuten geldig.</target>
+      <trans-unit id="M8j6j9o" resname="For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 30 minutes.">
+        <source>For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 30 minutes.</source>
+        <target state="translated">Voor jouw veiligheid moet je bij gevoelige handelingen opnieuw je wachtwoord invoeren. Deze bevestiging blijft 30 minuten geldig.</target>
       </trans-unit>
       <trans-unit id="dpBHSVe" resname="Forbidden">
         <source>Forbidden</source>

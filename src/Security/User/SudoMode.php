@@ -26,7 +26,7 @@ final class SudoMode
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly ClockInterface $clock,
-        private readonly int $ttlSeconds = 600,
+        private readonly int $ttlSeconds = 1800,
     ) {
     }
 
