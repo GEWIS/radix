@@ -1,0 +1,12 @@
+{{ form_start(form, {'action': path('decision_decision_form', {'form': 'member_suspension'})}) }}
+    {% include 'database/partials/decision/member-lookup.html.twig' with {
+        'field': form.member,
+        'label': 'Lid'|trans,
+    } only %}
+    {# Both ends are part of the suspension, which is what the decision text says as well. #}
+    {{ form_row(form.since) }}
+    {{ form_row(form.until) }}
+    <div class="decision-form-actions">
+        {{ form_widget(form.submit, {'attr': {'class': 'btn-gewis-primary'}}) }}
+    </div>
+{{ form_end(form) }}

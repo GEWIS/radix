@@ -47,7 +47,7 @@ abstract class AbstractDecisionMapper implements DataMapperInterface
             return;
         }
 
-        /** @var array<string, FormInterface> $children */
+        /** @var array<string, FormInterface<mixed>> $children */
         $children = iterator_to_array($forms);
 
         $meeting = $children['meeting']->getData();
@@ -75,8 +75,7 @@ abstract class AbstractDecisionMapper implements DataMapperInterface
      * This runs before validation, so anything still missing has to be left alone rather than forced into a setter
      * that does not take null.
      *
-     * @param array<string, FormInterface> $forms
-     * @param array<string, FormInterface> $forms
+     * @param array<string, FormInterface<mixed>> $forms
      */
     abstract protected function mapSubDecisions(
         array $forms,

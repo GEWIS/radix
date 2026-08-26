@@ -11,8 +11,8 @@ use App\Entity\User\User;
 use App\Repository\Database\MeetingRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
@@ -46,6 +46,8 @@ final class DecisionControllerTest extends DatabaseTestCase
             [
                 'tab-organ-install',
                 'tab-board-install',
+                'tab-member-warning',
+                'tab-member-suspension',
                 'tab-other',
             ] as $kind
         ) {

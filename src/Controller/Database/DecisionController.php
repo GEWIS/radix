@@ -20,6 +20,8 @@ use App\Form\Database\FoundationType;
 use App\Form\Database\InstallType;
 use App\Form\Database\Key\GrantType as KeyGrantType;
 use App\Form\Database\Key\WithdrawType as KeyWithdrawType;
+use App\Form\Database\Member\SuspensionType as MemberSuspensionType;
+use App\Form\Database\Member\WarningType as MemberWarningType;
 use App\Form\Database\MemberFunctionType;
 use App\Form\Database\MinutesType;
 use App\Form\Database\OrganRegulationType;
@@ -60,6 +62,8 @@ final class DecisionController extends AbstractController
         'board_discharge' => BoardDischargeType::class,
         'key_grant' => KeyGrantType::class,
         'key_withdraw' => KeyWithdrawType::class,
+        'member_warning' => MemberWarningType::class,
+        'member_suspension' => MemberSuspensionType::class,
         'annulment' => AnnulmentType::class,
         'minutes' => MinutesType::class,
         'other' => OtherType::class,

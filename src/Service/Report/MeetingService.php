@@ -414,6 +414,16 @@ class MeetingService
 
             $reportSubDecision->setGranting($granting);
             $reportSubDecision->setWithdrawnOn($subdecision->getWithdrawnOn());
+        } elseif ($subdecision instanceof DatabaseSubDecision\Member\Warning) {
+            assert($reportSubDecision instanceof ReportSubDecision\Member\Warning);
+
+            $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
+        } elseif ($subdecision instanceof DatabaseSubDecision\Member\Suspension) {
+            assert($reportSubDecision instanceof ReportSubDecision\Member\Suspension);
+
+            $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
+            $reportSubDecision->setSince($subdecision->getSince());
+            $reportSubDecision->setUntil($subdecision->getUntil());
         } elseif ($subdecision instanceof DatabaseSubDecision\Annulment) {
             assert($reportSubDecision instanceof ReportSubDecision\Annulment);
 

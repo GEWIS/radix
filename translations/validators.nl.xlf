@@ -53,25 +53,29 @@
         <source>Another vacancy of this company already uses this slug in this category.</source>
         <target state="translated">Een andere vacature van dit bedrijf gebruikt deze slug al in deze categorie.</target>
       </trans-unit>
+      <trans-unit id="1qT9z3I" resname="Are you sure that you are younger than 10 years?">
+        <source>Are you sure that you are younger than 10 years?</source>
+        <target state="translated">Weet je zeker dat je jonger bent dan 10 jaar?</target>
+      </trans-unit>
       <trans-unit id="mUY7qf3" resname="At least one language must be used.">
         <source>At least one language must be used.</source>
         <target>Er moet ten minste één taal worden gebruikt.</target>
       </trans-unit>
-      <trans-unit id="Kq2sBvA" resname="Choose a category.">
+      <trans-unit id="toeJ.wb" resname="Choose a category.">
         <source>Choose a category.</source>
         <target state="translated">Kies een categorie.</target>
-      </trans-unit>
-      <trans-unit id="Lp7dRc2" resname="Choose an organising body, or say there is none.">
-        <source>Choose an organising body, or say there is none.</source>
-        <target state="translated">Kies een organiserend orgaan, of geef aan dat er geen is.</target>
-      </trans-unit>
-      <trans-unit id="Mz3hWq8" resname="Choose an organising company, or say there is none.">
-        <source>Choose an organising company, or say there is none.</source>
-        <target state="translated">Kies een organiserend bedrijf, of geef aan dat er geen is.</target>
       </trans-unit>
       <trans-unit id="O2fBMa4" resname="Choose an image to upload.">
         <source>Choose an image to upload.</source>
         <target state="translated">Kies een afbeelding om te uploaden.</target>
+      </trans-unit>
+      <trans-unit id="E2oTVWD" resname="Choose an organising body, or say there is none.">
+        <source>Choose an organising body, or say there is none.</source>
+        <target state="translated">Kies een organiserend orgaan, of geef aan dat er geen is.</target>
+      </trans-unit>
+      <trans-unit id=".3CttTu" resname="Choose an organising company, or say there is none.">
+        <source>Choose an organising company, or say there is none.</source>
+        <target state="translated">Kies een organiserend bedrijf, of geef aan dat er geen is.</target>
       </trans-unit>
       <trans-unit id="NrVT1pI" resname="Choose the job package this vacancy belongs to.">
         <source>Choose the job package this vacancy belongs to.</source>
@@ -397,6 +401,10 @@
         <source>This round only covers %from% to %until%.</source>
         <target state="translated">Deze ronde beslaat alleen %from% tot %until%.</target>
       </trans-unit>
+      <trans-unit id="mdHmLw3" resname="To pay the membership fee you must accept Stripe's privacy policy.">
+        <source>To pay the membership fee you must accept Stripe's privacy policy.</source>
+        <target state="translated">Om de lidmaatschapsbijdrage te betalen, moet je het privacybeleid van Stripe accepteren.</target>
+      </trans-unit>
       <trans-unit id="Q5RHBE_" resname="Upload a JPEG, PNG or WebP image.">
         <source>Upload a JPEG, PNG or WebP image.</source>
         <target state="translated">Upload een JPEG-, PNG- of WebP-afbeelding.</target>
@@ -412,6 +420,10 @@
       <trans-unit id="fcfNWQJ" resname="You can only highlight your own vacancies that are currently shown on the website.">
         <source>You can only highlight your own vacancies that are currently shown on the website.</source>
         <target state="translated">Je kunt alleen je eigen vacatures uitlichten die op dit moment op de website staan.</target>
+      </trans-unit>
+      <trans-unit id="FLbmfMo" resname="You cannot become a member of the association without agreeing to the terms.">
+        <source>You cannot become a member of the association without agreeing to the terms.</source>
+        <target state="translated">Je kunt geen lid worden van de vereniging zonder akkoord te gaan met de voorwaarden.</target>
       </trans-unit>
       <trans-unit id="WZfD5UV" resname="You cannot propose an activity for this body.">
         <source>You cannot propose an activity for this body.</source>

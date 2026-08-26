@@ -111,6 +111,17 @@
                         'template': 'key-withdraw', 'context': {'form': forms.key_withdraw, 'grants': grants}},
                 },
             },
+            'member': {
+                'label': 'Members'|trans,
+                'items': {
+                    'tab-member-warning': {'icon': 'fa-triangle-exclamation', 'label': 'Official Warning'|trans,
+                        'hint': 'Hand a member an official warning.'|trans,
+                        'template': 'member-warning', 'context': {'form': forms.member_warning}},
+                    'tab-member-suspension': {'icon': 'fa-user-slash', 'label': 'Suspension'|trans,
+                        'hint': 'Suspend a member for a period.'|trans,
+                        'template': 'member-suspension', 'context': {'form': forms.member_suspension}},
+                },
+            },
             'meeting': {
                 'label': 'Meetings'|trans,
                 'items': {

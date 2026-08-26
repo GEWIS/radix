@@ -17,18 +17,6 @@
         <source> met genoemde wijzigingen</source>
         <target state="translated"> with mentioned changes</target>
       </trans-unit>
-      <trans-unit id="AoY3XHY" resname="&quot;%name%&quot; has been given a day. The activity has been started for you and still needs filling in.">
-        <source>"%name%" has been given a day. The activity has been started for you and still needs filling in.</source>
-        <target state="translated">"%name%" has been given a day. The activity has been started for you and still needs filling in.</target>
-      </trans-unit>
-      <trans-unit id="FPSBTz3" resname="&quot;%name%&quot; has been put forward and is waiting for a day.">
-        <source>"%name%" has been put forward and is waiting for a day.</source>
-        <target state="translated">"%name%" has been put forward and is waiting for a day.</target>
-      </trans-unit>
-      <trans-unit id="3WCdvsC" resname="&quot;%name%&quot; has been turned down; its days are free again.">
-        <source>"%name%" has been turned down; its days are free again.</source>
-        <target state="translated">"%name%" has been turned down; its days are free again.</target>
-      </trans-unit>
       <trans-unit id="Uvxq3WQ" resname="%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.">
         <source>%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.</source>
         <target state="translated">%GRANTEE% is granted a key code of GEWIS until %UNTIL%.</target>
@@ -40,6 +28,10 @@
       <trans-unit id="dqOql01" resname="%MEMBER% wordt gedechargeerd als %FUNCTION% van %ORGAN_ABBR%.">
         <source>%MEMBER% wordt gedechargeerd als %FUNCTION% van %ORGAN_ABBR%.</source>
         <target state="translated">%MEMBER% is discharged as %FUNCTION% of %ORGAN_ABBR%.</target>
+      </trans-unit>
+      <trans-unit id="m43S9_g" resname="%MEMBER% wordt geschorst van %SINCE% tot en met %UNTIL%.">
+        <source>%MEMBER% wordt geschorst van %SINCE% tot en met %UNTIL%.</source>
+        <target state="translated">%MEMBER% is suspended from %SINCE% through %UNTIL%.</target>
       </trans-unit>
       <trans-unit id="ud5TMBu" resname="%MEMBER% wordt geïnstalleerd als %FUNCTION% van %ORGAN_ABBR%.">
         <source>%MEMBER% wordt geïnstalleerd als %FUNCTION% van %ORGAN_ABBR%.</source>
@@ -516,6 +508,18 @@
       <trans-unit id="s4eJWBv" resname="%valid% changes, %issues% issues">
         <source>%valid% changes, %issues% issues</source>
         <target state="translated">%valid% changes, %issues% issues</target>
+      </trans-unit>
+      <trans-unit id="AoY3XHY" resname="&quot;%name%&quot; has been given a day. The activity has been started for you and still needs filling in.">
+        <source>"%name%" has been given a day. The activity has been started for you and still needs filling in.</source>
+        <target state="translated">"%name%" has been given a day. The activity has been started for you and still needs filling in.</target>
+      </trans-unit>
+      <trans-unit id="FPSBTz3" resname="&quot;%name%&quot; has been put forward and is waiting for a day.">
+        <source>"%name%" has been put forward and is waiting for a day.</source>
+        <target state="translated">"%name%" has been put forward and is waiting for a day.</target>
+      </trans-unit>
+      <trans-unit id="3WCdvsC" resname="&quot;%name%&quot; has been turned down; its days are free again.">
+        <source>"%name%" has been turned down; its days are free again.</source>
+        <target state="translated">"%name%" has been turned down; its days are free again.</target>
       </trans-unit>
       <trans-unit id="r0_Bmcr" resname="(bulk) renew as ordinary OR convert to graduate">
         <source>(bulk) renew as ordinary OR convert to graduate</source>
@@ -3645,6 +3649,10 @@
         <source>Finish it</source>
         <target state="translated">Finish it</target>
       </trans-unit>
+      <trans-unit id=".3YvpAU" resname="First Day">
+        <source>First Day</source>
+        <target state="translated">First Day</target>
+      </trans-unit>
       <trans-unit id="BQjGS3q" resname="First Name">
         <source>First Name</source>
         <target state="translated">First Name</target>
@@ -3957,6 +3965,10 @@
         <source>HS512 (shared secret, legacy)</source>
         <target>HS512 (shared secret, legacy)</target>
       </trans-unit>
+      <trans-unit id="rxGcg5d" resname="Hand a member an official warning.">
+        <source>Hand a member an official warning.</source>
+        <target state="translated">Hand a member an official warning.</target>
+      </trans-unit>
       <trans-unit id="HBZe6l1" resname="Hand it in">
         <source>Hand it in</source>
         <target state="translated">Hand it in</target>
@@ -3996,6 +4008,10 @@
       <trans-unit id="8ozef1V" resname="Het %DOCUMENTTYPE% van %NAME% door %AUTHOR%, versie %VERSION% van %DATE% wordt %APPROVAL%%CHANGES%.">
         <source>Het %DOCUMENTTYPE% van %NAME% door %AUTHOR%, versie %VERSION% van %DATE% wordt %APPROVAL%%CHANGES%.</source>
         <target state="translated">The %DOCUMENTTYPE% of %NAME% by %AUTHOR%, version %VERSION% dated %DATE% are %APPROVAL%%CHANGES%.</target>
+      </trans-unit>
+      <trans-unit id="TpMENtB" resname="Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.">
+        <source>Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.</source>
+        <target state="translated">%MEMBER% receives an official warning from the board.</target>
       </trans-unit>
       <trans-unit id="bMJFh5R" resname="Hidden">
         <source>Hidden</source>
@@ -4556,6 +4572,10 @@
       <trans-unit id="xkMjr4i" resname="Lapsed">
         <source>Lapsed</source>
         <target state="translated">Lapsed</target>
+      </trans-unit>
+      <trans-unit id="kMjMOLe" resname="Last Day">
+        <source>Last Day</source>
+        <target state="translated">Last Day</target>
       </trans-unit>
       <trans-unit id="0jsx_LN" resname="Last Name">
         <source>Last Name</source>
@@ -5673,7 +5693,7 @@
         <source>No open vacancies</source>
         <target>No open vacancies</target>
       </trans-unit>
-      <trans-unit id="0upPDPu" resname="No organising body">
+      <trans-unit id="rN5UfRc" resname="No organising body">
         <source>No organising body</source>
         <target state="translated">No organising body</target>
       </trans-unit>
@@ -5804,6 +5824,10 @@
       <trans-unit id="chuO6G_" resname="Not downloadable yet">
         <source>Not downloadable yet</source>
         <target state="translated">Not downloadable yet</target>
+      </trans-unit>
+      <trans-unit id="RsA0_Lz" resname="Not filled in">
+        <source>Not filled in</source>
+        <target state="translated">Not filled in</target>
       </trans-unit>
       <trans-unit id="9i49VgK" resname="Not found in a known data breach.">
         <source>Not found in a known data breach.</source>
@@ -6004,6 +6028,10 @@
       <trans-unit id="wBbSi_k" resname="Off">
         <source>Off</source>
         <target state="translated">Off</target>
+      </trans-unit>
+      <trans-unit id="z2Dcgex" resname="Official Warning">
+        <source>Official Warning</source>
+        <target state="translated">Official Warning</target>
       </trans-unit>
       <trans-unit id="fm8k4L1" resname="Oh no! Something went wrong :(">
         <source>Oh no! Something went wrong :(</source>
@@ -6221,13 +6249,17 @@
         <source>Organisers</source>
         <target state="translated">Organisers</target>
       </trans-unit>
-      <trans-unit id="PK.ewBR" resname="Organising body">
+      <trans-unit id="_R1iLbW" resname="Organising body">
         <source>Organising body</source>
         <target state="translated">Organising body</target>
       </trans-unit>
       <trans-unit id="xer5g4K" resname="Organising company">
         <source>Organising company</source>
         <target state="translated">Organising company</target>
+      </trans-unit>
+      <trans-unit id="PK.ewBR" resname="Organising organ">
+        <source>Organising organ</source>
+        <target state="translated">Organising organ</target>
       </trans-unit>
       <trans-unit id="zvvKAKp" resname="Organising party">
         <source>Organising party</source>
@@ -7665,11 +7697,11 @@
         <source>Select a body</source>
         <target state="translated">Select a body</target>
       </trans-unit>
-      <trans-unit id="Ub2kZ9c" resname="Select a category">
+      <trans-unit id="Ag80cSu" resname="Select a category">
         <source>Select a category</source>
         <target state="translated">Select a category</target>
       </trans-unit>
-      <trans-unit id="Qm4vT1x" resname="Select a company">
+      <trans-unit id="McFnbou" resname="Select a company">
         <source>Select a company</source>
         <target state="translated">Select a company</target>
       </trans-unit>
@@ -8001,6 +8033,10 @@
         <source>Some of the entered information appears to be missing or incorrect. Please check your data and submit again.</source>
         <target state="translated">Some of the entered information appears to be missing or incorrect. Please check your data and submit again.</target>
       </trans-unit>
+      <trans-unit id="eKw5uFX" resname="Some of the entered information is missing or incorrect.">
+        <source>Some of the entered information is missing or incorrect.</source>
+        <target state="translated">Some of the entered information is missing or incorrect.</target>
+      </trans-unit>
       <trans-unit id="LTyr6e2" resname="Somebody else is editing %subject% right now.">
         <source>Somebody else is editing %subject% right now.</source>
         <target state="translated">Somebody else is editing %subject% right now.</target>
@@ -8127,7 +8163,7 @@
       </trans-unit>
       <trans-unit id="d0B5Saa" resname="Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.">
         <source>Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.</source>
-        <target state="translated">Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.</target>
+        <target state="translated"><![CDATA[Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as <code>qwerty</code> or <code>Passw0rd!</code> score low.]]></target>
       </trans-unit>
       <trans-unit id="Z3JKRRe" resname="Student Address">
         <source>Student Address</source>
@@ -8240,6 +8276,18 @@
       <trans-unit id="R34wcDm" resname="Supremum">
         <source>Supremum</source>
         <target state="translated">Supremum</target>
+      </trans-unit>
+      <trans-unit id="TLbWfSB" resname="Suspend Member">
+        <source>Suspend Member</source>
+        <target state="translated">Suspend Member</target>
+      </trans-unit>
+      <trans-unit id="hYdj4Oh" resname="Suspend a member for a period.">
+        <source>Suspend a member for a period.</source>
+        <target state="translated">Suspend a member for a period.</target>
+      </trans-unit>
+      <trans-unit id="kpIW36G" resname="Suspension">
+        <source>Suspension</source>
+        <target state="translated">Suspension</target>
       </trans-unit>
       <trans-unit id="aVW9SPQ" resname="Sync in progress">
         <source>Sync in progress</source>
@@ -9980,6 +10028,10 @@
       <trans-unit id="8WNxAmi" resname="Wants to receive the Supremum.">
         <source>Wants to receive the Supremum.</source>
         <target state="translated">Wants to receive the Supremum.</target>
+      </trans-unit>
+      <trans-unit id="iMtvGkN" resname="Warn Member">
+        <source>Warn Member</source>
+        <target state="translated">Warn Member</target>
       </trans-unit>
       <trans-unit id="V9XnrRt" resname="Warning">
         <source>Warning</source>

@@ -19,6 +19,8 @@ use App\Entity\Decision\SubDecision\FoundationReference;
 use App\Entity\Decision\SubDecision\Installation;
 use App\Entity\Decision\SubDecision\Key\Granting as KeyGranting;
 use App\Entity\Decision\SubDecision\Key\Withdrawal as KeyWithdrawal;
+use App\Entity\Decision\SubDecision\Member\Suspension as MemberSuspension;
+use App\Entity\Decision\SubDecision\Member\Warning as MemberWarning;
 use App\Entity\Decision\SubDecision\Minutes;
 use App\Entity\Decision\SubDecision\OrganRegulation;
 use App\Entity\Decision\SubDecision\Other;
@@ -73,6 +75,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
         'foundationreference' => FoundationReference::class,
         'key_granting' => KeyGranting::class,
         'key_withdraw' => KeyWithdrawal::class,
+        'member_warning' => MemberWarning::class,
+        'member_suspension' => MemberSuspension::class,
     ],
 )]
 #[Queryable]

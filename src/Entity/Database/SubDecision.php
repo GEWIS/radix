@@ -19,6 +19,8 @@ use App\Entity\Database\SubDecision\FoundationReference;
 use App\Entity\Database\SubDecision\Installation;
 use App\Entity\Database\SubDecision\Key\Granting as KeyGranting;
 use App\Entity\Database\SubDecision\Key\Withdrawal as KeyWithdrawal;
+use App\Entity\Database\SubDecision\Member\Suspension as MemberSuspension;
+use App\Entity\Database\SubDecision\Member\Warning as MemberWarning;
 use App\Entity\Database\SubDecision\Minutes;
 use App\Entity\Database\SubDecision\OrganRegulation;
 use App\Entity\Database\SubDecision\Other;
@@ -66,6 +68,8 @@ use function str_replace;
         'key_granting' => KeyGranting::class,
         'key_withdraw' => KeyWithdrawal::class,
         'minutes' => Minutes::class,
+        'member_warning' => MemberWarning::class,
+        'member_suspension' => MemberSuspension::class,
     ],
 )]
 abstract class SubDecision
