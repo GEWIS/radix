@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ReviseRefusal;
@@ -11,7 +12,8 @@ use App\Entity\Career\Company;
 use App\Entity\Career\CompanyRevision;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
-use App\Form\Career\CompanyType;
+use App\Form\Career\CompanyProfile\CompanyProfileData;
+use App\Form\Career\CompanyProfile\CompanyProfileFlowType;
 use App\Repository\Career\CompanyAuditLogRepository;
 use App\Repository\Career\CompanyRevisionCommentRepository;
 use App\Repository\Career\VacancyRevisionRepository;
@@ -32,6 +34,8 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function assert;
+
 /**
  * Companies, from the board's side: the list, adding one, what a company looks like right now, and revising its
  * profile. The profile goes through the same review chain a company's own proposal does, so even a board edit is a
@@ -47,6 +51,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class AdminController extends AbstractController
 {
+    use HandlesFormFlowTrait;
     use HoldsEditLockTrait;
 
     public function __construct(
@@ -93,28 +98,44 @@ class AdminController extends AbstractController
         $company->addRevision($revision);
         $company->setCurrentRevision($revision);
 
-        $form = $this->createForm(
-            CompanyType::class,
-            $company,
-            ['admin' => true],
-        )->handleRequest($request);
+        $flow = $this->createFlow(
+            CompanyProfileFlowType::class,
+            new CompanyProfileData(),
+            [
+                'admin' => true,
+                'flow_key' => 'create',
+                'finish_label' => $this->translator->trans('Save draft'),
+            ],
+        );
+        $flow->handleRequest($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/admin/create.html.twig',
-                ['form' => $form],
+                ['form' => $flow->getStepForm()],
             );
         }
+
+        $data = $flow->getData();
+        assert($data instanceof CompanyProfileData);
+        $data->applyTo(
+            $company,
+            $revision,
+            true,
+        );
 
         $this->warnOnRefusedLogo($this->companyDraftService->create(
             $company,
             $revision,
             $user,
-            ...$this->uploadedLogos($form),
+            ...$this->uploadedLogos($flow),
         ));
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -212,32 +233,53 @@ class AdminController extends AbstractController
             );
         }
 
-        $form = $this->createForm(
-            CompanyType::class,
-            $company,
-            ['admin' => true],
-        )->handleRequest($request);
+        $flow = $this->createFlow(
+            CompanyProfileFlowType::class,
+            CompanyProfileData::fromCompany(
+                $company,
+                $current,
+            ),
+            [
+                'admin' => true,
+                'flow_key' => (string) $current->getId(),
+                'finish_label' => $this->translator->trans('Save changes'),
+                'has_square_logo' => null !== $current->getSquareLogo(),
+                'has_banner_logo' => null !== $current->getBannerLogo(),
+            ],
+        );
+        $flow->handleRequest($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/admin/edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'company' => $company,
                     'comments' => $this->commentRepository->findThreadForCompany($company),
                 ],
             );
         }
 
+        $data = $flow->getData();
+        assert($data instanceof CompanyProfileData);
+        $data->applyTo(
+            $company,
+            $current,
+            true,
+        );
+
         $this->warnOnRefusedLogo($this->companyDraftService->saveDraft(
             $company,
             $current,
             $user,
-            ...$this->uploadedLogos($form),
+            ...$this->uploadedLogos($flow),
         ));
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -369,9 +411,9 @@ class AdminController extends AbstractController
      */
     private function uploadedLogos(FormInterface $form): array
     {
-        $revisionForm = $form->get('currentRevision');
-        $square = $revisionForm->get('squareLogoFile')->getData();
-        $banner = $revisionForm->get('bannerLogoFile')->getData();
+        $logoForm = $form->get(CompanyProfileData::STEP_LOGO);
+        $square = $logoForm->get('squareLogoFile')->getData();
+        $banner = $logoForm->get('bannerLogoFile')->getData();
 
         return [
             $square instanceof UploadedFile ? $square : null,
