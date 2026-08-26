@@ -2797,10 +2797,6 @@
         <source>Details and committees</source>
         <target state="translated">Gegevens en commissies</target>
       </trans-unit>
-      <trans-unit id=".jLMxIH" resname="Development">
-        <source>Development</source>
-        <target state="translated">Ontwikkeling</target>
-      </trans-unit>
       <trans-unit id="7chmnoI" resname="Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.">
         <source>Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.</source>
         <target state="translated">Apparaten waarop je momenteel bent ingelogd. Als je een onbekend apparaat of een onbekende locatie opmerkt, beëindig dan onmiddellijk die sessie af en overweeg om je wachtwoord te wijzigen.</target>
@@ -6496,6 +6492,10 @@
       <trans-unit id="kPcFhRk" resname="Personal details">
         <source>Personal details</source>
         <target state="translated">Persoonlijke informatie</target>
+      </trans-unit>
+      <trans-unit id="VZ_XJXL" resname="Personal development">
+        <source>Personal development</source>
+        <target state="translated">Persoonlijke ontwikkeling</target>
       </trans-unit>
       <trans-unit id="rV2ozxI" resname="Personal information">
         <source>Personal information</source>
