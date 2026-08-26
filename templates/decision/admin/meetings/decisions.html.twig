@@ -15,6 +15,53 @@
                 <span class="badge badge-gewis-primary font-monospace">
                     {{ meeting_label }}.{{ decision.point }}.{{ decision.number }}
                 </span>
+                {# On a virtual decision, the decision it belongs to; on that decision, the virtual ones that
+                   belong to it. The reference itself sits on the virtual decision, which is why one decision can
+                   carry several of these. #}
+                {% if decision.counterpart is not null %}
+                    <span class="badge badge-secondary">
+                        {{ 'Counterpart of %type% %number%.%point%.%decision%'|trans({
+                            '%type%': decision.counterpart.meetingType,
+                            '%number%': decision.counterpart.meetingNumber,
+                            '%point%': decision.counterpart.point,
+                            '%decision%': decision.counterpart.number,
+                        }) }}
+                    </span>
+                {% endif %}
+                {% for virtual in decision.virtualCounterparts %}
+                    <span class="badge badge-secondary">
+                        {{ 'Virtual counterpart %type% %number%.%point%.%decision%'|trans({
+                            '%type%': virtual.meetingType,
+                            '%number%': virtual.meetingNumber,
+                            '%point%': virtual.point,
+                            '%decision%': virtual.number,
+                        }) }}
+                        {# Asked for through the shared confirmation the page already carries, which sits outside
+                           this component so the re-render that follows cannot leave a backdrop behind. #}
+                        {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                            <button type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline text-reset"
+                                    data-bs-toggle="modal" data-bs-target="#confirm-modal"
+                                    data-confirm-title="{{ 'Unlink this counterpart?'|trans }}"
+                                    data-confirm-message="{{ 'Both decisions stay on the record, and %type% %number%.%point%.%decision% is answered with in the decision search again.'|trans({
+                                        '%type%': virtual.meetingType,
+                                        '%number%': virtual.meetingNumber,
+                                        '%point%': virtual.point,
+                                        '%decision%': virtual.number,
+                                    }) }}"
+                                    data-confirm-label="{{ 'Unlink'|trans }}"
+                                    data-confirm-live-action="unlinkVirtualCounterpart"
+                                    data-confirm-live-args="{{ {
+                                        'virtualType': virtual.meetingType,
+                                        'virtualMeeting': virtual.meetingNumber,
+                                        'virtualPoint': virtual.point,
+                                        'virtualDecision': virtual.number,
+                                    }|json_encode }}"
+                                    aria-label="{{ 'Unlink'|trans }}">
+                                <span class="fas fa-xmark" aria-hidden="true"></span>
+                            </button>
+                        {% endif %}
+                    </span>
+                {% endfor %}
                 {% if annulled %}
                     <span class="badge badge-secondary">
                         {{ 'Annulled by %type% %number%.%point%.%decision%'|trans({
@@ -33,6 +80,16 @@
                         <span class="fas fa-copy" aria-hidden="true"></span>
                         <span data-copy-target="label">{{ 'Copy Decision'|trans }}</span>
                     </button>
+                    {# Which virtual decision belongs to this one is said here rather than while either is entered:
+                       neither has to be on the record before the other, and the virtual one often is not. #}
+                    {% if is_granted('ROLE_DATABASE_ADMIN') and ledgerMeeting.type != enum('App\\Entity\\Database\\Enums\\MeetingTypes').VIRT %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-bs-toggle="modal" data-bs-target="#counterpart-modal"
+                                data-point="{{ decision.point }}" data-number="{{ decision.number }}">
+                            <span class="fas fa-link" aria-hidden="true"></span>
+                            {{ 'Link virtual counterpart'|trans }}
+                        </button>
+                    {% endif %}
                     {# Copying a decision is reading it; deleting one is keeping the record. The confirmation is the
                        shared modal the page already carries, which sits outside this component so the re-render
                        that follows cannot leave a backdrop behind. #}

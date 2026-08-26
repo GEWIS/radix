@@ -13,6 +13,7 @@ use App\Entity\Decision\Decision as ReportDecision;
 use App\Entity\Decision\Meeting as ReportMeeting;
 use App\Entity\Decision\Member as ReportMember;
 use App\Entity\Decision\SubDecision as ReportSubDecision;
+use App\Repository\Database\DecisionRepository;
 use App\Repository\Database\MeetingRepository;
 use Closure;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +40,7 @@ class MeetingService
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly MeetingRepository $meetingRepository,
+        private readonly DecisionRepository $decisionRepository,
         private readonly SubDecisionService $subDecisionService,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $emReport,
@@ -141,7 +143,34 @@ class MeetingService
             $onProgress($num, $total);
         }
 
+        $this->linkCounterparts();
+
         $this->emReport->flush();
+    }
+
+    /**
+     * Link every projected decision that repeats another to the one it repeats.
+     *
+     * A pass of its own rather than part of projecting a decision, because the meetings are replayed oldest first and
+     * a virtual meeting may sort before the meeting whose decision it says again -- a meeting's date can be corrected
+     * after the fact. Projecting them in one go and matching up afterwards is what makes the link independent of that
+     * order.
+     */
+    private function linkCounterparts(): void
+    {
+        foreach ($this->decisionRepository->findRepeats() as $decision) {
+            $reportDecision = $this->findReportDecision($decision);
+            $counterpart = $decision->getCounterpart();
+
+            if (
+                null === $reportDecision
+                || null === $counterpart
+            ) {
+                continue;
+            }
+
+            $reportDecision->setCounterpart($this->findReportDecision($counterpart));
+        }
     }
 
     public function generateMeeting(DatabaseMeeting $meeting): void
@@ -200,6 +229,20 @@ class MeetingService
             $reportDecision->setMeeting($reportMeeting);
             $reportDecision->setPoint($decision->getPoint());
             $reportDecision->setNumber($decision->getNumber());
+        }
+
+        // The decision a virtual one repeats, as far as it can be told from here: a decision the projection does not
+        // know yet is left for {@see self::linkCounterparts()}, which runs once every meeting has been replayed.
+        $counterpart = $decision->getCounterpart();
+        $projectedCounterpart = null === $counterpart
+            ? null
+            : $this->findReportDecision($counterpart);
+
+        if (
+            null === $counterpart
+            || null !== $projectedCounterpart
+        ) {
+            $reportDecision->setCounterpart($projectedCounterpart);
         }
 
         $contentNL = [];

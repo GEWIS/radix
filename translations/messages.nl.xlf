@@ -641,6 +641,10 @@
         <source>A vacancy that closes, or that you take down, drops off the career page on its own.</source>
         <target state="translated">Een vacature die sluit, of die je offline haalt, verdwijnt vanzelf van de carrièrepagina.</target>
       </trans-unit>
+      <trans-unit id="KD6UD0B" resname="A virtual meeting puts on the record what this meeting decided. Naming that decision keeps the two from being read as two, and hides it from the decision search in favour of this one.">
+        <source>A virtual meeting puts on the record what this meeting decided. Naming that decision keeps the two from being read as two, and hides it from the decision search in favour of this one.</source>
+        <target state="translated">Een virtuele vergadering legt vast wat deze vergadering besloten heeft. Door dat besluit te noemen worden de twee niet als twee gelezen, en wordt het in de besluitenzoeker verborgen ten gunste van dit besluit.</target>
+      </trans-unit>
       <trans-unit id="pLS2dV0" resname="A wide variety of activities">
         <source>A wide variety of activities</source>
         <target state="translated">Een breed scala aan activiteiten</target>
@@ -1180,6 +1184,10 @@
       <trans-unit id="CrcKB8q" resname="Already in the agenda">
         <source>Already in the agenda</source>
         <target state="translated">Staat al in de agenda</target>
+      </trans-unit>
+      <trans-unit id="E1I5elk" resname="Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings">
+        <source>Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings</source>
+        <target state="translated">Ook vastgelegd in %count% virtuele vergadering|Ook vastgelegd in %count% virtuele vergaderingen</target>
       </trans-unit>
       <trans-unit id="qh2PXfe" resname="Alternative">
         <source>Alternative</source>
@@ -1756,6 +1764,10 @@
       <trans-unit id="I02HUu6" resname="Borrel Policy">
         <source>Borrel Policy</source>
         <target state="translated">Borrelbeleid</target>
+      </trans-unit>
+      <trans-unit id="E.zb501" resname="Both decisions stay on the record, and %type% %number%.%point%.%decision% is answered with in the decision search again.">
+        <source>Both decisions stay on the record, and %type% %number%.%point%.%decision% is answered with in the decision search again.</source>
+        <target state="translated">Beide besluiten blijven vastgelegd, en %type% %number%.%point%.%decision% komt weer terug in de besluitenzoeker.</target>
       </trans-unit>
       <trans-unit id="pg8.RVR" resname="Brand Manager">
         <source>Brand Manager</source>
@@ -2376,6 +2388,10 @@
       <trans-unit id="kDhOoV8" resname="Could not save change(s) of %entity%!">
         <source>Could not save change(s) of %entity%!</source>
         <target state="translated">Kon wijziging(en) van %entity% niet opslaan!</target>
+      </trans-unit>
+      <trans-unit id="dA6J4om" resname="Counterpart of %type% %number%.%point%.%decision%">
+        <source>Counterpart of %type% %number%.%point%.%decision%</source>
+        <target state="translated">Tegenhanger van %type% %number%.%point%.%decision%</target>
       </trans-unit>
       <trans-unit id="imSItxK" resname="Country">
         <source>Country</source>
@@ -4732,6 +4748,22 @@
       <trans-unit id="k.FfKzl" resname="Limited capacity (%capacity%)">
         <source>Limited capacity (%capacity%)</source>
         <target>Beperkte capaciteit (%capacity%)</target>
+      </trans-unit>
+      <trans-unit id="bUwX1fD" resname="Link a virtual counterpart">
+        <source>Link a virtual counterpart</source>
+        <target state="translated">Een virtuele tegenhanger koppelen</target>
+      </trans-unit>
+      <trans-unit id="TebsUJp" resname="Link counterpart">
+        <source>Link counterpart</source>
+        <target state="translated">Tegenhanger koppelen</target>
+      </trans-unit>
+      <trans-unit id="KcWa0hQ" resname="Link virtual counterpart">
+        <source>Link virtual counterpart</source>
+        <target state="translated">Virtuele tegenhanger koppelen</target>
+      </trans-unit>
+      <trans-unit id="Nlj5zvt" resname="Link virtual decision">
+        <source>Link virtual decision</source>
+        <target state="translated">Virtueel besluit koppelen</target>
       </trans-unit>
       <trans-unit id="Dz0Nyiu" resname="Links">
         <source>Links</source>
@@ -7297,6 +7329,14 @@
         <source>Repeat password</source>
         <target state="translated">Wachtwoord herhalen</target>
       </trans-unit>
+      <trans-unit id=".0FEbsd" resname="Repeated by %type% %number%.%point%.%decision%">
+        <source>Repeated by %type% %number%.%point%.%decision%</source>
+        <target state="translated">Herhaald door %type% %number%.%point%.%decision%</target>
+      </trans-unit>
+      <trans-unit id="DvFM3dn" resname="Repeats %type% %number%.%point%.%decision%">
+        <source>Repeats %type% %number%.%point%.%decision%</source>
+        <target state="translated">Herhaalt %type% %number%.%point%.%decision%</target>
+      </trans-unit>
       <trans-unit id="FcC7urS" resname="Reply">
         <source>Reply</source>
         <target state="translated">Reageren</target>
@@ -9153,6 +9193,10 @@
         <source>These lose their day if the financial side is not settled in time. Record an approved budget, or that there is no budget to approve.</source>
         <target state="translated">Deze verliezen hun dag als het financiële deel niet op tijd geregeld is. Leg een goedgekeurde begroting vast, of dat er geen begroting goed te keuren is.</target>
       </trans-unit>
+      <trans-unit id="EoPLYae" resname="These two decisions cannot be one another's counterpart.">
+        <source>These two decisions cannot be one another's counterpart.</source>
+        <target state="translated">Deze twee besluiten kunnen niet elkaars tegenhanger zijn.</target>
+      </trans-unit>
       <trans-unit id="MvzWOfp" resname="Thesis project">
         <source>Thesis project</source>
         <target>Afstudeerproject</target>
@@ -9268,6 +9312,10 @@
       <trans-unit id="xhl4EeK" resname="This course is listed but empty. If you kept your notes, sending them in takes a minute and saves the next cohort a weekend.">
         <source>This course is listed but empty. If you kept your notes, sending them in takes a minute and saves the next cohort a weekend.</source>
         <target state="translated">Dit vak staat in de lijst maar is leeg. Heb je je aantekeningen bewaard, dan kost opsturen een minuut en scheelt het volgende cohort een weekend.</target>
+      </trans-unit>
+      <trans-unit id="jUse04l" resname="This decision cannot be said to repeat that one.">
+        <source>This decision cannot be said to repeat that one.</source>
+        <target state="translated">Van dit besluit kan niet gezegd worden dat het dat besluit herhaalt.</target>
       </trans-unit>
       <trans-unit id="I6hgvcK" resname="This decision has already been annulled.">
         <source>This decision has already been annulled.</source>
@@ -9741,6 +9789,14 @@
         <source>Unknown reason</source>
         <target state="translated">Reden onbekend</target>
       </trans-unit>
+      <trans-unit id="_c9YbkL" resname="Unlink">
+        <source>Unlink</source>
+        <target state="translated">Ontkoppelen</target>
+      </trans-unit>
+      <trans-unit id="hGeuCbc" resname="Unlink this counterpart?">
+        <source>Unlink this counterpart?</source>
+        <target state="translated">Deze tegenhanger ontkoppelen?</target>
+      </trans-unit>
       <trans-unit id="tTYXtrf" resname="Unpublish">
         <source>Unpublish</source>
         <target state="translated">Depubliceren</target>
@@ -9996,6 +10052,14 @@
       <trans-unit id="kPrgwUx" resname="Virtual Meeting">
         <source>Virtual Meeting</source>
         <target state="translated">Virtuele Vergadering</target>
+      </trans-unit>
+      <trans-unit id="CdmbeoM" resname="Virtual counterpart %type% %number%.%point%.%decision%">
+        <source>Virtual counterpart %type% %number%.%point%.%decision%</source>
+        <target state="translated">Virtuele tegenhanger %type% %number%.%point%.%decision%</target>
+      </trans-unit>
+      <trans-unit id="DLPKSqP" resname="Virtual decision">
+        <source>Virtual decision</source>
+        <target state="translated">Virtueel besluit</target>
       </trans-unit>
       <trans-unit id="e489ss4" resname="Visibility">
         <source>Visibility</source>
@@ -10344,6 +10408,10 @@
       <trans-unit id="klYLh_k" resname="Which is basically the same thing.">
         <source>Which is basically the same thing.</source>
         <target state="translated">Wat in feite hetzelfde is.</target>
+      </trans-unit>
+      <trans-unit id="kv89K6a" resname="Which virtual decision repeats this?">
+        <source>Which virtual decision repeats this?</source>
+        <target state="translated">Welk virtueel besluit herhaalt dit besluit?</target>
       </trans-unit>
       <trans-unit id="WRiNbfh" resname="Who and when">
         <source>Who and when</source>

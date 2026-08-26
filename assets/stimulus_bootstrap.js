@@ -36,6 +36,8 @@ import InfimumController from './controllers/frontpage/infimum_controller.ts';
 import PageEditorController from './controllers/frontpage/page_editor_controller.ts';
 
 // Decision-specific controllers.
+import CounterpartModalController from './controllers/decision/counterpart_modal_controller.ts';
+import DecisionCounterpartController from './controllers/decision/decision_counterpart_controller.ts';
 import DecisionLookupController from './controllers/decision/decision_lookup_controller.ts';
 import DecisionNumberController from './controllers/decision/decision_number_controller.ts';
 import DocumentUploadController from './controllers/decision/document_upload_controller.ts';
@@ -99,6 +101,8 @@ app.register('birthday-rotator', BirthdayRotatorController);
 app.register('infimum', InfimumController);
 app.register('page-editor', PageEditorController);
 
+app.register('counterpart-modal', CounterpartModalController);
+app.register('decision-counterpart', DecisionCounterpartController);
 app.register('decision-lookup', DecisionLookupController);
 app.register('decision-number', DecisionNumberController);
 app.register('document-upload', DocumentUploadController);

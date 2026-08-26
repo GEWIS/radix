@@ -20,6 +20,7 @@ use App\Entity\Database\SubDecision\Foundation as FoundationModel;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation as InstallationModel;
 use App\Exception\Database\AnnulmentNotPossible;
+use App\Exception\Database\CounterpartNotPossible;
 use App\Exception\Database\DecisionNamesDeletedMember;
 use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Database\MeetingRepository;
@@ -117,6 +118,13 @@ class Meeting
                 null === $decision->getAnnulledBy()
                     ? null
                     : DecisionReference::fromDecision($decision->getAnnulledBy()->getDecision()),
+                null === $decision->getCounterpart()
+                    ? null
+                    : DecisionReference::fromDecision($decision->getCounterpart()),
+                array_map(
+                    static fn (DecisionModel $virtual): DecisionReference => DecisionReference::fromDecision($virtual),
+                    $decision->getVirtualCounterparts()->toArray(),
+                ),
             );
 
             $point = $decision->getPoint();
@@ -284,6 +292,95 @@ class Meeting
     }
 
     /**
+     * Say that a virtual decision is the counterpart of one of this meeting's decisions.
+     *
+     * Done from the decision being given a counterpart rather than from the virtual one, because that is the decision
+     * a reader comes across, and because neither of the two has to be on the record before the other: a virtual
+     * meeting is often minuted before the meeting it belongs to has been.
+     *
+     * The reference itself is stored on the virtual decision, which is the only side it fits: one decision can be
+     * given more than one virtual counterpart.
+     *
+     * @return bool whether both decisions were still there; false when either has since been removed.
+     *
+     * @throws CounterpartNotPossible when either side is not the kind of decision this link is between.
+     */
+    public function linkVirtualCounterpart(
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+        MeetingTypes $virtualType,
+        int $virtualNumber,
+        int $virtualPoint,
+        int $virtualDecision,
+    ): bool {
+        if (MeetingTypes::VIRT === $type) {
+            throw new CounterpartNotPossible('A decision of a virtual meeting has no virtual counterpart of its own.');
+        }
+
+        if (MeetingTypes::VIRT !== $virtualType) {
+            throw new CounterpartNotPossible('Only a decision of a virtual meeting is a virtual counterpart.');
+        }
+
+        $model = $this->meetingRepository->findDecision(
+            $type,
+            $number,
+            $point,
+            $decision,
+        );
+        $virtual = $this->meetingRepository->findDecision(
+            $virtualType,
+            $virtualNumber,
+            $virtualPoint,
+            $virtualDecision,
+        );
+
+        if (
+            null === $model
+            || null === $virtual
+        ) {
+            return false;
+        }
+
+        $virtual->setCounterpart($model);
+        $this->meetingRepository->persist($virtual->getMeeting());
+
+        return true;
+    }
+
+    /**
+     * Take back what a virtual decision was said to be the counterpart of.
+     *
+     * Addressed by the virtual decision rather than by the one it belongs to, because that is the side the reference
+     * is on and because a decision can be given several.
+     *
+     * @return bool whether there was a decision left to unlink; false when it has since been removed.
+     */
+    public function unlinkVirtualCounterpart(
+        MeetingTypes $virtualType,
+        int $virtualNumber,
+        int $virtualPoint,
+        int $virtualDecision,
+    ): bool {
+        $virtual = $this->meetingRepository->findDecision(
+            $virtualType,
+            $virtualNumber,
+            $virtualPoint,
+            $virtualDecision,
+        );
+
+        if (null === $virtual) {
+            return false;
+        }
+
+        $virtual->setCounterpart(null);
+        $this->meetingRepository->persist($virtual->getMeeting());
+
+        return true;
+    }
+
+    /**
      * Assemble the decision list of the given meetings.
      *
      * @param string[] $meetings as the export form posts them, `<type>-<number>`.
@@ -371,6 +468,7 @@ class Meeting
         ?int $meetingNumber = null,
         ?int $point = null,
         ?int $number = null,
+        bool $onlyUnlinkedVirtual = false,
     ): array {
         $before = null;
 
@@ -393,6 +491,7 @@ class Meeting
                 $before,
                 $point,
                 $number,
+                $onlyUnlinkedVirtual,
             ),
         );
     }

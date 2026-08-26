@@ -14,6 +14,7 @@ use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Exception\Database\AnnulmentNotPossible;
+use App\Exception\Database\CounterpartNotPossible;
 use App\Exception\Database\DecisionNamesDeletedMember;
 use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Decision\MeetingActivityLogRepository;
@@ -504,6 +505,88 @@ final class MeetingManage
         $this->markSaved();
     }
 
+    /**
+     * Say that a virtual decision is the counterpart of one of this meeting's decisions.
+     *
+     * The virtual decision is named by its four coordinates rather than looked up here, because that is what the
+     * search it is picked from answers with.
+     */
+    #[LiveAction]
+    public function linkVirtualCounterpart(
+        #[LiveArg]
+        int $point,
+        #[LiveArg]
+        int $number,
+        #[LiveArg]
+        string $virtualType,
+        #[LiveArg]
+        int $virtualMeeting,
+        #[LiveArg]
+        int $virtualPoint,
+        #[LiveArg]
+        int $virtualDecision,
+    ): void {
+        $this->assertAccess();
+
+        $type = MeetingTypes::tryFrom($virtualType);
+
+        if (null === $type) {
+            $this->feedback = $this->cannotBeCounterparts();
+
+            return;
+        }
+
+        try {
+            $linked = $this->databaseMeetingService->linkVirtualCounterpart(
+                $this->type,
+                $this->number,
+                $point,
+                $number,
+                $type,
+                $virtualMeeting,
+                $virtualPoint,
+                $virtualDecision,
+            );
+        } catch (CounterpartNotPossible) {
+            // The button is only offered on a meeting that is not virtual and the lookup answers with virtual
+            // decisions only, so the one way to arrive here is a decision removed between picking it and confirming.
+            $this->feedback = $this->cannotBeCounterparts();
+
+            return;
+        }
+
+        $this->reportWritten($linked);
+    }
+
+    #[LiveAction]
+    public function unlinkVirtualCounterpart(
+        #[LiveArg]
+        string $virtualType,
+        #[LiveArg]
+        int $virtualMeeting,
+        #[LiveArg]
+        int $virtualPoint,
+        #[LiveArg]
+        int $virtualDecision,
+    ): void {
+        $this->assertAccess();
+
+        $type = MeetingTypes::tryFrom($virtualType);
+
+        if (null === $type) {
+            $this->feedback = $this->cannotBeCounterparts();
+
+            return;
+        }
+
+        $this->reportWritten($this->databaseMeetingService->unlinkVirtualCounterpart(
+            $type,
+            $virtualMeeting,
+            $virtualPoint,
+            $virtualDecision,
+        ));
+    }
+
     #[LiveAction]
     public function deleteMinutes(): void
     {
@@ -602,6 +685,29 @@ final class MeetingManage
     private function meeting(): Meeting
     {
         return $this->getView()->meeting;
+    }
+
+    private function cannotBeCounterparts(): string
+    {
+        return new TranslatableMessage('These two decisions cannot be one another\'s counterpart.')
+            ->trans($this->translator);
+    }
+
+    /**
+     * What a write to the ledger's side of this meeting answers with.
+     *
+     * Two secretaries can have this page open at once, and the second one to act on a decision the first has removed
+     * changes nothing. Reporting success either way would have them believe otherwise.
+     */
+    private function reportWritten(bool $written): void
+    {
+        if (!$written) {
+            $this->feedback = new TranslatableMessage('This decision no longer exists.')->trans($this->translator);
+
+            return;
+        }
+
+        $this->markSaved();
     }
 
     private function markSaved(): void

@@ -222,6 +222,60 @@ final class AdminConsolidationTest extends DatabaseTestCase
         return self::getContainer()->get(DashboardController::class);
     }
 
+    /**
+     * A virtual counterpart is shown on the decision it belongs to, and taking it back is asked for through the
+     * shared confirmation rather than done on the click.
+     */
+    public function testAVirtualCounterpartIsShownAndUnlinkedThroughTheSharedConfirmation(): void
+    {
+        $this->authenticate(
+            self::REGISTER_ADMIN,
+            [
+                UserRoles::Board->value,
+                UserRoles::DatabaseAdmin->value,
+            ],
+        );
+        $this->pushRequest();
+        self::getContainer()->get(SudoMode::class)->grant();
+
+        $content = $this->render($this->meetings()->view(
+            MeetingTypes::BV,
+            $this->aMeetingNumberWithACounterpart(),
+        ));
+
+        self::assertStringContainsString(
+            'Virtual counterpart',
+            $content,
+        );
+        self::assertStringContainsString(
+            'data-confirm-live-action="unlinkVirtualCounterpart"',
+            $content,
+            'Unlinking is asked for before it happens, through the modal the page already carries.',
+        );
+    }
+
+    /**
+     * The board meeting whose decision the seed gives a virtual counterpart.
+     */
+    private function aMeetingNumberWithACounterpart(): int
+    {
+        $meetings = $this->entityManager
+            ->getRepository(Meeting::class)
+            ->findBy(['type' => MeetingTypes::BV]);
+
+        foreach ($meetings as $meeting) {
+            foreach ($meeting->getDecisions() as $decision) {
+                if ([] === $decision->getVirtualCounterparts()->toArray()) {
+                    continue;
+                }
+
+                return $meeting->getNumber();
+            }
+        }
+
+        self::fail('The seed is expected to give a board decision a virtual counterpart.');
+    }
+
     private function meetings(): AdminMeetingController
     {
         return self::getContainer()->get(AdminMeetingController::class);

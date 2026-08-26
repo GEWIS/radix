@@ -13,12 +13,18 @@ namespace App\ViewModel\Database;
  */
 final readonly class DecisionRow
 {
+    /**
+     * @param ?DecisionReference  $counterpart         what a virtual decision is the counterpart of
+     * @param DecisionReference[] $virtualCounterparts the virtual decisions that are this one's counterpart
+     */
     public function __construct(
         public int $point,
         public int $number,
         public string $content,
         public string $copyContent,
         public ?DecisionReference $annulment,
+        public ?DecisionReference $counterpart,
+        public array $virtualCounterparts,
     ) {
     }
 }

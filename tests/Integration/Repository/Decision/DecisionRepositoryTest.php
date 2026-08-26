@@ -11,6 +11,7 @@ use App\Service\Decision\DecisionSearchQueryParser;
 use App\Tests\Integration\DatabaseTestCase;
 use Override;
 
+use function array_values;
 use function count;
 
 final class DecisionRepositoryTest extends DatabaseTestCase
@@ -65,6 +66,71 @@ final class DecisionRepositoryTest extends DatabaseTestCase
                 $decision->getPoint(),
             );
         }
+    }
+
+    /**
+     * A virtual meeting exists to say again what a real meeting decided. Searching for the words they share must not
+     * answer with both, which is what naming the decision it repeats settles.
+     */
+    public function testADecisionThatRepeatsAnotherIsLeftOutOfTheTextSearch(): void
+    {
+        $results = $this->search('introductieweekend ter hoogte van');
+
+        self::assertNotEmpty($results);
+        foreach ($results as $decision) {
+            self::assertNull(
+                $decision->getCounterpart(),
+                'A decision that repeats another should not answer a search the one it repeats answers.',
+            );
+        }
+    }
+
+    /**
+     * Hidden from the results, but not out of reach: the search page folds them away under the decision they repeat,
+     * which is what this answers with.
+     */
+    public function testTheVirtualDecisionsRepeatingAResultAreFoundAlongsideIt(): void
+    {
+        $results = $this->search('introductieweekend ter hoogte van');
+
+        self::assertNotEmpty($results);
+
+        $repeats = $this->repository->findVirtualCounterpartsOf(array_values($results));
+
+        self::assertNotEmpty(
+            $repeats,
+            'The decision the seed repeats should be among the results, with its repeat alongside it.',
+        );
+
+        foreach ($repeats as $key => $decisions) {
+            foreach ($decisions as $decision) {
+                $counterpart = $decision->getCounterpart();
+
+                self::assertSame(
+                    MeetingTypes::VIRT,
+                    $decision->getMeeting()->getType(),
+                );
+                self::assertNotNull($counterpart);
+                self::assertSame(
+                    $key,
+                    DecisionRepository::key($counterpart),
+                );
+            }
+        }
+    }
+
+    /**
+     * It is still on the record and still reachable: naming it directly is not the text search this rule is about.
+     */
+    public function testADecisionThatRepeatsAnotherIsStillFoundByItsOwnReference(): void
+    {
+        $results = $this->search('Virt 1.1.1');
+
+        self::assertCount(
+            1,
+            $results,
+        );
+        self::assertNotNull($results[0]->getCounterpart());
     }
 
     public function testExcludedTermsDropMatches(): void

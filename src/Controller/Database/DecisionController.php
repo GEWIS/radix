@@ -96,6 +96,9 @@ final class DecisionController extends AbstractController
             null === $meetingNumber ? null : (int) $meetingNumber,
             $request->query->getInt('point'),
             $request->query->getInt('decision'),
+            // Asked for by the lookup that picks a virtual counterpart: only a virtual decision is one, and one
+            // that is already somebody's counterpart is spoken for.
+            $request->query->getBoolean('only_virtual'),
         ));
     }
 
