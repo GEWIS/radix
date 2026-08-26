@@ -644,12 +644,6 @@ parameters:
 			path: src/Form/Database/DeleteAddressType.php
 
 		-
-			message: '#^Class App\\Form\\Database\\DeleteDecisionType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Form/Database/DeleteDecisionType.php
-
-		-
 			message: '#^Class App\\Form\\Database\\DeleteListType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1

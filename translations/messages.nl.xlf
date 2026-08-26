@@ -2737,6 +2737,10 @@
         <source>Delete selected</source>
         <target state="translated">Selectie verwijderen</target>
       </trans-unit>
+      <trans-unit id="JeaCB9H" resname="Delete this decision?">
+        <source>Delete this decision?</source>
+        <target state="translated">Dit besluit verwijderen?</target>
+      </trans-unit>
       <trans-unit id="P21LgGI" resname="Delete this news item?">
         <source>Delete this news item?</source>
         <target state="translated">Dit nieuwsbericht verwijderen?</target>
@@ -9268,6 +9272,10 @@
       <trans-unit id="I6hgvcK" resname="This decision has already been annulled.">
         <source>This decision has already been annulled.</source>
         <target state="translated">Dit besluit is al vernietigd.</target>
+      </trans-unit>
+      <trans-unit id="G1w32hn" resname="This decision no longer exists.">
+        <source>This decision no longer exists.</source>
+        <target state="translated">Dit besluit bestaat niet meer.</target>
       </trans-unit>
       <trans-unit id="pvQxQCC" resname="This deletes %name% and everything on record about them.">
         <source>This deletes %name% and everything on record about them.</source>

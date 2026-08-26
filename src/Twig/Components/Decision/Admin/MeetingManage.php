@@ -13,6 +13,8 @@ use App\Entity\Decision\MeetingReferenceSelection;
 use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
+use App\Exception\Database\AnnulmentNotPossible;
+use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Decision\MeetingActivityLogRepository;
 use App\Repository\Decision\MeetingDocumentRepository;
 use App\Repository\Decision\MeetingPointRepository;
@@ -33,6 +35,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -111,6 +115,7 @@ final class MeetingManage
 
     public function __construct(
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
         private readonly DatabaseMeetingService $databaseMeetingService,
         private readonly MeetingQueryService $meetingQueryService,
         private readonly MeetingPointRepository $meetingPointRepository,
@@ -444,6 +449,52 @@ final class MeetingManage
             $document,
             $this->actor(),
         );
+        $this->markSaved();
+    }
+
+    /**
+     * Remove one decision of this meeting from the ledger, along with everything it recorded.
+     *
+     * The ledger turns down a decision that a later one builds on, which is the whole reason this is worth an answer
+     * rather than a redirect: the reader stays on the meeting and is told why nothing was removed.
+     */
+    #[LiveAction]
+    public function deleteDecision(
+        #[LiveArg]
+        int $point,
+        #[LiveArg]
+        int $number,
+    ): void {
+        $this->assertAccess();
+
+        try {
+            $deleted = $this->databaseMeetingService->deleteDecision(
+                MeetingTypes::tryFromSearch(strtoupper($this->type)),
+                $this->number,
+                $point,
+                $number,
+            );
+        } catch (DecisionStillReferenced) {
+            $this->feedback = new TranslatableMessage('Other decisions still refer to this one.')
+                ->trans($this->translator);
+
+            return;
+        } catch (AnnulmentNotPossible) {
+            $this->feedback = new TranslatableMessage(
+                'Removing this annulment would restore a decision that later decisions have since overtaken.',
+            )->trans($this->translator);
+
+            return;
+        }
+
+        // Two secretaries can hold this open at once, and the second one to answer it deletes nothing. Reporting
+        // success either way would have them believe they removed something they did not.
+        if (!$deleted) {
+            $this->feedback = new TranslatableMessage('This decision no longer exists.')->trans($this->translator);
+
+            return;
+        }
+
         $this->markSaved();
     }
 

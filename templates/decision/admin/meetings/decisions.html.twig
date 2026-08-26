@@ -33,17 +33,21 @@
                         <span class="fas fa-copy" aria-hidden="true"></span>
                         <span data-copy-target="label">{{ 'Copy Decision'|trans }}</span>
                     </button>
-                    {# Copying a decision is reading it; deleting one is keeping the record. #}
+                    {# Copying a decision is reading it; deleting one is keeping the record. The confirmation is the
+                       shared modal the page already carries, which sits outside this component so the re-render
+                       that follows cannot leave a backdrop behind. #}
                     {% if is_granted('ROLE_DATABASE_ADMIN') %}
-                        <a class="btn btn-sm btn-outline-danger"
-                           href="{{ path('decision_decision_delete', {
-                               type: ledgerMeeting.type.value,
-                               number: ledgerMeeting.number,
-                               point: decision.point,
-                               decision: decision.number,
-                           }) }}">
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                data-bs-toggle="modal" data-bs-target="#confirm-modal"
+                                data-confirm-title="{{ 'Delete this decision?'|trans }}"
+                                data-confirm-message="{{ 'This deletes decision %decision% and everything it recorded.'|trans({
+                                    '%decision%': meeting_label ~ '.' ~ decision.point ~ '.' ~ decision.number,
+                                }) }}"
+                                data-confirm-label="{{ 'Delete'|trans }}"
+                                data-confirm-live-action="deleteDecision"
+                                data-confirm-live-args="{{ {'point': decision.point, 'number': decision.number}|json_encode }}">
                             {{ 'Delete Decision'|trans }}
-                        </a>
+                        </button>
                     {% endif %}
                 </span>
             </div>
