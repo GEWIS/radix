@@ -14,6 +14,7 @@ use App\Tests\Support\LedgerBuilder;
 use App\ViewModel\Checker\Error;
 use App\ViewModel\Checker\Error\AnnulmentOfAnnulment;
 use App\ViewModel\Checker\Error\AnnulmentOfLaterDecision;
+use App\ViewModel\Checker\Error\DocumentDatedAfterMeeting;
 use App\ViewModel\Checker\Error\KeyGrantedInThePast;
 use App\ViewModel\Checker\Error\KeyGrantedPastBoundary;
 use App\ViewModel\Checker\Error\KeyWithdrawnPastOriginalGranting;
@@ -403,6 +404,68 @@ class CheckerTest extends KernelTestCase
                 $this->checker->checkAnnulments($meeting),
                 $annulment,
                 AnnulmentOfLaterDecision::class,
+            ),
+        );
+    }
+
+    /**
+     * A meeting can only decide on the version of a document in front of it, so nothing it approves may be dated
+     * after it.
+     */
+    public function testReportsADocumentDatedAfterTheMeetingThatApprovedIt(): void
+    {
+        $meeting = $this->build->meeting(
+            MeetingTypes::BV,
+            '2026-03-04',
+        );
+        $budget = $this->build->approveBudget(
+            $meeting,
+            '2026-03-05',
+        );
+        $regulation = $this->build->approveOrganRegulation(
+            $meeting,
+            '2026-04-01',
+        );
+
+        $errors = $this->checker->checkDocumentDates($meeting);
+
+        self::assertCount(
+            1,
+            $this->errorsAbout(
+                $errors,
+                $budget,
+                DocumentDatedAfterMeeting::class,
+            ),
+        );
+        self::assertCount(
+            1,
+            $this->errorsAbout(
+                $errors,
+                $regulation,
+                DocumentDatedAfterMeeting::class,
+            ),
+        );
+    }
+
+    /**
+     * Both ends of the range are allowed: a document written on the day of the meeting is in time.
+     */
+    public function testAcceptsADocumentDatedOnTheDayOfTheMeeting(): void
+    {
+        $meeting = $this->build->meeting(
+            MeetingTypes::BV,
+            '2026-03-04',
+        );
+        $budget = $this->build->approveBudget(
+            $meeting,
+            '2026-03-04',
+        );
+
+        self::assertCount(
+            0,
+            $this->errorsAbout(
+                $this->checker->checkDocumentDates($meeting),
+                $budget,
             ),
         );
     }

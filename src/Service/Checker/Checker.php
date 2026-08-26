@@ -11,6 +11,7 @@ use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Database\Meeting as MeetingModel;
 use App\Entity\Database\SubDecision as SubDecisionModel;
 use App\Service\Checker\Annulment as AnnulmentService;
+use App\Service\Checker\Document as DocumentService;
 use App\Service\Checker\Installation as InstallationService;
 use App\Service\Checker\Key as KeyService;
 use App\Service\Checker\Meeting as MeetingService;
@@ -30,6 +31,7 @@ class Checker
 {
     public function __construct(
         private readonly AnnulmentService $annulmentService,
+        private readonly DocumentService $documentService,
         private readonly InstallationService $installationService,
         private readonly KeyService $keyService,
         private readonly MeetingService $meetingService,
@@ -60,6 +62,7 @@ class Checker
                 $this->checkKeyWithdrawalTime($meeting),
                 $this->checkOrganComposition($meeting),
                 $this->checkAnnulments($meeting),
+                $this->checkDocumentDates($meeting),
             );
 
             $reports[] = [
@@ -353,6 +356,31 @@ class Checker
                     $errors[] = new ErrorModel\KeyGrantedPastBoundary($granting);
                 }
             }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Checks that no budget, financial statement or body regulation the meeting approved is dated after it. A meeting
+     * can only decide on the version in front of it, so a later date describes a document that did not exist yet.
+     *
+     * @return list<ErrorModel<SubDecisionModel>>
+     */
+    public function checkDocumentDates(MeetingModel $meeting): array
+    {
+        $errors = [];
+        $documents = array_merge(
+            $this->documentService->getBudgetsDuringMeeting($meeting),
+            $this->documentService->getOrganRegulationsDuringMeeting($meeting),
+        );
+
+        foreach ($documents as $document) {
+            if ($document->getDate() <= $meeting->getDate()) {
+                continue;
+            }
+
+            $errors[] = new ErrorModel\DocumentDatedAfterMeeting($document);
         }
 
         return $errors;
