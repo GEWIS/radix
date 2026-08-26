@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 use function array_values;
 use function assert;
@@ -56,14 +57,18 @@ class GeneralStepType extends AbstractType
         array $options,
     ): void {
         $builder
+            // Both have to be answered rather than left on whatever came first in the list, so the placeholder is
+            // not a choice and having no organiser is one.
             ->add(
                 'organId',
                 ChoiceType::class,
                 [
-                    'label' => t('Organising organ'),
-                    'required' => false,
-                    'placeholder' => t('No organising organ'),
+                    'label' => t('Organising body'),
+                    'placeholder' => t('Select a body'),
                     'choices' => $this->organChoices($options['bound_organ_id']),
+                    'choice_label' => static fn (string $value, string $label): string|TranslatableInterface => (
+                        ActivityData::NONE === $value ? t('No organising body') : $label
+                    ),
                 ],
             )
             ->add(
@@ -71,12 +76,13 @@ class GeneralStepType extends AbstractType
                 ChoiceType::class,
                 [
                     'label' => t('Organising company'),
-                    'required' => false,
-                    'placeholder' => t('No organising company'),
+                    'placeholder' => t('Select a company'),
                     'choices' => $this->companyChoices(),
-                    // Attaching an organising company is C4/board-only; a disabled field renders read-only and keeps
-                    // whatever it already had on submit.
-                    'disabled' => !$this->security->isGranted(UserRoles::CompanyAdmin->value),
+                    'choice_label' => static fn (string $value, string $label): string|TranslatableInterface => (
+                        ActivityData::NONE === $value ? t('No organising company') : $label
+                    ),
+                    // A disabled field renders read-only and keeps whatever it already had on submit.
+                    'disabled' => true !== $options['company_editable'],
                 ],
             )
             ->add(
@@ -106,6 +112,7 @@ class GeneralStepType extends AbstractType
                     'label' => t('Category'),
                     'class' => ActivityCategories::class,
                     'choices' => ActivityCategories::selectableCases(),
+                    'placeholder' => t('Select a category'),
                 ],
             )
             ->add(
@@ -148,7 +155,7 @@ class GeneralStepType extends AbstractType
      * Every active organ for the board, otherwise only the organs the user is currently installed in (mirroring
      * {@see \App\Security\Application\RevisionVoter}'s rule), plus the one the revision already carries.
      *
-     * @return array<string, int>
+     * @return array<string, string>
      */
     private function organChoices(?int $boundOrganId): array
     {
@@ -174,10 +181,11 @@ class GeneralStepType extends AbstractType
             }
         }
 
-        $choices = [];
+        // Keyed by a placeholder the `choice_label` above replaces with the translated text.
+        $choices = ['none' => ActivityData::NONE];
 
         foreach ($organs as $organ) {
-            $choices[$organ->getAbbr()] = intval($organ->getId());
+            $choices[$organ->getAbbr()] = (string) intval($organ->getId());
         }
 
         return $choices;
@@ -209,15 +217,15 @@ class GeneralStepType extends AbstractType
     }
 
     /**
-     * @return array<string, int>
+     * @return array<string, string>
      */
     private function companyChoices(): array
     {
-        $choices = [];
+        $choices = ['none' => ActivityData::NONE];
 
         foreach ($this->companyRepository->findAll() as $company) {
             assert($company instanceof Company);
-            $choices[$company->getName()] = intval($company->getId());
+            $choices[$company->getName()] = (string) intval($company->getId());
         }
 
         return $choices;
@@ -245,11 +253,17 @@ class GeneralStepType extends AbstractType
         $resolver->setDefaults([
             'inherit_data' => true,
             'schedule_locked' => false,
+            'company_editable' => true,
             'bound_organ_id' => null,
         ]);
 
         $resolver->setAllowedTypes(
             'schedule_locked',
+            'bool',
+        );
+
+        $resolver->setAllowedTypes(
+            'company_editable',
             'bool',
         );
         $resolver->setAllowedTypes(

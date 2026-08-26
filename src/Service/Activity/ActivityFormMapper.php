@@ -33,13 +33,13 @@ class ActivityFormMapper
         ActivityRevision $revision,
     ): void {
         $revision->setOrgan(
-            null !== $data->organId
-                ? $this->organRepository->find($data->organId)
+            null !== ($organId = self::identifier($data->organId))
+                ? $this->organRepository->find($organId)
                 : null,
         );
         $revision->setCompany(
-            null !== $data->companyId
-                ? $this->companyRepository->find($data->companyId)
+            null !== ($companyId = self::identifier($data->companyId))
+                ? $this->companyRepository->find($companyId)
                 : null,
         );
 
@@ -72,5 +72,20 @@ class ActivityFormMapper
         $current = $revision->getLabels()->toArray();
         $revision->removeLabels($current);
         $revision->addLabels($wanted);
+    }
+
+    /**
+     * The record a choice points at, or null where the answer was that there is no organiser.
+     */
+    private static function identifier(?string $choice): ?int
+    {
+        if (
+            null === $choice
+            || ActivityData::NONE === $choice
+        ) {
+            return null;
+        }
+
+        return (int) $choice;
     }
 }

@@ -28,9 +28,32 @@ final class ActivityData
     public const string STEP_DETAILS = 'details';
     public const string STEP_SIGNUP_LISTS = 'signupLists';
 
-    public ?int $organId = null;
+    /**
+     * What is chosen when an activity has no organising body or no organising company. Not the same as leaving the
+     * question unanswered, which is what the rule below refuses.
+     */
+    public const string NONE = 'none';
 
-    public ?int $companyId = null;
+    #[Assert\NotNull(
+        message: 'Choose an organising body, or say there is none.',
+        groups: [self::STEP_GENERAL],
+    )]
+    public ?string $organId = null;
+
+    /**
+     * Attaching an organising company is C4/board-only. Everybody else is shown the field read-only, so there is
+     * nothing for them to answer and the rule below does not apply to them.
+     */
+    public bool $companyEditable = true;
+
+    #[Assert\When(
+        expression: 'this.companyEditable',
+        constraints: [
+            new Assert\NotNull(message: 'Choose an organising company, or say there is none.'),
+        ],
+        groups: [self::STEP_GENERAL],
+    )]
+    public ?string $companyId = null;
 
     /** True once the activity is live and under way, which is when its start becomes read-only. */
     public bool $scheduleLocked = false;
@@ -47,6 +70,10 @@ final class ActivityData
     )]
     public ?DateTimeImmutable $endTime = null;
 
+    #[Assert\NotNull(
+        message: 'Choose a category.',
+        groups: [self::STEP_GENERAL],
+    )]
     public ?ActivityCategories $category = null;
 
     /** @var int[] */
@@ -82,8 +109,9 @@ final class ActivityData
     ): self {
         $data = new self();
         $data->scheduleLocked = $scheduleLocked;
-        $data->organId = $revision->getOrgan()?->getId();
-        $data->companyId = $revision->getCompany()?->getId();
+        // A revision that was saved has answered both questions, so nothing is left unanswered on an edit.
+        $data->organId = self::identifier($revision->getOrgan()?->getId());
+        $data->companyId = self::identifier($revision->getCompany()?->getId());
         $data->beginTime = null !== $revision->getBeginTime()
             ? DateTimeImmutable::createFromInterface($revision->getBeginTime())
             : null;
@@ -112,6 +140,13 @@ final class ActivityData
         $data->languageEnglish = $data->hasContent(false) || !$data->languageDutch;
 
         return $data;
+    }
+
+    private static function identifier(?int $id): string
+    {
+        return null === $id
+            ? self::NONE
+            : (string) $id;
     }
 
     /**

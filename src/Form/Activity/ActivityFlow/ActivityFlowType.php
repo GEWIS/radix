@@ -36,6 +36,7 @@ class ActivityFlowType extends AbstractStepperFlowType
                 GeneralStepType::class,
                 [
                     'schedule_locked' => $options['schedule_locked'],
+                    'company_editable' => $options['company_editable'],
                     'bound_organ_id' => $options['bound_organ_id'],
                 ],
             )
@@ -64,6 +65,7 @@ class ActivityFlowType extends AbstractStepperFlowType
             'data_class' => ActivityData::class,
             'finish_label' => t('Save draft'),
             'schedule_locked' => false,
+            'company_editable' => true,
             'bound_organ_id' => null,
             'revision' => null,
             'step_labels' => [
@@ -75,6 +77,11 @@ class ActivityFlowType extends AbstractStepperFlowType
 
         $resolver->setAllowedTypes(
             'schedule_locked',
+            'bool',
+        );
+
+        $resolver->setAllowedTypes(
+            'company_editable',
             'bool',
         );
         $resolver->setAllowedTypes(

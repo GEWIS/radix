@@ -5661,13 +5661,13 @@
         <source>No open vacancies</source>
         <target>No open vacancies</target>
       </trans-unit>
+      <trans-unit id="0upPDPu" resname="No organising body">
+        <source>No organising body</source>
+        <target state="translated">No organising body</target>
+      </trans-unit>
       <trans-unit id="MXNPMwh" resname="No organising company">
         <source>No organising company</source>
         <target state="translated">No organising company</target>
-      </trans-unit>
-      <trans-unit id="0upPDPu" resname="No organising organ">
-        <source>No organising organ</source>
-        <target state="translated">No organising organ</target>
       </trans-unit>
       <trans-unit id="F8tps6v" resname="No pending activities.">
         <source>No pending activities.</source>
@@ -6205,13 +6205,13 @@
         <source>Organisers</source>
         <target state="translated">Organisers</target>
       </trans-unit>
+      <trans-unit id="PK.ewBR" resname="Organising body">
+        <source>Organising body</source>
+        <target state="translated">Organising body</target>
+      </trans-unit>
       <trans-unit id="xer5g4K" resname="Organising company">
         <source>Organising company</source>
         <target state="translated">Organising company</target>
-      </trans-unit>
-      <trans-unit id="PK.ewBR" resname="Organising organ">
-        <source>Organising organ</source>
-        <target state="translated">Organising organ</target>
       </trans-unit>
       <trans-unit id="zvvKAKp" resname="Organising party">
         <source>Organising party</source>
@@ -7648,6 +7648,14 @@
       <trans-unit id="hTRxAeK" resname="Select a body">
         <source>Select a body</source>
         <target state="translated">Select a body</target>
+      </trans-unit>
+      <trans-unit id="Ub2kZ9c" resname="Select a category">
+        <source>Select a category</source>
+        <target state="translated">Select a category</target>
+      </trans-unit>
+      <trans-unit id="Qm4vT1x" resname="Select a company">
+        <source>Select a company</source>
+        <target state="translated">Select a company</target>
       </trans-unit>
       <trans-unit id="WI1x1ys" resname="Select a round">
         <source>Select a round</source>
