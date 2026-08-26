@@ -294,7 +294,7 @@
                                     <input type="text" class="form-control" id="email-subject-{{ list.listId }}" required
                                            placeholder="{{ 'Subject'|trans }}"
                                            data-model="norender|emailSubject" value="{{ emailSubject }}">
-                                    <label for="email-subject-{{ list.listId }}">{{ 'Subject'|trans }} <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label class="required" for="email-subject-{{ list.listId }}">{{ 'Subject'|trans }}</label>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -307,7 +307,7 @@
                                               data-markdown-editor-toolbar-value="minimal"
                                               data-markdown-editor-language-value="{{ app.request.locale }}"
                                               data-model="norender|emailBody">{{ emailBody }}</textarea>
-                                    <label for="email-body-{{ list.listId }}">{{ 'Message'|trans }} <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label class="required" for="email-body-{{ list.listId }}">{{ 'Message'|trans }}</label>
                                 </div>
                             </div>
                             <div class="col-md-12 d-flex justify-content-end gap-2">

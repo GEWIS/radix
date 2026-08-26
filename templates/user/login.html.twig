@@ -31,7 +31,7 @@
                         {% else %}
                             <div class="form-floating mb-2">
                                 <input type="text" value="{{ last_username }}" placeholder="{{ 'jane.doe@example.com'|trans }}" name="_username" id="username" class="form-control{% if error %} is-invalid{% endif %}" autocomplete="username" required autofocus>
-                                <label for="username">
+                                <label class="required" for="username">
                                     {% if 'user' === type %}
                                         {{ 'Email address or membership number'|trans }}
                                     {% else %}
@@ -41,7 +41,7 @@
                             </div>
                             <div class="form-floating mb-2">
                                 <input type="password" placeholder="****************" name="_password" id="password" class="form-control{% if error %} is-invalid{% endif %}" autocomplete="current-password" required>
-                                <label for="password">{{ 'Password'|trans }}</label>
+                                <label class="required" for="password">{{ 'Password'|trans }}</label>
                                 {% if error %}
                                     <div class="invalid-feedback d-block">
                                         {{ error.messageKey|trans(error.messageData, 'security') }}
