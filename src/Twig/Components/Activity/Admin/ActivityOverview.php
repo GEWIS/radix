@@ -10,7 +10,7 @@ use App\Entity\Decision\Member;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\Activity\Admin\ActivityAdminRow;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
@@ -34,14 +34,14 @@ use function min;
  * "approved" table, both paginated. Each member sees the activities they created or that one of their organs
  * organises; a board member can flip {@see self::$showAll} to see every activity.
  *
- * @extends AbstractPaginatedOverview<Activity>
+ * @extends AbstractDoctrinePaginatedOverview<Activity>
  */
 #[AsLiveComponent(
     name: 'Activity:Admin:ActivityOverview',
     template: 'components/Activity/Admin/ActivityOverview.html.twig',
 )]
 #[IsGranted(new Expression("is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD')"))]
-final class ActivityOverview extends AbstractPaginatedOverview
+final class ActivityOverview extends AbstractDoctrinePaginatedOverview
 {
     #[LiveProp(writable: true)]
     public bool $showAll = false;
@@ -139,6 +139,17 @@ final class ActivityOverview extends AbstractPaginatedOverview
     public function toggleApproved(): void
     {
         $this->expanded = !$this->expanded;
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->showingAll(),
+        ];
     }
 
     /**

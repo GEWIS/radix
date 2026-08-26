@@ -9,7 +9,7 @@ use App\Entity\Frontpage\Poll;
 use App\Entity\User\User;
 use App\Repository\Frontpage\PollCommentRepository;
 use App\Repository\Frontpage\PollRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -24,13 +24,13 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
  * Narrowing to what the reader did or did not answer is offered only while they are signed in; to a passer-by it
  * would mean nothing.
  *
- * @extends AbstractPaginatedOverview<Poll>
+ * @extends AbstractDoctrinePaginatedOverview<Poll>
  */
 #[AsLiveComponent(
     name: 'Frontpage:PollArchive',
     template: 'components/Frontpage/PollArchive.html.twig',
 )]
-final class PollArchive extends AbstractPaginatedOverview
+final class PollArchive extends AbstractDoctrinePaginatedOverview
 {
     #[LiveProp(
         writable: true,
@@ -97,6 +97,19 @@ final class PollArchive extends AbstractPaginatedOverview
     public function knowsTheReader(): bool
     {
         return null !== $this->member();
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->search,
+            $this->answered,
+            $this->oldestFirst,
+        ];
     }
 
     /**

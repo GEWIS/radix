@@ -40,68 +40,7 @@
         {% endfor %}
     </div>
 
-    {% if unprocessedCount > 0 %}
-        <div class="panel">
-            <div class="panel-heading">
-                <h3>{{ 'Waiting to become downloadable'|trans }}</h3>
-            </div>
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>{{ 'Course'|trans }}</th>
-                                <th>{{ 'Document'|trans }}</th>
-                                <th>{{ 'Status'|trans }}</th>
-                                <th class="text-end">{{ 'Actions'|trans }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for document in unprocessed %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ path('admin/education/courses/documents', {code: document.getCourse.getCode}) }}">
-                                            {{ document.getCourse.getCode }}
-                                        </a>
-                                        <div class="text-muted small">{{ document.getCourse.getName }}</div>
-                                    </td>
-                                    <td>
-                                        {{ document.getType.label|trans }}
-                                        <div class="text-muted small">{{ document.getDate|date('j M Y') }}</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge {{ document.getFlattenStatus.badgeClass }}">
-                                            {{ document.getFlattenStatus.label|trans }}
-                                        </span>
-                                        {% if document.getFlattenError is not null %}
-                                            <div class="text-muted small">{{ document.getFlattenError }}</div>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-end">
-                                        <form method="post" class="d-inline"
-                                              action="{{ path('admin/education/documents/reprocess', {document: document.getId}) }}">
-                                            <input type="hidden" name="_csrf_token"
-                                                   value="{{ csrf_token('education_document_reprocess-' ~ document.getId) }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">{{ 'Process again'|trans }}</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                {% include 'partials/application/pagination.html.twig' with {
-                    'route': 'admin/education/index',
-                    'routeParams': {},
-                    'page': currentPage,
-                    'pageSize': pageSize,
-                    'totalCount': unprocessedCount,
-                    'totalPages': (unprocessedCount / pageSize)|round(0, 'ceil'),
-                } only %}
-            </div>
-        </div>
-    {% endif %}
+    <twig:Education:Admin:UnprocessedDocumentOverview />
 
     {{ component('Education:Admin:CourseOverview') }}
 {% endblock %}

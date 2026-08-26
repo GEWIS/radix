@@ -7,7 +7,7 @@ namespace App\Twig\Components\Database;
 use App\Entity\Database\Enums\ProspectiveMemberFilter;
 use App\Entity\Database\ProspectiveMember;
 use App\Repository\Database\ProspectiveMemberRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\Twig\Components\Concerns\FilterPillsTrait;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
@@ -17,13 +17,13 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 /**
  * Everyone who has registered but is not a member yet, in the order they will be dealt with.
  *
- * @extends AbstractPaginatedOverview<ProspectiveMember>
+ * @extends AbstractDoctrinePaginatedOverview<ProspectiveMember>
  */
 #[AsLiveComponent(
     name: 'Database:ProspectiveMemberOverview',
     template: 'components/Database/ProspectiveMemberOverview.html.twig',
 )]
-final class ProspectiveMemberOverview extends AbstractPaginatedOverview
+final class ProspectiveMemberOverview extends AbstractDoctrinePaginatedOverview
 {
     use FilterPillsTrait;
 
@@ -76,6 +76,18 @@ final class ProspectiveMemberOverview extends AbstractPaginatedOverview
     public function getFilters(): array
     {
         return ProspectiveMemberFilter::cases();
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->search,
+            $this->filter,
+        ];
     }
 
     /**
