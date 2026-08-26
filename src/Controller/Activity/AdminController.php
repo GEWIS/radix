@@ -97,12 +97,24 @@ class AdminController extends AbstractController
         $revision = $activity->getCurrentRevision();
         assert($revision instanceof ActivityRevision);
 
+        $companyEditable = $this->isGranted(UserRoles::CompanyAdmin->value);
+
+        $data = new ActivityData();
+        $data->companyEditable = $companyEditable;
+
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             ActivityFlowType::class,
-            new ActivityData(),
+            $data,
             [
-                'flow_key' => 'create',
+                'flow_key' => $run,
                 'revision' => $revision,
+                'company_editable' => $companyEditable,
             ],
         );
         $flow->handleRequest($request);
@@ -119,10 +131,10 @@ class AdminController extends AbstractController
             );
         }
 
-        $data = $flow->getData();
-        assert($data instanceof ActivityData);
+        $collected = $flow->getData();
+        assert($collected instanceof ActivityData);
         $this->activityFormMapper->apply(
-            $data,
+            $collected,
             $revision,
         );
 
@@ -244,16 +256,29 @@ class AdminController extends AbstractController
 
         // For a spawned draft the cloner has already pointed the activity's current revision at it; for an in-place
         // draft it was already current.
+        $companyEditable = $this->isGranted(UserRoles::CompanyAdmin->value);
+        $scheduleLocked = $this->scheduleIsLocked($revision);
+
+        $data = ActivityData::fromRevision(
+            $revision,
+            $scheduleLocked,
+        );
+        $data->companyEditable = $companyEditable;
+
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             ActivityFlowType::class,
-            ActivityData::fromRevision(
-                $revision,
-                $this->scheduleIsLocked($revision),
-            ),
+            $data,
             [
-                'flow_key' => (string) $revision->getId(),
+                'flow_key' => $run,
                 'revision' => $revision,
-                'schedule_locked' => $this->scheduleIsLocked($revision),
+                'schedule_locked' => $scheduleLocked,
+                'company_editable' => $companyEditable,
                 'bound_organ_id' => $revision->getOrgan()?->getId(),
                 'finish_label' => $this->translator->trans('Save changes'),
             ],
@@ -288,10 +313,10 @@ class AdminController extends AbstractController
             );
         }
 
-        $data = $flow->getData();
-        assert($data instanceof ActivityData);
+        $collected = $flow->getData();
+        assert($collected instanceof ActivityData);
         $this->activityFormMapper->apply(
-            $data,
+            $collected,
             $revision,
         );
 

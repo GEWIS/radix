@@ -29,6 +29,7 @@ use Override;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -113,12 +114,18 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         $vacancy->addRevision($revision);
         $vacancy->setCurrentRevision($revision);
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             VacancyFlowType::class,
             new VacancyData(),
             [
                 'company' => $company,
-                'flow_key' => 'create',
+                'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
             ],
         );
@@ -225,6 +232,12 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         // company may only still set them while nothing of the vacancy is public yet.
         $identityEditable = null === $vacancy->getLiveRevision();
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             VacancyFlowType::class,
             VacancyData::fromVacancy(
@@ -235,7 +248,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
                 'company' => $company,
                 'identity_editable' => $identityEditable,
                 'current_package_id' => $vacancy->getPackage()->getId(),
-                'flow_key' => (string) $current->getId(),
+                'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
             ],
         );

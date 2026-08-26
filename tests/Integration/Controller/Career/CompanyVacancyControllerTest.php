@@ -25,7 +25,7 @@ final class CompanyVacancyControllerTest extends DatabaseTestCase
         $companyUser = $this->signIn();
 
         $response = $this->controller()->index(
-            new Request(),
+            new Request(query: ['flow' => 'testing']),
             $companyUser,
         );
 
@@ -124,7 +124,7 @@ final class CompanyVacancyControllerTest extends DatabaseTestCase
         $this->entityManager->flush();
 
         $response = $this->controller()->edit(
-            new Request(),
+            new Request(query: ['flow' => 'testing']),
             $vacancy,
             $companyUser,
         );
@@ -174,7 +174,7 @@ final class CompanyVacancyControllerTest extends DatabaseTestCase
         $companyUser = $this->signIn();
 
         $response = $this->controller()->create(
-            new Request(),
+            new Request(query: ['flow' => 'testing']),
             $companyUser,
         );
 

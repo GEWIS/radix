@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -92,10 +93,16 @@ class AdminPageController extends AbstractController
         $page->setContent(new FrontpageLocalisedText());
         $page->setRequiredRole(UserRoles::Guest);
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             PageFlowType::class,
             new PageData(),
-            ['flow_key' => 'create'],
+            ['flow_key' => $run],
         );
         $flow->handleRequest($request);
 
@@ -139,11 +146,17 @@ class AdminPageController extends AbstractController
         Request $request,
         Page $page,
     ): Response {
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             PageFlowType::class,
             PageData::fromEntity($page),
             [
-                'flow_key' => (string) $page->getId(),
+                'flow_key' => $run,
                 'role_editable' => UserRoles::ApiUser !== $page->getRequiredRole(),
             ],
         );

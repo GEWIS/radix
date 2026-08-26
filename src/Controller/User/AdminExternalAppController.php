@@ -13,6 +13,7 @@ use App\Form\User\ExternalApp\ExternalAppFlowType;
 use App\Repository\User\ExternalAppRepository;
 use App\Service\User\ExternalAppService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -71,10 +72,16 @@ class AdminExternalAppController extends AbstractController
     )]
     public function create(Request $request): Response
     {
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             ExternalAppFlowType::class,
             new ExternalAppData(),
-            ['flow_key' => 'create'],
+            ['flow_key' => $run],
         );
         $flow->handleRequest($request);
 
@@ -122,10 +129,16 @@ class AdminExternalAppController extends AbstractController
         Request $request,
         ExternalApp $externalApp,
     ): Response {
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             ExternalAppFlowType::class,
             ExternalAppData::fromEntity($externalApp),
-            ['flow_key' => (string) $externalApp->getId()],
+            ['flow_key' => $run],
         );
         $flow->handleRequest($request);
 

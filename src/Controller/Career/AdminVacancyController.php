@@ -24,6 +24,7 @@ use App\Service\Career\VacancyFormMapper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -98,12 +99,18 @@ class AdminVacancyController extends AbstractController
         $vacancy->addRevision($revision);
         $vacancy->setCurrentRevision($revision);
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             VacancyFlowType::class,
             new VacancyData(),
             [
                 'admin' => true,
-                'flow_key' => 'create',
+                'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
             ],
         );
@@ -241,6 +248,12 @@ class AdminVacancyController extends AbstractController
 
         // A vacancy belongs to whichever company sold the package it hangs off, so leaving the choice open would let
         // an edit hand the posting to somebody else. Creating one is where that choice is actually made.
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             VacancyFlowType::class,
             VacancyData::fromVacancy(
@@ -251,7 +264,7 @@ class AdminVacancyController extends AbstractController
                 'admin' => true,
                 'company' => $vacancy->getCompany(),
                 'current_package_id' => $vacancy->getPackage()->getId(),
-                'flow_key' => (string) $current->getId(),
+                'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save changes'),
             ],
         );

@@ -348,6 +348,8 @@ final class AdminPageControllerTest extends DatabaseTestCase
         string $button,
     ): Request {
         $request = new Request(
+            // The run the flow is kept under, which the controller would otherwise mint and redirect to.
+            query: ['flow' => 'testing'],
             request: [
                 'page_flow' => [
                     $step => $fields,

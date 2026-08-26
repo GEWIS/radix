@@ -24,6 +24,7 @@ use App\Service\Decision\OrganPageService;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -198,10 +199,16 @@ class AdminBodyController extends AbstractRevisionController
             );
         }
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             OrganPageFlowType::class,
             OrganPageData::fromRevision($draft),
-            ['flow_key' => (string) $draft->getId()],
+            ['flow_key' => $run],
         );
         $flow->handleRequest($request);
 

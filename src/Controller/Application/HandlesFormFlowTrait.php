@@ -7,15 +7,47 @@ namespace App\Controller\Application;
 use App\Entity\Application\Enums\AlertTypes;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\FormFlowTypeInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
+use function bin2hex;
+use function random_bytes;
 
 /**
  * Shared handling for the controllers that drive an {@see \App\Form\Application\Flow\AbstractStepperFlowType}.
  */
 trait HandlesFormFlowTrait
 {
+    /**
+     * The query parameter a run of a flow is recognised by.
+     */
+    private const string FLOW_RUN = 'flow';
+
+    /**
+     * The key the flow being filled in is kept under. Every arrival gets one of its own, or opening a form that was
+     * abandoned half-way would carry on where it was left off rather than start over. It travels in the address, so
+     * reloading a step stays in the same run.
+     *
+     * Answers a redirect on the first arrival, which the caller has to return.
+     */
+    private function flowRun(Request $request): string|RedirectResponse
+    {
+        $run = $request->query->getString(self::FLOW_RUN);
+
+        if ('' !== $run) {
+            return $run;
+        }
+
+        return $this->redirectToRoute(
+            $request->attributes->getString('_route'),
+            $request->attributes->all()['_route_params'] + [
+                self::FLOW_RUN => bin2hex(random_bytes(8)),
+            ],
+        );
+    }
+
     /**
      * `createForm()` answers the base interface as far as static analysis is concerned, and every caller here needs
      * the flow's own methods.

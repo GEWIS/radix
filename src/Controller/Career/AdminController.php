@@ -26,6 +26,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -98,12 +99,18 @@ class AdminController extends AbstractController
         $company->addRevision($revision);
         $company->setCurrentRevision($revision);
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             CompanyProfileFlowType::class,
             new CompanyProfileData(),
             [
                 'admin' => true,
-                'flow_key' => 'create',
+                'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
             ],
         );
@@ -233,6 +240,12 @@ class AdminController extends AbstractController
             );
         }
 
+        $run = $this->flowRun($request);
+
+        if ($run instanceof RedirectResponse) {
+            return $run;
+        }
+
         $flow = $this->createFlow(
             CompanyProfileFlowType::class,
             CompanyProfileData::fromCompany(
@@ -241,7 +254,7 @@ class AdminController extends AbstractController
             ),
             [
                 'admin' => true,
-                'flow_key' => (string) $current->getId(),
+                'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save changes'),
                 'has_square_logo' => null !== $current->getSquareLogo(),
                 'has_banner_logo' => null !== $current->getBannerLogo(),
