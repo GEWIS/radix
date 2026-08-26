@@ -24,9 +24,8 @@
                 <h3>{{ 'Change password'|trans }}</h3>
             </div>
             <div class="panel-body">
-                <p class="text-muted mb-2">
-                    {{ 'Pick a long, unique password - at least 16 characters and not found in any known data breach.'|trans }}
-                </p>
+                {% include 'partials/user/password-requirements.html.twig' %}
+
                 {{ form_start(form, {
                     'action': path(routePrefix ~ 'security_index'),
                     'method': 'POST',

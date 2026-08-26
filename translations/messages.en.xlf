@@ -601,6 +601,10 @@
         <source>A page is found by its own words rather than by a number, so what is written here is the address it answers to. Leave the parts a page higher up the tree does not have empty.</source>
         <target state="translated">A page is found by its own words rather than by a number, so what is written here is the address it answers to. Leave the parts a page higher up the tree does not have empty.</target>
       </trans-unit>
+      <trans-unit id="z9Rcu8q" resname="A password manager is the best option: it generates a random password, stores it, and fills it in, so every account gets a different one and you never have to type it.">
+        <source>A password manager is the best option: it generates a random password, stores it, and fills it in, so every account gets a different one and you never have to type it.</source>
+        <target state="translated">A password manager is the best option: it generates a random password, stores it, and fills it in, so every account gets a different one and you never have to type it.</target>
+      </trans-unit>
       <trans-unit id="gtNLrrR" resname="A pinned announcement needs an end date.">
         <source>A pinned announcement needs an end date.</source>
         <target state="translated">A pinned announcement needs an end date.</target>
@@ -1636,6 +1640,10 @@
       <trans-unit id="jqn1HNK" resname="Besluit %DECISION_HASH% wordt nietig verklaard. Het besluit luidde: &quot;%DECISION_CONTENT%&quot;">
         <source>Besluit %DECISION_HASH% wordt nietig verklaard. Het besluit luidde: "%DECISION_CONTENT%"</source>
         <target state="translated">Decision %DECISION_HASH% is annulled. The decision read: "%DECISION_CONTENT%"</target>
+      </trans-unit>
+      <trans-unit id="sOTUIjG" resname="Between %min% and %max% characters.">
+        <source>Between %min% and %max% characters.</source>
+        <target state="translated">Between %min% and %max% characters.</target>
       </trans-unit>
       <trans-unit id="KkmGks6" resname="Billboard (%width% by %height% pixels)">
         <source>Billboard (%width% by %height% pixels)</source>
@@ -4201,6 +4209,10 @@
         <source>If you hide yours, you also stop seeing others' age. The board can always see it.</source>
         <target>If you hide yours, you also stop seeing others' age. The board can always see it.</target>
       </trans-unit>
+      <trans-unit id="zPFQWZo" resname="If you would rather remember it, take several random words and add characters that are not words. Take the words at random, not a phrase about yourself. %example% has leaked, so pick your own. See %link%.">
+        <source>If you would rather remember it, take several random words and add characters that are not words. Take the words at random, not a phrase about yourself. %example% has leaked, so pick your own. See %link%.</source>
+        <target state="translated">If you would rather remember it, take several random words and add characters that are not words. Take the words at random, not a phrase about yourself. %example% has leaked, so pick your own. See %link%.</target>
+      </trans-unit>
       <trans-unit id="fpxrHOE" resname="If your browser does not redirect you, %link% manually.">
         <source>If your browser does not redirect you, %link% manually.</source>
         <target>If your browser does not redirect you, %link% manually.</target>
@@ -5793,6 +5805,10 @@
         <source>Not downloadable yet</source>
         <target state="translated">Not downloadable yet</target>
       </trans-unit>
+      <trans-unit id="9i49VgK" resname="Not found in a known data breach.">
+        <source>Not found in a known data breach.</source>
+        <target state="translated">Not found in a known data breach.</target>
+      </trans-unit>
       <trans-unit id="HJHmtgI" resname="Not open yet">
         <source>Not open yet</source>
         <target state="translated">Not open yet</target>
@@ -6313,6 +6329,10 @@
         <source>Password and sessions</source>
         <target state="translated">Password and sessions</target>
       </trans-unit>
+      <trans-unit id=".Gj312w" resname="Password requirements">
+        <source>Password requirements</source>
+        <target state="translated">Password requirements</target>
+      </trans-unit>
       <trans-unit id="LTQgZqV" resname="Password updated successfully.">
         <source>Password updated successfully.</source>
         <target state="translated">Password updated successfully.</target>
@@ -6452,10 +6472,6 @@
       <trans-unit id="wFkdS6Z" resname="Pick a kind of decision">
         <source>Pick a kind of decision</source>
         <target state="translated">Pick a kind of decision</target>
-      </trans-unit>
-      <trans-unit id="C_d4kR9" resname="Pick a long, unique password - at least 16 characters and not found in any known data breach.">
-        <source>Pick a long, unique password - at least 16 characters and not found in any known data breach.</source>
-        <target state="translated">Pick a long, unique password - at least 16 characters and not found in any known data breach.</target>
       </trans-unit>
       <trans-unit id="Iv28Lt2" resname="Pick an answer to cast your vote.">
         <source>Pick an answer to cast your vote.</source>
@@ -8108,6 +8124,10 @@
       <trans-unit id="fZ1Z.Qu" resname="Street and number">
         <source>Street and number</source>
         <target>Street and number</target>
+      </trans-unit>
+      <trans-unit id="d0B5Saa" resname="Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.">
+        <source>Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.</source>
+        <target state="translated">Strong: we count how hard it is to guess, not whether it has a capital, a digit, and a symbol. Common words, names, dates, and sequences such as &lt;code&gt;qwerty&lt;/code&gt; or &lt;code&gt;Passw0rd!&lt;/code&gt; score low.</target>
       </trans-unit>
       <trans-unit id="Z3JKRRe" resname="Student Address">
         <source>Student Address</source>
