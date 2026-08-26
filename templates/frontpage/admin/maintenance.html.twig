@@ -1,5 +1,7 @@
 {% extends 'layout-admin.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
 {% block page_title %}{{ 'Maintenance'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
@@ -78,32 +80,15 @@
                 </div>
 
                 {% for window in windows %}
-                    <div class="modal fade" id="delete-window-{{ window.id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">{{ 'Remove maintenance window'|trans }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="{{ 'Close'|trans }}"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="mb-0">
-                                        {{ 'Remove this maintenance window? If it is active, the site returns to normal for everyone.'|trans }}
-                                    </p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">
-                                        {{ 'Cancel'|trans }}
-                                    </button>
-                                    <form method="post" class="mb-0"
-                                          action="{{ path('admin/maintenance/delete', {id: window.id}) }}">
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_window_delete') }}">
-                                        <button type="submit" class="btn btn-danger">{{ 'Remove'|trans }}</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {{ modals.confirm_modal(
+                        'delete-window-' ~ window.id,
+                        path('admin/maintenance/delete', {id: window.id}),
+                        csrf_token('maintenance_window_delete'),
+                        'Remove maintenance window'|trans,
+                        'Remove this maintenance window? If it is active, the site returns to normal for everyone.'|trans,
+                        'Remove'|trans,
+                        'danger',
+                    ) }}
                 {% endfor %}
             {% endif %}
         </div>

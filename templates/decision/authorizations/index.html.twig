@@ -1,5 +1,7 @@
 {% extends 'layout.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
 {% block page_title %}{{ 'Authorizations'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block breadcrumbs %}
@@ -90,32 +92,21 @@
     </div>
 
     {% if meeting and authorization %}
-        <div class="modal fade" id="revoke-authorization-modal" tabindex="-1"
-             aria-labelledby="revoke-authorization-modal-label" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="revoke-authorization-modal-label">{{ 'Revoke authorization?'|trans }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-                    </div>
-                    <form method="post" action="{{ path('members/authorizations/revoke') }}">
-                        <div class="modal-body">
-                            <p class="mb-0">
-                                {{ '%name% will no longer be allowed to vote on your behalf and will be notified by email.'|trans({'%name%': authorization.recipient.fullName}) }}
-                            </p>
-                        </div>
-                        <div class="modal-footer">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authorization_revoke') }}">
-                            <input type="hidden" name="meeting" value="{{ meeting.number }}">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                            <button type="submit" class="btn btn-outline-danger">
-                                <span class="fas fa-user-minus" aria-hidden="true"></span>
-                                {{ 'Revoke authorization'|trans }}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        {% set revoke_label %}
+            <span class="fas fa-user-minus" aria-hidden="true"></span>
+            {{ 'Revoke authorization'|trans }}
+        {% endset %}
+        {{ modals.confirm_modal(
+            'revoke-authorization-modal',
+            path('members/authorizations/revoke'),
+            csrf_token('authorization_revoke'),
+            'Revoke authorization?'|trans,
+            '%name% will no longer be allowed to vote on your behalf and will be notified by email.'|trans({
+                '%name%': authorization.recipient.fullName,
+            }),
+            revoke_label,
+            'outline-danger',
+            {'meeting': meeting.number},
+        ) }}
     {% endif %}
 {% endblock %}

@@ -1,5 +1,7 @@
 {% extends 'layout-sidebar.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
 {% block page_title %}{{ 'Privacy'|trans }}{% endblock %}
 
 {% block sidebar_label %}{{ app.user.member.getFullName }}{% endblock %}
@@ -111,31 +113,16 @@
         </div>
     </div>
 
-    <div class="modal fade" id="purge-tags-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ 'Remove all tags of me'|trans }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="{{ 'Close'|trans }}"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">
-                        {{ 'This removes every photo tag of you across all albums, and clears your profile photo. This cannot be undone.'|trans }}
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        {{ 'Cancel'|trans }}
-                    </button>
-                    <form method="POST" action="{{ path('user_settings_purge_tags') }}">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('purge_tags') }}">
-                        <button type="submit" class="btn btn-danger">
-                            <span class="fas fa-trash"></span> {{ 'Remove all tags'|trans }}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% set purge_label %}
+        <span class="fas fa-trash" aria-hidden="true"></span> {{ 'Remove all tags'|trans }}
+    {% endset %}
+    {{ modals.confirm_modal(
+        'purge-tags-modal',
+        path('user_settings_purge_tags'),
+        csrf_token('purge_tags'),
+        'Remove all tags of me'|trans,
+        'This removes every photo tag of you across all albums, and clears your profile photo. This cannot be undone.'|trans,
+        purge_label,
+        'danger',
+    ) }}
 {% endblock %}

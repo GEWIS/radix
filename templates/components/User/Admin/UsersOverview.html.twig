@@ -1,3 +1,5 @@
+{% import 'partials/application/confirm-target-modal.html.twig' as modals %}
+
 <div {{ attributes }}>
     <div class="panel mb-3">
         <div class="panel-body">
@@ -165,32 +167,23 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modal-admin-mfa-reset" data-controller="modal-form-target" tabindex="-1" aria-labelledby="modal-admin-mfa-reset-label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-admin-mfa-reset-label">{{ 'Reset MFA?'|trans }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'Close'|trans }}"></button>
-                </div>
-                <form data-modal-form-target-target="form" method="POST" action="">
-                    <div class="modal-body">
-                        <p>
-                            {{ 'You are about to reset multi-factor authentication for:'|trans }}
-                            <strong data-modal-form-target-target="name"></strong>
-                        </p>
-                        <p class="mb-0 small text-muted">
-                            {{ 'Their TOTP secret and backup codes will be discarded and every active session for the user will be terminated. Use this when a device has been lost or compromised.'|trans }}
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <input type="hidden" name="_csrf_token" value="" data-modal-form-target-target="csrfToken">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                        <button type="submit" class="btn btn-warning">
-                            <span class="fas fa-rotate-left"></span> {{ 'Reset MFA'|trans }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% set mfa_reset_body %}
+        <p>
+            {{ 'You are about to reset multi-factor authentication for:'|trans }}
+            <strong data-modal-form-target-target="name"></strong>
+        </p>
+        <p class="mb-0 small text-muted">
+            {{ 'Their TOTP secret and backup codes will be discarded and every active session for the user will be terminated. Use this when a device has been lost or compromised.'|trans }}
+        </p>
+    {% endset %}
+    {% set mfa_reset_label %}
+        <span class="fas fa-rotate-left" aria-hidden="true"></span> {{ 'Reset MFA'|trans }}
+    {% endset %}
+    {{ modals.confirm_modal(
+        'modal-admin-mfa-reset',
+        'Reset MFA?'|trans,
+        mfa_reset_body,
+        mfa_reset_label,
+        'warning',
+    ) }}
 </div>

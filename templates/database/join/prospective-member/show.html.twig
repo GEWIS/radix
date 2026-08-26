@@ -1,5 +1,7 @@
 {% extends 'layout-register.html.twig' %}
 
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
 {% block page_title %}{{ member.fullName|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
@@ -150,42 +152,24 @@
                     </div>
                 </div>
 
-                <div class="modal fade" id="prospective-removal" tabindex="-1"
-                     aria-labelledby="prospective-removal-label" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="prospective-removal-label">
-                                    {{ 'Remove Prospective Member'|trans }}
-                                </h4>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="{{ 'Close'|trans }}"></button>
-                            </div>
-                            <div class="modal-body">
-                                {% if member.hasPaid %}
-                                    {{ 'Are you sure that you want to remove %name%? Because they have already paid a refund will be requested. If this fails, the prospective member will NOT be removed.'|trans({
-                                        '%name%': member.fullName,
-                                    }) }}
-                                {% else %}
-                                    {{ 'Are you sure that you want to remove %name%?'|trans({'%name%': member.fullName}) }}
-                                {% endif %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    {{ 'No'|trans }}
-                                </button>
-                                <form method="post"
-                                      action="{{ path('join_prospective_member_delete', {'id': member.lidnr}) }}">
-                                    <input type="hidden" name="_csrf_token"
-                                           value="{{ csrf_token('prospective_member_delete-' ~ member.lidnr) }}">
-                                    <button type="submit" class="btn btn-outline-danger">
-                                        {{ 'Delete Prospective Member'|trans }}
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% set removal_body %}
+                    {% if member.hasPaid %}
+                        {{ 'Are you sure that you want to remove %name%? Because they have already paid a refund will be requested. If this fails, the prospective member will NOT be removed.'|trans({
+                            '%name%': member.fullName,
+                        }) }}
+                    {% else %}
+                        {{ 'Are you sure that you want to remove %name%?'|trans({'%name%': member.fullName}) }}
+                    {% endif %}
+                {% endset %}
+                {{ modals.confirm_modal(
+                    'prospective-removal',
+                    path('join_prospective_member_delete', {'id': member.lidnr}),
+                    csrf_token('prospective_member_delete-' ~ member.lidnr),
+                    'Remove Prospective Member'|trans,
+                    removal_body,
+                    'Delete Prospective Member'|trans,
+                    'outline-danger',
+                ) }}
             {% endif %}
         </div>
 

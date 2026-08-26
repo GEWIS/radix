@@ -1,32 +1,22 @@
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
+
+{# A board lifecycle control: the button that asks, and the shared confirmation it opens. Its own modal rather than
+   the live-action one, because these post and navigate rather than re-render the component. #}
 {% macro confirm_form_modal(key, action, token, label, message, buttonClass) %}
     {% set modalId = 'activity-' ~ key ~ '-modal' %}
     <button type="button" class="btn btn-sm {{ buttonClass }}"
             data-bs-toggle="modal" data-bs-target="#{{ modalId }}">
         {{ label }}
     </button>
-    <div class="modal fade text-start" id="{{ modalId }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ label }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="{{ 'Close'|trans }}"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">{{ message }}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        {{ 'Cancel'|trans }}
-                    </button>
-                    <form method="post" action="{{ action }}">
-                        <input type="hidden" name="_csrf_token" value="{{ token }}">
-                        <button type="submit" class="btn {{ buttonClass }}">{{ label }}</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{ modals.confirm_modal(
+        modalId,
+        action,
+        token,
+        label,
+        message,
+        label,
+        buttonClass|replace({'btn-': ''}),
+    ) }}
 {% endmacro %}
 
 <div{{ attributes }}>
@@ -174,7 +164,6 @@
                                                     {{ 'Revise'|trans }}
                                                 </a>
                                             {% endif %}
-                                            {# Board lifecycle controls use their own Bootstrap modal; the shared confirm-modal drives live actions only. #}
                                             {% if this.isBoard %}
                                                 {% if row.cancelled %}
                                                     {{ _self.confirm_form_modal(
