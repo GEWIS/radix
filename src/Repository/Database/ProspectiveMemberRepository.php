@@ -20,7 +20,6 @@ use function addcslashes;
 use function is_numeric;
 use function mb_strtolower;
 use function str_replace;
-use function strtolower;
 use function trim;
 
 /**
@@ -54,95 +53,6 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
         $ret = $qb->getQuery()->getResult();
 
         return [] !== $ret;
-    }
-
-    /**
-     * Search for a member.
-     *
-     * @return array<array-key, ProspectiveMember>
-     */
-    public function search(
-        string $query,
-        string $type,
-    ): array {
-        $qb = $this->createQueryBuilder('m');
-
-        $qb->where("CONCAT(LOWER(m.firstName), ' ', LOWER(m.lastName)) LIKE :name")
-            ->orWhere("CONCAT(LOWER(m.firstName), ' ', LOWER(m.middleName), ' ', LOWER(m.lastName)) LIKE :name")
-            ->orWhere('m.email LIKE :name')
-            ->setMaxResults(128)
-            ->orderBy(
-                'm.lidnr',
-                'DESC',
-            )
-            ->setFirstResult(0);
-
-        $qb->setParameter(
-            ':name',
-            '%' . strtolower($query) . '%',
-        );
-
-        // also allow searching for membership number
-        if (is_numeric($query)) {
-            $qb->orWhere('m.lidnr = :nr');
-            $qb->orWhere('m.studentNumber = :nr');
-            $qb->setParameter(
-                ':nr',
-                $query,
-            );
-        }
-
-        // Get Checkout Session status.
-        $qb->leftJoin(
-            CheckoutSession::class,
-            'cs',
-            JoinExpr::WITH,
-            'cs.prospectiveMember = m.lidnr',
-        );
-        $qbc = $this->getEntityManager()->createQueryBuilder();
-        $qbc->select('MAX(css.id)')
-            ->from(
-                CheckoutSession::class,
-                'css',
-            )
-            ->where('css.prospectiveMember = m.lidnr');
-        $qb->andWhere($qb->expr()->orX(
-            $qb->expr()->eq(
-                'cs.id',
-                '(' . $qbc->getDQL() . ')',
-            ),
-            $qb->expr()->isNull('cs.id'),
-        ));
-
-        if ('paid' === $type) {
-            $qb->andWhere('cs.state = :paid')
-                ->setParameter(
-                    'paid',
-                    CheckoutSessionStates::Paid,
-                );
-        } elseif ('failed' === $type) {
-            $qb->andWhere('cs.state = :expired OR cs.state = :failed OR cs.state IS NULL')
-                ->setParameter(
-                    'expired',
-                    CheckoutSessionStates::Expired,
-                )
-                ->setParameter(
-                    'failed',
-                    CheckoutSessionStates::Failed,
-                );
-        } else {
-            $qb->andWhere('cs.state = :created OR cs.state = :pending')
-                ->setParameter(
-                    'created',
-                    CheckoutSessionStates::Created,
-                )
-                ->setParameter(
-                    'pending',
-                    CheckoutSessionStates::Pending,
-                );
-        }
-
-        return $qb->getQuery()->getResult();
     }
 
     /**

@@ -356,41 +356,13 @@ class Member
     }
 
     /**
-     * Search for a member.
-     *
-     * @return MemberModel[]
-     */
-    public function search(string $query): array
-    {
-        return $this->memberRepository->search($query);
-    }
-
-    /**
      * Search for a member that is not deleted, expired, and hidden.
      *
      * @return MemberModel[]
      */
     public function searchFiltered(string $query): array
     {
-        return $this->memberRepository->search(
-            $query,
-            true,
-        );
-    }
-
-    /**
-     * Search for a prospective member.
-     *
-     * @return ProspectiveMemberModel[]
-     */
-    public function searchProspective(
-        string $query,
-        string $type,
-    ): array {
-        return $this->prospectiveMemberRepository->search(
-            $query,
-            $type,
-        );
+        return $this->memberRepository->search($query);
     }
 
     /**
