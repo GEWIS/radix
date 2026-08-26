@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\OrganRegulationRepository;
@@ -19,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use ValueError;
 
 #[Entity(repositoryClass: OrganRegulationRepository::class)]
-class OrganRegulation extends SubDecision
+class OrganRegulation extends SubDecision implements NamesMember
 {
     use FormattableDateTrait;
     use MemberAwareTrait;

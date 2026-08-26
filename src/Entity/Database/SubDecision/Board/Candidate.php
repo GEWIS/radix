@@ -6,6 +6,7 @@ namespace App\Entity\Database\SubDecision\Board;
 
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Board\CandidateRepository;
@@ -22,7 +23,7 @@ use function assert;
  * constitutional order the candidates are put forward in is the order of the sub-decisions.
  */
 #[Entity(repositoryClass: CandidateRepository::class)]
-class Candidate extends SubDecision
+class Candidate extends SubDecision implements NamesMember
 {
     use MemberAwareTrait;
 

@@ -9273,6 +9273,10 @@
         <source>This decision has already been annulled.</source>
         <target state="translated">This decision has already been annulled.</target>
       </trans-unit>
+      <trans-unit id="FoiA9X1" resname="This decision names a member who has been deleted, and is what their record is kept for.">
+        <source>This decision names a member who has been deleted, and is what their record is kept for.</source>
+        <target state="translated">This decision names a member who has been deleted, and is what their record is kept for.</target>
+      </trans-unit>
       <trans-unit id="G1w32hn" resname="This decision no longer exists.">
         <source>This decision no longer exists.</source>
         <target state="translated">This decision no longer exists.</target>

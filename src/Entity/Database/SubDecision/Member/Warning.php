@@ -6,6 +6,7 @@ namespace App\Entity\Database\SubDecision\Member;
 
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Member\WarningRepository;
@@ -19,7 +20,7 @@ use function assert;
  * An official warning handed to a member by the board.
  */
 #[Entity(repositoryClass: WarningRepository::class)]
-class Warning extends SubDecision
+class Warning extends SubDecision implements NamesMember
 {
     use MemberAwareTrait;
 

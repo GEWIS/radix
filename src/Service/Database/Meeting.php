@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Decision as DecisionModel;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\Meeting as MeetingModel;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\SubDecision\Abrogation;
 use App\Entity\Database\SubDecision\Annulment as AnnulmentModel;
@@ -19,6 +20,7 @@ use App\Entity\Database\SubDecision\Foundation as FoundationModel;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation as InstallationModel;
 use App\Exception\Database\AnnulmentNotPossible;
+use App\Exception\Database\DecisionNamesDeletedMember;
 use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Database\MeetingRepository;
 use App\Repository\Database\SubDecision\FoundationRepository;
@@ -219,9 +221,10 @@ class Meeting
      *
      * @return bool whether there was a decision left to delete; false when another secretary got there first.
      *
-     * @throws AnnulmentNotPossible    when deleting an annulment would restore a decision that has since been
-     *                                 overtaken.
-     * @throws DecisionStillReferenced when later decisions still refer to what this one brought about.
+     * @throws AnnulmentNotPossible        when deleting an annulment would restore a decision that has since been
+     *                                     overtaken.
+     * @throws DecisionNamesDeletedMember  when the decision names a member whose record is kept for it.
+     * @throws DecisionStillReferenced     when later decisions still refer to what this one brought about.
      */
     public function deleteDecision(
         MeetingTypes $type,
@@ -243,6 +246,17 @@ class Meeting
         // Deleting an annulment restores everything it annulled, so the ledger has to allow that. Checking before the
         // deletion keeps it from failing halfway through.
         foreach ($model->getSubdecisions() as $subdecision) {
+            // A deleted member is kept for the decisions that name them, so a decision that names one is not
+            // something removing goes through by itself.
+            if (
+                $subdecision instanceof NamesMember
+                && true === $subdecision->getMember()?->getDeleted()
+            ) {
+                throw new DecisionNamesDeletedMember(
+                    'This decision names a member who has been deleted.',
+                );
+            }
+
             if (!($subdecision instanceof AnnulmentModel)) {
                 continue;
             }

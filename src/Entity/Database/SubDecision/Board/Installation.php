@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\Enums\BoardFunctions;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Board\InstallationRepository;
@@ -22,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Installation as board member.
  */
 #[Entity(repositoryClass: InstallationRepository::class)]
-class Installation extends SubDecision
+class Installation extends SubDecision implements NamesMember
 {
     use FormattableDateTrait;
     use MemberAwareTrait;

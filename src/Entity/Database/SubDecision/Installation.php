@@ -7,6 +7,7 @@ namespace App\Entity\Database\SubDecision;
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Repository\Database\SubDecision\InstallationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Installation into organ.
  */
 #[Entity(repositoryClass: InstallationRepository::class)]
-class Installation extends FoundationReference
+class Installation extends FoundationReference implements NamesMember
 {
     /**
      * The member this decision installs.

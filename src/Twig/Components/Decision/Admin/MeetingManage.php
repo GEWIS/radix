@@ -14,6 +14,7 @@ use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Exception\Database\AnnulmentNotPossible;
+use App\Exception\Database\DecisionNamesDeletedMember;
 use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Decision\MeetingActivityLogRepository;
 use App\Repository\Decision\MeetingDocumentRepository;
@@ -476,6 +477,12 @@ final class MeetingManage
         } catch (DecisionStillReferenced) {
             $this->feedback = new TranslatableMessage('Other decisions still refer to this one.')
                 ->trans($this->translator);
+
+            return;
+        } catch (DecisionNamesDeletedMember) {
+            $this->feedback = new TranslatableMessage(
+                'This decision names a member who has been deleted, and is what their record is kept for.',
+            )->trans($this->translator);
 
             return;
         } catch (AnnulmentNotPossible) {

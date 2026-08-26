@@ -7,6 +7,7 @@ namespace App\Entity\Database\SubDecision\Financial;
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Financial\BudgetRepository;
@@ -17,7 +18,7 @@ use Override;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Entity(repositoryClass: BudgetRepository::class)]
-class Budget extends SubDecision
+class Budget extends SubDecision implements NamesMember
 {
     use FormattableDateTrait;
     use MemberAwareTrait;

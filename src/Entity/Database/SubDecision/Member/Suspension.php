@@ -7,6 +7,7 @@ namespace App\Entity\Database\SubDecision\Member;
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\Member;
+use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Member\SuspensionRepository;
@@ -22,7 +23,7 @@ use function assert;
  * The suspension of a member, for a period that both ends are part of.
  */
 #[Entity(repositoryClass: SuspensionRepository::class)]
-class Suspension extends SubDecision
+class Suspension extends SubDecision implements NamesMember
 {
     use FormattableDateTrait;
     use MemberAwareTrait;
