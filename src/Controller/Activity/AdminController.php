@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Activity;
 
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityRevision;
@@ -12,7 +13,8 @@ use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ReviseRefusal;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
-use App\Form\Activity\ActivityType;
+use App\Form\Activity\ActivityFlow\ActivityData;
+use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\SignupType;
 use App\Repository\Activity\ActivityRepository;
 use App\Repository\Activity\ActivityRevisionCommentRepository;
@@ -20,11 +22,13 @@ use App\Repository\Activity\ExternalSignupRepository;
 use App\Security\Application\RevisionVoter;
 use App\Service\Activity\ActivityAdminService;
 use App\Service\Activity\ActivityDraftFactory;
+use App\Service\Activity\ActivityFormMapper;
 use App\Service\Activity\SignupManager;
 use App\Service\Application\RevisionReviewService;
 use App\Service\Application\RevisionReviser;
 use App\Util\Activity\PastActivityRule;
 use App\Util\Activity\SignupAdminWindow;
+use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,6 +53,7 @@ use function strval;
 )]
 class AdminController extends AbstractController
 {
+    use HandlesFormFlowTrait;
     use HoldsEditLockTrait;
 
     public function __construct(
@@ -59,6 +64,7 @@ class AdminController extends AbstractController
         private readonly RevisionReviewService $revisionReviewService,
         private readonly RevisionReviser $reviser,
         private readonly TranslatorInterface $translator,
+        private readonly ActivityFormMapper $activityFormMapper,
     ) {
     }
 
@@ -88,19 +94,40 @@ class AdminController extends AbstractController
     ): Response {
         $activity = $this->activityDraftFactory->newActivity($user->getMember());
 
-        $form = $this->createForm(ActivityType::class, $activity)->handleRequest($request);
+        $revision = $activity->getCurrentRevision();
+        assert($revision instanceof ActivityRevision);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        $flow = $this->createFlow(
+            ActivityFlowType::class,
+            new ActivityData(),
+            [
+                'flow_key' => 'create',
+                'revision' => $revision,
+            ],
+        );
+        $flow->handleRequest($request);
+
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'activity/admin/create.html.twig',
-                ['form' => $form],
+                ['form' => $flow->getStepForm()],
             );
         }
 
+        $data = $flow->getData();
+        assert($data instanceof ActivityData);
+        $this->activityFormMapper->apply(
+            $data,
+            $revision,
+        );
+
         $this->activityAdminService->create($activity);
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -217,14 +244,25 @@ class AdminController extends AbstractController
 
         // For a spawned draft the cloner has already pointed the activity's current revision at it; for an in-place
         // draft it was already current.
-        $form = $this->createForm(ActivityType::class, $activity)->handleRequest($request);
+        $flow = $this->createFlow(
+            ActivityFlowType::class,
+            ActivityData::fromRevision(
+                $revision,
+                $this->scheduleIsLocked($revision),
+            ),
+            [
+                'flow_key' => (string) $revision->getId(),
+                'revision' => $revision,
+                'schedule_locked' => $this->scheduleIsLocked($revision),
+                'bound_organ_id' => $revision->getOrgan()?->getId(),
+                'finish_label' => $this->translator->trans('Save changes'),
+            ],
+        );
+        $flow->handleRequest($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if (!$flow->isFinished()) {
             if (
-                !$form->isSubmitted()
+                !$flow->isSubmitted()
                 && null !== $revision->getId()
             ) {
                 // Remember, server-side, the version this edit started from, so the optimistic-lock check on save
@@ -235,15 +273,27 @@ class AdminController extends AbstractController
                 );
             }
 
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'activity/admin/edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'activity' => $activity,
                     'comments' => $this->commentRepository->findThreadForActivity($activity),
                 ],
             );
         }
+
+        $data = $flow->getData();
+        assert($data instanceof ActivityData);
+        $this->activityFormMapper->apply(
+            $data,
+            $revision,
+        );
 
         // Refuse the save only if the lock was force-taken by SOMEONE ELSE (a reviewer) while this form was open. We
         // use the read-only blockingLock() rather than ping(): ping() flushes, which would commit the bound form
@@ -294,6 +344,7 @@ class AdminController extends AbstractController
             $user,
         );
         $request->getSession()->remove($this->editVersionKey($activity));
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -301,6 +352,26 @@ class AdminController extends AbstractController
         );
 
         return $this->redirectToRoute('admin/activities/index');
+    }
+
+    /**
+     * Only a genuinely live, under-way activity has its start locked; a never-published draft stays editable.
+     */
+    private function scheduleIsLocked(ActivityRevision $revision): bool
+    {
+        $live = $revision->getActivity()->getLiveRevision();
+
+        if (
+            null === $live
+            || $live === $revision
+        ) {
+            return false;
+        }
+
+        $beginTime = $live->getBeginTime();
+
+        return null !== $beginTime
+            && $beginTime <= new DateTime();
     }
 
     /**
