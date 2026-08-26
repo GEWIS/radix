@@ -35,10 +35,11 @@
                 {{ 'All'|trans }}
             </a>
         </li>
-        {% for token in typeTokens %}
+        {% for meetingType in types %}
             <li class="nav-item">
-                <a class="nav-link {% if type == token %}active{% endif %}" href="{{ path('admin/meetings/index', {'type': token}) }}">
-                    {{ token|upper }}
+                <a class="nav-link {% if type == meetingType.value %}active{% endif %}"
+                   href="{{ path('admin/meetings/index', {'type': meetingType.value}) }}">
+                    {{ meetingType.getName|trans }}
                 </a>
             </li>
         {% endfor %}
@@ -61,7 +62,7 @@
                         {% for row in rows %}
                             <tr>
                                 <td>
-                                    <a href="{{ path('admin/meetings/view', {'type': row.meeting.type.urlToken, 'number': row.meeting.number}) }}" class="fw-semibold">
+                                    <a href="{{ path('admin/meetings/view', {'type': row.meeting.type.value, 'number': row.meeting.number}) }}" class="fw-semibold">
                                         {{ row.meeting.type.getName|trans }} {{ row.meeting.number }}
                                     </a>
                                     <div class="text-muted small">{{ row.meeting.type.label|trans }}</div>

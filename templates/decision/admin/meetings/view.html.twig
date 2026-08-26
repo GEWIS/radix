@@ -19,7 +19,7 @@
                 <span class="fas fa-file-arrow-down" aria-hidden="true"></span>
                 {{ 'Export a decision list'|trans }}
             </a>
-            <a href="{{ path('meetings/view', {'type': type, 'number': number}) }}" class="btn btn-outline-secondary">
+            <a href="{{ path('meetings/view', {'type': type.urlToken, 'number': number}) }}" class="btn btn-outline-secondary">
                 <span class="fas fa-eye" aria-hidden="true"></span>
                 {{ 'View as member'|trans }}
             </a>

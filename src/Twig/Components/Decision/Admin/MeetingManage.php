@@ -47,7 +47,6 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 use function array_map;
 use function array_values;
 use function assert;
-use function strtoupper;
 use function strval;
 use function trim;
 
@@ -69,7 +68,7 @@ final class MeetingManage
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $type;
+    public MeetingTypes $type;
 
     #[LiveProp]
     public int $number;
@@ -163,7 +162,7 @@ final class MeetingManage
         $this->assertAccess();
 
         return $this->databaseMeetingService->getMeetingView(
-            MeetingTypes::tryFromSearch(strtoupper($this->type)),
+            $this->type,
             $this->number,
         );
     }
@@ -177,7 +176,7 @@ final class MeetingManage
         }
 
         $view = $this->meetingQueryService->getMeetingView(
-            MeetingTypes::tryFromSearch(strtoupper($this->type)),
+            $this->type,
             $this->number,
         );
 
@@ -469,7 +468,7 @@ final class MeetingManage
 
         try {
             $deleted = $this->databaseMeetingService->deleteDecision(
-                MeetingTypes::tryFromSearch(strtoupper($this->type)),
+                $this->type,
                 $this->number,
                 $point,
                 $number,

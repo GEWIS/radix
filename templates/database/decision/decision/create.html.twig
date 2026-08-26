@@ -7,7 +7,7 @@
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('admin/meetings/index') }}">{{ 'Meetings'|trans }}</a></li>
     <li class="breadcrumb-item">
-        <a href="{{ path('admin/meetings/view', {type: meeting.type.urlToken, number: meeting.number}) }}">
+        <a href="{{ path('admin/meetings/view', {type: meeting.type.value, number: meeting.number}) }}">
             {{ meeting.type.value }} {{ meeting.number }}
         </a>
     </li>
@@ -41,7 +41,7 @@
                 } only %}
                 <div class="text-center">
                     <a class="btn btn-gewis-primary"
-                       href="{{ path('admin/meetings/view', {type: meeting.type.urlToken, number: meeting.number}) }}">
+                       href="{{ path('admin/meetings/view', {type: meeting.type.value, number: meeting.number}) }}">
                         {{ 'Back to %type% %number%'|trans({
                             '%type%': meeting.type.value,
                             '%number%': meeting.number,

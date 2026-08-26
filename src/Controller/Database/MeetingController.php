@@ -51,7 +51,7 @@ final class MeetingController extends AbstractController
                 return $this->redirectToRoute(
                     'admin/meetings/view',
                     [
-                        'type' => $meeting->getType()->urlToken(),
+                        'type' => $meeting->getType()->value,
                         'number' => $meeting->getNumber(),
                     ],
                 );

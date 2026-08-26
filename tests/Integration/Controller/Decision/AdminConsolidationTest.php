@@ -64,7 +64,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
 
         $content = $this->render(
             $this->meetings()->view(
-                'gmm',
+                MeetingTypes::ALV,
                 $this->aMeetingNumber(),
             ),
         );
@@ -104,7 +104,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
 
         $content = $this->render(
             $this->meetings()->view(
-                'gmm',
+                MeetingTypes::ALV,
                 $this->aMeetingNumber(),
             ),
         );
