@@ -52,7 +52,7 @@
         {% endblock %}
 
         {% block header_actions %}
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {% if is_granted('ROLE_USER') %}
                 {% if information is not null and information.getEmail is not null %}
                     <a href="mailto:{{ information.getEmail }}" class="btn btn-outline-gewis-primary">
                         <span class="fas fa-envelope" aria-hidden="true"></span> {{ 'Email us'|trans }}
@@ -69,7 +69,7 @@
 
 {% block contents %}
     {% set email = information ? information.getEmail : null %}
-    {% set signedIn = is_granted('IS_AUTHENTICATED_FULLY') %}
+    {% set isMember = is_granted('ROLE_USER') %}
 
     {% if iterations is not empty %}
         {# The same letters have belonged to more than one body, so say which one this is and offer the others. #}
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            {% if signedIn %}
+            {% if isMember %}
                 {% include 'partials/decision/organ-members.html.twig' with {
                     'organ': organ,
                     'members': members,
@@ -133,7 +133,7 @@
         <div class="col-lg-4">
             {# What is on the panel first: how to reach a body is what most readers came for. #}
             {% set hasContact = information is not null and (
-                (signedIn and email is not null)
+                (isMember and email is not null)
                 or information.getWebsite is not null
                 or information.getSocialLinks|length > 0
             ) %}
@@ -144,7 +144,7 @@
                     </div>
                     <div class="panel-body">
                         <ul class="organ-contact list-unstyled mb-0">
-                            {% if signedIn and email is not null %}
+                            {% if isMember and email is not null %}
                                 <li>
                                     <span class="fas fa-envelope" aria-hidden="true"></span>
                                     <span>

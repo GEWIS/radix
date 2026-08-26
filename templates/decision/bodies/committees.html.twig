@@ -22,7 +22,7 @@
             <a href="{{ path('association/committees/history') }}" class="btn btn-outline-secondary">
                 <span class="fas fa-clock-rotate-left" aria-hidden="true"></span> {{ 'Old committees'|trans }}
             </a>
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {% if is_granted('ROLE_USER') %}
                 <a href="{{ page_path(
                     category: 'commissie',
                     categoryEn: 'committee',

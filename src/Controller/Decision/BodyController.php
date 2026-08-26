@@ -6,6 +6,7 @@ namespace App\Controller\Decision;
 
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Decision\Organ;
+use App\Entity\User\Enums\UserRoles;
 use App\Repository\Activity\ActivityRepository;
 use App\Repository\Decision\OrganRepository;
 use App\Service\Decision\OrganMemberService;
@@ -170,7 +171,7 @@ class BodyController extends AbstractController
     /**
      * The bodies a member may look through, which is all of them: a body's installations are a matter of record.
      */
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted(UserRoles::User->value)]
     #[Route(
         path: '/organs',
         name: 'organs/index',
@@ -186,7 +187,7 @@ class BodyController extends AbstractController
         );
     }
 
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted(UserRoles::User->value)]
     #[Route(
         path: '/organs/history',
         name: 'organs/history',
@@ -205,7 +206,7 @@ class BodyController extends AbstractController
     /**
      * Everything the decisions say about one body: who was installed and discharged, and when.
      */
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted(UserRoles::User->value)]
     #[Route(
         path: '/organs/{organ}',
         name: 'organs/view',

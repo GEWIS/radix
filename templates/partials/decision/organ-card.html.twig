@@ -34,7 +34,7 @@
         </div>
         {% if information %}
             <div class="card-footer text-body-secondary icon-links flex-wrap">
-                {% if is_granted('IS_AUTHENTICATED_FULLY') and information.getEmail is not null %}
+                {% if is_granted('ROLE_USER') and information.getEmail is not null %}
                     <a href="mailto:{{ information.getEmail }}" title="{{ 'Email address'|trans }}">
                         <span class="fas fa-envelope" aria-hidden="true"></span>
                         <span class="visually-hidden">{{ 'Email address'|trans }}</span>
