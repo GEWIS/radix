@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Frontpage;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Frontpage\Enums\NewsCategory;
 use App\Entity\Frontpage\NewsItem;
 use App\Repository\Frontpage\NewsItemRepository;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function count;
 use function iterator_to_array;
@@ -27,12 +26,8 @@ use function iterator_to_array;
     name: 'Frontpage:NewsOverview',
     template: 'components/Frontpage/NewsOverview.html.twig',
 )]
-final class NewsOverview
+final class NewsOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    public const int PAGE_SIZE = 15;
-
     // Set by the page, not by the reader: the year switcher is a set of links, so it reloads.
     #[LiveProp]
     public ?int $year = null;
@@ -45,9 +40,6 @@ final class NewsOverview
     #[LiveProp(writable: true)]
     public string $search = '';
 
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
-
     /** @var Paginator<NewsItem>|null */
     private ?Paginator $paginator = null;
 
@@ -58,13 +50,6 @@ final class NewsOverview
         private readonly NewsItemRepository $newsItemRepository,
         private readonly RequestStack $requestStack,
     ) {
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
     }
 
     /**
@@ -99,6 +84,7 @@ final class NewsOverview
         return $this->getPaginator()->count();
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return $this->getTotalCount() > count($this->getItems());

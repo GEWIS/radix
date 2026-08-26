@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Decision;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Decision\Organ;
 use App\Repository\Decision\OrganRepository;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use Override;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\LiveComponent\Metadata\UrlMapping;
 
 use function array_slice;
@@ -36,12 +35,8 @@ use function random_int;
     name: 'Decision:BodyOverview',
     template: 'components/Decision/BodyOverview.html.twig',
 )]
-final class BodyOverview
+final class BodyOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    private const int PAGE_SIZE = 12;
-
     #[LiveProp]
     public string $type = '';
 
@@ -77,9 +72,6 @@ final class BodyOverview
     #[LiveProp]
     public int $seed = 0;
 
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
-
     /** @var int[]|null */
     private ?array $ids = null;
 
@@ -112,13 +104,6 @@ final class BodyOverview
         return $prop->withUrl(new UrlMapping(as: 'abrogated-search'));
     }
 
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
-    }
-
     /**
      * @return Organ[]
      */
@@ -136,6 +121,7 @@ final class BodyOverview
         return count($this->matchingIds());
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return $this->getTotalCount() > count($this->getOrgans());

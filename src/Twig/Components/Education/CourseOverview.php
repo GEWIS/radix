@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Education;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Education\Enums\CourseFilter;
 use App\Entity\Education\Enums\CourseSort;
 use App\Repository\Education\CourseRepository;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
 use App\ViewModel\Education\CourseOverviewRow;
+use Override;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_filter;
 use function array_map;
@@ -33,12 +32,8 @@ use function count;
     name: 'Education:CourseOverview',
     template: 'components/Education/CourseOverview.html.twig',
 )]
-final class CourseOverview
+final class CourseOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    private const int PAGE_SIZE = 25;
-
     #[LiveProp(
         writable: true,
         url: true,
@@ -57,10 +52,6 @@ final class CourseOverview
     )]
     public string $sort = CourseSort::Code->value;
 
-    // Not client-writable: it travels in the signed props, so a crafted request cannot ask for the whole archive.
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
-
     /** @var CourseOverviewRow[]|null */
     private ?array $window = null;
 
@@ -69,13 +60,6 @@ final class CourseOverview
 
     public function __construct(private readonly CourseRepository $courseRepository)
     {
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
     }
 
     /**
@@ -95,6 +79,7 @@ final class CourseOverview
         return $this->courseRepository->countAll();
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return count($this->window()) > $this->limit;
