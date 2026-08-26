@@ -23,6 +23,7 @@ use function imagecreatetruecolor;
 use function imagefilledrectangle;
 use function imagejpeg;
 use function json_decode;
+use function str_contains;
 use function strval;
 use function sys_get_temp_dir;
 use function tempnam;
@@ -43,7 +44,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
     {
         $before = count($this->repository()->findAll());
 
-        $this->controller()->create($this->form($this->fields()));
+        $this->write();
 
         self::assertCount(
             $before + 1,
@@ -56,9 +57,9 @@ final class AdminPageControllerTest extends DatabaseTestCase
             $page->getRequiredRole(),
         );
 
-        $this->controller()->edit(
-            $this->form($this->fields(['title' => 'A changed page'])),
+        $this->revise(
             $page,
+            ['title' => 'A changed page'],
         );
         self::assertSame(
             'A changed page',
@@ -78,9 +79,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
      */
     public function testWhatIsStoredHasBeenSanitised(): void
     {
-        $this->controller()->create($this->form($this->fields([
-            'content' => '<p onclick="alert(1)">Hello</p><script>alert(2)</script>',
-        ])));
+        $this->write(['content' => '<p onclick="alert(1)">Hello</p><script>alert(2)</script>']);
 
         $stored = strval($this->written()->getContent()->getValueEN());
 
@@ -100,10 +99,10 @@ final class AdminPageControllerTest extends DatabaseTestCase
 
     public function testTwoPagesCannotAnswerToTheSameAddress(): void
     {
-        $this->controller()->create($this->form($this->fields()));
+        $this->write();
         $before = count($this->repository()->findAll());
 
-        $response = $this->controller()->create($this->form($this->fields(['title' => 'A second page'])));
+        $response = $this->write(['title' => 'A second page']);
 
         self::assertCount(
             $before,
@@ -120,12 +119,12 @@ final class AdminPageControllerTest extends DatabaseTestCase
      */
     public function testAPageMayKeepItsOwnAddress(): void
     {
-        $this->controller()->create($this->form($this->fields()));
+        $this->write();
         $page = $this->written();
 
-        $this->controller()->edit(
-            $this->form($this->fields(['title' => 'Still here'])),
+        $this->revise(
             $page,
+            ['title' => 'Still here'],
         );
 
         self::assertSame(
@@ -142,7 +141,11 @@ final class AdminPageControllerTest extends DatabaseTestCase
     {
         $before = count($this->repository()->findAll());
 
-        $response = $this->controller()->create($this->form($this->fields(['category' => 'news'])));
+        $response = $this->write([
+            'category' => 'career',
+            'subCategory' => '',
+            'name' => '',
+        ]);
 
         self::assertCount(
             $before,
@@ -225,47 +228,151 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The fields as the form posts them, with both languages filled in.
+     * Write a page the way the flow does: the address, then the content that finishes it. Both steps go through the
+     * same session, which is where the flow keeps what has been filled in so far.
      *
      * @param array<string, string> $overrides
-     *
-     * @return array<string, mixed>
      */
-    private function fields(array $overrides = []): array
+    private function write(array $overrides = []): Response
+    {
+        $session = $this->session();
+
+        $response = $this->controller()->create($this->step(
+            $session,
+            'address',
+            $this->address($overrides),
+            'next',
+        ));
+
+        if (!$this->reachedTheContentStep($response)) {
+            return $response;
+        }
+
+        return $this->controller()->create($this->step(
+            $session,
+            'content',
+            $this->content($overrides),
+            'finish',
+        ));
+    }
+
+    /**
+     * @param array<string, string> $overrides
+     */
+    private function revise(
+        Page $page,
+        array $overrides = [],
+    ): Response {
+        $session = $this->session();
+
+        $this->controller()->edit(
+            $this->step(
+                $session,
+                'address',
+                $this->address($overrides),
+                'next',
+            ),
+            $page,
+        );
+
+        return $this->controller()->edit(
+            $this->step(
+                $session,
+                'content',
+                $this->content($overrides),
+                'finish',
+            ),
+            $page,
+        );
+    }
+
+    /**
+     * A refused address step renders itself again rather than the content step, which is what says the flow never
+     * got past it.
+     */
+    private function reachedTheContentStep(Response $response): bool
+    {
+        return str_contains(
+            strval($response->getContent()),
+            'page_flow[content]',
+        );
+    }
+
+    /**
+     * @param array<string, string> $overrides
+     *
+     * @return array<string, string>
+     */
+    private function address(array $overrides): array
     {
         $category = $overrides['category'] ?? 'testing';
-        $title = $overrides['title'] ?? 'A page for testing';
-        $content = $overrides['content'] ?? '<p>Hello</p>';
-
-        $localised = static fn (string $value): array => [
-            'valueEN' => $value,
-            'valueNL' => $value,
-        ];
+        $subCategory = $overrides['subCategory'] ?? 'pages';
+        $name = $overrides['name'] ?? 'one';
 
         return [
-            'category' => $localised($category),
-            'subCategory' => $localised('pages'),
-            'name' => $localised('one'),
-            'title' => $localised($title),
-            'content' => $localised($content),
+            'categoryNL' => $category,
+            'categoryEN' => $category,
+            'subCategoryNL' => $subCategory,
+            'subCategoryEN' => $subCategory,
+            'nameNL' => $name,
+            'nameEN' => $name,
             'requiredRole' => UserRoles::User->value,
-            '_csrf_token' => 'csrf-token',
         ];
     }
 
     /**
-     * @param array<string, mixed> $fields
+     * @param array<string, string> $overrides
+     *
+     * @return array<string, string>
      */
-    private function form(array $fields): Request
+    private function content(array $overrides): array
     {
+        $title = $overrides['title'] ?? 'A page for testing';
+        $content = $overrides['content'] ?? '<p>Hello</p>';
+
+        return [
+            'titleNL' => $title,
+            'titleEN' => $title,
+            'contentNL' => $content,
+            'contentEN' => $content,
+        ];
+    }
+
+    /**
+     * @param array<string, string> $fields
+     */
+    private function step(
+        FlashBagAwareSessionInterface $session,
+        string $step,
+        array $fields,
+        string $button,
+    ): Request {
         $request = new Request(
-            request: ['page' => $fields],
+            request: [
+                'page_flow' => [
+                    $step => $fields,
+                    $button => '',
+                    '_csrf_token' => 'csrf-token',
+                ],
+            ],
             server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
         );
         $request->setMethod(Request::METHOD_POST);
+        $request->setSession($session);
         $this->authenticateAsBoard($request);
 
         return $request;
+    }
+
+    private function session(): FlashBagAwareSessionInterface
+    {
+        $session = self::getContainer()->get('session.factory')->createSession();
+        self::assertInstanceOf(
+            FlashBagAwareSessionInterface::class,
+            $session,
+        );
+
+        return $session;
     }
 
     private function authenticateAsBoard(Request $request): void
@@ -282,12 +389,10 @@ final class AdminPageControllerTest extends DatabaseTestCase
             ['ROLE_BOARD'],
         ));
 
-        $session = self::getContainer()->get('session.factory')->createSession();
-        self::assertInstanceOf(
-            FlashBagAwareSessionInterface::class,
-            $session,
-        );
-        $request->setSession($session);
+        if (!$request->hasSession()) {
+            $request->setSession($this->session());
+        }
+
         self::getContainer()->get('request_stack')->push($request);
     }
 
