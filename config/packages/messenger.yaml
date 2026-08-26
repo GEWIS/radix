@@ -117,6 +117,9 @@ framework:
             'App\Message\Photo\ProcessImageVariantsMessage': images
             'App\Message\Photo\GenerateAlbumCoverMessage': images
             'App\Message\Application\GenerateImageVariantMessage': images
+            # Unrouted this would be handled synchronously, which is the whole thing `app:image:pregenerate` exists
+            # to avoid: the backfill would encode in the container the command was run from.
+            'App\Message\Application\PregenerateImageVariantMessage': images
             # Rasterizing an exam and rebuilding a watermarked copy of it are both page-at-a-time image work, so they
             # belong on the same queue as the photo pipeline rather than in front of anything time-sensitive.
             'App\Message\Education\FlattenCourseDocumentMessage': images

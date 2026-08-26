@@ -25,8 +25,12 @@ use function sprintf;
  */
 final readonly class ImageVariantResponder
 {
-    /** Long enough to cover a backlogged queue, short enough that a message lost with the broker costs minutes. */
-    private const int PENDING_TTL = 900;
+    /**
+     * Long enough to cover a backlogged queue, short enough that a message lost with the broker costs minutes.
+     * Public because `app:image:pregenerate` marks what it queues with the same key and lifetime, so a visitor who
+     * lands on a page mid-backfill does not queue a second message for a variant already on the transport.
+     */
+    public const int PENDING_TTL = 900;
 
     private const int RETRY_AFTER_SECONDS = 60;
 
