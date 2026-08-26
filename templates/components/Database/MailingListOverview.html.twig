@@ -1,0 +1,93 @@
+{# A yes/no column used to be a glyphicon tick or cross; without an icon font a badge says the same thing and does
+   not need a text alternative bolted on. #}
+{% macro yes_no(value) %}
+    {% if value %}
+        <span class="badge badge-success">{{ 'Yes'|trans }}</span>
+    {% else %}
+        <span class="badge badge-secondary">{{ 'No'|trans }}</span>
+    {% endif %}
+{% endmacro %}
+
+{% import _self as flag %}
+
+<div {{ attributes }}>
+    <div class="panel mb-3">
+        <div class="panel-body">
+            <label class="form-label" for="mailing-list-overview-search">{{ 'Search'|trans }}</label>
+            <input type="search" class="form-control" id="mailing-list-overview-search"
+                   placeholder="{{ 'Search by name or description'|trans }}"
+                   data-model="debounce(300)|search"
+                   value="{{ this.search }}">
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'Name (Sync)'|trans }}</th>
+                        <th scope="col">{{ 'Dutch Description'|trans }}</th>
+                        <th scope="col">{{ 'English Description'|trans }}</th>
+                        <th scope="col">{{ 'On Form'|trans }}</th>
+                        <th scope="col">{{ 'Auto-subscription'|trans }}</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for list in this.lists %}
+                        <tr>
+                            <td>
+                                {{ list.name }}
+                                {# A list synchronises with at most one external system, so at most one of these is
+                                   set. #}
+                                ({% if list.hasListmonkList %}
+                                    {{ list.listmonkList.name }}
+                                {% elseif list.hasMailmanList %}
+                                    {{ list.mailmanList.mailmanId }}
+                                {% else %}
+                                    {{ 'n/a'|trans }}
+                                {% endif %})
+                            </td>
+                            <td>{{ list.nlDescription }}</td>
+                            <td>{{ list.enDescription }}</td>
+                            <td>{{ flag.yes_no(list.onForm) }}</td>
+                            <td>{{ flag.yes_no(list.defaultSub) }}</td>
+                            <td class="text-end text-nowrap">
+                                <a href="{{ path('mailing_list_edit', {'name': list.name}) }}"
+                                   class="btn btn-sm btn-outline-gewis-primary">
+                                    {{ 'Edit'|trans }}
+                                </a>
+                                <a href="{{ path('mailing_list_delete', {'name': list.name}) }}"
+                                   class="btn btn-sm btn-outline-danger">
+                                    {{ 'Delete'|trans }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">
+                                {% include 'partials/application/empty-state.html.twig' with {
+                                    icon: 'fa-envelope',
+                                    title: this.search is empty ? 'No mailing lists'|trans : 'No mailing lists match'|trans,
+                                    body: this.search is empty
+                                        ? 'Add one to offer it on the registration form.'|trans
+                                        : 'Try a different name or description.'|trans,
+                                } only %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel-body">
+            {% include 'partials/application/pagination.html.twig' with {
+                'page': this.page,
+                'totalPages': this.totalPages,
+                'totalCount': this.totalCount,
+                'pageSize': this.pageSize,
+            } only %}
+        </div>
+    </div>
+</div>

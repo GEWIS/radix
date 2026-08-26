@@ -5625,6 +5625,10 @@
         <source>No mailing lists</source>
         <target state="translated">Geen mailinglijsten</target>
       </trans-unit>
+      <trans-unit id="F_fjmfJ" resname="No mailing lists match">
+        <source>No mailing lists match</source>
+        <target state="translated">Geen maillijsten gevonden</target>
+      </trans-unit>
       <trans-unit id="3YWcfhV" resname="No maintenance is planned. The site is fully available.">
         <source>No maintenance is planned. The site is fully available.</source>
         <target>Er is geen onderhoud gepland. De website is volledig beschikbaar.</target>
@@ -7528,6 +7532,10 @@
       <trans-unit id="6kHgBD1" resname="Search by course code or name">
         <source>Search by course code or name</source>
         <target>Zoek op vakcode of vaknaam</target>
+      </trans-unit>
+      <trans-unit id="6jZpReD" resname="Search by name or description">
+        <source>Search by name or description</source>
+        <target state="translated">Zoek op naam of omschrijving</target>
       </trans-unit>
       <trans-unit id="SkCIc_t" resname="Search by name or membership number">
         <source>Search by name or membership number</source>
@@ -9492,6 +9500,10 @@
       <trans-unit id="fhVR..D" resname="Try a different filter, or clear the search.">
         <source>Try a different filter, or clear the search.</source>
         <target state="translated">Probeer een ander filter, of wis de zoekopdracht.</target>
+      </trans-unit>
+      <trans-unit id="_R21A33" resname="Try a different name or description.">
+        <source>Try a different name or description.</source>
+        <target state="translated">Probeer een andere naam of omschrijving.</target>
       </trans-unit>
       <trans-unit id="oeDZBUR" resname="Try a shorter search, or ask the question you were hoping to find.">
         <source>Try a shorter search, or ask the question you were hoping to find.</source>

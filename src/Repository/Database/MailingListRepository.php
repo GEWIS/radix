@@ -6,8 +6,12 @@ namespace App\Repository\Database;
 
 use App\Entity\Database\MailingList;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
+
+use function mb_strtolower;
+use function trim;
 
 /**
  * @extends ServiceEntityRepository<MailingList>
@@ -52,6 +56,40 @@ class MailingListRepository extends ServiceEntityRepository
             [],
             ['name' => 'ASC'],
         );
+    }
+
+    /**
+     * One page of the mailing lists, optionally narrowed to a name or a description in either language.
+     *
+     * @return Paginator<MailingList>
+     */
+    public function paginateForOverview(
+        string $search,
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        $qb = $this->createQueryBuilder('l')
+            ->orderBy(
+                'l.name',
+                'ASC',
+            )
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        $search = trim($search);
+        if ('' !== $search) {
+            $qb->andWhere($qb->expr()->orX(
+                'LOWER(l.name) LIKE :search',
+                'LOWER(l.nl_description) LIKE :search',
+                'LOWER(l.en_description) LIKE :search',
+            ))
+                ->setParameter(
+                    'search',
+                    '%' . mb_strtolower($search) . '%',
+                );
+        }
+
+        return new Paginator($qb);
     }
 
     /**

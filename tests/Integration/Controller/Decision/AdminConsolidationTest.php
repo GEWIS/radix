@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller\Decision;
 
 use App\Controller\Application\AdminController as DashboardController;
-use App\Controller\Decision\AdminBodyController;
 use App\Controller\Decision\AdminMeetingController;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Meeting;
@@ -14,13 +13,12 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Security\User\SudoMode;
 use App\Tests\Integration\DatabaseTestCase;
+use App\Twig\Components\Decision\Admin\BodyPageOverview;
+use App\ViewModel\Decision\BodyPageRow;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-
-use function count;
-use function substr_count;
 
 /**
  * The meeting and body pages after the register and the administration were folded into one section.
@@ -33,6 +31,10 @@ use function substr_count;
  * Invoked directly, which is this codebase's pattern for controller tests; the class-level guards are enforced at the
  * HTTP layer, so what these exercise is the action body and its template.
  */
+use function array_map;
+use function count;
+use function substr_count;
+
 final class AdminConsolidationTest extends DatabaseTestCase
 {
     /**
@@ -164,20 +166,25 @@ final class AdminConsolidationTest extends DatabaseTestCase
         );
         $this->pushRequest();
 
-        $user = $this->user(self::REGISTER_ADMIN);
-        $content = $this->render($this->bodies()->index($user));
-
         $abrogated = $this->entityManager->getRepository(Organ::class)->findAbrogated();
         self::assertNotEmpty(
             $abrogated,
             'The seed is expected to contain a body that has been abrogated.',
         );
 
+        // Asked of the overview rather than of the rendered page: the table pages, so which page an abrogated body
+        // lands on is not something to assert against. What matters is that it is in the list at all.
+        $overview = self::getContainer()->get(BodyPageOverview::class);
+        $overview->pageSize = 100;
+
         // The list the board is shown is the bodies whose page they may write, which is the active ones. A register
         // administrator reads the same page as the list of bodies there have ever been.
-        self::assertStringContainsString(
+        self::assertContains(
             $abrogated[0]->getAbbr(),
-            $content,
+            array_map(
+                static fn (BodyPageRow $row): string => $row->organ->getAbbr(),
+                $overview->getBodies(),
+            ),
             'A body that has been abrogated is still a body the register knows about.',
         );
     }
@@ -218,11 +225,6 @@ final class AdminConsolidationTest extends DatabaseTestCase
     private function meetings(): AdminMeetingController
     {
         return self::getContainer()->get(AdminMeetingController::class);
-    }
-
-    private function bodies(): AdminBodyController
-    {
-        return self::getContainer()->get(AdminBodyController::class);
     }
 
     private function user(int $lidnr): User
