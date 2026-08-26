@@ -77,14 +77,16 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * Search for a member.
+     * Search for a member, for the name lookup the decision forms type into.
+     *
+     * Capped rather than paginated on purpose: this answers a typeahead, which wants the first handful of matches
+     * while somebody is still typing and never wants a second page. Narrowing the query is what finds a member who
+     * is not in the first thirty-two, not asking for more of them.
      *
      * @return Member[]
      */
-    public function search(
-        string $query,
-        bool $filtered = false,
-    ): array {
+    public function search(string $query): array
+    {
         $qb = $this->createQueryBuilder('m');
 
         $qb->where("CONCAT(LOWER(m.firstName), ' ', LOWER(m.lastName)) LIKE :name")
@@ -120,22 +122,20 @@ class MemberRepository extends ServiceEntityRepository
             );
         }
 
-        if ($filtered) {
-            $sq = self::getMembershipSubquery(
-                $qb,
-                includeGraduates: true,
-                includeFutureMembers: true,
-            );
+        $sq = self::getMembershipSubquery(
+            $qb,
+            includeGraduates: true,
+            includeFutureMembers: true,
+        );
 
-            $qb->andWhere(
-                $qb->expr()->in(
-                    'm',
-                    $sq->getDQL(),
-                ),
-            )
+        $qb->andWhere(
+            $qb->expr()->in(
+                'm',
+                $sq->getDQL(),
+            ),
+        )
             ->andWhere('m.deleted = False')
             ->andWhere('m.hidden = False');
-        }
 
         return $qb->getQuery()->getResult();
     }
@@ -172,35 +172,6 @@ class MemberRepository extends ServiceEntityRepository
         );
 
         return $qb->getQuery()->getOneOrNullResult();
-    }
-
-    /**
-     * Find all non-hidden and non-deleted members.
-     *
-     * @return Member[]
-     */
-    public function findNormal(): array
-    {
-        $qb = $this->createQueryBuilder('m');
-
-        $sq = self::getMembershipSubquery(
-            $qb,
-            includeGraduates: true,
-            includeFutureMembers: true,
-        );
-
-        $qb->andWhere(
-            $qb->expr()->in(
-                'm',
-                $sq->getDQL(),
-            ),
-        )
-            ->andWhere('m.hidden = false')
-            ->andWhere('m.deleted = false')
-            ->setMaxResults(32)
-            ->setFirstResult(0);
-
-        return $qb->getQuery()->getResult();
     }
 
     /**

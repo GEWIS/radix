@@ -74,7 +74,8 @@ class AbstractPaginatedOverviewTest extends TestCase
         int $page,
         int $queried,
     ): void {
-        $overview = $this->overview();
+        // Ten pages at the default size, so the page asked for is only ever clamped by the bound under test.
+        $overview = $this->overview(100);
         $overview->page = $page;
 
         $overview->getRows();
@@ -189,9 +190,48 @@ class AbstractPaginatedOverviewTest extends TestCase
         $overview->pageSize = 10;
 
         $overview->gotoPage($requested);
+        $overview->getRows();
 
         self::assertSame(
             $lands,
+            $overview->page,
+        );
+    }
+
+    /**
+     * The page prop is written from the URL as well as by the action, so a hand-written `?page=999` has to land on
+     * the last page too. Leaving it out there renders an empty table with no control to get back out of it.
+     */
+    public function testAPageFromTheUrlPastTheEndLandsOnTheLastOne(): void
+    {
+        $overview = $this->overview(45);
+        $overview->pageSize = 10;
+        $overview->page = 999;
+
+        $overview->getRows();
+
+        self::assertSame(
+            5,
+            $overview->page,
+        );
+        self::assertSame(
+            [
+                5,
+                10,
+            ],
+            $overview->askedFor,
+        );
+    }
+
+    public function testAnEmptyOverviewStaysOnTheFirstPage(): void
+    {
+        $overview = $this->overview();
+        $overview->page = 4;
+
+        $overview->getRows();
+
+        self::assertSame(
+            1,
             $overview->page,
         );
     }
@@ -252,6 +292,39 @@ class AbstractPaginatedOverviewTest extends TestCase
                 10,
             ],
             $overview->askedFor,
+        );
+    }
+
+    /**
+     * The page number alone is not what a page holds. Leaving a filter out of the key means the rows of the old one
+     * survive a change that lands on the same page number, which is the shape of every paging bug this class exists
+     * to stop.
+     */
+    public function testChangingAFilterRefetchesTheSamePageNumber(): void
+    {
+        $overview = $this->overview(100);
+        $overview->getRows();
+
+        $overview->filter = 'narrowed';
+        $overview->getRows();
+
+        self::assertSame(
+            2,
+            $overview->queries,
+        );
+    }
+
+    public function testNothingIsRefetchedWhileTheFilterAndThePageStand(): void
+    {
+        $overview = $this->overview(100);
+
+        $overview->getRows();
+        $overview->getTotalCount();
+        $overview->getTotalPages();
+
+        self::assertSame(
+            1,
+            $overview->queries,
         );
     }
 

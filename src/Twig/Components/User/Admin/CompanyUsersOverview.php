@@ -8,34 +8,30 @@ use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\User\CompanyUserRepository;
-use App\Twig\Components\Concerns\PageSizeTrait;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\User\Admin\CompanyUserRow;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Override;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_map;
-use function ceil;
 use function in_array;
-use function iterator_to_array;
-use function max;
-use function min;
 
+/**
+ * @extends AbstractDoctrinePaginatedOverview<CompanyUser>
+ */
 #[AsLiveComponent(
     name: 'User:Admin:CompanyUsersOverview',
     template: 'components/User/Admin/CompanyUsersOverview.html.twig',
 )]
 #[IsGranted(UserRoles::Admin->value)]
 #[IsGranted('SUDO')]
-final class CompanyUsersOverview
+final class CompanyUsersOverview extends AbstractDoctrinePaginatedOverview
 {
-    use DefaultActionTrait;
-    use PageSizeTrait;
-
     private const array ALLOWED_SORTS = [
         'company',
         'name',
@@ -43,20 +39,23 @@ final class CompanyUsersOverview
         'mfa',
     ];
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public string $search = '';
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public string $sort = 'company';
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public string $direction = 'asc';
-
-    #[LiveProp(writable: true)]
-    public int $page = 1;
-
-    /** @var Paginator<CompanyUser>|null */
-    private ?Paginator $paginator = null;
 
     public function __construct(private readonly CompanyUserRepository $companyUserRepository)
     {
@@ -65,44 +64,41 @@ final class CompanyUsersOverview
     /**
      * @return list<CompanyUserRow>
      */
-    public function getRows(): array
+    public function getCompanyUsers(): array
     {
         return array_map(
             static fn (CompanyUser $cu): CompanyUserRow => CompanyUserRow::fromCompanyUser($cu),
-            iterator_to_array(
-                $this->getPaginator()->getIterator(),
-                false,
-            ),
+            $this->getRows(),
         );
     }
 
-    public function getTotalCount(): int
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
     {
-        return $this->getPaginator()->count();
+        return [
+            $this->search,
+            $this->effectiveSort(),
+            $this->direction,
+        ];
     }
 
     /**
      * @return Paginator<CompanyUser>
      */
-    private function getPaginator(): Paginator
-    {
-        return $this->paginator ??= $this->companyUserRepository->paginateForAdmin(
+    #[Override]
+    protected function createPaginator(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        return $this->companyUserRepository->paginateForAdmin(
             search: $this->search,
             sort: $this->effectiveSort(),
             direction: $this->direction,
-            page: max(
-                1,
-                $this->page,
-            ),
-            pageSize: $this->pageSize(),
-        );
-    }
-
-    public function getTotalPages(): int
-    {
-        return max(
-            1,
-            (int) ceil($this->getTotalCount() / $this->pageSize()),
+            page: $page,
+            pageSize: $pageSize,
         );
     }
 
@@ -130,21 +126,7 @@ final class CompanyUsersOverview
             $this->direction = 'asc';
         }
 
-        $this->page = 1;
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function gotoPage(#[LiveArg]
-    int $page,): void
-    {
-        $this->page = max(
-            1,
-            min(
-                $page,
-                $this->getTotalPages(),
-            ),
-        );
+        $this->resetToFirstPage();
     }
 
     private function effectiveSort(): string

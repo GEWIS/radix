@@ -7,13 +7,11 @@ namespace App\Controller\Frontpage;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Frontpage\Poll;
 use App\Entity\User\Enums\UserRoles;
-use App\Repository\Frontpage\PollRepository;
 use App\Repository\Frontpage\PollRevisionRepository;
 use App\Service\Frontpage\PollService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,10 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * The polls the board has agreed to, with how far each one has got. Taking one down moves its closing date to today
  * rather than deleting it, so what was asked and how it was answered stays on the website.
  */
-use function array_values;
-use function in_array;
-use function iterator_to_array;
-use function max;
 
 #[Route(
     path: '/admin/polls',
@@ -35,18 +29,7 @@ use function max;
 #[IsGranted(UserRoles::Board->value)]
 class AdminPollController extends AbstractController
 {
-    /** The sizes the pagination partial offers; anything else in the query string is not one of them. */
-    private const array PAGE_SIZES = [
-        10,
-        25,
-        50,
-        100,
-    ];
-
-    private const int PAGE_SIZE = 25;
-
     public function __construct(
-        private readonly PollRepository $pollRepository,
         private readonly PollRevisionRepository $revisionRepository,
         private readonly PollService $pollService,
         private readonly TranslatorInterface $translator,
@@ -57,41 +40,12 @@ class AdminPollController extends AbstractController
         path: '',
         name: 'index',
     )]
-    public function index(
-        #[MapQueryParameter]
-        int $page = 1,
-        #[MapQueryParameter]
-        int $pageSize = self::PAGE_SIZE,
-    ): Response {
-        $page = max(
-            1,
-            $page,
-        );
-        $pageSize = in_array(
-            $pageSize,
-            self::PAGE_SIZES,
-            true,
-        )
-            ? $pageSize
-            : self::PAGE_SIZE;
-
-        $paginator = $this->pollRepository->paginateForAdmin(
-            $page,
-            $pageSize,
-        );
-        $polls = array_values(iterator_to_array($paginator));
-        // The rows show what each question was answered, which is a query per poll unless the page is warmed at once.
-        $this->pollRepository->primeResults($polls);
-
+    public function index(): Response
+    {
+        // The table itself is `Frontpage:Admin:PollOverview`, which pages over the polls on its own.
         return $this->render(
             'frontpage/admin/polls/index.html.twig',
-            [
-                'polls' => $polls,
-                'currentPage' => $page,
-                'pageSize' => $pageSize,
-                'totalCount' => $paginator->count(),
-                'awaitingReview' => $this->revisionRepository->countForReview(),
-            ],
+            ['awaitingReview' => $this->revisionRepository->countForReview()],
         );
     }
 

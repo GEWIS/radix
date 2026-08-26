@@ -446,9 +446,11 @@ is linked to by its path on disk.
 **A web request never encodes an image.** Serving reads the pre-generated variant cache only; a miss on an existing
 original queues one `GenerateImageVariantMessage` on the `images` transport (deduplicated through a shared-cache
 marker) and answers 503 with `Retry-After` (`ImageVariantResponder`). The variants exist because uploads queue them
-(`ProcessImageVariantsMessage`) and because `app:image:pregenerate` backfills the rest at a bounded pace — run it
-after clearing the variant cache or changing the variant set or encoding. Synchronous encode-on-miss is what once
-saturated the production host; do not reintroduce it.
+(`ProcessImageVariantsMessage`) and because `app:image:pregenerate` queues the rest
+(`PregenerateImageVariantMessage`). That command only dispatches, so a backfill is encoded by the `messenger-images`
+workers rather than by whichever container the command was run from, and `IMAGE_WORKER_REPLICAS` is what paces it.
+Run it after clearing the variant cache, and with `--force` after changing the variant set or the encoding.
+Synchronous encode-on-miss is what once saturated the production host; do not reintroduce it.
 
 The application inherits one legacy pool: the flat content-addressed tree GEWISWEB wrote at `public/data`, holding
 every photo, company and organ image, course document, page-embedded image and meeting document. `app:storage:migrate`

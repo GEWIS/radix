@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Career;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Career\Company;
 use App\Repository\Career\CompanyRepository;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use Override;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_slice;
 use function count;
@@ -32,12 +31,8 @@ use function random_int;
     name: 'Career:CompanyOverview',
     template: 'components/Career/CompanyOverview.html.twig',
 )]
-final class CompanyOverview
+final class CompanyOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    public const int PAGE_SIZE = 12;
-
     #[LiveProp(
         writable: true,
         url: true,
@@ -49,9 +44,6 @@ final class CompanyOverview
     // represents exactly, since the props go through JSON.parse in the browser and a rounded seed fails the checksum.
     #[LiveProp]
     public int $seed = 0;
-
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
 
     /** @var int[]|null */
     private ?array $ids = null;
@@ -69,13 +61,6 @@ final class CompanyOverview
             0,
             mt_getrandmax(),
         );
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
     }
 
     /**
@@ -97,6 +82,7 @@ final class CompanyOverview
         return count($this->matchingIds());
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return $this->getTotalCount() > count($this->getCompanies());

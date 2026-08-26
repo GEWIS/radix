@@ -11,27 +11,19 @@ use App\Entity\Application\RevisionInterface;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityRevisionCommentRepository;
-use App\Repository\Activity\ActivityRevisionRepository;
 use App\Service\Activity\SignupListMigrator;
 use App\Util\Activity\PastActivityRule;
-use App\ViewModel\Activity\Admin\ActivityAdminRow;
 use App\ViewModel\Application\RevisionActions;
 use Override;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-use function array_map;
-use function array_values;
 use function assert;
-use function in_array;
-use function iterator_to_array;
-use function max;
 
 /**
  * The shared review surface for activities:
@@ -49,26 +41,10 @@ use function max;
 )]
 class AdminApprovalController extends AbstractRevisionReviewController
 {
-    /** The sizes the pagination partial offers; anything else in the query string is not one of them. */
-    private const array PAGE_SIZES = [
-        10,
-        25,
-        50,
-        100,
-    ];
-
-    private const int PAGE_SIZE = 25;
-
     public function __construct(
-        private readonly ActivityRevisionRepository $revisionRepository,
         private readonly ActivityRevisionCommentRepository $commentRepository,
         private readonly SignupListMigrator $signupListMigrator,
     ) {
-    }
-
-    private static function rowFromRevision(ActivityRevision $revision): ActivityAdminRow
-    {
-        return ActivityAdminRow::fromRevision($revision);
     }
 
     #[Route(
@@ -76,41 +52,10 @@ class AdminApprovalController extends AbstractRevisionReviewController
         name: 'index',
     )]
     #[IsGranted(UserRoles::Board->value)]
-    public function index(
-        #[MapQueryParameter]
-        int $page = 1,
-        #[MapQueryParameter]
-        int $pageSize = self::PAGE_SIZE,
-    ): Response {
-        $page = max(
-            1,
-            $page,
-        );
-        $pageSize = in_array(
-            $pageSize,
-            self::PAGE_SIZES,
-            true,
-        )
-            ? $pageSize
-            : self::PAGE_SIZE;
-
-        $paginator = $this->revisionRepository->paginateForReview(
-            $page,
-            $pageSize,
-        );
-
-        return $this->render(
-            'activity/admin/approvals/index.html.twig',
-            [
-                'rows' => array_map(
-                    self::rowFromRevision(...),
-                    array_values(iterator_to_array($paginator)),
-                ),
-                'currentPage' => $page,
-                'pageSize' => $pageSize,
-                'totalCount' => $paginator->count(),
-            ],
-        );
+    public function index(): Response
+    {
+        // The queue itself is `Activity:Admin:ApprovalOverview`, which pages over the submissions on its own.
+        return $this->render('activity/admin/approvals/index.html.twig');
     }
 
     #[Route(

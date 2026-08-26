@@ -11,7 +11,7 @@ use App\Entity\Career\Vacancy;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Career\VacancyRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -29,14 +29,14 @@ use function strval;
  * Rendered twice: on its own tab, where the company can be picked, and on a single company's page, where {@see
  * $company} is passed in and pins the list to that company.
  *
- * @extends AbstractPaginatedOverview<Vacancy>
+ * @extends AbstractDoctrinePaginatedOverview<Vacancy>
  */
 #[AsLiveComponent(
     name: 'Career:Admin:VacancyOverview',
     template: 'components/Career/Admin/VacancyOverview.html.twig',
 )]
 #[IsGranted(UserRoles::CompanyAdmin->value)]
-final class VacancyOverview extends AbstractPaginatedOverview
+final class VacancyOverview extends AbstractDoctrinePaginatedOverview
 {
     #[LiveProp]
     public ?Company $company = null;
@@ -130,6 +130,21 @@ final class VacancyOverview extends AbstractPaginatedOverview
         return '' !== strval($this->companyFilter)
             ? intval($this->companyFilter)
             : null;
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->search,
+            $this->status,
+            $this->category,
+            $this->companyFilter,
+            $this->companyId(),
+        ];
     }
 
     /**

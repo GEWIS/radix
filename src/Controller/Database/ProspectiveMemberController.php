@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller\Database;
 
 use App\Entity\Database\Enums\MembershipTypes;
-use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Form\Database\MemberApproveType;
 use App\Form\Database\MemberRenewalType;
 use App\Form\Database\RegistrationType;
@@ -16,15 +15,12 @@ use App\Service\Database\RegistrationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
-use function array_map;
 
 /**
  * Everyone who has registered but whose membership the secretary has not confirmed yet, from the public sign-up form
@@ -179,42 +175,6 @@ final class ProspectiveMemberController extends AbstractController
     public function index(): Response
     {
         return $this->render('database/join/prospective-member/index.html.twig');
-    }
-
-    /**
-     * The overview searches while typing; `type` picks which of its three tables is being filled.
-     */
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
-    #[Route(
-        path: '/members/prospective/search',
-        name: 'join_prospective_member_search',
-        methods: ['GET'],
-    )]
-    public function search(Request $request): JsonResponse
-    {
-        $prospectiveMembers = $this->memberService->searchProspective(
-            (string) $request->query->get(
-                'q',
-                '',
-            ),
-            (string) $request->query->get(
-                'type',
-                '',
-            ),
-        );
-
-        return $this->json(array_map(
-            fn (ProspectiveMemberModel $prospectiveMember): array => [
-                'lidnr' => $prospectiveMember->getLidnr(),
-                'fullName' => $prospectiveMember->getFullName(),
-                'email' => $prospectiveMember->getEmail(),
-                'url' => $this->generateUrl(
-                    'join_prospective_member_show',
-                    ['id' => $prospectiveMember->getLidnr()],
-                ),
-            ],
-            $prospectiveMembers,
-        ));
     }
 
     #[IsGranted(SudoVoter::ATTRIBUTE)]

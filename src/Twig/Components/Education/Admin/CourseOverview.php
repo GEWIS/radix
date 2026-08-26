@@ -8,7 +8,7 @@ use App\Entity\Education\Course;
 use App\Entity\Education\Enums\CourseFilter;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Education\CourseRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\Education\CourseOverviewRow;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
@@ -22,14 +22,14 @@ use function array_map;
  * How much material a course has is counted for the visible page in one query rather than read off each course, so the
  * table costs two queries whatever the page size.
  *
- * @extends AbstractPaginatedOverview<Course>
+ * @extends AbstractDoctrinePaginatedOverview<Course>
  */
 #[AsLiveComponent(
     name: 'Education:Admin:CourseOverview',
     template: 'components/Education/Admin/CourseOverview.html.twig',
 )]
 #[IsGranted(UserRoles::Board->value)]
-final class CourseOverview extends AbstractPaginatedOverview
+final class CourseOverview extends AbstractDoctrinePaginatedOverview
 {
     #[LiveProp(
         writable: true,
@@ -82,6 +82,18 @@ final class CourseOverview extends AbstractPaginatedOverview
     public function getFilters(): array
     {
         return CourseFilter::cases();
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->search,
+            $this->filter,
+        ];
     }
 
     /**

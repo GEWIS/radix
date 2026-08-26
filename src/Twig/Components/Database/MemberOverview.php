@@ -7,7 +7,7 @@ namespace App\Twig\Components\Database;
 use App\Entity\Database\Enums\MemberFilter;
 use App\Entity\Database\Member;
 use App\Repository\Database\MemberRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\Twig\Components\Concerns\FilterPillsTrait;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
@@ -21,13 +21,13 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
  * The counts on the chips are of the current search rather than of the whole table, so narrowing the search says how
  * many of those matches are expired rather than how many members are.
  *
- * @extends AbstractPaginatedOverview<Member>
+ * @extends AbstractDoctrinePaginatedOverview<Member>
  */
 #[AsLiveComponent(
     name: 'Database:MemberOverview',
     template: 'components/Database/MemberOverview.html.twig',
 )]
-final class MemberOverview extends AbstractPaginatedOverview
+final class MemberOverview extends AbstractDoctrinePaginatedOverview
 {
     use FilterPillsTrait;
 
@@ -80,6 +80,18 @@ final class MemberOverview extends AbstractPaginatedOverview
     public function getFilters(): array
     {
         return MemberFilter::cases();
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->search,
+            $this->filter,
+        ];
     }
 
     /**

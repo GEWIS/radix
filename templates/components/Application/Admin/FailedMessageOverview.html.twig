@@ -1,0 +1,89 @@
+<div {{ attributes }}>
+    <div class="panel">
+        <div class="panel-heading">
+            <h3 class="mb-0">{{ 'Failed messages'|trans }}</h3>
+        </div>
+        <div class="panel-body">
+            {# On the total, not the rows: an out-of-range page has no rows but must still render the pager. #}
+            {% if this.totalCount == 0 %}
+                <p class="text-muted mb-0">
+                    {{ 'Nothing has failed every one of its retries.'|trans }}
+                </p>
+            {% else %}
+                <p class="text-muted">
+                    {{ 'Messages that used up every retry. Retry or discard them with %retry% and %remove%.'|trans({
+                        '%retry%': 'bin/console messenger:failed:retry',
+                        '%remove%': 'bin/console messenger:failed:remove',
+                    }) }}
+                </p>
+                {% if this.truncated %}
+                    <div class="alert alert-warning">
+                        {{ 'Only the first %inspected% of %total% failed messages can be paged through here; read the rest with %command%.'|trans({
+                            '%inspected%': this.totalCount,
+                            '%total%': this.transportTotal ?? '?',
+                            '%command%': 'bin/console messenger:failed:show',
+                        }) }}
+                    </div>
+                {% endif %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>{{ 'ID'|trans }}</th>
+                                <th>{{ 'Message'|trans }}</th>
+                                <th>{{ 'From'|trans }}</th>
+                                <th>{{ 'Failed'|trans }}</th>
+                                <th>{{ 'Error'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for message in this.rows %}
+                                <tr>
+                                    <td><small class="text-muted">{{ message.id ?? '?' }}</small></td>
+                                    <td>
+                                        {# The class is what identifies the work; the namespace in front of it is noise in a table. #}
+                                        <code>{{ message.class|split('\\')|last }}</code>
+                                        <br>
+                                        <small class="text-muted">{{ message.class }}</small>
+                                    </td>
+                                    <td>
+                                        {% if message.originalTransport %}
+                                            <code>{{ message.originalTransport }}</code>
+                                        {% else %}
+                                            <small class="text-muted">{{ 'Unknown'|trans }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if message.failedAt %}
+                                            <small class="text-muted">{{ message.failedAt|date('Y-m-d H:i') }}</small>
+                                        {% else %}
+                                            <small class="text-muted">&mdash;</small>
+                                        {% endif %}
+                                        {% if message.retries > 0 %}
+                                            <br>
+                                            <small class="text-muted">{{ 'after %count% retries'|trans({'%count%': message.retries}) }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if message.errorClass %}
+                                            <code>{{ message.errorClass|split('\\')|last }}</code>
+                                            <br>
+                                        {% endif %}
+                                        <small class="text-muted">{{ message.errorMessage ?? '' }}</small>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% include 'partials/application/pagination.html.twig' with {
+                    'page': this.page,
+                    'totalPages': this.totalPages,
+                    'totalCount': this.totalCount,
+                    'pageSize': this.pageSize,
+                } only %}
+            {% endif %}
+        </div>
+    </div>
+</div>

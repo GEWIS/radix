@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Career;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Career\Company;
 use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
@@ -12,13 +11,13 @@ use App\Entity\Career\VacancyLabel;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Career\VacancyLabelRepository;
 use App\Repository\Career\VacancyRepository;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use Override;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\LiveComponent\Metadata\UrlMapping;
 
 use function array_filter;
@@ -48,12 +47,8 @@ use function strval;
     name: 'Career:VacancyOverview',
     template: 'components/Career/VacancyOverview.html.twig',
 )]
-final class VacancyOverview
+final class VacancyOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    public const int PAGE_SIZE = 16;
-
     #[LiveProp(
         writable: true,
         url: true,
@@ -84,9 +79,6 @@ final class VacancyOverview
     // represents exactly, since the props go through JSON.parse in the browser and a rounded seed fails the checksum.
     #[LiveProp]
     public int $seed = 0;
-
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
 
     /** @var int[]|null */
     private ?array $ids = null;
@@ -144,13 +136,6 @@ final class VacancyOverview
         $this->labelFilters = self::positiveIntIds($values);
     }
 
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
-    }
-
     /**
      * @return Vacancy[]
      */
@@ -196,6 +181,7 @@ final class VacancyOverview
         return count($this->matchingIds());
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return $this->getTotalCount() > count($this->getVacancies());

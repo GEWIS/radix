@@ -16,11 +16,9 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Form\Decision\OrganInformationType;
 use App\Repository\Decision\OrganInformationRevisionCommentRepository;
-use App\Repository\Decision\OrganRepository;
 use App\Security\Application\RevisionVoter;
 use App\Service\Decision\OrganImageUploadService;
 use App\Service\Decision\OrganPageService;
-use App\ViewModel\Decision\BodyPageRow;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -32,8 +30,6 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function array_filter;
-use function array_values;
-use function ksort;
 
 /**
  * Where a body writes its own page. A body never edits what is on the website: it works on a draft, submits it, and the
@@ -58,7 +54,6 @@ class AdminBodyController extends AbstractRevisionController
     use HoldsEditLockTrait;
 
     public function __construct(
-        private readonly OrganRepository $organRepository,
         private readonly OrganInformationRevisionCommentRepository $commentRepository,
         private readonly OrganImageUploadService $imageUploadService,
         private readonly OrganPageService $organPageService,
@@ -72,17 +67,10 @@ class AdminBodyController extends AbstractRevisionController
         path: '',
         name: 'index',
     )]
-    public function index(
-        #[CurrentUser]
-        User $user,
-    ): Response {
-        $organs = $this->listableOrgans($user);
-        $this->organRepository->warmPageAssociations($organs);
-
-        return $this->render(
-            'decision/admin/bodies/index.html.twig',
-            ['rows' => BodyPageRow::fromOrgans($organs)],
-        );
+    public function index(): Response
+    {
+        // The table itself is `Decision:Admin:BodyPageOverview`, which pages over the bodies on its own.
+        return $this->render('decision/admin/bodies/index.html.twig');
     }
 
     /**
@@ -459,44 +447,5 @@ class AdminBodyController extends AbstractRevisionController
         }
 
         return false;
-    }
-
-    /**
-     * The bodies whose page this member may write: everything active for the board, and otherwise the ones they are
-     * installed in.
-     *
-     * @return Organ[]
-     */
-    private function listableOrgans(User $user): array
-    {
-        // Whoever administers the register reads this page as the list of bodies rather than as the list of pages
-        // they may write, and that list includes the ones that have been abrogated.
-        if ($this->isGranted(UserRoles::DatabaseReadOnly->value)) {
-            return array_values($this->organRepository->findAll());
-        }
-
-        return $this->editableOrgans($user);
-    }
-
-    /**
-     * The bodies whose page this reader may write.
-     *
-     * @return list<Organ>
-     */
-    private function editableOrgans(User $user): array
-    {
-        if ($this->isGranted(UserRoles::Board->value)) {
-            return array_values($this->organRepository->findActive());
-        }
-
-        $organs = [];
-
-        foreach ($user->getMember()->getCurrentOrganInstallations() as $installation) {
-            $organs[$installation->getOrgan()->getAbbr()] = $installation->getOrgan();
-        }
-
-        ksort($organs);
-
-        return array_values($organs);
     }
 }

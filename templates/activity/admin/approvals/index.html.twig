@@ -21,65 +21,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            {# The same columns the overview's tables carry, so an activity reads the same wherever it is listed. #}
-            <div class="panel">
-                <div class="panel-heading">
-                    <h3>{{ 'Activities'|trans }}</h3>
-                </div>
-                <div class="panel-body">
-                    {% if rows is empty %}
-                        <p class="text-muted mb-0">{{ 'There is nothing to review right now.'|trans }}</p>
-                    {% else %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        {% include 'partials/activity/admin/overview-header-cells.html.twig' %}
-                                        <th>{{ 'Status'|trans }}</th>
-                                        <th class="text-end">{{ 'Actions'|trans }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for row in rows %}
-                                        <tr>
-                                            {% include 'partials/activity/admin/overview-row-cells.html.twig' with {
-                                                row: row,
-                                            } only %}
-                                            <td>
-                                                {% include 'partials/application/revision-status-badge.html.twig' with {
-                                                    'status': row.status,
-                                                    'live': row.liveRevisionNumber,
-                                                } only %}
-                                                {% if row.changesRequested %}
-                                                    <span class="badge badge-warning">
-                                                        {{ 'Changes requested'|trans }}
-                                                    </span>
-                                                {% endif %}
-                                            </td>
-                                            <td class="text-end">
-                                                <a href="{{ path('admin/activities/approvals/review', {
-                                                    'revision': row.revisionId,
-                                                }) }}" class="btn btn-sm btn-outline-gewis-primary">
-                                                    {{ 'Review'|trans }}
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {% include 'partials/application/pagination.html.twig' with {
-                            'route': 'admin/activities/approvals/index',
-                            'routeParams': {},
-                            'page': currentPage,
-                            'pageSize': pageSize,
-                            'totalCount': totalCount,
-                            'totalPages': (totalCount / pageSize)|round(0, 'ceil'),
-                        } only %}
-                    {% endif %}
-                </div>
-            </div>
+            <twig:Activity:Admin:ApprovalOverview />
         </div>
     </div>
 {% endblock %}

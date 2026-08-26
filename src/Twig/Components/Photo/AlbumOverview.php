@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Photo;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Photo\Album;
 use App\Service\Photo\AlbumService;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use Override;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_merge;
 use function array_slice;
@@ -30,12 +29,8 @@ use function count;
     name: 'Photo:AlbumOverview',
     template: 'components/Photo/AlbumOverview.html.twig',
 )]
-final class AlbumOverview
+final class AlbumOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    private const int PAGE_SIZE = 24;
-
     #[LiveProp]
     public ?int $year = null;
 
@@ -46,10 +41,6 @@ final class AlbumOverview
     #[LiveProp(writable: true)]
     public string $search = '';
 
-    // Not client-writable: it travels in the signed props, so a crafted request cannot ask for the whole archive.
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
-
     /** @var array<string, Album[]>|null */
     private ?array $albumsByMonth = null;
 
@@ -59,13 +50,6 @@ final class AlbumOverview
     public function __construct(
         private readonly AlbumService $albumService,
     ) {
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
     }
 
     /**
@@ -79,6 +63,7 @@ final class AlbumOverview
         );
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return $this->totalCount() > $this->limit;

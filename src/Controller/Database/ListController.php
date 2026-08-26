@@ -27,12 +27,10 @@ final class ListController extends AbstractController
     )]
     public function index(): Response
     {
+        // The table itself is `Database:MailingListOverview`, which searches and pages over the lists on its own.
         return $this->render(
             'database/mailing/list/index.html.twig',
-            [
-                'lists' => $this->mailingListService->getAllLists(),
-                'listmonk_last_fetch' => $this->mailingListService->getListmonkLastFetch(),
-            ],
+            ['listmonk_last_fetch' => $this->mailingListService->getListmonkLastFetch()],
         );
     }
 

@@ -96,6 +96,21 @@ class CourseDocumentRepository extends ServiceEntityRepository
         return new Paginator($qb);
     }
 
+    /**
+     * How many documents are still on their way to being downloadable. Counted on its own because the tile that shows
+     * it sits next to a paginated table that no longer knows the total.
+     */
+    public function countNotReady(): int
+    {
+        // The shared builder orders by status for the table's benefit. On a count that sorts nothing, and it is a
+        // non-aggregated column that a strict `ONLY_FULL_GROUP_BY` would reject outright, so it goes first.
+        return (int) $this->notReadyQueryBuilder()
+            ->select('COUNT(d.id)')
+            ->resetDQLPart('orderBy')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     private function notReadyQueryBuilder(): QueryBuilder
     {
         return $this->createQueryBuilder('d')

@@ -65,22 +65,12 @@ final class MemberController extends AbstractMemberController
         return $this->render('database/member/index.html.twig');
     }
 
-    #[Route(
-        path: '/search',
-        name: 'member_search',
-        methods: ['GET'],
-    )]
-    public function search(Request $request): JsonResponse
-    {
-        return $this->json($this->results($this->memberService->search($request->query->getString('q'))));
-    }
-
     /**
      * The members that can still be picked for a decision.
      *
-     * No sudo here, nor on the search above it: the decision forms call these from pages that hold no grant of their
-     * own, and a secretary composing a decision would lose the member picker as soon as the grant ran out. Both
-     * already ask for a register role and answer with a search result rather than a record.
+     * No sudo: the decision forms call this from pages that hold no grant of their own, and a secretary composing a
+     * decision would lose the member picker as soon as the grant ran out. It already asks for a register role and
+     * answers with a search result rather than a record.
      */
     #[Route(
         path: '/searchFiltered',

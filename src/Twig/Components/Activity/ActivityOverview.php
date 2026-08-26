@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Activity;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\Enums\ActivityCategories;
@@ -14,14 +13,14 @@ use App\Entity\Decision\Organ;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityLabelRepository;
 use App\Repository\Activity\ActivityRepository;
+use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
 use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\LiveComponent\Metadata\UrlMapping;
 
 use function array_filter;
@@ -43,12 +42,8 @@ use function trim;
     name: 'Activity:ActivityOverview',
     template: 'components/Activity/ActivityOverview.html.twig',
 )]
-final class ActivityOverview
+final class ActivityOverview extends AbstractInfiniteScrollOverview
 {
-    use DefaultActionTrait;
-
-    public const int PAGE_SIZE = 15;
-
     #[LiveProp]
     public bool $subscribed = false;
 
@@ -104,11 +99,6 @@ final class ActivityOverview
     )]
     public ?string $untilDate = null;
 
-    // Pagination state: not URL-synced and not client-writable. Only the `loadMore` action grows it server-side, so a
-    // crafted request cannot ask for an arbitrarily large page.
-    #[LiveProp]
-    public int $limit = self::PAGE_SIZE;
-
     /** @var Paginator<Activity>|null */
     private ?Paginator $paginator = null;
 
@@ -154,13 +144,6 @@ final class ActivityOverview
             );
 
         $this->labelFilters = self::positiveIntIds($values);
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function loadMore(): void
-    {
-        $this->limit += self::PAGE_SIZE;
     }
 
     /**
@@ -218,6 +201,7 @@ final class ActivityOverview
         return $this->getPaginator()->count();
     }
 
+    #[Override]
     public function hasMore(): bool
     {
         return $this->getTotalCount() > count($this->getActivities());

@@ -7,7 +7,7 @@ namespace App\Twig\Components\Career\Admin;
 use App\Entity\Career\Company;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Career\CompanyRepository;
-use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -18,14 +18,14 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
  * The companies tab of the career overview: every company on the books, hidden and out of contract ones included,
  * searchable by name or slug and paged through.
  *
- * @extends AbstractPaginatedOverview<Company>
+ * @extends AbstractDoctrinePaginatedOverview<Company>
  */
 #[AsLiveComponent(
     name: 'Career:Admin:CompanyOverview',
     template: 'components/Career/Admin/CompanyOverview.html.twig',
 )]
 #[IsGranted(UserRoles::CompanyAdmin->value)]
-final class CompanyOverview extends AbstractPaginatedOverview
+final class CompanyOverview extends AbstractDoctrinePaginatedOverview
 {
     #[LiveProp(
         writable: true,
@@ -49,6 +49,17 @@ final class CompanyOverview extends AbstractPaginatedOverview
     public function getCompanies(): array
     {
         return $this->getRows();
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
+    {
+        return [
+            $this->search,
+        ];
     }
 
     /**
