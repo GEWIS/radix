@@ -8,6 +8,41 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.2.0](https://github.com/GEWIS/radix/tree/v5.2.0) (2026-08-26)
+
+* Added a queue overview to the administration, which reports what each transport holds and lists the messages that failed, without acknowledging, retrying or removing any of them.
+* Added an official warning and a suspension as decisions about a member of their own, each naming the member it is about, rather than being written as free text.
+* Added a decision putting candidates forward for a coming board, with one sub-decision per candidate and the constitutional order carried by the order of those sub-decisions.
+* Added a decision telling a body that it may continue to exist, which refers to the foundation the body already has instead of founding it a second time.
+* Added a link from a decision to the virtual decision that is its counterpart, so the decision search answers with the one taken in the real meeting and folds its counterparts away underneath instead of returning both.
+* Added an explanation of the password requirements wherever a password is set, which reads the length bounds off the policy and says why we count guesses rather than character classes.
+* Added a search over the name and both descriptions of a mailing list.
+* Added a red asterisk to the label of every required form input.
+* Improved the multi-step forms by moving them onto Symfony's form flow, so a step is validated on the server as it is handed in rather than everything at the end. The sign-up, an external application, a custom page, a body's page, a company profile, a vacancy and an activity all go through it.
+* Improved `app:image:pregenerate`, which now only walks storage and dispatches, leaving the encoding to the image workers instead of doing it in the container that serves requests, and which gained `--force` for a changed variant set, quality or encoder.
+* Improved the overviews by giving all of them the same pagination, which asks for rows and a total rather than for a Doctrine paginator, and by turning the four admin tables that paged by hand into components.
+* Improved the public overviews that grow their list rather than paging it by giving them one step of twenty-four, which leaves no half-finished row at any width the site's grids are laid out in.
+* Improved the bodies and mailing list overviews, which rendered everything they had, by paging them.
+* Improved the questions asked before something irreversible by putting all of them through the two shared modals, one for a single action and one serving a whole table.
+* Improved the removal of a decision, which is confirmed on the meeting itself instead of on a page of its own, and which says there why the ledger turned it down.
+* Improved the register's addresses by naming a meeting throughout by the abbreviation every decision cites it with. The website keeps its own token, as those addresses are printed, bookmarked and linked to.
+* Improved the length of a sudo grant, which lasts thirty minutes rather than ten, so a longer job no longer asks for the password again halfway through.
+* Improved the gates on external applications and API principals, both of which are credentials that can authenticate as somebody else and now ask for sudo, and opened the API principals to an administrator rather than to the register's administrator alone.
+* Changed the activity form to ask for the organising body, the company and the category rather than opening each of them on whatever came first in the list.
+* Changed the forms for a budget, a financial statement and a body regulation to turn down a date later than the meeting that approved it, and the checker to report the ones already recorded.
+* Changed the removal of a decision that names a deleted member to be refused, since that record is kept for the sake of the decisions naming it.
+* Removed three capped member searches that nothing calls any more, among them the one that answered `GET /api/members` with the first thirty-two members and said nothing about the rest.
+* Fixed an issue where changing the page on the meetings overview and on both account overviews left the rows of the previous page in place.
+* Fixed an issue where the page, the search and the sort of those overviews were missing from the address, so a page could not be linked to and a reload went back to the first one.
+* Fixed an issue where a body's members and e-mail address were shown only on a full authentication, so a member returning on a remembered session was told to sign in on a page they were already signed in to.
+* Fixed an issue where the page that records a new decision never resolved, because the point and the decision number overwrote the wrong part of the address.
+* Fixed an issue where the page that records a decision died on a collection prototype the form had already rendered itself.
+* Fixed an issue where walking away from a half-filled form and starting again came back to the abandoned one with everything still in it.
+* Fixed an issue where the check for an address the application already answers to looked at the first segment alone, which refused every custom page under `association`.
+* Fixed an issue where the join form named the pillars of GEWIS without 'personal'.
+* Fixed an issue where the infimum in the footer was more intrusive than it should be.
+* Fixed an issue where the asterisk on the login forms sat a space away from the label it belongs to.
+
 ### [v5.1.1](https://github.com/GEWIS/radix/tree/v5.1.1) (2026-08-25)
 
 * Fixed an issue where (re)setting passwords was not possible due to incorrect pwned passwords API call.
