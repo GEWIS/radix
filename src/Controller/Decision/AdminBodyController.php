@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Decision;
 
 use App\Controller\Application\AbstractRevisionController;
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ReviseRefusal;
@@ -14,7 +15,8 @@ use App\Entity\Decision\SubDecision\FoundationReference;
 use App\Entity\Decision\SubDecision\Installation;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
-use App\Form\Decision\OrganInformationType;
+use App\Form\Decision\OrganPage\OrganPageData;
+use App\Form\Decision\OrganPage\OrganPageFlowType;
 use App\Repository\Decision\OrganInformationRevisionCommentRepository;
 use App\Security\Application\RevisionVoter;
 use App\Service\Decision\OrganImageUploadService;
@@ -30,6 +32,7 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function array_filter;
+use function assert;
 
 /**
  * Where a body writes its own page. A body never edits what is on the website: it works on a draft, submits it, and the
@@ -51,6 +54,7 @@ use function array_filter;
 )]
 class AdminBodyController extends AbstractRevisionController
 {
+    use HandlesFormFlowTrait;
     use HoldsEditLockTrait;
 
     public function __construct(
@@ -194,19 +198,23 @@ class AdminBodyController extends AbstractRevisionController
             );
         }
 
-        $form = $this->createForm(
-            OrganInformationType::class,
-            $page,
-        )->handleRequest($request);
+        $flow = $this->createFlow(
+            OrganPageFlowType::class,
+            OrganPageData::fromRevision($draft),
+            ['flow_key' => (string) $draft->getId()],
+        );
+        $flow->handleRequest($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'decision/admin/bodies/edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'organ' => $organ,
                     'information' => $page,
                     'revision' => $draft,
@@ -218,16 +226,20 @@ class AdminBodyController extends AbstractRevisionController
             );
         }
 
-        $revisionForm = $form->get('currentRevision');
-        $banner = $revisionForm->get('bannerFile')->getData();
-        $logo = $revisionForm->get('logoFile')->getData();
+        $data = $flow->getData();
+        assert($data instanceof OrganPageData);
+        $data->applyTo($draft);
+
+        $images = $flow->get(OrganPageData::STEP_IMAGES);
+        $banner = $images->get('bannerFile')->getData();
+        $logo = $images->get('logoFile')->getData();
 
         $stored = $this->organPageService->applyImages(
             $draft,
             $banner instanceof UploadedFile ? $banner : null,
             $logo instanceof UploadedFile ? $logo : null,
-            $revisionForm->get('bannerCropData')->getData(),
-            $revisionForm->get('logoCropData')->getData(),
+            $images->get('bannerCropData')->getData(),
+            $images->get('logoCropData')->getData(),
         );
 
         $this->organPageService->saveDraft(
@@ -235,6 +247,7 @@ class AdminBodyController extends AbstractRevisionController
             $draft,
             $user,
         );
+        $flow->reset();
 
         // The text is saved either way, so what went wrong is said rather than hidden behind the usual reassurance: a
         // body that is told its page is saved would submit it for review with the old image still on it.
