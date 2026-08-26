@@ -13,6 +13,7 @@ use App\Entity\Decision\SubDecision\Board\Candidate as BoardCandidate;
 use App\Entity\Decision\SubDecision\Board\Discharge as BoardDischarge;
 use App\Entity\Decision\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Decision\SubDecision\Board\Release as BoardRelease;
+use App\Entity\Decision\SubDecision\Continuation;
 use App\Entity\Decision\SubDecision\Discharge;
 use App\Entity\Decision\SubDecision\Financial\Budget;
 use App\Entity\Decision\SubDecision\Financial\Statement;
@@ -63,6 +64,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
         'organ_regulation' => OrganRegulation::class,
         'foundation' => Foundation::class,
         'abrogation' => Abrogation::class,
+        'continuation' => Continuation::class,
         'installation' => Installation::class,
         'reappointment' => Reappointment::class,
         'discharge' => Discharge::class,

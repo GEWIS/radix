@@ -16,6 +16,7 @@ use App\Form\Database\Board\DischargeType as BoardDischargeType;
 use App\Form\Database\Board\InstallType as BoardInstallType;
 use App\Form\Database\Board\ReleaseType as BoardReleaseType;
 use App\Form\Database\BudgetType;
+use App\Form\Database\ContinuationType;
 use App\Form\Database\DeleteDecisionType;
 use App\Form\Database\FoundationType;
 use App\Form\Database\InstallType;
@@ -56,6 +57,7 @@ final class DecisionController extends AbstractController
         'budget' => BudgetType::class,
         'organ_regulation' => OrganRegulationType::class,
         'foundation' => FoundationType::class,
+        'continuation' => ContinuationType::class,
         'abolish' => AbolishType::class,
         'install' => InstallType::class,
         'board_install' => BoardInstallType::class,

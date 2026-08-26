@@ -45,6 +45,7 @@ final class DecisionControllerTest extends DatabaseTestCase
         foreach (
             [
                 'tab-organ-install',
+                'tab-organ-continuation',
                 'tab-board-install',
                 'tab-board-candidacy',
                 'tab-member-warning',

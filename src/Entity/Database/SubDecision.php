@@ -13,6 +13,7 @@ use App\Entity\Database\SubDecision\Board\Candidate as BoardCandidate;
 use App\Entity\Database\SubDecision\Board\Discharge as BoardDischarge;
 use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Database\SubDecision\Board\Release as BoardRelease;
+use App\Entity\Database\SubDecision\Continuation;
 use App\Entity\Database\SubDecision\Discharge;
 use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Financial\Statement;
@@ -56,6 +57,7 @@ use function str_replace;
         'organ_regulation' => OrganRegulation::class,
         'foundation' => Foundation::class,
         'abrogation' => Abrogation::class,
+        'continuation' => Continuation::class,
         'installation' => Installation::class,
         'reappointment' => Reappointment::class,
         'discharge' => Discharge::class,

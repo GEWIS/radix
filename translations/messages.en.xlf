@@ -53,6 +53,10 @@
         <source>%MEMBER%.</source>
         <target state="translated">%MEMBER%.</target>
       </trans-unit>
+      <trans-unit id="QBX9Cwt" resname="%ORGAN_TYPE% %ORGAN_ABBR% mag blijven voortbestaan.">
+        <source>%ORGAN_TYPE% %ORGAN_ABBR% mag blijven voortbestaan.</source>
+        <target state="translated">%ORGAN_TYPE% %ORGAN_ABBR% may continue to exist.</target>
+      </trans-unit>
       <trans-unit id="3i5Tv.K" resname="%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.">
         <source>%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.</source>
         <target state="translated">%ORGAN_TYPE% %ORGAN_ABBR% is abrogated.</target>
@@ -2289,9 +2293,17 @@
         <source>Content</source>
         <target state="translated">Content</target>
       </trans-unit>
+      <trans-unit id="ZLvZpFx" resname="Continuation">
+        <source>Continuation</source>
+        <target state="translated">Continuation</target>
+      </trans-unit>
       <trans-unit id="Xj30MRg" resname="Continue">
         <source>Continue</source>
         <target state="translated">Continue</target>
+      </trans-unit>
+      <trans-unit id="_GXgKds" resname="Continue Body">
+        <source>Continue Body</source>
+        <target state="translated">Continue Body</target>
       </trans-unit>
       <trans-unit id="0kOeFqp" resname="Continue your draft">
         <source>Continue your draft</source>
@@ -4676,6 +4688,10 @@
       <trans-unit id="gsxxdUb" resname="Leave the start empty to begin at once, and the end empty to keep it on until you turn it off. Windows may not overlap.">
         <source>Leave the start empty to begin at once, and the end empty to keep it on until you turn it off. Windows may not overlap.</source>
         <target>Leave the start empty to begin at once, and the end empty to keep it on until you turn it off. Windows may not overlap.</target>
+      </trans-unit>
+      <trans-unit id="7ZkZcT2" resname="Let a body continue to exist.">
+        <source>Let a body continue to exist.</source>
+        <target state="translated">Let a body continue to exist.</target>
       </trans-unit>
       <trans-unit id="psSCy6w" resname="Let back in">
         <source>Let back in</source>
