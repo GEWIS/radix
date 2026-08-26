@@ -7,6 +7,7 @@ namespace App\Tests\Service\Database;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\ProspectiveMember;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
+use App\Form\Database\Registration\RegistrationData;
 use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\CheckoutSessionRepository;
@@ -15,6 +16,7 @@ use App\Repository\Database\ProspectiveMemberRepository;
 use App\Service\Database\CheckoutRestartFailure;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\ProspectiveMemberRemoval;
+use App\Service\Database\RegistrationFailure;
 use App\Service\Database\RegistrationService;
 use App\Service\Database\StripeService;
 use Override;
@@ -24,7 +26,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -158,7 +159,7 @@ class RegistrationServiceTest extends TestCase
             });
         $this->stripeService = $stripeService;
 
-        $url = $this->service()->register(self::createStub(FormInterface::class));
+        $url = $this->service()->register(new RegistrationData());
 
         self::assertSame(
             'https://checkout.stripe.test/session',
@@ -186,7 +187,10 @@ class RegistrationServiceTest extends TestCase
         $this->stripeService = self::createStub(StripeService::class);
         $this->stripeService->method('getCheckoutLink')->willReturn(null);
 
-        self::assertNull($this->service()->register(self::createStub(FormInterface::class)));
+        self::assertSame(
+            RegistrationFailure::CheckoutUnavailable,
+            $this->service()->register(new RegistrationData()),
+        );
     }
 
     public function testARejectedRegistrationIsNeitherMailedNorCharged(): void
@@ -200,7 +204,10 @@ class RegistrationServiceTest extends TestCase
         $stripeService->expects(self::never())->method('getCheckoutLink');
         $this->stripeService = $stripeService;
 
-        self::assertNull($this->service()->register(self::createStub(FormInterface::class)));
+        self::assertSame(
+            RegistrationFailure::EmailTaken,
+            $this->service()->register(new RegistrationData()),
+        );
     }
 
     public function testSendsSomeoneBackToTheCheckoutWithTheirPaymentLink(): void

@@ -53,7 +53,6 @@ import SubDecisionChoiceController from './controllers/decision/subdecision_choi
 
 // Join-specific controllers.
 import InitialsController from './controllers/join/initials_controller.ts';
-import RegistrationReviewController from './controllers/join/registration_review_controller.ts';
 import StudyNoticeController from './controllers/join/study_notice_controller.ts';
 
 // Photo-specific controllers.
@@ -117,7 +116,6 @@ app.register('revision-filter', RevisionFilterController);
 app.register('subdecision-choice', SubDecisionChoiceController);
 
 app.register('initials', InitialsController);
-app.register('registration-review', RegistrationReviewController);
 app.register('study-notice', StudyNoticeController);
 
 app.register('album-search', AlbumSearchController);

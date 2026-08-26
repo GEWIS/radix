@@ -25,12 +25,6 @@ parameters:
 			path: src/Controller/Database/DecisionController.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: src/Controller/Database/ProspectiveMemberController.php
-
-		-
 			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -842,12 +836,6 @@ parameters:
 			path: src/Form/Database/OtherType.php
 
 		-
-			message: '#^Class App\\Form\\Database\\RegistrationType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Form/Database/RegistrationType.php
-
-		-
 			message: '#^Class App\\Form\\Database\\SubDecisionType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
@@ -1336,12 +1324,6 @@ parameters:
 			path: src/Service/Database/Member.php
 
 		-
-			message: '#^Method App\\Service\\Database\\Member\:\:subscribe\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Service/Database/Member.php
-
-		-
 			message: '#^Method App\\Service\\Database\\Member\:\:subscribeLists\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
@@ -1358,12 +1340,6 @@ parameters:
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: src/Service/Database/Member.php
-
-		-
-			message: '#^Method App\\Service\\Database\\RegistrationService\:\:register\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Service/Database/RegistrationService.php
 
 		-
 			message: '#^Cannot call method setTimezone\(\) on DateTime\|false\.$#'

@@ -14,9 +14,9 @@ use App\Entity\Database\Enums\AttentionReasons;
 use App\Entity\Database\Enums\MailingListMemberAction;
 use App\Entity\Database\Enums\MailingListMemberOrigin;
 use App\Entity\Database\Enums\MembershipTypes;
+use App\Entity\Database\Enums\PostalRegions;
 use App\Entity\Database\Enums\ProspectiveMemberFilter;
 use App\Entity\Database\Enums\Studies;
-use App\Entity\Database\MailingList as MailingListModel;
 use App\Entity\Database\MailingListMember as MailingListMemberModel;
 use App\Entity\Database\Member as MemberModel;
 use App\Entity\Database\Membership as MembershipModel;
@@ -25,6 +25,7 @@ use App\Entity\Database\PaymentLink;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Entity\Database\RenewalLink as RenewalLinkModel;
 use App\Entity\User\User;
+use App\Form\Database\Registration\RegistrationData;
 use App\Message\Database\RefundProblemEmail;
 use App\Message\Database\RegistrationUpdate;
 use App\Message\Database\RegistrationUpdateEmail;
@@ -41,7 +42,6 @@ use DateTime;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -76,28 +76,30 @@ class Member
     }
 
     /**
-     * Subscribe a member.
+     * Subscribe a member from what the sign-up flow collected.
      *
-     * The form is bound to a fresh prospective member and submitted by the caller.
+     * Answers null when the address is already spoken for. The flow rejects that on the step that asks for it, so
+     * getting here means it was taken while the rest of the form was being filled in.
      */
-    public function subscribe(FormInterface $form): ?ProspectiveMemberModel
+    public function subscribe(RegistrationData $data): ?ProspectiveMemberModel
     {
-        if (!$form->isValid()) {
-            return null;
-        }
-
-        $prospectiveMember = $form->getData();
-        assert($prospectiveMember instanceof ProspectiveMemberModel);
-
-        // find if there is an earlier member with the same email or name
         if (
-            $this->memberRepository->hasMemberWith($prospectiveMember->getEmail())
-            || $this->prospectiveMemberRepository->hasMemberWith($prospectiveMember->getEmail())
+            null === $data->email
+            || $this->memberRepository->hasMemberWith($data->email)
+            || $this->prospectiveMemberRepository->hasMemberWith($data->email)
         ) {
-            $form->get('email')->addError(new FormError('There already is a member with this email address.'));
-
             return null;
         }
+
+        $prospectiveMember = new ProspectiveMemberModel();
+        $prospectiveMember->setEmail($data->email);
+        $prospectiveMember->setInitials((string) $data->initials);
+        $prospectiveMember->setFirstName((string) $data->firstName);
+        $prospectiveMember->setMiddleName($data->middleName);
+        $prospectiveMember->setLastName((string) $data->lastName);
+        $prospectiveMember->setStudentNumber($data->studentNumber);
+        $prospectiveMember->setBirth(DateTime::createFromInterface($data->birth ?? new DateTime()));
+        $prospectiveMember->setStudy($data->study ?? Studies::Other);
 
         // changed on date
         $date = new DateTime();
@@ -108,15 +110,18 @@ class Member
         $prospectiveMember->setChangedOn($date);
 
         // store the address
-        $address = $form->get('address')->getData();
+        $address = new AddressModel();
+        $address->setType(AddressTypes::Student);
+        $address->setCountry($data->country ?? PostalRegions::Netherlands);
+        $address->setStreet((string) $data->street);
+        $address->setNumber((string) $data->number);
+        $address->setPostalCode((string) $data->postalCode);
+        $address->setCity((string) $data->city);
+        $address->setPhone($data->phone);
         $prospectiveMember->setAddress($address);
 
         // check mailing lists
-        /** @var MailingListModel[] $lists */
-        $lists = $form->get('lists')->getData();
-        foreach ($lists as $list) {
-            $prospectiveMember->addList($list->getName());
-        }
+        $prospectiveMember->addLists($data->lists);
 
         // subscribe to default mailing lists not on the form
         foreach ($this->mailingListRepository->findDefault() as $list) {
