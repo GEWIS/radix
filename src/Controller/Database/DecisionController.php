@@ -11,6 +11,7 @@ use App\Exception\Database\AnnulmentNotPossible;
 use App\Exception\Database\DecisionStillReferenced;
 use App\Form\Database\AbolishType;
 use App\Form\Database\AnnulmentType;
+use App\Form\Database\Board\CandidacyType as BoardCandidacyType;
 use App\Form\Database\Board\DischargeType as BoardDischargeType;
 use App\Form\Database\Board\InstallType as BoardInstallType;
 use App\Form\Database\Board\ReleaseType as BoardReleaseType;
@@ -60,6 +61,7 @@ final class DecisionController extends AbstractController
         'board_install' => BoardInstallType::class,
         'board_release' => BoardReleaseType::class,
         'board_discharge' => BoardDischargeType::class,
+        'board_candidacy' => BoardCandidacyType::class,
         'key_grant' => KeyGrantType::class,
         'key_withdraw' => KeyWithdrawType::class,
         'member_warning' => MemberWarningType::class,

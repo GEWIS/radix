@@ -46,6 +46,7 @@ final class DecisionControllerTest extends DatabaseTestCase
             [
                 'tab-organ-install',
                 'tab-board-install',
+                'tab-board-candidacy',
                 'tab-member-warning',
                 'tab-member-suspension',
                 'tab-other',

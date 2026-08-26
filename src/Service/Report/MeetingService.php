@@ -400,6 +400,14 @@ class MeetingService
             assert($installation instanceof ReportSubDecision\Board\Installation);
 
             $reportSubDecision->setInstallation($installation);
+        } elseif ($subdecision instanceof DatabaseSubDecision\Board\Candidacy) {
+            assert($reportSubDecision instanceof ReportSubDecision\Board\Candidacy);
+
+            $reportSubDecision->setBoardYear($subdecision->getBoardYear());
+        } elseif ($subdecision instanceof DatabaseSubDecision\Board\Candidate) {
+            assert($reportSubDecision instanceof ReportSubDecision\Board\Candidate);
+
+            $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
         } elseif ($subdecision instanceof DatabaseSubDecision\Key\Granting) {
             assert($reportSubDecision instanceof ReportSubDecision\Key\Granting);
 

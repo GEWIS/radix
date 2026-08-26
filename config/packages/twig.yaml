@@ -4,6 +4,7 @@ twig:
     form_themes:
         - 'bootstrap_5_layout.html.twig'
         - 'form/api_permissions.html.twig'
+        - 'form/board_candidate_collection.html.twig'
         - 'form/bootstrap_floating.html.twig'
         - 'form/collection.html.twig'
         - 'form/date_option_collection.html.twig'

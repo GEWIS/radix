@@ -49,6 +49,10 @@
         <source>%MEMBER% wordt per %DATE% ontheven uit de functie van %FUNCTION% der s.v. GEWIS.</source>
         <target state="translated">%MEMBER% wordt per %DATE% ontheven uit de functie van %FUNCTION% der s.v. GEWIS.</target>
       </trans-unit>
+      <trans-unit id="ea_G8Nb" resname="%MEMBER%.">
+        <source>%MEMBER%.</source>
+        <target state="translated">%MEMBER%.</target>
+      </trans-unit>
       <trans-unit id="3i5Tv.K" resname="%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.">
         <source>%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.</source>
         <target state="translated">%ORGAN_TYPE% %ORGAN_ABBR% wordt opgeheven.</target>
@@ -929,6 +933,10 @@
         <source>Add answer</source>
         <target state="translated">Antwoord toevoegen</target>
       </trans-unit>
+      <trans-unit id="UQBdpih" resname="Add candidate">
+        <source>Add candidate</source>
+        <target state="translated">Kandidaat toevoegen</target>
+      </trans-unit>
       <trans-unit id="9gQ_xmi" resname="Add documents">
         <source>Add documents</source>
         <target>Documenten toevoegen</target>
@@ -1681,6 +1689,10 @@
         <source>Board Member(s) to Relieve</source>
         <target state="translated">Bestuurder(s) om te ontheffen</target>
       </trans-unit>
+      <trans-unit id="25jXj14" resname="Board Year">
+        <source>Board Year</source>
+        <target state="translated">Bestuursjaar</target>
+      </trans-unit>
       <trans-unit id="JG_49I8" resname="Board member">
         <source>Board member</source>
         <target state="translated">Bestuurslid</target>
@@ -1820,6 +1832,10 @@
       <trans-unit id="uULlIlE" resname="Cancelled">
         <source>Cancelled</source>
         <target state="translated">Geannuleerd</target>
+      </trans-unit>
+      <trans-unit id="WJJE4q_" resname="Candidates">
+        <source>Candidates</source>
+        <target state="translated">Kandidaten</target>
       </trans-unit>
       <trans-unit id="X4vyX.I" resname="Cannot Delete Prospective Member">
         <source>Cannot Delete Prospective Member</source>
@@ -4012,6 +4028,10 @@
       <trans-unit id="TpMENtB" resname="Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.">
         <source>Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.</source>
         <target state="translated">Het bestuur deelt een officiële waarschuwing uit aan %MEMBER%.</target>
+      </trans-unit>
+      <trans-unit id="70N7Dti" resname="Het bestuur stelt, op constitutievolgorde, de volgende kandidaten voor het bestuur %BOARD_YEAR%:">
+        <source>Het bestuur stelt, op constitutievolgorde, de volgende kandidaten voor het bestuur %BOARD_YEAR%:</source>
+        <target state="translated">Het bestuur stelt, op constitutievolgorde, de volgende kandidaten voor het bestuur %BOARD_YEAR%:</target>
       </trans-unit>
       <trans-unit id="bMJFh5R" resname="Hidden">
         <source>Hidden</source>
@@ -6837,6 +6857,14 @@
         <source>Purpose</source>
         <target state="translated">Doel</target>
       </trans-unit>
+      <trans-unit id="wLO7geI" resname="Put Candidates Forward">
+        <source>Put Candidates Forward</source>
+        <target state="translated">Kandidaten stellen</target>
+      </trans-unit>
+      <trans-unit id="TcJFiAL" resname="Put candidates forward for a coming board.">
+        <source>Put candidates forward for a coming board.</source>
+        <target state="translated">Stel kandidaten voor een komend bestuur.</target>
+      </trans-unit>
       <trans-unit id="IE0v1jr" resname="Put the day you would rather have first. The board picks one of them.">
         <source>Put the day you would rather have first. The board picks one of them.</source>
         <target state="translated">Zet de dag van je voorkeur bovenaan. Het bestuur kiest er één.</target>
@@ -7096,6 +7124,10 @@
       <trans-unit id="x_kw6sf" resname="Remove answer">
         <source>Remove answer</source>
         <target state="translated">Antwoord verwijderen</target>
+      </trans-unit>
+      <trans-unit id="qwixbPF" resname="Remove candidate">
+        <source>Remove candidate</source>
+        <target state="translated">Kandidaat verwijderen</target>
       </trans-unit>
       <trans-unit id=".6NMI10" resname="Remove course">
         <source>Remove course</source>
@@ -8704,6 +8736,10 @@
       <trans-unit id="d94JzXR" resname="The external subscriber has been added.">
         <source>The external subscriber has been added.</source>
         <target>De externe inschrijver is toegevoegd.</target>
+      </trans-unit>
+      <trans-unit id="yObrSwo" resname="The first of the two years, so 2026 for the board of 2026 - 2027.">
+        <source>The first of the two years, so 2026 for the board of 2026 - 2027.</source>
+        <target state="translated">Het eerste van de twee jaren, dus 2026 voor het bestuur van 2026 - 2027.</target>
       </trans-unit>
       <trans-unit id="o3N.0Uq" resname="The image to crop">
         <source>The image to crop</source>

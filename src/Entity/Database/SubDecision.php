@@ -8,6 +8,8 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\SubDecision\Abrogation;
 use App\Entity\Database\SubDecision\Annulment;
+use App\Entity\Database\SubDecision\Board\Candidacy as BoardCandidacy;
+use App\Entity\Database\SubDecision\Board\Candidate as BoardCandidate;
 use App\Entity\Database\SubDecision\Board\Discharge as BoardDischarge;
 use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Database\SubDecision\Board\Release as BoardRelease;
@@ -64,6 +66,8 @@ use function str_replace;
         'board_installation' => BoardInstallation::class,
         'board_release' => BoardRelease::class,
         'board_discharge' => BoardDischarge::class,
+        'board_candidacy' => BoardCandidacy::class,
+        'board_candidate' => BoardCandidate::class,
         'foundationreference' => FoundationReference::class,
         'key_granting' => KeyGranting::class,
         'key_withdraw' => KeyWithdrawal::class,

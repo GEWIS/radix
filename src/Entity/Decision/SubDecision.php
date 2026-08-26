@@ -8,6 +8,8 @@ use App\Doctrine\Query\Queryable;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\SubDecision\Abrogation;
 use App\Entity\Decision\SubDecision\Annulment;
+use App\Entity\Decision\SubDecision\Board\Candidacy as BoardCandidacy;
+use App\Entity\Decision\SubDecision\Board\Candidate as BoardCandidate;
 use App\Entity\Decision\SubDecision\Board\Discharge as BoardDischarge;
 use App\Entity\Decision\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Decision\SubDecision\Board\Release as BoardRelease;
@@ -72,6 +74,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
         'board_installation' => BoardInstallation::class,
         'board_release' => BoardRelease::class,
         'board_discharge' => BoardDischarge::class,
+        'board_candidacy' => BoardCandidacy::class,
+        'board_candidate' => BoardCandidate::class,
         'foundationreference' => FoundationReference::class,
         'key_granting' => KeyGranting::class,
         'key_withdraw' => KeyWithdrawal::class,
