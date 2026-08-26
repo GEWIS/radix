@@ -19,6 +19,7 @@ use App\Repository\User\DataExportRequestRepository;
 use App\Repository\User\NotificationEmailSubscriptionRepository;
 use App\Repository\User\UserSettingsRepository;
 use App\Security\User\SudoMode;
+use App\Security\User\SudoVoter;
 use App\Service\Application\FileDownloadHelper;
 use App\Service\Application\FileStorage;
 use App\Service\Photo\MemberTagPurgeService;
@@ -307,7 +308,7 @@ class SettingsController extends AbstractController
      * Remove all existing photo tags of the current member (the retroactive counterpart to the tagging opt-out). This
      * is irreversible, so it requires sudo (recent re-authentication), like the other destructive account actions.
      */
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'purge_tags',
         tokenKey: '_csrf_token',
@@ -336,7 +337,7 @@ class SettingsController extends AbstractController
      * Kick off building the member's data export. It runs asynchronously and the member is emailed a download link
      * when it is ready. Requires sudo, like the other actions that touch the member's full personal data.
      */
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'data_export',
         tokenKey: '_csrf_token',
@@ -401,7 +402,7 @@ class SettingsController extends AbstractController
      * member can only ever reach their own file. Requires sudo, like the other actions that touch the member's full
      * personal data; being a GET route, the re-authentication returns the member straight back here to the download.
      */
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/data-export/download',
         name: 'data_export_download',

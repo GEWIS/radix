@@ -248,7 +248,7 @@ class AdminPackageController extends AbstractController
         return $this->backToCompany($package->getCompany());
     }
 
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{package}/delete',
         name: 'delete',

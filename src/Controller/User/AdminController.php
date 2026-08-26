@@ -10,6 +10,7 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\User\CompanyUserRepository;
 use App\Repository\User\UserRepository;
+use App\Security\User\SudoVoter;
 use App\Service\User\MultiFactorService;
 use App\Service\User\SessionManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,7 @@ use function sprintf;
     attribute: UserRoles::Admin->value,
     message: 'You are not allowed to administer users.',
 )]
-#[IsGranted('SUDO')]
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(
     path: '/admin/users',
     name: 'admin/users/',

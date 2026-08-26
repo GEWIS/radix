@@ -8,6 +8,7 @@ use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\User\CompanyUserRepository;
+use App\Security\User\SudoVoter;
 use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\User\Admin\CompanyUserRow;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -29,7 +30,7 @@ use function in_array;
     template: 'components/User/Admin/CompanyUsersOverview.html.twig',
 )]
 #[IsGranted(UserRoles::Admin->value)]
-#[IsGranted('SUDO')]
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 final class CompanyUsersOverview extends AbstractDoctrinePaginatedOverview
 {
     private const array ALLOWED_SORTS = [

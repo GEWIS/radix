@@ -20,6 +20,7 @@ use App\Repository\Activity\ActivityRepository;
 use App\Repository\Activity\ActivityRevisionCommentRepository;
 use App\Repository\Activity\ExternalSignupRepository;
 use App\Security\Application\RevisionVoter;
+use App\Security\User\SudoVoter;
 use App\Service\Activity\ActivityAdminService;
 use App\Service\Activity\ActivityDraftFactory;
 use App\Service\Activity\ActivityFormMapper;
@@ -710,7 +711,7 @@ class AdminController extends AbstractController
         requirements: ['activity' => '\d+'],
         methods: ['GET'],
     )]
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     public function signups(Activity $activity): Response
     {
         // Organisers (creator, revision author, organ member) and the board may view sign-up details.
@@ -763,7 +764,7 @@ class AdminController extends AbstractController
             'POST',
         ],
     )]
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     public function addExternalSignup(
         Activity $activity,
         SignupList $signupList,

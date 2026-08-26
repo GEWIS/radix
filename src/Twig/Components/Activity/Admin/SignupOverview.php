@@ -19,6 +19,7 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Message\Activity\OrganiserAnnouncementEmail;
 use App\Security\Application\RevisionVoter;
+use App\Security\User\SudoVoter;
 use App\Service\Activity\DrawManager;
 use App\Util\Activity\SignupAdminWindow;
 use App\ViewModel\Activity\Admin\SignupAdminListView;
@@ -60,7 +61,7 @@ use function trim;
     template: 'components/Activity/Admin/SignupOverview.html.twig',
 )]
 #[IsGranted(new Expression("is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD')"))]
-#[IsGranted('SUDO')]
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 final class SignupOverview
 {
     use DefaultActionTrait;

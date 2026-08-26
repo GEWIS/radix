@@ -15,6 +15,7 @@ use App\Repository\Career\CompanyRepository;
 use App\Repository\User\CompanyUserInviteRepository;
 use App\Repository\User\CompanyUserRepository;
 use App\Security\User\Firewall;
+use App\Security\User\SudoVoter;
 use App\Service\Career\CompanyRepresentativeService;
 use App\Service\User\CompanyUserInviteService;
 use App\Service\User\SessionManager;
@@ -246,7 +247,7 @@ class AdminRepresentativeController extends AbstractController
      * Removes the account outright. Everything that points at it from the review chains falls back to null, which is
      * why shutting somebody out is the milder option offered first.
      */
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: new Expression('"company_representative_remove-" ~ args["representativeId"]'),
         tokenKey: '_csrf_token',
@@ -328,7 +329,7 @@ class AdminRepresentativeController extends AbstractController
         return $this->backToIndex($id);
     }
 
-    #[IsGranted('SUDO')]
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: new Expression('"company_representative_sessions-" ~ args["representativeId"]'),
         tokenKey: '_csrf_token',
