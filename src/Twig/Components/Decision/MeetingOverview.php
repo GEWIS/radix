@@ -9,36 +9,34 @@ use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Meeting;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Decision\MeetingRepository;
-use App\Twig\Components\Concerns\PageSizeTrait;
+use App\Twig\Components\Application\AbstractPaginatedOverview;
+use App\ViewModel\Application\ResultPage;
 use App\ViewModel\Decision\MeetingOverviewRow;
 use App\ViewModel\Decision\MeetingStatus;
 use InvalidArgumentException;
+use Override;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_map;
-use function ceil;
 use function in_array;
-use function max;
-use function min;
 use function preg_match;
 use function strtoupper;
 use function trim;
 
+/**
+ * @extends AbstractPaginatedOverview<array{0: Meeting, 1: int, 2: int}>
+ */
 #[AsLiveComponent(
     name: 'Decision:MeetingOverview',
     template: 'components/Decision/MeetingOverview.html.twig',
 )]
 #[IsGranted(UserRoles::User->value)]
-final class MeetingOverview
+final class MeetingOverview extends AbstractPaginatedOverview
 {
-    use DefaultActionTrait;
-    use PageSizeTrait;
-
     private const array TYPE_TOKENS = [
         'gmm',
         'bm',
@@ -66,12 +64,6 @@ final class MeetingOverview
     )]
     public string $search = '';
 
-    #[LiveProp(writable: true)]
-    public int $page = 1;
-
-    /** @var array{items: list<array{0: Meeting, 1: int, 2: int}>, total: int}|null */
-    private ?array $result = null;
-
     public function __construct(private readonly MeetingRepository $meetingRepository)
     {
     }
@@ -79,7 +71,7 @@ final class MeetingOverview
     /**
      * @return list<MeetingOverviewRow>
      */
-    public function getRows(): array
+    public function getMeetings(): array
     {
         return array_map(
             static fn (array $item): MeetingOverviewRow => new MeetingOverviewRow(
@@ -92,20 +84,7 @@ final class MeetingOverview
                     $item[2] > 0,
                 ),
             ),
-            $this->getResult()['items'],
-        );
-    }
-
-    public function getTotalCount(): int
-    {
-        return $this->getResult()['total'];
-    }
-
-    public function getTotalPages(): int
-    {
-        return max(
-            1,
-            (int) ceil($this->getTotalCount() / $this->pageSize()),
+            $this->getRows(),
         );
     }
 
@@ -127,7 +106,7 @@ final class MeetingOverview
 
     public function resetPage(): void
     {
-        $this->page = 1;
+        $this->resetToFirstPage();
     }
 
     #[LiveAction]
@@ -145,34 +124,40 @@ final class MeetingOverview
         $this->resetPage();
     }
 
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function gotoPage(#[LiveArg]
-    int $page,): void
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
     {
-        $this->page = max(
-            1,
-            min(
-                $page,
-                $this->getTotalPages(),
-            ),
-        );
+        return [
+            $this->resolveType()?->value,
+            $this->resolveNumber(),
+        ];
     }
 
     /**
-     * @return array{items: list<array{0: Meeting, 1: int, 2: int}>, total: int}
+     * The repository answers with its own row shape rather than a `Paginator`, carrying a decision count and whether
+     * minutes exist alongside each meeting, which is why this is the plain overview rather than the Doctrine one.
+     *
+     * @return ResultPage<array{0: Meeting, 1: int, 2: int}>
      */
-    private function getResult(): array
-    {
-        return $this->result ??= $this->meetingRepository->paginateForOverview(
+    #[Override]
+    protected function fetchPage(
+        int $page,
+        int $pageSize,
+    ): ResultPage {
+        $result = $this->meetingRepository->paginateForOverview(
             $this->resolveType(),
             $this->resolveNumber(),
-            max(
-                1,
-                $this->page,
-            ),
-            $this->pageSize(),
+            $page,
+            $pageSize,
             excludeVirtual: true,
+        );
+
+        return new ResultPage(
+            $result['items'],
+            $result['total'],
         );
     }
 

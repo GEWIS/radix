@@ -48,7 +48,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in this.rows %}
+                        {% for row in this.meetings %}
                             <tr>
                                 <td>
                                     <a href="{{ path('meetings/view', {'type': row.meeting.type.urlToken, 'number': row.meeting.number}) }}" class="fw-semibold">

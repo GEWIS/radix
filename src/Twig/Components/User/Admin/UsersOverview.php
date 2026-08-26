@@ -11,34 +11,30 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Decision\MemberRepository;
 use App\Repository\User\UserRepository;
-use App\Twig\Components\Concerns\PageSizeTrait;
+use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\User\Admin\MemberRow;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Override;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_map;
-use function ceil;
 use function in_array;
-use function iterator_to_array;
-use function max;
-use function min;
 
+/**
+ * @extends AbstractDoctrinePaginatedOverview<Member>
+ */
 #[AsLiveComponent(
     name: 'User:Admin:UsersOverview',
     template: 'components/User/Admin/UsersOverview.html.twig',
 )]
 #[IsGranted(UserRoles::Admin->value)]
 #[IsGranted('SUDO')]
-final class UsersOverview
+final class UsersOverview extends AbstractDoctrinePaginatedOverview
 {
-    use DefaultActionTrait;
-    use PageSizeTrait;
-
     private const array ALLOWED_SORTS = [
         'lidnr',
         'name',
@@ -46,38 +42,59 @@ final class UsersOverview
         'expiration',
     ];
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public string $search = '';
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public string $sort = 'lidnr';
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public string $direction = 'asc';
 
-    #[LiveProp(writable: true)]
-    public int $page = 1;
-
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public ?string $typeFilter = null;
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public bool $hiddenOnly = false;
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public bool $deletedOnly = false;
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public bool $expiredOnly = false;
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public bool $activatedOnly = false;
 
-    #[LiveProp(writable: true)]
+    #[LiveProp(
+        writable: true,
+        url: true,
+    )]
     public bool $mfaOnly = false;
-
-    /** @var Paginator<Member>|null */
-    private ?Paginator $paginator = null;
 
     public function __construct(
         private readonly MemberRepository $memberRepository,
@@ -88,12 +105,9 @@ final class UsersOverview
     /**
      * @return list<MemberRow>
      */
-    public function getRows(): array
+    public function getMembers(): array
     {
-        $members = iterator_to_array(
-            $this->getPaginator()->getIterator(),
-            false,
-        );
+        $members = $this->getRows();
 
         // Hydrate the matching `User` per row in one extra query. Doctrine's LEFT JOIN above does not produce a
         // straightforward `Member -> ?User` mapping for unmanaged entities, so we look the users up explicitly.
@@ -118,17 +132,34 @@ final class UsersOverview
         );
     }
 
-    public function getTotalCount(): int
+    /**
+     * @return list<mixed>
+     */
+    #[Override]
+    protected function filterKey(): array
     {
-        return $this->getPaginator()->count();
+        return [
+            $this->search,
+            $this->effectiveSort(),
+            $this->direction,
+            $this->typeFilter,
+            $this->hiddenOnly,
+            $this->deletedOnly,
+            $this->expiredOnly,
+            $this->activatedOnly,
+            $this->mfaOnly,
+        ];
     }
 
     /**
      * @return Paginator<Member>
      */
-    private function getPaginator(): Paginator
-    {
-        return $this->paginator ??= $this->memberRepository->paginateForAdmin(
+    #[Override]
+    protected function createPaginator(
+        int $page,
+        int $pageSize,
+    ): Paginator {
+        return $this->memberRepository->paginateForAdmin(
             search: $this->search,
             sort: $this->effectiveSort(),
             direction: $this->direction,
@@ -140,19 +171,8 @@ final class UsersOverview
                 'activatedOnly' => $this->activatedOnly,
                 'mfaOnly' => $this->mfaOnly,
             ],
-            page: max(
-                1,
-                $this->page,
-            ),
-            pageSize: $this->pageSize(),
-        );
-    }
-
-    public function getTotalPages(): int
-    {
-        return max(
-            1,
-            (int) ceil($this->getTotalCount() / $this->pageSize()),
+            page: $page,
+            pageSize: $pageSize,
         );
     }
 
@@ -196,21 +216,7 @@ final class UsersOverview
             $this->direction = 'asc';
         }
 
-        $this->page = 1;
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function gotoPage(#[LiveArg]
-    int $page,): void
-    {
-        $this->page = max(
-            1,
-            min(
-                $page,
-                $this->getTotalPages(),
-            ),
-        );
+        $this->resetToFirstPage();
     }
 
     private function effectiveSort(): string
