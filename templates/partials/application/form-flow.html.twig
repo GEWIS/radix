@@ -1,0 +1,57 @@
+{#
+    The header and the buttons of a form flow ({@see App\Form\Application\Flow\AbstractStepperFlowType}). A step
+    already gone through is a button back to it; one still ahead is plain text, because it cannot be reached until
+    the steps before it are accepted. Everything that leaves a step unfinished carries `formnovalidate`, or the
+    browser refuses to go back over a field that has not been filled in yet.
+
+        {% import 'partials/application/form-flow.html.twig' as flow %}
+        {{ flow.stepper(form) }}
+        ...the current step...
+        {{ flow.navigation(form) }}
+#}
+{% macro tab_content(form, name, step) %}
+    <span class="form-stepper__num">{{ step.position }}</span>
+    <span class="form-stepper__label">{{ form.vars.step_labels[name]|default(name)|trans }}</span>
+{% endmacro %}
+
+{% macro stepper(form) %}
+    {% import _self as self %}
+    {% set current = form_flow_step_index(form) %}
+    <ol class="form-stepper" role="tablist">
+        {% for name, step in form.vars.visible_steps %}
+            <li class="form-stepper__step" role="presentation">
+                {% if step.index < current and form.previous is defined %}
+                    <button type="submit" class="form-stepper__btn is-complete" role="tab" formnovalidate
+                            name="{{ form.previous.vars.full_name }}" value="{{ name }}">
+                        {{ self.tab_content(form, name, step) }}
+                    </button>
+                {% else %}
+                    <span class="form-stepper__btn{{ step.is_current_step ? ' active' }}" role="tab"
+                          {% if step.is_current_step %}aria-current="step"{% endif %}>
+                        {{ self.tab_content(form, name, step) }}
+                    </span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+{% endmacro %}
+
+{% macro navigation(form, cancel_url = null, cancel_label = null) %}
+    <div class="mt-3 d-flex justify-content-between gap-2">
+        <span class="d-flex gap-2">
+            {% if cancel_url is not null %}
+                <a href="{{ cancel_url }}" class="btn btn-link">{{ cancel_label|default('Cancel'|trans) }}</a>
+            {% endif %}
+            {% if form_flow_can_move_back(form) and form.previous is defined %}
+                {{ form_widget(form.previous, {'attr': {
+                    'class': 'btn-outline-gewis-primary',
+                    'formnovalidate': 'formnovalidate',
+                }}) }}
+            {% endif %}
+        </span>
+        <span class="ms-auto d-flex gap-2">
+            {% if form.next is defined %}{{ form_widget(form.next) }}{% endif %}
+            {% if form.finish is defined %}{{ form_widget(form.finish) }}{% endif %}
+        </span>
+    </div>
+{% endmacro %}
