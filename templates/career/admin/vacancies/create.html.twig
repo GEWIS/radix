@@ -20,7 +20,6 @@
             <h3 class="mb-3">{{ 'Add a vacancy'|trans }}</h3>
             {% include 'partials/career/vacancy-form.html.twig' with {
                 'form': form,
-                'submitLabel': 'Save draft'|trans,
                 'cancelUrl': path('admin/career/vacancies/index'),
             } only %}
         </div>

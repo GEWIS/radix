@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Career;
 
 use App\Controller\Application\AbstractRevisionReviewController;
+use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ReviseRefusal;
@@ -14,11 +15,13 @@ use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\UserRoles;
-use App\Form\Career\VacancyType;
+use App\Form\Career\VacancyProfile\VacancyData;
+use App\Form\Career\VacancyProfile\VacancyFlowType;
 use App\Repository\Career\VacancyRepository;
 use App\Repository\Career\VacancyRevisionCommentRepository;
 use App\Security\Application\RevisionVoter;
 use App\Service\Career\VacancyDraftService;
+use App\Service\Career\VacancyFormMapper;
 use App\ViewModel\Application\Review\RevisionAudience;
 use App\ViewModel\Application\RevisionActions;
 use App\ViewModel\Career\Portal\CompanyVacancyOverview;
@@ -52,12 +55,14 @@ use function assert;
 )]
 class CompanyVacancyController extends AbstractRevisionReviewController
 {
+    use HandlesFormFlowTrait;
     use HoldsEditLockTrait;
 
     public function __construct(
         private readonly VacancyRepository $vacancyRepository,
         private readonly VacancyRevisionCommentRepository $commentRepository,
         private readonly VacancyDraftService $vacancyDraftService,
+        private readonly VacancyFormMapper $vacancyFormMapper,
     ) {
     }
 
@@ -108,30 +113,48 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         $vacancy->addRevision($revision);
         $vacancy->setCurrentRevision($revision);
 
-        $form = $this->createForm(
-            VacancyType::class,
-            $vacancy,
-            ['company' => $company],
-        )->handleRequest($request);
+        $flow = $this->createFlow(
+            VacancyFlowType::class,
+            new VacancyData(),
+            [
+                'company' => $company,
+                'flow_key' => 'create',
+                'finish_label' => $this->translator->trans('Save draft'),
+            ],
+        );
+        $flow->handleRequest($request);
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/company/vacancy-edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'company' => $company,
                     'vacancy' => null,
                 ],
             );
         }
 
+        $data = $flow->getData();
+        assert($data instanceof VacancyData);
+        $this->vacancyFormMapper->apply(
+            $data,
+            $vacancy,
+            $revision,
+            true,
+            false,
+        );
+
         $this->vacancyDraftService->createDraft(
             $vacancy,
             $revision,
         );
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -198,20 +221,36 @@ class CompanyVacancyController extends AbstractRevisionReviewController
             );
         }
 
-        $form = $this->createForm(
-            VacancyType::class,
-            $vacancy,
-            ['company' => $company],
-        )->handleRequest($request);
+        // The slug and the package take effect the moment they are saved rather than when the committee agrees, so a
+        // company may only still set them while nothing of the vacancy is public yet.
+        $identityEditable = null === $vacancy->getLiveRevision();
 
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
+        $flow = $this->createFlow(
+            VacancyFlowType::class,
+            VacancyData::fromVacancy(
+                $vacancy,
+                $current,
+            ),
+            [
+                'company' => $company,
+                'identity_editable' => $identityEditable,
+                'current_package_id' => $vacancy->getPackage()->getId(),
+                'flow_key' => (string) $current->getId(),
+                'finish_label' => $this->translator->trans('Save draft'),
+            ],
+        );
+        $flow->handleRequest($request);
+
+        if (!$flow->isFinished()) {
+            $this->flashRejectedStep(
+                $flow,
+                $this->translator,
+            );
+
             return $this->render(
                 'career/company/vacancy-edit.html.twig',
                 [
-                    'form' => $form,
+                    'form' => $flow->getStepForm(),
                     'company' => $company,
                     'vacancy' => $vacancy,
                     'comments' => $this->commentRepository->findThreadForVacancy($vacancy),
@@ -219,11 +258,22 @@ class CompanyVacancyController extends AbstractRevisionReviewController
             );
         }
 
+        $data = $flow->getData();
+        assert($data instanceof VacancyData);
+        $this->vacancyFormMapper->apply(
+            $data,
+            $vacancy,
+            $current,
+            $identityEditable,
+            false,
+        );
+
         $this->vacancyDraftService->saveDraft(
             $vacancy,
             $current,
             $companyUser,
         );
+        $flow->reset();
 
         $this->addFlash(
             AlertTypes::Success->value,
