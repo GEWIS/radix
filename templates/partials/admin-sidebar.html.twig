@@ -292,7 +292,7 @@
                     },
                 ]|filter(child => child is not null)) }}
 
-                {{ sidebar.section('application', 'fa-sliders', 'Application'|trans, is_module_active(['application', 'announcement']) or is_module_active(['application', 'maintenance']), [
+                {{ sidebar.section('application', 'fa-sliders', 'Application'|trans, is_module_active(['application', 'announcement']) or is_module_active(['application', 'maintenance']) or is_module_active(['application', 'queue']), [
                     {
                         'href': path('admin/announcement'),
                         'label': 'Announcement'|trans,
@@ -302,6 +302,11 @@
                         'href': path('admin/maintenance'),
                         'label': 'Maintenance'|trans,
                         'active': is_module_active(['application', 'maintenance']),
+                    },
+                    {
+                        'href': path('admin/queues'),
+                        'label': 'Queues'|trans,
+                        'active': is_module_active(['application', 'queue']),
                     },
                 ]) }}
             </ul>

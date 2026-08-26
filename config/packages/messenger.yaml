@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 framework:
     messenger:
-        failure_transport: failed
+        failure_transport: '%app.messenger.failure_transport%'
 
         transports:
             # Kept on the website database rather than on the ledger: a message that could not be handled is the

@@ -21,6 +21,9 @@ parameters:
     # mapping to read — has nothing to resolve `when@dev:` against and fails outright. Defaulted to `true` for the
     # same reason the parameter above is: an environment that says nothing gets enforcement.
     env(MFA_ENFORCEMENT): 'true'
+    # The transport a message lands on once every retry is spent. Named here rather than in `messenger.yaml` alone
+    # because the administration's queue page reads the same transport back, and the two must not drift apart.
+    app.messenger.failure_transport: 'failed'
     # Fallback contact for board/committee correspondence with no more specific sender/reply-to (e.g. a bulk email to
     # an activity's sign-ups when the organising organ has no public email).
     app.email.internal_affairs: 'cib@gewis.nl'
@@ -193,6 +196,13 @@ services:
             - '../src/Command/Application/LoadFixturesCommand.php'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # The queue page reads the transports themselves. `messenger.receiver_locator` is not autowirable (it is a
+    # generic service locator), and it is the only place that knows every configured transport by name.
+    App\Service\Application\TransportStatusProvider:
+        arguments:
+            $transportLocator: '@messenger.receiver_locator'
+            $failureTransportName: '%app.messenger.failure_transport%'
 
     # The external-application signing service uses the bundle-managed JWS builder and the association's key set. Both
     # are referenced by their bundle service id because several of each exist and autowiring cannot pick by type.

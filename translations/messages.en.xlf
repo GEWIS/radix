@@ -3281,6 +3281,10 @@
         <source>Entities</source>
         <target state="translated">Entities</target>
       </trans-unit>
+      <trans-unit id="B9r0Hn5" resname="Error">
+        <source>Error</source>
+        <target state="translated">Error</target>
+      </trans-unit>
       <trans-unit id="_4UtFPd" resname="Establish a committee or fraternity.">
         <source>Establish a committee or fraternity.</source>
         <target state="translated">Establish a committee or fraternity.</target>
@@ -3540,6 +3544,14 @@
       <trans-unit id="S.vnhPJ" resname="Failed">
         <source>Failed</source>
         <target state="translated">Failed</target>
+      </trans-unit>
+      <trans-unit id="sYEpUaC" resname="Failed messages">
+        <source>Failed messages</source>
+        <target state="translated">Failed messages</target>
+      </trans-unit>
+      <trans-unit id="mkhl67L" resname="Failures">
+        <source>Failures</source>
+        <target state="translated">Failures</target>
       </trans-unit>
       <trans-unit id="idkT3DH" resname="Family name">
         <source>Family name</source>
@@ -4136,6 +4148,10 @@
       <trans-unit id="is3pxKx" resname="ICT Policy">
         <source>ICT Policy</source>
         <target state="translated">ICT Policy</target>
+      </trans-unit>
+      <trans-unit id="37wivZ3" resname="ID">
+        <source>ID</source>
+        <target state="translated">ID</target>
       </trans-unit>
       <trans-unit id="z_EeVDq" resname="ISO">
         <source>ISO</source>
@@ -5133,6 +5149,10 @@
         <source>Message</source>
         <target>Message</target>
       </trans-unit>
+      <trans-unit id="VcYG1IX" resname="Messages that used up every retry. Retry or discard them with %retry% and %remove%.">
+        <source>Messages that used up every retry. Retry or discard them with %retry% and %remove%.</source>
+        <target state="translated">Messages that used up every retry. Retry or discard them with %retry% and %remove%.</target>
+      </trans-unit>
       <trans-unit id="p4brRXh" resname="Middle name">
         <source>Middle name</source>
         <target state="translated">Middle name</target>
@@ -5853,6 +5873,10 @@
         <source>Nothing has been shared for this course yet</source>
         <target state="translated">Nothing has been shared for this course yet</target>
       </trans-unit>
+      <trans-unit id="cRnSHA3" resname="Nothing has failed every one of its retries.">
+        <source>Nothing has failed every one of its retries.</source>
+        <target state="translated">Nothing has failed every one of its retries.</target>
+      </trans-unit>
       <trans-unit id="DSKucbX" resname="Nothing has happened here yet.">
         <source>Nothing has happened here yet.</source>
         <target state="translated">Nothing has happened here yet.</target>
@@ -6020,6 +6044,10 @@
       <trans-unit id="zPrdSvC" resname="Only bodies that should get a different number in this round. Anything set here beats that body's standing exception and the number set for the round. Every other body is answered without a row.">
         <source>Only bodies that should get a different number in this round. Anything set here beats that body's standing exception and the number set for the round. Every other body is answered without a row.</source>
         <target state="translated">Only bodies that should get a different number in this round. Anything set here beats that body's standing exception and the number set for the round. Every other body is answered without a row.</target>
+      </trans-unit>
+      <trans-unit id="kdHSiMt" resname="Only the first %inspected% of %total% failed messages can be paged through here; read the rest with %command%.">
+        <source>Only the first %inspected% of %total% failed messages can be paged through here; read the rest with %command%.</source>
+        <target state="translated">Only the first %inspected% of %total% failed messages can be paged through here; read the rest with %command%.</target>
       </trans-unit>
       <trans-unit id="daKTDU1" resname="Only the first %limit% matches are shown; refine your search to narrow them down.">
         <source>Only the first %limit% matches are shown; refine your search to narrow them down.</source>
@@ -6780,6 +6808,10 @@
       <trans-unit id="kkOf_T8" resname="Questions about your profile, vacancies, banner or package all go here.">
         <source>Questions about your profile, vacancies, banner or package all go here.</source>
         <target state="translated">Questions about your profile, vacancies, banner or package all go here.</target>
+      </trans-unit>
+      <trans-unit id="gYtZoYm" resname="Queues">
+        <source>Queues</source>
+        <target state="translated">Queues</target>
       </trans-unit>
       <trans-unit id="44LAne5" resname="RS512 (legacy, avoid for new applications)">
         <source>RS512 (legacy, avoid for new applications)</source>
@@ -9449,6 +9481,14 @@
         <source>Trainings for hard and soft skills</source>
         <target state="translated">Trainings for hard and soft skills</target>
       </trans-unit>
+      <trans-unit id="TjyG27F" resname="Transport">
+        <source>Transport</source>
+        <target state="translated">Transport</target>
+      </trans-unit>
+      <trans-unit id="09V_UUH" resname="Transports">
+        <source>Transports</source>
+        <target state="translated">Transports</target>
+      </trans-unit>
       <trans-unit id="fhVR..D" resname="Try a different filter, or clear the search.">
         <source>Try a different filter, or clear the search.</source>
         <target state="translated">Try a different filter, or clear the search.</target>
@@ -10016,6 +10056,10 @@
       <trans-unit id="WXSDLDA" resname="What each one is gets guessed from its filename. Nothing is visible to a member until you publish it below.">
         <source>What each one is gets guessed from its filename. Nothing is visible to a member until you publish it below.</source>
         <target>What each one is gets guessed from its filename. Nothing is visible to a member until you publish it below.</target>
+      </trans-unit>
+      <trans-unit id="4OMmRsn" resname="What each transport is holding right now. A count that keeps climbing means the consumers of that transport are not keeping up.">
+        <source>What each transport is holding right now. A count that keeps climbing means the consumers of that transport are not keeping up.</source>
+        <target state="translated">What each transport is holding right now. A count that keeps climbing means the consumers of that transport are not keeping up.</target>
       </trans-unit>
       <trans-unit id="Plh8MiX" resname="What has happened">
         <source>What has happened</source>
@@ -10712,6 +10756,10 @@
       <trans-unit id="zxPuD2." resname="afgekeurd">
         <source>afgekeurd</source>
         <target state="translated">disapproved</target>
+      </trans-unit>
+      <trans-unit id="rUr_9Oc" resname="after %count% retries">
+        <source>after %count% retries</source>
+        <target state="translated">after %count% retries</target>
       </trans-unit>
       <trans-unit id="mC5UFtS" resname="and">
         <source>and</source>
