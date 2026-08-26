@@ -6,6 +6,7 @@ namespace App\Controller\User;
 
 use App\Entity\Database\User\ApiPrincipal;
 use App\Form\User\ApiPrincipalType;
+use App\Security\User\SudoVoter;
 use App\Service\User\ApiPrincipalService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -14,9 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function Symfony\Component\Translation\t;
 
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(path: '/users/api-principals')]
 final class ApiPrincipalController extends AbstractController
 {

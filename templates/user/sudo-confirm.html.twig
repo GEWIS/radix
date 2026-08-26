@@ -22,9 +22,9 @@
                 {% endif %}
                 <p class="text-muted mb-3">
                     {% if app.user and app.user.totpAuthenticationEnabled %}
-                        {{ 'For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 10 minutes.'|trans }}
+                        {{ 'For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 30 minutes.'|trans }}
                     {% else %}
-                        {{ 'For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 10 minutes.'|trans }}
+                        {{ 'For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 30 minutes.'|trans }}
                     {% endif %}
                 </p>
                 {{ form_start(form, {'action': path(sudoConfirmRoute, {'next': next}), 'attr': {'novalidate': 'novalidate'}}) }}

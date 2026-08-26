@@ -11,6 +11,7 @@ use App\Entity\User\ExternalApp;
 use App\Form\User\ExternalApp\ExternalAppData;
 use App\Form\User\ExternalApp\ExternalAppFlowType;
 use App\Repository\User\ExternalAppRepository;
+use App\Security\User\SudoVoter;
 use App\Service\User\ExternalAppService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,6 +31,7 @@ use function assert;
     attribute: UserRoles::Admin->value,
     message: 'You are not allowed to administer external applications.',
 )]
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(
     path: '/admin/users/apps',
     name: 'admin/users/apps/',

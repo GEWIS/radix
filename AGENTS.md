@@ -210,7 +210,7 @@ wrong shuts the register rather than opening it.
 
 `App\Security\User\UserChecker` blocks `User` login for deleted, hidden or expired members and members without an
 email. Authorization beyond roles lives in voters under `src/Security/`; notably
-`App\Security\User\SudoVoter` gates destructive actions behind a 10-minute time-bounded `SUDO` grant (see `SudoMode`).
+`App\Security\User\SudoVoter` gates destructive actions behind a 30-minute time-bounded `SUDO` grant (see `SudoMode`).
 
 Remember-me is a **custom** integration (`App\Security\User\PersistentSignatureRememberMeHandler`, persisted via the
 `Session` entity). The cookies, lifetimes and per-firewall handlers differ deliberately — read

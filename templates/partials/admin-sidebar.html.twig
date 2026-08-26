@@ -266,8 +266,6 @@
             {{ sidebar.group('System'|trans) }}
             <ul class="sidebar-list">
                 {% set companyUsers = is_module_active(['user', 'admin', 'companyusersindex']) %}
-                {# The API principals row follows the register's administrator rather than this group's: the tokens
-                   it manages read the register. #}
                 {{ sidebar.section('users', 'fa-user-shield', 'Users'|trans,
                     is_module_active(['user']) or route starts with 'user_api_principal', [
                     {
@@ -280,11 +278,11 @@
                         'label': 'Company accounts'|trans,
                         'active': companyUsers,
                     },
-                    is_granted('ROLE_DATABASE_ADMIN') ? {
+                    {
                         'href': path('user_api_principal_index'),
                         'label': 'API principals'|trans,
                         'active': route starts with 'user_api_principal',
-                    } : null,
+                    },
                     {
                         'href': path('admin/users/apps/index'),
                         'label': 'External apps'|trans,

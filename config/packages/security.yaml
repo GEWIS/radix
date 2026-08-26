@@ -131,8 +131,10 @@ security:
         - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', methods: [POST, PUT, PATCH, DELETE], roles: [ROLE_DATABASE_ADMIN] }
         - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', roles: [ROLE_DATABASE_READ_ONLY] }
         # Bearer tokens that read the register over the API. Credentials rather than a page about them, so reading the
-        # list asks for the administrator as much as changing it does.
-        - { path: '^/(%app.locales%)/admin/users/api-principals', roles: [ROLE_DATABASE_ADMIN] }
+        # list asks for an administrator as much as changing it does. The association's administrator is named next to
+        # the register's because a token is not the register: nothing about handing one out or revoking one has to
+        # happen from the network the register itself is restricted to.
+        - { path: '^/(%app.locales%)/admin/users/api-principals', roles: [ROLE_ADMIN, ROLE_DATABASE_ADMIN] }
         # The rest of the administration. The register's roles are named here as well because the meeting and body
         # pages are shared with the board: this rule lets a register reader as far as the door, and the controllers
         # behind it decide what they are shown.

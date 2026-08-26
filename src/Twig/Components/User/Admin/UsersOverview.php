@@ -11,6 +11,7 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Decision\MemberRepository;
 use App\Repository\User\UserRepository;
+use App\Security\User\SudoVoter;
 use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\User\Admin\MemberRow;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -32,7 +33,7 @@ use function in_array;
     template: 'components/User/Admin/UsersOverview.html.twig',
 )]
 #[IsGranted(UserRoles::Admin->value)]
-#[IsGranted('SUDO')]
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 final class UsersOverview extends AbstractDoctrinePaginatedOverview
 {
     private const array ALLOWED_SORTS = [

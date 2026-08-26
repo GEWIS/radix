@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * Layered on top of {@see Symfony\Component\Security\Http\Authorization\AuthenticatedVoter}'s
  * `IS_AUTHENTICATED_REMEMBERED` check. We must never grant SUDO to a fully-anonymous token.
  *
- * Used via {@code #[IsGranted('SUDO')]} on destructive controller actions.
+ * Used via {@code #[IsGranted(SudoVoter::ATTRIBUTE)]} on destructive controller actions.
  *
  * @extends Voter<string, mixed>
  */

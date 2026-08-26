@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Twig\Components\Application\Admin;
 
 use App\Entity\User\Enums\UserRoles;
+use App\Security\User\SudoVoter;
 use App\Service\Application\TransportStatusProvider;
 use App\Twig\Components\Application\AbstractPaginatedOverview;
 use App\ViewModel\Application\FailedMessageList;
@@ -33,7 +34,7 @@ use function count;
     template: 'components/Application/Admin/FailedMessageOverview.html.twig',
 )]
 #[IsGranted(UserRoles::Admin->value)]
-#[IsGranted('SUDO')]
+#[IsGranted(SudoVoter::ATTRIBUTE)]
 final class FailedMessageOverview extends AbstractPaginatedOverview
 {
     private ?FailedMessageList $list = null;

@@ -23,8 +23,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * Driving it over the live-component HTTP endpoint is not viable here: the app's session guard force-logs-out any
  * session not backed by a managed-session row, so a synthetic browser session never survives. The class-level
- * `#[IsGranted('SUDO')]` is therefore enforced by the framework at that HTTP layer, not exercised here; the substantive
- * per-action authorisation ({@see SignupOverview::assertAccess()}, board-only draws) is.
+ * `#[IsGranted(SudoVoter::ATTRIBUTE)]` is therefore enforced by the framework at that HTTP layer, not exercised here;
+ * the substantive per-action authorisation ({@see SignupOverview::assertAccess()}, board-only draws) is.
  *
  * Activity #9 (the Gala) has one limited list (#6) with four subscribers; activity #13 (the Excursion) has a closed,
  * not-yet-drawn limited list (#11, capacity 2, four sign-ups) ready for a draw.
