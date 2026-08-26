@@ -14,6 +14,8 @@
                     {{ 'You have been invited to represent %company% on the GEWIS website. Choose a password to finish setting up your account.'|trans({'%company%': invite.company.name}) }}
                 </p>
 
+                {% include 'partials/user/password-requirements.html.twig' %}
+
                 {{ form_start(form, { 'method': 'POST' }) }}
                     {{ form_row(form.plainPassword.first) }}
                     {{ form_row(form.plainPassword.second) }}
