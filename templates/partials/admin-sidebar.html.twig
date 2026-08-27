@@ -1,20 +1,14 @@
 {#
-    The rows of the administration sidebar, rendered into `layout-admin.html.twig`, which every page under /admin
-    extends -- the register's pages among them, since the register no longer has a section of its own.
+    A group renders nothing at all when the reader may reach none of its rows.
 
-    Grouped by subject rather than by which of the two applications a page came from: a body is one thing whether you
-    are editing its description or reading its composition out of the ledger, so it gets one row whose children are
-    gated individually. A group renders nothing at all when the reader may reach none of its rows.
-
-    Which row is highlighted is decided by route name, matched on its prefix so that a detail page keeps its section
-    lit rather than leaving the reader without a place in the tree. The admin routes carry a locale suffix
-    (`admin/meetings/index.en`), which is why they are matched with `starts with` too rather than compared.
+    Which row is highlighted is decided by route name, matched on its prefix so that a detail page keeps its
+    section lit. The admin routes carry a locale suffix (`admin/meetings/index.en`), which is why they are
+    matched with `starts with` too rather than compared.
 #}
 {% import 'partials/application/sidebar.html.twig' as sidebar %}
 
 {% set route = app.current_route ?? '' %}
 
-{# The sidebar says which hat the reader is wearing, since what it offers below depends on it. #}
 {% if null == app.user %}
     {% set role = 'Not signed in'|trans %}
 {% elseif is_granted('ROLE_ADMIN') %}
@@ -89,8 +83,8 @@
                     ]) }}
                 {% endif %}
 
-                {# The board reads a meeting; the serving secretary keeps it, and holds a board seat for as long as
-                   they do. A secretary who has been relieved keeps reading the register but has no business here. #}
+                {# The serving secretary keeps the meeting and holds a board seat for as long as they do; a secretary
+                   who has been relieved keeps reading the register but has no business here. #}
                 {% if is_granted('ROLE_BOARD') %}
                     {% set meetingAuthorizations = route starts with 'admin/meetings/authorizations' %}
                     {% set meetingReference = route starts with 'admin/meetings/reference' %}
@@ -153,9 +147,6 @@
             {{ sidebar.group('Content'|trans) }}
             <ul class="sidebar-list">
                 {% if is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD') %}
-                    {# The board's option rounds, decisions and exceptions hang off the calendar page itself rather
-                       than getting an entry each: they are all one job, and four entries for one feature crowd out
-                       the module. #}
                     {{ sidebar.section('activities', 'fa-calendar-days', 'Activities'|trans, is_module_active(['activity']), [
                         {
                             'href': path('admin/activities/index'),

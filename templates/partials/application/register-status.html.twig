@@ -1,13 +1,3 @@
-{#
-    What the register is made up of and whether the things it talks to are still answering.
-
-    Standing figures rather than anything waiting, which is why they sit beside the queues rather than in them, and
-    above the site's own state: how the association is made up is read far more often than what is being announced.
-#}
-{#
-    One integration per line: a dot for its state, what it last did, and the page that can do something about it. The
-    state is the same one the notification is raised from, so a red dot here always has a row in the panel beside it.
-#}
 {% macro integration(label, tone, value, route, action) %}
     <div class="integration">
         <span class="integration-dot bg-{{ tone }}" aria-hidden="true"></span>

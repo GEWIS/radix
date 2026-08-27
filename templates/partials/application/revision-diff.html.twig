@@ -7,7 +7,7 @@
     The page is responsible for emitting `diff_styles()` into its stylesheets block once.
 #}
 
-{# Two columns of the same localised text, Dutch beside English. `old` null renders the new value plainly. #}
+{# `old` null renders the new value plainly. #}
 {% macro localised_flag_diff(old, new, renderer, struck) %}
     <div class="row mb-2">
         <div class="col-md-6">
@@ -22,8 +22,7 @@
 {% endmacro %}
 
 {#
-    A panel body split into a Dutch and an English column, each headed by its flag once. Capture the per-language
-    fields with {% set %} and hand them over:
+    Capture the per-language fields with {% set %} and hand them over:
 
     {% set dutch %}{{ diffmacro.field_diff('Name'|trans, previous ? previous.name.valueNL : null, revision.name.valueNL) }}{% endset %}
 #}
@@ -50,7 +49,6 @@
     </div>
 {% endmacro %}
 
-{# One labelled field, left out entirely when it renders to nothing. #}
 {% macro field_diff(label, old, new, renderer) %}
     {% set rendered = diff(old, new, renderer|default('Combined')) %}
     {% if rendered|trim is not empty %}
@@ -61,7 +59,6 @@
     {% endif %}
 {% endmacro %}
 
-{# A boolean, coloured by whether this revision turned it on, off, or left it alone. #}
 {% macro flag(label, old, new) %}
     {% if old is not null and new and not old %}
         <span class="badge badge-success">{{ label }}</span>

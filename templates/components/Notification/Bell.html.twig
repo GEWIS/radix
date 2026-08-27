@@ -21,8 +21,8 @@
             {% endif %}
         </div>
         <div class="notification-list">
-            {# The register's own, for a member who administers it. No read state and nothing to dismiss: each one
-               stops being shown by dealing with it. #}
+            {# The register's own have no read state and nothing to dismiss: each stops being shown by dealing with
+               it. #}
             {% for notification in this.registerNotifications %}
                 <div class="notification-entry d-flex align-items-start border-bottom notification-unread">
                     <a class="dropdown-item d-flex gap-2 py-2 text-wrap fw-semibold"

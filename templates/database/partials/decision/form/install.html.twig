@@ -18,9 +18,7 @@
     } only -%}
 {% endset %}
 
-{# The organ's membership is edited here and submitted as one decision: every button below only adds a row to one of
-   the three collections, and the tables show what the organ will look like once the decision is taken. The modals
-   sit outside the form but inside the editor, so opening one never submits anything. #}
+{# The modals sit outside the form but inside the editor, so opening one never submits anything. #}
 <div data-controller="organ-lookup install-editor"
      data-action="organ-lookup:selected->install-editor#organSelected
                   member-lookup:selected->install-editor#memberSelected"
@@ -73,9 +71,8 @@
                                 </tr>
                             </thead>
                             <tbody data-install-editor-target="currentMembers"></tbody>
-                            {# Row shapes live here rather than in the controller so their wording stays translated
-                               and their markup stays reviewable; the parser only handles `<tr>` inside a template
-                               when the template itself sits in table context. #}
+                            {# Row shapes live here rather than in the controller so their wording stays translated;
+                               the parser only handles `<tr>` inside a template that itself sits in table context. #}
                             <template data-install-editor-target="currentRowTemplate">
                                 <tr>
                                     <td data-field="name"></td>
@@ -197,8 +194,7 @@
                             aria-label="{{ 'Close'|trans }}"></button>
                 </div>
                 <div class="modal-body">
-                    {# The placeholders are filled with the member and function the clicked row stands for; the markup
-                       spliced in here is the template's own, not anything that came from the request. #}
+                    {# The markup spliced in here is the template's own, not anything that came from the request. #}
                     {{ 'Discharge %name% as %function%?'|trans({
                         '%name%': '<span data-install-editor-target="dischargeName"></span>',
                         '%function%': '<span data-install-editor-target="dischargeFunction"></span>',

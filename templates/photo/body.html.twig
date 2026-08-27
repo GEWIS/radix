@@ -2,7 +2,6 @@
 
 {% block page_title %}{{ 'Photos'|trans|page_title }}{{ organ.getName|page_title }}{{ parent() }}{% endblock %}
 
-{# Photos fill the full width of the window, like a regular album. #}
 {% block container_class %}container-fluid{% endblock %}
 
 {% block stylesheets %}
@@ -22,7 +21,6 @@
         </a>
     </div>
 
-    {# The same viewer as a real album: a photo opens here, and the viewer offers the way to its own album. #}
     {% import 'partials/photo/gallery.html.twig' as gallery %}
     <div {{ gallery.attributes(path('photo/body_manifest', { organ: organ.getId }), false) }}>
         {{ gallery.grid('%name% has not been tagged in any photos yet.'|trans({ '%name%': organ.getName })) }}

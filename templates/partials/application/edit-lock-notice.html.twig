@@ -1,7 +1,4 @@
 {#
-    Somebody else holds the edit lock. Every module says the same thing about it, so they all say it through here;
-    only what is being edited and where the reader goes instead belong to the module.
-
     {% include 'partials/application/edit-lock-notice.html.twig' with {
         'lock': lock,
         'subject': 'this vacancy'|trans,
@@ -10,8 +7,8 @@
         'takeOverUrl': path('admin/career/vacancies/edit', {'vacancy': vacancy.id, 'take': 1}),
     } only %}
 
-    takeOverUrl is optional; when it is given the control still only shows to the board, which is who may force a
-    lock open.
+    takeOverUrl is optional; when it is given the control still only shows to the board, which is who may
+    force a lock open.
 #}
 <div class="panel">
     <div class="panel-heading">

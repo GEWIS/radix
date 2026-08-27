@@ -1,6 +1,6 @@
 {#
-    The heading and tabs shared by the four pages that manage one company. Pass `active` as 'profile', 'vacancies',
-    'packages' or 'representatives'. Embed it to add the page's own actions beside the link to the public page:
+    Pass `active` as 'profile', 'vacancies', 'packages' or 'representatives'. Embed it to add the page's own
+    actions beside the link to the public page:
 
     {% embed 'partials/career/admin/company-tabs.html.twig' with {'company': company, 'active': 'profile'} only %}
         {% block actions %}

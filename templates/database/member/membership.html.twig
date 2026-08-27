@@ -25,8 +25,8 @@
     {% endembed %}
 {% endblock %}
 
-{# `membership` is the period the form edits. `MembershipTypeType` takes it as an option, which a template cannot
-   read back, so the controller passes it along for the explanation beside the form. #}
+{# `MembershipTypeType` takes the period as an option, which a template cannot read back, so the controller
+   passes `membership` along for the explanation beside the form. #}
 {% block contents %}
     <div class="row g-3">
         <div class="col-12 col-xl-7">

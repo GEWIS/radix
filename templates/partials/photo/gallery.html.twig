@@ -1,13 +1,12 @@
 {#
-    Helpers for the windowed-masonry gallery plus the PhotoSwipe viewer (the `gallery` controller), driven by an album's
-    viewer manifest fetched once. `attributes()` renders the controller and its config onto the page's own wrapper, so
-    the page controls the surrounding layout (a plain page, or a panel whose heading carries the Select toggle); `grid()`
-    renders the empty message and the tile container.
+    Helpers for the windowed-masonry gallery plus the PhotoSwipe viewer (the `gallery` controller), driven by
+    an album's viewer manifest fetched once. `attributes()` renders the controller and its config onto the
+    page's own wrapper; `grid()` renders the empty message and the tile container.
 
-    Pass `selectable` to enable the Select toggle; the page then adds the toggle and its bulk actions, and the controller
-    keeps the form marked `data-gallery-target="selectionForm"` filled with the selected photo ids. The tag/vote/profile
-    endpoints take numeric ids, so each URL is generated with a sentinel id then swapped for the placeholder the viewer
-    fills in per photo.
+    Pass `selectable` to enable the Select toggle; the page then adds the toggle and its bulk actions, and the
+    controller keeps the form marked `data-gallery-target="selectionForm"` filled with the selected photo ids.
+    The tag/vote/profile endpoints take numeric ids, so each URL is generated with a sentinel id then swapped
+    for the placeholder the viewer fills in per photo.
 #}
 {% macro attributes(manifest_url, selectable) %}
     {%- set labels = {
@@ -79,8 +78,8 @@
          data-view-label="{{ 'View photo'|trans }}"></div>
 {% endmacro %}
 
-{# Breadcrumb items for an album's ancestor chain (root first), each a link. Pass `album.parent` so the current album
-   is left for the page to render as the active crumb. Public trails skip unpublished ancestors (they 404 anyway). #}
+{# Pass `album.parent` so the current album is left for the page to render as the active crumb. Public
+   trails skip unpublished ancestors (they 404 anyway). #}
 {% macro albumTrail(album, admin) %}
     {% if album is not null %}
         {{ _self.albumTrail(album.parent, admin) }}

@@ -1,10 +1,9 @@
 {#
-    What a reader may do with the revision in front of them, in the order a decision is made: what moves it forward on
-    top, what sends it back underneath. Which buttons exist at all is the decision form's business, since only the
-    transitions the reader is allowed are on it, so the same block serves the committee and the company alike.
+    Which buttons exist at all is the decision form's business, since only the transitions the reader is
+    allowed are on it, so the same block serves the committee and the company alike.
 
-    `emptyNote` is for a screen where nothing being possible is worth saying out loud rather than leaving blank, which
-    is how the company portal reads while a proposal is with the committee.
+    `emptyNote` is for a screen where nothing being possible is worth saying out loud rather than leaving
+    blank, which is how the company portal reads while a proposal is with the committee.
 
     {% include 'partials/application/revision-decisions.html.twig' with {
         'decisionForm': decisionForm,
@@ -17,8 +16,7 @@
     {% if decisionForm.message is defined %}
         {{ form_row(decisionForm.message) }}
     {% endif %}
-    {# A domain may put fields of its own on the decision form (a poll's closing date); they render before the
-       buttons, in form order. #}
+    {# A domain may put fields of its own on the decision form; they render before the buttons, in form order. #}
     {% for child in decisionForm %}
         {% if child.vars.name != 'message' and 'submit' not in child.vars.block_prefixes and 'hidden' not in child.vars.block_prefixes %}
             {{ form_row(child) }}

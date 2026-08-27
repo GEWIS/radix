@@ -1,8 +1,3 @@
-{#
-    Every dropdown follows the same pattern: labelled groups of rows rather than one flat run of links, an icon per
-    row, a count where knowing the number tells you whether the click is worth it, sub-sections that expand inside the
-    panel instead of flying out sideways, and the action that ends the menu last behind a rule.
-#}
 {% macro item(href, icon, label, count, active) %}
     <li>
         <a href="{{ href }}" class="dropdown-item {{ active|default(false) ? 'active' : '' }}"
@@ -41,8 +36,7 @@
 
 {% import _self as menu %}
 
-{# Which of the two kinds of account is signed in, or null for nobody. Asked for rather than assumed, so an account
-   class that answers to neither accessor cannot fatal the navigation. #}
+{# Asked for rather than assumed, so an account class that answers to neither accessor cannot fatal the navigation. #}
 {% set user_type = null !== app.user and app.user.getUserType is defined ? app.user.getUserType : null %}
 
 <nav class="navbar navbar-expand navbar-gewis rainbow">
@@ -354,9 +348,8 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-members-text">
                             {{ menu.item(path('user_login'), 'fa-right-to-bracket', 'Login'|trans) }}
-                            {# The sign-up form itself, not a page about it: this is the action the label names. It
-                               is locale-less and answers on this host as well as on the sign-up host, so there is no
-                               reason to send a visitor across to that name to reach it. #}
+                            {# The sign-up form is locale-less and answers on this host as well as on the sign-up
+                               host, so there is no reason to send a visitor across to that name to reach it. #}
                             {{ menu.item(
                                 path('join_index'),
                                 'fa-user-plus',
@@ -411,9 +404,8 @@
                             <li><hr class="dropdown-divider"></li>
                             {{ menu.item(path('members/me'), 'fa-id-card', 'My Information'|trans) }}
                             {{ menu.item(path('user_token', {app: 'sudosos'}), 'fa-beer-mug-empty', 'SudoSOS'|trans) }}
-                            {# Everyone the administration has something for. The register's roles are named because
-                               they are held on their own: somebody who keeps the register is not otherwise an active
-                               member of anything, and would have no way in. #}
+                            {# The register's roles are named because they are held on their own: somebody who keeps
+                               the register is not otherwise an active member of anything, and would have no way in. #}
                             {% if
                                 is_granted('ROLE_ACTIVE_MEMBER') or
                                 is_granted('ROLE_BOARD') or

@@ -1,12 +1,10 @@
 {#
-    Numbered pagination with a window around the current page and a page-size selector.
-
     Inside a live component (the default) the controls call the component's `gotoPage` action and the dropdown
-    writes the `pageSize` model. Pass `route` (and optionally `routeParams`) to render plain links instead, with
-    `page` and `pageSize` as query parameters.
+    writes the `pageSize` model. Pass `route` (and optionally `routeParams`) to render plain links instead,
+    with `page` and `pageSize` as query parameters.
 
-    A component with more than one paginated table passes `action` to name the one this control drives, since both
-    would otherwise call `gotoPage`.
+    A component with more than one paginated table passes `action` to name the one this control drives, since
+    both would otherwise call `gotoPage`.
 #}
 {% macro control(label, targetPage, disabled, active, route, routeParams, pageSize, action) %}
     <li class="page-item{% if disabled %} disabled{% endif %}{% if active %} active{% endif %}">

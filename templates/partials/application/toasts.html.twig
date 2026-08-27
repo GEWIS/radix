@@ -1,8 +1,7 @@
-{# Flash messages as a stack of toasts in the bottom corner rather than a block pushing the page down. The label a
-   controller flashed is an AlertTypes value, and anything it does not match still shows its message, without a level
-   and without a coloured indicator, rather than disappearing. The message runs through the translator because some
-   controllers flash a sentence to be translated here rather than one they translated themselves; a sentence that is
-   not a translation key comes back unchanged. #}
+{# The label a controller flashed is an AlertTypes value, and anything it does not match still shows its
+   message, without a level and without a coloured indicator, rather than disappearing. The message runs
+   through the translator because some controllers flash a sentence to be translated here; one that is not a
+   translation key comes back unchanged. #}
 {% macro toast(message, label, delay) %}
     {% set level = enum('App\\Entity\\Application\\Enums\\AlertTypes').tryFrom(label|default('')) %}
     <div class="toast fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="{{ delay|default(5000) }}">

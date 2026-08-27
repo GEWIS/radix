@@ -1,12 +1,8 @@
-{# Renders the activity's sign-up lists (and each list's custom fields) as collapsible panels, reusing the same
-   collapse strategy as the read-only accordion on the activity view page (templates/partials/activity/signup-list.html.twig):
-   a `.panel` with a `.panel-heading` collapse toggle button, the rotating `.panel-collapse-chevron`, and a `.collapse.show`
-   body. Each panel is open by default. Add/remove is driven by the generic `form-collection` Stimulus controller;
-   the prototype already contains the whole panel, so adding an entry clones it with its placeholder (`__list__` /
-   `__field__`) replaced by a fresh index, keeping the collapse target ids unique. The nested option collection keeps the
-   generic `collection` form theme. #}
+{# The same collapse strategy as the read-only accordion on the activity view page
+   (templates/partials/activity/signup-list.html.twig). The prototype already contains the whole panel, so
+   adding an entry clones it with its placeholder (`__list__` / `__field__`) replaced by a fresh index,
+   keeping the collapse target ids unique. #}
 
-{# --- Sign-up list --------------------------------------------------------------------------------------------- #}
 {% macro signup_list_panel(child, collapse_id, remove_label) %}
     <div class="panel mb-3" data-form-collection-target="entry">
         <button type="button"
@@ -32,8 +28,6 @@
                         <div data-signup-list-target="capacity">
                             {{ form_row(child.capacity) }}
                         </div>
-                        {# Allocation method + its per-method settings; shown only when limited, and only the selected
-                           method's (and cutoff rule's) sub-fields, driven by the signup-list controller. #}
                         <div data-signup-list-target="methodBlock">
                             {{ form_row(child.allocationMethod, {'attr': {
                                 'data-signup-list-target': 'method',
@@ -100,12 +94,11 @@
     </div>
 {% endblock %}
 
-{# --- Custom field (question) ---------------------------------------------------------------------------------- #}
 {% macro signup_field_panel(child, collapse_id, remove_label) %}
     <div class="panel mb-3" data-form-collection-target="entry">
         {# The drag handle is a sibling of (never nested in) the collapse button: a nested interactive element would
-           fight `data-bs-toggle` and swallow text selection. Only the handle is draggable, and it is offered only when
-           the fields collection is editable (a frozen list ignores its submissions, so reordering could not persist). #}
+           fight `data-bs-toggle` and swallow text selection. It is offered only when the fields collection is
+           editable, since a frozen list ignores its submissions. #}
         <div class="panel-heading d-flex align-items-center gap-2">
             {% if not child.vars.disabled %}
                 <span class="sortable-handle" draggable="true"
@@ -123,8 +116,6 @@
             </button>
         </div>
         <div class="collapse show" id="{{ collapse_id }}">
-            {# signup-field shows the min/max bounds only for a "number" field and the options only for a "choice"
-               field, seeding/clearing the options as the type changes. #}
             <div class="panel-body" data-controller="signup-field">
                 {{ form_row(child.name) }}
                 <div class="row align-items-center mb-2">
@@ -161,8 +152,6 @@
     {% set has_prototype = allow_add and prototype is defined and prototype is not null %}
     {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__field__' %}
     {% set remove_label = 'Remove question'|trans %}
-    {# `sortable` (added only when the collection is editable) turns the drag handles into a reorder: it moves the
-       question panels and writes their new order into each panel's hidden position input. #}
     <div id="{{ id }}" class="signup-field-collection"
          data-controller="form-collection{% if not disabled %} sortable{% endif %}"
          data-form-collection-prototype-name-value="{{ placeholder }}"
@@ -184,11 +173,6 @@
     </div>
 {% endblock %}
 
-{# --- Choice option -------------------------------------------------------------------------------------------- #}
-{# The options of a "choice" question. Like the questions themselves these are draggable to reorder (the `sortable`
-   controller writes the new order into each option's hidden position input) and each carries an "is default" checkbox;
-   the signup-field controller keeps at most one default checked per question. This mirrors the generic `collection`
-   form theme but adds the handle, the default checkbox and the position input. #}
 {% macro signup_option_entry(child, remove_label) %}
     <div class="d-flex align-items-start gap-2 border rounded p-3 mb-2" data-form-collection-target="entry">
         {% if not child.vars.disabled %}

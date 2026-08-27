@@ -4,10 +4,6 @@
 
 {% block page_title %}{{ 'GEWIS Registration'|trans|page_title }}{{ parent() }}{% endblock %}
 
-{#
-    Five steps, a request each. Nothing is stored before the last one is accepted; what has been entered so far lives
-    in the session, which is what going back to an earlier step reads from.
-#}
 {% macro review_row(label, value, step, form) %}
     <div class="registration-review-row">
         <dt>{{ label }}</dt>
@@ -88,8 +84,7 @@
                     <div class="col-md-6" data-controller="study-notice">
                         {{ form_row(fields.study, {attr: {'data-action': 'change->study-notice#toggle'}}) }}
                         {# The footnote marker is put on the label by `StudyChoices`, so the notice keys off the
-                           option text rather than off a list of studies repeated here. It starts out visible, as
-                           it does for an empty selection. #}
+                           option text rather than off a list of studies repeated here. #}
                         <p class="form-text" data-study-notice-target="notice">
                             {{ '¹ DSA Pattern is the study association for students of the data science programs. The introduction week, round table discussions, and other education activities for these programs are organized by Pattern. Although you can join GEWIS, you might benefit more from joining Pattern on <a href="https://dsapattern.nl/" target="_blank">their website</a>.'|trans|raw }}
                         </p>

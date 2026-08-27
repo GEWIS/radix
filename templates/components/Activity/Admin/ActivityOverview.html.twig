@@ -1,7 +1,6 @@
 {% import 'partials/application/confirm-post-modal.html.twig' as modals %}
 
-{# A board lifecycle control: the button that asks, and the shared confirmation it opens. Its own modal rather than
-   the live-action one, because these post and navigate rather than re-render the component. #}
+{# Its own modal rather than the live-action one, because these post and navigate rather than re-render. #}
 {% macro confirm_form_modal(key, action, token, label, message, buttonClass) %}
     {% set modalId = 'activity-' ~ key ~ '-modal' %}
     <button type="button" class="btn btn-sm {{ buttonClass }}"

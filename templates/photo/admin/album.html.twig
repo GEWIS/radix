@@ -55,7 +55,6 @@
         </div>
     </div>
 
-    {# Sub-albums, so the tree can be navigated from the manage view as well. #}
     {% if album.children is not empty %}
         <h5 class="text-muted mb-3">{{ 'Sub-albums'|trans }}</h5>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xxl-6 g-3 mb-4">
@@ -184,8 +183,8 @@
         </div>
     </div>
 
-    {# Bulk-delete confirmation, kept at page level so the modal is not inside the hidden selection toolbar; it posts
-       the selection form through the button's form + formaction. #}
+    {# Kept at page level so the modal is not inside the hidden selection toolbar; it posts the selection
+       form through the button's form + formaction. #}
     <div class="modal fade" id="delete-photos" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

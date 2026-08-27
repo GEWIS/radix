@@ -1,8 +1,3 @@
-{#
-    The vacancy form, shared by the board's create/edit pages and the company's own. The slug and the job package are
-    only offered while they may still be changed, and only the board decides whether a vacancy is shown at all, so
-    the first step carries whichever of those apply.
-#}
 {% import 'partials/application/form-flow.html.twig' as flow %}
 
 {% set step = form_flow_current_step(form) %}

@@ -30,10 +30,8 @@
                 <div class="panel-heading">
                     <h3>{{ 'Banners'|trans }}</h3>
                 </div>
-                {#
-                    A banner is not a revision, so it has no queue row of its own; what it shares with one is that the
-                    decision is taken where the thing itself is, which for a banner is the package's own page.
-                #}
+                {# A banner is not a revision and has no queue row of its own; its decision is taken on the package's
+                   own page. #}
                 <div class="panel-body">
                     {% if pendingBanners is empty %}
                         <p class="text-muted mb-0">{{ 'There is nothing to review right now.'|trans }}</p>

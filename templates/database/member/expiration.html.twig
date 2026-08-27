@@ -26,8 +26,7 @@
 {% endblock %}
 
 {% block contents %}
-    {# `new_expiration` is the first of July after the current expiration; the controller works it out so that this
-       page and the action that carries it out cannot drift apart. #}
+    {# The controller works `new_expiration` out so this page and the action carrying it out cannot drift apart. #}
     <div class="row g-3">
         <div class="col-12 col-xl-6">
             <div class="panel">

@@ -1,10 +1,6 @@
-{# The days a body puts forward for one activity, as a collection with add/remove wired to the `form-collection`
-   Stimulus controller.
-
-   Two things this needs that the generic collection theme does not give it. The rows are an order of preference, so
-   the first is headed differently from the rest, and there is a hard house limit of three, so the add button goes
-   away once they are all used. The server refuses a fourth either way; hiding the button only stops the form offering
-   something it would then reject.
+{# The rows are an order of preference, so the first is headed differently from the rest, and there is a
+   hard house limit of three. The server refuses a fourth either way; hiding the button only stops the form
+   offering something it would then reject.
 
    Pass `max_entries` (an integer) to cap it; without one it behaves like any other collection. #}
 {% macro date_option_entry(child, index, allow_delete) %}
@@ -33,9 +29,9 @@
     </div>
 {% endmacro %}
 
-{# Bootstrap renders a compound field's label as a `<legend>`, which here would repeat the panel heading right above
-   it. Dropping it in this block rather than globally: for a group of radios or checkboxes the legend is the group's
-   accessible name, and three forms in this app rely on that. Same approach as the poll answers collection. #}
+{# Bootstrap renders a compound field's label as a `<legend>`, which here would repeat the panel heading
+   right above it. Dropped in this block rather than globally: for a group of radios or checkboxes the legend
+   is the group's accessible name, and three forms in this app rely on that. #}
 {% block date_option_collection_row %}
     {{ form_errors(form) }}
     {{ form_widget(form) }}

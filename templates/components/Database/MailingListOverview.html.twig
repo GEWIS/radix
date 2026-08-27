@@ -1,5 +1,3 @@
-{# A yes/no column used to be a glyphicon tick or cross; without an icon font a badge says the same thing and does
-   not need a text alternative bolted on. #}
 {% macro yes_no(value) %}
     {% if value %}
         <span class="badge badge-success">{{ 'Yes'|trans }}</span>

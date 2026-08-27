@@ -1,10 +1,6 @@
-{# Renders a LocalisedTextType (a Dutch + an English value) as two mirrored columns, so a bilingual field shows both
-   translations side by side. Like the activity "Information" panel, each column is headed by its language's flag (but
-   without that panel's enable-checkbox) and each input carries the field's own label (e.g. "Name", "Question",
-   "Option") as its floating label, so the compound renders no separate label of its own. Used wherever a localised
-   text is rendered as a whole: the sign-up list name and the custom-field questions/options. The "Information" panel
-   renders the valueNL / valueEN children directly, so it keeps its full-height mirrored columns and is not affected by
-   this block. #}
+{# A LocalisedTextType (a Dutch and an English value) as two mirrored columns. Each input carries the
+   field's own label as its floating label, so the compound renders no separate label of its own. The
+   activity "Information" panel renders the valueNL / valueEN children directly and is not affected. #}
 {% block localised_text_row %}
     {# Passed through untranslated: each child row's own label block translates it (once, with the form's
        translation domain). #}

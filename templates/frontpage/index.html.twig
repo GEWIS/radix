@@ -66,8 +66,8 @@
                     {% include 'partials/frontpage/news-pinned.html.twig' with {'item': item} %}
                 {% endfor %}
 
-                {# The banners sit in the feed rather than under it. They follow what the board pinned, and where
-                   nothing is pinned they come after the second item. #}
+                {# The banners follow what the board pinned, and where nothing is pinned they come after the second
+                   item. #}
                 {% set adAfter = pinned is empty ? min(2, regular|length) : 0 %}
                 {% if 0 == adAfter %}
                     {% include 'partials/career/banner-strip.html.twig' with {'banners': company_banners()} only %}
@@ -126,10 +126,8 @@
                 </div>
             </div>
 
-            {#
-                The photo of the week. Members fetch the signed members-only original; anonymous visitors are served the
-                public copy the weekly command publishes, and only while it is not hidden.
-            #}
+            {# Members fetch the signed members-only original; anonymous visitors are served the public copy the
+               weekly command publishes, and only while it is not hidden. #}
             {% if weeklyPhoto is not null and (is_granted('ROLE_USER') or (not weeklyPhoto.hidden and weeklyPublicPath is not null)) %}
                 {% set potw = weeklyPhoto.photo %}
                 {% set potw_url = path('photo/album', { type: 'album', album: potw.album.id }) ~ '#pid=' ~ potw.id %}

@@ -3,10 +3,9 @@
     <div class="toast-container top-0 start-50 translate-middle-x p-3">
         {% if maintenance_status() == enum('App\\Entity\\Application\\Enums\\MaintenanceStatus').ReadOnly %}
             {#
-                Closable so the text behind it can be read, but deliberately without an announcement id: the
-                controller only remembers a dismissal it can name, so this one lasts the page and is back on the next
-                load. `show` stays on the markup rather than being left to the controller, so that a site in read-only
-                mode still says so without JavaScript.
+                Deliberately without an announcement id: the controller only remembers a dismissal it can name,
+                so this one lasts the page and is back on the next load. `show` stays on the markup rather than
+                being left to the controller, so that a site in read-only mode still says so without JavaScript.
             #}
             <div class="toast toast-warning show" role="alert" aria-live="assertive" aria-atomic="true"
                  data-dismissible-target="banner">
@@ -21,9 +20,7 @@
             </div>
         {% endif %}
         {#
-            A member reachable only at their university address loses touch with the association the day they
-            graduate. The notice rides along with the real announcements so it is closed the same way and stays
-            closed; its id is a word rather than a number, so it can never collide with an announcement's own.
+            Its id is a word rather than a number, so it can never collide with an announcement's own.
         #}
         {% if show_student_email_notice() %}
             <div class="toast toast-{{ enum('App\\Entity\\Application\\Enums\\AlertTypes').Info.value }}" role="alert"

@@ -1,10 +1,7 @@
 {#
-    The decisions taken at a meeting, and the form that starts a new one. Included from the decisions tab of the
-    management component for whoever administers the register, and from the meeting page itself for a board reader
-    who has no component to find them in. Expects the ledger's view of the meeting; `flush` strips the first
-    panel's top margin so the tab starts where its siblings do.
+    Expects the ledger's view of the meeting; `flush` strips the first panel's top margin so the tab starts
+    where its siblings do.
 #}
-{# How a decision is cited: the meeting it was taken at, then the point and the number within it. #}
 {% set meeting_label = ledgerMeeting.type.value ~ ' ' ~ ledgerMeeting.number %}
 
 {% for decision in decisions %}
@@ -15,9 +12,7 @@
                 <span class="badge badge-gewis-primary font-monospace">
                     {{ meeting_label }}.{{ decision.point }}.{{ decision.number }}
                 </span>
-                {# On a virtual decision, the decision it belongs to; on that decision, the virtual ones that
-                   belong to it. The reference itself sits on the virtual decision, which is why one decision can
-                   carry several of these. #}
+                {# The reference sits on the virtual decision, which is why one decision can carry several of these. #}
                 {% if decision.counterpart is not null %}
                     <span class="badge badge-secondary">
                         {{ 'Counterpart of %type% %number%.%point%.%decision%'|trans({
@@ -36,8 +31,8 @@
                             '%point%': virtual.point,
                             '%decision%': virtual.number,
                         }) }}
-                        {# Asked for through the shared confirmation the page already carries, which sits outside
-                           this component so the re-render that follows cannot leave a backdrop behind. #}
+                        {# The shared confirmation sits outside this component so the re-render that follows cannot
+                           leave a backdrop behind. #}
                         {% if is_granted('ROLE_DATABASE_ADMIN') %}
                             <button type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline text-reset"
                                     data-bs-toggle="modal" data-bs-target="#confirm-modal"
@@ -80,8 +75,8 @@
                         <span class="fas fa-copy" aria-hidden="true"></span>
                         <span data-copy-target="label">{{ 'Copy Decision'|trans }}</span>
                     </button>
-                    {# Which virtual decision belongs to this one is said here rather than while either is entered:
-                       neither has to be on the record before the other, and the virtual one often is not. #}
+                    {# Said here rather than while either is entered: neither has to be on the record before the
+                       other, and the virtual one often is not. #}
                     {% if is_granted('ROLE_DATABASE_ADMIN') and ledgerMeeting.type != enum('App\\Entity\\Database\\Enums\\MeetingTypes').VIRT %}
                         <button type="button" class="btn btn-sm btn-outline-secondary"
                                 data-bs-toggle="modal" data-bs-target="#counterpart-modal"
@@ -90,9 +85,8 @@
                             {{ 'Link virtual counterpart'|trans }}
                         </button>
                     {% endif %}
-                    {# Copying a decision is reading it; deleting one is keeping the record. The confirmation is the
-                       shared modal the page already carries, which sits outside this component so the re-render
-                       that follows cannot leave a backdrop behind. #}
+                    {# The shared confirmation sits outside this component so the re-render that follows cannot leave
+                       a backdrop behind. #}
                     {% if is_granted('ROLE_DATABASE_ADMIN') %}
                         <button type="button" class="btn btn-sm btn-outline-danger"
                                 data-bs-toggle="modal" data-bs-target="#confirm-modal"
@@ -131,13 +125,9 @@
             <p class="text-secondary">
                 {{ 'The point and the decision number are combined with the meeting to address the decision.'|trans }}
             </p>
-            {# Not a form the server ever receives: filling in a point and a decision number navigates to the
-               page that records that decision. The point also suggests the next free number, which the
-               meeting already knows.
-
-               The URL is generated with both numbers set to zero and the controller rewrites the point and
-               the decision number in it, because the route requires digits there and so cannot be asked to
-               generate a template with named placeholders in them. #}
+            {# Not a form the server ever receives: filling in a point and a decision number navigates to the page
+               that records that decision. The URL is generated with both numbers set to zero and the controller
+               rewrites them, because the route requires digits there. #}
             <form class="row row-cols-lg-auto g-2 align-items-start" data-controller="decision-number"
                   data-decision-number-url-value="{{ path('decision_decision_create', {
                       type: ledgerMeeting.type.value,

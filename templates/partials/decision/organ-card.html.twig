@@ -1,10 +1,8 @@
 {#
-    One body on an overview: its logo, what it calls itself, and the line or two it introduces itself with.
-
     {% include 'partials/decision/organ-card.html.twig' with {'organ': organ} only %}
 
-    Pass `dated` to link with the body's foundation year, which is what tells two bodies apart when an abbreviation has
-    been reused. The historical overviews always do; the current ones do not, so a live body keeps the short address.
+    Pass `dated` to link with the body's foundation year, which is what tells two bodies apart when an
+    abbreviation has been reused. The historical overviews always do; the current ones do not.
 #}
 {% set information = organ.getOrganInformation %}
 {# A dated link carries the whole founding date: two bodies founded in the same year share a year but never a date,

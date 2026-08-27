@@ -1,6 +1,5 @@
 {{ form_start(form, {'action': path('decision_decision_form', {'form': 'organ_regulation'})}) }}
-    {# Organ types without organ regulations are rendered disabled by the form type itself, so the radio group needs
-       no help from the template to keep them out of reach. #}
+    {# Organ types without organ regulations are rendered disabled by the form type itself. #}
     {{ form_row(form.type) }}
     {{ form_row(form.abbr) }}
     {{ form_row(form.date) }}

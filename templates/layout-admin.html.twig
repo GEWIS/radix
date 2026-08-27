@@ -8,11 +8,9 @@
     {% include 'partials/admin-sidebar.html.twig' %}
 {% endblock %}
 
-{# The build this is running, which is what a bug report needs. An image built outside the release pipeline carries
-   no commit, and a link to one that is not there is worse than saying so. #}
+{# An image built outside the release pipeline carries no commit, and a link to one that is not there is
+   worse than saying so. #}
 {% block sidebar_footer %}
-    {# A row of the menu, built from the menu's own classes rather than from measurements of its own, so it keeps
-       whatever the rows above it are. #}
     {% if git_commit is not empty %}
         <a class="sidebar-link" href="https://github.com/GEWIS/radix/commit/{{ git_commit }}"
            target="_blank" rel="noopener">

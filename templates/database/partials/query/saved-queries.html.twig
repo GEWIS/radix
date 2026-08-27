@@ -1,5 +1,5 @@
-{# Stored queries, grouped under their category. Grouping first rather than opening and closing a list as the
-   category changes does not depend on the order the queries come back in. #}
+{# Grouping first, rather than opening and closing a list as the category changes, does not depend on the
+   order the queries come back in. #}
 {% set grouped = {} %}
 {% for saved_query in saved_queries %}
     {% set category = saved_query.category|default('') is empty ? 'No category'|trans : saved_query.category %}
@@ -10,8 +10,7 @@
     {% for category, queries in grouped %}
         <span class="stored-queries-group">{{ category }}</span>
         {% for saved_query in queries %}
-            {# Opening a stored query is a page load rather than a client-side fill, so what is running is always the
-               query the address names. #}
+            {# A page load rather than a client-side fill, so what is running is always the query the address names. #}
             <a class="stored-query{{ saved_query.id == (current_query_id|default(null)) ? ' active' : '' }}"
                href="{{ path('query_show', {'query': saved_query.id}) }}">
                 <span class="fas fa-code stored-query-icon" aria-hidden="true"></span>

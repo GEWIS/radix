@@ -13,8 +13,7 @@
     <li class="breadcrumb-item active" aria-current="page">{{ labels.address_type(address.type) }}</li>
 {% endblock %}
 
-{# Adding and updating an address are the same form on the same fields; `add` only decides how the page introduces
-   itself, and the form posts back to whichever of the two routes rendered it. #}
+{# `add` only decides how the page introduces itself; the form posts back to whichever route rendered it. #}
 {% block page_header %}
     {% embed 'partials/application/page-header.html.twig' %}
         {% block header_container_class %}container-fluid px-3{% endblock %}

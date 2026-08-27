@@ -28,7 +28,6 @@
             </div>
         {% endif %}
 
-        {# One virtual weekly album per association year; open it to browse that year's photos of the week. #}
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
             {% for year, weeklies in photosByYear %}
                 {% set cover = weeklies|first.photo %}

@@ -1,7 +1,6 @@
-{# The candidates the board puts forward, in constitutional order. Each row names a member: the name is typed and the
-   membership number beside it is what the form reads back, so a row needs the lookup controller of its own that the
-   shared partial gives it. Add and remove are the generic `form-collection` controller, and the order of the rows is
-   the order the candidates are recorded in, which is why nothing here reorders them. #}
+{# Each row names a member: the name is typed and the membership number beside it is what the form reads
+   back, so a row needs the lookup controller of its own that the shared partial gives it. The order of the
+   rows is the order the candidates are recorded in, which is why nothing here reorders them. #}
 {% macro board_candidate_entry(child, remove_label) %}
     <div class="d-flex align-items-start gap-2 mb-2" data-form-collection-target="entry">
         <div class="flex-grow-1">

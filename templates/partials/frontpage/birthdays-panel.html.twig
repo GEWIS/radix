@@ -1,11 +1,7 @@
 {#
-    Who has a birthday today, with a photo of each of them there is one of rotating above the list. Every photo is
-    rendered here and all but the first hidden, so a reader without JavaScript still sees one of them. A photo links
-    to the tagged member's own album, not to the album it came from.
-
-    The age is null when the reader may not see this member's year of birth; the member still appears, only ageless.
-
-    Pass `birthdays` and `birthdayTags`.
+    Pass `birthdays` and `birthdayTags`. Every photo is rendered and all but the first hidden, so a reader
+    without JavaScript still sees one of them. `age` is null where the reader may not see this member's year
+    of birth; the member still appears, only ageless.
 #}
 <div class="panel overflow-hidden">
     <div class="panel-heading">

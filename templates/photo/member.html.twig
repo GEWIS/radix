@@ -59,8 +59,7 @@
         {% if isSelf %}
             {% set empty_message = 'You have not been tagged in any photos yet.'|trans %}
         {% elseif memberHasTags %}
-            {# Tagged, but this member's privacy settings hide every photo from this viewer. Be transparent that photos
-               exist without revealing which or how many. #}
+            {# Be transparent that photos exist without revealing which or how many. #}
             {% set empty_message = '%name% has hidden their tagged photos.'|trans({ '%name%': member.getFullName }) %}
         {% else %}
             {% set empty_message = '%name% has not been tagged in any photos yet.'|trans({ '%name%': member.getFullName }) %}

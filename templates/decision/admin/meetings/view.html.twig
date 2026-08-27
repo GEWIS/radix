@@ -27,8 +27,6 @@
     </div>
     <p class="text-muted mb-3">{{ meeting.date|format_date('full') }}</p>
 
-    {# Whoever keeps the register gets the whole record as the component below, decisions included; a board
-       reader who may not change it gets the decision list by itself. #}
     {# A meeting the projection knows and the ledger does not has no decisions to show; it still has its documents. #}
     {% if decisions is defined and not is_granted('ROLE_DATABASE_ADMIN') %}
         {% include 'decision/admin/meetings/decisions.html.twig' %}

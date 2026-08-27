@@ -1,11 +1,10 @@
 {#
-    A queue of revisions waiting for a decision. Every module's queue says the same four things, so they all render
-    through this one; pass a list of ReviewQueueRow.
-
     {% include 'partials/application/review-queue.html.twig' with {
         'heading': 'Vacancies'|trans,
         'rows': rows,
     } only %}
+
+    `rows` is a list of ReviewQueueRow.
 #}
 <div class="panel">
     <div class="panel-heading">

@@ -1,6 +1,5 @@
-{# The registration confirmation repeats the same two-column summary for the personal and the address details.
-   Rows are hashes of `label` and `value`, with an optional `href` for the one value that is a link; keeping the
-   link out of the value means no fragment of member input is ever printed raw. #}
+{# Rows are hashes of `label` and `value`, with an optional `href` for the one value that is a link; keeping
+   the link out of the value means no fragment of member input is ever printed raw. #}
 
 {% macro summary(title, rows) %}
     <h3>{{ title }}</h3>
