@@ -16,6 +16,17 @@ framework:
             # table, and the transport helpfully creates `messenger_messages` on the website database — which the
             # subsequent `--em=web` then trips over.
             failed: 'doctrine://web?queue_name=failed&auto_setup=false'
+            # Where a failure goes when `failed` cannot be written to, which is whenever the website database is
+            # itself what failed. Nothing consumes it; `app:messenger:recover-failures` moves what is held here into
+            # `failed` once that answers again.
+            failed_fallback:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: failed_fallback
+                        type: direct
+                    queues:
+                        failed_fallback_queue: ~
             high_priority:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -141,6 +152,8 @@ when@test:
     framework:
         messenger:
             transports:
+                failed_fallback:
+                    dsn: 'in-memory://'
                 high_priority:
                     dsn: 'in-memory://'
                 normal_priority:

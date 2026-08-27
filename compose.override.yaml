@@ -90,14 +90,19 @@ services:
         extra_hosts:
             - "host.docker.internal:host-gateway"
         tty: true
+    # Drops the opcache file cache production's workers run with: `var/` is bound from the checkout here, so the
+    # directory the image creates for it is not there, and a cache of compiled code is the wrong thing next to hot
+    # reload anyway.
     messenger-high-priority: &worker_dev
         <<: *app_development
+        entrypoint: [ "php" ]
         volumes: *worker_dev_volumes
         deploy: *worker_dev_deploy
     messenger-normal-priority: *worker_dev
     messenger-bulk: *worker_dev
     messenger-images:
         <<: *app_development
+        entrypoint: [ "php" ]
         volumes: *worker_dev_volumes
         deploy:
             resources:

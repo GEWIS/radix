@@ -79,11 +79,13 @@ ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
 COPY --link docker/app/frankenphp/conf.d/10-radix.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY --link docker/app/healthcheck.php /usr/local/bin/healthcheck.php
 COPY --link docker/app/frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
 ENTRYPOINT ["docker-entrypoint"]
 
-HEALTHCHECK --start-period=60s CMD php -r 'exit(false === @file_get_contents("http://localhost:2019/metrics", context: stream_context_create(["http" => ["timeout" => 5]])) ? 1 : 0);'
+# The timeout allows for both connection timeouts /health may sit through before it reports what is unreachable.
+HEALTHCHECK --start-period=300s --interval=30s --timeout=25s CMD php /usr/local/bin/healthcheck.php
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
 
 # Radix Development Image (local)
@@ -133,7 +135,9 @@ RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scri
 COPY --link --exclude=docker/ . ./
 
 RUN <<-EOF
-    mkdir -p var/cache var/log var/share
+    # opcache refuses to start on a `file_cache` directory it cannot stat, so var/opcache is created rather than
+    # left to the workers that use it.
+    mkdir -p var/cache var/log var/share var/opcache
     composer dump-autoload --classmap-authoritative --no-dev
     composer dump-env prod
     # `post-install-cmd` is inlined rather than run: the `cache:clear` in its `auto-scripts` runs the optional cache
@@ -230,6 +234,7 @@ RUN chmod g=u /app/var
 RUN mkdir -p /app/data && chown www-data:0 /app/data && chmod g=u /app/data
 
 COPY --link --chmod=755 docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY --link docker/app/healthcheck.php /usr/local/bin/healthcheck.php
 
 ARG GIT_COMMIT
 ENV GIT_COMMIT=${GIT_COMMIT}
@@ -240,5 +245,6 @@ WORKDIR /app
 
 ENTRYPOINT ["docker-entrypoint"]
 
-HEALTHCHECK --start-period=60s CMD php -r 'exit(false === @file_get_contents("http://localhost:2019/metrics", context: stream_context_create(["http" => ["timeout" => 5]])) ? 1 : 0);'
+# The timeout allows for both connection timeouts /health may sit through before it reports what is unreachable.
+HEALTHCHECK --start-period=300s --interval=30s --timeout=25s CMD php /usr/local/bin/healthcheck.php
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]

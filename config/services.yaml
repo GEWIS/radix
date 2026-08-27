@@ -10,6 +10,8 @@ parameters:
     app.locales: en|nl
     # Default for the infra-level maintenance flag so an unset variable resolves to "off" rather than null.
     env(MAINTENANCE): ''
+    # Names this container's log file on the shared `data` volume; compose.yaml gives each worker its own.
+    env(LOG_NAME): 'app'
     # MFA enforcement defaults to `true` so any unrecognised environment fails safe. Overridden per environment in
     # `when@dev:` (driven by `MFA_ENFORCEMENT` so individual developers can flip enrolment on/off in `.env.local`;
     # because the parameter is read once at first service instantiation under FrankenPHP's worker mode, the web
