@@ -25,6 +25,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 use function array_map;
 use function array_values;
+use function shuffle;
 
 /**
  * Gathers the home-page blocks: the news feed the page leads with, the agenda of what is coming up, the current photo
@@ -82,6 +83,9 @@ final readonly class HomePageService
             $birthdayMembers,
         ));
 
+        $birthdayTags = $this->memberTagRepository->findMostRecentTagPerMember($birthdayMembers);
+        shuffle($birthdayTags);
+
         return [
             'activities' => $this->activityRepository->findUpcoming(),
             'newsFeed' => $this->newsItemRepository->findFeed(limit: self::NEWS_LIMIT),
@@ -90,7 +94,7 @@ final readonly class HomePageService
             'weeklyPublicPath' => null === $weeklyPhoto
                 ? null
                 : $this->publicPathIfAvailable($weeklyPhoto),
-            'birthdayTags' => $this->memberTagRepository->findMostRecentTagPerMember($birthdayMembers),
+            'birthdayTags' => $birthdayTags,
             'birthdays' => $birthdays,
         ];
     }
