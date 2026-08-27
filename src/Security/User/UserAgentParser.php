@@ -13,7 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 use function explode;
 use function is_array;
+use function preg_replace;
 use function str_starts_with;
+use function strtolower;
 use function trim;
 
 /**
@@ -41,6 +43,28 @@ final readonly class UserAgentParser
             $clientHints[$hint] ?? '',
             '" ',
         );
+    }
+
+    /**
+     * The family a parsed browser or operating system belongs to: the name with the trailing version dropped, lowered
+     * so that two spellings of it compare equal.
+     *
+     * Shared deliberately. {@see \App\EventListener\User\StaleSessionGuardListener} tears a session down when the
+     * family changes under a cookie, and {@see DeviceFingerprint} keys a recognised device on it. Were the two to
+     * disagree about what counts as the same browser, a device could be torn down as a stranger and recognised as
+     * familiar on the same request.
+     */
+    public static function family(?string $combined): ?string
+    {
+        if (null === $combined) {
+            return null;
+        }
+
+        return strtolower(preg_replace(
+            '/\s+\d+$/',
+            '',
+            $combined,
+        ) ?? $combined);
     }
 
     /**

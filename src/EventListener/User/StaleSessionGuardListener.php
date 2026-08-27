@@ -23,8 +23,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
-use function preg_replace;
-use function strtolower;
 
 /**
  * For every authenticated request:
@@ -140,10 +138,10 @@ final class StaleSessionGuardListener
         // gate. A mismatch on either side suggests the cookie pair has been replayed from a different device -> tear
         // down.
         $currentMeta = $this->userAgentParser->parseRequest($request);
-        $storedBrowser = self::extractName($managedSession->getBrowser());
-        $currentBrowser = self::extractName($currentMeta['browser']);
-        $storedOs = self::extractName($managedSession->getOperatingSystem());
-        $currentOs = self::extractName($currentMeta['operatingSystem']);
+        $storedBrowser = UserAgentParser::family($managedSession->getBrowser());
+        $currentBrowser = UserAgentParser::family($currentMeta['browser']);
+        $storedOs = UserAgentParser::family($managedSession->getOperatingSystem());
+        $currentOs = UserAgentParser::family($currentMeta['operatingSystem']);
 
         $browserMismatch = null !== $storedBrowser && null !== $currentBrowser && $storedBrowser !== $currentBrowser;
         $osMismatch = null !== $storedOs && null !== $currentOs && $storedOs !== $currentOs;
@@ -224,17 +222,5 @@ final class StaleSessionGuardListener
         $event->setResponse(new RedirectResponse(
             $this->urlGenerator->generate($loginRoute),
         ));
-    }
-
-    /**
-     * Strip the trailing major-version token ("Firefox 124" -> "firefox") and lower-case for stable comparison.
-     */
-    private static function extractName(?string $combined): ?string
-    {
-        if (null === $combined) {
-            return null;
-        }
-
-        return strtolower(preg_replace('/\s+\d+$/', '', $combined) ?? $combined);
     }
 }

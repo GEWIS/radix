@@ -11,6 +11,7 @@ use App\Entity\User\User;
 use App\Message\User\PasswordResetRequestEmail;
 use App\Security\User\HandlerRegistry;
 use App\Service\User\AccountPasswordService;
+use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
 use App\Service\User\PasswordResetService;
 use App\Service\User\SessionManager;
@@ -38,6 +39,7 @@ class CompanyUserController extends AbstractSecurityController
         AccountPasswordService $accountPasswordService,
         MultiFactorService $multiFactorService,
         PasswordResetService $passwordResetService,
+        KnownDeviceRegistry $knownDevices,
     ) {
         parent::__construct(
             $translator,
@@ -47,6 +49,7 @@ class CompanyUserController extends AbstractSecurityController
             $accountPasswordService,
             $multiFactorService,
             $passwordResetService,
+            $knownDevices,
             routePrefix: 'company_user_',
             userType: UserTypes::CompanyUser,
         );

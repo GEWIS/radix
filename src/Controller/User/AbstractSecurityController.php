@@ -26,6 +26,7 @@ use App\Security\User\SudoMode;
 use App\Security\User\SudoVoter;
 use App\Service\Application\AltchaSolutionGuard;
 use App\Service\User\AccountPasswordService;
+use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
 use App\Service\User\PasswordResetService;
 use App\Service\User\SecurityNotifier;
@@ -74,6 +75,7 @@ abstract class AbstractSecurityController extends AbstractController
         protected readonly AccountPasswordService $accountPasswordService,
         protected readonly MultiFactorService $multiFactorService,
         protected readonly PasswordResetService $passwordResetService,
+        protected readonly KnownDeviceRegistry $knownDevices,
         protected readonly string $routePrefix,
         protected readonly UserTypes $userType,
     ) {
@@ -1034,6 +1036,10 @@ abstract class AbstractSecurityController extends AbstractController
     /**
      * Tell whoever owns the account that the way they sign in has changed. Not something they asked for and not
      * something they can turn off, which is rather the point of a security notice.
+     *
+     * Every device the account was recognised on is forgotten at the same time, so the next sign-in from any of them
+     * is announced. Whether the member is securing an account they believe has been reached or an intruder got there
+     * first, nothing should stay trusted across a change like this.
      */
     private function raiseSecurityNotice(
         SecurityNotifier $securityNotifier,
@@ -1046,6 +1052,11 @@ abstract class AbstractSecurityController extends AbstractController
         if (null === $firewall) {
             return;
         }
+
+        $this->knownDevices->forget(
+            $user->getUserIdentifier(),
+            $firewall->value,
+        );
 
         $securityNotifier->notify(
             $firewall,
