@@ -5,6 +5,7 @@ localised_routes:
     resource: '../src/Controller/'
     exclude:
         - '../src/Controller/Application/ApplicationController.php'
+        - '../src/Controller/Application/HealthController.php'
         - '../src/Controller/Database/'
         - '../src/Controller/Photo/ApiController.php'
         - '../src/Controller/Report/'
@@ -68,6 +69,11 @@ database_api_principal_routes:
         _locale: '%kernel.default_locale%'
     requirements:
         _locale: '%app.locales%'
+
+# What the container healthcheck asks. No language in the address, and no firewall in front of it.
+health_routes:
+    resource: '../src/Controller/Application/HealthController.php'
+    type: attribute
 
 # The API is a contract with the other GEWIS applications: one address, no language in it, and the one that
 # openapi.yaml publishes. It is also what the stateless `api` firewall is matched on, so a prefix here would take

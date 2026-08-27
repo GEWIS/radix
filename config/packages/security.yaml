@@ -30,6 +30,12 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        # The container healthcheck. Outside every firewall so a probe never loads a user, which is a query on the
+        # database it exists to report on.
+        health:
+            pattern: ^/health$
+            security: false
+
         # Stripe posts the checkout webhook server-to-server: no session, no cookie and no token, authenticated
         # instead by its signature against STRIPE_WEBHOOK_SIGNING_KEY. It stays outside every secured firewall so
         # neither the access rules nor the login form can intercept it. Both spellings are live and configured in

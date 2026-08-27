@@ -32,6 +32,9 @@ x-app-environment: &app_environment
     # Set to any non-empty value to serve the maintenance page to everyone, admins included, for work done before the
     # application can serve properly. App-level maintenance is set through the admin interface instead.
     MAINTENANCE: "${MAINTENANCE:-}"
+    # Names this container's log file under data/logs (see monolog.yaml). Each worker below states its own, so they
+    # do not rotate one another's file; replicas of one worker do share theirs.
+    LOG_NAME: "${LOG_NAME:-app}"
     # The domain the mailing lists are created under on Mailman, which is what it reports back when asked for a list.
 
     # The ledger, on PostgreSQL: the `default` connection. `role` is not a driver parameter —
@@ -203,7 +206,10 @@ x-worker-deploy: &worker_deploy
 
 x-worker: &worker
     <<: *app
-    entrypoint: []
+    # Replaces the image entrypoint and supplies the interpreter each `command:` below continues. These containers
+    # hold no opcode cache, so a restart recompiles the codebase; the file cache survives a restart of the same
+    # container, and `file_cache_only` keeps it out of shared memory and so out of the memory limit.
+    entrypoint: [ "php", "-d", "opcache.enable_cli=1", "-d", "opcache.file_cache=/app/var/opcache", "-d", "opcache.file_cache_only=1" ]
     volumes: *worker_volumes
     # Workers skip the entrypoint (and thus migrations); wait for the app, which runs them. Restated in full
     # because the `<<` merge replaces depends_on completely.
@@ -241,24 +247,36 @@ services:
               protocol: tcp
     messenger-high-priority:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: messenger-high-priority
         deploy:
             <<: *worker_deploy
             replicas: ${HIGH_PRIORITY_WORKER_REPLICAS:-1}
-        command: [ "php", "bin/console", "messenger:consume", "high_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+        command: [ "bin/console", "messenger:consume", "high_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-normal-priority:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: messenger-normal-priority
         deploy:
             <<: *worker_deploy
             replicas: ${NORMAL_PRIORITY_WORKER_REPLICAS:-1}
-        command: [ "php", "bin/console", "messenger:consume", "normal_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+        command: [ "bin/console", "messenger:consume", "normal_priority", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-bulk:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: messenger-bulk
         deploy:
             <<: *worker_deploy
             replicas: ${BULK_WORKER_REPLICAS:-1}
-        command: [ "php", "bin/console", "messenger:consume", "bulk", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+        command: [ "bin/console", "messenger:consume", "bulk", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     messenger-images:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: messenger-images
         # Above the shared limit: libvips allocates outside PHP's limit, so the `--memory-limit` below does not bound
         # this worker's peak. Each replica adds a libvips pool, so scaling costs CPU as well as memory.
         # Image encoding is heavier and more memory-hungry, so recycle the worker sooner and give it more headroom.
@@ -275,12 +293,15 @@ services:
                     memory: "${IMAGE_WORKER_MEMORY_LIMIT:-1536m}"
         # `--limit=64` rather than the 16 this started at: every restart reboots a kernel, which is noise next to one
         # encode but real overhead against a queue of hundreds of thousands. `--memory-limit` is the actual guard.
-        command: [ "php", "bin/console", "messenger:consume", "images", "-vv", "--time-limit=600", "--limit=64", "--memory-limit=512M" ]
+        command: [ "bin/console", "messenger:consume", "images", "-vv", "--time-limit=600", "--limit=64", "--memory-limit=512M" ]
     # Must stay at one replica: a schedule is generated rather than queued, and MainSchedule's lock lets only one
     # consumer advance it, so a second replica would do nothing. It only dispatches onto the queues below, so one
     # is also enough.
     scheduler-default:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: scheduler-default
         deploy:
             <<: *worker_deploy
             replicas: 1
@@ -289,27 +310,36 @@ services:
                 limits:
                     cpus: "${SCHEDULER_CPU_LIMIT:-0.5}"
                     memory: "${SCHEDULER_MEMORY_LIMIT:-256m}"
-        command: [ "php", "bin/console", "messenger:consume", "scheduler_default", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+        command: [ "bin/console", "messenger:consume", "scheduler_default", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     # Jobs that must run close to their due time. Two consumers so a long run does not delay the every-minute ones.
     # The commands lock themselves, so a second consumer never causes a second run of the same command.
     cron-worker:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: cron-worker
         deploy:
             <<: *worker_deploy
             replicas: ${CRON_WORKER_REPLICAS:-2}
-        command: [ "php", "bin/console", "messenger:consume", "cron", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+        command: [ "bin/console", "messenger:consume", "cron", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     # Personal-data deletion on its own queue and worker log, so deletions can be audited from one log. Short and
     # nightly, so one consumer.
     gdpr-worker:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: gdpr-worker
         deploy:
             <<: *worker_deploy
             replicas: ${GDPR_WORKER_REPLICAS:-1}
-        command: [ "php", "bin/console", "messenger:consume", "gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
+        command: [ "bin/console", "messenger:consume", "gdpr", "-vv", "--time-limit=600", "--limit=32", "--memory-limit=256M" ]
     # No `--limit` and an hour of `--time-limit`, because `app:decision:generate` is one message running most of an
     # hour. Two consumers because the half-hourly and hourly jobs here fall inside that run and would queue behind it.
     maintenance-worker:
         <<: *worker
+        environment:
+            <<: *app_environment
+            LOG_NAME: maintenance-worker
         # Twice the short-job workers' `--memory-limit`, because the projection rebuild loads the ledger it replays.
         deploy:
             <<: *worker_deploy
@@ -318,7 +348,7 @@ services:
                 limits:
                     cpus: "${MAINTENANCE_WORKER_CPU_LIMIT:-1.0}"
                     memory: "${MAINTENANCE_WORKER_MEMORY_LIMIT:-768m}"
-        command: [ "php", "bin/console", "messenger:consume", "maintenance", "-vv", "--time-limit=3600", "--memory-limit=512M" ]
+        command: [ "bin/console", "messenger:consume", "maintenance", "-vv", "--time-limit=3600", "--memory-limit=512M" ]
     # Analytics, on its own hostname: the proxy sends analytics.gewis.nl to the port below. It is part of this stack
     # rather than a separate one because the image is built and published beside the application's, and the site's
     # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name a

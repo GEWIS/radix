@@ -69,6 +69,9 @@ final readonly class MaintenanceListener
         'company_user_sudo_confirm',
     ];
 
+    /** The container healthcheck, which reports on maintenance rather than being subject to it. */
+    private const string HEALTH_ROUTE = 'app_health';
+
     /** Where every live component request lands, whichever component and action it is for. */
     private const string LIVE_COMPONENT_ROUTE = 'ux_live_component';
 
@@ -100,6 +103,10 @@ final readonly class MaintenanceListener
     public function __invoke(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
+            return;
+        }
+
+        if (self::HEALTH_ROUTE === $event->getRequest()->attributes->get('_route')) {
             return;
         }
 

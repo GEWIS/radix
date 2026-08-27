@@ -21,10 +21,39 @@ wait_for_database() {
 	if [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ]; then
 		echo "The $1 database is not up or not reachable:"
 		echo "$DATABASE_ERROR"
-		exit 1
+		return 1
 	fi
 
 	echo "The $1 database is now ready and reachable"
+}
+
+# Where the entrypoint records that it came up without migrating, so the healthcheck stays red and the workers,
+# which wait on it, stay down.
+MIGRATIONS_SKIPPED_MARKER=/app/var/.migrations-skipped
+
+# Clears the marker above once both databases answer, but only after establishing that neither has a migration
+# pending, which outside a deploy is the normal case. So a container that started during an outage heals itself
+# without a migration ever running unattended; an interrupted deploy, which is the case that has work to do, keeps
+# the marker and waits for somebody.
+clear_marker_when_nothing_to_migrate() {
+	while [ -f "$MIGRATIONS_SKIPPED_MARKER" ]; do
+		sleep 60
+
+		php bin/console dbal:run-sql -q --connection=default "SELECT 1" >/dev/null 2>&1 || continue
+		php bin/console dbal:run-sql -q --connection=web "SELECT 1" >/dev/null 2>&1 || continue
+
+		if
+			! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/default.yaml >/dev/null 2>&1 \
+			|| ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/web.yaml >/dev/null 2>&1
+		then
+			echo "Both databases answer, but a migration is pending: this container started in the middle of a deploy. Restart it to migrate."
+			return 0
+		fi
+
+		echo "Both databases answer and nothing is pending to migrate; the container is healthy again."
+		rm -f "$MIGRATIONS_SKIPPED_MARKER"
+		return 0
+	done
 }
 
 if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
@@ -48,9 +77,14 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	# Display information about the application or errors during initialization
 	php bin/console -V
 
+	# Not reaching a database is no longer fatal: exiting here means a restart during an outage crash-loops the
+	# container, so nothing serves the maintenance page and nothing reports why.
+	rm -f "$MIGRATIONS_SKIPPED_MARKER"
+	DATABASES_REACHABLE=1
+
 	if [ -n "$DATABASE_DSN" ]; then
-		wait_for_database default
-		wait_for_database web
+		wait_for_database default || DATABASES_REACHABLE=0
+		wait_for_database web || DATABASES_REACHABLE=0
 	fi
 
 	# The image is built with `cache:clear --no-optional-warmers` (see Dockerfile): the optional warmers instantiate
@@ -61,8 +95,13 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	fi
 
 	# `app` is the single container that migrates. SKIP_MIGRATIONS is left as a way to start one that does not, for
-	# an operator who needs the application up while the schema is being dealt with by hand; nothing sets it.
-	if [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then
+	# an operator who needs the application up while the schema is being dealt with by hand; nothing sets it. That
+	# is a deliberate skip and leaves no marker, unlike an unreachable database.
+	if [ "$DATABASES_REACHABLE" -eq 0 ]; then
+		echo "Starting without migrating: a database could not be reached. Serving (the maintenance page, if MAINTENANCE is set) but reporting unhealthy, so no worker starts."
+		touch "$MIGRATIONS_SKIPPED_MARKER"
+		clear_marker_when_nothing_to_migrate &
+	elif [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then
 		# One set per database, each naming its own connection; a command given no configuration finds none.
 		for set in database web; do
 			if find "./migrations/$set" -iname '*.php' -print -quit | grep --quiet .; then

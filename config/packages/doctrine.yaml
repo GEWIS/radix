@@ -12,11 +12,18 @@ doctrine:
             default:
                 url: '%env(resolve:DATABASE_DSN)%'
                 profiling_collect_backtrace: '%kernel.debug%'
+                options:
+                    # Bounds the connection attempt only (libpq `connect_timeout`, MYSQL_OPT_CONNECT_TIMEOUT), so a
+                    # long query is unaffected. Without it libpq waits out the TCP timeout and holds one of the eight
+                    # FrankenPHP worker threads for two minutes.
+                    !php/const PDO::ATTR_TIMEOUT: 10
             # Everything the website owns, on MariaDB, together with the projection of the ledger the site and the
             # API read.
             web:
                 url: '%env(resolve:WEB_DATABASE_DSN)%'
                 profiling_collect_backtrace: '%kernel.debug%'
+                options:
+                    !php/const PDO::ATTR_TIMEOUT: 10
     # The ledger is the default manager, so an unqualified `getRepository()` reaches the source of truth rather than a
     # copy of it. For most of the codebase that is the wrong manager: ask for `web` explicitly.
     orm:
@@ -141,7 +148,7 @@ when@prod:
                 web:
                     # TLS to the production MariaDB. CAPATH points at the system CA bundle, which is present in the
                     # production image. These are MySQL-specific PDO attributes, so they only apply to this
-                    # connection.
+                    # connection. Merged with the `options` above rather than replacing them.
                     options:
                         !php/const Pdo\Mysql::ATTR_SSL_CAPATH: '/etc/ssl/certs/'
                         !php/const Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT: true
