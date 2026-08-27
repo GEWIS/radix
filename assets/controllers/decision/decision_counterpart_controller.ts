@@ -9,8 +9,7 @@ interface DecisionMatch {
 }
 
 /**
- * Picks the virtual decision that repeats a decision, inside the modal that asks for it. Unlike the annulment lookup
- * it gates nothing: the modal reads the hidden fields this fills in when the link is confirmed, and answers for
+ * Unlike the annulment lookup this gates nothing: the modal reads the hidden fields it fills in, and answers for
  * whether one was picked at all.
  */
 export default class extends LookupController<DecisionMatch> {

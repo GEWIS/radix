@@ -9,17 +9,11 @@ interface MemberMatch {
 type Collection = 'installations' | 'reappointments' | 'discharges';
 
 /**
- * Editing an organ's membership as a single decision.
- *
- * Two tables carry the work: the left one is the organ as it stands, the right one is the organ as the decision will
- * leave it. Every button on the right adds a row to one of the three collections the form submits -- installations,
- * reappointments and discharges -- and the mutations are listed underneath in the words they will read as.
- *
- * The rows of those collections are built from the form's own prototypes rather than assembled here, so their field
- * names and their wording come from the server. A prototype carries two kinds of placeholder: the ones in its
- * sentence, which are filled with what the member and the function are called, and the ones in its hidden fields,
- * which are filled with the identifiers the form reads back. They are substituted separately, into text nodes and
- * into input values, so that a member's name is never treated as markup.
+ * The rows of the three collections the form submits are built from the form's own prototypes rather than assembled
+ * here, so their field names and their wording come from the server. A prototype carries two kinds of placeholder:
+ * the ones in its sentence, which are filled with what the member and the function are called, and the ones in its
+ * hidden fields, which are filled with the identifiers the form reads back. They are substituted separately, into
+ * text nodes and into input values, so that a member's name is never treated as markup.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['panel', 'currentMembers', 'currentRowTemplate', 'result', 'resultRowTemplate',
@@ -66,9 +60,7 @@ export default class extends Controller<HTMLElement> {
     private subject: HTMLTableRowElement | null = null;
     private counts: Record<Collection, number> = { installations: 0, reappointments: 0, discharges: 0 };
 
-    /**
-     * A different organ means different membership, so everything recorded so far is dropped along with it.
-     */
+    /** A different organ means different membership, so everything recorded so far is dropped along with it. */
     organSelected(event: CustomEvent<OrganInfo>): void {
         this.names.clear();
         this.counts = { installations: 0, reappointments: 0, discharges: 0 };
@@ -122,8 +114,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Discharging someone's ordinary membership discharges the functions that hang off it as well: a function without
-     * a membership behind it is not something the organ can have.
+     * Discharging someone's ordinary membership discharges the functions that hang off it as well: a function without a
+     * membership behind it is not something the organ can have.
      */
     confirmDischarge(): void {
         const row = this.subject;
@@ -168,9 +160,7 @@ export default class extends Controller<HTMLElement> {
         }));
     }
 
-    /**
-     * Whatever is not reappointed is discharged: a function left unchecked is one the organ will not have any more.
-     */
+    /** Whatever is not reappointed is discharged: a function left unchecked is one the organ will not have any more. */
     confirmReappoint(): void {
         const row = this.subject;
 

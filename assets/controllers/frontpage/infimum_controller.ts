@@ -19,12 +19,9 @@ function fetchInfimum(url: string): Promise<unknown> {
 }
 
 /**
- * Fills in the infimum after the page has been drawn, and swaps it when a fresh one is pushed. It is fetched here
- * rather than rendered with the page because it comes from somebody else's server, and the footer it sits in is on
- * every page of this website.
- *
- * The rotation needs no connection of its own: the application's single EventSource re-dispatches anything it does not
- * handle itself as a `gewis:realtime:<type>` DOM event.
+ * The infimum is fetched here rather than rendered with the page because it comes from somebody else's server, and
+ * the footer it sits in is on every page of this website. The rotation needs no connection of its own: the
+ * application's single EventSource re-dispatches anything it does not handle as a `gewis:realtime:<type>` DOM event.
  *
  *   - the text:    data-infimum-target="quote"
  *   - the source:  data-infimum-url-value="<the infimum endpoint>"

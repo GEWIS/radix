@@ -1,12 +1,10 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Add/remove entries of a Symfony CollectionType (allow_add / allow_delete).
- *
- * The prototype already contains the whole entry (wrapper and remove button, see the collection form theme), so adding
- * an entry just clones it with its placeholder replaced by a fresh index. Nesting works because each level uses a
- * distinct prototype placeholder (e.g. `__list__`, `__field__`, `__option__`): replacing the outer placeholder leaves
- * the inner ones intact, and Stimulus auto-connects the nested controllers when the new markup is inserted.
+ * The prototype already contains the whole entry (wrapper and remove button, see the collection form theme), so
+ * adding an entry just clones it with its placeholder replaced by a fresh index. Nesting works because each level
+ * uses a distinct prototype placeholder (e.g. `__list__`, `__field__`, `__option__`): replacing the outer placeholder
+ * leaves the inner ones intact, and Stimulus auto-connects the nested controllers when the new markup is inserted.
  */
 export default class extends Controller {
     static targets = ['entries', 'add'];
@@ -69,8 +67,8 @@ export default class extends Controller {
     }
 
     /**
-     * Hide the add button once the collection is full. The server refuses a fourth entry anyway; this only stops the
-     * form offering something it will then reject.
+     * The server refuses an entry past the maximum anyway; this only stops the form offering something it will then
+     * reject.
      */
     private reflectMax(): void {
         if (!this.hasAddTarget) {

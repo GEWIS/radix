@@ -1,12 +1,9 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Copies text to the clipboard, briefly saying so on the button because the clipboard gives no other sign that it
- * worked.
- *
- * What gets copied is either handed over through the `text` value or read out of the source target. Both exist because
- * a page does not always display what it offers to copy: a decision's LaTeX form, for instance, is nothing like the
- * sentence shown above the button.
+ * What gets copied is either handed over through the `text` value or read out of the source target. Both exist
+ * because a page does not always display what it offers to copy: a decision's LaTeX form, for instance, is nothing
+ * like the sentence shown above the button.
  *
  * The confirmation replaces the label target when there is one, and the button itself otherwise. A button holding an
  * icon needs the label target: assigning to the button's own `textContent` would replace its children with a single

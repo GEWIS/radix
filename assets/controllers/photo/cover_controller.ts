@@ -1,11 +1,9 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Live album cover on the manage view. Regeneration runs on a worker, so the new cover is not known when the request
- * returns; the worker publishes the fresh (signed) URL to a private Mercure topic and this controller swaps it in.
- * Regenerating is an in-page fetch (no reload) so the EventSource stays open the whole time -- there is no
- * reconnection gap in which a fast worker's push could be missed. The subscribe URL (with its authorization cookie)
- * is minted server-side.
+ * Regeneration runs on a worker, so the new cover is not known when the request returns; the worker publishes the
+ * fresh (signed) URL to a private Mercure topic and this controller swaps it in. Regenerating is an in-page fetch (no
+ * reload) so the EventSource stays open the whole time and a fast worker's push cannot be missed.
  *
  *   <div data-controller="photo-cover" data-photo-cover-hub-url-value="{{ mercure(topic, { subscribe: [topic] }) }}">
  *       <img data-photo-cover-target="image" ...>

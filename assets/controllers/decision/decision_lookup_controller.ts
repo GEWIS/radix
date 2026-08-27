@@ -9,8 +9,8 @@ interface DecisionMatch {
 }
 
 /**
- * Picks the decision an annulment takes back. The decision being recorded travels with the query so the endpoint can
- * leave out the decisions this one cannot annul, and the chosen decision is shown in full before it is annulled.
+ * The decision being recorded travels with the query, so the endpoint can leave out the decisions this one cannot
+ * annul.
  */
 export default class extends LookupController<DecisionMatch> {
     static targets = ['meetingType', 'meetingNumber', 'point', 'number', 'preview', 'previewNumber',

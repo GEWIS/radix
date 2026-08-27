@@ -8,9 +8,9 @@ interface DirectoryResult {
 }
 
 /**
- * The member search: fetches matches while typing and renders them as profile links (the directory) or, in `select`
- * mode, as buttons that fill a hidden destination input (the authorization form). A monotonic token guards against a
- * slow response overwriting a newer one; rows are built through DOM APIs because names are user data.
+ * Renders matches as profile links (the directory) or, in `select` mode, as buttons that fill a hidden destination
+ * input (the authorization form). A monotonic token guards against a slow response overwriting a newer one; rows are
+ * built through DOM APIs because names are user data.
  */
 export default class extends Controller {
     static targets = ['input', 'results', 'hint', 'destination'];

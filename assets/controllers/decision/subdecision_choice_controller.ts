@@ -1,11 +1,8 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Points a decision at an existing sub-decision -- the board installation being relieved or discharged, the key code
- * being withdrawn -- by copying the reference the chosen radio carries into the hidden fields the form reads back.
- *
- * The radios themselves are not form fields: which one is checked says nothing the server needs beyond the reference,
- * and leaving them out of the form keeps the reference the single source of truth.
+ * The radios themselves are not form fields: which one is checked says nothing the server needs beyond the reference
+ * they carry, and leaving them out of the form keeps that reference the single source of truth.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['meetingType', 'meetingNumber', 'decisionPoint', 'decisionNumber', 'sequence', 'until',

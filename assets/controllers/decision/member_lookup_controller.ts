@@ -6,9 +6,8 @@ interface MemberMatch {
 }
 
 /**
- * Picks a member for one of the decision forms. The field the form reads back is the hidden membership number next to
- * the search box; where a page has no such field (the install editor's "add member" box) it listens for the event
- * instead.
+ * The field the form reads back is the hidden membership number next to the search box; where a page has no such
+ * field (the install editor's "add member" box) it listens for the event instead.
  */
 export default class extends LookupController<MemberMatch> {
     static targets = ['lidnr'];

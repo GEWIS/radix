@@ -37,13 +37,10 @@ interface Slot {
 }
 
 /**
- * The album gallery: a windowed masonry plus the PhotoSwipe viewer, both driven by the album manifest (fetched once).
- *
- * Every photo's position is computed up front from its aspect ratio, so the page has its full height immediately and a
- * `#pid` deep link can scroll straight to a photo that has not been rendered yet. Only the tiles within roughly a
- * screenful of the viewport are mounted; the rest are added and removed as the page scrolls, so an album of thousands of
- * photos stays light in both directions. Without JavaScript there is no grid (the viewer needs it regardless); the
- * manifest is member-only and never indexed.
+ * Every photo's position is computed up front from its aspect ratio, so the page has its full height immediately and
+ * a `#pid` deep link can scroll straight to a photo that has not been rendered yet. Only the tiles within roughly a
+ * screenful of the viewport are mounted; the rest are added and removed as the page scrolls, so an album of thousands
+ * of photos stays light in both directions. Without JavaScript there is no grid (the viewer needs it regardless).
  */
 export default class extends Controller<HTMLElement> {
     static values = {
@@ -97,8 +94,7 @@ export default class extends Controller<HTMLElement> {
     // Whether opening the viewer pushed a history entry (an in-page open). A deep link arriving with #pid already in
     // the URL pushes nothing, so closing must strip the hash rather than navigate back off the album page.
     private pushedHistory = false;
-    // Selection mode (only when `selectable`): a click selects rather than opens, and the ids are kept in the form the
-    // page's bulk actions submit.
+    // In selection mode a click selects rather than opens, and the ids are kept in the form the bulk actions submit.
     private selecting = false;
     private readonly selected = new Set<number>();
 
@@ -189,11 +185,10 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // FontAwesome sprite icons for PhotoSwipe's built-in buttons, overridden through its own SVG options (no custom
-        // UI elements). Both arrows use the left chevron because PhotoSwipe mirrors the next arrow horizontally. The
-        // zoom icon carries a plus and a minus <use>; the stylesheet shows the right one for the current zoom state.
-        // The <use> inset (6px padding, 20/32 glyph) matches spriteIcon(), so the close and zoom icons come out the same
-        // size as the other toolbar buttons.
+        // FontAwesome sprite icons for PhotoSwipe's built-in buttons, overridden through its own SVG options. Both arrows
+        // use the left chevron because PhotoSwipe mirrors the next arrow horizontally. The zoom icon carries a plus and a
+        // minus <use>; the stylesheet shows the right one for the current zoom state. The <use> inset (6px padding, 20/32
+        // glyph) matches spriteIcon(), so the close and zoom icons come out the same size as the other toolbar buttons.
         const sprite = this.iconSpriteUrlValue;
         const leftArrowSVG = `<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 50 30" width="50" height="30"><use href="${sprite}#chevron-left"></use></svg>`;
         const closeSVG = `<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 32 32" width="32" height="32"><use href="${sprite}#xmark" x="6" y="6" width="20" height="20"></use></svg>`;
@@ -501,8 +496,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Open, move or close the viewer to match the URL hash. A shared `#pid` link scrolls the masonry to that photo
-     * first, so the tile exists behind the viewer and closing lands back on it instead of jumping.
+     * A shared `#pid` link scrolls the masonry to that photo first, so the tile exists behind the viewer and closing
+     * lands back on it instead of jumping.
      */
     private syncFromHash(): void {
         const match = window.location.hash.match(/^#pid=(\d+)$/);
@@ -610,9 +605,6 @@ export default class extends Controller<HTMLElement> {
         });
     }
 
-    /**
-     * Briefly swap the share button's icon to a checkmark so the user sees the link was copied to their clipboard.
-     */
     private flashCopied(element: HTMLElement): void {
         const use = element.querySelector('use');
         if (null === use) {

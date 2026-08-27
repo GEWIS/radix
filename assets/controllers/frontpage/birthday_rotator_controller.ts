@@ -1,9 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Rotates between the photos of the members whose birthday it is, cross-fading from one to the next so the panel is
- * about all of them rather than about whoever happens to have been tagged most.
- *
  * Every image is rendered by the server and all but the first are hidden, so a reader without JavaScript still sees
  * one of them. With nothing to rotate between (no photos, or only one) this does nothing at all.
  *

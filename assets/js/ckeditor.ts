@@ -34,15 +34,11 @@ export interface CkEditorModule {
 }
 
 /**
- * Loads the bundle and turns `textarea` into an editor built from `config`. Both editors on the site are the same three
- * steps around a different configuration: fetch ~1.9 MB of CKEditor, add the Dutch interface when the page is in Dutch,
- * and keep the textarea in step with what is typed.
- *
  * The textarea stays in the DOM as the bound source of truth: the editor's data is written back to it and a bubbling
  * `input` event is fired, so both a Symfony form POST and a Live Component `data-model` binding keep working.
  *
- * `aborted` is asked again after every await, since the controller that started this may have disconnected (or already
- * have an editor) while the bundle was on its way; nothing is left behind when it says so.
+ * `aborted` is asked again after every await, since the controller that started this may have disconnected (or
+ * already have an editor) while the bundle was on its way; nothing is left behind when it says so.
  */
 export async function createEditor(
     textarea: HTMLTextAreaElement,

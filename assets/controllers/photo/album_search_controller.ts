@@ -6,9 +6,8 @@ interface AlbumResult {
 }
 
 /**
- * Async destination picker for moving photos: type to search albums by name and pick one, which writes its id into the
- * hidden field the bulk form submits. This replaces a `<select>` of every album, so a set of thousands stays one query
- * per keystroke rather than a page-long list.
+ * Picking an album writes its id into the hidden field the bulk form submits. This replaces a `<select>` of every
+ * album, so a set of thousands stays one query per keystroke rather than a page-long list.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['input', 'destination', 'menu'];

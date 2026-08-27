@@ -1,15 +1,10 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Reorders the entries of a Symfony CollectionType by dragging, persisting the new order through the surrounding form.
- *
- * Each entry carries a drag handle (`draggable`, firing `dragStart`/`dragEnd`) and a hidden `position` input
- * (`data-sortable-target="position"`); the entries wrapper (`data-sortable-target="entries"`) receives
- * `dragOver`/`drop`. On drop the dragged entry is moved in the DOM and every entry's position input is rewritten to its
- * new index. A capture-phase submit listener reindexes once more so entries added after the last drag (whose prototype
- * position is 0) are numbered too. Only DIRECT entries of this controller's wrapper are considered, so a nested
- * collection (a choice field's options inside a question) reorders independently -- Stimulus binds each `position`
- * target to its nearest `sortable` controller.
+ * On drop the dragged entry is moved in the DOM and every entry's position input is rewritten to its new index. A
+ * capture-phase submit listener reindexes once more so entries added after the last drag (whose prototype position is
+ * 0) are numbered too. Only DIRECT entries of this controller's wrapper are considered, so a nested collection (a
+ * choice field's options inside a question) reorders independently.
  *
  * ```
  * <div data-controller="form-collection sortable">
@@ -93,8 +88,7 @@ export default class extends Controller {
     }
 
     /**
-     * The first direct entry whose vertical midpoint is below the cursor (the entry the dragged one should sit before),
-     * or null to append at the end.
+     * The first direct entry whose vertical midpoint is below the cursor, or null to append at the end.
      */
     private entryAfter(y: number): HTMLElement | null {
         let closestOffset = Number.NEGATIVE_INFINITY;
@@ -123,8 +117,8 @@ export default class extends Controller {
     }
 
     private reindex(): void {
-        // positionTargets are in document (i.e. entry) order, one per direct entry -- nested collections' position
-        // inputs bind to their own inner sortable controller, not this one.
+        // positionTargets are in document order, one per direct entry -- a nested collection's position inputs bind to its
+        // own inner sortable controller, not this one.
         this.positionTargets.forEach((input, index) => {
             input.value = String(index);
         });

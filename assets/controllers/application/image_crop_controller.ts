@@ -3,15 +3,13 @@ import { Controller } from '@hotwired/stimulus';
 type Rectangle = { x: number; y: number; width: number; height: number };
 
 /**
- * Pick the part of an image that is actually shown, and write it back as fractions of that image.
+ * Fractions rather than pixels: the frame is drawn on whichever rendition of the original fits on the page, or on
+ * the file the browser has just been handed, and the server applies it to the original either way. Everything is
+ * measured against the image's own box within the canvas, so it does not matter how the image sits in there.
  *
- * Fractions rather than pixels: the frame is drawn on whichever rendition of the original fits on the page, or on the
- * file the browser has just been handed, and the server applies it to the original either way. Everything is measured
- * against the image's own box within the canvas, so it does not matter how the image sits in there.
- *
- * The frame cannot leave the image. Cropper draws it on the canvas, which is the wider box the image is fitted into, so
- * without refusing the changes that would take it off the picture it can be dragged onto the empty margins beside it and
- * ask for a crop of nothing.
+ * The frame cannot leave the image. Cropper draws it on the canvas, which is the wider box the image is fitted into,
+ * so without refusing the changes that would take it off the picture it can be dragged onto the empty margins beside
+ * it and ask for a crop of nothing.
  *
  * The markup:
  *
@@ -21,10 +19,6 @@ type Rectangle = { x: number; y: number; width: number; height: number };
  *   - the boxes:       data-image-crop-target="x" | "y" | "width" | "height"   (hidden inputs)
  *   - the shape:       data-image-crop-ratio-value="4"                         (width divided by height)
  *   - the crop:        data-image-crop-rectangle-value="{...}"                 (the one in force, if any)
- *
- * The crop that was chosen before is restored, so re-opening the form shows the frame that is in force rather than
- * starting over. Choosing a new file starts a fresh frame, since the old one described an image that is being
- * replaced.
  *
  * Everything here is a convenience: with no JavaScript at all the file still uploads and is stored whole.
  */
@@ -69,7 +63,7 @@ export default class extends Controller<HTMLElement> {
 
     private observer?: ResizeObserver;
 
-    /** How wide the file the reader picked is, once one has been picked, which beats anything the server said. */
+    /** How wide the file the reader picked is, which beats anything the server said about the stored one. */
     private picked?: number;
 
     /** Set while the frame is being put back on the image, so that correction is not itself corrected. */
@@ -89,10 +83,6 @@ export default class extends Controller<HTMLElement> {
         this.teardown();
     }
 
-    /**
-     * The reader picked a file. Show it straight away and frame it, so choosing one visibly does something long before
-     * anything is saved.
-     */
     choose(): void {
         const file = this.fileTarget.files?.[0];
         if (undefined === file) {
@@ -111,8 +101,7 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Show the picked file, unless it is narrower than the server is going to accept: framing an image that is turned
-     * away on saving reads as a promise that it was fine.
+     * Framing an image the server is going to turn away for being too narrow reads as a promise that it was fine.
      */
     private async show(source: string): Promise<void> {
         const probe = new Image();
@@ -236,8 +225,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * A move or a resize, before Cropper applies it. One that would take the frame off the image is replaced by the
-     * nearest one that is still on it, so dragging past an edge slides along it rather than stopping dead.
+     * A move or a resize that would take the frame off the image is replaced by the nearest one that is still on it, so
+     * dragging past an edge slides along it rather than stopping dead.
      */
     private proposed(event: CustomEvent<Rectangle>): void {
         const bounds = this.imageBounds();
@@ -259,8 +248,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Draw the frame. Cropper's own initial coverage is of the canvas rather than of the image, so on a picture that
-     * does not fill the canvas it would start out partly beside it, with nothing to cut there.
+     * Cropper's own initial coverage is of the canvas rather than of the image, so on a picture that does not fill the
+     * canvas it would start out partly beside it, with nothing to cut there.
      */
     private place(frame: Rectangle, bounds: Rectangle): void {
         (this.selection as unknown as {
@@ -286,9 +275,7 @@ export default class extends Controller<HTMLElement> {
         };
     }
 
-    /**
-     * The frame to start from: the one that was saved, or the largest that fits, centred.
-     */
+    /** The frame to start from: the one that was saved, or the largest that fits, centred. */
     private opening(stored: Rectangle | null, bounds: Rectangle): Rectangle {
         if (null !== stored) {
             return this.inside({
@@ -308,10 +295,7 @@ export default class extends Controller<HTMLElement> {
         };
     }
 
-    /**
-     * Where the image sits within the canvas it is fitted into, which is what the frame is confined to and what the
-     * fractions are of.
-     */
+    /** Where the image sits within the canvas, which is what the frame is confined to and what the fractions are of. */
     private imageBounds(): Rectangle | null {
         const image = this.cropper?.getCropperImage();
         const canvas = this.selection?.parentElement;
@@ -334,8 +318,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Half a pixel of slack, so a frame dragged flush against an edge or resized down to the minimum is not rejected
-     * over the rounding between the boxes Cropper works in and the ones the browser reports.
+     * Half a pixel of slack, so a frame dragged flush against an edge is not rejected over the rounding between the
+     * boxes Cropper works in and the ones the browser reports.
      */
     private within(frame: Rectangle, bounds: Rectangle): boolean {
         const slack = 0.5;
@@ -353,9 +337,8 @@ export default class extends Controller<HTMLElement> {
 
     /**
      * The narrowest the frame may be drawn, so that what is cut out is never narrower than what was demanded of the
-     * upload in the first place. Measured against the original rather than against what is on screen: the frame is
-     * drawn on a rendition of it, and a rendition is capped at the very width being asked for, which would put the
-     * floor at the whole image and leave nothing to drag.
+     * upload. Measured against the original rather than against what is on screen: the frame is drawn on a rendition,
+     * and a rendition is capped at the very width being asked for, which would put the floor at the whole image.
      */
     private smallestWidth(bounds: Rectangle): number {
         const source = this.source();
@@ -370,8 +353,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * How wide the original is: what the file the reader just picked measures, or what the server said about the one
-     * that is already stored. Falling back to the rendition on screen only keeps the frame usable if neither is known.
+     * How wide the original is. Falling back to the rendition on screen only keeps the frame usable if neither the
+     * picked file nor the server has said.
      */
     private source(): number {
         return this.picked
@@ -393,9 +376,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * The framed part on its own, at the shape it is cut to, so what is being chosen can be seen beside what it would
-     * replace. Drawn from the same fractions that are written above, which is what the server cuts by, rather than from
-     * anything the frame knows: the two cannot drift apart that way.
+     * Drawn from the same fractions that are written above, which is what the server cuts by, rather than from anything
+     * the frame knows: the two cannot drift apart that way.
      */
     private paint(fractions: Rectangle): void {
         if (!this.hasPreviewTarget) {
@@ -443,9 +425,9 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * The crop that is in force. It arrives beside the frame rather than in the boxes that are submitted: those are
-     * only ever written here, so a form saved without a frame having been drawn carries no rectangle at all, and the
-     * server leaves the crop alone rather than cutting an old one out of a new image.
+     * The crop that is in force. It arrives beside the frame rather than in the boxes that are submitted: those are only
+     * ever written here, so a form saved without a frame having been drawn carries no rectangle at all, and the server
+     * leaves the crop alone rather than cutting an old one out of a new image.
      */
     private stored(): Rectangle | null {
         const frame = {
@@ -509,9 +491,6 @@ export default class extends Controller<HTMLElement> {
         this.previewTarget.replaceChildren();
     }
 
-    /**
-     * A frame that described the file being replaced says nothing about the new one.
-     */
     private clear(): void {
         [this.xTarget, this.yTarget, this.widthTarget, this.heightTarget].forEach((box) => { box.value = ''; });
     }

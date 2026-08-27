@@ -1,10 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Keeps an edit lock alive while the user is actually editing. It pings the server on an interval; after a stretch of
- * inactivity it releases the lock and locks the form down. It also locks the form down if the server reports the lock
- * was lost (taken over by a reviewer or expired); and it best-effort releases the lock when the page is left.
- *
  * Wire it on a wrapper around the edit form:
  *
  * ```
@@ -45,8 +41,7 @@ export default class extends Controller {
     };
 
     // Submitting the form is itself a navigation, so the beforeunload handler would otherwise race a lock release
-    // against the save the server is about to perform. Flag the submit so `_release()` skips it; the server releases
-    // the lock once the save succeeds.
+    // against the save the server is about to perform. The server releases the lock once the save succeeds.
     private readonly _onSubmit = (): void => {
         this.submitting = true;
     };

@@ -1,8 +1,8 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * The "All documents" / "Revised only" chips on the meeting page: toggles a class on the wrapper that CSS uses to
- * hide documents with a single version. Purely client-side; nothing is persisted.
+ * Toggles a class on the wrapper that CSS uses to hide documents with a single version. Purely client-side; nothing
+ * is persisted.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['all', 'revised'];

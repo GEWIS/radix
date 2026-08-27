@@ -72,8 +72,8 @@ interface ViewerConfig {
 }
 
 /**
- * The markup for a custom toolbar button's icon: a Font Awesome sprite reference wrapped in PhotoSwipe's own `.pswp__icn`
- * SVG (via `isCustomSVG`), so PhotoSwipe positions and centres it exactly like its built-in zoom and close buttons.
+ * A Font Awesome sprite reference wrapped in PhotoSwipe's own `.pswp__icn` SVG (via `isCustomSVG`), so PhotoSwipe
+ * positions and centres it exactly like its built-in zoom and close buttons.
  */
 export function spriteIcon(spriteUrl: string, name: string): { isCustomSVG: true; inner: string } {
     // PhotoSwipe wraps this in a 32x32 viewBox. Font Awesome glyphs fill their own viewBox edge to edge, so inset the
@@ -85,16 +85,12 @@ export function spriteIcon(spriteUrl: string, name: string): { isCustomSVG: true
 }
 
 /**
- * The tag, vote and profile-photo layer of the album viewer. It hangs off the PhotoSwipe lightbox the gallery owns and
- * shows, for every slide, a panel to the side: who is tagged (with links and, where allowed, a remove control and an
- * add form), a vote button, and a set-as-profile-photo button when the viewer is tagged. Every action posts to the
- * backend and re-reads the details, so the panel always reflects the server's answer, including the graduate rule.
+ * The panel's structure is built once; only the tag list and button states are updated per slide. That keeps the
+ * search field alive across photos, so a member can be tagged in one photo after another without re-focusing it.
  *
- * The panel's structure is built once; only the tag list and button states are updated per slide. That keeps the search
- * field alive across photos, so a member can be tagged in one photo after another without re-focusing it.
+ * Every action posts to the backend and re-reads the details, so the panel always reflects the server's answer.
  */
 export class ViewerInteractions {
-    // Font Awesome icon for each EXIF row's label, shown before it in the metadata panel.
     private static readonly exifIcons: Record<string, string> = {
         artist: 'fa-user',
         camera: 'fa-camera',
@@ -124,8 +120,7 @@ export class ViewerInteractions {
     private searchInput: HTMLInputElement | null = null;
     private suggestions: HTMLElement | null = null;
     private pendingRow: HTMLElement | null = null;
-    // Whether the search targets members or bodies (committees, fraternities, ...), and the candidate picked from the
-    // suggestions but not yet committed (awaiting a Tag or Place action).
+    // The candidate picked from the suggestions but not yet committed (awaiting a Tag or Place action).
     private activeType: 'member' | 'organ' = 'member';
     private pending: Candidate | null = null;
     // Whether the collapsible tag list is expanded; a photo with many tags starts collapsed so the chips do not cover it.
@@ -214,8 +209,7 @@ export class ViewerInteractions {
         ui.registerElement({
             name: 'photo-of-the-week',
             appendTo: 'root',
-            // The photo-of-the-week badge sits on its own in the bottom-right corner (outside the bottom-centre tag
-            // panel), shown when a photo is or was the photo of the week.
+            // The photo-of-the-week badge sits on its own in the bottom-right corner, outside the bottom-centre tag panel.
             onInit: (element: HTMLElement): void => {
                 element.classList.add('pswp__photo-potw');
                 element.hidden = true;
@@ -348,7 +342,6 @@ export class ViewerInteractions {
         const form = document.createElement('div');
         form.className = 'pswp__photo-tag-add';
 
-        // The member/body toggle and the search field share one row.
         const controls = document.createElement('div');
         controls.className = 'pswp__photo-tag-controls';
 
@@ -397,7 +390,6 @@ export class ViewerInteractions {
         return tab;
     }
 
-    // Switch the search between members and bodies, resetting the query, the suggestions and any pending pick.
     private selectType(type: 'member' | 'organ'): void {
         this.activeType = type;
         this.memberTab?.classList.toggle('active', 'member' === type);
@@ -466,7 +458,6 @@ export class ViewerInteractions {
         void this.prefetchNeighbours();
     }
 
-    // The details for a photo, from the cache when available (instant) or the server otherwise.
     private async loadDetails(pid: number): Promise<Details | null> {
         const cached = this.detailsCache.get(pid);
         if (cached !== undefined) {
@@ -553,8 +544,8 @@ export class ViewerInteractions {
         this.form.hidden = !details.canTag;
     }
 
-    // Show a single header message (loading / error) with the tag list and badge cleared, so a slide change never
-    // flashes the previous photo's tags or an empty "no tags" state.
+    // A single header message (loading / error) with the tag list and badge cleared, so a slide change never flashes
+    // the previous photo's tags or an empty "no tags" state.
     private renderTagsMessage(message: string): void {
         if (null === this.title || null === this.list) {
             return;
@@ -584,9 +575,8 @@ export class ViewerInteractions {
         }
     }
 
-    // The header labels the tag list and, once a photo carries more than a handful of tags, doubles as a collapse
-    // toggle (count + chevron) with the list hidden by default, so a heavily-tagged photo is not covered by its chips.
-    // Placed tags still show as dots on the photo regardless.
+    // Once a photo carries more than a handful of tags the header doubles as a collapse toggle, with the list hidden by
+    // default so the chips do not cover it. Placed tags still show as dots on the photo regardless.
     private renderTagsHeader(count: number): void {
         if (null === this.title || null === this.list) {
             return;
@@ -665,7 +655,6 @@ export class ViewerInteractions {
         return chip;
     }
 
-    // The shared trailing bits of a tag chip: a dot when the tag is pinned to a point, then a remove control.
     private decorateChip(
         chip: HTMLElement,
         tag: MemberTag | OrganTag,
@@ -711,8 +700,7 @@ export class ViewerInteractions {
         return button;
     }
 
-    // Search the active pool (members via the server, bodies from the loaded list) and show the matches. Typing clears
-    // any pending pick so the two never disagree.
+    // Typing clears any pending pick so the two never disagree.
     private async search(): Promise<void> {
         if (null === this.searchInput || null === this.suggestions) {
             return;
@@ -817,7 +805,6 @@ export class ViewerInteractions {
         this.renderPending();
     }
 
-    // Build (or hide) the pending-pick row: the chosen member/body with a Tag and a Place on photo action.
     private renderPending(): void {
         if (null === this.pendingRow) {
             return;
@@ -861,7 +848,6 @@ export class ViewerInteractions {
         this.pendingRow.hidden = false;
     }
 
-    // Tag the pending pick on the whole photo (no point).
     private async tagPending(): Promise<void> {
         if (null === this.pending) {
             return;
@@ -1211,7 +1197,6 @@ export class ViewerInteractions {
         return Math.min(1, Math.max(0, value));
     }
 
-    // The ISO-8601 week number and week-year of a date, for the Photo of the Week badge (as the old viewer showed).
     private isoWeek(date: Date): { week: number; year: number } {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         // Shift to the Thursday of this ISO week, which fixes both the week number and the week-year.
