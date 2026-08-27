@@ -1,8 +1,3 @@
-// Education archive
-//
-// The band at the top of the education overview and the pieces that repeat down the archive: a course code badge, a
-// course row and a document row. Rows rather than cards, because every list here is something to scan for one entry.
-
 .education-hero {
     background-color: var(--#{$prefix}body-bg);
     border-bottom: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
@@ -24,7 +19,6 @@
     }
 }
 
-// The counts double as the way into each list, so they are links rather than figures.
 .education-stat {
     display: flex;
     flex-direction: column;
@@ -55,8 +49,6 @@
     font-size: $font-size-sm;
 }
 
-// A course is known by its code far more than by its name, so the code leads every row it appears in and is set in a
-// fixed-width slab that keeps a column of them aligned.
 .education-code {
     display: inline-flex;
     flex: none;
@@ -88,7 +80,6 @@
     white-space: nowrap;
 }
 
-// The square that tells a summary from an exam at a glance, down the length of a list.
 .education-doc-icon {
     display: flex;
     flex: none;
@@ -111,7 +102,6 @@
     color: #{$gewis-blue-dark};
 }
 
-// A document nobody may open yet is still listed, greyed rather than hidden, so it is clear what logging in would get.
 .panel.panel-surface.education-doc-locked {
     --#{$prefix}panel-bg: var(--#{$prefix}tertiary-bg);
 }

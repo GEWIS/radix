@@ -19,9 +19,8 @@
     }
 }
 
-// On a body's page a mutation is one line: the meeting reference in a fixed column on the left, the text filling what
-// is left beside it. Tied to the reference so it applies only where that column exists, and not to a decision set as
-// its own paragraph.
+// Tied to the meeting reference so it applies only where that fixed left column exists, and not to a decision set
+// as its own paragraph.
 .decision-meeting + .decision-content {
     @include media-breakpoint-up(md) {
         & {
@@ -32,23 +31,18 @@
     }
 }
 
-// In a panel a decision reads as one text, set off by a rule so where it starts and ends is clear without breaking it
-// into pieces that each look like a decision of their own.
 .panel-body > .decision-content {
     padding-inline-start: map-get($spacers, 3);
     border-inline-start: 0.125rem solid var(--#{$prefix}border-color-translucent);
     text-wrap: pretty;
 }
 
-// An annulled decision stays in the list -- the record is what was decided, not what still holds -- but it is set back
-// so it is not mistaken for one in force.
 .decision-annulled .decision-content {
     color: var(--#{$prefix}secondary-color);
     text-decoration: line-through;
 }
 
-// The dashed drop targets of the meeting management page; `upload-dragover` is toggled by the `document-upload`
-// controller while a file hovers over the zone.
+// `upload-dragover` is toggled by the `document-upload` controller while a file hovers over the zone.
 .upload-dropzone {
     border: 1px dashed var(--#{$prefix}border-color);
     border-radius: var(--#{$prefix}border-radius);
@@ -64,8 +58,8 @@
     max-width: 5rem;
 }
 
-// The "Revised only" chip on the meeting page hides single-version documents (and agenda points left without any
-// visible document) via the wrapper class the `revision-filter` controller toggles.
+// The wrapper class the `revision-filter` controller toggles; it hides single-version documents, and agenda points
+// left without any visible document.
 .revised-only .meeting-documents {
     [data-version-count='1'] {
         display: none;

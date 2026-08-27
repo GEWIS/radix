@@ -1,8 +1,3 @@
-// Poll
-//
-// The bars underneath a poll's answers. Three weights: an ordinary answer is tinted, the answer in front is full
-// strength, and the answer this reader gave is full strength and named as theirs.
-
 .poll-result {
     &__bar {
         --#{$prefix}progress-bar-bg: #{rgba($gewis-red, .32)};
@@ -18,7 +13,6 @@
         font-weight: 600;
     }
 
-    // On a card in the archive the bars are a summary rather than the point of the page.
     &--compact {
         .progress {
             height: 0.4rem;
@@ -26,8 +20,6 @@
     }
 }
 
-// The answers on the poll's own page are pressable rows, so the whole row carries the state and the bar sits behind
-// the label rather than under it.
 .poll-option {
     align-items: center;
     // The pressable variant is a button, which Bootstrap centres and pads for itself.
@@ -45,8 +37,8 @@
     text-align: left;
     width: 100%;
 
-    // Everything but the fill sits above it; the fill itself is taken out of the flow so the row lays out as if it
-    // were not there at all.
+    // Everything but the fill sits above it; the fill itself is taken out of the flow so the row lays out as if it were
+    // not there at all.
     > * {
         position: relative;
     }
@@ -86,7 +78,6 @@
     }
 }
 
-// The poll that is open right now, at the top of the archive.
 .poll-hero {
     background-color: $gewis-gray-dark;
     border-color: $gewis-gray-dark;
@@ -113,7 +104,6 @@
     }
 }
 
-// A comment under a poll: the pseudonym's initial beside what was written.
 .poll-comment {
     padding-top: 0.75rem;
 
@@ -137,7 +127,6 @@
     }
 }
 
-// Replies to a comment, set in from it behind the same accent line the navigation uses for a sub-section.
 .poll-thread {
     margin-left: $nav-row-sublist-margin-start;
     padding-left: $nav-row-sublist-padding-start;

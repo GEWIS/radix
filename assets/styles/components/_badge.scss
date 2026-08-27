@@ -1,6 +1,3 @@
-// Filled, subtle badge variants (one per theme colour). They use the same CSS custom properties as alerts
-// (`--bs-{state}-bg-subtle`, `--bs-{state}-text-emphasis`). No border: the (default) pill shape carries the visual
-// weight, and a border on a subtle fill just muddies it.
 @each $state, $value in $theme-colors {
     .badge-#{$state} {
         --#{$prefix}badge-color: var(--#{$prefix}#{$state}-text-emphasis);
@@ -8,8 +5,7 @@
     }
 }
 
-// GEWIS-red brand badge, keyed to the brand colour (which is not one of Bootstrap's theme colours). Same subtle,
-// borderless treatment as `.badge-{state}`; named `-primary` to match the brand's primary/secondary naming.
+// Keyed to the brand colour, which is not one of Bootstrap's theme colours, so it is not part of the loop above.
 .badge-gewis-primary {
     --#{$prefix}badge-color: #{shade-color($gewis-red, 20%)};
 
@@ -24,8 +20,6 @@
     }
 }
 
-// Neutral "tag" variant: transparent fill with a visible border and muted text. Use it for labels and similar tags.
-// Subtle in both `gewis-day` and `gewis-night` because it is built from surface tokens.
 .badge-tag {
     --#{$prefix}badge-color: var(--#{$prefix}secondary-color);
 
@@ -33,22 +27,19 @@
     border: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color);
 }
 
-// Outlined: transparent fill with a border and text taken from `currentColor`. Pair with a `.badge-{state}` to colour
-// it, e.g. `class="badge badge-secondary badge-outlined"`.
+// Pair with a `.badge-{state}` to colour it, e.g. `class="badge badge-secondary badge-outlined"`.
 .badge-outlined {
     background-color: transparent;
     border: var(--#{$prefix}border-width) var(--#{$prefix}border-style) currentcolor;
 }
 
-// Less-rounded corners: overrides the app-wide pill radius with the standard border-radius for a calmer, boxier badge
-// (e.g. the sign-up deadline).
+// Overrides the app-wide pill radius with the standard border-radius, for a calmer, boxier badge.
 .badge-squared {
     --#{$prefix}badge-border-radius: var(--#{$prefix}border-radius);
 }
 
-// Selectable: hidden input + label.badge pattern, mirroring Bootstrap's `btn-check`.
+// Hidden input + label.badge, mirroring Bootstrap's `btn-check`:
 //
-// Usage:
 //   <input type="checkbox" class="badge-check" id="tag-1" autocomplete="off">
 //   <label class="badge badge-secondary" for="tag-1">Tag</label>
 .badge-check {

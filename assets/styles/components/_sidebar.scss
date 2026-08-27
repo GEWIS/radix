@@ -1,15 +1,7 @@
-// Sidebar
-//
-// The section navigation down the left of every signed-in area: the company area, a member's own pages and the
-// administration. One shell for all three, rendered by `layout-sidebar.html.twig` with the rows coming from the macros
-// in `partials/application/sidebar.html.twig`.
-//
-// Below `lg` the column shrinks to a rail holding only the toggler, and the navigation moves into an offcanvas.
-
 .container-sidebar {
     // The sidebar column stretches to the row, which the flex-column body already grows to fill the screen. Giving the
     // column its own viewport height instead made every page a navbar taller than the screen, so even an empty one
-    // scrolled. What sticks is the sidebar inside it, which keeps the column full height either way.
+    // scrolled.
     > aside {
         @include media-breakpoint-up(lg) {
             .offcanvas-lg {
@@ -78,7 +70,6 @@
     }
 }
 
-// Who the section belongs to: a monogram, the name, and one qualifying line under it.
 .sidebar-context {
     display: flex;
     align-items: center;
@@ -150,9 +141,8 @@
     padding: 0 $sidebar-list-padding-x;
 }
 
-// The same row as a menu row in the navbar, down to the type size and the inset, since the two navigations are read
-// one after the other and a row a size smaller here reads as a lesser thing. Both take their measurements from the
-// `$nav-row-*` set, so neither can be adjusted without the other following.
+// The same row as a menu row in the navbar: both take their measurements from the `$nav-row-*` set, so neither can
+// be adjusted without the other following.
 //
 // Reboot underlines a hovered anchor, and `a:hover` outweighs a plain class, so the rows have to say again while
 // hovered what they already say at rest.
@@ -197,8 +187,6 @@
     min-width: 0;
 }
 
-// How many things are waiting behind a row, so you can see it without opening it. Takes the same treatment as the
-// counts in the navbar's menus.
 .sidebar-count {
     flex: none;
     padding: 0.0625rem 0.4375rem;
@@ -228,8 +216,6 @@
     transform: rotate(-90deg);
 }
 
-// A section's children hang off an accent line, the same way they do in the panels that drop out of the navbar, so the
-// two navigations show a sub-section the same way.
 .sidebar-sublist {
     display: flex;
     flex-direction: column;
@@ -241,7 +227,6 @@
 }
 
 .sidebar-sublink {
-    // A row rather than a block, so that a count sits at the end of it the way it does on a top-level row.
     display: flex;
     gap: 0.5rem;
     align-items: center;
@@ -267,8 +252,6 @@
     }
 }
 
-// Inset like a list, so the rule above it lines up with the rows' own edges rather than sitting on a measurement of
-// its own.
 .sidebar-footer {
     margin-inline: $sidebar-list-padding-x;
     padding-block: 0.5rem;
@@ -281,9 +264,6 @@
     }
 }
 
-// The build the container was made from is a row of the menu and carries `.sidebar-link`, so its measurements, its
-// weight and its response to the pointer are the rows' own. Only two things are its: a commit is a reference to be
-// read character by character rather than prose, and a build with nothing to link to is a row that does not answer.
 .sidebar-build-ref {
     font-family: var(--#{$prefix}font-monospace);
 }

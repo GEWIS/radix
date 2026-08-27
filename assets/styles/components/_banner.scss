@@ -1,8 +1,3 @@
-// Company banners
-//
-// The advertising strip that runs between the items on a listing page. It is deliberately quiet: a small label saying
-// what it is, the artwork at exactly the size it was bought at, and nothing else drawing the eye away from the page.
-
 .banner-strip {
     display: block;
     margin-bottom: map-get($spacers, 4);
@@ -31,8 +26,7 @@
     border-radius: var(--#{$prefix}border-radius);
 }
 
-// The indicators sit under the artwork rather than on top of it, where they would cover whatever the company put
-// in that corner.
+// Under the artwork rather than on top of it, where they would cover whatever the company put in that corner.
 .banner-strip .carousel-indicators {
     position: static;
     margin: 0.5rem 0 0;

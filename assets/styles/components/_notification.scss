@@ -31,7 +31,6 @@
     overflow-y: auto;
 }
 
-// What has not been read yet is tinted and carries a dot, so a full list still says which rows are new.
 .notification-unread {
     background-color: #{$nav-menu-active-bg};
 }

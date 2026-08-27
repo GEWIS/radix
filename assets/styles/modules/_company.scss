@@ -1,5 +1,3 @@
-// Company overview / vacancy cards.
-//
 // A flush list-group inside a card draws its dividers with `--bs-list-group-border-color` (a solid colour), which
 // reads darker and heavier than the card's own translucent border. Align the two so the dividers sit flush with the
 // card edge instead of standing out.
@@ -62,7 +60,6 @@
     }
 }
 
-// Clamp the (rendered Markdown) description teaser on a vacancy card, mirroring `.activity-description-content`.
 .vacancy-card-excerpt {
     display: -webkit-box;
     overflow: hidden;

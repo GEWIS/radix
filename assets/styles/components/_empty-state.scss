@@ -1,9 +1,3 @@
-// Empty state
-//
-// What a list shows in place of rows, rendered by `partials/application/empty-state.html.twig`. Quiet by design: an
-// empty list is usually the answer to a question rather than something going wrong, so it reads as an explanation and
-// not as an error.
-
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -15,8 +9,7 @@
 
 // Font Awesome's own rules are imported after every component, and `.fas` sets `display: var(--fa-display,
 // inline-block)`, which beats a `display` declared here. Setting the variable is how the icon font means for that to
-// be overridden, so the box centres its glyph instead of dropping it in the corner. `aspect-ratio` keeps it square
-// whatever the glyph's own metrics are.
+// be overridden. `aspect-ratio` keeps the box square whatever the glyph's own metrics are.
 .empty-state-icon {
     --fa-display: inline-flex;
 

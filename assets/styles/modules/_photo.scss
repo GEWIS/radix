@@ -1,11 +1,5 @@
-/*
-Photo
-
-*/
-
-// Selection mode for the gallery (member and album manage views). The Select toggle adds `is-selecting` to the grid,
-// revealing a corner check on each tile; a selected tile also gets a brand tint. In browse mode none of this shows, so
-// the grid reads as a plain viewer.
+// The Select toggle adds `is-selecting` to the grid, revealing a corner check on each tile; a selected tile also
+// gets a brand tint.
 .photo-masonry__check,
 .photo-masonry__hidden {
     position: absolute;
@@ -45,8 +39,6 @@ Photo
     }
 }
 
-// A photo the member has hidden from their own page: greyed with an eye-slash badge in both browse and select mode, so
-// they can tell which photos others do not see.
 .photo-masonry__item.is-hidden img {
     opacity: 0.4;
 }
@@ -57,15 +49,13 @@ Photo
     font-size: 1.1rem;
 }
 
-// Async album picker for moving photos: the results drop directly below the search input and scroll when there are many.
 .album-search .dropdown-menu {
     top: 100%;
     max-height: 16rem;
     overflow-y: auto;
 }
 
-// Drag-and-drop upload target on the album manage view. The dashed outline and the hover/drag highlight are the only
-// affordance that the whole panel accepts files; the upload controller toggles `is-dragging` while a drag is over it.
+// The upload controller toggles `is-dragging` while a drag is over the panel.
 .photo-dropzone {
     border-style: dashed !important;
     border-color: var(--#{$prefix}border-color);
@@ -79,8 +69,8 @@ Photo
     }
 }
 
-// Album photo grid, shared by the public gallery (windowed) and the album manage view. The container is sized and each
-// tile absolutely positioned by the controller from the photo's aspect ratio, so portrait and landscape keep their shape.
+// The container is sized and each tile absolutely positioned by the controller from the photo's aspect ratio, so
+// portrait and landscape keep their shape.
 .photo-masonry {
     position: relative;
 }
@@ -102,19 +92,18 @@ Photo
     }
 }
 
-// Point tags overlaid on the image (`.pswp__photo-markers` / `.pswp__photo-marker`) are positioned and styled inline by
-// the viewer controller: each marker is placed in pixels from the on-screen image rect and repositioned on zoom/pan, so
-// the layout cannot live in a stylesheet.
+// Point tags overlaid on the image (`.pswp__photo-markers` / `.pswp__photo-marker`) are positioned and styled inline
+// by the viewer controller: each marker is placed in pixels from the on-screen image rect and repositioned on
+// zoom/pan, so the layout cannot live in a stylesheet.
 
-// PhotoSwipe styles its toolbar buttons `display:block`, which overrides the [hidden] attribute; make hiding work so a
-// button the viewer may not use (vote when they cannot vote, profile when not tagged) is actually removed.
+// PhotoSwipe styles its toolbar buttons `display:block`, which overrides the [hidden] attribute; make hiding work so
+// a button the viewer may not use is actually removed.
 .pswp__button[hidden] {
     display: none !important;
 }
 
-// The prev/next arrows draw an FA chevron (set in gallery_controller). Keep them faint, brightening on hover/focus.
-// Scoped `.pswp.pswp--ui-visible` (three classes) so it outweighs PhotoSwipe's `.pswp--ui-visible .pswp__hide-on-close`,
-// whose stylesheet is linked after this one.
+// The arrows draw an FA chevron (set in gallery_controller). Scoped `.pswp.pswp--ui-visible` (three classes) so it
+// outweighs PhotoSwipe's `.pswp--ui-visible .pswp__hide-on-close`, whose stylesheet is linked after this one.
 .pswp.pswp--ui-visible .pswp__button--arrow {
     opacity: 0.25;
 }
@@ -135,18 +124,16 @@ Photo
     display: none;
 }
 
-// The point-tag placement uses a full-viewport capture overlay (`.pswp__photo-place-overlay`) above the PhotoSwipe
-// viewer; its styles are set inline by the viewer controller so it works before this stylesheet loads.
+// The point-tag placement overlay (`.pswp__photo-place-overlay`) is styled inline by the viewer controller, so it
+// works before this stylesheet loads.
 
-// Our custom toolbar buttons draw a Font Awesome sprite icon through PhotoSwipe's own .pswp__icn (via isCustomSVG), so
-// they are positioned and centred exactly like the built-in buttons. The sprite's paths use fill="currentColor", which
-// would otherwise resolve to PhotoSwipe's dark secondary colour, so give the icon colour to the <use> (the built-in
-// buttons' only <use> is their shadow, which is fill:none, so this leaves them untouched).
+// Our custom toolbar buttons draw a Font Awesome sprite icon through PhotoSwipe's own .pswp__icn (via isCustomSVG).
+// The sprite's paths use fill="currentColor", which would otherwise resolve to PhotoSwipe's dark secondary colour, so
+// give the icon colour to the <use> (the built-in buttons' only <use> is their shadow, which is fill:none).
 .pswp__icn use {
     color: var(--pswp-icon-color, #fff);
 }
 
-// The camera-metadata panel, toggled by the info button. It floats at the top right, below the toolbar.
 .pswp__photo-metadata {
     position: absolute;
     top: 60px;
@@ -188,11 +175,10 @@ Photo
     opacity: 0.7;
 }
 
-// While the photo is zoomed in, fade the tag / photo-of-the-week and metadata panels out so they never cover the detail
-// being examined; the panels come back the moment the photo is zoomed out again. PhotoSwipe toggles .pswp--zoomed-in
-// itself. `!important` is needed because these panels sit at the viewer root, so PhotoSwipe tags them with
-// `pswp__hide-on-close` and forces `opacity: 1` on them (at equal specificity, from a later-loaded stylesheet) whenever
-// the UI is visible; the old viewer beat the same rule with `.pswp__tags-ui--hidden { opacity: 0 !important }`.
+// While the photo is zoomed in, the tag / photo-of-the-week and metadata panels fade out so they never cover the
+// detail being examined. `!important` is needed because these panels sit at the viewer root, so PhotoSwipe tags them
+// with `pswp__hide-on-close` and forces `opacity: 1` on them (at equal specificity, from a later-loaded stylesheet)
+// whenever the UI is visible.
 .pswp--zoomed-in {
     .pswp__photo-tags,
     .pswp__photo-metadata,
@@ -202,7 +188,6 @@ Photo
     }
 }
 
-// The photo-of-the-week badge, on its own in the bottom-right corner (the tag panel moved to bottom-centre).
 .pswp__photo-potw {
     position: absolute;
     bottom: 16px;
@@ -239,9 +224,8 @@ Photo
     opacity: 0.85;
 }
 
-// The tag / vote / profile overlay the viewer renders inside the PhotoSwipe lightbox. It floats bottom-centre, clear of
-// the top toolbar and the side navigation arrows. Overflow stays visible so the search suggestions can open upward past
-// the panel edge; the chip list scrolls on its own when a photo has many tags.
+// Overflow stays visible so the search suggestions can open upward past the panel edge; the chip list scrolls on its
+// own when a photo has many tags.
 .pswp__photo-tags {
     position: absolute;
     bottom: 16px;
@@ -260,8 +244,8 @@ Photo
     transition: opacity 0.15s ease-in-out;
 }
 
-// The header labels the tag list; when a photo has many tags it doubles as a collapse toggle (count + chevron) so the
-// chips do not cover the photo. It is a <button>, reset here to read as plain text.
+// When a photo has many tags the header doubles as a collapse toggle (count + chevron). It is a <button>, reset here
+// to read as plain text.
 .pswp__photo-tags-title {
     display: flex;
     align-items: center;
@@ -309,8 +293,6 @@ Photo
     }
 }
 
-// A tagged member (linked) or body (plain text), led by a person / group icon; the dot shows when the tag is pinned to
-// a point on the photo.
 .pswp__photo-tag {
     display: inline-flex;
     align-items: center;
@@ -336,7 +318,6 @@ a.pswp__photo-tag-name:hover {
     font-size: 0.85em;
 }
 
-// Bodies get a brand tint on top of the group icon, so members and bodies read apart at a glance.
 .pswp__photo-tag--organ {
     background: rgba($brand-primary, 0.35);
     border-color: rgba($brand-primary, 0.4);
@@ -369,7 +350,6 @@ a.pswp__photo-tag-name:hover {
     gap: 0.5rem;
 }
 
-// The member/body toggle sits beside the search field on one row.
 .pswp__photo-tag-controls {
     display: flex;
     align-items: center;
@@ -442,7 +422,7 @@ a.pswp__photo-tag-name:hover {
     }
 }
 
-// The suggestion list opens upward, since the panel sits at the bottom of the viewer.
+// Opens upward, since the panel sits at the bottom of the viewer.
 .pswp__photo-tag-suggestions {
     position: absolute;
     bottom: calc(100% + 6px);
@@ -484,7 +464,6 @@ a.pswp__photo-tag-name:hover {
     white-space: nowrap;
 }
 
-// The picked member/body, with its Tag (whole photo) and Place on photo (a point) actions.
 .pswp__photo-tag-pending {
     display: flex;
     flex-wrap: wrap;
@@ -543,7 +522,6 @@ a.pswp__photo-tag-name:hover {
     }
 }
 
-// The vote button turns red once voted, and a member who has not voted recently gets a pulsing dot as a nudge.
 .pswp__button--vote-button {
     position: relative;
 }

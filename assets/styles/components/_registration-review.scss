@@ -1,7 +1,3 @@
-// The last step of the registration, where what was filled in is read back before it is paid for. A description list
-// rather than a repeat of the form: these values are the answer, and each row carries the way back to the step it came
-// from.
-
 .registration-review {
     display: flex;
     flex-direction: column;
@@ -37,7 +33,6 @@
     }
 }
 
-// Nothing filled in yet reads as a placeholder rather than as an answer.
 .registration-review-empty {
     color: var(--#{$prefix}secondary-color);
 }

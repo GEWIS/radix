@@ -1,5 +1,3 @@
-// Autocomplete
-//
 // Tom Select's Bootstrap 5 theme mostly follows Bootstrap's custom properties, but hard-codes the text colour, the
 // chips and the focus ring in the framework blue and in light-theme greys.
 
@@ -32,10 +30,6 @@
     box-shadow: 0 0 0 0.25rem #{rgba($gewis-red, 0.25)};
 }
 
-// Tom Select copies the select's classes onto its wrapper, so Bootstrap floats the label and reserves room for it on
-// the wrapper. The box that is actually drawn is the control inside it, which knows nothing about that and lays its
-// chips out over the label. Give the control the reserved space instead, and let both grow as chips wrap onto a second
-// row.
 // Bootstrap floats the label over the wrapper and reserves room for it there, but the box that draws the content is
 // the control inside, which knows nothing about that and lays its chips over the label. Move the reserved space onto
 // the control, and drop the wrapper's fixed height so it can grow as chips wrap onto a second row. The bottom padding
