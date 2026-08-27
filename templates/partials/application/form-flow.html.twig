@@ -1,8 +1,7 @@
 {#
-    The header and the buttons of a form flow ({@see App\Form\Application\Flow\AbstractStepperFlowType}). A step
-    already gone through is a button back to it; one still ahead is plain text, because it cannot be reached until
-    the steps before it are accepted. Everything that leaves a step unfinished carries `formnovalidate`, or the
-    browser refuses to go back over a field that has not been filled in yet.
+    The header and the buttons of a form flow ({@see App\Form\Application\Flow\AbstractStepperFlowType}).
+    Everything that leaves a step unfinished carries `formnovalidate`, or the browser refuses to go back over
+    a field that has not been filled in yet.
 
         {% import 'partials/application/form-flow.html.twig' as flow %}
         {{ flow.stepper(form) }}

@@ -3,9 +3,8 @@ import { getComponent } from '@symfony/ux-live-component';
 import type { Component } from '@symfony/ux-live-component';
 
 /**
- * Drives the shared confirmation modal for live-component actions. A trigger button opens the modal declaratively and
- * describes, via data-* attributes, the live action to run only if the user confirms. The modal lives OUTSIDE the live
- * component, so the component's re-render after the action never touches the modal or leaves an orphaned backdrop.
+ * The modal lives OUTSIDE the live component, so the component's re-render after the action never touches the modal
+ * or leaves an orphaned backdrop.
  *
  *   <button data-bs-toggle="modal" data-bs-target="#confirm-modal"
  *           data-confirm-title="Run the draw?"
@@ -26,8 +25,7 @@ export default class extends Controller {
     declare readonly hasConfirmTarget: boolean;
     declare readonly confirmTarget: HTMLElement;
 
-    // The live action armed by the trigger that opened the modal, held in one field so an armed action always comes
-    // with the component lookup to run it on; null while nothing is armed.
+    // Held in one field so an armed action always comes with the component lookup to run it on.
     private _pending: {
         action: string;
         args: Record<string, unknown>;
@@ -54,13 +52,10 @@ export default class extends Controller {
             return;
         }
 
-        // getComponent() does a STRICT lookup keyed by the component's ROOT element (the [data-controller~="live"]
-        // node), not a closest() from a descendant, so passing the trigger button (a descendant) never matches and
-        // rejects with "Component not found". Resolve the root from the trigger here, at show-time while the trigger is
-        // still attached: a re-render between opening and confirming (e.g. a data-model field blurring on click) can
-        // detach the trigger, and a detached node's closest() returns null, whereas the root element and the resolved
-        // component instance both survive re-renders. `.catch(() => null)` is attached eagerly so a cancelled modal
-        // never logs an unhandled rejection.
+        // getComponent() does a STRICT lookup keyed by the component's ROOT element, not a closest() from a descendant,
+        // so passing the trigger button never matches. Resolve the root at show-time while the trigger is still attached:
+        // a re-render between opening and confirming can detach it, and a detached node's closest() returns null.
+        // `.catch(() => null)` is attached eagerly so a cancelled modal never logs an unhandled rejection.
         const action = trigger.dataset.confirmLiveAction ?? null;
         const root = trigger.closest<HTMLElement>('[data-controller~="live"]');
         this._pending = null !== action && null !== root
@@ -84,9 +79,8 @@ export default class extends Controller {
         }
     };
 
-    // Parse the trigger's data-confirm-live-args. The value is server-rendered JSON, so a parse failure means a
-    // templating slip, not user input: swallow it (logging to the console) and fall back to no args rather than letting
-    // an uncaught SyntaxError leave the confirm button silently dead.
+    // The value is server-rendered JSON, so a parse failure means a templating slip, not user input: swallow it and
+    // fall back to no args rather than letting an uncaught SyntaxError leave the confirm button silently dead.
     private _parseArgs(raw: string | undefined): Record<string, unknown> {
         if (!raw) {
             return {};

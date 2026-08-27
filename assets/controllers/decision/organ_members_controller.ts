@@ -2,8 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import type { OrganInfo, OrganMember } from './organ_lookup_controller.ts';
 
 /**
- * Lists who an organ still has installed, so that abolishing it is not done blind. Purely informative: nothing here
- * is submitted.
+ * Purely informative: nothing here is submitted.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['panel', 'list'];
@@ -27,10 +26,7 @@ export default class extends Controller<HTMLElement> {
         this.panelTarget.classList.remove('d-none');
     }
 
-    /**
-     * The functions a member holds, read as a sentence: "chair", "chair and treasurer", "chair, secretary and
-     * treasurer".
-     */
+    /** Read as a sentence: "chair", "chair and treasurer", "chair, secretary and treasurer". */
     private functions(member: OrganMember): string {
         const names = member.installations.map((installation) => installation.functionName);
 

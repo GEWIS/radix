@@ -1,10 +1,9 @@
-{# Renders a Symfony CollectionType with add/remove wired to the `form-collection` Stimulus controller. The entry
-   macro renders the complete entry (wrapper and remove button) for both the server-rendered children and the
-   prototype, so JS-added entries can never drift from existing ones. Nesting is supported because each collection
-   level uses a distinct prototype placeholder (__list__, __field__, __option__).
-   Pass `add_label` / `remove_label` variables (e.g. `form_row(form.options, {'add_label': 'Add option'|trans,
-   'remove_label': 'Remove option'|trans})`) to name what the buttons add/remove; they fall back to a generic
-   "Add" / "Remove". #}
+{# The entry macro renders the complete entry (wrapper and remove button) for both the server-rendered
+   children and the prototype, so JS-added entries can never drift from existing ones. Nesting works because
+   each collection level uses a distinct prototype placeholder (__list__, __field__, __option__).
+
+   Pass `add_label` / `remove_label` to name what the buttons add and remove; they fall back to "Add" and
+   "Remove". #}
 {% macro collection_entry(child, allow_delete, remove_label) %}
     <div data-form-collection-target="entry" class="border rounded p-3 mb-2">
         {{ form_row(child) }}
@@ -19,9 +18,8 @@
 
 {% block collection_widget %}
     {% import _self as helper %}
-    {# `rendered` as well as defined: a form may render the prototype itself, to hand the markup to a controller
-       of its own, and a FormView can only be rendered once. Symfony's own collection theme guards on the same
-       thing; without it the second render throws "Field ... has already been rendered". #}
+    {# `rendered` as well as defined: a form may render the prototype itself and a FormView can only be
+       rendered once; without this the second render throws "Field ... has already been rendered". #}
     {% set has_prototype = allow_add and prototype is defined and prototype is not null and not prototype.rendered %}
     {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__name__' %}
     {% set add_label = add_label|default('Add'|trans) %}

@@ -2,9 +2,8 @@ import { Controller } from '@hotwired/stimulus';
 import { getComponent } from '@symfony/ux-live-component';
 
 /**
- * Drag-reordering that persists immediately through a live component action instead of a form submit (the drag
- * mechanics mirror the form-based `sortable` controller). Each direct entry carries its id; on drop the new id order
- * is sent to the named live action, merged with any extra arguments.
+ * Drag-reordering that persists immediately through a live component action instead of a form submit. Each direct
+ * entry carries its id; on drop the new id order is sent to the named live action, merged with any extra arguments.
  *
  * ```
  * <div data-controller="live-sortable" data-live-sortable-action-value="reorderPoints"

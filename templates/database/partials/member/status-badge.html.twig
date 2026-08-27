@@ -1,7 +1,3 @@
-{#
-    What state a member's record is in, as one badge. Derived rather than stored: a member is removed if they were
-    deleted, expired if they hold no membership now, and otherwise active.
-#}
 {% if member.deleted %}
     <span class="badge badge-danger">{{ 'Removed'|trans }}</span>
 {% elseif member.currentMembership is null %}

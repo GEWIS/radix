@@ -1,9 +1,9 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Drives the signing step of the external-application form. The shared secret only applies to HS512, so its field is
- * cleared and disabled for every other profile. RS512 is still supported for applications that cannot verify anything
- * stronger, but it should not be chosen for new ones, so selecting it reveals a warning.
+ * The shared secret only applies to HS512, so its field is cleared and disabled for every other profile. RS512 is
+ * still supported for applications that cannot verify anything stronger, but it should not be chosen for new ones, so
+ * selecting it reveals a warning.
  */
 export default class extends Controller {
     static targets = ['signature', 'secret', 'secretField', 'warning'];

@@ -3,9 +3,9 @@
     cursor: pointer;
 }
 
-// Sign-up list editor (activity create/edit form): number the collapsible list and question panels so collapsed ones
-// stay distinguishable. A CSS counter reflows automatically as entries are added or removed (see
-// form_collection_controller.ts); the prototype lives in a data attribute and is not counted.
+// A CSS counter numbers the collapsible list and question panels so collapsed ones stay distinguishable; it
+// reflows as entries are added or removed (see form_collection_controller.ts). The prototype lives in a data
+// attribute and is not counted.
 .signup-list-collection {
     counter-reset: signup-list;
 
@@ -24,7 +24,6 @@
     }
 }
 
-// Clamp the (rendered Markdown) activity description on overview pages until the user expands it.
 .activity-description-content {
     display: -webkit-box;
     overflow: hidden;
@@ -44,16 +43,13 @@
     }
 }
 
-// Activity overview list items reuse the shared .panel, but with a calmer, flatter surface than the default panel: the
-// body background plus a border, so a long dense list reads as separated rows rather than a stack of filled cards. The
-// selector is `.panel.panel-surface` (specificity 0,2,0) on purpose: _activity.scss is imported before _panel.scss, so
-// a single-class modifier would lose the source-order tie to `.panel { --bs-panel-bg }`.
+// The selector is `.panel.panel-surface` (specificity 0,2,0) on purpose: _activity.scss is imported before
+// _panel.scss, so a single-class modifier would lose the source-order tie to `.panel { --bs-panel-bg }`.
 .panel.panel-surface {
     --#{$prefix}panel-bg: var(--#{$prefix}body-bg);
 
     transition: background-color $transition-duration ease;
 
-    // The whole panel is clickable (see activity_item_controller.ts); a subtle background lift signals that on hover.
     &:hover {
         --#{$prefix}panel-bg: var(--#{$prefix}tertiary-bg);
     }
@@ -73,8 +69,6 @@
     }
 }
 
-// Stacked date beside an activity, wherever one is listed: red uppercase month on top, bold day, small weekday
-// underneath, on a brand-tinted block that keeps it readable against both the list panels and a side panel.
 .activity-date-badge {
     display: flex;
     flex: 0 0 auto;

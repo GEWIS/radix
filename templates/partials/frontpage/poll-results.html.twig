@@ -1,11 +1,10 @@
 {#
-    How a poll was answered. The totals come from the options themselves, so answers that have since been anonymised
-    still count towards them.
-
     Pass `poll`, and optionally:
     - `chosen`: the option this reader gave (or null), to mark their own answer
     - `limit`: show only this many answers, most answered first (the archive cards)
     - `compact`: the tighter row without vote counts or the closing total line
+
+    The totals come from the options themselves, so answers that have since been anonymised still count.
 #}
 {% set chosen = chosen|default(null) %}
 {% set limit = limit|default(null) %}

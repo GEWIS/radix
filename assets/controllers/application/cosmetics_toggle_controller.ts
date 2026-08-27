@@ -1,10 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Persists the "festive effects" preference from the navbar switch. Flipping the switch immediately toggles
- * the `data-cosmetics` attribute on <html> (the CSS hides #gewis-festivities when it is "off"), then POSTs the new
- * state so it survives across pages and devices. Re-enabling only fully re-appears on the next navigation, since the
- * effect scripts are emitted server-side.
+ * Re-enabling only fully re-appears on the next navigation, since the effect scripts are emitted server-side.
  */
 export default class extends Controller {
     static values = { url: String, csrf: String };

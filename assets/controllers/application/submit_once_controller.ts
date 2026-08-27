@@ -1,8 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Disable a form's submit button once the form is submitted, and replace its label with a spinner.
- *
  * The button is disabled a tick after the event rather than inside it: a form's data is collected after its `submit`
  * handlers have run, so a button disabled inside one is left out of the request along with its name and value.
  *

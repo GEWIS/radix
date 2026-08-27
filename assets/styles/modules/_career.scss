@@ -1,8 +1,3 @@
-// Career landing page
-//
-// The band at the top of the career overview and the three kinds of row underneath it: a vacancy, a company, and an
-// upcoming event. Rows rather than cards, because the page is a set of tastes of longer lists.
-
 .career-hero {
     background-color: var(--#{$prefix}body-bg);
     border-bottom: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
@@ -24,7 +19,6 @@
     }
 }
 
-// The counts double as the way into each list, so they are links rather than figures.
 .career-stat {
     display: flex;
     flex-direction: column;

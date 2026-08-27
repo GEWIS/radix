@@ -26,13 +26,6 @@
     {% endembed %}
 {% endblock %}
 
-{#
-    `rows` pairs each member with the `AttentionReasons` they turned up under; the reason renders its own label and
-    recommended action.
-
-    `bulk_renewal_shortcuts` holds the membership numbers behind the two shortcuts, which prefill the bulk renewal
-    form; producing that preview reads nothing and changes nothing, so it is a link rather than a post.
-#}
 {% macro shortcut(member_ids, membership_type, label) %}
     {% if member_ids is empty %}
         <span class="btn btn-gewis-primary disabled" aria-disabled="true">{{ label }}</span>
@@ -89,7 +82,6 @@
                     {% set member_url = path('member_show', {lidnr: row.member.lidnr}) %}
                     {% for reason in row.reasons %}
                         <tr>
-                            {# The member is stated once and spans all of their reasons. #}
                             {% if loop.first %}
                                 <td rowspan="{{ row.reasons|length }}">
                                     <a href="{{ member_url }}">{{ row.member.lidnr }}</a>

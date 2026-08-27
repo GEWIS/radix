@@ -1,6 +1,3 @@
-// The dashboard: the figures across the top, what needs someone underneath, and the rail that says where the numbers
-// come from.
-
 .stat .panel-body {
     display: flex;
     flex-direction: column;
@@ -32,8 +29,6 @@
     font-size: $font-size-sm;
 }
 
-// One row per thing that needs someone. Each is its own panel body so the rows are separated the way the panel
-// separates anything else, rather than by a rule this file would have to invent.
 .attention {
     display: flex;
     align-items: flex-start;
@@ -115,8 +110,6 @@
     background-color: var(--#{$prefix}secondary-color);
 }
 
-// Ordinary members are the association's own, so they carry the association's colour; the rest are told apart from
-// them and from each other rather than ranked.
 .breakdown-fill-ordinary {
     background-color: $gewis-red;
 }

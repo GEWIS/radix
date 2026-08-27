@@ -1,11 +1,9 @@
 {#
-    The advertising strip that sits between the items on a listing page. Pass the banners to show:
-
     {% include 'partials/career/banner-strip.html.twig' with {'banners': company_banners()} only %}
 
-    One banner is shown on its own; several rotate, because the space was sold to each of them and only the first
-    would ever be seen otherwise. The carousel is given the height of the tallest banner in it, so the items below do
-    not jump every time it moves on.
+    One banner is shown on its own; several rotate, because the space was sold to each of them and only the
+    first would ever be seen otherwise. The carousel is given the height of the tallest banner in it, so the
+    items below do not jump every time it moves on.
 #}
 {% if banners is not empty %}
     {% set tallest = 0 %}

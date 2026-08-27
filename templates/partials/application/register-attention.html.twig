@@ -1,10 +1,3 @@
-{#
-    The register's own checks: approvals waiting on a decision, and integrations that have stopped reporting in.
-
-    A panel beside the approval queues rather than rows within them. What is in the queues is one kind of thing --
-    a revision, submitted by somebody, waiting to be reviewed -- and each of these is something else: a count that
-    has grown, or a service that has gone quiet. Mixing them cost the queue panel its shape.
-#}
 <div class="panel {{ standalone ?? false ? 'mt-0' : '' }}">
     <div class="panel-heading d-flex flex-wrap align-items-baseline gap-2">
         <h3>{{ 'Needs attention'|trans }}</h3>

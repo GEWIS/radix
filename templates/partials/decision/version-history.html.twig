@@ -1,7 +1,7 @@
 {#
-    The collapsible history of a versioned document: every version except the latest, newest first. Expects `versions`
-    (the full collection, upload order), `route` (a download route name taking a `version` parameter), and `collapseId`
-    (a unique id for the collapse). Pass `showUploader: true` on management pages to include who uploaded each version.
+    Expects `versions` (the full collection, upload order), `route` (a download route name taking a `version`
+    parameter), and `collapseId` (a unique id for the collapse). Pass `showUploader: true` on management pages
+    to include who uploaded each version.
 #}
 {% set older = versions|slice(0, versions|length - 1)|reverse %}
 <div class="collapse" id="{{ collapseId }}">

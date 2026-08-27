@@ -1,10 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * One sign-up list's settings. The capacity + allocation-method block only apply when "limited capacity" is checked,
- * and within it only the selected method's settings (and, for a conditional draw, only the selected cutoff rule's
- * sub-field) are shown. Bound to the limited checkbox, the method select and the cutoff-rule select.
- *
  *   <div data-controller="signup-list">
  *     <input type="checkbox" data-signup-list-target="limited" data-action="change->signup-list#apply">
  *     <div data-signup-list-target="capacity">…capacity…</div>

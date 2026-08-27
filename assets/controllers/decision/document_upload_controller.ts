@@ -1,9 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * A single-PDF upload flow for the meeting management pages: a dropzone (or "New version" button) that, once a file
- * is picked, reveals a small confirm area where the name and/or version label can be adjusted before the XHR posts to
- * the endpoint. On success a bubbling `decision-upload:success` event lets the surrounding live component re-render.
+ * On success a bubbling `decision-upload:success` event lets the surrounding live component re-render.
  *
  * The name input is optional: a new-document dropzone has one (pre-filled from the filename), a new-version flow does
  * not. Extra fixed fields (such as the agenda point id) come from the `extra` value.

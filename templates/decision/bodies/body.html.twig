@@ -131,7 +131,6 @@
         </div>
 
         <div class="col-lg-4">
-            {# What is on the panel first: how to reach a body is what most readers came for. #}
             {% set hasContact = information is not null and (
                 (isMember and email is not null)
                 or information.getWebsite is not null
@@ -180,7 +179,6 @@
                 </div>
             {% endif %}
 
-            {# The same panel the homepage and the career overview show their agenda in. #}
             <div class="panel{{ hasContact ? '' : ' mt-0' }}">
                 <div class="panel-heading">
                     <h3>{{ 'Activities'|trans }}</h3>

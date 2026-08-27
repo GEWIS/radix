@@ -19,8 +19,6 @@
             </p>
         </div>
 
-        {# Every action this reader has, in one place, whichever part of the administration it belongs to. Exactly
-           one of them is the primary: the announcement when there is one to make, and otherwise the meeting. #}
         <div class="d-flex flex-wrap gap-2">
             {% if register is defined %}
                 <a href="{{ path('query_index') }}" class="btn btn-outline-secondary">
@@ -157,8 +155,6 @@
         </div>
 
         <aside class="col-lg-4">
-            {# How the association is made up and whether its integrations are answering: read far more often than
-               what is being announced, so it comes first. #}
             {% if register is defined %}
                 {% include 'partials/application/register-status.html.twig' with register only %}
             {% endif %}

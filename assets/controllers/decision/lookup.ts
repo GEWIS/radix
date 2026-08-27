@@ -1,9 +1,8 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * The type-ahead behaviour every lookup on the decision forms shares: a text field that queries a JSON endpoint while
- * typing, and a dropdown of matches to pick from. Subclasses say how a match reads and what picking one does -- which
- * is always to fill in hidden identifiers, because the text field itself is never what the form reads back.
+ * Subclasses say how a match reads and what picking one does -- which is always to fill in hidden identifiers,
+ * because the text field itself is never what the form reads back.
  *
  * A monotonic token guards against a slow response replacing a newer one, and options are built through DOM APIs
  * rather than markup because the labels contain names people typed.
@@ -77,26 +76,16 @@ export abstract class LookupController<T> extends Controller<HTMLElement> {
         this.highlighted = -1;
     }
 
-    /**
-     * How a match reads in the dropdown.
-     */
     protected abstract label(match: T): string;
 
-    /**
-     * What picking a match does. Implementations fill in the hidden fields the form reads back.
-     */
+    /** Implementations fill in the hidden fields the form reads back. */
     protected abstract choose(match: T): void;
 
-    /**
-     * What the text field is left showing once a match is picked; the label by default.
-     */
+    /** What the text field is left showing once a match is picked; the label by default. */
     protected chosenLabel(match: T): string {
         return this.label(match);
     }
 
-    /**
-     * Extra query parameters the endpoint needs beyond the search term.
-     */
     protected parameters(): Record<string, string> {
         return {};
     }

@@ -22,14 +22,12 @@
 {% endblock %}
 
 {% block contents %}
-    {# The editor and the entity list are under one controller because clicking an entity types it into the editor,
-       and the two sit in different columns. #}
+    {# One controller over both columns, because clicking an entity types it into the editor. #}
     <div class="row g-3" data-controller="query-editor">
         <div class="col-12 col-xl-8">
-            {# One form holds both buttons: `QuerySaveType` extends `QueryType`, so executing and saving submit the
-               same query field and the controller decides on the button that was clicked. That is also why the editor
-               behaviour hangs off a wrapper rather than off the textarea: Ctrl/Cmd+Enter has to submit through
-               "Execute" specifically, so the controller needs to reach that button. #}
+            {# `QuerySaveType` extends `QueryType`, so executing and saving submit the same query field and the
+               controller decides on the button that was clicked. The editor behaviour hangs off a wrapper rather than
+               off the textarea because Ctrl/Cmd+Enter has to submit through "Execute" specifically. #}
             {{ form_start(form) }}
                 <div class="panel">
                     <div class="panel-heading d-flex flex-wrap align-items-baseline gap-2">
@@ -49,8 +47,8 @@
                         </span>
                     </div>
                     <div class="panel-body query-editor">
-                        {# The gutter counts lines, so the box must not soft-wrap them: `wrap="off"` scrolls
-                           sideways instead, which keeps one line in the box on one line in the gutter. #}
+                        {# The gutter counts lines, so the box must not soft-wrap them: `wrap="off"` keeps one line in
+                           the box on one line in the gutter. #}
                         <span class="query-editor-gutter" aria-hidden="true"
                               data-query-editor-target="gutter"></span>
                         {{ form_widget(form.query, {attr: {

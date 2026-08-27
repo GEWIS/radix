@@ -21,12 +21,6 @@
     {% endembed %}
 {% endblock %}
 
-{#
-    The preview sits inside the form: confirming it resubmits the very numbers and type that produced it, so
-    `BulkMemberRenewalType` carries a second submit button (`intent`) instead of a hidden field and a second form.
-
-    `preview` is null until the numbers have been checked; `result` stays null until the preview has been confirmed.
-#}
 {% block contents %}
     {{ form_start(form) }}
     <div class="row g-3">

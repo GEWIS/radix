@@ -1,7 +1,4 @@
 {#
-    One upcoming activity, compact enough for a side panel: the stacked date beside the name, when it runs and where.
-    The overview's own list item is the full version of this; both draw the same date badge.
-
     {% include 'partials/activity/agenda-item.html.twig' with {'activity': activity} only %}
 #}
 {% set dateBadge = activity_date_badge(activity.getBeginTime, activity.getEndTime) %}

@@ -1,7 +1,3 @@
-{#
-    The company profile form, shared by the board's create/edit pages and the company's own proposal page. The board's
-    flow carries the identity step; a company's does not, so its flow has one step fewer.
-#}
 {% import 'partials/application/form-flow.html.twig' as flow %}
 
 {% set step = form_flow_current_step(form) %}

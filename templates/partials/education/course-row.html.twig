@@ -8,7 +8,7 @@
             </h5>
             {% if row.isEmpty %}
                 <span class="d-block small text-body-secondary">{{ 'Nothing has been shared for this course yet'|trans }}</span>
-                {# An empty course should point somewhere rather than dead-end. Often the same course under a code it
+                {# An empty course should point somewhere rather than dead-end, often the same course under a code it
                    had before. #}
                 {% if row.similarCourses is not empty %}
                     <span class="d-block small text-body-secondary mt-1">

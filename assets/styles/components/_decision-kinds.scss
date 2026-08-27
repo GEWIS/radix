@@ -1,9 +1,3 @@
-// Decision kinds
-//
-// The list of kinds of decision on the create page. Each row says what the kind does, because "Other" and
-// "Abolition" mean nothing on their own to someone minuting their first meeting. Bootstrap drives the panes; these
-// are its tab buttons with the rows shaped the way the sidebar's are.
-
 .decision-kinds {
     display: flex;
     flex-direction: column;
@@ -119,15 +113,12 @@
     }
 }
 
-// The chevron follows the fold, the way the panel headings do.
 .decision-kinds-group.collapsed .panel-collapse-chevron {
     transform: rotate(-90deg);
 }
 
-// The form beside the list
-//
-// Nothing is chosen when the page opens, so the panel starts on the placeholder and gives way to a form as soon as a
-// pane goes active. Hiding it that way keeps the two in step without a controller to switch between them.
+// The stylesheet hides the placeholder as soon as the pane beside it goes active, which keeps the two in step
+// without a controller to switch between them.
 .decision-form-placeholder {
     display: block;
 }
@@ -136,8 +127,6 @@
     display: none;
 }
 
-// Each form says which kind it records, because with nothing chosen by default the panel is the first thing that
-// answers "what am I filling in".
 .decision-form-header {
     margin-block-end: map-get($spacers, 3);
     padding-block-end: map-get($spacers, 2);
@@ -155,7 +144,6 @@
     }
 }
 
-// The button that records the decision is set off from the fields above it, so it does not read as one more row.
 .decision-form-actions {
     display: flex;
     justify-content: flex-end;

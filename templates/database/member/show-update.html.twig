@@ -25,8 +25,6 @@
     {% endembed %}
 {% endblock %}
 
-{# Every field is the same comparison of what is on record against what the member proposes, so the rows are driven
-   off a list rather than written out one by one. #}
 {% macro value(text, mailto) %}
     {%- if mailto -%}
         <a href="mailto:{{ text }}">{{ text }}</a>
@@ -68,7 +66,6 @@
                                 <tr>
                                     <th scope="row">{{ comparison.label }}</th>
                                     <td>{{ field.value(comparison.current, comparison.mailto|default(false)) }}</td>
-                                    {# The proposed value is highlighted only where it actually differs. #}
                                     <td class="{{ comparison.current != comparison.proposed ? 'table-warning' }}">
                                         {{ field.value(comparison.proposed, comparison.mailto|default(false)) }}
                                     </td>

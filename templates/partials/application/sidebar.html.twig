@@ -1,5 +1,6 @@
 {#
-    The rows of the section sidebar rendered by `layout-sidebar.html.twig`. Import and call from a sidebar partial:
+    The rows of the section sidebar rendered by `layout-sidebar.html.twig`. Import and call from a sidebar
+    partial:
 
     {% import 'partials/application/sidebar.html.twig' as sidebar %}
 
@@ -12,8 +13,7 @@
         ]) }}
     </ul>
 
-    A section is open when it is active or one of its children is, and toggles in place rather than flying out
-    sideways, so a page buried two levels down is still reachable in one look.
+    A section is open when it is active or one of its children is.
 #}
 
 {% macro context(monogram, name, meta) %}
@@ -36,7 +36,6 @@
            {% if active %}aria-current="page"{% endif %}>
             <span class="sidebar-icon fas {{ icon }}" aria-hidden="true"></span>
             <span class="sidebar-label">{{ label }}</span>
-            {# A count only says something when there is something to count. #}
             {% if (count ?? 0) > 0 %}
                 <span class="sidebar-count">{{ count }}</span>
             {% endif %}
@@ -60,7 +59,6 @@
                     <a class="sidebar-sublink {{ child.active ?? false ? 'active' : '' }}" href="{{ child.href }}"
                        {% if child.active ?? false %}aria-current="page"{% endif %}>
                         {{ child.label }}
-                        {# As in link(): a count only says something when there is something to count. #}
                         {% if (child.count ?? 0) > 0 %}
                             <span class="sidebar-count">{{ child.count }}</span>
                         {% endif %}

@@ -1,11 +1,9 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Drag-and-drop photo uploads for the album manage view. Files are posted one request per file (with a small
- * concurrency cap) so a single rejected file never aborts the batch and each file gets its own progress bar. The
- * endpoint is board-guarded and takes no CSRF token (it is not a form submit); authentication is enforced server-side.
- * Once every file has settled the page reloads if anything was created, so the new photos (and the regenerated cover)
- * appear.
+ * Files are posted one request per file (with a small concurrency cap) so a single rejected file never aborts the
+ * batch and each file gets its own progress bar. The endpoint is board-guarded and takes no CSRF token (it is not a
+ * form submit); authentication is enforced server-side.
  *
  *   <div data-controller="photo-upload" data-photo-upload-upload-url-value="...">
  *       <div data-photo-upload-target="dropzone"> ... </div>

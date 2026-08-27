@@ -1,5 +1,5 @@
-{# The decision list as a LaTeX document. Nothing here is HTML, so escaping is off: `content` arrives already escaped
-   for LaTeX (`Decision::getContent()` with character escaping on) and everything else is a hash or a date. #}
+{# Nothing here is HTML, so escaping is off: `content` arrives already escaped for LaTeX
+   (`Decision::getContent()` with character escaping on) and everything else is a hash or a date. #}
 {% autoescape false %}
 {%- macro besluiten(decisions) -%}
 {% for decision in decisions %}

@@ -44,9 +44,9 @@
                                     <span class="badge text-bg-danger ms-1">{{ 'Annulled'|trans }}</span>
                                 {% endif %}
 
-                                {# A virtual meeting says again what this meeting decided, and answering with both is
-                                   what made the same decision turn up twice. The search answers with this one and
-                                   folds its virtual counterparts away underneath, so they are still there to read. #}
+                                {# A virtual meeting says again what this meeting decided, which is what made the same
+                                   decision turn up twice; its virtual counterparts are folded away underneath
+                                   instead. #}
                                 {% set virtual = this.getVirtualCounterpartsOf(decision) %}
                                 {% if virtual is not empty %}
                                     {% set virtual_id = 'search-virtual-' ~ decision.meetingType.value ~ '-' ~ decision.meetingNumber ~ '-' ~ decision.point ~ '-' ~ decision.number %}

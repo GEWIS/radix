@@ -21,8 +21,7 @@
     {% endembed %}
 {% endblock %}
 
-{# The three sections are the same list of organ functions with a different explanation, so the list itself is a
-   macro. The cases carry their own (translatable) name, which is why they are passed as enum cases rather than as
+{# The cases carry their own (translatable) name, which is why they are passed as enum cases rather than as
    a pre-translated array. #}
 {% macro functions(title, description, functions) %}
     <div class="col-12 col-xl-4">

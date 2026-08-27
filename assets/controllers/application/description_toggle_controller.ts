@@ -1,9 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
 
-/**
- * Reveals/hides the full description. The content is line-clamped by CSS; this only shows the toggle button when the
- * content actually overflows, and swaps its label between "Show more" and "Show less".
- */
 export default class extends Controller {
     static targets = ['content', 'button'];
     static values = { more: String, less: String };

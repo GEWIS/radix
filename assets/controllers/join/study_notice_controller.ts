@@ -1,8 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Shows the footnote about DSA Pattern while a data science program, or nothing at all, is selected. The marker is
- * put on the option label by `StudyChoices`, so the studies it applies to are not repeated here.
+ * The marker is put on the option label by `StudyChoices`, so the studies it applies to are not repeated here.
  */
 export default class extends Controller {
     static targets = ['notice'];

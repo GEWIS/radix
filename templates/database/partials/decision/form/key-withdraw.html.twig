@@ -1,5 +1,5 @@
-{# Choosing a key code copies both its reference and the grantee and expiry it was handed out with; the latter two are
-   unmapped and only exist so the withdrawal date can be checked against them. #}
+{# Choosing a key code also copies the grantee and expiry it was handed out with; both are unmapped and only
+   exist so the withdrawal date can be checked against them. #}
 {{ form_start(form, {
     'action': path('decision_decision_form', {'form': 'key_withdraw'}),
     'attr': {'data-controller': 'subdecision-choice'},

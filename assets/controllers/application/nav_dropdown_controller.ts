@@ -2,9 +2,8 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * Opens the main navbar dropdowns on click, which Bootstrap 5.3 only does through its own dropdown plugin and Popper.
- *
- * Escape closes the open menu; a click or tab away closes everything. Sub-sections inside a panel are plain Bootstrap
- * collapses and are none of this controller's business, so a click on one leaves the panel open.
+ * Sub-sections inside a panel are plain Bootstrap collapses and are none of this controller's business, so a click on
+ * one leaves the panel open.
  *
  * It works on the existing Bootstrap markup: a `.dropdown-nav` with a `.dropdown-toggle` and a `.dropdown-menu`. The
  * template adds `data-controller="nav-dropdown"` on the container and leaves `data-bs-toggle` off those toggles. Menus

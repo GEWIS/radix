@@ -1,4 +1,3 @@
-// The wide strip a body's own page leads with, at the shape it is cut to.
 .organ-banner {
     display: block;
     width: 100%;
@@ -9,8 +8,8 @@
     border-radius: var(--#{$prefix}border-radius);
 }
 
-// What a body is recognised by on an overview card. A flex box rather than a plain image, since the same class dresses
-// the monogram a body without a logo falls back to, and that is a span with a letter in it.
+// A flex box rather than a plain image, since the same class dresses the monogram a body without a logo falls back
+// to, and that is a span with a letter in it.
 .organ-logo {
     display: flex;
     align-items: center;
@@ -21,14 +20,12 @@
     border-radius: var(--#{$prefix}border-radius);
 }
 
-// Leading a card, the logo follows the card's own top corners rather than rounding all four of its own.
 .organ-card {
     .organ-logo {
         border-radius: var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius) 0 0;
     }
 }
 
-// The first letter of a body's abbreviation, for one that has not uploaded a logo.
 .organ-logo-monogram {
     font-size: 2.5rem;
     font-weight: 700;
@@ -36,7 +33,6 @@
     background-color: var(--#{$prefix}secondary-bg);
 }
 
-// Where a body can be reached, one way per row.
 .organ-contact {
     display: flex;
     flex-direction: column;
@@ -63,12 +59,9 @@
     color: var(--#{$prefix}secondary-color);
 }
 
-// The frame that picks what part of an uploaded image is used. Cropper puts its canvas next to the image and hides the
-// image itself, so the height belongs to the box around both.
-//
-// The image is fitted inside the canvas, so the canvas is what decides how large the thing being framed is drawn. It
-// grows with the column it sits in, up to a ceiling: large enough to see what is being cut, short enough that the two
-// frames beside each other are both in view.
+// Cropper puts its canvas next to the image and hides the image itself, so the height belongs to the box around
+// both. The image is fitted inside the canvas, so the canvas is what decides how large the thing being framed is
+// drawn; it grows with the column it sits in, up to a ceiling that keeps the two frames beside each other in view.
 .organ-image-crop {
     max-width: 100%;
 
@@ -82,8 +75,6 @@
     }
 }
 
-// The pair above the frame: what the website is showing, and what the frame currently holds. Both are one box at the
-// shape the image is cut to, so the two are the same size and can be compared at a glance rather than by eye.
 .organ-image-preview {
     display: flex;
     align-items: center;
@@ -107,7 +98,6 @@
     aspect-ratio: 4;
 }
 
-// What is in use now, small enough to sit above the frame rather than push it off the screen.
 .organ-image-current {
     max-width: 100%;
 }

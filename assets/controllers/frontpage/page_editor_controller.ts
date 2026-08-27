@@ -3,10 +3,8 @@ import { CkEditorInstance, CkEditorModule, FileLoader, UploadAdapter, createEdit
 import { flattenFloatingLabel } from '../../js/floating_label.ts';
 
 /**
- * Turns a `<textarea>` into a CKEditor 5 editor that writes HTML, for the custom pages. Everything else on the site is
- * written in Markdown (see markdown_editor_controller.ts); a page is laid out with the tables, columns and images
- * Markdown has no way to say.
- *
+ * Writes HTML rather than the Markdown everything else on the site is written in (see
+ * markdown_editor_controller.ts): a page is laid out with the tables, columns and images Markdown has no way to say.
  *
  *   - the textarea: data-controller="page-editor"
  *   - the upload:   data-page-editor-upload-url-value / data-page-editor-upload-token-value

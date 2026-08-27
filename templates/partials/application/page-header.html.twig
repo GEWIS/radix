@@ -1,8 +1,4 @@
 {#
-    Full-width header band for the top of a page: an optional eyebrow line, the page title with
-    an optional status line and subtitle, actions on the right, and an optional stats strip
-    along the bottom edge.
-
     Embed from a layout's `pre_body` block and fill the blocks as needed:
 
     {% embed 'partials/application/page-header.html.twig' %}
@@ -19,11 +15,8 @@
         {% endblock %}
     {% endembed %}
 
-    Breadcrumbs go in the layout's own `breadcrumbs` block, which renders in the regular
-    breadcrumb bar above this band, like on every other page.
-
-    Inside a sidebar layout there is no page-wide container to line up with, so those pages override
-    `header_container_class` with `container-fluid px-3` to sit flush with the content below.
+    Breadcrumbs go in the layout's own `breadcrumbs` block. Inside a sidebar layout there is no page-wide
+    container to line up with, so those pages override `header_container_class` with `container-fluid px-3`.
 #}
 <header class="page-header">
     <div class="{% block header_container_class %}container{% endblock %} pt-3 pb-4">

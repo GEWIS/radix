@@ -3,9 +3,6 @@ import { CkEditorInstance, CkEditorModule, createEditor } from '../../js/ckedito
 import { flattenFloatingLabel } from '../../js/floating_label.ts';
 
 /**
- * Turns a `<textarea>` into a CKEditor 5 Markdown editor (GFM, via the Markdown plugin). What is typed is written back
- * to the textarea, which stays the bound source of truth; see js/ckeditor.ts.
- *
  * The editor is built as the page opens, not when the box is first pressed: the bundle is large, but nearly every box
  * it is put on sits on a screen whose whole purpose is writing, and there a download in the way of the first keystroke
  * costs more than it saves.
@@ -17,9 +14,9 @@ import { flattenFloatingLabel } from '../../js/floating_label.ts';
  * textarea behind `data-live-ignore` cannot empty it through a re-render, so it says so with a browser event instead
  * (`data-action="poll-comment:posted@window->markdown-editor#clear"`).
  *
- * Coordinates with the `localised-fields` controller without coupling to it: when that disables the textarea (an
- * unchecked language is not submitted), a MutationObserver puts the editor into read-only mode; the disabled textarea
- * is still omitted from the POST, so the stored value is preserved.
+ * Coordinates with the `localised-fields` controller without coupling to it: when that disables the textarea, a
+ * MutationObserver puts the editor into read-only mode; the disabled textarea is still omitted from the POST, so the
+ * stored value is preserved.
  */
 export default class extends Controller {
     static values = {

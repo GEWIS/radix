@@ -185,7 +185,6 @@
                         <p class="text-secondary">{{ 'No addresses on record.'|trans }}</p>
                     {% endfor %}
 
-                    {# Only the address types the member does not have yet can be added. #}
                     {% set present = member.addresses|map(address => address.type.value) %}
                     {% set addable = {
                         'home': 'Add Home Address',
@@ -194,8 +193,7 @@
                     } %}
                     {% set missing = addable|filter((text, key) => key not in present) %}
                     {% if missing is not empty %}
-                        {# Vertical, because the column is narrow and these labels are long enough that a row of them
-                           would not fit across it. #}
+                        {# Vertical, because the column is too narrow for a row of labels this long. #}
                         <div class="btn-group-vertical btn-group-sm w-100" role="group"
                              aria-label="{{ 'Add an address'|trans }}">
                             {% for type, label in missing %}
@@ -246,10 +244,9 @@
                         {% endif %}
                     </p>
 
-                    {# Setting the preference changes the member, so each answer is posted rather than linked. The
-                       three answers are three routes, and one form reaches all of them through `formaction`; a form
-                       apiece would put three separate buttons here instead of one group. They share a token because
-                       they share the check that guards them. #}
+                    {# Setting the preference changes the member, so each answer is posted rather than linked. One
+                       form reaches all three routes through `formaction`; they share a token because they share the
+                       check that guards them. #}
                     <form method="post" action="{{ path('member_supremum_reset', {lidnr: member.lidnr}) }}">
                         <input type="hidden" name="_csrf_token"
                                value="{{ csrf_token('member_supremum-' ~ member.lidnr) }}">
@@ -288,7 +285,6 @@
                         </p>
                     {% endfor %}
 
-                    {# The note form posts back to this page, which is where the audit trail lives. #}
                     {{ form_start(note_form) }}
                         <div class="input-group input-group-sm">
                             {{ form_widget(note_form.note, {attr: {

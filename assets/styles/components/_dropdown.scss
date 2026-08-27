@@ -1,7 +1,3 @@
-// Dropdown and select element styling for dark mode support.
-// Ensures that select dropdowns, year selectors, and other dropdown menus maintain
-// proper contrast and readability in both light and dark themes.
-
 @include color-mode(gewis-night) {
     select,
     .form-select {

@@ -3,11 +3,8 @@ import { Controller } from '@hotwired/stimulus';
 const KEY = 'gewis:dismissed-announcements';
 
 /**
- * Remembers which announcement banners a visitor has closed. Closing one records its id so it stays closed on later
- * visits, until the announcement's own end date removes it server-side.
- *
- * Banners arrive hidden and are shown here once they are known not to have been dismissed. The other way around meant
- * a banner somebody had already closed was painted and then taken away again.
+ * Banners arrive hidden and are shown here once they are known not to have been dismissed. The other way around
+ * meant a banner somebody had already closed was painted and then taken away again.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['banner'];

@@ -22,10 +22,7 @@
     </div>
 {% endmacro %}
 
-{#
-    One comment and everything written under it, however deep that goes. Past `maxDepth` the replies stop moving
-    right, so a long back and forth does not walk off the edge of the panel.
-#}
+{# Past `maxDepth` the replies stop moving right, so a long back and forth does not walk off the panel. #}
 {% macro thread(comment, component, depth) %}
     {% import _self as self %}
     {% set maxDepth = 4 %}

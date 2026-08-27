@@ -1,5 +1,3 @@
-// The query console: the box you type DQL into, the numbers beside it, and the two lists in the rail that fill it.
-
 .query-editor {
     display: flex;
     align-items: stretch;
@@ -84,7 +82,7 @@
     color: inherit;
 }
 
-// The entity list scrolls on its own so a long list does not push the rail past the results beside it.
+// Scrolls on its own so a long list does not push the rail past the results beside it.
 .entity-list {
     max-block-size: 22rem;
     overflow-y: auto;

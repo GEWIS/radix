@@ -1,10 +1,8 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Interactivity for the notification settings table: a topic's delivery frequency is greyed out while its email switch
- * is off, and turning on "pause everything" disables and dims the whole table. This is purely cosmetic -- the server
- * ignores a disabled topic's frequency and mutes all email while paused, so the form still submits correctly without
- * this controller.
+ * Purely cosmetic: the server ignores a disabled topic's frequency and mutes all email while paused, so the form
+ * still submits correctly without this controller.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['email', 'frequency', 'pause', 'dim'];

@@ -1,7 +1,4 @@
 {#
-    One of a body's images: what the website shows now, what this frame would make of it, a box to choose another file,
-    and the frame that picks the part of it that is shown.
-
     {% include 'partials/decision/organ-image-field.html.twig' with {
         'fileField': revisionForm.bannerFile,
         'cropField': revisionForm.bannerCropData,
@@ -13,14 +10,12 @@
         'shape': 'banner',
     } only %}
 
-    The crop that is in force arrives here rather than in the boxes that are submitted. Those stay empty until a frame
-    is drawn, so a page saved without JavaScript never sends back a rectangle that was chosen on another image.
+    The crop that is in force arrives here rather than in the boxes that are submitted. Those stay empty until
+    a frame is drawn, so a page saved without JavaScript never sends back a rectangle that was chosen on
+    another image.
 
-    The frame is drawn on the file as it was uploaded rather than on the cut, so moving it never compounds: the server
-    always cuts from the original. Choosing a file shows it straight away, framed, before anything is saved.
-
-    Without JavaScript the frame never appears, the preview stays empty, and the file is stored whole, which is a
-    reasonable image either way.
+    The frame is drawn on the file as it was uploaded rather than on the cut, so moving it never compounds:
+    the server always cuts from the original.
 #}
 {% set minimumWidth = fileField.vars.attr['data-minimum-width']|default(0) %}
 {% set minimumHeight = fileField.vars.attr['data-minimum-height']|default(0) %}
@@ -46,7 +41,6 @@
         }) }}
     </p>
 
-    {# The two side by side and the same size, so what is being chosen can be held against what it would replace. #}
     <div class="row g-2 mb-2">
         <div class="col-6">
             <p class="text-muted small mb-1">{{ 'On the website now'|trans }}</p>

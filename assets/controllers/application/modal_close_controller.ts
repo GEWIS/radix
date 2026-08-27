@@ -11,10 +11,9 @@ declare global {
 }
 
 /**
- * Closes the Bootstrap modal this controller is attached to when a scoped `signup:success` browser event fires
- * (dispatched by the Activity:SignupList live component after a successful sign-up or edit). The event carries the
- * list id in its detail, so with several lists on the page only the matching modal closes. The modal lives inside the
- * live component, so on a re-render the show class is preserved (ExternalMutationTracker) until this hides it.
+ * Closes the modal on a scoped `signup:success` event. The event carries the list id in its detail, so with several
+ * lists on the page only the matching modal closes. The modal lives inside the live component, so on a re-render the
+ * show class is preserved (ExternalMutationTracker) until this hides it.
  */
 export default class extends Controller {
     static values = { listId: Number };

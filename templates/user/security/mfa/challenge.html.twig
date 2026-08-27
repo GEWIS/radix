@@ -43,8 +43,8 @@
                     {% if availableTwoFactorProviders|length > 1 %}
                         <p class="small text-muted">
                             {{ 'choose_provider'|trans({}, 'SchebTwoFactorBundle') }}:
-                            {# One template serves both firewalls, each with its own challenge address, so the link back
-                               to this same form is built from the route that is answering rather than named outright. #}
+                            {# One template serves both firewalls, each with its own challenge address, so the link
+                               back is built from the route that is answering rather than named outright. #}
                             {% for provider in availableTwoFactorProviders %}
                                 <a href="{{ path(app.current_route, app.current_route_parameters|merge({'preferProvider': provider})) }}">{{ provider }}</a>{% if not loop.last %},{% endif %}
                             {% endfor %}

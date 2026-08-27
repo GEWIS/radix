@@ -44,7 +44,6 @@ body {
         }
     }
 
-    // Disable box-shadow if second special notice is present.
     &:has(+ .special-notice) {
         box-shadow: none;
     }
@@ -74,7 +73,7 @@ body {
     }
 }
 
-// Sticky announcement banner: sits just below the special notices (via the same offset) and above the page content,
+// The announcement banner sits just below the special notices (via the same offset) and above the page content,
 // which its default stacking order left it behind.
 .announcement-banner {
     top: var(--sticky-offset, 0);

@@ -3,9 +3,8 @@ import { getComponent } from '@symfony/ux-live-component';
 import type { Component } from '@symfony/ux-live-component';
 
 /**
- * The modal that says which virtual decision is a decision's counterpart. One modal serves every decision of the
- * meeting: the trigger carries the decision it was opened for, and the lookup beside this controller fills in the
- * four hidden fields naming the virtual decision that was picked.
+ * One modal serves every decision of the meeting: the trigger carries the decision it was opened for, and the lookup
+ * beside this controller fills in the four hidden fields naming the virtual decision that was picked.
  *
  * It lives OUTSIDE the live component, like the shared confirmation does, so the re-render that follows the action
  * never touches the modal or leaves an orphaned backdrop behind.
@@ -22,8 +21,7 @@ export default class extends Controller {
     declare readonly hasConfirmTarget: boolean;
     declare readonly confirmTarget: HTMLButtonElement;
 
-    // The decision the modal was opened for, held with the component lookup to run the action on; null while nothing
-    // is armed.
+    // Held with the component lookup to run the action on; null while nothing is armed.
     private _pending: {
         point: string;
         number: string;

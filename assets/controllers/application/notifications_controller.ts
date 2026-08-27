@@ -21,10 +21,10 @@ interface LocalisedText {
 }
 
 /**
- * The application's single Server-Sent Events connection, mounted once by the base layout with the hub URL carrying
- * every topic the visitor may subscribe to. Messages are routed on their `type`: system commands act on the browser
- * (sign out, reload) and a toast is rendered for the user. Any other type is re-emitted as a `gewis:realtime:<type>`
- * DOM event so a feature can react without opening a second connection.
+ * The application's single Server-Sent Events connection, mounted once by the base layout. Messages are routed on
+ * their `type`: system commands act on the browser (sign out, reload) and a toast is rendered for the user. Any other
+ * type is re-emitted as a `gewis:realtime:<type>` DOM event so a feature can react without opening a second
+ * connection.
  *
  *   <div data-controller="notifications"
  *        data-notifications-hub-url-value="{{ mercure(topics, { subscribe: topics }) }}"
@@ -99,10 +99,10 @@ export default class extends Controller<HTMLElement> {
     }
 
     private onError(): void {
-        // CONNECTING means the browser is retrying on its own (and Mercure replays via Last-Event-ID). CLOSED means it
-        // gave up, which for us almost always means the authorization cookie expired; reload to mint a fresh one. A
-        // CLOSED EventSource fires this once and never reconnects, so we act on the first one, throttled to at most once
-        // a minute so a hub outage cannot become a reload storm.
+        // CONNECTING means the browser is retrying on its own (and Mercure replays via Last-Event-ID). CLOSED means it gave
+        // up, which for us almost always means the authorization cookie expired; reload to mint a fresh one. A CLOSED
+        // EventSource fires this once and never reconnects, so act on the first one, throttled so a hub outage cannot become
+        // a reload storm.
         if (this.source?.readyState !== EventSource.CLOSED) {
             return;
         }
@@ -133,8 +133,8 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // The dot is GEWIS red by default (in the template); only a genuine warning/danger/success level overrides it
-        // with a semantic colour, keeping ordinary notifications on-brand rather than Bootstrap's info blue.
+        // Only a genuine warning/danger/success level overrides the template's GEWIS red, keeping ordinary notifications
+        // on-brand rather than Bootstrap's info blue.
         const level = 'string' === typeof data.level ? data.level : 'info';
         const indicator = toast.querySelector('.toast-indicator');
         if (indicator instanceof HTMLElement && 'info' !== level) {
@@ -164,8 +164,8 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // The href comes in per language for the same reason the label does: point the reader at the page in their
-        // own language rather than whichever one happened to be active when the notification was published.
+        // The href comes in per language for the same reason the label does: point the reader at the page in their own
+        // language rather than whichever one happened to be active when the notification was published.
         const href = this.localise(link.href);
         const label = this.localise(link.label);
         if ('' === href || '' === label) {

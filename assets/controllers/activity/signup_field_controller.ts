@@ -1,11 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * One custom sign-up field: only a "number" field shows the min/max bounds and only a "choice" field shows the options
- * collection. Switching to "choice" seeds one empty option (so the editor is not left with an empty choice); switching
- * away clears the options again. Bound to the type `<select>`. It also keeps the choice options' "default" checkboxes
- * mutually exclusive, so at most one option per field is preselected on the public sign-up form.
- *
  * ```
  * <div data-controller="signup-field">
  *     <select data-signup-field-target="type" data-action="change->signup-field#typeChanged">...</select>
@@ -56,8 +51,7 @@ export default class extends Controller {
     }
 
     /**
-     * The "default" checkboxes act as a radio group across this field's options: checking one clears the rest, so at
-     * most one option is preselected (none is allowed). Dynamically added options register as targets automatically.
+     * The "default" checkboxes act as a radio group across this field's options: checking one clears the rest.
      */
     defaultChanged(event: Event): void {
         const changed = event.target;

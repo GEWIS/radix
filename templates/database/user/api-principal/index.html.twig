@@ -80,8 +80,6 @@
                                        href="{{ path('user_api_principal_edit', {'id': principal.id}) }}">
                                         {{ 'Edit'|trans }}
                                     </a>
-                                    {# An icon-only button carried no accessible name; the actions are spelled out
-                                       now that the glyphicon set is gone. #}
                                     {% if not principal.revoked %}
                                         <form method="post"
                                               action="{{ path('user_api_principal_revoke', {'id': principal.id}) }}">

@@ -1,5 +1,5 @@
-{# The minutes are of a meeting other than the one the decision is taken in; picking that meeting by name fills in the
-   hidden `fmeeting` reference, which is what the form reads back. #}
+{# Picking the meeting the minutes are of fills in the hidden `fmeeting` reference, which is what the form
+   reads back. #}
 {{ form_start(form, {
     'action': path('decision_decision_form', {'form': 'minutes'}),
     'attr': {

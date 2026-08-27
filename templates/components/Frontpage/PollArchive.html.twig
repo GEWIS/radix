@@ -1,5 +1,4 @@
-{# The number of answers a card shows before it says how many more there are. #}
-{% set shown = 3 %}
+{% set shown_answers = 3 %}
 
 <div {{ attributes }}>
     <div class="collapse mb-3" id="poll-filters">
@@ -56,14 +55,14 @@
 
                         {% include 'partials/frontpage/poll-results.html.twig' with {
                             'poll': poll,
-                            'limit': shown,
+                            'limit': shown_answers,
                             'compact': true,
                         } only %}
 
                         <div class="d-flex flex-wrap align-items-center gap-3 pt-2 border-top">
-                            {% if poll.options|length > shown %}
+                            {% if poll.options|length > shown_answers %}
                                 <span class="text-muted small">
-                                    {{ '%count% more answer|%count% more answers'|trans({'%count%': poll.options|length - shown}) }}
+                                    {{ '%count% more answer|%count% more answers'|trans({'%count%': poll.options|length - shown_answers}) }}
                                 </span>
                             {% endif %}
                             <span class="text-muted small">

@@ -1,7 +1,5 @@
-{# Which virtual decision is a decision's counterpart. One modal for the whole meeting: the button that opens it says
-   which decision it was opened for, and the lookup here says which virtual decision belongs to that one.
-
-   Rendered once per page, outside any live component, so the re-render that follows the action cannot orphan it. #}
+{# One modal for the whole meeting: the button that opens it says which decision it was opened for.
+   Rendered once per page, outside any live component, so the re-render that follows cannot orphan it. #}
 <div class="modal fade" id="counterpart-modal" tabindex="-1"
      aria-labelledby="counterpart-modal-label" aria-hidden="true"
      data-controller="counterpart-modal decision-counterpart"
@@ -26,7 +24,6 @@
                     <div class="dropdown-menu w-100" role="listbox" data-decision-counterpart-target="results"></div>
                 </div>
 
-                {# What the lookup fills in, and what the modal reads back when the link is confirmed. #}
                 <input type="hidden" data-decision-counterpart-target="meetingType"
                        data-counterpart-modal-target="meetingType">
                 <input type="hidden" data-decision-counterpart-target="meetingNumber"

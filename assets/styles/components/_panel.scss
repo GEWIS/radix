@@ -1,7 +1,3 @@
-// Panel
-//
-// A panel is a card in disguise.
-
 .panel {
     --#{$prefix}panel-spacer-x: #{$panel-spacer-x};
     --#{$prefix}panel-spacer-y: #{$panel-spacer-y};
@@ -117,7 +113,7 @@
     text-transform: uppercase;
 }
 
-// Collapse toggle on a `.panel-heading`: rotate the chevron when open. Bootstrap sets `.collapsed` while hidden.
+// Bootstrap sets `.collapsed` while hidden, so the chevron rotates only when open.
 .panel-collapse-chevron {
     flex-shrink: 0;
     transition: transform 0.2s ease;
@@ -144,8 +140,7 @@
     }
 }
 
-// A panel that has to be read rather than scanned past: filled in the brand red on both themes, so it stands out from
-// the column of ordinary panels around it. Declared after the night block, which is no less specific.
+// Filled in the brand red on both themes. Declared after the night block, which is no less specific.
 .panel.panel-accent {
     --#{$prefix}panel-bg: #{$gewis-red-dark};
     --#{$prefix}panel-border-color: #{$gewis-red-dark};
@@ -177,7 +172,6 @@
     }
 }
 
-// A note on a member's record: separated by a rule rather than boxed, so a column of them reads as one list.
 .member-note + .member-note {
     margin-block-start: map-get($spacers, 2);
     padding-block-start: map-get($spacers, 2);
@@ -188,12 +182,10 @@
     margin-block-end: map-get($spacers, 3);
 }
 
-// A panel that is an invitation rather than a record: the add-a-decision form under a meeting's decisions.
 .panel-dashed {
     border-style: dashed;
 }
 
-// Label and value pairs in a panel's rail.
 .meeting-facts {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -211,7 +203,6 @@
     }
 }
 
-// The generated decision list, shown as source to copy rather than as a rendered document.
 .export-source {
     max-block-size: 70vh;
     margin: 0;

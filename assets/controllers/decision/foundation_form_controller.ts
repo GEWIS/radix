@@ -1,8 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * The two things founding an organ needs beyond a plain form.
- *
  * A voting committee is founded for a purpose rather than under a name, and its abbreviation is only the suffix after
  * `SC<meeting>-`; picking that type relabels both fields to say so.
  *

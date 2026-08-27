@@ -1,5 +1,5 @@
-{# Searching for the decision to annul is narrowed to decisions this one can still take back, so the lookup carries
-   the coordinates of the decision being recorded along with the query. #}
+{# The lookup is narrowed to decisions this one can still take back, so it carries the coordinates of the
+   decision being recorded along with the query. #}
 {{ form_start(form, {
     'action': path('decision_decision_form', {'form': 'annulment'}),
     'attr': {

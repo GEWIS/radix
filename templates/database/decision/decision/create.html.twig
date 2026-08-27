@@ -51,15 +51,9 @@
             </div>
         </div>
     {% else %}
-        {#
-            One kind per decision, because that is what the server records: each of these posts its own form to
-            `decision_decision_form`, which builds one decision from it. The designs show a builder that mixes kinds
-            within a single decision; that needs a form type and a recording path this application does not have, and
-            is listed in .github/REDESIGN.md rather than mocked up here.
-
-            The kinds are one flat list instead of the two levels of tabs this page used to have. Nesting them meant
-            the kind you wanted was often two clicks away behind a label that did not name it.
-        #}
+        {# One kind per decision, because that is what the server records: each of these posts its own form to
+           `decision_decision_form`, which builds one decision from it. A builder that mixes kinds within a single
+           decision is listed in .github/REDESIGN.md. #}
         {% set kinds = {
             'body': {
                 'label': 'Bodies'|trans,
@@ -154,9 +148,8 @@
                 <div class="panel">
                     <div class="panel-heading"><h3>{{ 'Kind of decision'|trans }}</h3></div>
                     <div class="panel-body">
-                        {# Each group folds away, and they all start folded with no kind chosen. Opening one is
-                           how the form on the right is asked for: a decision is a thing you set out to record, so
-                           landing on a form you did not pick invites recording the wrong kind. #}
+                        {# All groups start folded: landing on a form you did not pick invites recording the wrong
+                           kind. #}
                         <div class="nav decision-kinds" role="tablist" aria-orientation="vertical">
                             {% for key, group in kinds %}
                                 <button class="decision-kinds-group collapsed" type="button"
@@ -190,9 +183,8 @@
             <div class="col-12 col-xl-8">
                 <div class="panel">
                     <div class="panel-body">
-                        {# One pane per kind, from the same map the list on the left is built from, so a kind cannot
-                           appear in one and not the other. Each names the partial that records it and the context
-                           that partial needs. #}
+                        {# From the same map the list on the left is built from, so a kind cannot appear in one and
+                           not the other. #}
                         <div class="tab-content">
                             {% for group in kinds %}
                                 {% for id, item in group.items %}
@@ -209,8 +201,8 @@
                             {% endfor %}
                         </div>
 
-                        {# Shown until a kind is picked. It gives way to the form on its own: the stylesheet hides it
-                           as soon as the pane beside it goes active, so nothing has to switch it off. #}
+                        {# The stylesheet hides this as soon as the pane beside it goes active, so nothing has to
+                           switch it off. #}
                         {% include 'partials/application/empty-state.html.twig' with {
                             icon: 'fa-gavel',
                             title: 'Pick a kind of decision'|trans,

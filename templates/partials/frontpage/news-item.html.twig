@@ -1,8 +1,6 @@
 {#
-    One item in a news list, as the contents of a panel body. Nothing here names who wrote it: news is the association
-    speaking, not a person, and the entity holds no author.
-
-    Pass `item`.
+    Pass `item`. Nothing here names who wrote it: news is the association speaking, not a person, and the
+    entity holds no author.
 #}
 {% set isNew = date(item.date) > date('-7 days') %}
 
