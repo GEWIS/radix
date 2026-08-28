@@ -32,6 +32,9 @@ final readonly class DeviceFingerprint
 {
     private const string HMAC_ALGO = 'sha256';
 
+    /** What an IPv4 address looks like once it has been written as an IPv6 one: ten zero bytes and then `ffff`. */
+    private const string MAPPED_V4_PREFIX = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff";
+
     public function __construct(
         private UserAgentParser $userAgentParser,
         #[Autowire(param: 'kernel.secret')]
@@ -109,6 +112,22 @@ final readonly class DeviceFingerprint
 
         if (false === $packed) {
             return '';
+        }
+
+        // A dual-stack listener, or a proxy that forwards what it was given, hands us IPv4 written as `::ffff:1.2.3.4`.
+        // That packs to sixteen bytes whose first ten are zero, so cutting it to eight would put every address that
+        // arrives this way on one network and leave the fingerprint with three parts instead of four.
+        if (
+            self::MAPPED_V4_PREFIX === substr(
+                $packed,
+                0,
+                12,
+            )
+        ) {
+            $packed = substr(
+                $packed,
+                12,
+            );
         }
 
         return bin2hex(substr(

@@ -101,6 +101,39 @@ final class DeviceFingerprintTest extends TestCase
     }
 
     /**
+     * IPv4 written as IPv6 is still IPv4, and it arrives that way from a dual-stack listener or a proxy that forwards
+     * what it was given. Read as an IPv6 address it would be cut to ten zero bytes, which is the same network for
+     * everybody who reaches us like this.
+     */
+    public function testIpv4WrittenAsIpv6IsTheSameDevice(): void
+    {
+        self::assertSame(
+            $this->fingerprint(
+                self::CHROME_140,
+                '192.0.2.10',
+            ),
+            $this->fingerprint(
+                self::CHROME_140,
+                '::ffff:192.0.2.10',
+            ),
+        );
+    }
+
+    public function testAnotherNetworkWrittenAsIpv6IsStillADifferentDevice(): void
+    {
+        self::assertNotSame(
+            $this->fingerprint(
+                self::CHROME_140,
+                '::ffff:192.0.2.10',
+            ),
+            $this->fingerprint(
+                self::CHROME_140,
+                '::ffff:198.51.100.10',
+            ),
+        );
+    }
+
+    /**
      * IPv6 privacy addressing rewrites the host part about once a day, so anything narrower than the /64 would make
      * every member on IPv6 a new device every morning.
      */
