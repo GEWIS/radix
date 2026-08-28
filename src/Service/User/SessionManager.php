@@ -138,20 +138,20 @@ final class SessionManager
         Request $request,
         string $firewallName,
     ): int {
-        $this->knownDevices->forget(
-            $user->getUserIdentifier(),
-            $firewallName,
-        );
-
         $handler = $this->registry->get($firewallName);
         $currentSeries = $handler?->getSeriesFromCookie($request);
 
         // No identifiable "current" device -> refuse to scope "all others". Falling through would terminate every
         // session including the caller's, which is a surprise self-logout the StaleSessionGuardListener should have
-        //prevented us reaching, but let's be defensive and not do that if something's weird with the cookie.
+        // prevented us reaching, but let's be defensive and not do that if something's weird with the cookie.
         if (null === $currentSeries) {
             return 0;
         }
+
+        $this->knownDevices->forget(
+            $user->getUserIdentifier(),
+            $firewallName,
+        );
 
         $currentPhpSessionId = $request->getSession()->getId();
 
