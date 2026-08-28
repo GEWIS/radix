@@ -327,6 +327,14 @@ abstract class AbstractSecurityController extends AbstractController
             $target,
         );
 
+        // The same reason raiseSecurityNotice() forgets devices when a password is changed from /security: a reset is
+        // what somebody reaches for when they think their account has been reached, and a device an intruder was
+        // recognised on would go on signing in quietly afterwards.
+        $this->knownDevices->forget(
+            $target->getUserIdentifier(),
+            $this->firewall($request),
+        );
+
         $session->remove($sessionKey);
 
         $this->addFlash(
