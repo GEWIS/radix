@@ -37,49 +37,12 @@
     flex: none;
 }
 
-.stored-queries-group {
-    display: block;
-    padding-block: map-get($spacers, 2) 0.3125rem;
-    color: var(--#{$prefix}secondary-color);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-
-    &:first-child {
-        padding-block-start: 0;
-    }
-}
-
 .stored-query {
-    display: flex;
     align-items: center;
-    gap: map-get($spacers, 2);
-    padding: $nav-row-padding-y $nav-row-padding-x;
-    border-radius: 0.5625rem;
-    color: var(--#{$prefix}body-color);
-    text-decoration: none;
 
-    &:hover {
-        background-color: $nav-menu-hover-bg;
-        color: var(--#{$prefix}body-color);
-        text-decoration: none;
+    .picker-item-icon {
+        margin-block-start: 0;
     }
-
-    &.active {
-        background-color: $nav-menu-active-bg;
-        color: $nav-menu-active-color;
-    }
-}
-
-.stored-query-icon {
-    flex: none;
-    color: var(--#{$prefix}secondary-color);
-    font-size: $font-size-sm;
-}
-
-.stored-query.active .stored-query-icon {
-    color: inherit;
 }
 
 // Scrolls on its own so a long list does not push the rail past the results beside it.
@@ -127,16 +90,6 @@
 }
 
 @include color-mode(gewis-night) {
-    .stored-query {
-        &:hover {
-            background-color: $nav-menu-hover-bg-dark;
-        }
-
-        &.active {
-            background-color: $nav-menu-active-bg-dark;
-        }
-    }
-
     .entity:hover {
         background-color: $nav-menu-hover-bg-dark;
     }

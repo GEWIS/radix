@@ -77,6 +77,11 @@ class QueryService
         return $savedQuery;
     }
 
+    public function delete(SavedQuery $savedQuery): void
+    {
+        $this->savedQueryRepository->remove($savedQuery);
+    }
+
     /**
      * Get a saved query
      */

@@ -150,26 +150,26 @@
                     <div class="panel-body">
                         {# All groups start folded: landing on a form you did not pick invites recording the wrong
                            kind. #}
-                        <div class="nav decision-kinds" role="tablist" aria-orientation="vertical">
+                        <div class="nav picker" role="tablist" aria-orientation="vertical">
                             {% for key, group in kinds %}
-                                <button class="decision-kinds-group collapsed" type="button"
+                                <button class="picker-group collapsed" type="button"
                                         data-bs-toggle="collapse" data-bs-target="#kinds-{{ key }}"
                                         aria-expanded="false" aria-controls="kinds-{{ key }}">
-                                    <span class="decision-kinds-group-label">{{ group.label }}</span>
-                                    <span class="decision-kinds-group-count">{{ group.items|length }}</span>
+                                    <span class="picker-group-label">{{ group.label }}</span>
+                                    <span class="picker-group-count">{{ group.items|length }}</span>
                                     <span class="fas fa-chevron-down panel-collapse-chevron" aria-hidden="true"></span>
                                 </button>
-                                <div class="collapse decision-kinds-items" id="kinds-{{ key }}">
+                                <div class="collapse picker-items" id="kinds-{{ key }}">
                                     {% for id, item in group.items %}
-                                        <button class="decision-kind" id="{{ id }}-tab"
+                                        <button class="picker-item" id="{{ id }}-tab"
                                                 type="button" role="tab" data-bs-toggle="tab"
                                                 data-bs-target="#{{ id }}" aria-controls="{{ id }}"
                                                 aria-selected="false">
-                                            <span class="decision-kind-icon fas {{ item.icon }}"
+                                            <span class="picker-item-icon fas {{ item.icon }}"
                                                   aria-hidden="true"></span>
-                                            <span class="decision-kind-text">
-                                                <span class="decision-kind-label">{{ item.label }}</span>
-                                                <span class="decision-kind-hint">{{ item.hint }}</span>
+                                            <span class="picker-item-text">
+                                                <span class="picker-item-label">{{ item.label }}</span>
+                                                <span class="picker-item-hint">{{ item.hint }}</span>
                                             </span>
                                         </button>
                                     {% endfor %}

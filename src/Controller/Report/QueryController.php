@@ -11,11 +11,13 @@ use App\Form\SubmitButtons;
 use App\Service\Report\QueryService;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 use function str_replace;
 
@@ -68,6 +70,33 @@ final class QueryController extends AbstractController
             $request,
             $savedQuery,
         );
+    }
+
+    #[Route(
+        path: '/delete/{query}',
+        name: 'query_delete',
+        requirements: ['query' => '[0-9]+'],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        new Expression("'query_delete-' ~ args['query']"),
+        tokenKey: '_csrf_token',
+    )]
+    public function delete(int $query): Response
+    {
+        $savedQuery = $this->queryService->getSavedQuery($query);
+
+        if (null === $savedQuery) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->queryService->delete($savedQuery);
+        $this->addFlash(
+            'success',
+            'The stored query has been deleted.',
+        );
+
+        return $this->redirectToRoute('query_index');
     }
 
     /**
@@ -161,7 +190,7 @@ final class QueryController extends AbstractController
                 ),
                 'entities' => $this->queryService->getEntities(),
                 'saved_queries' => $this->queryService->getSavedQueries(),
-                'current_query_id' => $savedQuery?->getId(),
+                'current_query' => $savedQuery,
                 'result' => $result,
             ],
         );

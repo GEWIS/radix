@@ -1,0 +1,120 @@
+.picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+// The group heading is the control that folds the group away, so it is a button that still reads as a heading.
+.picker-group {
+    display: flex;
+    align-items: center;
+    gap: map-get($spacers, 2);
+    inline-size: 100%;
+    padding: $nav-row-padding-y $nav-row-padding-x;
+    border: 0;
+    border-radius: 0.5625rem;
+    background-color: transparent;
+    color: var(--#{$prefix}body-color);
+    font-size: $font-size-sm;
+    font-weight: 600;
+    text-align: start;
+
+    &:not(:first-child) {
+        margin-block-start: map-get($spacers, 2);
+    }
+
+    &:hover {
+        background-color: $nav-menu-hover-bg;
+    }
+}
+
+.picker-group-label {
+    min-inline-size: 0;
+}
+
+.picker-group-count {
+    margin-inline-start: auto;
+    color: var(--#{$prefix}secondary-color);
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+}
+
+.picker-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+// Bootstrap toggles `.collapse` with inline display, so the flex column above only applies while it is open.
+.picker-items.collapsing {
+    display: block;
+}
+
+.picker-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: $nav-row-padding-y $nav-row-padding-x;
+    border: 0;
+    border-radius: 0.5625rem;
+    background-color: transparent;
+    color: var(--#{$prefix}body-color);
+    text-align: start;
+    text-decoration: none;
+
+    &:hover {
+        background-color: $nav-menu-hover-bg;
+        color: var(--#{$prefix}body-color);
+        text-decoration: none;
+    }
+
+    &.active {
+        background-color: $nav-menu-active-bg;
+        color: $nav-menu-active-color;
+    }
+}
+
+.picker-item-icon {
+    flex: none;
+    inline-size: 1rem;
+    margin-block-start: 0.1875rem;
+    text-align: center;
+    font-size: $font-size-sm;
+    opacity: 0.85;
+}
+
+.picker-item-text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+}
+
+.picker-item-label {
+    font-weight: 600;
+}
+
+.picker-item-hint {
+    color: var(--#{$prefix}secondary-color);
+    font-size: $font-size-sm;
+    line-height: 1.4;
+    text-wrap: pretty;
+}
+
+.picker-item.active .picker-item-hint {
+    color: var(--#{$prefix}body-color);
+}
+
+.picker-group.collapsed .panel-collapse-chevron {
+    transform: rotate(-90deg);
+}
+
+@include color-mode(gewis-night) {
+    .picker-group:hover,
+    .picker-item:hover {
+        background-color: $nav-menu-hover-bg-dark;
+    }
+
+    .picker-item.active {
+        background-color: $nav-menu-active-bg-dark;
+    }
+}
