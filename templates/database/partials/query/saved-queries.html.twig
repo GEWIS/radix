@@ -1,3 +1,5 @@
+{% set current = current_query|default(null) %}
+
 {# Grouping first, rather than opening and closing a list as the category changes, does not depend on the
    order the queries come back in. #}
 {% set grouped = {} %}
@@ -7,17 +9,30 @@
 {% endfor %}
 
 {% if grouped is not empty %}
-    {% for category, queries in grouped %}
-        <span class="stored-queries-group">{{ category }}</span>
-        {% for saved_query in queries %}
-            {# A page load rather than a client-side fill, so what is running is always the query the address names. #}
-            <a class="stored-query{{ saved_query.id == (current_query_id|default(null)) ? ' active' : '' }}"
-               href="{{ path('query_show', {'query': saved_query.id}) }}">
-                <span class="fas fa-code stored-query-icon" aria-hidden="true"></span>
-                {{ saved_query.name }}
-            </a>
+    <div class="picker">
+        {% for category, queries in grouped %}
+            {% set open = null is not same as(current) and current.id in queries|map(query => query.id) %}
+            <button class="picker-group{{ open ? '' : ' collapsed' }}" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#stored-queries-{{ loop.index }}"
+                    aria-expanded="{{ open ? 'true' : 'false' }}"
+                    aria-controls="stored-queries-{{ loop.index }}">
+                <span class="picker-group-label">{{ category }}</span>
+                <span class="picker-group-count">{{ queries|length }}</span>
+                <span class="fas fa-chevron-down panel-collapse-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="collapse picker-items{{ open ? ' show' : '' }}" id="stored-queries-{{ loop.index }}">
+                {% for saved_query in queries %}
+                    {# A page load rather than a client-side fill, so what is running is always the query the address
+                       names. #}
+                    <a class="picker-item stored-query{{ open and saved_query.id == current.id ? ' active' : '' }}"
+                       href="{{ path('query_show', {'query': saved_query.id}) }}">
+                        <span class="fas fa-code picker-item-icon" aria-hidden="true"></span>
+                        <span class="picker-item-label">{{ saved_query.name }}</span>
+                    </a>
+                {% endfor %}
+            </div>
         {% endfor %}
-    {% endfor %}
+    </div>
 {% else %}
     {{ 'There are no saved queries.'|trans }}
 {% endif %}

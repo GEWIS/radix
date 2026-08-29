@@ -2745,6 +2745,10 @@
         <source>Delete Prospective Member</source>
         <target state="translated">Toekomstig lid verwijderen</target>
       </trans-unit>
+      <trans-unit id="b3wLjPR" resname="Delete Stored Query">
+        <source>Delete Stored Query</source>
+        <target state="translated">Opgeslagen query verwijderen</target>
+      </trans-unit>
       <trans-unit id="nooMqa8" resname="Delete album">
         <source>Delete album</source>
         <target state="translated">Album verwijderen</target>
@@ -9548,6 +9552,10 @@
       <trans-unit id="ROW7BJf" resname="This prospective member cannot be removed.">
         <source>This prospective member cannot be removed.</source>
         <target state="translated">Dit toekomstige lid kan niet verwijderd worden.</target>
+      </trans-unit>
+      <trans-unit id="Ysai6uY" resname="This removes %name% from the stored queries. Nothing the query reads is changed.">
+        <source>This removes %name% from the stored queries. Nothing the query reads is changed.</source>
+        <target state="translated">Dit verwijdert %name% uit de opgeslagen queries. Er verandert niets aan wat de query uitleest.</target>
       </trans-unit>
       <trans-unit id="3k9kouE" resname="This removes every photo tag of you across all albums, and clears your profile photo. This cannot be undone.">
         <source>This removes every photo tag of you across all albums, and clears your profile photo. This cannot be undone.</source>

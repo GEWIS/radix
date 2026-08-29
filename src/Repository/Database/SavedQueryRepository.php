@@ -31,6 +31,12 @@ class SavedQueryRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    public function remove(SavedQuery $query): void
+    {
+        $this->getEntityManager()->remove($query);
+        $this->getEntityManager()->flush();
+    }
+
     /**
      * Find by name.
      */

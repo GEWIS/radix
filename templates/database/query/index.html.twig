@@ -1,4 +1,5 @@
 {% extends 'layout-register.html.twig' %}
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
 
 {% block page_title %}{{ 'Query'|trans|page_title }}{{ parent() }}{% endblock %}
 
@@ -27,15 +28,25 @@
         <div class="col-12 col-xl-8">
             {# `QuerySaveType` extends `QueryType`, so executing and saving submit the same query field and the
                controller decides on the button that was clicked. The editor behaviour hangs off a wrapper rather than
-               off the textarea because Ctrl/Cmd+Enter has to submit through "Execute" specifically. #}
-            {{ form_start(form) }}
-                <div class="panel">
+               off the textarea because Ctrl/Cmd+Enter has to submit through "Execute" specifically.
+
+               The form is inside the panel because only a panel that is its column's first child drops its top
+               margin under the page header. #}
+            <div class="panel">
+                {{ form_start(form) }}
                     <div class="panel-heading d-flex flex-wrap align-items-baseline gap-2">
                         <h3>{{ 'Editor'|trans }}</h3>
                         {# The line count is written by the controller; the label is translated here so it does not have to be. #}
                         <span class="panel-heading-meta" data-query-editor-target="meta"
                               data-label="{{ '%number% lines · DQL'|trans({'%number%': '%number%'}) }}"></span>
                         <span class="ms-auto d-flex gap-2">
+                            {% if null is not same as(current_query) %}
+                                {# The modal carries a form of its own, so it is at the end of the page. #}
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal" data-bs-target="#delete-stored-query">
+                                    {{ 'Delete'|trans }}
+                                </button>
+                            {% endif %}
                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                     data-action="query-editor#clear">
                                 {{ 'Clear'|trans }}
@@ -78,8 +89,8 @@
                             {{ 'Saving with a name that is already in use overwrites that query and updates its category.'|trans }}
                         </p>
                     </div>
-                </div>
-            {{ form_end(form) }}
+                {{ form_end(form) }}
+            </div>
 
             <div class="panel">
                 <div class="panel-heading d-flex flex-wrap align-items-baseline gap-2">
@@ -151,4 +162,18 @@
             </div>
         </div>
     </div>
+
+    {% if null is not same as(current_query) %}
+        {{ modals.confirm_modal(
+            'delete-stored-query',
+            path('query_delete', {'query': current_query.id}),
+            csrf_token('query_delete-' ~ current_query.id),
+            'Delete Stored Query'|trans,
+            'This removes %name% from the stored queries. Nothing the query reads is changed.'|trans({
+                '%name%': current_query.name,
+            }),
+            'Delete'|trans,
+            'danger',
+        ) }}
+    {% endif %}
 {% endblock %}
