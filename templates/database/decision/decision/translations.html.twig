@@ -1,0 +1,87 @@
+{% extends 'layout-register.html.twig' %}
+
+{% block page_title %}{{ 'Untranslated decisions'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{{ path('admin/meetings/index') }}">{{ 'Meetings'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Untranslated decisions'|trans }}</li>
+{% endblock %}
+
+{% block page_header %}
+    {% embed 'partials/application/page-header.html.twig' %}
+        {% block header_container_class %}container-fluid px-3{% endblock %}
+        {% block header_title %}{{ 'Untranslated decisions'|trans }}{% endblock %}
+        {% block header_subtitle %}
+            <p class="page-header-meta mb-0">
+                {{ 'Free text is recorded in the language it was decided in. Until it is also written in English, the decision reads as an apology to everybody who asked for it in English.'|trans }}
+            </p>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}
+
+{% block contents %}
+    <div class="row g-3">
+        <div class="col-12 col-xl-10">
+            {% for row in rows %}
+                {% set label = row.meetingType ~ ' ' ~ row.meetingNumber ~ '.' ~ row.point ~ '.' ~ row.number %}
+                {% set form = forms[row.formName] %}
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <span class="badge badge-gewis-primary font-monospace">{{ label }}</span>
+                            <a class="ms-auto btn btn-sm btn-outline-secondary"
+                               href="{{ path('admin/meetings/view', {
+                                   'type': row.meetingType,
+                                   'number': row.meetingNumber,
+                               }) }}">
+                                {{ 'Go to %type% %number%'|trans({
+                                    '%type%': row.meetingType,
+                                    '%number%': row.meetingNumber,
+                                }) }}
+                            </a>
+                        </div>
+
+                        {{ form_start(form) }}
+                            {{ form_errors(form) }}
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-1">
+                                        <span class="flag-icon flag-icon-nl"></span> {{ 'Dutch'|trans }}
+                                    </div>
+                                    <p class="decision-content mb-0">{{ row.content }}</p>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-1">
+                                        <span class="flag-icon flag-icon-en"></span> {{ 'English'|trans }}
+                                    </div>
+                                    {{ form_row(form.contentEN, {'attr': {'placeholder': 'Decision'|trans}}) }}
+                                    <div class="decision-form-actions">
+                                        {{ form_widget(form.submit, {'attr': {'class': 'btn-gewis-primary'}}) }}
+                                    </div>
+                                </div>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="panel">
+                    <div class="panel-body">
+                        {% include 'partials/application/empty-state.html.twig' with {
+                            icon: 'fa-language',
+                            title: 'Every free-text decision reads in both languages.'|trans,
+                            body: 'A decision recorded from now on is written in Dutch and English at once, so there is nothing left to catch up with.'|trans,
+                        } only %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% include 'partials/application/pagination.html.twig' with {
+                'page': currentPage,
+                'totalPages': totalPages,
+                'totalCount': totalCount,
+                'pageSize': pageSize,
+                'route': 'decision_decision_translations',
+            } only %}
+        </div>
+    </div>
+{% endblock %}

@@ -19,18 +19,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Entity(repositoryClass: OtherRepository::class)]
 class Other extends SubDecision
 {
-    /**
-     * Textual content for the decision.
-     */
     #[Column(type: 'text')]
-    private string $content;
+    private string $contentNL;
 
-    /**
-     * Set the content.
-     */
-    public function setContent(string $content): void
+    /** Null for the decisions recorded before the form asked for a translation. */
+    #[Column(
+        type: 'text',
+        nullable: true,
+    )]
+    private ?string $contentEN = null;
+
+    public function getContentNL(): string
     {
-        $this->content = $content;
+        return $this->contentNL;
+    }
+
+    public function setContentNL(string $contentNL): void
+    {
+        $this->contentNL = $contentNL;
+    }
+
+    public function getContentEN(): ?string
+    {
+        return $this->contentEN;
+    }
+
+    public function setContentEN(?string $contentEN): void
+    {
+        $this->contentEN = $contentEN;
     }
 
     #[Override]
@@ -48,10 +64,13 @@ class Other extends SubDecision
     ): string {
         // The stored content is the (statutory) Dutch text, there is nothing to translate.
         if (AppLanguages::Dutch === $language) {
-            return $this->content;
+            return $this->contentNL;
         }
 
-        // No alternative content exists for a custom decision.
+        if (null !== $this->contentEN) {
+            return $this->contentEN;
+        }
+
         return $translator->trans(
             'If you are reading this, the secretary has not done their job.',
             locale: $language->getLangParam(),

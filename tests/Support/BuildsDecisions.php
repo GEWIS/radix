@@ -57,9 +57,11 @@ trait BuildsDecisions
         Decision $decision,
         string $content,
         int $sequence = 1,
+        ?string $contentEN = null,
     ): Other {
         $other = new Other();
-        $other->setContent($content);
+        $other->setContentNL($content);
+        $other->setContentEN($contentEN);
         $other->setSequence($sequence);
         $other->setDecision($decision);
 

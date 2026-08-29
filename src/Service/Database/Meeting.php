@@ -19,12 +19,14 @@ use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Foundation as FoundationModel;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation as InstallationModel;
+use App\Entity\Database\SubDecision\Other;
 use App\Exception\Database\AnnulmentNotPossible;
 use App\Exception\Database\CounterpartNotPossible;
 use App\Exception\Database\DecisionNamesDeletedMember;
 use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Database\MeetingRepository;
 use App\Repository\Database\SubDecision\FoundationRepository;
+use App\Repository\Database\SubDecision\OtherRepository;
 use App\Service\Report\ApiService;
 use App\ViewModel\Database\DecisionOptions;
 use App\ViewModel\Database\DecisionReference;
@@ -66,6 +68,7 @@ class Meeting
         private readonly TranslatorInterface $translator,
         private readonly MeetingRepository $meetingRepository,
         private readonly FoundationRepository $foundationRepository,
+        private readonly OtherRepository $otherRepository,
     ) {
     }
 
@@ -222,6 +225,49 @@ class Meeting
             ),
             $warnings,
         );
+    }
+
+    /**
+     * @return array{items: list<Other>, total: int}
+     */
+    public function getUntranslatedDecisions(
+        int $page,
+        int $pageSize,
+    ): array {
+        return $this->otherRepository->paginateWithoutEnglish(
+            $page,
+            $pageSize,
+        );
+    }
+
+    public function countUntranslatedDecisions(): int
+    {
+        return $this->otherRepository->countWithoutEnglish();
+    }
+
+    public function getUntranslatedDecision(
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+        int $sequence,
+    ): ?Other {
+        return $this->otherRepository->findWithoutEnglish(
+            $type,
+            $number,
+            $point,
+            $decision,
+            $sequence,
+        );
+    }
+
+    /**
+     * The export is not held off the way recording and deleting a decision hold it off: the decision keeps saying
+     * what it always said.
+     */
+    public function translateDecision(Other $decision): void
+    {
+        $this->otherRepository->persist($decision);
     }
 
     /**

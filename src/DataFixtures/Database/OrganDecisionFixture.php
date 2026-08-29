@@ -276,6 +276,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             Member::class,
         );
 
+        // The English half is left out of a handful on purpose, or the translation page has nothing to show.
         $texts = [
             [
                 'ledger-meeting-BV-1801',
@@ -283,6 +284,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
                 1,
                 'Het bestuur besluit de begroting van de wisselactiviteit van GETÉST ter hoogte van € 250,00 goed'
                 . ' te keuren.',
+                'The board decides to approve the budget of the exchange activity of GETÉST amounting to € 250.00.',
             ],
             [
                 'ledger-meeting-BV-1802',
@@ -292,60 +294,72 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
                     'Het bestuur besluit %s sleutelrechten toe te kennen tot het einde van het verenigingsjaar.',
                     $keyGrantee->getFullName(),
                 ),
+                sprintf(
+                    'The board decides to grant %s key rights until the end of the association year.',
+                    $keyGrantee->getFullName(),
+                ),
             ],
             [
                 'ledger-meeting-BV-1803',
                 1,
                 1,
                 'Het bestuur besluit de notulen van de vorige bestuursvergadering vast te stellen.',
+                'The board decides to adopt the minutes of the previous board meeting.',
             ],
             [
                 'ledger-meeting-BV-1803',
                 1,
                 2,
                 'Het bestuur besluit het activiteitenbeleid ter instemming voor te leggen aan de ALV.',
+                null,
             ],
             [
                 'ledger-meeting-BV-1805',
                 1,
                 1,
                 'Het bestuur besluit de begroting van het introductieweekend ter hoogte van € 1.250,00 goed te keuren.',
+                'The board decides to approve the budget of the introduction weekend amounting to € 1,250.00.',
             ],
             [
                 'ledger-meeting-BV-1807',
                 2,
                 1,
                 'Het bestuur besluit de samenwerkingsovereenkomst met de faculteit te bekrachtigen.',
+                'The board decides to ratify the cooperation agreement with the department.',
             ],
             [
                 'ledger-meeting-BV-1808',
                 1,
                 1,
                 'Het bestuur besluit een bijdrage van € 75,00 toe te kennen aan de constitutieborrel van KEUR.',
+                null,
             ],
             [
                 'ledger-meeting-BV-1810',
                 1,
                 1,
                 'Het bestuur besluit de declaratierichtlijn per direct te actualiseren.',
+                'The board decides to update the expense claim guideline with immediate effect.',
             ],
             [
                 'ledger-meeting-BV-1811',
                 1,
                 1,
                 'Het bestuur besluit de jaarplanning van GETÉST vast te stellen.',
+                null,
             ],
         ];
 
         $annulmentTarget = null;
 
-        foreach ($texts as [$meetingReference, $point, $number, $content]) {
+        foreach ($texts as [$meetingReference, $point, $number, $contentNL, $contentEN]) {
             $decision = $this->createTextDecision(
                 $manager,
                 $meetingReference,
                 $point,
                 $number,
-                $content,
+                $contentNL,
+                $contentEN,
             );
 
             // Said again by a virtual meeting further down, which is what the counterpart there points back at.
@@ -393,31 +407,36 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
                 2,
                 1,
                 'De agenda van de vergadering wordt vastgesteld.',
+                'The agenda of the meeting is adopted.',
             ],
             [
                 3,
                 1,
                 'De notulen van de vorige ALV worden goedgekeurd.',
+                'The minutes of the previous GMM are approved.',
             ],
             [
                 5,
                 1,
                 'De motie van orde over de vergaderduur wordt aangenomen.',
+                null,
             ],
             [
                 7,
                 1,
                 'De begroting voor het komende verenigingsjaar wordt vastgesteld.',
+                'The budget for the coming association year is adopted.',
             ],
         ];
 
-        foreach ($gmmTexts as [$point, $number, $content]) {
+        foreach ($gmmTexts as [$point, $number, $contentNL, $contentEN]) {
             $this->createTextDecision(
                 $manager,
                 'ledger-meeting-gmm-complete',
                 $point,
                 $number,
-                $content,
+                $contentNL,
+                $contentEN,
             );
         }
 
@@ -428,6 +447,8 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             1,
             'Rectificatie: de in BV 1805.1.1 genoemde begroting betreft het introductieweekend van het komende'
             . ' verenigingsjaar.',
+            'Correction: the budget mentioned in BV 1805.1.1 concerns the introduction weekend of the coming'
+            . ' association year.',
         );
 
         // A virtual meeting saying again what a board meeting decided, and naming the decision it repeats. Without
@@ -438,6 +459,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             1,
             1,
             'Het bestuur besluit de begroting van het introductieweekend ter hoogte van € 1.250,00 goed te keuren.',
+            'The board decides to approve the budget of the introduction weekend amounting to € 1,250.00.',
         );
         $repeat->setCounterpart($this->getReference(
             self::REPEATED_DECISION,
@@ -453,6 +475,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         int $point,
         int $number,
         string $contentNL,
+        ?string $contentEN = null,
     ): Decision {
         $decision = new Decision();
         $decision->setMeeting($this->getReference(
@@ -465,7 +488,8 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         // A decision says what its subdecisions say, so free text is a subdecision rather than a field on the
         // decision; the replay reads the projection's content off it.
         $other = new Other();
-        $other->setContent($contentNL);
+        $other->setContentNL($contentNL);
+        $other->setContentEN($contentEN);
         $other->setSequence(1);
         $other->setDecision($decision);
         $decision->addSubdecision($other);

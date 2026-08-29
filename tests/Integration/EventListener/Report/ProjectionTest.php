@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Integration\EventListener\Report;
 
 use App\Entity\Database\Enums\InstallationFunctions;
+use App\Entity\Database\SubDecision\Other;
+use App\Entity\Decision\Decision as ReportDecision;
 use App\Entity\Decision\Meeting as ReportMeeting;
 use App\Entity\Decision\Member as ReportMember;
 use App\Entity\Decision\Organ as ReportOrgan;
@@ -199,6 +201,47 @@ class ProjectionTest extends KernelTestCase
         $this->ledger->flush();
 
         self::assertNull($this->organOf('RTC'));
+    }
+
+    public function testTranslatingAFreeTextDecisionRewritesWhatTheDecisionReadsAs(): void
+    {
+        $other = $this->build->decideFreely(
+            $this->build->meeting(),
+            'Er wordt een taart gekocht.',
+        );
+        $projected = $this->projectedDecisionOf($other);
+
+        self::assertNotNull($projected);
+        self::assertSame(
+            'Er wordt een taart gekocht.',
+            $projected->getContentNL(),
+        );
+        self::assertSame(
+            'If you are reading this, the secretary has not done their job.',
+            $projected->getContentEN(),
+        );
+
+        $other->setContentEN('A cake is bought.');
+        $this->ledger->flush();
+
+        self::assertSame(
+            'A cake is bought.',
+            $projected->getContentEN(),
+        );
+        self::assertSame(
+            'Er wordt een taart gekocht.',
+            $projected->getContentNL(),
+        );
+    }
+
+    private function projectedDecisionOf(Other $other): ?ReportDecision
+    {
+        return $this->report->getRepository(ReportDecision::class)->find([
+            'meeting_type' => $other->getMeetingType(),
+            'meeting_number' => $other->getMeetingNumber(),
+            'point' => $other->getDecisionPoint(),
+            'number' => $other->getDecisionNumber(),
+        ]);
     }
 
     private function organOf(string $abbreviation): ?ReportOrgan

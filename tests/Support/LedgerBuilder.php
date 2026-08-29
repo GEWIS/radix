@@ -24,6 +24,7 @@ use App\Entity\Database\SubDecision\Installation;
 use App\Entity\Database\SubDecision\Key\Granting;
 use App\Entity\Database\SubDecision\Key\Withdrawal;
 use App\Entity\Database\SubDecision\OrganRegulation;
+use App\Entity\Database\SubDecision\Other;
 use App\Entity\Database\SubDecision\Reappointment;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -301,6 +302,20 @@ final class LedgerBuilder
         $regulation->setDecision($this->decision($meeting));
 
         return $this->persist($regulation);
+    }
+
+    public function decideFreely(
+        Meeting $meeting,
+        string $contentNL,
+        ?string $contentEN = null,
+    ): Other {
+        $other = new Other();
+        $other->setContentNL($contentNL);
+        $other->setContentEN($contentEN);
+        $other->setSequence(1);
+        $other->setDecision($this->decision($meeting));
+
+        return $this->persist($other);
     }
 
     public function decision(Meeting $meeting): Decision
