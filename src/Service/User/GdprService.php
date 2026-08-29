@@ -17,6 +17,7 @@ use App\Repository\Photo\PhotoRepository;
 use App\Repository\Photo\ProfilePhotoRepository;
 use App\Repository\Photo\VoteRepository;
 use App\Repository\User\ExternalAppAuthenticationRepository;
+use App\Repository\User\KnownDeviceRepository;
 use App\Repository\User\SessionRepository;
 use App\Repository\User\UserRepository;
 
@@ -34,6 +35,7 @@ class GdprService
         private readonly UserRepository $userRepository,
         private readonly ProfilePhotoRepository $profilePhotoRepository,
         private readonly SessionRepository $sessionRepository,
+        private readonly KnownDeviceRepository $knownDeviceRepository,
         private readonly ExternalAppAuthenticationRepository $externalAppAuthenticationRepository,
         private readonly UserSignupRepository $signupRepository,
         private readonly AuthorizationRepository $authorizationRepository,
@@ -73,6 +75,10 @@ class GdprService
                 'sessions' => array_map(
                     static fn ($session) => $session->toGdprArray(),
                     $this->sessionRepository->findAllByUser(strval($lidnr)),
+                ),
+                'known_devices' => array_map(
+                    static fn ($device) => $device->toGdprArray(),
+                    $this->knownDeviceRepository->findAllByUser(strval($lidnr)),
                 ),
                 'external_applications' => array_map(
                     static fn ($authentication) => $authentication->toGdprArray(),

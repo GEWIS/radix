@@ -8,6 +8,7 @@ use App\Repository\User\SessionRepository;
 use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
 use App\Security\User\UserAgentParser;
+use App\Service\User\KnownDeviceRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -23,8 +24,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
-use function preg_replace;
-use function strtolower;
 
 /**
  * For every authenticated request:
@@ -64,6 +63,7 @@ final class StaleSessionGuardListener
         private readonly FirewallMap $firewallMap,
         private readonly UserAgentParser $userAgentParser,
         private readonly TokenStorageInterface $tokenStorage,
+        private readonly KnownDeviceRegistry $knownDevices,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -140,10 +140,10 @@ final class StaleSessionGuardListener
         // gate. A mismatch on either side suggests the cookie pair has been replayed from a different device -> tear
         // down.
         $currentMeta = $this->userAgentParser->parseRequest($request);
-        $storedBrowser = self::extractName($managedSession->getBrowser());
-        $currentBrowser = self::extractName($currentMeta['browser']);
-        $storedOs = self::extractName($managedSession->getOperatingSystem());
-        $currentOs = self::extractName($currentMeta['operatingSystem']);
+        $storedBrowser = UserAgentParser::family($managedSession->getBrowser());
+        $currentBrowser = UserAgentParser::family($currentMeta['browser']);
+        $storedOs = UserAgentParser::family($managedSession->getOperatingSystem());
+        $currentOs = UserAgentParser::family($currentMeta['operatingSystem']);
 
         $browserMismatch = null !== $storedBrowser && null !== $currentBrowser && $storedBrowser !== $currentBrowser;
         $osMismatch = null !== $storedOs && null !== $currentOs && $storedOs !== $currentOs;
@@ -187,16 +187,28 @@ final class StaleSessionGuardListener
         // moments of token rotation.
         $now = new DateTimeImmutable();
         $staleAfter = $now->modify('-' . self::LAST_USED_THROTTLE_SECONDS . ' seconds');
-        if ($managedSession->getLastUsedAt() < $staleAfter) {
+        $inUse = $managedSession->getLastUsedAt() < $staleAfter;
+        if ($inUse) {
             $managedSession->setLastUsedAt($now);
             $changed = true;
         }
 
-        if (!$changed) {
+        if ($changed) {
+            $this->entityManager->flush();
+        }
+
+        if (!$inUse) {
             return;
         }
 
-        $this->entityManager->flush();
+        // Somebody working in a device they signed in from months ago is the same reason to keep it recognised as
+        // signing in from it again would be, and this is the only place that sees them do it. Behind the same throttle
+        // as the bump above, so it costs one lookup per three minutes of activity.
+        $this->knownDevices->refresh(
+            $managedSession->getUserIdentifier(),
+            $firewall,
+            $request,
+        );
     }
 
     private function forceLogout(
@@ -224,17 +236,5 @@ final class StaleSessionGuardListener
         $event->setResponse(new RedirectResponse(
             $this->urlGenerator->generate($loginRoute),
         ));
-    }
-
-    /**
-     * Strip the trailing major-version token ("Firefox 124" -> "firefox") and lower-case for stable comparison.
-     */
-    private static function extractName(?string $combined): ?string
-    {
-        if (null === $combined) {
-            return null;
-        }
-
-        return strtolower(preg_replace('/\s+\d+$/', '', $combined) ?? $combined);
     }
 }

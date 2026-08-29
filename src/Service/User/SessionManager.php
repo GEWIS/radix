@@ -33,6 +33,7 @@ final class SessionManager
 {
     public function __construct(
         private readonly SessionRepository $repository,
+        private readonly KnownDeviceRegistry $knownDevices,
         private readonly HandlerRegistry $registry,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $em,
@@ -126,6 +127,12 @@ final class SessionManager
         return true;
     }
 
+    /**
+     * Signing every other device out also forgets the devices this account was recognised on, so the next sign-in from
+     * any of them is announced. Somebody reaches for this when they think a device is not theirs, and a recognised
+     * fingerprint left in place would keep that device quiet on its way back in. The caller's own goes with the rest;
+     * only recognition is lost, so nobody is signed out by it.
+     */
     public function terminateAllExceptCurrent(
         UserInterface $user,
         Request $request,
@@ -136,10 +143,15 @@ final class SessionManager
 
         // No identifiable "current" device -> refuse to scope "all others". Falling through would terminate every
         // session including the caller's, which is a surprise self-logout the StaleSessionGuardListener should have
-        //prevented us reaching, but let's be defensive and not do that if something's weird with the cookie.
+        // prevented us reaching, but let's be defensive and not do that if something's weird with the cookie.
         if (null === $currentSeries) {
             return 0;
         }
+
+        $this->knownDevices->forget(
+            $user->getUserIdentifier(),
+            $firewallName,
+        );
 
         $currentPhpSessionId = $request->getSession()->getId();
 
@@ -171,10 +183,16 @@ final class SessionManager
         return count($sessions);
     }
 
+    /** As {@see self::terminateAllExceptCurrent()}, recognition goes with the sessions. */
     public function terminateAll(
         UserInterface $user,
         string $firewallName,
     ): int {
+        $this->knownDevices->forget(
+            $user->getUserIdentifier(),
+            $firewallName,
+        );
+
         $sessions = $this->repository->findAllByUserOnFirewall(
             $user->getUserIdentifier(),
             $firewallName,

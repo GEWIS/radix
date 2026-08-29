@@ -18,6 +18,7 @@ use App\Repository\User\UserRepository;
 use App\Security\User\HandlerRegistry;
 use App\Service\User\AccountPasswordService;
 use App\Service\User\ExternalAppService;
+use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
 use App\Service\User\PasswordResetService;
 use App\Service\User\SessionManager;
@@ -53,6 +54,7 @@ class UserController extends AbstractSecurityController
         AccountPasswordService $accountPasswordService,
         MultiFactorService $multiFactorService,
         PasswordResetService $passwordResetService,
+        KnownDeviceRegistry $knownDevices,
         private readonly UserRepository $userRepository,
         private readonly ExternalAppRepository $externalAppRepository,
         private readonly ExternalAppAuthenticationRepository $externalAppAuthenticationRepository,
@@ -66,6 +68,7 @@ class UserController extends AbstractSecurityController
             $accountPasswordService,
             $multiFactorService,
             $passwordResetService,
+            $knownDevices,
             routePrefix: 'user_',
             userType: UserTypes::User,
         );

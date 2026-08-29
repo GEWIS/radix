@@ -7,6 +7,7 @@ namespace App\Security\User;
 use App\Entity\Application\Enums\NotificationType;
 use App\Entity\User\Session;
 use App\Repository\User\SessionRepository;
+use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\SecurityNotifier;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -75,6 +76,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         private readonly SessionRepository $repository,
         private readonly UserAgentParser $userAgentParser,
         private readonly SecurityNotifier $securityNotifier,
+        private readonly KnownDeviceRegistry $knownDevices,
         #[Autowire(param: 'kernel.secret')]
         #[SensitiveParameter]
         private readonly string $secret,
@@ -416,12 +418,12 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
     }
 
     /**
-     * Every persistent sign-in is announced, with no attempt to work out whether this browser is one we have seen.
+     * A sign-in is announced unless it came from a device this account has signed in from before.
      *
-     * That is deliberate. Recognising a device means either a user-agent fingerprint, which cannot tell two identical
-     * machines apart and so stays quiet on exactly the case worth warning about, or a cookie compared against session
-     * rows that are deleted on sign-out. Both get it wrong often enough to be worth less than saying plainly what
-     * happened, which is that somebody signed in.
+     * Only this notice is ever withheld. A changed password or a second factor turned off goes out whatever device it
+     * came from, which is why the decision sits here rather than inside {@see SecurityNotifier}, where it could
+     * quietly come to cover them too. {@see \App\Service\User\KnownDeviceRegistry} sets out what recognition rests
+     * on and how weak it is.
      */
     private function announceSignIn(
         string $userIdentifier,
@@ -430,6 +432,16 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         $firewall = Firewall::tryFrom($this->firewallName);
 
         if (null === $firewall) {
+            return;
+        }
+
+        if (
+            $this->knownDevices->recognise(
+                $userIdentifier,
+                $this->firewallName,
+                $request,
+            )
+        ) {
             return;
         }
 

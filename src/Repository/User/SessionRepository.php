@@ -15,7 +15,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * NOTE: All queries that list, count, or delete sessions for a user MUST
  * also filter by firewallName. This guarantees that:
  *   - A "terminate all" action on the `main` firewall does not touch `company` sessions.
- *   - The per-user session cap is enforced independently per firewall.
  *   - The session management UI shows only the sessions relevant to the current user context.
  *
  * The only exception is findOneBySeries(), which is looked up globally (series
@@ -131,6 +130,29 @@ class SessionRepository extends ServiceEntityRepository
             ->setParameter(
                 'fw',
                 $firewallName,
+            )
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Sessions nobody has used since `$before`, whatever their expiry says.
+     *
+     * `expiresAt` is fixed when the row is written and never extended, so it says how old a session is and not how
+     * long ago somebody used it. A private window that was closed rather than signed out of leaves a row no cookie can
+     * ever reach again, which would otherwise sit in the member's device list for the rest of its ninety days.
+     *
+     * `lastUsedAt` is the honest measure: {@see \App\EventListener\User\StaleSessionGuardListener} bumps it on real
+     * activity, so an abandoned row keeps the timestamp it was created with while a device in use keeps moving.
+     */
+    public function deleteIdleSince(DateTimeImmutable $before): int
+    {
+        return $this->createQueryBuilder('s')
+            ->delete()
+            ->where('s.lastUsedAt <= :before')
+            ->setParameter(
+                'before',
+                $before,
             )
             ->getQuery()
             ->execute();
