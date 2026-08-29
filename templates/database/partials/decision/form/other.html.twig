@@ -1,7 +1,19 @@
 {# `form_end()` emits whatever a form has not rendered itself, so the hidden meeting reference and the
    decision's place in it never have to be listed by hand. #}
 {{ form_start(form, {'action': path('decision_decision_form', {'form': 'other'})}) }}
-    {{ form_row(form.content, {'attr': {'placeholder': 'Decision'|trans}}) }}
+    <div class="row">
+        {% for language in [
+            {'code': 'nl', 'label': 'Dutch'|trans, 'field': form.contentNL},
+            {'code': 'en', 'label': 'English'|trans, 'field': form.contentEN},
+        ] %}
+            <div class="col-lg-6">
+                <div class="mb-1">
+                    <span class="flag-icon flag-icon-{{ language.code }}"></span> {{ language.label }}
+                </div>
+                {{ form_row(language.field, {'attr': {'placeholder': 'Decision'|trans}}) }}
+            </div>
+        {% endfor %}
+    </div>
     <div class="decision-form-actions">
         {{ form_widget(form.submit, {'attr': {'class': 'btn-gewis-primary'}}) }}
     </div>

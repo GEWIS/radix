@@ -89,7 +89,8 @@
                     {% set meetingAuthorizations = route starts with 'admin/meetings/authorizations' %}
                     {% set meetingReference = route starts with 'admin/meetings/reference' %}
                     {{ sidebar.section('meetings', 'fa-gavel', 'Meetings'|trans,
-                        route starts with 'admin/meetings' or route starts with 'decision_export', [
+                        route starts with 'admin/meetings' or route starts with 'decision_export'
+                        or route starts with 'decision_decision_translat', [
                         {
                             'href': path('admin/meetings/index'),
                             'label': 'Overview'|trans,
@@ -106,12 +107,18 @@
                             'label': 'Reference documents'|trans,
                             'active': meetingReference,
                         },
+                        is_granted('ROLE_DATABASE_ADMIN') ? {
+                            'href': path('decision_decision_translations'),
+                            'label': 'Untranslated decisions'|trans,
+                            'active': route starts with 'decision_decision_translat',
+                            'count': decisions_awaiting_translation(),
+                        } : null,
                         {
                             'href': path('decision_export_index'),
                             'label': 'Export'|trans,
                             'active': route starts with 'decision_export',
                         },
-                    ]) }}
+                    ]|filter(child => child is not null)) }}
                 {% endif %}
 
                 {{ sidebar.section('bodies', 'fa-sitemap', 'Bodies'|trans,

@@ -558,7 +558,10 @@ workflow. Read this before touching any of those domains.
   it is told it decided.
 - **Decisions are the historical record.** They are amended by further decisions, never edited. Subdecision `sequence`
   is part of the primary key and is copied downstream, so subdecisions cannot be reordered. Don't "fix" past data by
-  editing decision rows; model corrections as new decisions or sub-decisions.
+  editing decision rows; model corrections as new decisions or sub-decisions. The one thing written afterwards is the
+  English text of a free-text decision, on the page the register's menu calls "Untranslated decisions". That is how the
+  decision reads rather than what was decided, the Dutch text it was decided in stays as it is, and a decision that
+  already has an English text is not offered there at all.
 - **Nothing joins across the two connections.** If a query needs the ledger and the website's data at once, it is two
   queries and a match in PHP.
 - **The API is a contract.** Other GEWIS systems read it. The envelope, status codes and version negotiation are not

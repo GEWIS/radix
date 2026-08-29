@@ -277,6 +277,39 @@ class MeetingService
     }
 
     /**
+     * A subdecision written after its decision was recorded leaves the decision itself saying what it said before,
+     * and that text is what the site shows and what the search reads. A decision the projection does not know yet is
+     * left to {@see self::generateDecision()}, which is about to write it in full.
+     */
+    public function refreshDecisionContent(DatabaseDecision $decision): void
+    {
+        $reportDecision = $this->findReportDecision($decision);
+
+        if (null === $reportDecision) {
+            return;
+        }
+
+        $contentNL = [];
+        $contentEN = [];
+
+        foreach ($decision->getSubdecisions() as $subdecision) {
+            $contentNL[] = $subdecision->getTranslatedContent(
+                $this->translator,
+                AppLanguages::Dutch,
+            );
+            $contentEN[] = $subdecision->getTranslatedContent(
+                $this->translator,
+                AppLanguages::English,
+            );
+        }
+
+        $reportDecision->setContentNL(implode(' ', $contentNL));
+        $reportDecision->setContentEN(implode(' ', $contentEN));
+
+        $this->emReport->persist($reportDecision);
+    }
+
+    /**
      * Project a subdecision onto its `App\Entity\Decision` counterpart.
      *
      * The two class trees mirror each other one-for-one, so which report class belongs to a subdecision follows from

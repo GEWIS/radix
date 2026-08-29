@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Form\Database;
 
-use App\Form\Database\DataMapper\OtherMapper;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,12 +14,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 use function Symfony\Component\Translation\t;
 
-class OtherType extends AbstractType
+/**
+ * The English text alone. The Dutch text is the record and is never written here.
+ *
+ * @extends AbstractType<array<string, mixed>>
+ */
+class OtherTranslationType extends AbstractType
 {
-    public function __construct(private readonly OtherMapper $dataMapper)
-    {
-    }
-
     /**
      * @param array<string, mixed> $options
      */
@@ -30,17 +30,6 @@ class OtherType extends AbstractType
         array $options,
     ): void {
         $builder
-            ->add(
-                'contentNL',
-                TextType::class,
-                [
-                    'label' => t('Decision'),
-                    'constraints' => [
-                        new NotBlank(),
-                        new Length(min: 3),
-                    ],
-                ],
-            )
             ->add(
                 'contentEN',
                 TextType::class,
@@ -55,14 +44,7 @@ class OtherType extends AbstractType
             ->add(
                 'submit',
                 SubmitType::class,
-                ['label' => t('Add Decision')],
-            )
-            ->setDataMapper($this->dataMapper);
-    }
-
-    #[Override]
-    public function getParent(): string
-    {
-        return BaseDecisionType::class;
+                ['label' => t('Save Translation')],
+            );
     }
 }

@@ -88,6 +88,9 @@ final class DatabaseUpdateListener
                 $subDecision = $this->meetingService->generateSubDecision($entity);
                 $this->subDecisionService->generateRelated($subDecision);
                 $this->emReport->persist($subDecision);
+                // Reached before or after the decision itself when one is recorded; either order ends up with the
+                // same text.
+                $this->meetingService->refreshDecisionContent($entity->getDecision());
                 break;
 
             case $entity instanceof MailingList:

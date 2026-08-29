@@ -17,6 +17,18 @@
         <source> met genoemde wijzigingen</source>
         <target state="translated"> met genoemde wijzigingen</target>
       </trans-unit>
+      <trans-unit id="AoY3XHY" resname="&quot;%name%&quot; has been given a day. The activity has been started for you and still needs filling in.">
+        <source>"%name%" has been given a day. The activity has been started for you and still needs filling in.</source>
+        <target state="translated">"%name%" heeft een dag gekregen. De activiteit is voor je aangemaakt en moet nog ingevuld worden.</target>
+      </trans-unit>
+      <trans-unit id="FPSBTz3" resname="&quot;%name%&quot; has been put forward and is waiting for a day.">
+        <source>"%name%" has been put forward and is waiting for a day.</source>
+        <target state="translated">"%name%" is ingediend en wacht op een dag.</target>
+      </trans-unit>
+      <trans-unit id="3WCdvsC" resname="&quot;%name%&quot; has been turned down; its days are free again.">
+        <source>"%name%" has been turned down; its days are free again.</source>
+        <target state="translated">"%name%" is afgewezen; de dagen zijn weer vrij.</target>
+      </trans-unit>
       <trans-unit id="Uvxq3WQ" resname="%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.">
         <source>%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.</source>
         <target state="translated">%GRANTEE% krijgt een sleutelcode van GEWIS tot en met %UNTIL%.</target>
@@ -517,18 +529,6 @@
         <source>%valid% changes, %issues% issues</source>
         <target state="translated">%valid% wijzigingen, %issues% problemen</target>
       </trans-unit>
-      <trans-unit id="AoY3XHY" resname="&quot;%name%&quot; has been given a day. The activity has been started for you and still needs filling in.">
-        <source>"%name%" has been given a day. The activity has been started for you and still needs filling in.</source>
-        <target state="translated">"%name%" heeft een dag gekregen. De activiteit is voor je aangemaakt en moet nog ingevuld worden.</target>
-      </trans-unit>
-      <trans-unit id="FPSBTz3" resname="&quot;%name%&quot; has been put forward and is waiting for a day.">
-        <source>"%name%" has been put forward and is waiting for a day.</source>
-        <target state="translated">"%name%" is ingediend en wacht op een dag.</target>
-      </trans-unit>
-      <trans-unit id="3WCdvsC" resname="&quot;%name%&quot; has been turned down; its days are free again.">
-        <source>"%name%" has been turned down; its days are free again.</source>
-        <target state="translated">"%name%" is afgewezen; de dagen zijn weer vrij.</target>
-      </trans-unit>
       <trans-unit id="r0_Bmcr" resname="(bulk) renew as ordinary OR convert to graduate">
         <source>(bulk) renew as ordinary OR convert to graduate</source>
         <target state="translated">(bulk-)verleng als gewoon OF zet om naar afgestudeerde</target>
@@ -564,6 +564,10 @@
       <trans-unit id="CgePw2X" resname="A decision cannot annul itself.">
         <source>A decision cannot annul itself.</source>
         <target state="translated">Een besluit kan zichzelf niet vernietigen.</target>
+      </trans-unit>
+      <trans-unit id="F7kPOUI" resname="A decision recorded from now on is written in Dutch and English at once, so there is nothing left to catch up with.">
+        <source>A decision recorded from now on is written in Dutch and English at once, so there is nothing left to catch up with.</source>
+        <target state="translated">Een besluit dat vanaf nu wordt vastgelegd, wordt meteen in het Nederlands en het Engels geschreven, dus er valt niets meer in te halen.</target>
       </trans-unit>
       <trans-unit id="gVglBuS" resname="A dependency on somebody outside the association, how big it is, why this day.">
         <source>A dependency on somebody outside the association, how big it is, why this day.</source>
@@ -3373,6 +3377,10 @@
         <source>Every decision of the selected meetings, ordered by meeting, point and decision number, as a LaTeX document ready to be typeset.</source>
         <target state="translated">Elk besluit van de geselecteerde vergaderingen, op volgorde van vergadering, punt en besluitnummer, als een LaTeX-document dat klaar is om gezet te worden.</target>
       </trans-unit>
+      <trans-unit id="94QDl8R" resname="Every free-text decision reads in both languages.">
+        <source>Every free-text decision reads in both languages.</source>
+        <target state="translated">Elk vrijetekstbesluit is in beide talen te lezen.</target>
+      </trans-unit>
       <trans-unit id="xVvK.Uw" resname="Every input should map to an output. This one got lost.">
         <source>Every input should map to an output. This one got lost.</source>
         <target state="translated">Elke invoer moet een uitvoer als beeld hebben. Deze is verloren gegaan.</target>
@@ -3761,6 +3769,10 @@
         <source>Fraternities are groups of members who share an interest and organise around it themselves.</source>
         <target state="translated">Disputen zijn groepen leden met een gedeelde interesse die zich daar zelf omheen organiseren.</target>
       </trans-unit>
+      <trans-unit id="1gvUgF5" resname="Free text is recorded in the language it was decided in. Until it is also written in English, the decision reads as an apology to everybody who asked for it in English.">
+        <source>Free text is recorded in the language it was decided in. Until it is also written in English, the decision reads as an apology to everybody who asked for it in English.</source>
+        <target state="translated">Vrije tekst wordt vastgelegd in de taal waarin is besloten. Zolang die er niet ook in het Engels staat, leest het besluit als een excuus voor iedereen die het in het Engels opvraagt.</target>
+      </trans-unit>
       <trans-unit id="o4SwWqO" resname="Free text. Changes nothing on the register.">
         <source>Free text. Changes nothing on the register.</source>
         <target state="translated">Vrije tekst. Verandert niets in het register.</target>
@@ -3928,6 +3940,10 @@
       <trans-unit id="u_d4d47" resname="Go back">
         <source>Go back</source>
         <target state="translated">Terug</target>
+      </trans-unit>
+      <trans-unit id="yzpO_h5" resname="Go to %type% %number%">
+        <source>Go to %type% %number%</source>
+        <target state="translated">Ga naar %type% %number%</target>
       </trans-unit>
       <trans-unit id="FVNx2sk" resname="Go to checkout">
         <source>Go to checkout</source>
@@ -7561,6 +7577,10 @@
         <source>Save</source>
         <target state="translated">Opslaan</target>
       </trans-unit>
+      <trans-unit id="DTP03xu" resname="Save Translation">
+        <source>Save Translation</source>
+        <target state="translated">Vertaling opslaan</target>
+      </trans-unit>
       <trans-unit id="516349u" resname="Save changes">
         <source>Save changes</source>
         <target>Wijzigingen opslaan</target>
@@ -8701,6 +8721,10 @@
         <source>The days this round covers</source>
         <target state="translated">De dagen die deze ronde beslaat</target>
       </trans-unit>
+      <trans-unit id="PzOfZ3D" resname="The decision now reads in English as well.">
+        <source>The decision now reads in English as well.</source>
+        <target state="translated">Het besluit is nu ook in het Engels te lezen.</target>
+      </trans-unit>
       <trans-unit id="CaROd3w" resname="The decision was not recorded. Correct what is marked below and submit again.">
         <source>The decision was not recorded. Correct what is marked below and submit again.</source>
         <target state="translated">Het besluit is niet vastgelegd. Verbeter wat hieronder gemarkeerd staat en verstuur opnieuw.</target>
@@ -9832,6 +9856,10 @@
       <trans-unit id="xkD9RrB" resname="Until turned off">
         <source>Until turned off</source>
         <target>Totdat het wordt uitgezet</target>
+      </trans-unit>
+      <trans-unit id="4Xiqooa" resname="Untranslated decisions">
+        <source>Untranslated decisions</source>
+        <target state="translated">Onvertaalde besluiten</target>
       </trans-unit>
       <trans-unit id="_TEgMtE" resname="Up to date">
         <source>Up to date</source>

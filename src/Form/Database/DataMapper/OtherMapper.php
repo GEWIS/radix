@@ -21,15 +21,20 @@ class OtherMapper extends AbstractDecisionMapper
         array $forms,
         Decision $decision,
     ): void {
-        $content = $forms['content']->getData();
+        $contentNL = $forms['contentNL']->getData();
+        $contentEN = $forms['contentEN']->getData();
 
-        if (!is_string($content)) {
+        if (
+            !is_string($contentNL)
+            || !is_string($contentEN)
+        ) {
             return;
         }
 
         $subdecision = new Other();
         $subdecision->setSequence(1);
-        $subdecision->setContent($content);
+        $subdecision->setContentNL($contentNL);
+        $subdecision->setContentEN($contentEN);
         $subdecision->setDecision($decision);
     }
 }

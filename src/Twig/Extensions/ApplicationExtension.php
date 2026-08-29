@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Extensions;
 
+use App\Service\Database\Meeting as MeetingService;
 use App\Service\Database\Member as MemberService;
 use Override;
 use Twig\Extension\AbstractExtension;
@@ -11,8 +12,10 @@ use Twig\TwigFunction;
 
 final class ApplicationExtension extends AbstractExtension
 {
-    public function __construct(private readonly MemberService $memberService)
-    {
+    public function __construct(
+        private readonly MemberService $memberService,
+        private readonly MeetingService $meetingService,
+    ) {
     }
 
     /**
@@ -29,6 +32,10 @@ final class ApplicationExtension extends AbstractExtension
             new TwigFunction(
                 'member_updates_pending',
                 $this->memberUpdatesPending(...),
+            ),
+            new TwigFunction(
+                'decisions_awaiting_translation',
+                $this->decisionsAwaitingTranslation(...),
             ),
         ];
     }
@@ -52,5 +59,10 @@ final class ApplicationExtension extends AbstractExtension
     public function memberUpdatesPending(): int
     {
         return $this->memberService->getPendingUpdateCount();
+    }
+
+    public function decisionsAwaitingTranslation(): int
+    {
+        return $this->meetingService->countUntranslatedDecisions();
     }
 }

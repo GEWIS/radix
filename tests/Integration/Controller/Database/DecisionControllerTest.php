@@ -9,11 +9,14 @@ use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Database\MeetingRepository;
+use App\Service\Database\Meeting as MeetingService;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
+use function sprintf;
 
 /**
  * The page that offers every kind of decision for one place in a meeting. It renders a dozen forms at once, three of
@@ -58,13 +61,126 @@ final class DecisionControllerTest extends DatabaseTestCase
                 $content,
             );
         }
+
+        foreach (
+            [
+                'other[contentNL]',
+                'other[contentEN]',
+            ] as $field
+        ) {
+            self::assertStringContainsString(
+                $field,
+                $content,
+            );
+        }
+    }
+
+    public function testOnlyDecisionsWithoutAnEnglishTextAreOfferedForTranslation(): void
+    {
+        $this->authenticateSecretary();
+        $this->pushRequest();
+
+        $response = self::getContainer()->get(DecisionController::class)->translations();
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        $content = (string) $response->getContent();
+
+        self::assertStringContainsString(
+            'Het bestuur besluit de jaarplanning van GETÉST vast te stellen.',
+            $content,
+        );
+        self::assertStringNotContainsString(
+            'Het bestuur besluit de notulen van de vorige bestuursvergadering vast te stellen.',
+            $content,
+        );
+    }
+
+    public function testTranslatingADecisionTakesItOffThePage(): void
+    {
+        $this->authenticateSecretary();
+
+        $service = self::getContainer()->get(MeetingService::class);
+        $waiting = $service->getUntranslatedDecisions(
+            1,
+            1,
+        )['items'];
+
+        self::assertNotEmpty(
+            $waiting,
+            'The seed is expected to contain a free-text decision without an English text.',
+        );
+
+        $subdecision = $waiting[0];
+        $name = sprintf(
+            'translation_%s_%d_%d_%d_%d',
+            $subdecision->getMeetingType()->value,
+            $subdecision->getMeetingNumber(),
+            $subdecision->getDecisionPoint(),
+            $subdecision->getDecisionNumber(),
+            $subdecision->getSequence(),
+        );
+
+        $request = $this->translationRequest(
+            $name,
+            'The board decides to buy a cake.',
+        );
+        // The request the translation arrives on is the one the CSRF check reads.
+        $this->pushRequest($request);
+
+        $response = self::getContainer()->get(DecisionController::class)->translate(
+            $request,
+            $subdecision->getMeetingType(),
+            $subdecision->getMeetingNumber(),
+            $subdecision->getDecisionPoint(),
+            $subdecision->getDecisionNumber(),
+            $subdecision->getSequence(),
+        );
+
+        self::assertSame(
+            Response::HTTP_FOUND,
+            $response->getStatusCode(),
+        );
+        self::assertSame(
+            'The board decides to buy a cake.',
+            $subdecision->getContentEN(),
+        );
+        self::assertNull($service->getUntranslatedDecision(
+            $subdecision->getMeetingType(),
+            $subdecision->getMeetingNumber(),
+            $subdecision->getDecisionPoint(),
+            $subdecision->getDecisionNumber(),
+            $subdecision->getSequence(),
+        ));
+    }
+
+    /** CSRF is stateless here, so a same-origin request is what the manager accepts. */
+    private function translationRequest(
+        string $name,
+        string $contentEN,
+    ): Request {
+        $request = new Request(
+            request: [
+                $name => [
+                    'contentEN' => $contentEN,
+                    '_csrf_token' => 'csrf-token',
+                ],
+            ],
+            server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
+        );
+        $request->setMethod(Request::METHOD_POST);
+
+        return $request;
     }
 
     /**
      * The page extends the register's layout, which asks the current request for the language it renders in and
      * the session for the language switch.
      */
-    private function pushRequest(): void
+    private function pushRequest(?Request $request = null): void
     {
         $session = self::getContainer()->get('session.factory')->createSession();
         self::assertInstanceOf(
@@ -72,7 +188,7 @@ final class DecisionControllerTest extends DatabaseTestCase
             $session,
         );
 
-        $request = new Request();
+        $request ??= new Request();
         $request->setLocale('en');
         $request->setSession($session);
         self::getContainer()->get('request_stack')->push($request);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
+use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\User\Enums\UserRoles;
@@ -25,20 +26,29 @@ use App\Form\Database\Member\WarningType as MemberWarningType;
 use App\Form\Database\MemberFunctionType;
 use App\Form\Database\MinutesType;
 use App\Form\Database\OrganRegulationType;
+use App\Form\Database\OtherTranslationType;
 use App\Form\Database\OtherType;
 use App\Form\Report\ExportType;
 use App\Service\Database\Meeting as MeetingService;
+use App\ViewModel\Database\UntranslatedDecision;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function array_key_exists;
 use function assert;
+use function ceil;
+use function in_array;
+use function max;
+use function sprintf;
+use function Symfony\Component\Translation\t;
 
 // Deliberately without a class-level prefix: the decision list has always been served from `/export`, which cannot
 // sit under the prefix the other actions share.
@@ -70,8 +80,18 @@ final class DecisionController extends AbstractController
         'other' => OtherType::class,
     ];
 
-    public function __construct(private readonly MeetingService $meetingService)
-    {
+    private const int TRANSLATIONS_PAGE_SIZE = 25;
+    private const array TRANSLATIONS_PAGE_SIZES = [
+        10,
+        25,
+        50,
+        100,
+    ];
+
+    public function __construct(
+        private readonly MeetingService $meetingService,
+        private readonly FormFactoryInterface $formFactory,
+    ) {
     }
 
     /**
@@ -250,6 +270,254 @@ final class DecisionController extends AbstractController
                 'grants' => $options->keyGrants,
                 'member_function_form' => $this->memberFunctionForm(),
             ],
+        );
+    }
+
+    #[Route(
+        path: '/meetings/decisions/translations',
+        name: 'decision_decision_translations',
+        methods: ['GET'],
+    )]
+    #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    public function translations(
+        #[MapQueryParameter]
+        int $page = 1,
+        #[MapQueryParameter]
+        int $pageSize = self::TRANSLATIONS_PAGE_SIZE,
+    ): Response {
+        return $this->renderTranslations(
+            $page,
+            $pageSize,
+        );
+    }
+
+    #[Route(
+        path: '/meetings/decisions/translations/{type}/{number}/{point}/{decision}/{sequence}',
+        name: 'decision_decision_translate',
+        requirements: [
+            'type' => 'ALV|BV|VV|Virt',
+            'number' => '-?\d+',
+            'point' => '\d+',
+            'decision' => '\d+',
+            'sequence' => '\d+',
+        ],
+        methods: ['POST'],
+    )]
+    #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    public function translate(
+        Request $request,
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+        int $sequence,
+        #[MapQueryParameter]
+        int $page = 1,
+        #[MapQueryParameter]
+        int $pageSize = self::TRANSLATIONS_PAGE_SIZE,
+    ): Response {
+        $subdecision = $this->meetingService->getUntranslatedDecision(
+            $type,
+            $number,
+            $point,
+            $decision,
+            $sequence,
+        );
+
+        if (null === $subdecision) {
+            throw $this->createNotFoundException();
+        }
+
+        $form = $this->translationForm(
+            $subdecision->getMeetingType(),
+            $subdecision->getMeetingNumber(),
+            $subdecision->getDecisionPoint(),
+            $subdecision->getDecisionNumber(),
+            $subdecision->getSequence(),
+            $page,
+            $pageSize,
+        );
+        $form->handleRequest($request);
+
+        if (
+            $form->isSubmitted()
+            && $form->isValid()
+        ) {
+            /** @var array{contentEN: string} $data */
+            $data = $form->getData();
+
+            $subdecision->setContentEN($data['contentEN']);
+            $this->meetingService->translateDecision($subdecision);
+
+            $this->addFlash(
+                AlertTypes::Success->value,
+                t('The decision now reads in English as well.'),
+            );
+
+            return $this->redirectToRoute(
+                'decision_decision_translations',
+                [
+                    'page' => $page,
+                    'pageSize' => $pageSize,
+                ],
+            );
+        }
+
+        return $this->renderTranslations(
+            $page,
+            $pageSize,
+            $form,
+        );
+    }
+
+    /**
+     * The submitted form takes the place of the one built for its row, so its errors land on the field they were
+     * written in.
+     *
+     * @param ?FormInterface<array<string, mixed>|null> $submitted
+     */
+    private function renderTranslations(
+        int $page,
+        int $pageSize,
+        ?FormInterface $submitted = null,
+    ): Response {
+        if (
+            !in_array(
+                $pageSize,
+                self::TRANSLATIONS_PAGE_SIZES,
+                true,
+            )
+        ) {
+            $pageSize = self::TRANSLATIONS_PAGE_SIZE;
+        }
+
+        $page = max(
+            1,
+            $page,
+        );
+        $result = $this->meetingService->getUntranslatedDecisions(
+            $page,
+            $pageSize,
+        );
+        $totalPages = max(
+            1,
+            (int) ceil($result['total'] / $pageSize),
+        );
+
+        // Translating the last decision on a page empties it, as does asking for a page that is not there.
+        if (
+            [] === $result['items']
+            && $page > $totalPages
+        ) {
+            return $this->redirectToRoute(
+                'decision_decision_translations',
+                [
+                    'page' => $totalPages,
+                    'pageSize' => $pageSize,
+                ],
+            );
+        }
+
+        $rows = [];
+        $forms = [];
+
+        foreach ($result['items'] as $subdecision) {
+            $name = self::translationFormName(
+                $subdecision->getMeetingType(),
+                $subdecision->getMeetingNumber(),
+                $subdecision->getDecisionPoint(),
+                $subdecision->getDecisionNumber(),
+                $subdecision->getSequence(),
+            );
+            $rows[] = UntranslatedDecision::fromSubDecision(
+                $subdecision,
+                $name,
+            );
+            $forms[$name] = (
+                null !== $submitted
+                && $name === $submitted->getName()
+                    ? $submitted
+                    : $this->translationForm(
+                        $subdecision->getMeetingType(),
+                        $subdecision->getMeetingNumber(),
+                        $subdecision->getDecisionPoint(),
+                        $subdecision->getDecisionNumber(),
+                        $subdecision->getSequence(),
+                        $page,
+                        $pageSize,
+                    )
+            )->createView();
+        }
+
+        return $this->render(
+            'database/decision/decision/translations.html.twig',
+            [
+                'rows' => $rows,
+                'forms' => $forms,
+                'currentPage' => $page,
+                'pageSize' => $pageSize,
+                'totalPages' => $totalPages,
+                'totalCount' => $result['total'],
+            ],
+        );
+    }
+
+    /**
+     * Named after the decision: a page holds one of these per decision, and two forms of the same name would answer
+     * for each other's fields.
+     *
+     * @return FormInterface<array<string, mixed>|null>
+     */
+    private function translationForm(
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+        int $sequence,
+        int $page,
+        int $pageSize,
+    ): FormInterface {
+        return $this->formFactory->createNamed(
+            self::translationFormName(
+                $type,
+                $number,
+                $point,
+                $decision,
+                $sequence,
+            ),
+            OtherTranslationType::class,
+            null,
+            [
+                'action' => $this->generateUrl(
+                    'decision_decision_translate',
+                    [
+                        'type' => $type->value,
+                        'number' => $number,
+                        'point' => $point,
+                        'decision' => $decision,
+                        'sequence' => $sequence,
+                        'page' => $page,
+                        'pageSize' => $pageSize,
+                    ],
+                ),
+            ],
+        );
+    }
+
+    private static function translationFormName(
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+        int $sequence,
+    ): string {
+        return sprintf(
+            'translation_%s_%d_%d_%d_%d',
+            $type->value,
+            $number,
+            $point,
+            $decision,
+            $sequence,
         );
     }
 
