@@ -89,8 +89,7 @@
                         {{ form_row(language.content, {
                             'attr': {
                                 'data-controller': 'page-editor',
-                                'data-page-editor-upload-url-value': path('admin/frontpage/pages/upload'),
-                                'data-page-editor-upload-token-value': csrf_token('page_image_upload'),
+                                'data-page-editor-browse-label-value': 'Images'|trans,
                                 'data-page-editor-language-value': app.request.locale,
                             },
                         }) }}

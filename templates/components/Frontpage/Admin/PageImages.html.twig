@@ -1,0 +1,74 @@
+<div {{ attributes.defaults({
+    'data-action': 'page-images:changed@window->live#$render',
+}) }}>
+    {% if this.feedback %}
+        <div class="alert alert-warning" role="alert">{{ this.feedback }}</div>
+    {% endif %}
+
+    {% set images = this.images %}
+    {% if images is empty %}
+        <p class="text-muted mb-0">
+            {{ 'Nothing has been uploaded for this page yet.'|trans }}
+        </p>
+    {% else %}
+        <div class="row g-3">
+            {% for image in images %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="border rounded p-2 h-100 d-flex flex-column gap-2">
+                        {% if image.ready %}
+                            <img src="{{ image_url(image.path, 'w320') }}" class="rounded" loading="lazy"
+                                 alt="{{ 'An image of this page'|trans }}">
+                        {% else %}
+                            <div class="rounded bg-body-secondary d-flex flex-column align-items-center justify-content-center text-muted gap-2 py-4">
+                                <span class="fas fa-circle-notch fa-spin fa-lg" aria-hidden="true"></span>
+                                <span class="small text-center">{{ 'Preparing the sizes the website serves'|trans }}</span>
+                            </div>
+                        {% endif %}
+
+                        <span class="small text-muted">
+                            {{ image.uploadedAt|format_date('medium') }}
+                        </span>
+
+                        <div class="btn-group btn-group-sm mt-auto" role="group">
+                            {% if image.ready %}
+                                <button type="button" class="btn btn-outline-gewis-primary"
+                                        data-action="page-images#insert"
+                                        data-page-images-url-param="{{ image_url(image.path, 'w1280') }}"
+                                        title="{{ 'Place in the text'|trans }}"
+                                        aria-label="{{ 'Place in the text'|trans }}">
+                                    <span class="fas fa-arrow-turn-up" aria-hidden="true"></span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary"
+                                        data-controller="copy" data-copy-text-value="{{ image_url(image.path, 'w1280') }}"
+                                        data-action="copy#copy"
+                                        title="{{ 'Copy the address'|trans }}"
+                                        aria-label="{{ 'Copy the address'|trans }}">
+                                    <span class="far fa-copy" aria-hidden="true"></span>
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-outline-secondary" disabled
+                                        title="{{ 'This image cannot be placed in the page until it is ready'|trans }}"
+                                        aria-label="{{ 'This image cannot be placed in the page until it is ready'|trans }}">
+                                    <span class="fas fa-hourglass-half" aria-hidden="true"></span>
+                                </button>
+                            {% endif %}
+
+                            {# Not `data-bs-toggle`: the browser steps aside for the question and comes back after. #}
+                            <button type="button" class="btn btn-outline-danger"
+                                    data-action="page-images#confirm"
+                                    data-confirm-title="{{ 'Remove this image?'|trans }}"
+                                    data-confirm-message="{{ 'The file is thrown away. Wherever the text still shows it, the picture is gone with it.'|trans }}"
+                                    data-confirm-label="{{ 'Remove'|trans }}"
+                                    data-confirm-live-action="remove"
+                                    data-confirm-live-args='{{ {'path': image.path}|json_encode }}'
+                                    title="{{ 'Remove'|trans }}"
+                                    aria-label="{{ 'Remove'|trans }}">
+                                <span class="far fa-trash-can" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

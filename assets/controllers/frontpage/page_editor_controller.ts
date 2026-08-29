@@ -1,42 +1,71 @@
 import { Controller } from '@hotwired/stimulus';
-import { CkEditorInstance, CkEditorModule, FileLoader, UploadAdapter, createEditor } from '../../js/ckeditor.ts';
+import {
+    CkEditorButtonConstructor,
+    CkEditorInstance,
+    CkEditorModule,
+    createEditor,
+} from '../../js/ckeditor.ts';
 import { flattenFloatingLabel } from '../../js/floating_label.ts';
 
 /**
  * Writes HTML rather than the Markdown everything else on the site is written in (see
  * markdown_editor_controller.ts): a page is laid out with the tables, columns and images Markdown has no way to say.
  *
- *   - the textarea: data-controller="page-editor"
- *   - the upload:   data-page-editor-upload-url-value / data-page-editor-upload-token-value
+ * An image is picked out of the browser behind the toolbar's image button (page_images_controller.ts, which answers
+ * the `page-editor:browse` this dispatches), never dropped into the text.
  */
 export default class extends Controller {
     static values = {
-        uploadUrl: String,
-        uploadToken: String,
+        browseLabel: { type: String, default: 'Images' },
         language: { type: String, default: 'en' },
     };
 
-    declare readonly uploadUrlValue: string;
-    declare readonly uploadTokenValue: string;
+    declare readonly browseLabelValue: string;
     declare readonly languageValue: string;
 
     private editor: CkEditorInstance | null = null;
     private aborted = false;
+    private lastFocusedAt = 0;
 
     connect(): void {
         this.aborted = false;
         flattenFloatingLabel(this.textarea);
+        this.host.addEventListener('focusin', this.noteFocus);
         void this.createEditor();
     }
 
     disconnect(): void {
         this.aborted = true;
+        this.host.removeEventListener('focusin', this.noteFocus);
         void this.editor?.destroy();
         this.editor = null;
     }
 
+    /** A page is written in two languages side by side, so the browser has to know which one to place a picture in. */
+    get focusedAt(): number {
+        return this.lastFocusedAt;
+    }
+
+    insertImage(url: string): void {
+        if (null === this.editor) {
+            return;
+        }
+
+        this.editor.execute('insertImage', { source: url });
+        this.editor.focus();
+    }
+
+    private readonly noteFocus = (): void => {
+        this.lastFocusedAt = Date.now();
+    };
+
     private get textarea(): HTMLTextAreaElement {
         return this.element as HTMLTextAreaElement;
+    }
+
+    /** The editor draws itself next to the textarea, so what the writer clicks is a sibling. */
+    private get host(): HTMLElement {
+        return this.element.parentElement ?? this.element;
     }
 
     private async createEditor(): Promise<void> {
@@ -56,42 +85,34 @@ export default class extends Controller {
         }
 
         this.editor = editor;
-        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => this.uploadAdapter(loader);
     }
 
-    /**
-     * CKEditor's own upload adapter posts a field name and no CSRF token, neither of which the endpoint takes.
-     */
-    private uploadAdapter(loader: FileLoader): UploadAdapter {
-        const controller = new AbortController();
+    /** Pressing the button says which editor the picture is for, cursor or no cursor. */
+    private browse(): void {
+        this.lastFocusedAt = Date.now();
+        this.dispatch('browse', { prefix: 'page-editor', bubbles: true });
+    }
 
-        return {
-            upload: async (): Promise<{ default: string }> => {
-                const file = await loader.file;
-                if (null === file) {
-                    throw new Error('There is no file to upload.');
-                }
+    /** A plugin of the plainest kind CKEditor takes: a function it calls with the editor. */
+    private browser(c: CkEditorModule): (editor: CkEditorInstance) => void {
+        const ButtonView = c.ButtonView as CkEditorButtonConstructor;
+        const icon = c.IconImage;
+        const label = this.browseLabelValue;
+        const open = (): void => this.browse();
 
-                const body = new FormData();
-                body.append('image', file);
-                body.append('_csrf_token', this.uploadTokenValue);
+        return function PageImageBrowser(editor: CkEditorInstance): void {
+            editor.ui.componentFactory.add('pageImages', (locale) => {
+                const button = new ButtonView(locale);
 
-                const response = await fetch(this.uploadUrlValue, {
-                    method: 'POST',
-                    body,
-                    credentials: 'same-origin',
-                    headers: { 'Sec-Fetch-Site': 'same-origin' },
-                    signal: controller.signal,
+                button.set({
+                    label,
+                    icon,
+                    tooltip: true,
                 });
+                button.on('execute', open);
 
-                const stored = (await response.json()) as { url?: string; error?: string };
-                if (!response.ok || 'string' !== typeof stored.url) {
-                    throw new Error(stored.error ?? 'The image could not be uploaded.');
-                }
-
-                return { default: stored.url };
-            },
-            abort: (): void => controller.abort(),
+                return button;
+            });
         };
     }
 
@@ -106,14 +127,16 @@ export default class extends Controller {
                 c.List, c.TodoList, c.Indent, c.IndentBlock, c.Alignment, c.HorizontalLine,
                 c.Link, c.AutoLink, c.BlockQuote,
                 c.Table, c.TableToolbar, c.TableCaption, c.TableProperties, c.TableCellProperties,
-                c.Image, c.ImageToolbar, c.ImageCaption, c.ImageStyle, c.ImageResize, c.ImageUpload,
+                // No ImageUpload: dropping a file into the text would place a picture the website cannot serve yet.
+                c.Image, c.ImageToolbar, c.ImageCaption, c.ImageStyle, c.ImageResize,
                 c.FindAndReplace, c.SourceEditing, c.GeneralHtmlSupport,
             ],
+            extraPlugins: [this.browser(c)],
             toolbar: [
                 'heading', '|',
                 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'removeFormat', '|',
                 'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent', 'alignment', '|',
-                'link', 'blockQuote', 'insertTable', 'uploadImage', 'horizontalLine', 'code', 'codeBlock', '|',
+                'link', 'blockQuote', 'insertTable', 'pageImages', 'horizontalLine', 'code', 'codeBlock', '|',
                 'findAndReplace', 'undo', 'redo', '|',
                 'sourceEditing',
             ],

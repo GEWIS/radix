@@ -29,7 +29,7 @@ use function ksort;
 class MainScheduleTest extends KernelTestCase
 {
     /**
-     * Stated here rather than read off twenty-five attributes. The transport decides which consumers run a job, and
+     * Stated here rather than read off twenty-six attributes. The transport decides which consumers run a job, and
      * keeps `app:decision:generate` off the queue carrying the every-minute jobs.
      */
     private const array EXPECTED = [
@@ -46,6 +46,7 @@ class MainScheduleTest extends KernelTestCase
         'app:infimum:rotate' => 'cron',
         'app:messenger:recover-failures' => 'maintenance',
         'app:notification:run-digests' => 'cron',
+        'app:page:prune-images' => 'maintenance',
         'app:photo:weekly' => 'cron',
         'app:poll:anonymise-votes' => 'gdpr',
         'app:public-archive:sync' => 'cron',

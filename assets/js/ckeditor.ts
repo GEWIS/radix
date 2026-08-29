@@ -4,27 +4,26 @@
 // cannot ESM-ify. The browser bundle inlines everything (no dependency tree to keep patched).
 export interface CkEditorInstance {
     getData(): string;
+    execute(command: string, ...args: unknown[]): void;
     setData(data: string): void;
     destroy(): Promise<unknown>;
     focus(): void;
     enableReadOnlyMode(lockId: string): void;
     disableReadOnlyMode(lockId: string): void;
     model: { document: { on(event: string, callback: () => void): void } };
-    plugins: {
-        get(name: string): {
-            createUploadAdapter?: (loader: FileLoader) => UploadAdapter;
+    ui: {
+        componentFactory: {
+            add(name: string, factory: (locale: unknown) => CkEditorButton): void;
         };
     };
 }
 
-export interface FileLoader {
-    file: Promise<File | null>;
+export interface CkEditorButton {
+    set(properties: Record<string, unknown>): void;
+    on(event: string, callback: () => void): void;
 }
 
-export interface UploadAdapter {
-    upload(): Promise<{ default: string }>;
-    abort(): void;
-}
+export type CkEditorButtonConstructor = new (locale: unknown) => CkEditorButton;
 
 export interface CkEditorModule {
     ClassicEditor: {

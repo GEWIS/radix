@@ -247,6 +247,41 @@ final readonly class FileStorage
     }
 
     /**
+     * Copy a file to another exact stored path, leaving the source where it is.
+     */
+    public function copy(
+        string $source,
+        string $destination,
+    ): void {
+        $this->defaultStorage->copy(
+            $source,
+            $destination,
+        );
+    }
+
+    /**
+     * Remove a directory and everything below it, whose files are expected to have been dealt with already: nothing
+     * here consults the reference providers.
+     */
+    public function deleteDirectory(string $directory): void
+    {
+        $this->defaultStorage->deleteDirectory($directory);
+    }
+
+    /**
+     * Delete an exact stored path the caller owns outright (a cached variant, a temporary file). A content-addressed
+     * source is shared and goes through {@see remove()} instead.
+     */
+    public function delete(string $path): void
+    {
+        if (!$this->defaultStorage->fileExists($path)) {
+            return;
+        }
+
+        $this->defaultStorage->delete($path);
+    }
+
+    /**
      * Delete the file at the given stored path, but only if no domain still references it. Returns whether the
      * file was actually removed (or was already absent); `false` means another entity still points at the shared bytes.
      *

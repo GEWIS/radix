@@ -10,6 +10,7 @@ use App\Entity\Frontpage\Page;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Frontpage\PageRepository;
+use App\Service\Frontpage\PageImageStore;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +24,13 @@ use function imagecreatetruecolor;
 use function imagefilledrectangle;
 use function imagejpeg;
 use function json_decode;
+use function preg_replace;
 use function str_contains;
+use function str_replace;
 use function strval;
 use function sys_get_temp_dir;
 use function tempnam;
+use function urlencode;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -40,6 +44,9 @@ use const JSON_THROW_ON_ERROR;
  */
 final class AdminPageControllerTest extends DatabaseTestCase
 {
+    /** Shaped the way {@see \App\Controller\Application\HandlesFormFlowTrait::flowRun()} mints one. */
+    private const string RUN = '00112233445566aa';
+
     public function testAPageIsWrittenChangedAndTakenDown(): void
     {
         $before = count($this->repository()->findAll());
@@ -157,17 +164,197 @@ final class AdminPageControllerTest extends DatabaseTestCase
         );
     }
 
+    /**
+     * A page that is still being written has no id to file an upload under, so it waits under the run of the flow
+     * writing it.
+     */
     public function testAnUploadedImageComesBackAsAnAddress(): void
     {
+        $url = $this->upload(['flow' => self::RUN]);
+
+        self::assertMatchesRegularExpression(
+            '#^/img/w1280/pages/images/pending/' . self::RUN . '/#',
+            $url,
+        );
+    }
+
+    public function testAnUploadForAPageIsFiledUnderThatPage(): void
+    {
+        $this->write();
+        $page = $this->written();
+
+        $url = $this->upload(['page' => strval($page->getId())]);
+
+        self::assertMatchesRegularExpression(
+            '#^/img/w1280/pages/images/' . $page->getId() . '/#',
+            $url,
+        );
+    }
+
+    /**
+     * Nothing says where the file belongs, and an image that cannot be told apart from another page's is worse than
+     * an upload that did not happen.
+     */
+    public function testAnUploadThatNamesNoPageIsRefused(): void
+    {
+        $request = $this->uploadRequest([]);
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $this->controller()->upload($request)->getStatusCode(),
+        );
+    }
+
+    /**
+     * What was uploaded while a page was being written follows it once it exists: the file moves into the page's own
+     * directory and the content the editor wrote is pointed at where it now is.
+     */
+    public function testWhatWasUploadedWhileWritingFollowsThePage(): void
+    {
+        $url = $this->upload(['flow' => self::RUN]);
+
+        $this->write(['content' => '<p><img src="' . $url . '"></p>']);
+        $page = $this->written();
+
+        $stored = 'pages/images/' . $page->getId() . '/';
+        self::assertStringContainsString(
+            $stored,
+            strval($page->getContent()->getValueEN()),
+        );
+        self::assertStringNotContainsString(
+            'pending',
+            strval($page->getContent()->getValueEN()),
+        );
+
+        $images = self::getContainer()->get(PageImageStore::class)->list(strval($page->getId()));
+        self::assertCount(
+            1,
+            $images,
+        );
+        self::assertStringStartsWith(
+            $stored,
+            $images[0]->path,
+        );
+    }
+
+    public function testAnUploadWithoutAnImageIsRefused(): void
+    {
         $request = new Request(
-            request: ['_csrf_token' => 'csrf-token'],
-            files: ['image' => $this->image()],
+            request: [
+                '_csrf_token' => 'csrf-token',
+                'flow' => self::RUN,
+            ],
             server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
         );
         $request->setMethod(Request::METHOD_POST);
         $this->authenticateAsBoard($request);
 
-        $response = $this->controller()->upload($request);
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $this->controller()->upload($request)->getStatusCode(),
+        );
+    }
+
+    /**
+     * The browser is drawn from the directory rather than from the text, so an image the page no longer shows is
+     * still on the screen to be put back. An image is only offered once the sizes the website serves it at have been
+     * rendered; until then it is shown as being worked on and there is nothing to press.
+     */
+    public function testTheBrowserOffersAnImageOnlyOnceItIsReady(): void
+    {
+        $this->write();
+        $page = $this->written();
+
+        $url = $this->upload(['page' => strval($page->getId())]);
+        $thumbnail = str_replace(
+            '/w1280/',
+            '/w320/',
+            $url,
+        );
+
+        $waiting = $this->browser($page);
+        self::assertStringContainsString(
+            'The images of this page',
+            $waiting,
+        );
+        self::assertStringContainsString(
+            'Preparing the sizes',
+            $waiting,
+        );
+        self::assertStringNotContainsString(
+            $thumbnail,
+            $waiting,
+        );
+
+        // What the renderer does when it is finished with the image.
+        self::getContainer()->get(PageImageStore::class)->settle($this->storedPath($url));
+
+        $ready = $this->browser($page);
+        self::assertStringContainsString(
+            $thumbnail,
+            $ready,
+        );
+        self::assertStringNotContainsString(
+            'Preparing the sizes',
+            $ready,
+        );
+        self::assertStringNotContainsString(
+            'Nothing has been uploaded',
+            $ready,
+        );
+    }
+
+    /**
+     * The dialog listens for the renderer on the topic of the page it was opened for, and the layout is told to have
+     * the cookie authorize exactly that one.
+     */
+    public function testTheBrowserListensOnTheTopicOfItsOwnPage(): void
+    {
+        $this->write();
+        $page = $this->written();
+
+        // The topic travels in the hub URL, where it is escaped as a query parameter.
+        self::assertStringContainsString(
+            'topic=' . urlencode('frontpage/page-images/' . $page->getId()),
+            $this->browser($page),
+        );
+    }
+
+    /**
+     * The editor's own upload is not loaded at all, so a file dropped into the text cannot put a picture in a page
+     * before the website is able to serve it.
+     */
+    private function browser(Page $page): string
+    {
+        return strval($this->controller()->edit(
+            $this->step(
+                $this->session(),
+                'address',
+                $this->address([]),
+                'next',
+            ),
+            $page,
+        )->getContent());
+    }
+
+    /**
+     * The stored path an image URL was built from, which is everything after the variant.
+     */
+    private function storedPath(string $url): string
+    {
+        return strval(preg_replace(
+            '#^/img/[^/]+/#',
+            '',
+            $url,
+        ));
+    }
+
+    /**
+     * @param array<string, string> $says where the image belongs
+     */
+    private function upload(array $says): string
+    {
+        $response = $this->controller()->upload($this->uploadRequest($says));
 
         self::assertSame(
             Response::HTTP_OK,
@@ -180,25 +367,24 @@ final class AdminPageControllerTest extends DatabaseTestCase
             512,
             JSON_THROW_ON_ERROR,
         );
-        self::assertMatchesRegularExpression(
-            '#^/img/w1280/#',
-            strval($body['url']),
-        );
+
+        return strval($body['url']);
     }
 
-    public function testAnUploadWithoutAnImageIsRefused(): void
+    /**
+     * @param array<string, string> $says
+     */
+    private function uploadRequest(array $says): Request
     {
         $request = new Request(
-            request: ['_csrf_token' => 'csrf-token'],
+            request: ['_csrf_token' => 'csrf-token'] + $says,
+            files: ['image' => $this->image()],
             server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
         );
         $request->setMethod(Request::METHOD_POST);
         $this->authenticateAsBoard($request);
 
-        self::assertSame(
-            Response::HTTP_BAD_REQUEST,
-            $this->controller()->upload($request)->getStatusCode(),
-        );
+        return $request;
     }
 
     private function controller(): AdminPageController
@@ -348,8 +534,9 @@ final class AdminPageControllerTest extends DatabaseTestCase
         string $button,
     ): Request {
         $request = new Request(
-            // The run the flow is kept under, which the controller would otherwise mint and redirect to.
-            query: ['flow' => 'testing'],
+            // The run the flow is kept under, which the controller would otherwise mint and redirect to. It is
+            // shaped the way one is minted, because where an upload waits is named after it.
+            query: ['flow' => self::RUN],
             request: [
                 'page_flow' => [
                     $step => $fields,
