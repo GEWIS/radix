@@ -26,10 +26,12 @@ concurrency:
 env:
   # Shared compose file set for the docker compose invocations below. `.env.local` is passed the way the Makefile
   # passes it: `.env` holds almost nothing, so the values compose.yaml's guards ask for come from that file, which the
-  # "Prepare the local environment file" step below creates. The order is the one compose itself loads them in --
-  # production, then the development layer over it, then this one -- because the last file wins: named the other way
-  # round, compose.yaml puts the production volume back over `/app/data` and the application starts without its keys.
-  COMPOSE_FILES: --env-file .env --env-file .env.local --file compose.yaml --file compose.override.yaml --file compose.github.yaml
+  # "Prepare the checkout" step below creates. The order is the one compose itself loads them in -- production, then
+  # the development layer over it -- because the last file wins: named the other way round, compose.yaml puts the
+  # production volume back over `/app/data` and the application starts without its keys.
+  COMPOSE_FILES: --env-file .env --env-file .env.local --file compose.yaml --file compose.override.yaml
+  # The tag compose.override.yaml gives the development image; built below rather than by compose.
+  APP_IMAGE: abc.docker-registry.gewis.nl/web/radix/app:development
   # One set per database, each naming its own connection. Mirrors the Makefile.
   DEFAULT_MIGRATIONS: --configuration=config/packages/migrations/default.yaml
   WEB_MIGRATIONS: --configuration=config/packages/migrations/web.yaml
@@ -54,8 +56,9 @@ jobs:
           # The head commit rather than the merge commit, so a pull request with conflicts -- which has no merge ref
           # to check out -- still gets an answer here instead of failing the check it is supposed to unblock.
           ref: ${{ github.event.pull_request.head.sha }}
-          # Both ends of the range have to be present locally for the diff below.
+          # Both ends of the range have to be present locally for the diff below, which reads trees and no blobs.
           fetch-depth: 0
+          filter: blob:none
           persist-credentials: false
 
       - name: Check whether entities, migrations, or fixtures changed
@@ -64,7 +67,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          if git diff --name-only "$BASE_SHA...$HEAD_SHA" \
+          if git diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" \
             | grep -Eq '^(src/(Entity|DataFixtures)/.*\.php|migrations/.*\.php)$'; then
             echo "Entities, migrations, or fixtures changed; the migration and seed check will run."
             echo "relevant=true" >> "$GITHUB_OUTPUT"
@@ -88,28 +91,51 @@ jobs:
           ref: ${{ github.event.pull_request.base.ref }}
           persist-credentials: false
 
-      # `.env.local` is not committed, and it is where the development values live.
-      - name: Prepare the local environment file
-        run: make setuplocalenv
+      # `.env.local` is not committed, and it is where the development values live. A missing `var/` bind-mount
+      # source is created as root, which the container user then cannot write.
+      - name: Prepare the checkout
+        run: |
+          make setuplocalenv
+          mkdir -p var
+          echo "HOST_UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "HOST_GID=$(id -g)" >> "$GITHUB_ENV"
 
-      - name: setup docker buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
+      # Before the build rather than after, so both databases initialise while buildx works.
+      - name: Start the databases
+        run: docker compose $COMPOSE_FILES up --detach --quiet-pull postgresql mariadb valkey
+
+      # Not through `docker compose up --build`: reaching the Actions cache needs credentials the runner only puts
+      # in an action's environment, so compose ignored `cache_from` and rebuilt from scratch every run. The scope is
+      # the one docker-build.yml's `app` leg writes on main. The uid and gid are the runner's, or the container user
+      # cannot write the bind-mounted checkout.
+      - name: Build the development image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ./Dockerfile
+          target: radix_app_development
+          build-args: |
+            USER_UID=${{ env.HOST_UID }}
+            USER_GID=${{ env.HOST_GID }}
+          cache-from: type=gha,scope=app
+          load: true
+          push: false
+          tags: ${{ env.APP_IMAGE }}
+
       # --no-deps keeps this lightweight: only what the console needs starts, not everything else it depends on.
-      - name: run base
-        # Both are what `make up` does for a developer: `var/` is not committed and a missing bind-mount source is
-        # created as root, and the entrypoint installs `vendor/` into the checkout as a container user that is uid
-        # 1000 unless told otherwise. Through `env` because bash makes `UID` readonly.
-        run: |
-          mkdir -p var
-          env UID="$(id -u)" GID="$(id -g)" docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb valkey
+      - name: Start the application
+        run: docker compose $COMPOSE_FILES up --detach --no-build --no-deps app
 
       # The entrypoint installs `vendor/`, waits for both databases and migrates before printing this marker, and
-      # `up -d` returns long before it does; exec'ing in between is what failed the next step on "Dependencies are
-      # missing". Ten minutes because a cold runner installs without a composer cache.
-      - name: wait for the app (base)
+      # `up --detach` returns long before it does; exec'ing in between is what failed the next step on "Dependencies
+      # are missing". Ten minutes because a cold runner installs without a composer cache. Polled rather than
+      # followed: `logs --follow` writes nothing more once the marker is out.
+      - name: Wait for the application
         run: |
-          for i in $(seq 1 120); do
+          for i in $(seq 1 300); do
             if docker compose $COMPOSE_FILES logs app 2>/dev/null | grep -q 'PHP app ready!'; then
               echo "The application has finished starting."
               exit 0
@@ -119,8 +145,7 @@ jobs:
               docker compose $COMPOSE_FILES logs app
               exit 1
             fi
-            echo "Waiting for the application to finish starting... ($i/120)"
-            sleep 5
+            sleep 2
           done
           echo "::error::The application did not become ready in time"
           docker compose $COMPOSE_FILES logs app
@@ -139,51 +164,40 @@ jobs:
           echo "Web is at: $MIGRATION_BASE_WEB"
           echo "MIGRATION_BASE_WEB=$MIGRATION_BASE_WEB" >> $GITHUB_ENV
 
+      # Seeds the databases only; `make seed` would also drive the sync-based Mailman and Listmonk services, which
+      # `--no-deps` deliberately never started. Each connection has its own loader and its own fixture group: the
+      # bundle's takes one entity manager at a time, and the website's own drops the foreign key checks its purge
+      # cannot resolve in order.
       - name: seed base
         run: |
           docker compose $COMPOSE_FILES exec -T app bin/console app:fixtures:load --no-interaction
           docker compose $COMPOSE_FILES exec -T app bin/console app:decision:generate
 
-      - name: cleanup base
-        run: docker compose $COMPOSE_FILES down
+      - name: Record the base dependency set
+        id: deps
+        run: echo "lock=$(sha256sum composer.lock | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
+      # `clean: false` keeps the untracked tree the running stack is bound to: `vendor/`, `var/` and `.env.local`.
       - name: Checkout head branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+            clean: false
             persist-credentials: false
 
-      - name: Prepare the local environment file
-        run: make setuplocalenv
+      # Compiled from the base branch's sources, and dev-mode freshness does not track excluded entity classes.
+      - name: Discard the base branch's compiled container
+        run: rm -rf var/cache
 
-      - name: run head
-        # Both are what `make up` does for a developer: `var/` is not committed and a missing bind-mount source is
-        # created as root, and the entrypoint installs `vendor/` into the checkout as a container user that is uid
-        # 1000 unless told otherwise. Through `env` because bash makes `UID` readonly.
+      - name: Install the head branch's dependencies
+        env:
+          BASE_LOCK: ${{ steps.deps.outputs.lock }}
         run: |
-          mkdir -p var
-          env UID="$(id -u)" GID="$(id -g)" docker compose $COMPOSE_FILES up -d --build --no-deps --quiet-pull app postgresql mariadb valkey
-
-      # The entrypoint installs `vendor/`, waits for both databases and migrates before printing this marker, and
-      # `up -d` returns long before it does; exec'ing in between is what failed the next step on "Dependencies are
-      # missing". Ten minutes because a cold runner installs without a composer cache.
-      - name: wait for the app (head)
-        run: |
-          for i in $(seq 1 120); do
-            if docker compose $COMPOSE_FILES logs app 2>/dev/null | grep -q 'PHP app ready!'; then
-              echo "The application has finished starting."
-              exit 0
-            fi
-            if [ -z "$(docker compose $COMPOSE_FILES ps --quiet --status running app)" ]; then
-              echo "::error::The app container stopped before it finished starting"
-              docker compose $COMPOSE_FILES logs app
-              exit 1
-            fi
-            echo "Waiting for the application to finish starting... ($i/120)"
-            sleep 5
-          done
-          echo "::error::The application did not become ready in time"
-          docker compose $COMPOSE_FILES logs app
-          exit 1
+          if [ "$(sha256sum composer.lock | cut -d' ' -f1)" = "$BASE_LOCK" ]; then
+            echo "composer.lock is unchanged; the dependencies installed for the base branch still apply."
+            exit 0
+          fi
+          echo "composer.lock changed; reinstalling the dependencies."
+          docker compose $COMPOSE_FILES exec -T app composer install --prefer-dist --no-progress --no-interaction
 
       - name: migrate head
         run: make migrate
@@ -205,10 +219,6 @@ jobs:
           fi
           echo "All migrations are up to date."
 
-      # Seeds the databases only; `make seed` would also drive the sync-based Mailman and Listmonk services, which
-      # `--no-deps` deliberately never started. Each connection has its own loader and its own fixture group: the
-      # bundle's takes one entity manager at a time, and the website's own drops the foreign key checks its purge
-      # cannot resolve in order.
       - name: seed head
         run: |
           docker compose $COMPOSE_FILES exec -T app bin/console app:fixtures:load --no-interaction
