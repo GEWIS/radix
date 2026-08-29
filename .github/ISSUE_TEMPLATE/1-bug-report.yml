@@ -34,9 +34,9 @@ body:
     -   type: input
         id: version
         attributes:
-            label: Application version
-            description: Check [the website](https://gewis.nl/en/admin) to determine the version and short commit hash.
-            placeholder: ex. v2.8.2 (3dde2979b)
+            label: Application build
+            description: The footer of every page on [the website](https://gewis.nl) has the commit hash in brackets after the GitHub link. Copy it from there.
+            placeholder: ex. 3dde2979b
         validations:
             required: true
     -   type: dropdown

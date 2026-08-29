@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Checker;
 
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Database\RenewalLink as RenewalLinkModel;
 use App\Entity\Decision\OrganMember as OrganMemberModel;
 use App\Repository\Checker\MemberRepository;
@@ -75,9 +76,13 @@ class Renewal
                 'isInstalled' => $isInstalled,
                 'currentExpiration' => $link->getCurrentExpiration(),
                 'newExpiration' => $link->getNewExpiration(),
+                // The message is in English, so ask for the English page rather than whatever the router holds.
                 'url' => $this->urlGenerator->generate(
-                    'join_renew_short',
-                    ['token' => $link->getToken()],
+                    'join_renew',
+                    [
+                        '_locale' => Languages::English->getLangParam(),
+                        'token' => $link->getToken(),
+                    ],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),
             ],

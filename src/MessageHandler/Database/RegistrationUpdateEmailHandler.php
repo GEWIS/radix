@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler\Database;
 
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Database\ProspectiveMember;
 use App\Message\Database\RegistrationUpdateEmail;
 use App\Repository\Database\MemberRepository;
@@ -62,8 +63,11 @@ class RegistrationUpdateEmailHandler
             'restartUrl' => null === $paymentLink
                 ? null
                 : $this->urlGenerator->generate(
-                    'join_checkout_restart_short',
-                    ['token' => $paymentLink->getToken()],
+                    'join_checkout_restart',
+                    [
+                        '_locale' => Languages::English->getLangParam(),
+                        'token' => $paymentLink->getToken(),
+                    ],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),
             'passwordResetUrl' => $this->urlGenerator->generate(

@@ -60,9 +60,9 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
     }
 
     /**
-     * Opening a review screen is gated on being allowed to see it, and reviewers additionally on sudo. This is a GET,
-     * so the sudo listener brings them back here afterwards. Somebody who can only submit their own draft is never
-     * asked.
+     * Opening a review screen is gated on being allowed to see it, and reviewers additionally on sudo. The path rule
+     * has already asked by the time this runs; this is kept because it is about who is looking at this revision
+     * rather than about where the screen answers. Somebody who can only submit their own draft is never asked.
      */
     protected function assertMayReview(RevisionInterface $revision): void
     {
@@ -206,8 +206,7 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
             return null;
         }
 
-        // Everything but the author's own submit is a reviewer action, so it needs a fresh sudo grant. Opening the
-        // screen already asked, so this normally passes; it fires when that grant has lapsed in the meantime.
+        // Everything but the author's own submit is a reviewer action, so it needs a live sudo grant of its own.
         if ('submit' !== $transition) {
             $this->denyAccessUnlessGranted(SudoVoter::ATTRIBUTE);
         }

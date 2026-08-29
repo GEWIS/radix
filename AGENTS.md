@@ -140,14 +140,25 @@ The application is bilingual (`en`, `nl`) and most controller routes are prefixe
 - **`page_route`** (custom-pages catch-all) and **`catch_all`** (404 fallback to `FrontpageController::notFound`) are
   defined in `config/routes.yaml` rather than as attributes — **order matters**. Attribute scanning that ran before the
   explicit YAML routes used to steal traffic; that bug bit voting committees. Don't reorder this file lightly.
-- A few routes are deliberately *not* locale-prefixed, and are in `config/routes.yaml` for that reason: `image_serve`
-  and `legacy_data` (assets and old bookmarks, not pages, and their slash-bearing `{path}` must be matched before
-  `page_route` could grab it), `user_token`, and the public JWKS document.
+- **Every page a person reads carries its language in its own address.** What is left without one is either not a page
+  (`image_serve` and `legacy_data`, assets and old bookmarks whose slash-bearing `{path}` must be matched before
+  `page_route` could grab it; the public JWKS document; the Stripe webhook; `/health`) or an address we do not get to
+  move, which answers through `App\Controller\Application\LocaleRedirectController` and forwards to the page proper.
+  Those are the sign-up and renewal links that sit in mailboxes and on posters, the checkout return addresses that
+  travel with a session already open, and `/user/token/{app}`, which external applications are configured with. The
+  redirect is a 302, not a 301: where it lands depends on `Accept-Language`, so it must not be remembered.
+- A locale-prefixed route has to be declared **above `page_route`** in `config/routes.yaml`, whose
+  `/{_locale}/{category}/{subCategory}/{name}` otherwise reads three segments of it as a page that does not exist.
+  That is why `user_token` sits with the anonymous flows rather than next to the JWKS document it used to follow.
+- **There is no session-stored locale.** `/lang/{lang}` and the listener that applied what it wrote are gone; a
+  request's language comes from `_locale` in its path, and `App\Service\Application\LocalePreference` answers for the
+  handful of addresses that have no room to say. E-mail is written in English and links to `/en/…` explicitly
+  (`_locale => Languages::English->getLangParam()`), rather than leaving it to whatever the router is holding.
 - Other YAML route files under `config/routes/`: `api_platform.yaml`, `scheb_2fa.yaml`, `security.yaml`,
   `framework.yaml`, `nelmio_security.yaml`, `altcha.yaml`, `ux_live_component.yaml`, `ux_autocomplete.yaml`, and
   `web_profiler.yaml` (dev).
-- `src/EventListener/Application/LocaleRedirectListener.php` redirects bare `/` to the user's preferred locale,
-  falling back to `%kernel.default_locale%` (= `en`).
+- `src/EventListener/Application/LocaleRedirectListener.php` redirects bare `/` to the visitor's preferred locale,
+  through the same `LocalePreference` as everything else, falling back to `%kernel.default_locale%` (= `en`).
 - `$defaultLocale` and `$supportedLocales` are auto-bound in `config/services.yaml` — services that need them can just
   declare the parameter.
 - **Live-component routes are locale-prefixed** (`config/routes/ux_live_component.yaml` → `/{_locale}/_components`).
@@ -210,7 +221,32 @@ wrong shuts the register rather than opening it.
 
 `App\Security\User\UserChecker` blocks `User` login for deleted, hidden or expired members and members without an
 email. Authorization beyond roles lives in voters under `src/Security/`; notably
-`App\Security\User\SudoVoter` gates destructive actions behind a 30-minute time-bounded `SUDO` grant (see `SudoMode`).
+`App\Security\User\SudoVoter` gates the `SUDO` attribute on a 30-minute time-bounded grant (see `SudoMode`).
+
+Whole areas are behind that grant rather than lists of actions within them.
+`App\EventListener\User\SudoEnforcementListener` asks for it on every address under
+`/{_locale}/{admin,user/settings,user/security,company/security}`, the areas named in its own `AREAS` constant, so a
+new controller in any of them needs no `#[IsGranted(SudoVoter::ATTRIBUTE)]` and adding one says nothing the path does
+not already say. Three things sit outside it deliberately. Signing in, resetting a password and confirming sudo answer
+under `/user` and `/company` but outside `/security`, which is what keeps somebody with no grant able to go and get
+one. The live components an admin page is built from answer under `/{_locale}/_components` and carry the attribute
+themselves. And `/user/cosmetics` (`CosmeticsController`) is the navbar's festive-effects switch, moved out of
+`/user/settings` because it posts with `fetch` from every page on the site.
+
+Two places keep the attribute because the rule there is about the thing being looked at rather than about where it
+answers: the review screens in `AbstractRevisionReviewController` (whether this reader may approve *this* revision),
+and the four administrative actions on `ProspectiveMemberController`, the one controller whose public flows and
+administrative ones answer at addresses declared in two different places, so the prefix is a property of the action
+rather than of the class.
+
+`App\EventListener\User\SudoGrantOnLoginListener` hands out the grant to somebody who has just signed in, so the
+password typed a moment ago is not asked for again on the way in. It follows the credentials on the passport rather
+than the login: a remember-me cookie presents nothing to check, and re-proving a session restored from one is what
+sudo is for. Do not reach for `InteractiveLoginEvent` here, Symfony calls the remember-me authenticator interactive as
+well. The grant runs for thirty minutes from when it was given rather than from the last page, so **an XHR endpoint
+inside a guarded area answers a lapsed grant with the confirmation page instead of its JSON**, which is nothing the
+script that asked can act on. That is the reason the cosmetics switch had to move, and the thing to check before
+putting a new `fetch` target inside one of these areas.
 
 Remember-me is a **custom** integration (`App\Security\User\PersistentSignatureRememberMeHandler`, persisted via the
 `Session` entity). The cookies, lifetimes and per-firewall handlers differ deliberately — read

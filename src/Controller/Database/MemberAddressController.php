@@ -8,11 +8,9 @@ use App\Entity\Database\Enums\AddressTypes;
 use App\Form\Database\AddressEditType;
 use App\Form\Database\DeleteAddressType;
 use App\Form\SubmitButtons;
-use App\Security\User\SudoVoter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function Symfony\Component\Translation\t;
 
@@ -20,7 +18,6 @@ use function Symfony\Component\Translation\t;
  * The three addresses a member can have on file. Which one a page is about follows from the route, never from what
  * is submitted.
  */
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(
     path: '/members/{lidnr}',
     requirements: [

@@ -15,7 +15,6 @@ use App\Entity\User\User;
 use App\Form\Career\BannerImageType;
 use App\Form\Career\CompanyPackageType;
 use App\Repository\Career\CompanyPackageRepository;
-use App\Security\User\SudoVoter;
 use App\Service\Career\CareerOverviewCountsProvider;
 use App\Service\Career\CompanyBannerService;
 use App\Service\Career\CompanyPackageService;
@@ -248,7 +247,6 @@ class AdminPackageController extends AbstractController
         return $this->backToCompany($package->getCompany());
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{package}/delete',
         name: 'delete',
@@ -284,11 +282,7 @@ class AdminPackageController extends AbstractController
      * image up. It is the same surface the company gets in its own portal, so C4 is never stuck waiting for a
      * representative to upload something on its behalf; the only difference is that what C4 uploads is already
      * decided on and goes straight up.
-     *
-     * Everything on the page changes what the whole site shows, so the sudo grant is asked for on the way in rather
-     * than per button: a GET carries the visitor back here afterwards, where a POST would have dropped their upload.
      */
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{package}/banner',
         name: 'banner',
@@ -353,10 +347,9 @@ class AdminPackageController extends AbstractController
     }
 
     /**
-     * A banner shows across the whole site, so taking one is a reviewer action and asks for a fresh sudo grant, the
-     * same as every decision on a revision does.
+     * A banner shows across the whole site, so taking one is a reviewer action, the same as every decision on a
+     * revision is.
      */
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{package}/banner/approve',
         name: 'banner/approve',
@@ -390,7 +383,6 @@ class AdminPackageController extends AbstractController
         return $this->backToApprovals();
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/{package}/banner/reject',
         name: 'banner/reject',

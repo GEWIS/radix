@@ -12,7 +12,6 @@ use App\Entity\User\User;
 use App\Repository\Decision\AuthorizationRepository;
 use App\Repository\Decision\MeetingPointRepository;
 use App\Repository\Decision\MeetingRepository;
-use App\Security\User\SudoVoter;
 use App\Service\Application\FileStorageException;
 use App\Service\Database\Meeting as MeetingService;
 use App\Service\Decision\MeetingDocumentService;
@@ -51,7 +50,6 @@ use function trim;
  * and what is minuted are one record, kept by whoever keeps the register. The authorizations below are the exception,
  * being about who may vote at a meeting rather than about its record, so those stay with the board.
  */
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(
     path: '/admin/meetings',
     name: 'admin/meetings/',

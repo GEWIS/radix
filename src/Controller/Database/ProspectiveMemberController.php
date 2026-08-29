@@ -11,6 +11,7 @@ use App\Form\Database\MemberRenewalType;
 use App\Form\Database\Registration\RegistrationData;
 use App\Form\Database\Registration\RegistrationFlowType;
 use App\Security\User\SudoVoter;
+use App\Service\Application\LocalePreference;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\ProspectiveMemberRemoval;
 use App\Service\Database\RegistrationFailure;
@@ -34,6 +35,10 @@ use function assert;
  * The paths are on the actions rather than on the class, and the two public flows have no path here at all: they are
  * declared in config/routes.yaml, because the addresses they answer at sit outside the administrative prefix this
  * controller is imported with.
+ *
+ * That is also why the four administrative actions still say `#[IsGranted(SudoVoter::ATTRIBUTE)]` where the rest of
+ * the administration leaves it to the path: here the prefix is a property of the action, so a second address given to
+ * one of them would take it out from behind {@see \App\EventListener\User\SudoEnforcementListener}.
  */
 final class ProspectiveMemberController extends AbstractController
 {
@@ -43,22 +48,21 @@ final class ProspectiveMemberController extends AbstractController
         private readonly MemberService $memberService,
         private readonly RegistrationService $registrationService,
         private readonly TranslatorInterface $translator,
+        private readonly LocalePreference $localePreference,
     ) {
     }
 
     /**
      * The address the form is reached at when nobody has said which language they want it in.
      *
-     * `/join` is on posters and behind gew.is/join, so it keeps answering; what it has no room for is a language, and
-     * the form is a page like any other and should carry one. The locale the request already resolved to is the
-     * visitor's own -- their session if they have chosen, and the default otherwise -- so it is the one to send them
-     * to rather than a language picked here.
+     * `/join` is on posters and behind gew.is/join, so it keeps answering, but it has no room for a language and the
+     * form is a page like any other. Nobody arriving here has said which language they want, so the browser decides.
      */
     public function subscribeUnlocalised(Request $request): Response
     {
         return $this->redirectToRoute(
             'join_index',
-            ['_locale' => $request->getLocale()],
+            ['_locale' => $this->localePreference->resolve($request)],
         );
     }
 
@@ -106,7 +110,10 @@ final class ProspectiveMemberController extends AbstractController
 
             // Stored, but without a checkout page; the e-mail that just went out can restart it.
             if (RegistrationFailure::CheckoutUnavailable === $result) {
-                return $this->redirectToRoute('join_checkout_error');
+                return $this->redirectToRoute(
+                    'join_checkout_error',
+                    ['_locale' => $request->getLocale()],
+                );
             }
 
             // Rendered rather than answered with a 303, because the Chromium CSP enforcer does not allow a
@@ -138,8 +145,8 @@ final class ProspectiveMemberController extends AbstractController
      * the token is what says who they are. A token that has been used or has expired is not an error — the page says
      * the link no longer works rather than pretending it does.
      *
-     * `join_renew_short` and `join_renew` are declared in config/routes.yaml. Both spellings answer here: the short one
-     * is what a renewal e-mail sent months ago links to, and the long one is what the register itself links to.
+     * `join_renew` is declared in config/routes.yaml, along with the two addresses this used to answer at, which
+     * redirect here because a renewal e-mail sent months ago links to one of them.
      */
     public function renew(
         Request $request,

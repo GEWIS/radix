@@ -23,7 +23,6 @@ use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
 use App\Security\User\MfaPolicy;
 use App\Security\User\SudoMode;
-use App\Security\User\SudoVoter;
 use App\Service\Application\AltchaSolutionGuard;
 use App\Service\User\AccountPasswordService;
 use App\Service\User\KnownDeviceRegistry;
@@ -345,7 +344,6 @@ abstract class AbstractSecurityController extends AbstractController
         return $this->redirectToRoute($this->routePrefix . 'login');
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/security',
         name: 'security_index',
@@ -432,7 +430,6 @@ abstract class AbstractSecurityController extends AbstractController
         );
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: new Expression('"session_guard_terminate-" ~ args["series"]'),
         tokenKey: '_csrf_token',
@@ -488,7 +485,6 @@ abstract class AbstractSecurityController extends AbstractController
         return $this->redirectToRoute($this->routePrefix . 'security_index');
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'session_guard_terminate_others',
         tokenKey: '_csrf_token',
@@ -521,7 +517,6 @@ abstract class AbstractSecurityController extends AbstractController
         return $this->redirectToRoute($this->routePrefix . 'security_index');
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'session_guard_terminate_all',
         tokenKey: '_csrf_token',
@@ -672,7 +667,6 @@ abstract class AbstractSecurityController extends AbstractController
         return new RedirectResponse($next);
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/security/mfa/enable',
         name: 'mfa_enable',
@@ -816,7 +810,6 @@ abstract class AbstractSecurityController extends AbstractController
         );
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'mfa_regenerate_backup_codes',
         tokenKey: '_csrf_token',
@@ -860,7 +853,6 @@ abstract class AbstractSecurityController extends AbstractController
         return $this->redirectToRoute($this->routePrefix . 'mfa_backup_codes');
     }
 
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'mfa_disable',
         tokenKey: '_csrf_token',
