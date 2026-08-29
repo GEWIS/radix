@@ -8,6 +8,7 @@ use App\Repository\User\SessionRepository;
 use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
 use App\Security\User\UserAgentParser;
+use App\Service\User\KnownDeviceRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -62,6 +63,7 @@ final class StaleSessionGuardListener
         private readonly FirewallMap $firewallMap,
         private readonly UserAgentParser $userAgentParser,
         private readonly TokenStorageInterface $tokenStorage,
+        private readonly KnownDeviceRegistry $knownDevices,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -185,16 +187,28 @@ final class StaleSessionGuardListener
         // moments of token rotation.
         $now = new DateTimeImmutable();
         $staleAfter = $now->modify('-' . self::LAST_USED_THROTTLE_SECONDS . ' seconds');
-        if ($managedSession->getLastUsedAt() < $staleAfter) {
+        $inUse = $managedSession->getLastUsedAt() < $staleAfter;
+        if ($inUse) {
             $managedSession->setLastUsedAt($now);
             $changed = true;
         }
 
-        if (!$changed) {
+        if ($changed) {
+            $this->entityManager->flush();
+        }
+
+        if (!$inUse) {
             return;
         }
 
-        $this->entityManager->flush();
+        // Somebody working in a device they signed in from months ago is the same reason to keep it recognised as
+        // signing in from it again would be, and this is the only place that sees them do it. Behind the same throttle
+        // as the bump above, so it costs one lookup per three minutes of activity.
+        $this->knownDevices->refresh(
+            $managedSession->getUserIdentifier(),
+            $firewall,
+            $request,
+        );
     }
 
     private function forceLogout(

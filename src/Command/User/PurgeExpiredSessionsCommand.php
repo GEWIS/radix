@@ -7,6 +7,7 @@ namespace App\Command\User;
 use App\Command\HoldsRunLockTrait;
 use App\Repository\User\KnownDeviceRepository;
 use App\Repository\User\SessionRepository;
+use App\Service\User\KnownDeviceRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -40,7 +41,7 @@ final class PurgeExpiredSessionsCommand extends Command
     private const string SESSION_IDLE = '-30 days';
 
     /** Devices stop being recognised at this age regardless; this only clears the rows out behind that. */
-    private const string DEVICE_IDLE = '-90 days';
+    private const string DEVICE_IDLE = KnownDeviceRegistry::RETENTION;
 
     public function __construct(
         private readonly SessionRepository $repository,

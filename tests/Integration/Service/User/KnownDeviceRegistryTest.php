@@ -88,7 +88,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         ));
 
         $device = $this->onlyDevice();
-        $device->setLastSeenAt(new DateTimeImmutable('-91 days'));
+        $device->setLastSeenAt(new DateTimeImmutable('-121 days'));
         $this->entityManager->flush();
 
         self::assertFalse($this->recognise(
