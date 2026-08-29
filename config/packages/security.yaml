@@ -156,14 +156,16 @@ security:
         # Endpoints carry their own permission checks; this is what catches one that forgot.
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
-        # The register's public flows: a visitor to them is nobody yet.
-        - { path: ^/lang, roles: PUBLIC_ACCESS }
+        # The register's public flows: a visitor to them is nobody yet. Each is named twice, once where it answers
+        # now and once where it used to, so the older spelling still reaches the redirect that forwards it.
         - { path: ^/join, roles: PUBLIC_ACCESS }
         - { path: '^/(%app.locales%)/join', roles: PUBLIC_ACCESS }
         - { path: ^/member/subscribe, roles: PUBLIC_ACCESS }
         - { path: ^/checkout, roles: PUBLIC_ACCESS }
+        - { path: '^/(%app.locales%)/checkout', roles: PUBLIC_ACCESS }
         - { path: ^/member/renew, roles: PUBLIC_ACCESS }
         - { path: ^/renew, roles: PUBLIC_ACCESS }
+        - { path: '^/(%app.locales%)/renew', roles: PUBLIC_ACCESS }
 
 
 when@dev:

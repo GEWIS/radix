@@ -21,13 +21,8 @@
                     {% set is_disabled = locale === app.request.locale %}
                     {% if null !== app.current_route and app.current_route_parameters._locale is defined %}
                         {% set altlang_url = page is not defined ? path(app.current_route, app.current_route_parameters|merge({_locale: locale})) : localised_page_path(page, locale) %}
-                    {% elseif app.current_route_parameters._locale is not defined and null !== app.current_route %}
-                        {# An address with no room for a language: the renewal form and the pages a payment returns to
-                           answer where the link that was sent points. The choice is remembered on the session
-                           instead. #}
-                        {% set altlang_url = path('application_lang', {lang: locale}) %}
                     {% else %}
-                        {# An error state: there is no route to rebuild from, so construct the URL by hand. #}
+                        {# No route to rebuild from, so construct the URL by hand. #}
                         {% set current_path = app.request.pathinfo %}
                         {% if current_path starts with '/' ~ app.request.locale ~ '/' %}
                             {% set stripped_path = current_path|slice((app.request.locale|length + 1)) %}
@@ -74,7 +69,7 @@
                    Language/Theme items; the inner flex row vertically centres the switch against its label. #}
                 <div class="dropdown-item-text"
                      data-controller="cosmetics-toggle"
-                     data-cosmetics-toggle-url-value="{{ path('user_settings_cosmetics') }}"
+                     data-cosmetics-toggle-url-value="{{ path('user_cosmetics') }}"
                      data-cosmetics-toggle-csrf-value="{{ csrf_token('cosmetics') }}"
                 >
                     <div class="form-check form-switch d-flex align-items-center m-0 ps-0">

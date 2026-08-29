@@ -40,7 +40,7 @@ database_routes:
     requirements:
         _locale: '%app.locales%'
 
-# The language switch and the reference list of installation functions.
+# The reference list of installation functions.
 application_routes:
     resource: '../src/Controller/Application/ApplicationController.php'
     type: attribute
@@ -102,19 +102,76 @@ api_routes:
     resource: '../src/Controller/Report/ApiController.php'
     type: attribute
 
-# Where someone is returned to after paying, and where Stripe reports the payment. Both spellings of each: the sign-up
-# host exposes the short one and rewrites it onto the long one. These addresses are held by Stripe rather than by us —
-# the webhook is configured in its dashboard and the return addresses travel with a checkout session that may already
-# be open — so they answer where they always have.
+# Where someone is returned to after paying, and where Stripe reports the payment. The pages carry their language like
+# every other page; the webhook does not, because nobody reads it and its address is configured in Stripe's dashboard.
 join_checkout_routes:
     resource: '../src/Controller/Database/CheckoutController.php'
     type: attribute
 
-# The rest of the anonymous flows, at the addresses they are reached by rather than under the register's prefix. A
-# language prefix in front of any of them would break the link in a renewal e-mail that went out last month, and the
-# short address gew.is/join points at.
-# The sign-up form carries its language in its address like every other page, so the language switch is the same
-# rewriting of the URL there as it is anywhere else rather than something remembered on the session.
+# Where those pages used to answer, in both spellings: the sign-up host exposes the short one and rewrites it onto the
+# long one, and a return address travels with a checkout session that may already be open.
+join_checkout_completed_legacy_short:
+    path: /checkout/completed
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_completed
+    methods: [GET]
+
+join_checkout_completed_legacy:
+    path: /member/subscribe/checkout/completed
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_completed
+    methods: [GET]
+
+join_checkout_cancelled_legacy_short:
+    path: /checkout/cancelled
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_cancelled
+    methods: [GET]
+
+join_checkout_cancelled_legacy:
+    path: /member/subscribe/checkout/cancelled
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_cancelled
+    methods: [GET]
+
+join_checkout_error_legacy_short:
+    path: /checkout/error
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_error
+    methods: [GET]
+
+join_checkout_error_legacy:
+    path: /member/subscribe/checkout/error
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_error
+    methods: [GET]
+
+join_checkout_restart_legacy_short:
+    path: /checkout/restart/{token}
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_restart
+    requirements:
+        token: '[a-zA-Z0-9_\-\+]+'
+    methods: [GET]
+
+join_checkout_restart_legacy:
+    path: /member/subscribe/checkout/restart/{token}
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_checkout_restart
+    requirements:
+        token: '[a-zA-Z0-9_\-\+]+'
+    methods: [GET]
+
+# The rest of the anonymous flows. Each is a page somebody reads, so each carries its language; the addresses they
+# used to answer at are kept below, because they are on posters and in mailboxes and we do not get to move them.
 join_index:
     path: '/{_locale}/join'
     controller: App\Controller\Database\ProspectiveMemberController::subscribe
@@ -129,38 +186,56 @@ join_index_short:
     controller: App\Controller\Database\ProspectiveMemberController::subscribeUnlocalised
     methods: [GET]
 
-# Where signing up used to answer, kept because it is printed on posters and sits in mailboxes. GET only: a 301 in
+# Where signing up used to answer, kept because it is printed on posters and sits in mailboxes. GET only: a redirect in
 # answer to a POST is not something every client replays as a POST, and nothing submits to this address any more.
 join_subscribe_legacy:
     path: /member/subscribe
-    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+    controller: App\Controller\Application\LocaleRedirectController
     defaults:
         route: join_index
-        permanent: true
     methods: [GET]
 
-join_renew_short:
-    path: /renew/{token}
-    controller: App\Controller\Database\ProspectiveMemberController::renew
-    requirements:
-        token: '[a-zA-Z0-9_\-\+]+'
-    methods: [GET, POST]
-
+# The renewal form, which is reached from a link in an e-mail. That e-mail is written in English and says so in its
+# address; a link sent before the language moved into the path is answered below.
 join_renew:
-    path: /member/renew/{token}
+    path: '/{_locale}/renew/{token}'
     controller: App\Controller\Database\ProspectiveMemberController::renew
     requirements:
+        _locale: '%app.locales%'
         token: '[a-zA-Z0-9_\-\+]+'
+    defaults:
+        _locale: '%kernel.default_locale%'
     methods: [GET, POST]
 
-# The language switch stores a choice on the session, which is the only thing that decides the language of a page that
-# carries no locale of its own — the sign-up and renewal forms. It cannot move behind a prefix either.
-application_lang:
-    path: /lang/{lang}
-    controller: App\Controller\Application\ApplicationController::lang
+# GET only, for the same reason as the sign-up address above: the form submits to the address the page answers at.
+join_renew_legacy_short:
+    path: /renew/{token}
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_renew
     requirements:
-        lang: '[a-zA-Z_]{2,5}'
+        token: '[a-zA-Z0-9_\-\+]+'
     methods: [GET]
+
+join_renew_legacy:
+    path: /member/renew/{token}
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: join_renew
+    requirements:
+        token: '[a-zA-Z0-9_\-\+]+'
+    methods: [GET]
+
+# Where a member consents to an external application signing them in. Declared above page_route, which would
+# otherwise read `/en/user/token` as a page that does not exist.
+user_token:
+    path: '/{_locale}/user/token/{app}'
+    controller: App\Controller\User\UserController::token
+    requirements:
+        _locale: '%app.locales%'
+        app: '[a-z][0-9a-z\_\-]{2,31}'
+    defaults:
+        _locale: '%kernel.default_locale%'
 
 # Image serving is defined here (not as a controller attribute) so it is NOT locale-prefixed (image URLs are assets,
 # not pages), and so its slash-bearing {path} is matched before the localised page_route below could grab it.
@@ -191,14 +266,18 @@ page_route:
         subCategory: null
         name: null
 
-user_token:
+# Where that page used to answer, kept because an external application is configured with the address.
+user_token_legacy:
     path: /user/token/{app}
-    controller: App\Controller\User\UserController::token
+    controller: App\Controller\Application\LocaleRedirectController
+    defaults:
+        route: user_token
     requirements:
         app: '[a-z][0-9a-z\_\-]{2,31}'
+    methods: [GET]
 
-# Public JWKS for verifying RS512 tokens issued to external applications. Locale-less, like user_token, so it is a plain
-# well-known URL an application can be configured with.
+# Public JWKS for verifying RS512 tokens issued to external applications. Locale-less, because it is read by an
+# application rather than by a person, so it is a plain well-known URL one can be configured with.
 external_app_jwks:
     path: /.well-known/jwks.json
     controller: App\Controller\User\JwksController::jwks

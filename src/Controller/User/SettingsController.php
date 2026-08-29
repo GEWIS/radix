@@ -19,7 +19,6 @@ use App\Repository\User\DataExportRequestRepository;
 use App\Repository\User\NotificationEmailSubscriptionRepository;
 use App\Repository\User\UserSettingsRepository;
 use App\Security\User\SudoMode;
-use App\Security\User\SudoVoter;
 use App\Service\Application\FileDownloadHelper;
 use App\Service\Application\FileStorage;
 use App\Service\Photo\MemberTagPurgeService;
@@ -41,8 +40,11 @@ use function in_array;
 
 /**
  * The member-facing settings/privacy page. Member-only, so it does not share the
- * {@see AbstractSecurityController} base (which also serves company users and is gated behind sudo re-auth) - these
- * are low-risk preferences that only need the member to be logged in.
+ * {@see AbstractSecurityController} base, which also serves company users.
+ *
+ * Everything here is behind sudo by path; see {@see \App\EventListener\User\SudoEnforcementListener}. The navbar's
+ * cosmetics switch was one of these actions and moved to {@see CosmeticsController}, because a `fetch` can do nothing
+ * with a confirmation page.
  */
 #[IsGranted(
     attribute: UserRoles::User->value,
@@ -279,36 +281,9 @@ class SettingsController extends AbstractController
     }
 
     /**
-     * Persist the cosmetics preference from the navbar switch. Called via `fetch` by the `cosmetics-toggle` Stimulus
-     * controller, so it just flips the flag and returns no content.
-     */
-    #[IsCsrfTokenValid(
-        id: 'cosmetics',
-        tokenKey: '_csrf_token',
-    )]
-    #[Route(
-        path: '/cosmetics',
-        name: 'cosmetics',
-        methods: ['POST'],
-    )]
-    public function cosmetics(
-        Request $request,
-        #[CurrentUser]
-        User $user,
-    ): Response {
-        $this->userSettingsService->setCosmeticsDisabled(
-            $this->settingsRepository->getOrCreateForUser($user),
-            $request->request->getBoolean('disabled'),
-        );
-
-        return new Response(status: Response::HTTP_NO_CONTENT);
-    }
-
-    /**
      * Remove all existing photo tags of the current member (the retroactive counterpart to the tagging opt-out). This
      * is irreversible, so it requires sudo (recent re-authentication), like the other destructive account actions.
      */
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'purge_tags',
         tokenKey: '_csrf_token',
@@ -337,7 +312,6 @@ class SettingsController extends AbstractController
      * Kick off building the member's data export. It runs asynchronously and the member is emailed a download link
      * when it is ready. Requires sudo, like the other actions that touch the member's full personal data.
      */
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[IsCsrfTokenValid(
         id: 'data_export',
         tokenKey: '_csrf_token',
@@ -402,7 +376,6 @@ class SettingsController extends AbstractController
      * member can only ever reach their own file. Requires sudo, like the other actions that touch the member's full
      * personal data; being a GET route, the re-authentication returns the member straight back here to the download.
      */
-    #[IsGranted(SudoVoter::ATTRIBUTE)]
     #[Route(
         path: '/data-export/download',
         name: 'data_export_download',

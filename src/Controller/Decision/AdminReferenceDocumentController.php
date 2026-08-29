@@ -7,7 +7,6 @@ namespace App\Controller\Decision;
 use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
-use App\Security\User\SudoVoter;
 use App\Service\Application\FileStorageException;
 use App\Service\Decision\ReferenceDocumentService;
 use App\Service\Decision\VersionLabelSuggester;
@@ -30,7 +29,6 @@ use function trim;
  * same XHR convention as the meeting document uploads.
  */
 #[IsGranted(UserRoles::Board->value)]
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(
     path: '/admin/meetings/reference',
     name: 'admin/meetings/reference/',

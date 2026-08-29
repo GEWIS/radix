@@ -8,7 +8,6 @@ use App\Entity\Database\SavedQuery;
 use App\Form\Report\QueryExportType;
 use App\Form\Report\QuerySaveType;
 use App\Form\SubmitButtons;
-use App\Security\User\SudoVoter;
 use App\Service\Report\QueryService;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,11 +16,9 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function str_replace;
 
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(path: '/query')]
 final class QueryController extends AbstractController
 {

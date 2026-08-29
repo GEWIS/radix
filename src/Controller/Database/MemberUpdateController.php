@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
-use App\Security\User\SudoVoter;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function Symfony\Component\Translation\t;
 
 /**
  * The changes members proposed to their own data, which only take effect once the secretary approves them.
  */
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 #[Route(path: '/members')]
 final class MemberUpdateController extends AbstractMemberController
 {

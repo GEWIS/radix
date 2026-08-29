@@ -17,6 +17,10 @@ use function is_string;
 /**
  * Where the payment provider drops a prospective member off: the pages they return to after the checkout, the link
  * that puts them back on it, and the webhook that tells us what actually happened.
+ *
+ * The webhook keeps both of its plain addresses because Stripe calls it from what is configured in their dashboard.
+ * The pages carry a language like every page somebody reads; the addresses they used to answer at are declared in
+ * config/routes.yaml and redirect here.
  */
 final class CheckoutController extends AbstractController
 {
@@ -27,13 +31,10 @@ final class CheckoutController extends AbstractController
     }
 
     #[Route(
-        path: '/checkout/completed',
-        name: 'join_checkout_completed_short',
-        methods: ['GET'],
-    )]
-    #[Route(
-        path: '/member/subscribe/checkout/completed',
+        path: '/{_locale}/checkout/completed',
         name: 'join_checkout_completed',
+        requirements: ['_locale' => '%app.locales%'],
+        defaults: ['_locale' => '%kernel.default_locale%'],
         methods: ['GET'],
     )]
     public function completed(Request $request): Response
@@ -45,13 +46,10 @@ final class CheckoutController extends AbstractController
     }
 
     #[Route(
-        path: '/checkout/cancelled',
-        name: 'join_checkout_cancelled_short',
-        methods: ['GET'],
-    )]
-    #[Route(
-        path: '/member/subscribe/checkout/cancelled',
+        path: '/{_locale}/checkout/cancelled',
         name: 'join_checkout_cancelled',
+        requirements: ['_locale' => '%app.locales%'],
+        defaults: ['_locale' => '%kernel.default_locale%'],
         methods: ['GET'],
     )]
     public function cancelled(Request $request): Response
@@ -63,13 +61,10 @@ final class CheckoutController extends AbstractController
     }
 
     #[Route(
-        path: '/checkout/error',
-        name: 'join_checkout_error_short',
-        methods: ['GET'],
-    )]
-    #[Route(
-        path: '/member/subscribe/checkout/error',
+        path: '/{_locale}/checkout/error',
         name: 'join_checkout_error',
+        requirements: ['_locale' => '%app.locales%'],
+        defaults: ['_locale' => '%kernel.default_locale%'],
         methods: ['GET'],
     )]
     public function error(Request $request): Response
@@ -81,15 +76,13 @@ final class CheckoutController extends AbstractController
     }
 
     #[Route(
-        path: '/checkout/restart/{token}',
-        name: 'join_checkout_restart_short',
-        requirements: ['token' => '[a-zA-Z0-9_\-+]+'],
-        methods: ['GET'],
-    )]
-    #[Route(
-        path: '/member/subscribe/checkout/restart/{token}',
+        path: '/{_locale}/checkout/restart/{token}',
         name: 'join_checkout_restart',
-        requirements: ['token' => '[a-zA-Z0-9_\-+]+'],
+        requirements: [
+            '_locale' => '%app.locales%',
+            'token' => '[a-zA-Z0-9_\-+]+',
+        ],
+        defaults: ['_locale' => '%kernel.default_locale%'],
         methods: ['GET'],
     )]
     public function restart(string $token): Response

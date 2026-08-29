@@ -10,7 +10,6 @@ use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\Enums\UserRoles;
 use App\Form\Application\AnnouncementType;
 use App\Repository\Application\AnnouncementRepository;
-use App\Security\User\SudoVoter;
 use App\Service\Application\AnnouncementService;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,7 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     attribute: UserRoles::Admin->value,
     message: 'You are not allowed to send announcements.',
 )]
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 class AnnouncementController extends AbstractController
 {
     public function __construct(

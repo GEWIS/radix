@@ -9,7 +9,6 @@ use App\Entity\Application\MaintenanceWindow;
 use App\Entity\User\Enums\UserRoles;
 use App\Form\Application\MaintenanceType;
 use App\Repository\Application\MaintenanceWindowRepository;
-use App\Security\User\SudoVoter;
 use App\Service\Application\MaintenanceWindowService;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +23,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     attribute: UserRoles::Admin->value,
     message: 'You are not allowed to manage maintenance mode.',
 )]
-#[IsGranted(SudoVoter::ATTRIBUTE)]
 class MaintenanceController extends AbstractController
 {
     public function __construct(

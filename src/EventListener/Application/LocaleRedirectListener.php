@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener\Application;
 
+use App\Service\Application\LocalePreference;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -15,12 +16,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 )]
 final readonly class LocaleRedirectListener
 {
-    /**
-     * @param string[] $supportedLocales
-     */
     public function __construct(
-        private string $defaultLocale,
-        private array $supportedLocales,
+        private LocalePreference $localePreference,
     ) {
     }
 
@@ -31,8 +28,8 @@ final readonly class LocaleRedirectListener
             return;
         }
 
-        $preferred = $request->getPreferredLanguage($this->supportedLocales) ?? $this->defaultLocale;
-
-        $event->setResponse(new RedirectResponse('/' . $preferred . '/'));
+        $event->setResponse(new RedirectResponse(
+            '/' . $this->localePreference->resolve($request) . '/',
+        ));
     }
 }

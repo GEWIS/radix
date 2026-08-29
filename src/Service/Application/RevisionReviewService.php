@@ -38,8 +38,8 @@ final readonly class RevisionReviewService
     }
 
     /**
-     * Whether this decision is open to be taken at all. Asked before the reader is put through a sudo prompt for it,
-     * so that an action the workflow would refuse is refused first.
+     * Whether this decision is open to be taken at all, so that an action the workflow would refuse is refused
+     * before anything else is done about it.
      */
     public function canApply(
         RevisionInterface $revision,
