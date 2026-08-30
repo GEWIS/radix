@@ -111,6 +111,53 @@
                     </div>
                 {% endif %}
 
+                {% if board.current is not empty or board.historical is not empty %}
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3>{{ 'Board'|trans }}</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% if board.current is not empty %}
+                                <div class="profile-membership-group">
+                                    <div class="profile-membership-label">{{ 'Currently on the board as'|trans }}</div>
+                                    {% for installation in board.current %}
+                                        <div class="profile-membership">
+                                            <span class="profile-membership-name">{{ installation.function }}</span>
+                                            <span class="text-muted">
+                                                {{ 'Since %date%'|trans({
+                                                    '%date%': installation.installDate|format_date(pattern: 'd MMMM yyyy', locale: app.request.locale),
+                                                }) }}
+                                            </span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if board.historical is not empty %}
+                                <div class="profile-membership-group">
+                                    <div class="profile-membership-label">{{ 'Previously on the board as'|trans }}</div>
+                                    {% for installation in board.historical %}
+                                        <div class="profile-membership">
+                                            <span class="profile-membership-name profile-membership-past">{{ installation.function }}</span>
+                                            <span class="text-muted">
+                                                {% if installation.releaseDate is not null %}
+                                                    {{ '%from% until %until%'|trans({
+                                                        '%from%': installation.installDate|format_date(pattern: 'd MMMM yyyy', locale: app.request.locale),
+                                                        '%until%': installation.releaseDate|format_date(pattern: 'd MMMM yyyy', locale: app.request.locale),
+                                                    }) }}
+                                                {% else %}
+                                                    {{ 'Since %date%'|trans({
+                                                        '%date%': installation.installDate|format_date(pattern: 'd MMMM yyyy', locale: app.request.locale),
+                                                    }) }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
                 <div class="panel">
                     <div class="panel-heading">
                         <h3>{{ 'Memberships of committees and fraternities'|trans }}</h3>
@@ -126,11 +173,11 @@
                             </p>
                         {% endif %}
                         {% if committees.current is not empty %}
-                            <div class="profile-committee-group">
-                                <div class="profile-committee-label">{{ 'Currently a member of'|trans }}</div>
+                            <div class="profile-membership-group">
+                                <div class="profile-membership-label">{{ 'Currently a member of'|trans }}</div>
                                 {% for committee in committees.current %}
-                                    <div class="profile-committee">
-                                        <span class="profile-committee-name" title="{{ committee.organ.getName }}">{{ committee.organ.getAbbr }}</span>
+                                    <div class="profile-membership">
+                                        <span class="profile-membership-name" title="{{ committee.organ.getName }}">{{ committee.organ.getAbbr }}</span>
                                         {% if committee.functions is not empty %}
                                             <span class="text-muted">{{ committee.functions|join(', ') }}</span>
                                         {% endif %}
@@ -139,11 +186,11 @@
                             </div>
                         {% endif %}
                         {% if committees.historical is not empty %}
-                            <div class="profile-committee-group">
-                                <div class="profile-committee-label">{{ 'Previously a member of'|trans }}</div>
+                            <div class="profile-membership-group">
+                                <div class="profile-membership-label">{{ 'Previously a member of'|trans }}</div>
                                 {% for committee in committees.historical %}
-                                    <div class="profile-committee">
-                                        <span class="profile-committee-name profile-committee-past" title="{{ committee.organ.getName }}">{{ committee.organ.getAbbr }}</span>
+                                    <div class="profile-membership">
+                                        <span class="profile-membership-name profile-membership-past" title="{{ committee.organ.getName }}">{{ committee.organ.getAbbr }}</span>
                                         {% if committee.functions is not empty %}
                                             <span class="text-muted">{{ committee.functions|join(', ') }}</span>
                                         {% endif %}

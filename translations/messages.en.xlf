@@ -413,6 +413,10 @@
         <source>%filename% is removed without being filed. This cannot be undone.</source>
         <target state="translated">%filename% is removed without being filed. This cannot be undone.</target>
       </trans-unit>
+      <trans-unit id="RD6RDKS" resname="%from% until %until%">
+        <source>%from% until %until%</source>
+        <target state="translated">%from% until %until%</target>
+      </trans-unit>
       <trans-unit id="4O9JbHV" resname="%label% disappears from the label picker. Vacancies that already carry it keep it.">
         <source>%label% disappears from the label picker. Vacancies that already carry it keep it.</source>
         <target state="translated">%label% disappears from the label picker. Vacancies that already carry it keep it.</target>
@@ -2532,6 +2536,10 @@
       <trans-unit id="2e2kzco" resname="Currently a member of">
         <source>Currently a member of</source>
         <target>Currently a member of</target>
+      </trans-unit>
+      <trans-unit id="ENNAt59" resname="Currently on the board as">
+        <source>Currently on the board as</source>
+        <target state="translated">Currently on the board as</target>
       </trans-unit>
       <trans-unit id="CLV479f" resname="Currently on the career page">
         <source>Currently on the career page</source>
@@ -6825,6 +6833,10 @@
         <source>Previously installed</source>
         <target state="translated">Previously installed</target>
       </trans-unit>
+      <trans-unit id="9k8vMU6" resname="Previously on the board as">
+        <source>Previously on the board as</source>
+        <target state="translated">Previously on the board as</target>
+      </trans-unit>
       <trans-unit id="qsr94el" resname="Primary contact">
         <source>Primary contact</source>
         <target state="translated">Primary contact</target>
@@ -8148,6 +8160,10 @@
       <trans-unit id="k4clD4v" resname="Similar courses">
         <source>Similar courses</source>
         <target state="translated">Similar courses</target>
+      </trans-unit>
+      <trans-unit id="oF5p4V7" resname="Since %date%">
+        <source>Since %date%</source>
+        <target state="translated">Since %date%</target>
       </trans-unit>
       <trans-unit id="1hOWNds" resname="Since 2024 these can only be changed in the code.">
         <source>Since 2024 these can only be changed in the code.</source>
