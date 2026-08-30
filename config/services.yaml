@@ -103,8 +103,9 @@ parameters:
     env(SUPREMUM_API_HOST): 'https://supremum.gewis.nl'
     env(SUPREMUM_API_KEY): ''
     app.education.watermark_tag: '%env(string:WATERMARK_TAG)%'
-    # The face the red watermark is drawn in. Shipped by `fonts-dejavu-core`, which the Dockerfile installs explicitly.
-    app.education.watermark_font: '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+    # The face the red watermark and the generated fixture images are drawn in. Shipped by `fonts-dejavu-core`, which
+    # the Dockerfile installs explicitly.
+    app.font: '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
     # The association's own agenda, which the option calendar draws behind the days bodies ask for. Defaulted so a
     # machine without a key runs perfectly well with that layer simply absent; production requires both for real
     # (see compose.yaml).
@@ -137,7 +138,7 @@ services:
             $tueRanges: '%app.education.tue_ranges%' # array
             $registerRanges: '%app.database.register_ranges%' # array
             $watermarkTag: '%app.education.watermark_tag%' # string
-            $watermarkFontPath: '%app.education.watermark_font%' # string
+            $watermarkFontPath: '%app.font%' # string
             $siteUrl: '%env(string:DEFAULT_URI)%' # string
             $defaultMaxProposals: '%app.activity.default_max_proposals%' # int
             $googleCalendarId: '%env(string:GOOGLE_CALENDAR_KEY)%' # string

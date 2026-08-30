@@ -21,4 +21,4 @@ jobs:
         uses: 'GEWIS/gewisphp-coding-standards/.github/workflows/coding-standards.yml@ee93e44901014ff6255ecd676e95c013e0feed47' # 2.1.1
         with:
             php-version: '8.5'
-            extensions: 'amqp, apcu, calendar, curl, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
+            extensions: 'amqp, apcu, calendar, curl, ffi, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'

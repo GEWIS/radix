@@ -16,6 +16,7 @@ use App\Entity\Photo\ProfilePhoto;
 use App\Entity\Photo\Vote;
 use App\Entity\Photo\WeeklyPhoto;
 use App\Service\Application\FileStorage;
+use App\Service\Application\ImageManagerProvider;
 use App\Service\Photo\WeeklyPhotoService;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -23,7 +24,10 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
-use GdImage;
+use Intervention\Image\Encoders\JpegEncoder;
+use Intervention\Image\Geometry\Point;
+use Intervention\Image\Geometry\Rectangle;
+use Intervention\Image\Typography\FontFactory;
 use Override;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,11 +36,8 @@ use function abs;
 use function assert;
 use function count;
 use function crc32;
-use function imagecolorallocate;
-use function imagecreatetruecolor;
-use function imagefilledrectangle;
-use function imagejpeg;
-use function imagestring;
+use function file_put_contents;
+use function intdiv;
 use function intval;
 use function min;
 use function sprintf;
@@ -104,6 +105,9 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         ],
     ];
 
+    /** Large enough to read on a fixture photo without the caption running off a narrow one. */
+    private const int CAPTION_SIZE = 28;
+
     /** Distinct background colours so generated thumbnails are told apart at a glance. */
     private const array PALETTE = [
         [
@@ -152,7 +156,10 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
 
     public function __construct(
         private readonly FileStorage $fileStorage,
+        private readonly ImageManagerProvider $imageManagerProvider,
         private readonly WeeklyPhotoService $weeklyPhotoService,
+        #[Autowire('%app.font%')]
+        private readonly string $fontPath,
         #[Autowire('%kernel.environment%')]
         private readonly string $environment,
     ) {
@@ -504,35 +511,33 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         int $height,
         string $caption,
     ): string {
-        $image = imagecreatetruecolor(
-            $width,
-            $height,
-        );
-        if (false === $image) {
-            throw new RuntimeException('Cannot create a canvas for a fixture image.');
-        }
-
         [
-            $red,
-            $green, $blue
-        ] = self::PALETTE[abs(crc32($caption)) % count(self::PALETTE)];
-        $background = $this->allocateColor(
-            $image,
             $red,
             $green,
             $blue,
-        );
-        imagefilledrectangle(
-            $image,
-            0,
-            0,
-            $width,
-            $height,
-            $background,
-        );
+        ] = self::PALETTE[abs(crc32($caption)) % count(self::PALETTE)];
 
-        $band = $this->allocateColor(
-            $image,
+        $image = $this->imageManagerProvider->create()
+            ->createImage(
+                $width,
+                $height,
+            )
+            ->fill($this->color(
+                $red,
+                $green,
+                $blue,
+            ));
+
+        $bandTop = intval((float) $height * 0.72);
+        $band = new Rectangle(
+            $width,
+            $height - $bandTop,
+            new Point(
+                0,
+                $bandTop,
+            ),
+        );
+        $band->setBackgroundColor($this->color(
             min(
                 255,
                 $red + 45,
@@ -545,29 +550,25 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
                 255,
                 $blue + 45,
             ),
-        );
-        imagefilledrectangle(
-            $image,
-            0,
-            intval((float) $height * 0.72),
-            $width,
-            $height,
-            $band,
-        );
+        ));
+        $image->drawRectangle($band);
 
-        $white = $this->allocateColor(
-            $image,
-            255,
-            255,
-            255,
-        );
-        imagestring(
-            $image,
-            5,
-            intval($width / 2) - 30,
-            intval($height / 2) - 8,
+        $image->text(
             $caption,
-            $white,
+            intdiv(
+                $width,
+                2,
+            ),
+            intdiv(
+                $height,
+                2,
+            ),
+            function (FontFactory $font): void {
+                $font->filename($this->fontPath);
+                $font->size(self::CAPTION_SIZE);
+                $font->color('#ffffff');
+                $font->align('center');
+            },
         );
 
         $temporaryFile = tempnam(
@@ -578,37 +579,25 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             throw new RuntimeException('Cannot create a temporary file for a fixture image.');
         }
 
-        imagejpeg(
-            $image,
+        file_put_contents(
             $temporaryFile,
-            82,
+            $image->encode(new JpegEncoder(quality: 82))->toString(),
         );
 
         return $temporaryFile;
     }
 
-    /**
-     * @param int<0, 255> $red
-     * @param int<0, 255> $green
-     * @param int<0, 255> $blue
-     */
-    private function allocateColor(
-        GdImage $image,
+    private function color(
         int $red,
         int $green,
         int $blue,
-    ): int {
-        $color = imagecolorallocate(
-            $image,
+    ): string {
+        return sprintf(
+            '#%02x%02x%02x',
             $red,
             $green,
             $blue,
         );
-        if (false === $color) {
-            throw new RuntimeException('Cannot allocate a colour for a fixture image.');
-        }
-
-        return $color;
     }
 
     private function memberTag(

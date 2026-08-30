@@ -72,11 +72,18 @@ jobs:
                 with:
                     persist-credentials: false
 
+            # php-vips dlopens this at runtime; without it the only image driver cannot load and every test that
+            # touches an image fails.
+            -   name: Install libvips
+                run: |
+                    sudo apt-get update
+                    sudo apt-get install -y --no-install-recommends libvips42t64
+
             -   name: Install PHP
                 uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
                 with:
                     php-version: '8.5'
-                    extensions: 'amqp, apcu, calendar, curl, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
+                    extensions: 'amqp, apcu, calendar, curl, ffi, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
 
             -   name: Setup problem matchers for PHPUnit
                 run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"

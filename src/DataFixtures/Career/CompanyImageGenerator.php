@@ -8,25 +8,25 @@ use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Career\Company;
 use App\Entity\Career\Enums\CompanyBannerFormats;
 use App\Service\Application\FileStorage;
-use GdImage;
+use App\Service\Application\ImageManagerProvider;
+use Intervention\Image\Encoders\PngEncoder;
+use Intervention\Image\Geometry\Point;
+use Intervention\Image\Geometry\Rectangle;
+use Intervention\Image\Interfaces\ImageInterface;
+use Intervention\Image\Typography\FontFactory;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 use function abs;
 use function count;
 use function crc32;
-use function imagecolorallocate;
-use function imagecopyresampled;
-use function imagecreatetruecolor;
-use function imagefilledrectangle;
-use function imagefontheight;
-use function imagefontwidth;
-use function imagepng;
-use function imagestring;
+use function file_put_contents;
 use function intdiv;
 use function max;
 use function mb_strtoupper;
 use function mb_substr;
 use function min;
+use function sprintf;
 use function strlen;
 use function strval;
 use function sys_get_temp_dir;
@@ -45,8 +45,8 @@ use function unlink;
  */
 final readonly class CompanyImageGenerator
 {
-    /** The built-in font the captions are drawn in before being scaled up. */
-    private const int FONT = 5;
+    /** Below this a caption stops being readable at all, however narrow the box it was given. */
+    private const int MINIMUM_FONT_SIZE = 12;
 
     private const int SQUARE_LOGO_SIZE = 512;
 
@@ -86,8 +86,12 @@ final readonly class CompanyImageGenerator
         ],
     ];
 
-    public function __construct(private FileStorage $fileStorage)
-    {
+    public function __construct(
+        private FileStorage $fileStorage,
+        private ImageManagerProvider $imageManagerProvider,
+        #[Autowire('%app.font%')]
+        private string $fontPath,
+    ) {
     }
 
     /**
@@ -135,7 +139,6 @@ final readonly class CompanyImageGenerator
         $this->drawText(
             $image,
             $this->monogram($company->getName()),
-            $accent,
             intdiv(
                 $height,
                 2,
@@ -162,7 +165,6 @@ final readonly class CompanyImageGenerator
         $this->drawText(
             $image,
             $company->getName(),
-            $background,
             $columnCentre,
             intdiv(
                 $height * 2,
@@ -177,7 +179,6 @@ final readonly class CompanyImageGenerator
         $this->drawText(
             $image,
             $slogan,
-            $background,
             $columnCentre,
             intdiv(
                 $height * 7,
@@ -216,7 +217,6 @@ final readonly class CompanyImageGenerator
         $this->drawText(
             $image,
             $this->monogram($company->getName()),
-            $background,
             intdiv(
                 $size,
                 2,
@@ -271,7 +271,6 @@ final readonly class CompanyImageGenerator
         $this->drawText(
             $image,
             $this->monogram($company->getName()),
-            $accent,
             intdiv(
                 $height,
                 2,
@@ -294,7 +293,6 @@ final readonly class CompanyImageGenerator
         $this->drawText(
             $image,
             $company->getName(),
-            $background,
             $height + intdiv(
                 $columnWidth,
                 2,
@@ -320,89 +318,45 @@ final readonly class CompanyImageGenerator
     }
 
     /**
-     * Draws a caption centred on a point, as large as the given box takes. GD's built-in fonts top out at fifteen
-     * pixels tall, which is lost on artwork this size, so the text is drawn small onto a strip of the colour it lands
-     * on and copied over enlarged. A strip that already carries its own background leaves no fringe around the letters
-     * when it is resampled.
-     *
-     * @param array{int<0, 255>, int<0, 255>, int<0, 255>} $background
+     * Draws a caption centred on a point, as large as the given box takes.
      */
     private function drawText(
-        GdImage $target,
+        ImageInterface $target,
         string $text,
-        array $background,
         int $centreX,
         int $centreY,
         int $boxWidth,
         int $boxHeight,
     ): void {
-        $width = max(
-            1,
-            imagefontwidth(self::FONT) * strlen($text),
-        );
-        $height = max(
-            1,
-            imagefontheight(self::FONT),
-        );
-        $scale = max(
-            1,
+        // DejaVu Sans Bold advances about six tenths of its size per character, which is close enough to keep a
+        // caption inside the box it was given.
+        $size = max(
+            self::MINIMUM_FONT_SIZE,
             min(
+                $boxHeight,
                 intdiv(
-                    $boxWidth,
-                    $width,
-                ),
-                intdiv(
-                    $boxHeight,
-                    $height,
+                    $boxWidth * 10,
+                    max(
+                        1,
+                        strlen($text),
+                    ) * 6,
                 ),
             ),
         );
 
-        $strip = $this->createCanvas(
-            $width,
-            $height,
-        );
-        $this->fill(
-            $strip,
-            $background,
-            0,
-            0,
-            $width,
-            $height,
-        );
-        imagestring(
-            $strip,
-            self::FONT,
-            0,
-            0,
+        $target->text(
             $text,
-            $this->allocate(
-                $strip,
-                [
-                    255,
-                    255,
-                    255,
-                ],
+            $centreX,
+            $centreY + intdiv(
+                $size,
+                3,
             ),
-        );
-
-        imagecopyresampled(
-            $target,
-            $strip,
-            $centreX - intdiv(
-                $width * $scale,
-                2,
-            ),
-            $centreY - intdiv(
-                $height * $scale,
-                2,
-            ),
-            0,
-            0,
-            $width * $scale,
-            $height * $scale,
-            $width,
-            $height,
+            function (FontFactory $font) use ($size): void {
+                $font->filename($this->fontPath);
+                $font->size($size);
+                $font->color('#ffffff');
+                $font->align('center');
+            },
         );
     }
 
@@ -411,7 +365,7 @@ final readonly class CompanyImageGenerator
      * must already have an id by the time this is called.
      */
     private function store(
-        GdImage $image,
+        ImageInterface $image,
         Company $company,
     ): string {
         $temporaryFile = tempnam(
@@ -423,9 +377,9 @@ final readonly class CompanyImageGenerator
             throw new RuntimeException('Could not create a temporary file for a fixture image.');
         }
 
-        imagepng(
-            $image,
+        file_put_contents(
             $temporaryFile,
+            $image->encode(new PngEncoder())->toString(),
         );
 
         try {
@@ -446,68 +400,60 @@ final readonly class CompanyImageGenerator
     private function createCanvas(
         int $width,
         int $height,
-    ): GdImage {
-        $image = imagecreatetruecolor(
+    ): ImageInterface {
+        return $this->imageManagerProvider->create()->createImage(
             $width,
             $height,
         );
-
-        if (false === $image) {
-            throw new RuntimeException('Cannot create a canvas for a fixture image.');
-        }
-
-        return $image;
     }
 
     /**
      * @param array{int<0, 255>, int<0, 255>, int<0, 255>} $color
      */
     private function fill(
-        GdImage $image,
+        ImageInterface $image,
         array $color,
         int $left,
         int $top,
         int $right,
         int $bottom,
     ): void {
-        imagefilledrectangle(
-            $image,
-            $left,
-            $top,
-            $right,
-            $bottom,
-            $this->allocate(
-                $image,
-                $color,
+        $rectangle = new Rectangle(
+            max(
+                1,
+                $right - $left,
+            ),
+            max(
+                1,
+                $bottom - $top,
+            ),
+            new Point(
+                $left,
+                $top,
             ),
         );
+        $rectangle->setBackgroundColor($this->hex($color));
+
+        $image->drawRectangle($rectangle);
     }
 
     /**
      * @param array{int<0, 255>, int<0, 255>, int<0, 255>} $color
      */
-    private function allocate(
-        GdImage $image,
-        array $color,
-    ): int {
+    private function hex(array $color): string
+    {
         [
             $red,
             $green,
             $blue,
         ] = $color;
 
-        $allocated = imagecolorallocate(
-            $image,
+        return sprintf(
+            '#%02x%02x%02x',
             $red,
             $green,
             $blue,
         );
-
-        if (false === $allocated) {
-            throw new RuntimeException('Cannot allocate a colour for a fixture image.');
-        }
-
-        return $allocated;
     }
 
     /**

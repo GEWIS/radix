@@ -6,24 +6,19 @@ namespace App\DataFixtures\Decision;
 
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Service\Application\FileStorage;
-use GdImage;
+use App\Service\Application\ImageManagerProvider;
+use Intervention\Image\Encoders\PngEncoder;
+use Intervention\Image\Interfaces\ImageInterface;
+use Intervention\Image\Typography\FontFactory;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 use function abs;
 use function count;
 use function crc32;
-use function imagecolorallocate;
-use function imagecopyresampled;
-use function imagecreatetruecolor;
-use function imagefilledrectangle;
-use function imagefontheight;
-use function imagefontwidth;
-use function imagepng;
-use function imagestring;
+use function file_put_contents;
 use function intdiv;
-use function max;
-use function min;
-use function strlen;
+use function sprintf;
 use function sys_get_temp_dir;
 use function tempnam;
 use function unlink;
@@ -38,9 +33,6 @@ use function unlink;
  */
 final readonly class OrganImageGenerator
 {
-    /** The built-in font the abbreviation is drawn in before being scaled up. */
-    private const int FONT = 5;
-
     private const int BANNER_WIDTH = 1600;
 
     private const int BANNER_HEIGHT = 400;
@@ -78,8 +70,12 @@ final readonly class OrganImageGenerator
         ],
     ];
 
-    public function __construct(private FileStorage $fileStorage)
-    {
+    public function __construct(
+        private FileStorage $fileStorage,
+        private ImageManagerProvider $imageManagerProvider,
+        #[Autowire('%app.font%')]
+        private string $fontPath,
+    ) {
     }
 
     /**
@@ -115,135 +111,60 @@ final readonly class OrganImageGenerator
         int $width,
         int $height,
     ): string {
-        $image = imagecreatetruecolor(
-            $width,
+        $size = intdiv(
             $height,
-        );
-        if (false === $image) {
-            throw new RuntimeException('Cannot create a canvas for a fixture image.');
-        }
-
-        $background = self::PALETTE[abs(crc32($abbr)) % count(self::PALETTE)];
-        imagefilledrectangle(
-            $image,
-            0,
-            0,
-            $width,
-            $height,
-            $this->allocate(
-                $image,
-                $background,
-            ),
+            4,
         );
 
-        $this->drawCaption(
-            $image,
+        $image = $this->imageManagerProvider->create()
+            ->createImage(
+                $width,
+                $height,
+            )
+            ->fill($this->background($abbr));
+
+        $image->text(
             $abbr,
-            $background,
-            $width,
-            $height,
+            intdiv(
+                $width,
+                2,
+            ),
+            // The baseline, since this build of the font factory has no vertical alignment of its own.
+            intdiv(
+                $height,
+                2,
+            ) + intdiv(
+                $size,
+                3,
+            ),
+            function (FontFactory $font) use ($size): void {
+                $font->filename($this->fontPath);
+                $font->size($size);
+                $font->color('#ffffff');
+                $font->align('center');
+            },
         );
 
         return $this->store($image);
     }
 
-    /**
-     * Draws the abbreviation across the middle. GD's built-in fonts top out at fifteen pixels tall, which is lost on
-     * artwork this size, so the text is drawn small onto a strip of the colour it lands on and copied over enlarged.
-     *
-     * @param array{int<0, 255>, int<0, 255>, int<0, 255>} $background
-     */
-    private function drawCaption(
-        GdImage $target,
-        string $text,
-        array $background,
-        int $width,
-        int $height,
-    ): void {
-        $textWidth = max(
-            1,
-            imagefontwidth(self::FONT) * strlen($text),
-        );
-        $textHeight = max(
-            1,
-            imagefontheight(self::FONT),
-        );
-        $scale = max(
-            1,
-            min(
-                intdiv(
-                    intdiv(
-                        $width * 3,
-                        5,
-                    ),
-                    $textWidth,
-                ),
-                intdiv(
-                    intdiv(
-                        $height * 3,
-                        5,
-                    ),
-                    $textHeight,
-                ),
-            ),
-        );
+    private function background(string $abbr): string
+    {
+        [
+            $red,
+            $green,
+            $blue,
+        ] = self::PALETTE[abs(crc32($abbr)) % count(self::PALETTE)];
 
-        $strip = imagecreatetruecolor(
-            $textWidth,
-            $textHeight,
-        );
-        if (false === $strip) {
-            throw new RuntimeException('Cannot create a canvas for a fixture image caption.');
-        }
-
-        imagefilledrectangle(
-            $strip,
-            0,
-            0,
-            $textWidth,
-            $textHeight,
-            $this->allocate(
-                $strip,
-                $background,
-            ),
-        );
-        imagestring(
-            $strip,
-            self::FONT,
-            0,
-            0,
-            $text,
-            $this->allocate(
-                $strip,
-                [
-                    255,
-                    255,
-                    255,
-                ],
-            ),
-        );
-
-        imagecopyresampled(
-            $target,
-            $strip,
-            intdiv(
-                $width - $textWidth * $scale,
-                2,
-            ),
-            intdiv(
-                $height - $textHeight * $scale,
-                2,
-            ),
-            0,
-            0,
-            $textWidth * $scale,
-            $textHeight * $scale,
-            $textWidth,
-            $textHeight,
+        return sprintf(
+            '#%02x%02x%02x',
+            $red,
+            $green,
+            $blue,
         );
     }
 
-    private function store(GdImage $image): string
+    private function store(ImageInterface $image): string
     {
         $temporaryFile = tempnam(
             sys_get_temp_dir(),
@@ -253,9 +174,9 @@ final readonly class OrganImageGenerator
             throw new RuntimeException('Could not create a temporary file for a fixture image.');
         }
 
-        imagepng(
-            $image,
+        file_put_contents(
             $temporaryFile,
+            $image->encode(new PngEncoder())->toString(),
         );
 
         try {
@@ -266,31 +187,5 @@ final readonly class OrganImageGenerator
         } finally {
             unlink($temporaryFile);
         }
-    }
-
-    /**
-     * @param array{int<0, 255>, int<0, 255>, int<0, 255>} $color
-     */
-    private function allocate(
-        GdImage $image,
-        array $color,
-    ): int {
-        [
-            $red,
-            $green,
-            $blue,
-        ] = $color;
-
-        $allocated = imagecolorallocate(
-            $image,
-            $red,
-            $green,
-            $blue,
-        );
-        if (false === $allocated) {
-            throw new RuntimeException('Cannot allocate a colour for a fixture image.');
-        }
-
-        return $allocated;
     }
 }

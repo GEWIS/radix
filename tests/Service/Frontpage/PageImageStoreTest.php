@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 use function base64_decode;
+use function dirname;
 use function end;
 use function explode;
 use function file_put_contents;
@@ -219,8 +220,9 @@ final class PageImageStoreTest extends TestCase
             $store,
             3,
         );
+        // A real image: this is the one test here that decodes one, and GD refuses the 1x1 PNG the others store.
         $path = $store->store(
-            $this->png(),
+            $this->fixture(),
             $scope,
         )->path;
 
@@ -469,6 +471,14 @@ final class PageImageStoreTest extends TestCase
         );
 
         return end($segments);
+    }
+
+    private function fixture(): string
+    {
+        return dirname(
+            __DIR__,
+            3,
+        ) . '/tests/Resources/images/gala-dinner-1.jpg';
     }
 
     private function png(): string
