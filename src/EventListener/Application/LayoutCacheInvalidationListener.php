@@ -12,7 +12,6 @@ use App\Entity\Career\CompanyPackage;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\Database\CheckoutSession;
-use App\Entity\Database\MemberUpdate;
 use App\Entity\Database\ProspectiveMember;
 use App\Entity\Database\SubDecision\Other;
 use App\Repository\Application\AnnouncementRepository;
@@ -115,7 +114,6 @@ final readonly class LayoutCacheInvalidationListener
         $badgeKey = match (true) {
             $entity instanceof ProspectiveMember,
             $entity instanceof CheckoutSession => ApplicationExtension::PROSPECTIVES_CACHE_KEY,
-            $entity instanceof MemberUpdate => ApplicationExtension::MEMBER_UPDATES_CACHE_KEY,
             $entity instanceof Other => ApplicationExtension::UNTRANSLATED_CACHE_KEY,
             default => null,
         };

@@ -12,7 +12,6 @@ use App\Entity\Career\CompanyFeaturedPackage;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\Database\CheckoutSession;
-use App\Entity\Database\MemberUpdate;
 use App\Entity\Database\ProspectiveMember;
 use App\Entity\Database\SubDecision\Other;
 use App\Entity\Frontpage\NewsItem;
@@ -125,11 +124,6 @@ final class LayoutCacheInvalidationListenerTest extends TestCase
         yield 'checkout session' => [
             new CheckoutSession(),
             ApplicationExtension::PROSPECTIVES_CACHE_KEY,
-        ];
-
-        yield 'member update' => [
-            new MemberUpdate(),
-            ApplicationExtension::MEMBER_UPDATES_CACHE_KEY,
         ];
 
         yield 'untranslated decision' => [

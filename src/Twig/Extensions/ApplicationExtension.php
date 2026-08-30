@@ -22,8 +22,6 @@ final class ApplicationExtension extends AbstractExtension
 {
     public const string PROSPECTIVES_CACHE_KEY = 'layout.admin.prospectives_awaiting_approval';
 
-    public const string MEMBER_UPDATES_CACHE_KEY = 'layout.admin.member_updates_pending';
-
     public const string UNTRANSLATED_CACHE_KEY = 'layout.admin.decisions_awaiting_translation';
 
     public function __construct(
@@ -46,10 +44,6 @@ final class ApplicationExtension extends AbstractExtension
                 $this->prospectiveAwaitingApproval(...),
             ),
             new TwigFunction(
-                'member_updates_pending',
-                $this->memberUpdatesPending(...),
-            ),
-            new TwigFunction(
                 'decisions_awaiting_translation',
                 $this->decisionsAwaitingTranslation(...),
             ),
@@ -69,17 +63,6 @@ final class ApplicationExtension extends AbstractExtension
         return $this->cache->get(
             self::PROSPECTIVES_CACHE_KEY,
             fn (): int => $this->memberService->getPaidProspectivesCount(),
-        );
-    }
-
-    /**
-     * Member-submitted changes waiting to be approved or rejected. Counted on its own, as the badge above is.
-     */
-    public function memberUpdatesPending(): int
-    {
-        return $this->cache->get(
-            self::MEMBER_UPDATES_CACHE_KEY,
-            fn (): int => $this->memberService->getPendingUpdateCount(),
         );
     }
 
