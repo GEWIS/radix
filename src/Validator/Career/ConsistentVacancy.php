@@ -15,11 +15,25 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute(Attribute::TARGET_CLASS)]
 class ConsistentVacancy extends Constraint
 {
-    public string $closesBeforeOpeningMessage = 'The vacancy cannot close before it opens.';
-
-    public string $outlivesPackageMessage = 'The vacancy cannot stay open past the job package it belongs to.';
-
-    public string $slugTakenMessage = 'Another vacancy of this company already uses this slug in this category.';
+    /**
+     * The messages are given where the constraint is applied: a default here is invisible to the translation
+     * extractor, and `make translations` deletes what it cannot see.
+     *
+     * @param string[]|null $groups
+     */
+    public function __construct(
+        public string $closesBeforeOpeningMessage,
+        public string $outlivesPackageMessage,
+        public string $slugTakenMessage,
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(
+            null,
+            $groups,
+            $payload,
+        );
+    }
 
     #[Override]
     public function getTargets(): string

@@ -16,13 +16,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function array_map;
+use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
  * A vacancy as the form asks for it. The package and the labels are identifiers rather than records: this sits in
  * the session between the steps, which a detached entity does not survive.
  */
-#[ConsistentVacancy(groups: [VacancyData::STEP_GENERAL])]
+#[ConsistentVacancy(
+    closesBeforeOpeningMessage: 'The vacancy cannot close before it opens.',
+    outlivesPackageMessage: 'The vacancy cannot stay open past the job package it belongs to.',
+    slugTakenMessage: 'Another vacancy of this company already uses this slug in this category.',
+    groups: [VacancyData::STEP_GENERAL],
+)]
 final class VacancyData
 {
     use HasFlowStep;
@@ -192,7 +198,11 @@ final class VacancyData
             !$this->languageDutch
             && !$this->languageEnglish
         ) {
-            $context->buildViolation('At least one language must be used.')
+            $context->buildViolation(t(
+                'At least one language must be used.',
+                [],
+                'validators',
+            )->getMessage())
                 ->atPath('languageDutch')
                 ->addViolation();
 

@@ -314,7 +314,11 @@ class SignupListType extends AbstractType
             null === $capacity
             || $capacity < 1
         ) {
-            $context->buildViolation('Enter a capacity of at least 1 for a limited-capacity list.')
+            $context->buildViolation(t(
+                'Enter a capacity of at least 1 for a limited-capacity list.',
+                [],
+                'validators',
+            )->getMessage())
                 ->atPath('capacity')
                 ->addViolation();
         }
@@ -336,7 +340,11 @@ class SignupListType extends AbstractType
             case AllocationMethod::ConditionalDraw:
                 $rule = $list->getDrawCutoffRule();
                 if (null === $rule) {
-                    $context->buildViolation('Choose when the draw happens.')
+                    $context->buildViolation(t(
+                        'Choose when the draw happens.',
+                        [],
+                        'validators',
+                    )->getMessage())
                         ->atPath('drawCutoffRule')
                         ->addViolation();
 
@@ -347,7 +355,11 @@ class SignupListType extends AbstractType
                     DrawCutoffRule::IfFullBefore === $rule
                     && null === $list->getDrawCutoffAt()
                 ) {
-                    $context->buildViolation('Enter the moment the list must be full by.')
+                    $context->buildViolation(t(
+                        'Enter the moment the list must be full by.',
+                        [],
+                        'validators',
+                    )->getMessage())
                         ->atPath('drawCutoffAt')
                         ->addViolation();
                 }
@@ -359,7 +371,11 @@ class SignupListType extends AbstractType
                         || $list->getDrawAfterDurationHours() < 1
                     )
                 ) {
-                    $context->buildViolation('Enter a positive number of hours.')
+                    $context->buildViolation(t(
+                        'Enter a positive number of hours.',
+                        [],
+                        'validators',
+                    )->getMessage())
                         ->atPath('drawAfterDurationHours')
                         ->addViolation();
                 }
@@ -367,7 +383,11 @@ class SignupListType extends AbstractType
                 break;
             case AllocationMethod::ExternalParty:
                 if ('' === trim($list->getExternalPolicyUrl() ?? '')) {
-                    $context->buildViolation('Enter the external party policy URL.')
+                    $context->buildViolation(t(
+                        'Enter the external party policy URL.',
+                        [],
+                        'validators',
+                    )->getMessage())
                         ->atPath('externalPolicyUrl')
                         ->addViolation();
                 }
@@ -375,7 +395,11 @@ class SignupListType extends AbstractType
                 break;
             case AllocationMethod::Custom:
                 if ('' === trim($list->getCustomMethodDescription() ?? '')) {
-                    $context->buildViolation('Describe the allocation method.')
+                    $context->buildViolation(t(
+                        'Describe the allocation method.',
+                        [],
+                        'validators',
+                    )->getMessage())
                         ->atPath('customMethodDescription')
                         ->addViolation();
                 }
