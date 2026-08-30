@@ -487,7 +487,9 @@ a.pswp__photo-tag-name:hover {
     left: 0;
     right: 0;
     z-index: 2;
-    overflow: hidden;
+    // Capped so a search with many hits cannot run off the top of the viewport.
+    max-height: 14rem;
+    overflow-y: auto;
     background: #1b1b20;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.6rem;
@@ -511,7 +513,8 @@ a.pswp__photo-tag-name:hover {
     text-align: left;
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &.is-active {
         background: rgba(255, 255, 255, 0.08);
     }
 }

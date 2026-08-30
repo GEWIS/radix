@@ -6317,6 +6317,10 @@
         <source>Or enter this secret in your app manually:</source>
         <target state="translated">Or enter this secret in your app manually:</target>
       </trans-unit>
+      <trans-unit id="gWYtvZA" resname="Or use the arrow keys and press Enter, hold Shift to move further.">
+        <source>Or use the arrow keys and press Enter, hold Shift to move further.</source>
+        <target state="translated">Or use the arrow keys and press Enter, hold Shift to move further.</target>
+      </trans-unit>
       <trans-unit id="V2sSnK9" resname="Order">
         <source>Order</source>
         <target state="translated">Order</target>
@@ -6668,6 +6672,10 @@
       <trans-unit id="u7c4pso" resname="Place on photo">
         <source>Place on photo</source>
         <target state="translated">Place on photo</target>
+      </trans-unit>
+      <trans-unit id="0maBUrq" resname="Place on the photo, or press Shift and Enter">
+        <source>Place on the photo, or press Shift and Enter</source>
+        <target state="translated">Place on the photo, or press Shift and Enter</target>
       </trans-unit>
       <trans-unit id="gX0CV88" resname="Placed on the photo">
         <source>Placed on the photo</source>
