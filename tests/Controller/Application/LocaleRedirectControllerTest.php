@@ -21,7 +21,7 @@ final class LocaleRedirectControllerTest extends TestCase
     {
         $response = $this->redirect(
             '/renew/abc-123',
-            'join_renew',
+            'join_renew_claim',
             ['token' => 'abc-123'],
         );
 
@@ -148,7 +148,7 @@ final class LocaleRedirectControllerTest extends TestCase
     {
         $routes = new RouteCollection();
         $routes->add(
-            'join_renew',
+            'join_renew_claim',
             new Route(
                 '/{_locale}/renew/{token}',
                 requirements: ['_locale' => 'en|nl'],

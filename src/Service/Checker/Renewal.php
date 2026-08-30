@@ -13,6 +13,7 @@ use App\Repository\Decision\MemberRepository as ReportMemberRepository;
 use App\Service\Application\Email as EmailService;
 use DateInterval;
 use DateTimeImmutable;
+use RuntimeException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Throwable;
 
@@ -75,12 +76,14 @@ class Renewal
                 'isInstalled' => $isInstalled,
                 'currentExpiration' => $link->currentExpiration,
                 'newExpiration' => $link->newExpiration,
-                // The message is in English, so the locale is set explicitly rather than left to the router.
+                // English page, and the token this link was just generated with: only its hash is stored.
                 'url' => $this->urlGenerator->generate(
-                    'join_renew',
+                    'join_renew_claim',
                     [
                         '_locale' => Languages::English->getLangParam(),
-                        'token' => $link->token,
+                        'token' => $link->plainToken ?? throw new RuntimeException(
+                            'Cannot send a renewal link that was not generated here',
+                        ),
                     ],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),

@@ -6,14 +6,18 @@ namespace App\Controller\Database;
 
 use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
+use App\Controller\Application\NoLeakHeadersTrait;
 use App\Controller\Application\RendersRejectedSubmissionTrait;
 use App\Entity\Database\Enums\MembershipTypes;
+use App\Entity\Database\RenewalLink;
 use App\Form\Database\MemberApproveType;
 use App\Form\Database\MemberRenewalType;
 use App\Form\Database\Registration\RegistrationData;
 use App\Form\Database\Registration\RegistrationFlowType;
+use App\Repository\Database\RenewalLinkRepository;
 use App\Security\User\SudoVoter;
 use App\Service\Application\LocalePreference;
+use App\Service\Database\ActionLinkService;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\ProspectiveMemberRemoval;
 use App\Service\Database\RegistrationFailure;
@@ -29,6 +33,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
+use function is_int;
 
 /**
  * Everyone who has registered but whose membership the secretary has not confirmed yet, from the public sign-up form
@@ -45,13 +50,18 @@ use function assert;
 final class ProspectiveMemberController extends AbstractController
 {
     use HandlesFormFlowTrait;
+    use NoLeakHeadersTrait;
     use RendersRejectedSubmissionTrait;
+
+    private const string RENEWAL_SESSION_KEY = '_renewal_link_id';
 
     public function __construct(
         private readonly MemberService $memberService,
         private readonly RegistrationService $registrationService,
         private readonly TranslatorInterface $translator,
         private readonly LocalePreference $localePreference,
+        private readonly ActionLinkService $actionLinkService,
+        private readonly RenewalLinkRepository $renewalLinkRepository,
     ) {
     }
 
@@ -159,23 +169,76 @@ final class ProspectiveMemberController extends AbstractController
     }
 
     /**
-     * Graduate renewal, reached from the link in the renewal e-mail.
+     * Graduate renewal, stage one: the address the link in the renewal e-mail points at.
      *
      * Served from the join host and open to anyone with the token: a user who follows the link is not signed in, and
-     * the token is what identifies them. A token that has been used or has expired is not an error: the page states
-     * that the link no longer works rather than showing the renewal form.
+     * the token is what identifies them. That is also why the token is not part of the address of the renewal form
+     * itself: the click comes from a mailbox on another origin, so the token would be in the referrer of every
+     * request that page makes, and the session cookie is not sent on it. The token is exchanged for a hash that is
+     * valid for one use and three minutes, and the form is served behind that hash.
      *
-     * `join_renew` is declared in config/routes.yaml, along with the two addresses this used to be served at, which
-     * redirect here because a renewal e-mail sent months ago links to one of them.
+     * A token that has been used or has expired is not an error: the page states that the link no longer works rather
+     * than showing the renewal form.
+     *
+     * `join_renew_claim` is declared in config/routes.yaml, along with the two addresses this used to be served at,
+     * which redirect here because a renewal e-mail sent months ago links to one of them.
      */
-    #[RendersOnSuccess]
-    public function renew(
-        Request $request,
-        string $token,
-    ): Response {
-        $renewalLink = $this->memberService->getRenewalLink($token);
+    public function renewClaim(string $token): Response
+    {
+        $renewalLink = $this->actionLinkService->resolveRenewal($token);
 
         if (null === $renewalLink) {
+            return $this->render('database/join/renew-unavailable.html.twig');
+        }
+
+        return $this->withNoLeakHeaders($this->redirectToRoute(
+            'join_renew',
+            ['th' => $this->actionLinkService->claim($renewalLink)],
+        ));
+    }
+
+    /**
+     * Graduate renewal, stage two: the form itself, served behind the hash that stage one returns.
+     */
+    #[RendersOnSuccess]
+    public function renew(Request $request): Response
+    {
+        $session = $request->getSession();
+
+        if (null !== ($tempHash = $request->query->get('th'))) {
+            $renewalLink = $this->actionLinkService->findByTempHash((string) $tempHash);
+
+            if (!$renewalLink instanceof RenewalLink) {
+                return $this->render('database/join/renew-unavailable.html.twig');
+            }
+
+            // Cleared when the form is served rather than when it is submitted, so the hash is valid once.
+            $this->actionLinkService->consumeTempHash($renewalLink);
+
+            $session->set(
+                self::RENEWAL_SESSION_KEY,
+                $renewalLink->id,
+            );
+
+            return $this->withNoLeakHeaders($this->redirectToRoute('join_renew'));
+        }
+
+        $renewalLinkId = $session->get(self::RENEWAL_SESSION_KEY);
+
+        if (!is_int($renewalLinkId)) {
+            return $this->render('database/join/renew-unavailable.html.twig');
+        }
+
+        $renewalLink = $this->renewalLinkRepository->find($renewalLinkId);
+
+        // Checked again, because the link may have been used in another tab or expired while the page was open.
+        if (
+            null === $renewalLink
+            || $renewalLink->used
+            || $renewalLink->linkExpired()
+        ) {
+            $session->remove(self::RENEWAL_SESSION_KEY);
+
             return $this->render('database/join/renew-unavailable.html.twig');
         }
 
@@ -206,6 +269,8 @@ final class ProspectiveMemberController extends AbstractController
                     $renewalLink->newExpiration,
                 );
 
+                $session->remove(self::RENEWAL_SESSION_KEY);
+
                 return $this->render(
                     'database/join/renew-done.html.twig',
                     ['member' => $member],
@@ -215,11 +280,11 @@ final class ProspectiveMemberController extends AbstractController
 
         // As with the registration above: this action renders its own success page, so it sets the status itself
         // when the response is a rejection rather than the form being opened.
-        return $this->render(
+        return $this->withNoLeakHeaders($this->render(
             'database/join/renew.html.twig',
             ['form' => $form],
             $this->rejectedSubmission($form),
-        );
+        ));
     }
 
     #[IsGranted(SudoVoter::ATTRIBUTE)]

@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function explode;
 use function str_contains;
 use function strlen;
 
@@ -21,23 +22,68 @@ use function strlen;
 class RenewalLinkTest extends TestCase
 {
     /**
-     * The token is the whole credential: it is what `/renew/{token}` is looked up by, and the only thing standing
-     * between an anonymous visitor and someone else's renewal.
+     * The token is the whole credential: `/renew/{token}` is looked up by it, and it is the only thing that
+     * separates an anonymous visitor from someone else's renewal. Only a hash of half of it is stored, so a link
+     * cannot be reconstructed from the register: {@see RenewalLink::$plainToken} is set in the request that
+     * generates the token and nowhere else.
      */
-    public function testCarriesATokenThatIsUnguessableAndFitsInAUrl(): void
+    public function testTheTokenIsUnguessableAndIsNotStoredWhole(): void
     {
         $first = $this->link();
         $second = $this->link();
 
+        $token = $first->plainToken;
+        self::assertNotNull($token);
         self::assertNotSame(
-            $first->token,
-            $second->token,
+            $token,
+            $second->plainToken,
         );
         self::assertGreaterThanOrEqual(
             128,
-            strlen($first->token),
+            strlen($token),
         );
-        self::assertFalse(str_contains($first->token, '/'));
+        self::assertFalse(str_contains($token, '/'));
+        self::assertStringNotContainsString(
+            $token,
+            $first->hashedToken,
+        );
+    }
+
+    public function testTheVerifierItWasGeneratedWithIsAccepted(): void
+    {
+        $link = $this->link();
+        $token = $link->plainToken;
+        self::assertNotNull($token);
+
+        [, $verifier
+        ] = explode(
+            '.',
+            $token,
+        );
+
+        self::assertTrue($link->tokenMatches($verifier));
+        self::assertFalse($link->tokenMatches('not the verifier'));
+    }
+
+    public function testGeneratingAgainInvalidatesThePreviousToken(): void
+    {
+        $link = $this->link();
+        $before = $link->plainToken;
+        self::assertNotNull($before);
+
+        [, $verifier
+        ] = explode(
+            '.',
+            $before,
+        );
+
+        $after = $link->rotateToken();
+
+        self::assertNotSame(
+            $before,
+            $after,
+        );
+        self::assertFalse($link->tokenMatches($verifier));
     }
 
     public function testStartsOutUnused(): void

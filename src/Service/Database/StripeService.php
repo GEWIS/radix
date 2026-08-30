@@ -6,7 +6,6 @@ namespace App\Service\Database;
 
 use App\Entity\Database\CheckoutSession as CheckoutSessionModel;
 use App\Entity\Database\Enums\CheckoutSessionStates;
-use App\Entity\Database\PaymentLink as PaymentLinkModel;
 use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\ActionLinkRepository;
@@ -46,11 +45,6 @@ class StripeService
         private readonly string $stripeCancelUrl,
         private readonly string $stripeSuccessUrl,
     ) {
-    }
-
-    public function getPaymentLink(string $token): ?PaymentLinkModel
-    {
-        return $this->actionLinkRepository->findPaymentByToken($token);
     }
 
     /**
