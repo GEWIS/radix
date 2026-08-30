@@ -34,6 +34,7 @@
                         {{ form_row(form.en_description) }}
                         {{ form_row(form.onForm) }}
                         {{ form_row(form.defaultSub) }}
+                        {{ form_row(form.selfService) }}
                         {# Mailman is on its way out: a list can still be shown and unbound, but a new binding is not
                            offered. #}
                         {% if form.mailmanList.vars.value is not empty %}

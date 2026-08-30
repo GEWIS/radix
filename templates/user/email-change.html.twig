@@ -1,0 +1,40 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ 'Confirm your e-mail address'|trans }}{% endblock %}
+
+{% block contents %}
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Confirm your e-mail address'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if link is null %}
+                        <p class="mb-0">
+                            {{ 'This link no longer works. It may have been used already, or it may have been asked for more than a day ago. You can ask for a new one from your details page.'|trans }}
+                        </p>
+                        <a class="btn btn-outline-gewis-primary mt-3" href="{{ path('user_settings_details_index') }}">
+                            {{ 'My details'|trans }}
+                        </a>
+                    {% else %}
+                        <p>
+                            {{ 'From now on the association writes to %email%, and you sign in with it as well.'|trans({
+                                '%email%': link.getNewEmail,
+                            }) }}
+                        </p>
+                        <form method="POST" action="{{ path('user_email_change_apply') }}">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('email_change') }}">
+                            <button type="submit" class="btn btn-gewis-primary">
+                                <span class="fas fa-check"></span> {{ 'Confirm'|trans }}
+                            </button>
+                            <a class="btn btn-outline-secondary" href="{{ path('user_settings_details_index') }}">
+                                {{ 'Cancel'|trans }}
+                            </a>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -35,8 +35,9 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
     public const string REF_LIST_ACTIVITIES = 'list-activities';
 
     /**
-     * Name, descriptions, whether the registration form offers it, whether it is ticked, and which server carries
-     * it -- the Listmonk id the seed gives it, or null where Mailman carries it instead.
+     * Name, descriptions, whether the registration form offers it, whether it is ticked, whether a member may put
+     * themselves on it afterwards, and which server carries it -- the Listmonk id the seed gives it, or null where
+     * Mailman carries it instead.
      */
     private const array LISTS = [
         [
@@ -46,6 +47,7 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
             // Not offered as a choice: every member is on it, which is what the registration form says.
             'on_form' => false,
             'default' => true,
+            'self_service' => false,
             'listmonk' => null,
             'reference' => self::REF_LIST_ANNOUNCEMENTS,
         ],
@@ -55,6 +57,7 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
             'en' => 'Announcements of activities.',
             'on_form' => true,
             'default' => true,
+            'self_service' => true,
             'listmonk' => 2,
             'reference' => self::REF_LIST_ACTIVITIES,
         ],
@@ -64,6 +67,7 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
             'en' => 'Vacancies and career opportunities from our partners.',
             'on_form' => true,
             'default' => false,
+            'self_service' => true,
             'listmonk' => 3,
             'reference' => null,
         ],
@@ -89,6 +93,7 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
             $list->setEnDescription($definition['en']);
             $list->setOnForm($definition['on_form']);
             $list->setDefaultSub($definition['default']);
+            $list->setSelfService($definition['self_service']);
 
             if (null === $definition['listmonk']) {
                 $mailman = new MailmanMailingList();

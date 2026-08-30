@@ -1,0 +1,35 @@
+{% extends 'layout-sidebar.html.twig' %}
+
+{% block page_title %}{{ 'Remove address'|trans }}{% endblock %}
+
+{% block sidebar_label %}{{ app.user.member.getFullName }}{% endblock %}
+{% block sidebar %}
+    {% include 'partials/member-sidebar.html.twig' with {
+        'member': app.user.member,
+        'isSelf': true,
+        'activeRoute': 'details',
+    } %}
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Remove address'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        {{ 'Are you sure you want to remove your %type%?'|trans({
+                            '%type%': addressType.getName|trans|lower,
+                        }) }}
+                    </p>
+                    {{ form_start(form) }}
+                        {{ form_widget(form.submit_yes, {'attr': {'class': 'btn-danger'}}) }}
+                        {{ form_widget(form.submit_no, {'attr': {'class': 'btn-outline-secondary'}}) }}
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

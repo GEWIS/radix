@@ -1186,12 +1186,6 @@ parameters:
 			path: src/Service/Database/MailmanService.php
 
 		-
-			message: '#^Cannot call method getEmail\(\) on App\\Entity\\Database\\MailingListMember\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Service/Database/Member.php
-
-		-
 			message: '#^Cannot call method getEndDate\(\) on App\\Entity\\Database\\Membership\|null\.$#'
 			identifier: method.nonObject
 			count: 3
@@ -1207,12 +1201,6 @@ parameters:
 			message: '#^Cannot call method getType\(\) on App\\Entity\\Database\\Membership\|null\.$#'
 			identifier: method.nonObject
 			count: 4
-			path: src/Service/Database/Member.php
-
-		-
-			message: '#^Cannot call method setToBeDeleted\(\) on App\\Entity\\Database\\MailingListMember\|null\.$#'
-			identifier: method.nonObject
-			count: 1
 			path: src/Service/Database/Member.php
 
 		-

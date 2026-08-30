@@ -33,6 +33,8 @@ use function strip_tags;
 )]
 #[DiscriminatorMap(
     value: [
+        'address_change' => AuditAddressChange::class,
+        'email_change' => AuditEmailChange::class,
         'mailing_list_membership' => AuditMailingListMembership::class,
         'note' => AuditNote::class,
         'renewal' => AuditRenewal::class,

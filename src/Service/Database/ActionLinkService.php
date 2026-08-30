@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Database;
 
 use App\Entity\Database\ActionLink;
+use App\Entity\Database\EmailChangeLink;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\RenewalLink;
 use App\Repository\Database\ActionLinkRepository;
@@ -66,6 +67,28 @@ class ActionLinkService
 
         if (
             null === $link
+            || !$link->tokenMatches($split['verifier'])
+        ) {
+            return null;
+        }
+
+        return $link;
+    }
+
+    public function resolveEmailChange(string $token): ?EmailChangeLink
+    {
+        $split = SplitToken::split($token);
+
+        if (null === $split) {
+            return null;
+        }
+
+        $link = $this->actionLinkRepository->findEmailChangeBySelector($split['selector']);
+
+        if (
+            null === $link
+            || $link->isUsed()
+            || $link->linkExpired()
             || !$link->tokenMatches($split['verifier'])
         ) {
             return null;
