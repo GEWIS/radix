@@ -581,6 +581,10 @@
         <source>A mailing list sync is running</source>
         <target state="translated">Er loopt een mailinglijstsynchronisatie</target>
       </trans-unit>
+      <trans-unit id="fbhWOMM" resname="A membership ends before it starts">
+        <source>A membership ends before it starts</source>
+        <target state="translated">Een lidmaatschap eindigt voordat het begint</target>
+      </trans-unit>
       <trans-unit id="cweoWmQ" resname="A new activity &quot;%name%&quot; has been published.">
         <source>A new activity "%name%" has been published.</source>
         <target state="translated">Een nieuwe activiteit "%name%" is gepubliceerd.</target>
@@ -9872,6 +9876,14 @@
       <trans-unit id="DaAfpuA" resname="Turn this proposal down?">
         <source>Turn this proposal down?</source>
         <target state="translated">Dit voorstel afwijzen?</target>
+      </trans-unit>
+      <trans-unit id="Xm61OTR" resname="Two memberships cover the same days">
+        <source>Two memberships cover the same days</source>
+        <target state="translated">Twee lidmaatschappen beslaan dezelfde dagen</target>
+      </trans-unit>
+      <trans-unit id="9Gwjtf4" resname="Two memberships start on the same day">
+        <source>Two memberships start on the same day</source>
+        <target state="translated">Twee lidmaatschappen beginnen op dezelfde dag</target>
       </trans-unit>
       <trans-unit id="ex7y5lM" resname="Two windows, and they are not the same: when bodies may hand a proposal in, and which days the activities they propose may fall on. Handing in usually happens well before the quartile itself.">
         <source>Two windows, and they are not the same: when bodies may hand a proposal in, and which days the activities they propose may fall on. Handing in usually happens well before the quartile itself.</source>
