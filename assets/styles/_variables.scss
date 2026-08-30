@@ -59,6 +59,20 @@ $nav-link-padding-y: 1.75rem;
 $navbar-bg: $gewis-red;
 $navbar-bg-dark: $body-bg-dark;
 
+// Every hue is dark enough to carry white text, which is what rules out an honest yellow. The cycle is listed twice
+// over because the bar paints half the gradient at a time.
+$navbar-rainbow-stops:
+    #c40024, #c2410c, #a16207, #15803d, #0e7490, #1d4ed8, #6d28d9,
+    #c40024, #c2410c, #a16207, #15803d, #0e7490, #1d4ed8, #6d28d9,
+    #c40024;
+// These lie over the dark bar rather than replacing it, and the alpha is what keeps the light link text readable.
+$navbar-rainbow-neon-stops:
+    rgba(#ff2d95, 0.4), rgba(#ff7a00, 0.32), rgba(#ffe600, 0.24), rgba(#39ff14, 0.26),
+    rgba(#00e5ff, 0.32), rgba(#3a86ff, 0.4), rgba(#c756ff, 0.44),
+    rgba(#ff2d95, 0.4), rgba(#ff7a00, 0.32), rgba(#ffe600, 0.24), rgba(#39ff14, 0.26),
+    rgba(#00e5ff, 0.32), rgba(#3a86ff, 0.4), rgba(#c756ff, 0.44),
+    rgba(#ff2d95, 0.4);
+
 $navbar-brand-color: $nav-link-color;
 $navbar-brand-color-dark: $gewis-red;
 $navbar-brand-font-size: 2.875rem;
