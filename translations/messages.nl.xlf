@@ -841,6 +841,10 @@
         <source>Accept your invitation</source>
         <target state="translated">Uitnodiging accepteren</target>
       </trans-unit>
+      <trans-unit id="WF.mmC." resname="Accepted">
+        <source>Accepted</source>
+        <target state="translated">Geaccepteerd</target>
+      </trans-unit>
       <trans-unit id="5DOuCi7" resname="Access Denied">
         <source>Access Denied</source>
         <target state="translated">Toegang geweigerd</target>
@@ -1349,6 +1353,10 @@
         <source>Already in the agenda</source>
         <target state="translated">Staat al in de agenda</target>
       </trans-unit>
+      <trans-unit id="f4NJOpu" resname="Also ask the secretary to remove my data">
+        <source>Also ask the secretary to remove my data</source>
+        <target state="translated">Vraag de secretaris ook om mijn gegevens te verwijderen</target>
+      </trans-unit>
       <trans-unit id="RqIy6Dg" resname="Also in another list">
         <source>Also in another list</source>
         <target>Ook op een andere lijst</target>
@@ -1381,8 +1389,8 @@
         <source>An error occurred while we were trying to prepare the checkout page. Please try again later.</source>
         <target state="translated">Er is een fout opgetreden terwijl we probeerden de afrekenpagina voor te bereiden. Probeer het later nog eens.</target>
       </trans-unit>
-      <trans-unit id="CpDMrCY" resname="An error occurred while we were trying to prepare the checkout page. We have received your registration and sent you an e-mail containing a link that allows you to restart the checkout process at a later time.">
-        <source>An error occurred while we were trying to prepare the checkout page. We have received your registration and sent you an e-mail containing a link that allows you to restart the checkout process at a later time.</source>
+      <trans-unit id="xsiI5rn" resname="An error occurred while we were trying to prepare the checkout page. We have received your registration and sent you an email containing a link that allows you to restart the checkout process at a later time.">
+        <source>An error occurred while we were trying to prepare the checkout page. We have received your registration and sent you an email containing a link that allows you to restart the checkout process at a later time.</source>
         <target state="translated">Er is een fout opgetreden terwijl we probeerden de afrekenpagina voor te bereiden. We hebben je registratie ontvangen en je een e-mail gestuurd met een link waarmee je het betalingsproces op een later tijdstip opnieuw kunt starten.</target>
       </trans-unit>
       <trans-unit id="z0YwYin" resname="An image of this page">
@@ -2129,6 +2137,10 @@
         <source>Change Subscriptions</source>
         <target state="translated">Abonnementen wijzigen</target>
       </trans-unit>
+      <trans-unit id="yll55H2" resname="Change email address">
+        <source>Change email address</source>
+        <target state="translated">E-mailadres wijzigen</target>
+      </trans-unit>
       <trans-unit id="lc4o0_G" resname="Change it">
         <source>Change it</source>
         <target state="translated">Aanpassen</target>
@@ -2164,6 +2176,10 @@
       <trans-unit id="qGup7Tf" resname="Changing this asks the company for artwork at the new size; the banner it already has stays up until it hands one over.">
         <source>Changing this asks the company for artwork at the new size; the banner it already has stays up until it hands one over.</source>
         <target state="translated">Dit wijzigen vraagt het bedrijf om beeldmateriaal op het nieuwe formaat; de banner die er al staat blijft staan tot het bedrijf een nieuwe aanlevert.</target>
+      </trans-unit>
+      <trans-unit id="QzuZgqk" resname="Check the address we write to before you confirm: if it is your TU/e address, it stops working once you leave.">
+        <source>Check the address we write to before you confirm: if it is your TU/e address, it stops working once you leave.</source>
+        <target state="translated">Controleer voordat je bevestigt naar welk adres we schrijven: als dat je TU/e-adres is, werkt het niet meer zodra je vertrekt.</target>
       </trans-unit>
       <trans-unit id="jyCX6j1" resname="Checkout Status">
         <source>Checkout Status</source>
@@ -2476,6 +2492,10 @@
       <trans-unit id="AQfghoF" resname="Confirm sign-up">
         <source>Confirm sign-up</source>
         <target>Inschrijving bevestigen</target>
+      </trans-unit>
+      <trans-unit id="Z4vs_hM" resname="Confirm your email address">
+        <source>Confirm your email address</source>
+        <target state="translated">Bevestig je e-mailadres</target>
       </trans-unit>
       <trans-unit id="aF4KZmI" resname="Confirm your identity">
         <source>Confirm your identity</source>
@@ -2941,6 +2961,10 @@
         <source>Declined</source>
         <target state="translated">Afgewezen</target>
       </trans-unit>
+      <trans-unit id="YXkhV1t" resname="Declined, removal requested">
+        <source>Declined, removal requested</source>
+        <target state="translated">Afgewezen, verwijdering aangevraagd</target>
+      </trans-unit>
       <trans-unit id="NR4FjXR" resname="Default">
         <source>Default</source>
         <target state="translated">Standaard</target>
@@ -3213,6 +3237,10 @@
         <source>Doing nothing is also an answer: your graduate status simply expires on the date shown below.</source>
         <target state="translated">Niets doen is ook een antwoord: je afgestudeerdenstatus verloopt gewoon op de hieronder getoonde datum.</target>
       </trans-unit>
+      <trans-unit id="MdfPPk1" resname="Doing nothing is also an answer: your membership simply ends on the date above.">
+        <source>Doing nothing is also an answer: your membership simply ends on the date above.</source>
+        <target state="translated">Niets doen is ook een antwoord: je lidmaatschap eindigt dan gewoon op de datum hierboven.</target>
+      </trans-unit>
       <trans-unit id="fZqz0Um" resname="Done">
         <source>Done</source>
         <target>Klaar</target>
@@ -3304,10 +3332,6 @@
       <trans-unit id="40Ecvhc" resname="Dutch Description">
         <source>Dutch Description</source>
         <target state="translated">Nederlandse beschrijving</target>
-      </trans-unit>
-      <trans-unit id="xqJDAX4" resname="E-mail Address">
-        <source>E-mail Address</source>
-        <target state="translated">E-mailadres</target>
       </trans-unit>
       <trans-unit id="Q0nHBMn" resname="ES512">
         <source>ES512</source>
@@ -3441,6 +3465,10 @@
         <source>Email %count% selected</source>
         <target>E-mail %count% geselecteerden</target>
       </trans-unit>
+      <trans-unit id="GNvlhgt" resname="Email Address">
+        <source>Email Address</source>
+        <target state="translated">E-mailadres</target>
+      </trans-unit>
       <trans-unit id="3PkXx5O" resname="Email address">
         <source>Email address</source>
         <target state="translated">E-mailadres</target>
@@ -3516,6 +3544,10 @@
       <trans-unit id="liO9jgY" resname="End date and time">
         <source>End date and time</source>
         <target state="translated">Einddatum en -tijd</target>
+      </trans-unit>
+      <trans-unit id="rJif16V" resname="End my membership">
+        <source>End my membership</source>
+        <target state="translated">Beëindig mijn lidmaatschap</target>
       </trans-unit>
       <trans-unit id="yNUVnqC" resname="End sessions">
         <source>End sessions</source>
@@ -4669,9 +4701,17 @@
         <source>If you hide yours, you also stop seeing others' age. The board can always see it.</source>
         <target>Als je die van jou verbergt, zie je ook de leeftijd van anderen niet meer. Het bestuur kan het altijd zien.</target>
       </trans-unit>
+      <trans-unit id="Yq8wkK0" resname="If you would rather leave">
+        <source>If you would rather leave</source>
+        <target state="translated">Als je liever vertrekt</target>
+      </trans-unit>
       <trans-unit id="zPFQWZo" resname="If you would rather remember it, take several random words and add characters that are not words. Take the words at random, not a phrase about yourself. %example% has leaked, so pick your own. See %link%.">
         <source>If you would rather remember it, take several random words and add characters that are not words. Take the words at random, not a phrase about yourself. %example% has leaked, so pick your own. See %link%.</source>
         <target state="translated">Wil je het liever onthouden, neem dan meerdere willekeurige woorden en voeg tekens toe die geen woord zijn. Kies de woorden willekeurig, niet een zin over jezelf. %example% is uitgelekt, kies dus je eigen woorden. Zie %link%.</target>
+      </trans-unit>
+      <trans-unit id="ZuIuqN9" resname="If you would still like to stay on as a graduate, let the secretary know.">
+        <source>If you would still like to stay on as a graduate, let the secretary know.</source>
+        <target state="translated">Wil je toch afgestudeerde blijven, laat het de secretaris weten.</target>
       </trans-unit>
       <trans-unit id="fpxrHOE" resname="If your browser does not redirect you, %link% manually.">
         <source>If your browser does not redirect you, %link% manually.</source>
@@ -5373,9 +5413,9 @@
         <source>Mailing lists - List mailing lists</source>
         <target>Mailinglijsten - Mailinglijsten tonen</target>
       </trans-unit>
-      <trans-unit id="f_J8vEL" resname="Mailing lists - List subscribers of a mailing list, including their e-mail addresses">
-        <source>Mailing lists - List subscribers of a mailing list, including their e-mail addresses</source>
-        <target>Mailinglijsten - Abonnees van een mailinglijst tonen, inclusief hun e-mailadressen</target>
+      <trans-unit id="dT3UtoV" resname="Mailing lists - List subscribers of a mailing list, including their email addresses">
+        <source>Mailing lists - List subscribers of a mailing list, including their email addresses</source>
+        <target state="translated">Mailinglijsten - Abonnees van een mailinglijst tonen, inclusief hun e-mailadressen</target>
       </trans-unit>
       <trans-unit id="LQoEY16" resname="Mailman Mailing List">
         <source>Mailman Mailing List</source>
@@ -5617,6 +5657,10 @@
         <source>Members who are still studying become ordinary.</source>
         <target state="translated">Leden die nog studeren worden gewoon lid.</target>
       </trans-unit>
+      <trans-unit id="sGfF4Oz" resname="Members who have been asked themselves whether they want to stay on as a graduate are left out until their own offer expires unanswered.">
+        <source>Members who have been asked themselves whether they want to stay on as a graduate are left out until their own offer expires unanswered.</source>
+        <target state="translated">Leden aan wie zelf is gevraagd of ze afgestudeerde willen blijven, blijven buiten de selectie totdat hun eigen aanbod onbeantwoord verloopt.</target>
+      </trans-unit>
       <trans-unit id="kbUxIYb" resname="Members' accounts">
         <source>Members' accounts</source>
         <target state="translated">Ledenaccounts</target>
@@ -5636,6 +5680,10 @@
       <trans-unit id="qpiYOi." resname="Membership Type (today)">
         <source>Membership Type (today)</source>
         <target state="translated">Lidmaatschapstype (huidig)</target>
+      </trans-unit>
+      <trans-unit id="6gJRvQw" resname="Membership details">
+        <source>Membership details</source>
+        <target state="translated">Lidmaatschapsgegevens</target>
       </trans-unit>
       <trans-unit id="8WkxWd7" resname="Membership number">
         <source>Membership number</source>
@@ -5917,12 +5965,12 @@
         <source>Name this query</source>
         <target state="translated">Geef deze query een naam</target>
       </trans-unit>
-      <trans-unit id="PxSV8_e" resname="Name, e-mail address or student number">
-        <source>Name, e-mail address or student number</source>
+      <trans-unit id="XpFrF8q" resname="Name, email address or student number">
+        <source>Name, email address or student number</source>
         <target state="translated">Naam, e-mailadres of studentnummer</target>
       </trans-unit>
-      <trans-unit id="xMNaqqB" resname="Name, e-mail address, member number or student number">
-        <source>Name, e-mail address, member number or student number</source>
+      <trans-unit id="uIoqPed" resname="Name, email address, member number or student number">
+        <source>Name, email address, member number or student number</source>
         <target state="translated">Naam, e-mailadres, lidnummer of studentnummer</target>
       </trans-unit>
       <trans-unit id="SSAtsR6" resname="Navigation">
@@ -5976,6 +6024,10 @@
       <trans-unit id="uYbxb6i" resname="New backup codes were generated for your account from %name%.">
         <source>New backup codes were generated for your account from %name%.</source>
         <target state="translated">Er zijn nieuwe back-upcodes gegenereerd voor je account vanaf %name%.</target>
+      </trans-unit>
+      <trans-unit id="uWfLt3x" resname="New email address">
+        <source>New email address</source>
+        <target state="translated">Nieuw e-mailadres</target>
       </trans-unit>
       <trans-unit id="59X.YoF" resname="New expiration">
         <source>New expiration</source>
@@ -6165,13 +6217,13 @@
         <source>No documents were uploaded under this agenda point.</source>
         <target state="translated">Er zijn geen documenten geüpload onder dit agendapunt.</target>
       </trans-unit>
-      <trans-unit id="aOcQUCS" resname="No e-mail on record">
-        <source>No e-mail on record</source>
-        <target state="translated">Geen e-mailadres geregistreerd</target>
-      </trans-unit>
       <trans-unit id="W8tUipN" resname="No email address">
         <source>No email address</source>
         <target state="translated">Geen e-mailadres</target>
+      </trans-unit>
+      <trans-unit id="tZb2_ws" resname="No email on record">
+        <source>No email on record</source>
+        <target state="translated">Geen e-mailadres geregistreerd</target>
       </trans-unit>
       <trans-unit id="AxexkU1" resname="No end time; meetings run until closed.">
         <source>No end time; meetings run until closed.</source>
@@ -6440,6 +6492,10 @@
       <trans-unit id="5oWvzf3" resname="Not activated">
         <source>Not activated</source>
         <target state="translated">Niet geactiveerd</target>
+      </trans-unit>
+      <trans-unit id="AwbG8SP" resname="Not answered">
+        <source>Not answered</source>
+        <target state="translated">Niet beantwoord</target>
       </trans-unit>
       <trans-unit id="bNWISK_" resname="Not answered by me">
         <source>Not answered by me</source>
@@ -8761,6 +8817,10 @@
         <source>Settings</source>
         <target>Instellingen</target>
       </trans-unit>
+      <trans-unit id="VDiBCah" resname="Settled by the secretary">
+        <source>Settled by the secretary</source>
+        <target state="translated">Afgehandeld door de secretaris</target>
+      </trans-unit>
       <trans-unit id="A4mwZuN" resname="Shared by a member">
         <source>Shared by a member</source>
         <target state="translated">Gedeeld door een lid</target>
@@ -9149,9 +9209,17 @@
         <source>Status</source>
         <target state="translated">Status</target>
       </trans-unit>
+      <trans-unit id="2MIXXLq" resname="Stay on as a graduate">
+        <source>Stay on as a graduate</source>
+        <target state="translated">Afgestudeerde blijven</target>
+      </trans-unit>
       <trans-unit id="4uoWKbc" resname="Staying at the university">
         <source>Staying at the university</source>
         <target state="translated">Blijven aan de universiteit</target>
+      </trans-unit>
+      <trans-unit id="DMvtg8X" resname="Staying on as a graduate">
+        <source>Staying on as a graduate</source>
+        <target state="translated">Afgestudeerde blijven</target>
       </trans-unit>
       <trans-unit id="K8oAbea" resname="Stemcommissie">
         <source>Stemcommissie</source>
@@ -9373,6 +9441,10 @@
         <source>Taking proposals</source>
         <target state="translated">Neemt voorstellen aan</target>
       </trans-unit>
+      <trans-unit id="J9YVbS7" resname="Tell us and we stop asking. Your membership ends on the date above either way.">
+        <source>Tell us and we stop asking. Your membership ends on the date above either way.</source>
+        <target state="translated">Laat het ons weten, dan vragen we er niet meer naar. Je lidmaatschap eindigt hoe dan ook op de datum hierboven.</target>
+      </trans-unit>
       <trans-unit id="OyEm9xf" resname="Terminate">
         <source>Terminate</source>
         <target state="translated">Beëindigen</target>
@@ -9405,9 +9477,21 @@
         <source>Thank you %name%!</source>
         <target state="translated">Bedankt, %name%!</target>
       </trans-unit>
-      <trans-unit id="ZsDl6p9" resname="Thank you %name%! We have sent you a confirmation by e-mail.">
-        <source>Thank you %name%! We have sent you a confirmation by e-mail.</source>
+      <trans-unit id="dZzFQhi" resname="Thank you %name%! We have sent you a confirmation by email.">
+        <source>Thank you %name%! We have sent you a confirmation by email.</source>
         <target state="translated">Bedankt %name%! We hebben je een bevestiging gestuurd per e-mail.</target>
+      </trans-unit>
+      <trans-unit id="ZG66WA8" resname="Thank you %name%! Your membership continues as a graduate membership.">
+        <source>Thank you %name%! Your membership continues as a graduate membership.</source>
+        <target state="translated">Bedankt %name%! Je lidmaatschap loopt door als lidmaatschap voor afgestudeerden.</target>
+      </trans-unit>
+      <trans-unit id="daa2xIE" resname="Thank you for letting us know, %name%. Your membership ends on %date% and we will not ask you about it again.">
+        <source>Thank you for letting us know, %name%. Your membership ends on %date% and we will not ask you about it again.</source>
+        <target state="translated">Bedankt voor het doorgeven, %name%. Je lidmaatschap eindigt op %date% en we vragen er niet meer naar.</target>
+      </trans-unit>
+      <trans-unit id="av2fpvc" resname="Thank you for the years you were with us.">
+        <source>Thank you for the years you were with us.</source>
+        <target state="translated">Bedankt voor de jaren dat je bij ons was.</target>
       </trans-unit>
       <trans-unit id="3UcLqDl" resname="That action is not available for this revision.">
         <source>That action is not available for this revision.</source>
@@ -10005,6 +10089,10 @@
         <source>The round is open. Every body may propose without anything being set up for it.</source>
         <target state="translated">De ronde is open. Elk orgaan mag voorstellen zonder dat er iets voor is ingesteld.</target>
       </trans-unit>
+      <trans-unit id="wgPYdnH" resname="The secretary keeps these. Write to them if any of it is wrong.">
+        <source>The secretary keeps these. Write to them if any of it is wrong.</source>
+        <target state="translated">De secretaris houdt deze gegevens bij. Neem contact met hen op als er iets niet klopt.</target>
+      </trans-unit>
       <trans-unit id="0AhMJmQ" resname="The selected photos are already in that album.">
         <source>The selected photos are already in that album.</source>
         <target state="translated">De geselecteerde foto's staan al in dat album.</target>
@@ -10085,8 +10173,8 @@
         <source>Theme</source>
         <target>Thema</target>
       </trans-unit>
-      <trans-unit id="pijhSvj" resname="There already is a member with this e-mail address.">
-        <source>There already is a member with this e-mail address.</source>
+      <trans-unit id="Wycb7se" resname="There already is a member with this email address.">
+        <source>There already is a member with this email address.</source>
         <target state="translated">Er is al een lid met dit e-mailadres.</target>
       </trans-unit>
       <trans-unit id="fTCEJeH" resname="There are currently no committees installed.">
@@ -10404,6 +10492,10 @@
       <trans-unit id="YD7fBr6" resname="This is %source%.">
         <source>This is %source%.</source>
         <target state="translated">Dit is %source%.</target>
+      </trans-unit>
+      <trans-unit id="9SWwVU0" resname="This is already your email address.">
+        <source>This is already your email address.</source>
+        <target state="translated">Dit is al je e-mailadres.</target>
       </trans-unit>
       <trans-unit id="lLyqjWt" resname="This is the address the association writes to, and the one you sign in with.">
         <source>This is the address the association writes to, and the one you sign in with.</source>
@@ -11025,6 +11117,10 @@
         <source>Use %number%</source>
         <target state="translated">Gebruik %number%</target>
       </trans-unit>
+      <trans-unit id="BDvrk2t" resname="Use an address you keep after you stop studying.">
+        <source>Use an address you keep after you stop studying.</source>
+        <target state="translated">Gebruik een adres dat je houdt nadat je stopt met studeren.</target>
+      </trans-unit>
       <trans-unit id="dd.2oLj" resname="Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.">
         <source>Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.</source>
         <target state="translated">Gebruik “aanhalingstekens” voor exacte zinnen, -woord om uit te sluiten, type:bm om te beperken tot een vergadertype en meeting:1805 om te beperken tot een vergadering.</target>
@@ -11301,12 +11397,12 @@
         <source>Was</source>
         <target state="translated">Was</target>
       </trans-unit>
-      <trans-unit id="3B9A3Hz" resname="Was it not your intention to close the payment page? Then do not worry, &lt;a href=&quot;%url%&quot;&gt;click here&lt;/a&gt; to go back. Are you unable to finish the payment now? Then also do not worry, we have sent you an e-mail containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.">
-        <source>Was it not your intention to close the payment page? Then do not worry, &lt;a href="%url%"&gt;click here&lt;/a&gt; to go back. Are you unable to finish the payment now? Then also do not worry, we have sent you an e-mail containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.</source>
+      <trans-unit id="4wv88I_" resname="Was it not your intention to close the payment page? Then do not worry, &lt;a href=&quot;%url%&quot;&gt;click here&lt;/a&gt; to go back. Are you unable to finish the payment now? Then also do not worry, we have sent you an email containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.">
+        <source>Was it not your intention to close the payment page? Then do not worry, &lt;a href="%url%"&gt;click here&lt;/a&gt; to go back. Are you unable to finish the payment now? Then also do not worry, we have sent you an email containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.</source>
         <target state="translated"><![CDATA[Was het niet je bedoeling om de betaalpagina te sluiten? Geen zorgen, <a href="%url%">klik hier</a> om terug te gaan. Lukt het je nu niet om de betaling af te ronden? Ook geen zorgen, we hebben je een e-mail gestuurd met een link waarmee je opnieuw naar de betaalpagina kunt. Wil je toch geen lid worden van GEWIS? Laat het ons weten, dan verwijderen we je gegevens.]]></target>
       </trans-unit>
-      <trans-unit id="ZNXr.2Z" resname="Was it not your intention to close the payment page? Then do not worry, we have sent you an e-mail containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.">
-        <source>Was it not your intention to close the payment page? Then do not worry, we have sent you an e-mail containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.</source>
+      <trans-unit id="dk_guT2" resname="Was it not your intention to close the payment page? Then do not worry, we have sent you an email containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.">
+        <source>Was it not your intention to close the payment page? Then do not worry, we have sent you an email containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.</source>
         <target state="translated">Was het niet je bedoeling om de betaalpagina te sluiten? Geen zorgen, we hebben je een e-mail gestuurd met een link waarmee je opnieuw naar de betaalpagina kunt gaan. Wil je toch geen lid worden van GEWIS? Laat het ons weten en we verwijderen jouw gegevens.</target>
       </trans-unit>
       <trans-unit id="Sz1D.Uy" resname="Was question %number%.">
@@ -11321,9 +11417,17 @@
         <source>We found a pointer to &lt;code&gt;NULL&lt;/code&gt; instead of this page</source>
         <target state="translated"><![CDATA[We hebben een verwijzing naar <code>NULL</code> gevonden in plaats van deze pagina]]></target>
       </trans-unit>
-      <trans-unit id="ZHHQek2" resname="We have received your registration, once your payment is verified the secretary will approve your membership. We will let you know via e-mail when this happens.">
-        <source>We have received your registration, once your payment is verified the secretary will approve your membership. We will let you know via e-mail when this happens.</source>
+      <trans-unit id="quiGWqk" resname="We have passed your request to have your data removed on to the secretary, who will be in touch.">
+        <source>We have passed your request to have your data removed on to the secretary, who will be in touch.</source>
+        <target state="translated">We hebben je verzoek om je gegevens te verwijderen doorgegeven aan de secretaris, die contact met je opneemt.</target>
+      </trans-unit>
+      <trans-unit id="00c4WBj" resname="We have received your registration, once your payment is verified the secretary will approve your membership. We will let you know via email when this happens.">
+        <source>We have received your registration, once your payment is verified the secretary will approve your membership. We will let you know via email when this happens.</source>
         <target state="translated">We hebben je aanmelding ontvangen, zodra je betaling is geverifieerd zal de secretaris je lidmaatschap goedkeuren. We laten je via e-mail weten wanneer dit is gebeurd.</target>
+      </trans-unit>
+      <trans-unit id="Xi42NDg" resname="We have sent a message to your new email address. Your address changes once you have followed the link in it.">
+        <source>We have sent a message to your new email address. Your address changes once you have followed the link in it.</source>
+        <target state="translated">We hebben een bericht naar je nieuwe e-mailadres gestuurd. Je adres verandert zodra je de link daarin hebt gevolgd.</target>
       </trans-unit>
       <trans-unit id="eXd3k.t" resname="We match you with a member who already passed the course.">
         <source>We match you with a member who already passed the course.</source>
@@ -11761,6 +11865,10 @@
         <source>You are signed up.</source>
         <target>Je bent ingeschreven.</target>
       </trans-unit>
+      <trans-unit id="NTfgXGN" resname="You are staying on as a graduate">
+        <source>You are staying on as a graduate</source>
+        <target state="translated">Je blijft afgestudeerde</target>
+      </trans-unit>
       <trans-unit id="jBpTPXS" resname="You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.">
         <source>You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.</source>
         <target state="translated">Je gebruikt beheerdersprivileges om de onderhoudsmodus te omzeilen; de website is gesloten voor iedereen anders.</target>
@@ -11881,6 +11989,10 @@
         <source>Your API token is "%token%". This value will NOT be shown again!</source>
         <target state="translated">Je API-token is "%token%". Deze waarde wordt NIET nog een keer getoond!</target>
       </trans-unit>
+      <trans-unit id="LT9joa5" resname="Your GEWIS membership ends on %date%. If you have finished studying, you can stay with the association as a graduate.">
+        <source>Your GEWIS membership ends on %date%. If you have finished studying, you can stay with the association as a graduate.</source>
+        <target state="translated">Je GEWIS-lidmaatschap eindigt op %date%. Als je klaar bent met studeren, kun je als afgestudeerde bij de vereniging blijven.</target>
+      </trans-unit>
       <trans-unit id="kn4AnO9" resname="Your GEWIS registration">
         <source>Your GEWIS registration</source>
         <target state="translated">Je GEWIS-inschrijving</target>
@@ -11985,6 +12097,10 @@
         <source>Your edit session expired; reopen the activity and try again.</source>
         <target state="translated">Je bewerkingssessie is verlopen; open de activiteit opnieuw en probeer het nogmaals.</target>
       </trans-unit>
+      <trans-unit id="UxfWMQi" resname="Your email address has been changed. You now sign in with it as well.">
+        <source>Your email address has been changed. You now sign in with it as well.</source>
+        <target state="translated">Je e-mailadres is gewijzigd. Je logt er nu ook mee in.</target>
+      </trans-unit>
       <trans-unit id="nyZTzfw" resname="Your email address will expire">
         <source>Your email address will expire</source>
         <target state="translated">Je e-mailadres komt te vervallen</target>
@@ -12008,6 +12124,14 @@
       <trans-unit id="e9IrVNn" resname="Your member name is never shown to other members.">
         <source>Your member name is never shown to other members.</source>
         <target state="translated">Je lidnaam wordt nooit aan andere leden getoond.</target>
+      </trans-unit>
+      <trans-unit id="GVs47pj" resname="Your membership is ending">
+        <source>Your membership is ending</source>
+        <target state="translated">Je lidmaatschap loopt af</target>
+      </trans-unit>
+      <trans-unit id="BE3ATw5" resname="Your membership will end">
+        <source>Your membership will end</source>
+        <target state="translated">Je lidmaatschap eindigt</target>
       </trans-unit>
       <trans-unit id="Mnrixx." resname="Your message is being sent to %count% recipient(s).">
         <source>Your message is being sent to %count% recipient(s).</source>

@@ -4,7 +4,7 @@
             <div>
                 <label class="form-label" for="member-overview-search">{{ 'Search'|trans }}</label>
                 <input type="search" class="form-control" id="member-overview-search"
-                       placeholder="{{ 'Name, e-mail address, member number or student number'|trans }}"
+                       placeholder="{{ 'Name, email address, member number or student number'|trans }}"
                        data-model="debounce(300)|search"
                        value="{{ this.search }}">
             </div>
@@ -43,7 +43,7 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">{{ 'Name'|trans }}</th>
-                                <th scope="col">{{ 'E-mail Address'|trans }}</th>
+                                <th scope="col">{{ 'Email Address'|trans }}</th>
                                 <th scope="col">{{ 'Generation'|trans }}</th>
                                 <th scope="col">{{ 'Expiration'|trans }}</th>
                                 <th scope="col" class="text-end">{{ 'Status'|trans }}</th>
@@ -65,7 +65,7 @@
                                     </td>
                                     <td>
                                         {% if member.email is empty %}
-                                            <span class="text-secondary">{{ 'No e-mail on record'|trans }}</span>
+                                            <span class="text-secondary">{{ 'No email on record'|trans }}</span>
                                         {% else %}
                                             <a href="mailto:{{ member.email }}">{{ member.email }}</a>
                                         {% endif %}

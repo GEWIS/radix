@@ -162,7 +162,7 @@ class EmailChangeController extends AbstractController
 
         $this->addFlash(
             AlertTypes::Success->value,
-            $this->translator->trans('Your e-mail address has been changed. You now sign in with it as well.'),
+            $this->translator->trans('Your email address has been changed. You now sign in with it as well.'),
         );
 
         return $this->redirectToRoute('user_settings_details_index');

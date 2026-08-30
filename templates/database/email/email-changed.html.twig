@@ -1,13 +1,13 @@
 {% extends 'database/email/_base.html.twig' %}
 
-{% block emailTitle %}Your e-mail address was changed{% endblock %}
+{% block emailTitle %}Your email address was changed{% endblock %}
 {% block preheader %}{% endblock %}
 {% block heading %}Membership notification{% endblock %}
-{% block subheading %}Your e-mail address was changed{% endblock %}
+{% block subheading %}Your email address was changed{% endblock %}
 {% block body %}
     <p>Dear {{ firstName }},</p>
     <p>
-        The e-mail address of your GEWIS membership was changed from <b>{{ previousEmail }}</b> to
+        The email address of your GEWIS membership was changed from <b>{{ previousEmail }}</b> to
         <b>{{ newEmail }}</b>. From now on we write to the new address, and you sign in with it as well.
     </p>
     <p>
@@ -19,4 +19,4 @@
         <br>The Secretary of GEWIS
     </p>
 {% endblock %}
-{% block footerNote %}You receive this message because the e-mail address of your GEWIS membership was changed. You can not opt-out of these emails.{% endblock %}
+{% block footerNote %}You receive this message because the email address of your GEWIS membership was changed. You can not opt-out of these emails.{% endblock %}

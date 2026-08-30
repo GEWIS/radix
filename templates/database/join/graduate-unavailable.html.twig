@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+
+
+{% block page_title %}{{ 'Staying on as a graduate'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block contents %}
+    {% embed 'database/partials/join/registration-header.html.twig' with {header_title: 'This link no longer works'|trans} %}
+        {% block registration_intro %}
+            <p>
+                {{ 'It was either used already or it has expired.'|trans }}
+            </p>
+            <p>
+                {{ 'If you would still like to stay on as a graduate, let the secretary know.'|trans }}
+            </p>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}
