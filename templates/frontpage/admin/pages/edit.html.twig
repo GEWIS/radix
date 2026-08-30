@@ -2,6 +2,9 @@
 
 {% block page_title %}{{ customPage.title|localise_text|page_title }}{{ 'Pages'|trans|page_title }}{{ parent() }}{% endblock %}
 
+{# The cookie that lets the browser listen is minted in the base layout from every topic named here. #}
+{% block realtime_extra_topics %}{{ imageTopic }}{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     {# The editor draws itself with this; without it the toolbar and the editing area render unstyled. #}
@@ -18,4 +21,9 @@
 {% block contents %}
     <h2 class="mb-3">{{ 'Edit page'|trans }}</h2>
     {% include 'frontpage/admin/pages/_form.html.twig' %}
+
+    {# Outside the form: nothing in the dialog belongs to what the form submits. The confirmation follows it so that
+       it is the one on top. #}
+    {% include 'partials/frontpage/page-image-browser.html.twig' %}
+    {% include 'partials/application/confirm-modal.html.twig' %}
 {% endblock %}

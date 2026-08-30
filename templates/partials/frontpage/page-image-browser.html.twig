@@ -1,0 +1,47 @@
+{# The address step has no editor to place a picture in, and a dialog there would hold a connection for nothing. #}
+{% if 'content' == form_flow_current_step(form) %}
+    {# An upload is filed under the page when editing one, and under the run of this flow until the page exists. #}
+    <div class="modal fade" id="page-images" tabindex="-1" aria-hidden="true" aria-labelledby="page-images-title"
+         data-controller="page-images"
+         data-page-images-page-editor-outlet="textarea[data-controller~='page-editor']"
+         data-page-images-hub-url-value="{{ imageTopic is not null ? mercure(imageTopic) : '' }}"
+         data-page-images-upload-url-value="{{ path('admin/frontpage/pages/upload') }}"
+         data-page-images-upload-token-value="{{ csrf_token('page_image_upload') }}"
+         data-page-images-page-value="{{ customPage is defined ? customPage.id : 0 }}"
+         data-page-images-flow-value="{{ app.request.query.get('flow') }}"
+         data-action="page-editor:browse@window->page-images#open">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="page-images-title">{{ 'The images of this page'|trans }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="{{ 'Close'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">
+                        {{ 'Everything uploaded for this page, whether or not it is shown. Taking a picture out of the text leaves it here, so it can be put back; removing it here throws the file away.'|trans }}
+                    </p>
+
+                    <div class="upload-dropzone p-4 text-center text-muted mb-3"
+                         data-action="dragover->page-images#dragOver dragleave->page-images#dragLeave drop->page-images#dropped">
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
+                               class="d-none" data-page-images-target="input" data-action="page-images#picked">
+                        <button type="button" class="btn btn-link text-decoration-none text-muted p-0"
+                                data-action="page-images#browse">
+                            <span class="fas fa-arrow-up-from-bracket" aria-hidden="true"></span>
+                            {{ 'Upload an image for this page'|trans }}
+                        </button>
+                        <div class="d-none small text-danger mt-1" data-page-images-target="error">
+                            {{ 'That image could not be uploaded.'|trans }}
+                        </div>
+                    </div>
+
+                    <twig:Frontpage:Admin:PageImages
+                        :page="customPage is defined ? customPage.id : null"
+                        :flowRun="app.request.query.get('flow')"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

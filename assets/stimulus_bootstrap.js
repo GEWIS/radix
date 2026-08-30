@@ -34,6 +34,7 @@ import SignupListController from './controllers/activity/signup_list_controller.
 import BirthdayRotatorController from './controllers/frontpage/birthday_rotator_controller.ts';
 import InfimumController from './controllers/frontpage/infimum_controller.ts';
 import PageEditorController from './controllers/frontpage/page_editor_controller.ts';
+import PageImagesController from './controllers/frontpage/page_images_controller.ts';
 
 // Decision-specific controllers.
 import CounterpartModalController from './controllers/decision/counterpart_modal_controller.ts';
@@ -100,6 +101,7 @@ app.register('signup-list', SignupListController);
 app.register('birthday-rotator', BirthdayRotatorController);
 app.register('infimum', InfimumController);
 app.register('page-editor', PageEditorController);
+app.register('page-images', PageImagesController);
 
 app.register('counterpart-modal', CounterpartModalController);
 app.register('decision-counterpart', DecisionCounterpartController);

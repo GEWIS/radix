@@ -126,6 +126,20 @@ final readonly class VariantGenerator
     }
 
     /**
+     * {@see ImageVariantResponder::respond()} serves a cached variant before it looks at the source, so removing a
+     * source without this does not stop the picture being handed out.
+     */
+    public function purge(string $sourcePath): void
+    {
+        foreach (ImageVariant::cases() as $variant) {
+            $this->fileStorage->delete($this->cachePath(
+                $sourcePath,
+                $variant,
+            ));
+        }
+    }
+
+    /**
      * The cache path a variant of the given source is stored at, i.e.
      * `cache/images/{variant}/<source without extension>.webp`.
      */

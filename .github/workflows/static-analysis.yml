@@ -27,7 +27,7 @@ jobs:
                 uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
                 with:
                     php-version: '8.5'
-                    extensions: 'amqp, apcu, calendar, curl, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
+                    extensions: 'amqp, apcu, calendar, curl, ffi, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
                     tools: 'cs2pr'
 
             -   name: Load environment variables

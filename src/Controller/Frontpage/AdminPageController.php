@@ -6,21 +6,18 @@ namespace App\Controller\Frontpage;
 
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
-use App\Entity\Application\Enums\ImageProfile;
 use App\Entity\Application\Enums\ImageVariant;
 use App\Entity\Application\Enums\Languages;
-use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Frontpage\FrontpageLocalisedText;
 use App\Entity\Frontpage\Page;
 use App\Entity\User\Enums\UserRoles;
 use App\Form\Frontpage\Page\PageData;
 use App\Form\Frontpage\Page\PageFlowType;
-use App\Message\Photo\ProcessImageVariantsMessage;
 use App\Repository\Frontpage\PageRepository;
-use App\Service\Application\FileStorage;
 use App\Service\Application\FileStorageException;
 use App\Service\Application\ImageUrlBuilder;
 use App\Service\Frontpage\PageAdminService;
+use App\Service\Frontpage\PageImageStore;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -28,7 +25,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -56,9 +52,8 @@ class AdminPageController extends AbstractController
     public function __construct(
         private readonly PageRepository $pageRepository,
         private readonly PageAdminService $pageAdminService,
-        private readonly FileStorage $fileStorage,
+        private readonly PageImageStore $pageImageStore,
         private readonly ImageUrlBuilder $imageUrlBuilder,
-        private readonly MessageBusInterface $messageBus,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -111,7 +106,10 @@ class AdminPageController extends AbstractController
             assert($data instanceof PageData);
 
             $data->applyTo($page);
-            $this->pageAdminService->save($page);
+            $this->pageAdminService->save(
+                $page,
+                $run,
+            );
             $flow->reset();
 
             $this->addFlash(
@@ -129,7 +127,13 @@ class AdminPageController extends AbstractController
 
         return $this->render(
             'frontpage/admin/pages/create.html.twig',
-            ['form' => $flow->getStepForm()],
+            [
+                'form' => $flow->getStepForm(),
+                'imageTopic' => $this->imageTopic(
+                    null,
+                    $run,
+                ),
+            ],
         );
     }
 
@@ -167,7 +171,10 @@ class AdminPageController extends AbstractController
             assert($data instanceof PageData);
 
             $data->applyTo($page);
-            $this->pageAdminService->save($page);
+            $this->pageAdminService->save(
+                $page,
+                $run,
+            );
             $flow->reset();
 
             $this->addFlash(
@@ -188,6 +195,10 @@ class AdminPageController extends AbstractController
             [
                 'form' => $flow->getStepForm(),
                 'customPage' => $page,
+                'imageTopic' => $this->imageTopic(
+                    $page,
+                    null,
+                ),
             ],
         );
     }
@@ -234,10 +245,22 @@ class AdminPageController extends AbstractController
             );
         }
 
+        $scope = $this->pageImageStore->scope(
+            $this->uploadingPage($request),
+            $request->request->getString('flow'),
+        );
+
+        if (null === $scope) {
+            return new JsonResponse(
+                ['error' => $this->translator->trans('It is not clear which page this image belongs to.')],
+                Response::HTTP_BAD_REQUEST,
+            );
+        }
+
         try {
-            $stored = $this->fileStorage->store(
-                StorageNamespace::PageImage,
+            $stored = $this->pageImageStore->store(
                 $file->getPathname(),
+                $scope,
             );
         } catch (FileStorageException) {
             return new JsonResponse(
@@ -246,13 +269,6 @@ class AdminPageController extends AbstractController
             );
         }
 
-        // The sizes a page asks for are made now rather than by whoever opens the page first, which would otherwise be
-        // the editor a moment from here.
-        $this->messageBus->dispatch(new ProcessImageVariantsMessage(
-            $stored->path,
-            ImageProfile::PageImage,
-        ));
-
         return new JsonResponse([
             // The widest a page column ever is, which is what an image dropped into one should be served at.
             'url' => $this->imageUrlBuilder->url(
@@ -260,6 +276,35 @@ class AdminPageController extends AbstractController
                 ImageVariant::W1280,
             ),
         ]);
+    }
+
+    /** Null when there is nowhere for an image to go, so the browser listens to nothing rather than to everything. */
+    private function imageTopic(
+        ?Page $page,
+        ?string $flowRun,
+    ): ?string {
+        $scope = $this->pageImageStore->scope(
+            $page,
+            $flowRun,
+        );
+
+        if (null === $scope) {
+            return null;
+        }
+
+        return $this->pageImageStore->topic($scope);
+    }
+
+    /** A page being created names none, and an id answering to nothing is treated the same way rather than trusted. */
+    private function uploadingPage(Request $request): ?Page
+    {
+        $id = $request->request->getInt('page');
+
+        if (0 === $id) {
+            return null;
+        }
+
+        return $this->pageRepository->find($id);
     }
 
     /**

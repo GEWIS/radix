@@ -14,7 +14,8 @@ use function sprintf;
  * directory prefix under the storage root (`data/`), the whitelist of MIME types and the maximum file size accepted
  * for it, and whether it is private (needs an authenticated, signed request to serve). Photo and company namespaces are
  * scoped per owning entity (album or company), which also keeps their directories bounded and means the same bytes in
- * two albums never share one stored file.
+ * two albums never share one stored file. Page images are scoped the same way but only once the page they belong to
+ * exists; see {@see withOptionalScope()}.
  *
  * The backing values are stable machine keys, never part of a URL; the URL always carries the full stored path.
  */
@@ -38,7 +39,7 @@ enum StorageNamespace: string
     /** Organ cover and thumbnail images (public). */
     case OrganImage = 'organ-image';
 
-    /** Images embedded in custom pages/markdown (public). */
+    /** Images embedded in custom pages/markdown, scoped per page once one exists (public). */
     case PageImage = 'page-image';
 
     /** Meeting document versions (PDFs, members-only). */
@@ -85,7 +86,7 @@ enum StorageNamespace: string
                 $scope,
                 'organs/images',
             ),
-            self::PageImage => $this->rejectScope(
+            self::PageImage => $this->withOptionalScope(
                 $scope,
                 'pages/images',
             ),
@@ -213,6 +214,28 @@ enum StorageNamespace: string
             $mimeType,
             $this->allowedMimeTypes(),
             true,
+        );
+    }
+
+    /**
+     * Takes a scope without insisting on one, because the files the old website left were never filed under a page
+     * and are still served from the unscoped directory.
+     */
+    private function withOptionalScope(
+        ?string $scope,
+        string $directory,
+    ): string {
+        if (
+            null === $scope
+            || '' === $scope
+        ) {
+            return $directory;
+        }
+
+        return sprintf(
+            '%s/%s',
+            $directory,
+            $scope,
         );
     }
 

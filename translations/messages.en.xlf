@@ -1221,6 +1221,10 @@
         <source>An error occurred while we were trying to prepare the checkout page. We have received your registration and sent you an e-mail containing a link that allows you to restart the checkout process at a later time.</source>
         <target state="translated">An error occurred while we were trying to prepare the checkout page. We have received your registration and sent you an e-mail containing a link that allows you to restart the checkout process at a later time.</target>
       </trans-unit>
+      <trans-unit id="z0YwYin" resname="An image of this page">
+        <source>An image of this page</source>
+        <target state="translated">An image of this page</target>
+      </trans-unit>
       <trans-unit id="3eX.3WJ" resname="Analytics are currently">
         <source>Analytics are currently</source>
         <target state="translated">Analytics are currently</target>
@@ -2365,6 +2369,10 @@
         <source>Copy list</source>
         <target state="translated">Copy list</target>
       </trans-unit>
+      <trans-unit id="YfvKTO7" resname="Copy the address">
+        <source>Copy the address</source>
+        <target state="translated">Copy the address</target>
+      </trans-unit>
       <trans-unit id="cmhL9hM" resname="Copy the selection from the previous meeting">
         <source>Copy the selection from the previous meeting</source>
         <target state="translated">Copy the selection from the previous meeting</target>
@@ -3469,6 +3477,10 @@
         <source>Everything that hangs off this package goes with it, including any vacancies posted under it.</source>
         <target state="translated">Everything that hangs off this package goes with it, including any vacancies posted under it.</target>
       </trans-unit>
+      <trans-unit id="uqEuwiO" resname="Everything uploaded for this page, whether or not it is shown. Taking a picture out of the text leaves it here, so it can be put back; removing it here throws the file away.">
+        <source>Everything uploaded for this page, whether or not it is shown. Taking a picture out of the text leaves it here, so it can be put back; removing it here throws the file away.</source>
+        <target state="translated">Everything uploaded for this page, whether or not it is shown. Taking a picture out of the text leaves it here, so it can be put back; removing it here throws the file away.</target>
+      </trans-unit>
       <trans-unit id="utOBMqh" resname="Everything you can do for your company on the GEWIS website.">
         <source>Everything you can do for your company on the GEWIS website.</source>
         <target state="translated">Everything you can do for your company on the GEWIS website.</target>
@@ -4516,6 +4528,10 @@
       <trans-unit id="e04dGNe" resname="It is getting closer... but it will never quite get there.">
         <source>It is getting closer... but it will never quite get there.</source>
         <target state="translated">It is getting closer... but it will never quite get there.</target>
+      </trans-unit>
+      <trans-unit id="8l5qkTe" resname="It is not clear which page this image belongs to.">
+        <source>It is not clear which page this image belongs to.</source>
+        <target state="translated">It is not clear which page this image belongs to.</target>
       </trans-unit>
       <trans-unit id="KxP44Mh" resname="It is pointing somewhere. Just not here.">
         <source>It is pointing somewhere. Just not here.</source>
@@ -6005,6 +6021,10 @@
         <source>Nothing has been shared for this course yet</source>
         <target state="translated">Nothing has been shared for this course yet</target>
       </trans-unit>
+      <trans-unit id="ANu96cS" resname="Nothing has been uploaded for this page yet.">
+        <source>Nothing has been uploaded for this page yet.</source>
+        <target state="translated">Nothing has been uploaded for this page yet.</target>
+      </trans-unit>
       <trans-unit id="cRnSHA3" resname="Nothing has failed every one of its retries.">
         <source>Nothing has failed every one of its retries.</source>
         <target state="translated">Nothing has failed every one of its retries.</target>
@@ -6633,6 +6653,10 @@
         <source>Pinned by the board</source>
         <target state="translated">Pinned by the board</target>
       </trans-unit>
+      <trans-unit id="DYaR8Dw" resname="Place in the text">
+        <source>Place in the text</source>
+        <target state="translated">Place in the text</target>
+      </trans-unit>
       <trans-unit id="u7c4pso" resname="Place on photo">
         <source>Place on photo</source>
         <target state="translated">Place on photo</target>
@@ -6760,6 +6784,10 @@
       <trans-unit id="R43hinT" resname="Preferred day">
         <source>Preferred day</source>
         <target state="translated">Preferred day</target>
+      </trans-unit>
+      <trans-unit id="egsm_4X" resname="Preparing the sizes the website serves">
+        <source>Preparing the sizes the website serves</source>
+        <target state="translated">Preparing the sizes the website serves</target>
       </trans-unit>
       <trans-unit id="bLMpw1M" resname="Preparing your download">
         <source>Preparing your download</source>
@@ -7252,6 +7280,10 @@
       <trans-unit id="KDu9Q0t" resname="Remove this exception?">
         <source>Remove this exception?</source>
         <target state="translated">Remove this exception?</target>
+      </trans-unit>
+      <trans-unit id="QStgasd" resname="Remove this image?">
+        <source>Remove this image?</source>
+        <target state="translated">Remove this image?</target>
       </trans-unit>
       <trans-unit id="Gs1vsDa" resname="Remove this label?">
         <source>Remove this label?</source>
@@ -8517,6 +8549,14 @@
         <source>That file could not be stored. Try a JPEG, PNG or WebP image.</source>
         <target state="translated">That file could not be stored. Try a JPEG, PNG or WebP image.</target>
       </trans-unit>
+      <trans-unit id="GfNaQD9" resname="That image could not be uploaded.">
+        <source>That image could not be uploaded.</source>
+        <target state="translated">That image could not be uploaded.</target>
+      </trans-unit>
+      <trans-unit id="bXUPhf3" resname="That image is not one of this page's own and was left alone.">
+        <source>That image is not one of this page's own and was left alone.</source>
+        <target state="translated">That image is not one of this page's own and was left alone.</target>
+      </trans-unit>
       <trans-unit id="wXKjgUO" resname="That image is too small. Pick one of at least %width% by %height% pixels.">
         <source>That image is too small. Pick one of at least %width% by %height% pixels.</source>
         <target state="translated">That image is too small. Pick one of at least %width% by %height% pixels.</target>
@@ -8825,6 +8865,10 @@
         <source>The external subscriber has been added.</source>
         <target>The external subscriber has been added.</target>
       </trans-unit>
+      <trans-unit id="dvMiKly" resname="The file is thrown away. Wherever the text still shows it, the picture is gone with it.">
+        <source>The file is thrown away. Wherever the text still shows it, the picture is gone with it.</source>
+        <target state="translated">The file is thrown away. Wherever the text still shows it, the picture is gone with it.</target>
+      </trans-unit>
       <trans-unit id="yObrSwo" resname="The first of the two years, so 2026 for the board of 2026 - 2027.">
         <source>The first of the two years, so 2026 for the board of 2026 - 2027.</source>
         <target state="translated">The first of the two years, so 2026 for the board of 2026 - 2027.</target>
@@ -8832,6 +8876,10 @@
       <trans-unit id="o3N.0Uq" resname="The image to crop">
         <source>The image to crop</source>
         <target state="translated">The image to crop</target>
+      </trans-unit>
+      <trans-unit id="dvzOxc0" resname="The images of this page">
+        <source>The images of this page</source>
+        <target state="translated">The images of this page</target>
       </trans-unit>
       <trans-unit id="zMSM59q" resname="The information the token carries about the member.">
         <source>The information the token carries about the member.</source>
@@ -9397,6 +9445,10 @@
         <source>This folder is empty.</source>
         <target state="translated">This folder is empty.</target>
       </trans-unit>
+      <trans-unit id="g39Xy2k" resname="This image cannot be placed in the page until it is ready">
+        <source>This image cannot be placed in the page until it is ready</source>
+        <target state="translated">This image cannot be placed in the page until it is ready</target>
+      </trans-unit>
       <trans-unit id="b1iOSjC" resname="This invitation is no longer valid. Ask your contact at GEWIS for a new one.">
         <source>This invitation is no longer valid. Ask your contact at GEWIS for a new one.</source>
         <target state="translated">This invitation is no longer valid. Ask your contact at GEWIS for a new one.</target>
@@ -9912,6 +9964,10 @@
       <trans-unit id="dDwI1qW" resname="Upload a new reference document">
         <source>Upload a new reference document</source>
         <target state="translated">Upload a new reference document</target>
+      </trans-unit>
+      <trans-unit id="uwn5K8_" resname="Upload an image for this page">
+        <source>Upload an image for this page</source>
+        <target state="translated">Upload an image for this page</target>
       </trans-unit>
       <trans-unit id="xspamGL" resname="Upload documents">
         <source>Upload documents</source>

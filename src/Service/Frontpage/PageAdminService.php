@@ -19,13 +19,17 @@ final readonly class PageAdminService
 {
     public function __construct(
         private PageContentSanitizer $sanitizer,
+        private PageImageStore $pageImageStore,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {
     }
 
-    public function save(Page $page): void
-    {
+    /** The images of a page being created can only be filed under it once it exists, hence after the first flush. */
+    public function save(
+        Page $page,
+        ?string $flowRun = null,
+    ): void {
         $content = $page->getContent();
         $content->updateValues(
             $this->sanitizer->sanitize($content->getValueEN()),
@@ -34,11 +38,38 @@ final readonly class PageAdminService
 
         $this->entityManager->persist($page);
         $this->entityManager->flush();
+
+        if (null === $flowRun) {
+            return;
+        }
+
+        if (
+            !$this->pageImageStore->claim(
+                $page,
+                $flowRun,
+                $content,
+            )
+        ) {
+            return;
+        }
+
+        $this->entityManager->flush();
     }
 
     public function delete(Page $page): void
     {
+        $scope = $this->pageImageStore->scope(
+            $page,
+            null,
+        );
+
         $this->entityManager->remove($page);
         $this->entityManager->flush();
+
+        if (null === $scope) {
+            return;
+        }
+
+        $this->pageImageStore->removeAll($scope);
     }
 }

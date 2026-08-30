@@ -126,6 +126,7 @@ framework:
             'App\Message\Decision\AuthorizationRevokedEmail': normal_priority
             'App\Message\Application\SendNotificationDigestMessage': bulk
             'App\Message\Photo\ProcessImageVariantsMessage': images
+            'App\Message\Frontpage\ProcessPageImageMessage': images
             'App\Message\Photo\GenerateAlbumCoverMessage': images
             'App\Message\Application\GenerateImageVariantMessage': images
             # Unrouted this would be handled synchronously, which is the whole thing `app:image:pregenerate` exists
