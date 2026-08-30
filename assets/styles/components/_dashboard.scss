@@ -88,6 +88,14 @@
     & + .breakdown {
         margin-block-start: map-get($spacers, 3);
     }
+
+    .progress {
+        --#{$prefix}progress-height: 0.375rem;
+        --#{$prefix}progress-border-radius: #{$border-radius-pill};
+        --#{$prefix}progress-bar-bg: var(--#{$prefix}secondary-color);
+
+        grid-column: 1 / -1;
+    }
 }
 
 .breakdown-count {
@@ -95,31 +103,16 @@
     font-variant-numeric: tabular-nums;
 }
 
-.breakdown-bar {
-    grid-column: 1 / -1;
-    block-size: 0.375rem;
-    border-radius: $border-radius-pill;
-    background-color: var(--#{$prefix}tertiary-bg);
-    overflow: hidden;
-}
-
-.breakdown-fill {
-    display: block;
-    block-size: 100%;
-    border-radius: $border-radius-pill;
-    background-color: var(--#{$prefix}secondary-color);
-}
-
 .breakdown-fill-ordinary {
-    background-color: $gewis-red;
+    --#{$prefix}progress-bar-bg: #{$gewis-red};
 }
 
 .breakdown-fill-graduate {
-    background-color: var(--#{$prefix}success);
+    --#{$prefix}progress-bar-bg: var(--#{$prefix}success);
 }
 
 .breakdown-fill-honorary {
-    background-color: var(--#{$prefix}warning);
+    --#{$prefix}progress-bar-bg: var(--#{$prefix}warning);
 }
 
 .integration {

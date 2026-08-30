@@ -137,10 +137,10 @@
     --#{$prefix}secondary-bg: #{$body-secondary-bg-dark};
     --#{$prefix}secondary-bg-rgb: #{to-rgb($body-secondary-bg-dark)};
 
-    //--#{$prefix}tertiary-color: #{$body-tertiary-color-dark};
-    //--#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color-dark)};
-    //--#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
-    //--#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
+    --#{$prefix}tertiary-color: #{$body-tertiary-color-dark};
+    --#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color-dark)};
+    --#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
+    --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
 
     @each $color, $value in $theme-colors-text-dark {
         --#{$prefix}#{$color}-text-emphasis: #{$value};

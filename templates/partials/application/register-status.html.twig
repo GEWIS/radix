@@ -18,13 +18,15 @@
            memberships of different types, so these are not slices of one number. #}
         {% set largest = max(membership_breakdown) %}
         {% for type, count in membership_breakdown %}
+            {% set label = enum('App\\Entity\\Database\\Enums\\MembershipTypes').from(type)|trans %}
             <div class="breakdown">
-                <span class="breakdown-label">{{ enum('App\\Entity\\Database\\Enums\\MembershipTypes').from(type)|trans }}</span>
+                <span class="breakdown-label">{{ label }}</span>
                 <span class="breakdown-count">{{ count }}</span>
-                <span class="breakdown-bar">
-                    <span class="breakdown-fill breakdown-fill-{{ type }}"
-                          style="inline-size: {{ largest > 0 ? (count / largest * 100)|round : 0 }}%"></span>
-                </span>
+                <div class="progress" role="progressbar" aria-label="{{ label }}"
+                     aria-valuenow="{{ count }}" aria-valuemin="0" aria-valuemax="{{ largest }}">
+                    <div class="progress-bar breakdown-fill-{{ type }}"
+                         style="width: {{ largest > 0 ? (count / largest * 100)|round : 0 }}%"></div>
+                </div>
             </div>
         {% endfor %}
     </div>
