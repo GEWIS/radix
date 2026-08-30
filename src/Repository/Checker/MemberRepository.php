@@ -54,6 +54,15 @@ class MemberRepository extends ServiceEntityRepository
             ->andWhere('m.deleted = false')
             ->andWhere($qb->expr()->eq('mem.startDate', '(' . $this->lastMembershipQuery()->getDQL() . ')'))
             ->andWhere('mem.endDate <= :expiresBefore')
+            // Bounded at the far end, or the sweep works back through every graduate who ever expired.
+            ->andWhere('mem.endDate >= :expiresAfter')
+            ->setParameter(
+                'expiresAfter',
+                new DateTime()->modify('-' . RenewalLink::GRACE_DAYS . ' days')->setTime(
+                    0,
+                    0,
+                ),
+            )
             ->setParameter(
                 'graduate',
                 MembershipTypes::Graduate,
