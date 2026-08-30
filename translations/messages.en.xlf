@@ -5269,6 +5269,10 @@
         <source>Membership types</source>
         <target state="translated">Membership types</target>
       </trans-unit>
+      <trans-unit id="eQ3BkkZ" resname="Memberships">
+        <source>Memberships</source>
+        <target state="translated">Memberships</target>
+      </trans-unit>
       <trans-unit id="8b7WgJG" resname="Memberships expiring within %days% days, and members missing information we need.">
         <source>Memberships expiring within %days% days, and members missing information we need.</source>
         <target state="translated">Memberships expiring within %days% days, and members missing information we need.</target>
@@ -5828,6 +5832,10 @@
       <trans-unit id="X7whl.T" resname="No membership expires soon and nothing is missing.">
         <source>No membership expires soon and nothing is missing.</source>
         <target state="translated">No membership expires soon and nothing is missing.</target>
+      </trans-unit>
+      <trans-unit id="SFkO.On" resname="No memberships on record.">
+        <source>No memberships on record.</source>
+        <target state="translated">No memberships on record.</target>
       </trans-unit>
       <trans-unit id="SDtIcMH" resname="No one is tagged in this photo yet">
         <source>No one is tagged in this photo yet</source>
@@ -10996,6 +11004,10 @@
       <trans-unit id="BE3ATw5" resname="Your membership will end">
         <source>Your membership will end</source>
         <target state="translated">Your membership will end</target>
+      </trans-unit>
+      <trans-unit id="Q_7tkoZ" resname="Your memberships">
+        <source>Your memberships</source>
+        <target state="translated">Your memberships</target>
       </trans-unit>
       <trans-unit id="Mnrixx." resname="Your message is being sent to %count% recipient(s).">
         <source>Your message is being sent to %count% recipient(s).</source>

@@ -5269,6 +5269,10 @@
         <source>Membership types</source>
         <target state="translated">Lidmaatschapstypes</target>
       </trans-unit>
+      <trans-unit id="eQ3BkkZ" resname="Memberships">
+        <source>Memberships</source>
+        <target state="translated">Lidmaatschappen</target>
+      </trans-unit>
       <trans-unit id="8b7WgJG" resname="Memberships expiring within %days% days, and members missing information we need.">
         <source>Memberships expiring within %days% days, and members missing information we need.</source>
         <target state="translated">Lidmaatschappen die binnen %days% dagen verlopen, en leden bij wie gegevens ontbreken die we nodig hebben.</target>
@@ -5828,6 +5832,10 @@
       <trans-unit id="X7whl.T" resname="No membership expires soon and nothing is missing.">
         <source>No membership expires soon and nothing is missing.</source>
         <target state="translated">Er verloopt binnenkort geen lidmaatschap en er ontbreekt niets.</target>
+      </trans-unit>
+      <trans-unit id="SFkO.On" resname="No memberships on record.">
+        <source>No memberships on record.</source>
+        <target state="translated">Geen lidmaatschappen geregistreerd.</target>
       </trans-unit>
       <trans-unit id="SDtIcMH" resname="No one is tagged in this photo yet">
         <source>No one is tagged in this photo yet</source>
@@ -10996,6 +11004,10 @@
       <trans-unit id="BE3ATw5" resname="Your membership will end">
         <source>Your membership will end</source>
         <target state="translated">Je lidmaatschap eindigt</target>
+      </trans-unit>
+      <trans-unit id="Q_7tkoZ" resname="Your memberships">
+        <source>Your memberships</source>
+        <target state="translated">Jouw lidmaatschappen</target>
       </trans-unit>
       <trans-unit id="Mnrixx." resname="Your message is being sent to %count% recipient(s).">
         <source>Your message is being sent to %count% recipient(s).</source>

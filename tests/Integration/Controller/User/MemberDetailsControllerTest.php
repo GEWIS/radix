@@ -67,6 +67,19 @@ final class MemberDetailsControllerTest extends DatabaseTestCase
             $content,
         );
 
+        // The years they were with the association, which is the record the secretary keeps and the member is shown.
+        self::assertNotCount(
+            0,
+            $member->getMemberships(),
+        );
+
+        foreach ($member->getMemberships() as $membership) {
+            self::assertStringContainsString(
+                $membership->getStartDate()->format('Y'),
+                $content,
+            );
+        }
+
         foreach ($this->ledger->getRepository(MailingList::class)->findAll() as $list) {
             if ($list->getSelfService()) {
                 self::assertStringContainsString(
