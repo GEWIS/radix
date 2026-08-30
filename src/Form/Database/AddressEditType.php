@@ -40,6 +40,7 @@ class AddressEditType extends AbstractType
                 'placeholder' => t('Select Postal Region'),
                 'invalid_message' => 'Select an existing postal region.',
                 'constraints' => [new Assert\NotNull()],
+                'data' => PostalRegions::Netherlands,
                 // The data mapper writes to the address before the constraint above is checked, and the setter does not
             // accept null, so an empty submission would be a TypeError rather than the violation it should be.
                 'setter' => static function (Address $address, ?PostalRegions $country): void {

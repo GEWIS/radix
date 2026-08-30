@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\Database;
 
 use App\Entity\Database\ActionLink;
+use App\Entity\Database\EmailChangeLink;
 use App\Entity\Database\Member;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\RenewalLink;
@@ -85,6 +86,31 @@ class ActionLinkRepository extends ServiceEntityRepository
                 'm',
             )
             ->where('rl.selector = :selector');
+
+        $qb->setParameter(
+            'selector',
+            $selector,
+        );
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * As {@see self::findPaymentBySelector()}, for a change of e-mail address.
+     */
+    public function findEmailChangeBySelector(string $selector): ?EmailChangeLink
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('el, m')
+            ->from(
+                EmailChangeLink::class,
+                'el',
+            )
+            ->leftJoin(
+                'el.member',
+                'm',
+            )
+            ->where('el.selector = :selector');
 
         $qb->setParameter(
             'selector',
