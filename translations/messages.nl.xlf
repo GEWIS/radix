@@ -6317,6 +6317,10 @@
         <source>No membership expires soon and nothing is missing.</source>
         <target state="translated">Er verloopt binnenkort geen lidmaatschap en er ontbreekt niets.</target>
       </trans-unit>
+      <trans-unit id="SFkO.On" resname="No memberships on record.">
+        <source>No memberships on record.</source>
+        <target state="translated">Geen lidmaatschappen geregistreerd.</target>
+      </trans-unit>
       <trans-unit id="ljwd7JS" resname="No more results">
         <source>No more results</source>
         <target state="translated">Geen resultaten meer</target>
@@ -12132,6 +12136,10 @@
       <trans-unit id="BE3ATw5" resname="Your membership will end">
         <source>Your membership will end</source>
         <target state="translated">Je lidmaatschap eindigt</target>
+      </trans-unit>
+      <trans-unit id="Q_7tkoZ" resname="Your memberships">
+        <source>Your memberships</source>
+        <target state="translated">Jouw lidmaatschappen</target>
       </trans-unit>
       <trans-unit id="Mnrixx." resname="Your message is being sent to %count% recipient(s).">
         <source>Your message is being sent to %count% recipient(s).</source>
