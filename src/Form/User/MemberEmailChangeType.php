@@ -38,7 +38,7 @@ class MemberEmailChangeType extends AbstractType
             'email',
             EmailType::class,
             [
-                'label' => t('New e-mail address'),
+                'label' => t('New email address'),
                 'help' => t('We send a message to this address to confirm that it reaches you.'),
                 'constraints' => [
                     new Assert\NotBlank(),
@@ -53,7 +53,7 @@ class MemberEmailChangeType extends AbstractType
         $builder->add(
             'submit',
             SubmitType::class,
-            ['label' => t('Change e-mail address')],
+            ['label' => t('Change email address')],
         );
     }
 

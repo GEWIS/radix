@@ -62,7 +62,7 @@ class MemberRenewalType extends AbstractType
             'email',
             EmailType::class,
             [
-                'label' => t('E-mail Address'),
+                'label' => t('Email Address'),
                 'constraints' => [new Assert\NotBlank()],
             ],
         );
@@ -76,7 +76,7 @@ class MemberRenewalType extends AbstractType
                 [
                     'widget' => 'single_text',
                     'mapped' => false,
-                    'data' => $options['renewal_link']->getNewExpiration(),
+                    'data' => $options['renewal_link']->newExpiration,
                 ],
             ),
         );

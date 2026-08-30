@@ -14,7 +14,7 @@ class AuditEmailChange extends AuditEntry
 {
     protected const bool IMMUTABLE = true;
 
-    private const string BODY_FORMAT = '<strong>Changed e-mail address</strong> of <emph>%s</emph> from '
+    private const string BODY_FORMAT = '<strong>Changed email address</strong> of <emph>%s</emph> from '
         . '<emph>%s</emph> to <emph>%s</emph>';
 
     #[Column(

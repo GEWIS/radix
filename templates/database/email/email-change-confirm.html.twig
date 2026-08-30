@@ -1,9 +1,9 @@
 {% extends 'database/email/_base.html.twig' %}
 
-{% block emailTitle %}Confirm your e-mail address{% endblock %}
+{% block emailTitle %}Confirm your email address{% endblock %}
 {% block preheader %}{% endblock %}
 {% block heading %}Membership notification{% endblock %}
-{% block subheading %}Confirm your e-mail address{% endblock %}
+{% block subheading %}Confirm your email address{% endblock %}
 {% block body %}
     <p>Dear {{ firstName }},</p>
     <p>
@@ -21,4 +21,4 @@
         <br>The Secretary of GEWIS
     </p>
 {% endblock %}
-{% block footerNote %}You receive this message because this address was entered as the new e-mail address of a GEWIS member. You can not opt-out of these emails.{% endblock %}
+{% block footerNote %}You receive this message because this address was entered as the new email address of a GEWIS member. You can not opt-out of these emails.{% endblock %}

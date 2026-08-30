@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+
+{% block page_title %}{{ 'Staying on as a graduate'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block contents %}
+    {% embed 'database/partials/join/registration-header.html.twig' with {header_title: 'You are staying on as a graduate'|trans} %}
+        {% block registration_intro %}
+            <p>
+                {{ 'Thank you %name%! Your membership continues as a graduate membership.'|trans({
+                    '%name%': member.firstName,
+                }) }}
+            </p>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

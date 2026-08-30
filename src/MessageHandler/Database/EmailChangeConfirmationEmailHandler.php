@@ -36,7 +36,7 @@ class EmailChangeConfirmationEmailHandler
                 $message->getNewEmail(),
                 $member->getFullName(),
             ),
-            'Confirm your e-mail address (' . $member->lidnr . ')',
+            'Confirm your email address (' . $member->lidnr . ')',
             'database/email/email-change-confirm.html.twig',
             [
                 'firstName' => $member->firstName,
