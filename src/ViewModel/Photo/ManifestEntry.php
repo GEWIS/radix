@@ -27,6 +27,8 @@ final readonly class ManifestEntry
         // Whether this photo is hidden from the member's own photo page (flagged only in that member's own view, so the
         // grid can grey it out).
         public bool $hidden = false,
+        // Whether this photo has been a photo of the week.
+        public bool $potw = false,
     ) {
     }
 }

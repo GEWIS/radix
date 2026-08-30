@@ -319,6 +319,45 @@ final class PhotoControllerTest extends DatabaseTestCase
         );
     }
 
+    public function testManifestFlagsThePhotosThatHaveBeenPhotoOfTheWeek(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+
+        $response = $this->controller()->manifest($this->albumId('Trip 2024'));
+
+        $entries = json_decode(
+            (string) $response->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        self::assertIsArray($entries);
+
+        $flagged = [];
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            self::assertArrayHasKey(
+                'potw',
+                $entry,
+            );
+
+            if (true !== $entry['potw']) {
+                continue;
+            }
+
+            $flagged[] = $entry['id'];
+        }
+
+        self::assertCount(
+            1,
+            $flagged,
+            'The trip album is seeded with one photo of the week.',
+        );
+    }
+
     public function testManifestIsNotFoundForAnUnpublishedAlbum(): void
     {
         $this->authenticate(
