@@ -130,6 +130,43 @@
     @include caret("down", $vertical-align: 0.125rem);
 }
 
+.navbar-gewis.navbar-rainbow {
+    --#{$prefix}navbar-bg: transparent;
+    --#{$prefix}navbar-bg-active: #{rgba($black, 0.28)};
+    --#{$prefix}navbar-bg-hover: #{rgba($black, 0.4)};
+
+    background-image: linear-gradient(
+        90deg,
+        $navbar-rainbow-stops
+    );
+    background-size: 200% 100%;
+
+    .nav-link {
+        --#{$prefix}nav-link-hover-bg: #{rgba($black, 0.4)};
+    }
+
+    .navbar-brand,
+    .nav-link,
+    .navbar-text {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        animation: navbar-rainbow-drift 30s linear infinite;
+    }
+}
+
+@keyframes navbar-rainbow-drift {
+    from {
+        background-position: 0 0;
+    }
+
+    // A whole tile, so the loop point lands where the repeat already matches.
+    to {
+        background-position: 200% 0;
+    }
+}
+
 @include color-mode(gewis-night) {
     .navbar-gewis {
         --#{$prefix}navbar-active-color: #{$nav-link-color-dark};
@@ -165,4 +202,28 @@
             --#{$prefix}offcanvas-bg: #{$navbar-bg-dark};
         }
     }
+
+    .navbar-gewis.navbar-rainbow {
+        --#{$prefix}navbar-bg: #{$navbar-bg-dark};
+        --#{$prefix}navbar-bg-active: #{rgba($black, 0.45)};
+        --#{$prefix}navbar-bg-hover: #{rgba($black, 0.6)};
+
+        background-image: linear-gradient(
+            90deg,
+            $navbar-rainbow-neon-stops
+        );
+        box-shadow:
+            0 0.5rem 1rem rgba(0, 0, 0, 0.5),
+            0 0 1.25rem rgba(0, 229, 255, 0.25);
+
+        .nav-link {
+            --#{$prefix}nav-link-hover-bg: #{rgba($black, 0.6)};
+        }
+
+        .navbar-brand {
+            --#{$prefix}navbar-brand-color: #{$nav-link-color};
+            --#{$prefix}navbar-brand-hover-color: #{$nav-link-color};
+        }
+    }
 }
+

@@ -1,7 +1,10 @@
+$potw-foil-gold: #ffc107;
+
 // The Select toggle adds `is-selecting` to the grid, revealing a corner check on each tile; a selected tile also
 // gets a brand tint.
 .photo-masonry__check,
-.photo-masonry__hidden {
+.photo-masonry__hidden,
+.photo-masonry__potw {
     position: absolute;
     color: #fff;
     line-height: 1;
@@ -89,6 +92,61 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+    }
+}
+
+.photo-masonry__item.is-potw {
+    box-shadow: 0 0 0.75rem rgba($potw-foil-gold, 0.4);
+
+    // Positioned, so that the thumbnail does not paint over it the way it would over an inset shadow.
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border-radius: inherit;
+        box-shadow: inset 0 0 0 2px rgba($potw-foil-gold, 0.9);
+    }
+}
+
+.photo-masonry__foil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        115deg,
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 64, 160, 0.26) 45%,
+        rgba($potw-foil-gold, 0.34) 49%,
+        rgba(64, 255, 214, 0.26) 53%,
+        rgba(140, 96, 255, 0.26) 57%,
+        rgba(255, 255, 255, 0) 62%
+    );
+    background-size: 300% 100%;
+    background-position: 0 0;
+    mix-blend-mode: screen;
+
+    @media (prefers-reduced-motion: no-preference) {
+        animation: photo-foil-sweep 5s ease-in-out infinite;
+    }
+}
+
+.photo-masonry__potw {
+    bottom: 0.4rem;
+    left: 0.4rem;
+    color: $potw-foil-gold;
+    font-size: 1.1rem;
+}
+
+// The band is off the tile at both ends of the sweep, and the held first half is the pause between passes.
+@keyframes photo-foil-sweep {
+    0%,
+    55% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 100% 0;
     }
 }
 
@@ -198,7 +256,7 @@
     gap: 0.35rem;
     padding: 0.2rem 0.7rem;
     color: #000;
-    background: #ffc107;
+    background: $potw-foil-gold;
     border-radius: 1rem;
     font-size: 0.8rem;
     font-weight: 600;
@@ -429,7 +487,9 @@ a.pswp__photo-tag-name:hover {
     left: 0;
     right: 0;
     z-index: 2;
-    overflow: hidden;
+    // Capped so a search with many hits cannot run off the top of the viewport.
+    max-height: 14rem;
+    overflow-y: auto;
     background: #1b1b20;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.6rem;
@@ -453,7 +513,8 @@ a.pswp__photo-tag-name:hover {
     text-align: left;
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &.is-active {
         background: rgba(255, 255, 255, 0.08);
     }
 }

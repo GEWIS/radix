@@ -39,7 +39,7 @@
 {# Asked for rather than assumed, so an account class that answers to neither accessor cannot fatal the navigation. #}
 {% set user_type = null !== app.user and app.user.getUserType is defined ? app.user.getUserType : null %}
 
-<nav class="navbar navbar-expand navbar-gewis rainbow">
+<nav class="navbar navbar-expand navbar-gewis{{ is_granted('ROLE_BOARD') and not cosmetics_disabled() ? ' navbar-rainbow' : '' }}">
     <div class="container">
         <a href="{{ path('frontpage/index') }}" class="navbar-brand">
             <div class="gi gewis-base"></div>

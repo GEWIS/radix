@@ -12,6 +12,7 @@ interface ManifestEntry {
     downloadUrl: string;
     albumUrl: string | null;
     hidden: boolean;
+    potw: boolean;
 }
 
 interface SlideData {
@@ -333,6 +334,10 @@ export default class extends Controller<HTMLElement> {
         image.src = slot.entry.thumbUrl;
 
         link.append(image);
+        if (slot.entry.potw) {
+            this.decoratePotw(link);
+        }
+
         if (this.selectableValue) {
             this.decorateSelectable(link, slot.entry);
         }
@@ -340,6 +345,18 @@ export default class extends Controller<HTMLElement> {
         slot.element = link;
         this.position(slot);
         this.gridTarget.append(link);
+    }
+
+    private decoratePotw(link: HTMLElement): void {
+        link.classList.add('is-potw');
+
+        const foil = document.createElement('span');
+        foil.className = 'photo-masonry__foil';
+        link.append(foil);
+
+        const badge = this.overlay('photo-masonry__potw', 'star');
+        badge.title = this.labelsValue.photoOfTheWeek ?? '';
+        link.append(badge);
     }
 
     private decorateSelectable(

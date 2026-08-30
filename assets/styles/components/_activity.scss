@@ -56,14 +56,6 @@
 }
 
 @include color-mode(gewis-night) {
-    .panel.panel-surface {
-        --#{$prefix}panel-bg: var(--#{$prefix}body-bg);
-
-        &:hover {
-            --#{$prefix}panel-bg: var(--#{$prefix}secondary-bg);
-        }
-    }
-
     .activity-date-badge {
         background-color: #{$activity-date-badge-bg-dark};
     }

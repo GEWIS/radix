@@ -119,6 +119,8 @@ export class ViewerInteractions {
     private bodyTab: HTMLElement | null = null;
     private searchInput: HTMLInputElement | null = null;
     private suggestions: HTMLElement | null = null;
+    private suggestionRows: HTMLButtonElement[] = [];
+    private activeSuggestion = -1;
     private pendingRow: HTMLElement | null = null;
     // The candidate picked from the suggestions but not yet committed (awaiting a Tag or Place action).
     private activeType: 'member' | 'organ' = 'member';
@@ -138,6 +140,8 @@ export class ViewerInteractions {
     private placing = false;
     private pendingPosition: { x: number; y: number } | null = null;
     private placingOverlay: HTMLElement | null = null;
+    private placingCursor: HTMLElement | null = null;
+    private placingPoint: { x: number; y: number } | null = null;
 
     constructor(
         private readonly lightbox: any,
@@ -149,21 +153,55 @@ export class ViewerInteractions {
             this.tagsExpanded = false;
             void this.refresh();
         });
-        // While the member is typing in the tag search, keep PhotoSwipe from swallowing the keys it acts on: 'z' toggles
-        // zoom, and the arrow keys change slide. Both are needed for the text field instead (arrows only once it has a
-        // value, so an empty field still navigates).
+        // PhotoSwipe acts on 'z' and on every arrow. It stands down on a keydown its own hook prevented, which is how
+        // the tag panel claims the ones it needs.
         this.lightbox.on('keydown', (event: any): void => {
-            const search = this.searchInput;
-            if (null === search || document.activeElement !== search) {
+            const key = event.originalEvent.key;
+
+            if (this.placing) {
+                if ('Enter' === key || 'Escape' === key || key.startsWith('Arrow')) {
+                    event.preventDefault();
+                }
+
                 return;
             }
 
-            const key = event.originalEvent.key;
-            if (
-                'z' === key
-                || ('' !== search.value && ('ArrowLeft' === key || 'ArrowRight' === key))
-            ) {
+            const focused = document.activeElement;
+
+            if (focused === this.memberTab || focused === this.bodyTab) {
+                if ('ArrowLeft' === key || 'ArrowRight' === key) {
+                    event.preventDefault();
+                }
+
+                return;
+            }
+
+            const search = this.searchInput;
+            if (null !== search && focused === search) {
+                // Left and right only once the field has a value, so an empty one still navigates the album.
+                if (
+                    'z' === key
+                    || 'Enter' === key
+                    || 'Escape' === key
+                    || 'ArrowUp' === key
+                    || 'ArrowDown' === key
+                    || ('' !== search.value && ('ArrowLeft' === key || 'ArrowRight' === key))
+                ) {
+                    event.preventDefault();
+                }
+
+                return;
+            }
+
+            const original = event.originalEvent as KeyboardEvent;
+            if (original.ctrlKey || original.altKey || original.metaKey || original.shiftKey) {
+                return;
+            }
+
+            if (this.runShortcut(key)) {
                 event.preventDefault();
+                // The DOM event as well as PhotoSwipe's, or the letter that focused the tag field is typed into it.
+                original.preventDefault();
             }
         });
         this.lightbox.on('close', (): void => {
@@ -174,6 +212,44 @@ export class ViewerInteractions {
             this.markersLayer?.remove();
             this.markersLayer = null;
         });
+    }
+
+    /**
+     * One letter each for what the toolbar offers, so a photo can be worked through without reaching for the mouse.
+     * A button that is hidden or disabled has nothing to do, and says so by not answering.
+     */
+    private runShortcut(key: string): boolean {
+        if ('t' === key) {
+            if (null === this.searchInput || true === this.form?.hidden) {
+                return false;
+            }
+
+            this.searchInput.focus();
+
+            return true;
+        }
+
+        const names: Record<string, string> = {
+            v: 'vote-button',
+            i: 'info-button',
+            s: 'share-button',
+            d: 'download-button',
+            o: 'album-button',
+        };
+
+        const name = names[key];
+        if (undefined === name) {
+            return false;
+        }
+
+        const button = this.lightbox.pswp?.element?.querySelector(`.pswp__button--${name}`);
+        if (!(button instanceof HTMLElement) || button.hidden || button.hasAttribute('disabled')) {
+            return false;
+        }
+
+        button.click();
+
+        return true;
     }
 
     private label(key: string): string {
@@ -347,9 +423,12 @@ export class ViewerInteractions {
 
         const toggle = document.createElement('div');
         toggle.className = 'pswp__photo-tag-toggle';
+        toggle.setAttribute('role', 'tablist');
         this.memberTab = this.typeTab('member', this.label('member'));
         this.bodyTab = this.typeTab('organ', this.label('body'));
         toggle.append(this.memberTab, this.bodyTab);
+        toggle.addEventListener('keydown', (event: KeyboardEvent): void => this.onToggleKeydown(event));
+        this.selectType(this.activeType, false);
 
         const searchWrap = document.createElement('div');
         searchWrap.className = 'pswp__photo-tag-searchwrap';
@@ -359,9 +438,16 @@ export class ViewerInteractions {
         this.searchInput.type = 'search';
         this.searchInput.className = 'form-control form-control-sm pswp__photo-tag-search';
         this.searchInput.placeholder = this.label('searchMembers');
+        this.searchInput.setAttribute('role', 'combobox');
+        this.searchInput.setAttribute('aria-autocomplete', 'list');
+        this.searchInput.setAttribute('aria-expanded', 'false');
+        this.searchInput.setAttribute('aria-controls', 'pswp-tag-suggestions');
         this.searchInput.addEventListener('input', (): void => void this.search());
+        this.searchInput.addEventListener('keydown', (event: KeyboardEvent): void => this.onSearchKeydown(event));
         this.suggestions = document.createElement('div');
         this.suggestions.className = 'pswp__photo-tag-suggestions';
+        this.suggestions.id = 'pswp-tag-suggestions';
+        this.suggestions.setAttribute('role', 'listbox');
         searchWrap.append(searchIcon, this.searchInput, this.suggestions);
 
         controls.append(toggle, searchWrap);
@@ -384,24 +470,46 @@ export class ViewerInteractions {
         tab.type = 'button';
         tab.className = 'pswp__photo-tag-toggle-btn';
         tab.textContent = label;
-        tab.classList.toggle('active', this.activeType === type);
+        tab.setAttribute('role', 'tab');
         tab.addEventListener('click', (): void => this.selectType(type));
 
         return tab;
     }
 
-    private selectType(type: 'member' | 'organ'): void {
+    private onToggleKeydown(event: KeyboardEvent): void {
+        if ('ArrowLeft' !== event.key && 'ArrowRight' !== event.key) {
+            return;
+        }
+
+        event.preventDefault();
+        const type = 'member' === this.activeType ? 'organ' : 'member';
+        this.selectType(type, false);
+        ('member' === type ? this.memberTab : this.bodyTab)?.focus();
+    }
+
+    private selectType(
+        type: 'member' | 'organ',
+        focusSearch = true,
+    ): void {
         this.activeType = type;
-        this.memberTab?.classList.toggle('active', 'member' === type);
-        this.bodyTab?.classList.toggle('active', 'organ' === type);
+
+        for (const [tab, tabType] of [[this.memberTab, 'member'], [this.bodyTab, 'organ']] as const) {
+            const active = tabType === type;
+            tab?.classList.toggle('active', active);
+            tab?.setAttribute('aria-selected', active ? 'true' : 'false');
+            // Roving, so Shift+Tab out of the field stops at the selected tab rather than at both.
+            tab?.setAttribute('tabindex', active ? '0' : '-1');
+        }
 
         if (null !== this.searchInput) {
             this.searchInput.value = '';
             this.searchInput.placeholder = this.label('member' === type ? 'searchMembers' : 'searchBodies');
-            this.searchInput.focus();
+            if (focusSearch) {
+                this.searchInput.focus();
+            }
         }
 
-        this.suggestions?.replaceChildren();
+        this.clearSuggestions();
         this.clearPending();
         // Bodies are filtered client-side, so make sure they are loaded before the first search.
         if ('organ' === type) {
@@ -428,7 +536,7 @@ export class ViewerInteractions {
             this.searchInput.value = '';
         }
 
-        this.suggestions?.replaceChildren();
+        this.clearSuggestions();
 
         // Fetching from the server (not a cached or prefetched slide) shows a brief "loading" message instead of the
         // previous photo's tags or an empty state; stale markers are cleared until the new ones render.
@@ -709,7 +817,7 @@ export class ViewerInteractions {
         this.clearPending();
         const type = this.activeType;
         const query = this.searchInput.value.trim();
-        this.suggestions.replaceChildren();
+        this.clearSuggestions();
         if (query.length < 2) {
             return;
         }
@@ -771,10 +879,12 @@ export class ViewerInteractions {
             return;
         }
 
-        this.suggestions.replaceChildren(...candidates.map((candidate) => {
+        this.suggestionRows = candidates.map((candidate, index) => {
             const row = document.createElement('button');
             row.type = 'button';
             row.className = 'pswp__photo-tag-suggestion';
+            row.id = `pswp-tag-suggestion-${index}`;
+            row.setAttribute('role', 'option');
             row.title = candidate.title ?? '';
             row.append(
                 this.typeIcon(candidate.type),
@@ -783,12 +893,108 @@ export class ViewerInteractions {
             row.addEventListener('click', (): void => this.setPending(candidate));
 
             return row;
-        }));
+        });
+
+        this.suggestions.replaceChildren(...this.suggestionRows);
+        this.searchInput?.setAttribute('aria-expanded', this.suggestionRows.length > 0 ? 'true' : 'false');
+        this.highlightSuggestion(0 === this.suggestionRows.length ? -1 : 0);
+    }
+
+    private clearSuggestions(): void {
+        this.suggestionRows = [];
+        this.activeSuggestion = -1;
+        this.suggestions?.replaceChildren();
+        this.searchInput?.setAttribute('aria-expanded', 'false');
+        this.searchInput?.removeAttribute('aria-activedescendant');
+    }
+
+    private highlightSuggestion(index: number): void {
+        this.activeSuggestion = index;
+
+        this.suggestionRows.forEach((row, position) => {
+            const active = position === index;
+            row.classList.toggle('is-active', active);
+            row.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+
+        const active = this.suggestionRows[index];
+        if (undefined === active) {
+            this.searchInput?.removeAttribute('aria-activedescendant');
+
+            return;
+        }
+
+        this.searchInput?.setAttribute('aria-activedescendant', active.id);
+        active.scrollIntoView({ block: 'nearest' });
+    }
+
+    private onSearchKeydown(event: KeyboardEvent): void {
+        // The overlay is up and takes the arrows and Enter for itself, even though the field still holds focus.
+        if (this.placing) {
+            return;
+        }
+
+        const count = this.suggestionRows.length;
+
+        // Escape backs out one step at a time and never closes the viewer, which is what it would otherwise do while
+        // the field has focus.
+        if ('Escape' === event.key) {
+            event.preventDefault();
+            if (count > 0) {
+                this.clearSuggestions();
+            } else if (null !== this.pending) {
+                this.clearPending();
+            } else {
+                this.searchInput?.blur();
+            }
+
+            return;
+        }
+
+        if ('ArrowDown' === event.key || 'ArrowUp' === event.key) {
+            if (0 === count) {
+                return;
+            }
+
+            event.preventDefault();
+            const step = 'ArrowDown' === event.key ? 1 : -1;
+            this.highlightSuggestion((this.activeSuggestion + step + count) % count);
+
+            return;
+        }
+
+        if ('Enter' !== event.key) {
+            return;
+        }
+
+        const active = this.suggestionRows[this.activeSuggestion];
+        if (undefined !== active) {
+            event.preventDefault();
+            active.click();
+            if (event.shiftKey) {
+                this.placePending();
+            }
+
+            return;
+        }
+
+        if (null === this.pending) {
+            return;
+        }
+
+        event.preventDefault();
+        if (event.shiftKey) {
+            this.placePending();
+
+            return;
+        }
+
+        void this.tagPending();
     }
 
     private setPending(candidate: Candidate): void {
         this.pending = candidate;
-        this.suggestions?.replaceChildren();
+        this.clearSuggestions();
         if (null !== this.searchInput) {
             this.searchInput.value = '';
         }
@@ -835,6 +1041,7 @@ export class ViewerInteractions {
         place.className = 'pswp__photo-tag-action pswp__photo-tag-action--place';
         place.innerHTML = '<span class="fa-solid fa-crosshairs"></span>';
         place.append(document.createTextNode(this.label('placeOnPhoto')));
+        place.title = this.label('placeOnPhotoTitle');
         place.addEventListener('click', (): void => this.placePending());
 
         this.pendingRow.title = this.pending.title ?? '';
@@ -1122,7 +1329,13 @@ export class ViewerInteractions {
             });
 
             const hintText = document.createElement('span');
-            hintText.textContent = this.label('placeHint');
+            Object.assign(hintText.style, { display: 'flex', flexDirection: 'column', gap: '0.1rem' });
+            const hintClick = document.createElement('span');
+            hintClick.textContent = this.label('placeHint');
+            const hintKeys = document.createElement('span');
+            hintKeys.textContent = this.label('placeKeyHint');
+            Object.assign(hintKeys.style, { fontSize: '0.8em', opacity: '0.75' });
+            hintText.append(hintClick, hintKeys);
 
             const cancel = document.createElement('button');
             cancel.type = 'button';
@@ -1141,8 +1354,24 @@ export class ViewerInteractions {
                 this.stopPlacing();
             });
 
+            this.placingCursor = document.createElement('span');
+            this.placingCursor.className = 'pswp__photo-place-cursor';
+            Object.assign(this.placingCursor.style, {
+                position: 'fixed',
+                width: '18px',
+                height: '18px',
+                marginLeft: '-9px',
+                marginTop: '-9px',
+                borderRadius: '50%',
+                border: '2px solid #fff',
+                boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.45)',
+                background: 'rgba(255, 255, 255, 0.5)',
+                pointerEvents: 'none',
+            });
+            this.placingCursor.hidden = true;
+
             hint.append(hintText, cancel);
-            this.placingOverlay.append(hint);
+            this.placingOverlay.append(hint, this.placingCursor);
 
             // pointerdown/up are swallowed too, so a drag that starts on the overlay never reaches a gesture handler.
             const swallow = (event: Event): void => event.stopPropagation();
@@ -1157,6 +1386,7 @@ export class ViewerInteractions {
 
     private stopPlacing(): void {
         this.placing = false;
+        this.placingPoint = null;
         this.placingOverlay?.remove();
         document.removeEventListener('keydown', this.onPlacingKeydown);
     }
@@ -1165,8 +1395,80 @@ export class ViewerInteractions {
         if ('Escape' === event.key) {
             event.stopPropagation();
             this.stopPlacing();
+
+            return;
         }
+
+        if ('Enter' === event.key) {
+            if (null === this.placingPoint) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            this.commitPlacement(this.placingPoint);
+
+            return;
+        }
+
+        const step = this.placingStep(event.key);
+        if (null === step) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        const from = this.placingPoint ?? { x: 0.5, y: 0.5 };
+        const distance = event.shiftKey ? 0.05 : 0.005;
+        this.movePlacingCursor({
+            x: this.clamp(from.x + (step.x * distance)),
+            y: this.clamp(from.y + (step.y * distance)),
+        });
     };
+
+    private placingStep(key: string): { x: number; y: number } | null {
+        switch (key) {
+            case 'ArrowLeft':
+                return { x: -1, y: 0 };
+            case 'ArrowRight':
+                return { x: 1, y: 0 };
+            case 'ArrowUp':
+                return { x: 0, y: -1 };
+            case 'ArrowDown':
+                return { x: 0, y: 1 };
+            default:
+                return null;
+        }
+    }
+
+    private movePlacingCursor(point: { x: number; y: number }): void {
+        this.placingPoint = point;
+
+        const rect = this.imageRect();
+        if (null === rect || null === this.placingCursor) {
+            return;
+        }
+
+        this.placingCursor.hidden = false;
+        this.placingCursor.style.left = `${rect.left + (point.x * rect.width)}px`;
+        this.placingCursor.style.top = `${rect.top + (point.y * rect.height)}px`;
+    }
+
+    private commitPlacement(point: { x: number; y: number }): void {
+        if (null === this.pending) {
+            this.stopPlacing();
+
+            return;
+        }
+
+        this.pendingPosition = point;
+        this.stopPlacing();
+
+        const { type, id } = this.pending;
+        this.pending = null;
+        this.renderPending();
+        void this.addTag(type, id);
+    }
 
     private onPlaceClick(event: MouseEvent): void {
         event.preventDefault();
@@ -1180,17 +1482,10 @@ export class ViewerInteractions {
         }
 
         // Normalise the click against the on-screen image rect, which reflects the current zoom and pan.
-        this.pendingPosition = {
+        this.commitPlacement({
             x: this.clamp((event.clientX - rect.left) / rect.width),
             y: this.clamp((event.clientY - rect.top) / rect.height),
-        };
-        this.stopPlacing();
-
-        // addTag reads pendingPosition, so this pins the pending pick to the placed point.
-        const { type, id } = this.pending;
-        this.pending = null;
-        this.renderPending();
-        void this.addTag(type, id);
+        });
     }
 
     private clamp(value: number): number {

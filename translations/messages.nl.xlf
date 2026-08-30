@@ -413,6 +413,10 @@
         <source>%filename% is removed without being filed. This cannot be undone.</source>
         <target state="translated">%filename% wordt verwijderd zonder te worden opgeslagen. Dit kan niet ongedaan worden gemaakt.</target>
       </trans-unit>
+      <trans-unit id="RD6RDKS" resname="%from% until %until%">
+        <source>%from% until %until%</source>
+        <target state="translated">%from% tot %until%</target>
+      </trans-unit>
       <trans-unit id="4O9JbHV" resname="%label% disappears from the label picker. Vacancies that already carry it keep it.">
         <source>%label% disappears from the label picker. Vacancies that already carry it keep it.</source>
         <target state="translated">%label% verdwijnt uit de labelkiezer. Vacatures die het label al hebben, behouden het.</target>
@@ -2532,6 +2536,10 @@
       <trans-unit id="2e2kzco" resname="Currently a member of">
         <source>Currently a member of</source>
         <target>Momenteel lid van</target>
+      </trans-unit>
+      <trans-unit id="ENNAt59" resname="Currently on the board as">
+        <source>Currently on the board as</source>
+        <target state="translated">Momenteel in het bestuur als</target>
       </trans-unit>
       <trans-unit id="CLV479f" resname="Currently on the career page">
         <source>Currently on the career page</source>
@@ -6309,6 +6317,10 @@
         <source>Or enter this secret in your app manually:</source>
         <target state="translated">Of voer deze geheime sleutel handmatig in je app in:</target>
       </trans-unit>
+      <trans-unit id="gWYtvZA" resname="Or use the arrow keys and press Enter, hold Shift to move further.">
+        <source>Or use the arrow keys and press Enter, hold Shift to move further.</source>
+        <target state="translated">Of gebruik de pijltjestoetsen en druk op Enter, houd Shift ingedrukt om verder te bewegen.</target>
+      </trans-unit>
       <trans-unit id="V2sSnK9" resname="Order">
         <source>Order</source>
         <target state="translated">Volgorde</target>
@@ -6661,6 +6673,10 @@
         <source>Place on photo</source>
         <target state="translated">Plaats op foto</target>
       </trans-unit>
+      <trans-unit id="0maBUrq" resname="Place on the photo, or press Shift and Enter">
+        <source>Place on the photo, or press Shift and Enter</source>
+        <target state="translated">Plaats op de foto, of druk op Shift en Enter</target>
+      </trans-unit>
       <trans-unit id="gX0CV88" resname="Placed on the photo">
         <source>Placed on the photo</source>
         <target>Op de foto geplaatst</target>
@@ -6824,6 +6840,10 @@
       <trans-unit id="PmlIDyq" resname="Previously installed">
         <source>Previously installed</source>
         <target state="translated">Eerder geïnstalleerd</target>
+      </trans-unit>
+      <trans-unit id="9k8vMU6" resname="Previously on the board as">
+        <source>Previously on the board as</source>
+        <target state="translated">Eerder in het bestuur als</target>
       </trans-unit>
       <trans-unit id="qsr94el" resname="Primary contact">
         <source>Primary contact</source>
@@ -8148,6 +8168,10 @@
       <trans-unit id="k4clD4v" resname="Similar courses">
         <source>Similar courses</source>
         <target state="translated">Vergelijkbare vakken</target>
+      </trans-unit>
+      <trans-unit id="oF5p4V7" resname="Since %date%">
+        <source>Since %date%</source>
+        <target state="translated">Sinds %date%</target>
       </trans-unit>
       <trans-unit id="1hOWNds" resname="Since 2024 these can only be changed in the code.">
         <source>Since 2024 these can only be changed in the code.</source>

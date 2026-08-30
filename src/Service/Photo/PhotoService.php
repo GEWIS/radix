@@ -143,6 +143,7 @@ final readonly class PhotoService
             ),
             albumUrl: $albumUrl,
             hidden: $hidden,
+            potw: null !== $photo->getWeeklyPhoto(),
         );
     }
 }

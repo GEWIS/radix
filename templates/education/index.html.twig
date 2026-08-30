@@ -162,9 +162,9 @@
                 <div class="panel-body">
                     <ul class="list-unstyled mb-0">
                         {% for link in [
-                            {'icon': 'fa-book-open', 'url': 'https://gewis.nl/boeken', 'title': 'Books via GEWIS'|trans, 'meta': 'Order your course books at a discount. Deadlines are mailed each quartile.'|trans},
-                            {'icon': 'fa-user-graduate', 'url': 'https://gew.is/requesttutor', 'title': 'Request tutoring'|trans, 'meta': 'We match you with a member who already passed the course.'|trans},
-                            {'icon': 'fa-chalkboard-user', 'url': 'https://gew.is/becometutor', 'title': 'Become a tutor'|trans, 'meta': 'A few hours a week, on your own schedule.'|trans},
+                            {'icon': 'fa-book-open', 'url': page_path(category: 'boeken', categoryEn: 'books'), 'title': 'Books via GEWIS'|trans, 'meta': 'Order your course books at a discount. Deadlines are mailed each quartile.'|trans},
+                            {'icon': 'fa-user-graduate', 'url': 'https://gew.is/requesttutor', 'newTab': true, 'title': 'Request tutoring'|trans, 'meta': 'We match you with a member who already passed the course.'|trans},
+                            {'icon': 'fa-chalkboard-user', 'url': 'https://gew.is/becometutor', 'newTab': true, 'title': 'Become a tutor'|trans, 'meta': 'A few hours a week, on your own schedule.'|trans},
                         ] %}
                             <li class="d-flex gap-3 {{ loop.last ? '' : 'mb-3' }}">
                                 <span class="education-doc-icon" aria-hidden="true">
@@ -172,7 +172,7 @@
                                 </span>
                                 <span class="overflow-hidden">
                                     <a class="d-block fw-semibold" href="{{ link.url }}"
-                                       target="_blank" rel="noopener noreferrer">{{ link.title }}</a>
+                                       {% if link.newTab|default(false) %}target="_blank"{% endif %}>{{ link.title }}</a>
                                     <span class="d-block small text-body-secondary">{{ link.meta }}</span>
                                 </span>
                             </li>

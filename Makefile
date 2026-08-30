@@ -45,7 +45,11 @@ help: ## Outputs this help screen
 # succeed. Listmonk identifies a list by number rather than by name, so the ids are pinned to match the fixtures.
 SEEDED_LISTS := announcements activities vacancies
 
-seed: ## Load the fixtures (ledger, replay, web) and prepare Mailman and Listmonk (run after `make start`)
+seed: ## Reset both development databases: drop the schemas, migrate them back up, then load the fixtures and prepare Mailman and Listmonk (run after `make start`)
+	@# Dropped rather than only purged, so migrations a branch of its own added leave nothing behind.
+	@$(SYMFONY) doctrine:schema:drop --force --full-database
+	@$(SYMFONY) doctrine:schema:drop --force --full-database --em=web
+	@$(MAKE) migrate
 	@# One command for all of it: the ledger, then the replay into the projection, then the web database whose
 	@# fixtures hang off what that replay produced. The projection is never seeded directly, so there is nothing to
 	@# regenerate afterwards.

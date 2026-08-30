@@ -1,6 +1,5 @@
 .option-calendar {
-    // Not `--bs-tertiary-bg`: the night theme leaves it at its light value and it would paint the day white. A tint
-    // of the body colour darkens the day theme and lightens the night one on its own.
+    // A tint rather than `--bs-tertiary-bg`, which is one flat token where the grid needs two steps of shade.
     --option-calendar-shade-weak: rgba(var(--bs-body-color-rgb), 0.04);
     --option-calendar-shade: rgba(var(--bs-body-color-rgb), 0.08);
 
