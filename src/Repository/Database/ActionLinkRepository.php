@@ -26,7 +26,10 @@ class ActionLinkRepository extends ServiceEntityRepository
         );
     }
 
-    public function findPaymentByToken(string $token): ?PaymentLink
+    /**
+     * A selector is half a token: the caller checks the verifier against {@see ActionLink::tokenMatches()}.
+     */
+    public function findPaymentBySelector(string $selector): ?PaymentLink
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('pl, m')
@@ -38,11 +41,11 @@ class ActionLinkRepository extends ServiceEntityRepository
                 'pl.prospectiveMember',
                 'm',
             )
-            ->where('pl.token = :token');
+            ->where('pl.selector = :selector');
 
         $qb->setParameter(
-            ':token',
-            $token,
+            'selector',
+            $selector,
         );
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -66,7 +69,10 @@ class ActionLinkRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    public function findRenewalByToken(string $token): ?RenewalLink
+    /**
+     * As {@see self::findPaymentBySelector()}, for a renewal link.
+     */
+    public function findRenewalBySelector(string $selector): ?RenewalLink
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('rl, m')
@@ -78,14 +84,19 @@ class ActionLinkRepository extends ServiceEntityRepository
                 'rl.member',
                 'm',
             )
-            ->where('rl.token = :token');
+            ->where('rl.selector = :selector');
 
         $qb->setParameter(
-            ':token',
-            $token,
+            'selector',
+            $selector,
         );
 
         return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function findByTempHash(string $tempHash): ?ActionLink
+    {
+        return $this->findOneBy(['tempHash' => $tempHash]);
     }
 
     /**

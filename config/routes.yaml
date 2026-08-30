@@ -158,7 +158,7 @@ join_checkout_restart_legacy_short:
     defaults:
         route: join_checkout_restart
     requirements:
-        token: '[a-zA-Z0-9_\-\+]+'
+        token: '[0-9a-f]{32}\.[0-9a-f]{96}'
     methods: [GET]
 
 join_checkout_restart_legacy:
@@ -167,7 +167,7 @@ join_checkout_restart_legacy:
     defaults:
         route: join_checkout_restart
     requirements:
-        token: '[a-zA-Z0-9_\-\+]+'
+        token: '[0-9a-f]{32}\.[0-9a-f]{96}'
     methods: [GET]
 
 # The rest of the anonymous flows. Each is a page somebody reads, so each carries its language; the addresses they
@@ -195,14 +195,26 @@ join_subscribe_legacy:
         route: join_index
     methods: [GET]
 
-# The renewal form, which is reached from a link in an e-mail. That e-mail is written in English and says so in its
-# address; a link sent before the language moved into the path is answered below.
-join_renew:
+# Where the link in the renewal e-mail points. It hands the token in for a hash that is good for one use, and the form
+# answers at the address below. That e-mail is written in English and says so in its address; a link sent before the
+# language moved into the path is answered below as well.
+join_renew_claim:
     path: '/{_locale}/renew/{token}'
+    controller: App\Controller\Database\ProspectiveMemberController::renewClaim
+    requirements:
+        _locale: '%app.locales%'
+        token: '[0-9a-f]{32}\.[0-9a-f]{96}'
+    defaults:
+        _locale: '%kernel.default_locale%'
+    methods: [GET]
+
+# The renewal form itself, which carries nothing in its address: which renewal it is about is in the session, put
+# there by the address above. The form submits to this same address, which is what makes that session cookie arrive.
+join_renew:
+    path: '/{_locale}/renew'
     controller: App\Controller\Database\ProspectiveMemberController::renew
     requirements:
         _locale: '%app.locales%'
-        token: '[a-zA-Z0-9_\-\+]+'
     defaults:
         _locale: '%kernel.default_locale%'
     methods: [GET, POST]
@@ -212,18 +224,18 @@ join_renew_legacy_short:
     path: /renew/{token}
     controller: App\Controller\Application\LocaleRedirectController
     defaults:
-        route: join_renew
+        route: join_renew_claim
     requirements:
-        token: '[a-zA-Z0-9_\-\+]+'
+        token: '[0-9a-f]{32}\.[0-9a-f]{96}'
     methods: [GET]
 
 join_renew_legacy:
     path: /member/renew/{token}
     controller: App\Controller\Application\LocaleRedirectController
     defaults:
-        route: join_renew
+        route: join_renew_claim
     requirements:
-        token: '[a-zA-Z0-9_\-\+]+'
+        token: '[0-9a-f]{32}\.[0-9a-f]{96}'
     methods: [GET]
 
 # Where a member consents to an external application signing them in. Declared above page_route, which would

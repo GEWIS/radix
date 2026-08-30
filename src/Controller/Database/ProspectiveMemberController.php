@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Controller\Database;
 
 use App\Controller\Application\HandlesFormFlowTrait;
+use App\Controller\Application\NoLeakHeadersTrait;
 use App\Entity\Database\Enums\MembershipTypes;
+use App\Entity\Database\RenewalLink;
 use App\Form\Database\MemberApproveType;
 use App\Form\Database\MemberRenewalType;
 use App\Form\Database\Registration\RegistrationData;
 use App\Form\Database\Registration\RegistrationFlowType;
+use App\Repository\Database\RenewalLinkRepository;
 use App\Security\User\SudoVoter;
 use App\Service\Application\LocalePreference;
+use App\Service\Database\ActionLinkService;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\ProspectiveMemberRemoval;
 use App\Service\Database\RegistrationFailure;
@@ -27,6 +31,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
+use function is_int;
 
 /**
  * Everyone who has registered but whose membership the secretary has not confirmed yet, from the public sign-up form
@@ -43,12 +48,17 @@ use function assert;
 final class ProspectiveMemberController extends AbstractController
 {
     use HandlesFormFlowTrait;
+    use NoLeakHeadersTrait;
+
+    private const string RENEWAL_SESSION_KEY = '_renewal_link_id';
 
     public function __construct(
         private readonly MemberService $memberService,
         private readonly RegistrationService $registrationService,
         private readonly TranslatorInterface $translator,
         private readonly LocalePreference $localePreference,
+        private readonly ActionLinkService $actionLinkService,
+        private readonly RenewalLinkRepository $renewalLinkRepository,
     ) {
     }
 
@@ -139,22 +149,72 @@ final class ProspectiveMemberController extends AbstractController
     }
 
     /**
-     * Graduate renewal, reached from the link in the renewal e-mail.
+     * Graduate renewal, stage one: the address the link in the renewal e-mail points at.
      *
      * Served from the join host and open to anyone holding the token: whoever follows the link is not signed in, and
-     * the token is what says who they are. A token that has been used or has expired is not an error — the page says
-     * the link no longer works rather than pretending it does.
+     * the token is what says who they are. Which is exactly why the token does not stay in the address of the page
+     * that renews: the click comes from a mailbox on another origin, so it would end up in the referrer of everything
+     * that page loads, and the session cookie is not sent on it at all. The token is exchanged for a hash that is
+     * good for one use and three minutes, and the form answers behind that.
      *
-     * `join_renew` is declared in config/routes.yaml, along with the two addresses this used to answer at, which
-     * redirect here because a renewal e-mail sent months ago links to one of them.
+     * A token that has been used or has expired is not an error -- the page says the link no longer works rather than
+     * pretending it does.
+     *
+     * `join_renew_claim` is declared in config/routes.yaml, along with the two addresses this used to answer at,
+     * which redirect here because a renewal e-mail sent months ago links to one of them.
      */
-    public function renew(
-        Request $request,
-        string $token,
-    ): Response {
-        $renewalLink = $this->memberService->getRenewalLink($token);
+    public function renewClaim(string $token): Response
+    {
+        $renewalLink = $this->actionLinkService->resolveRenewal($token);
 
         if (null === $renewalLink) {
+            return $this->render('database/join/renew-unavailable.html.twig');
+        }
+
+        return $this->withNoLeakHeaders($this->redirectToRoute(
+            'join_renew',
+            ['th' => $this->actionLinkService->claim($renewalLink)],
+        ));
+    }
+
+    public function renew(Request $request): Response
+    {
+        $session = $request->getSession();
+
+        if (null !== ($tempHash = $request->query->get('th'))) {
+            $renewalLink = $this->actionLinkService->findByTempHash((string) $tempHash);
+
+            if (!$renewalLink instanceof RenewalLink) {
+                return $this->render('database/join/renew-unavailable.html.twig');
+            }
+
+            // Single-use: spent as the form is handed over rather than once it is submitted.
+            $this->actionLinkService->consumeTempHash($renewalLink);
+
+            $session->set(
+                self::RENEWAL_SESSION_KEY,
+                $renewalLink->getId(),
+            );
+
+            return $this->withNoLeakHeaders($this->redirectToRoute('join_renew'));
+        }
+
+        $renewalLinkId = $session->get(self::RENEWAL_SESSION_KEY);
+
+        if (!is_int($renewalLinkId)) {
+            return $this->render('database/join/renew-unavailable.html.twig');
+        }
+
+        $renewalLink = $this->renewalLinkRepository->find($renewalLinkId);
+
+        // Decided afresh: it may have been used in another tab, or gone stale while the page was open.
+        if (
+            null === $renewalLink
+            || $renewalLink->isUsed()
+            || $renewalLink->linkExpired()
+        ) {
+            $session->remove(self::RENEWAL_SESSION_KEY);
+
             return $this->render('database/join/renew-unavailable.html.twig');
         }
 
@@ -185,6 +245,8 @@ final class ProspectiveMemberController extends AbstractController
                     $renewalLink->getNewExpiration(),
                 );
 
+                $session->remove(self::RENEWAL_SESSION_KEY);
+
                 return $this->render(
                     'database/join/renew-done.html.twig',
                     ['member' => $member],
@@ -192,10 +254,10 @@ final class ProspectiveMemberController extends AbstractController
             }
         }
 
-        return $this->render(
+        return $this->withNoLeakHeaders($this->render(
             'database/join/renew.html.twig',
             ['form' => $form],
-        );
+        ));
     }
 
     #[IsGranted(SudoVoter::ATTRIBUTE)]

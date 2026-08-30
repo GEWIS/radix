@@ -1378,24 +1378,6 @@ class Member
     }
 
     /**
-     * Get the renewal link a renewal form should be built for, if it can still be used.
-     */
-    public function getRenewalLink(string $token): ?RenewalLinkModel
-    {
-        $renewalLink = $this->actionLinkRepository->findRenewalByToken($token);
-
-        if (
-            null === $renewalLink
-            || $renewalLink->isUsed()
-            || $renewalLink->linkExpired()
-        ) {
-            return null;
-        }
-
-        return $renewalLink;
-    }
-
-    /**
      * Whether this address already belongs to someone else — a member or an applicant.
      *
      * A renewal may change the address it is sent to, and two records answering to the same address cannot both be

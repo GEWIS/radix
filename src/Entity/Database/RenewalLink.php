@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use InvalidArgumentException;
+use Override;
 
 /**
  * Membership / graduate status renewal links.
@@ -80,6 +81,7 @@ class RenewalLink extends ActionLink
      * We assume a link is valid until 30 days after the original membership expired
      * Then, people can still renew their membership after their account gets locked
      */
+    #[Override]
     public function linkExpired(): bool
     {
         $diff = new DateTime()->diff($this->currentExpiration);

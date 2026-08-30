@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Controller\Application\NoLeakHeadersTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\NotificationType;
 use App\Entity\User\CompanyUser;
@@ -65,6 +66,8 @@ use function trim;
 
 abstract class AbstractSecurityController extends AbstractController
 {
+    use NoLeakHeadersTrait;
+
     public function __construct(
         protected readonly TranslatorInterface $translator,
         protected readonly SessionManager $sessionManager,
@@ -968,28 +971,6 @@ abstract class AbstractSecurityController extends AbstractController
         );
 
         return $this->redirectToRoute($this->routePrefix . 'forgot_password');
-    }
-
-    /**
-     * Stage-1 and stage-2 responses must not leak the URL (with its `?th=...` query) to caches or history snapshots on
-     * third-party resources loaded by the rendered page.
-     */
-    private function withNoLeakHeaders(Response $response): Response
-    {
-        $response->headers->set(
-            'Referrer-Policy',
-            'no-referrer',
-        );
-        $response->headers->set(
-            'Cache-Control',
-            'no-store, no-cache, must-revalidate, private',
-        );
-        $response->headers->set(
-            'Pragma',
-            'no-cache',
-        );
-
-        return $response;
     }
 
     /**

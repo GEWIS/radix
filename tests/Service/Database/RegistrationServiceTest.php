@@ -213,46 +213,35 @@ class RegistrationServiceTest extends TestCase
     public function testSendsSomeoneBackToTheCheckoutWithTheirPaymentLink(): void
     {
         $this->stripeService = self::createStub(StripeService::class);
-        $this->stripeService->method('getPaymentLink')->willReturn($this->paymentLink());
         $this->stripeService->method('restartCheckoutLink')->willReturn('https://checkout.stripe.test/again');
 
         self::assertSame(
             'https://checkout.stripe.test/again',
-            $this->service()->restartCheckout('a-token'),
+            $this->service()->restartCheckout($this->paymentLink()),
         );
     }
 
-    public function testRefusesAPaymentLinkThatIsUnknownOrAlreadyUsed(): void
+    public function testRefusesAPaymentLinkThatWasAlreadyUsed(): void
     {
         $used = $this->paymentLink();
         $used->setUsed(true);
 
         $this->stripeService = self::createStub(StripeService::class);
-        $this->stripeService->method('getPaymentLink')->willReturn(null);
 
         self::assertSame(
             CheckoutRestartFailure::LinkUnusable,
-            $this->service()->restartCheckout('unknown'),
-        );
-
-        $this->stripeService = self::createStub(StripeService::class);
-        $this->stripeService->method('getPaymentLink')->willReturn($used);
-
-        self::assertSame(
-            CheckoutRestartFailure::LinkUnusable,
-            $this->service()->restartCheckout('used'),
+            $this->service()->restartCheckout($used),
         );
     }
 
     public function testReportsACheckoutThatCannotBeReopened(): void
     {
         $this->stripeService = self::createStub(StripeService::class);
-        $this->stripeService->method('getPaymentLink')->willReturn($this->paymentLink());
         $this->stripeService->method('restartCheckoutLink')->willReturn(null);
 
         self::assertSame(
             CheckoutRestartFailure::CheckoutUnavailable,
-            $this->service()->restartCheckout('a-token'),
+            $this->service()->restartCheckout($this->paymentLink()),
         );
     }
 
