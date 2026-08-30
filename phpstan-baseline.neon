@@ -145,12 +145,6 @@ parameters:
 			path: src/Entity/Database/Member.php
 
 		-
-			message: '#^Property App\\Entity\\Database\\MemberUpdate\:\:\$requestedDate is never written, only read\.$#'
-			identifier: property.onlyRead
-			count: 1
-			path: src/Entity/Database/MemberUpdate.php
-
-		-
 			message: '#^Property App\\Entity\\Database\\PaymentLink\:\:\$prospectiveMember type mapping mismatch\: database can contain App\\Entity\\Database\\ProspectiveMember\|null but property expects App\\Entity\\Database\\ProspectiveMember\.$#'
 			identifier: doctrine.associationType
 			count: 1
@@ -946,7 +940,7 @@ parameters:
 			path: src/Security/Api/ApiTokenAuthenticator.php
 
 		-
-			message: '#^Method App\\Service\\Application\\RegisterStatusService\:\:getStatus\(\) should return array\{members\: int, graduates\: int, expired\: int, prospectives\: array\{total\: int, paid\: int\}, updates\: int, syncPaused\: bool, syncPausedUntil\: DateTime\|null, totalCount\: int, \.\.\.\} but returns array\<string, mixed\>\.$#'
+			message: '#^Method App\\Service\\Application\\RegisterStatusService\:\:getStatus\(\) should return array\{members\: int, graduates\: int, expired\: int, prospectives\: array\{total\: int, paid\: int\}, syncPaused\: bool, syncPausedUntil\: DateTime\|null, totalCount\: int, mailmanLastFetch\: DateTime\|null, \.\.\.\} but returns array\<string, mixed\>\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Service/Application/RegisterStatusService.php

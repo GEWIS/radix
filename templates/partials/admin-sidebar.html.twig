@@ -49,20 +49,13 @@
                             'href': path('member_index'),
                             'label': 'Overview'|trans,
                             'active': route starts with 'member_' and not (
-                                route starts with 'member_attention' or route starts with 'member_update'
-                                or route starts with 'member_bulk_renewal'
+                                route starts with 'member_attention' or route starts with 'member_bulk_renewal'
                             ),
                         },
                         {
                             'href': path('member_attention_index'),
                             'label': 'Attention needed'|trans,
                             'active': route starts with 'member_attention',
-                        },
-                        {
-                            'href': path('member_update_index'),
-                            'label': 'Pending updates'|trans,
-                            'active': route starts with 'member_update',
-                            'count': member_updates_pending(),
                         },
                         {
                             'href': path('join_prospective_member_index'),

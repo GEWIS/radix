@@ -30,10 +30,6 @@ final class ApplicationExtension extends AbstractExtension
                 $this->prospectiveAwaitingApproval(...),
             ),
             new TwigFunction(
-                'member_updates_pending',
-                $this->memberUpdatesPending(...),
-            ),
-            new TwigFunction(
                 'decisions_awaiting_translation',
                 $this->decisionsAwaitingTranslation(...),
             ),
@@ -51,14 +47,6 @@ final class ApplicationExtension extends AbstractExtension
     public function prospectiveAwaitingApproval(): int
     {
         return $this->memberService->getPaidProspectivesCount();
-    }
-
-    /**
-     * Member-submitted changes waiting to be approved or rejected. Counted on its own, as the badge above is.
-     */
-    public function memberUpdatesPending(): int
-    {
-        return $this->memberService->getPendingUpdateCount();
     }
 
     public function decisionsAwaitingTranslation(): int
