@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function Symfony\Component\Translation\t;
@@ -141,7 +142,11 @@ class SignupListsStepType extends AbstractType
         ) {
             $this->reject(
                 $openForm,
-                'The sign-up list must open in the future.',
+                t(
+                    'The sign-up list must open in the future.',
+                    [],
+                    'validators',
+                ),
             );
         }
 
@@ -152,7 +157,11 @@ class SignupListsStepType extends AbstractType
         ) {
             $this->reject(
                 $closeForm,
-                'The sign-up list must open before it closes.',
+                t(
+                    'The sign-up list must open before it closes.',
+                    [],
+                    'validators',
+                ),
             );
         }
 
@@ -166,7 +175,11 @@ class SignupListsStepType extends AbstractType
 
         $this->reject(
             $closeForm,
-            'The sign-up list must close before the activity starts.',
+            t(
+                'The sign-up list must close before the activity starts.',
+                [],
+                'validators',
+            ),
         );
     }
 
@@ -201,7 +214,11 @@ class SignupListsStepType extends AbstractType
 
         $this->reject(
             $fieldForm,
-            'Only one option can be preselected as the default.',
+            t(
+                'Only one option can be preselected as the default.',
+                [],
+                'validators',
+            ),
         );
     }
 
@@ -216,11 +233,19 @@ class SignupListsStepType extends AbstractType
             [
                 'valueNL' => [
                     $activity->languageDutch,
-                    'Fill in the Dutch text.',
+                    t(
+                        'Fill in the Dutch text.',
+                        [],
+                        'validators',
+                    ),
                 ],
                 'valueEN' => [
                     $activity->languageEnglish,
-                    'Fill in the English text.',
+                    t(
+                        'Fill in the English text.',
+                        [],
+                        'validators',
+                    ),
                 ],
             ] as $child => [$enabled, $message]
         ) {
@@ -239,18 +264,15 @@ class SignupListsStepType extends AbstractType
     }
 
     /**
+     * A message rather than a literal, so the string is written where the extractor can see it: what is handed to a
+     * method is invisible to it, and `make translations` deletes every message it cannot find.
+     *
      * @param FormInterface<mixed> $form
      */
     private function reject(
         FormInterface $form,
-        string $message,
+        TranslatableMessage $message,
     ): void {
-        $form->addError(new FormError(
-            $this->translator->trans(
-                $message,
-                [],
-                'validators',
-            ),
-        ));
+        $form->addError(new FormError($message->trans($this->translator)));
     }
 }

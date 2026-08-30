@@ -102,6 +102,10 @@ class SuspensionType extends AbstractType
             return;
         }
 
-        $context->buildViolation('A suspension cannot end before it starts.')->addViolation();
+        $context->buildViolation(t(
+            'A suspension cannot end before it starts.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 }

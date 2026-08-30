@@ -124,7 +124,11 @@ final class StagedDocumentType extends AbstractType
             : '';
 
         if ('' === $code) {
-            $context->buildViolation('Enter the course this belongs to.')->addViolation();
+            $context->buildViolation(t(
+                'Enter the course this belongs to.',
+                [],
+                'validators',
+            )->getMessage())->addViolation();
 
             return;
         }
@@ -133,7 +137,11 @@ final class StagedDocumentType extends AbstractType
             return;
         }
 
-        $context->buildViolation('There is no course with code "{{ code }}".')
+        $context->buildViolation(t(
+            'There is no course with code "{{ code }}".',
+            [],
+            'validators',
+        )->getMessage())
             ->setParameter(
                 '{{ code }}',
                 $code,

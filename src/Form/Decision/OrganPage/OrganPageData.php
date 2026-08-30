@@ -9,6 +9,7 @@ use App\Form\Application\Flow\HasFlowStep;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
@@ -121,7 +122,11 @@ final class OrganPageData
             !$this->languageDutch
             && !$this->languageEnglish
         ) {
-            $context->buildViolation('At least one language must be used.')
+            $context->buildViolation(t(
+                'At least one language must be used.',
+                [],
+                'validators',
+            )->getMessage())
                 ->atPath('languageDutch')
                 ->addViolation();
 
@@ -139,7 +144,11 @@ final class OrganPageData
                     continue;
                 }
 
-                $context->buildViolation('Fill in the Dutch text.')
+                $context->buildViolation(t(
+                    'Fill in the Dutch text.',
+                    [],
+                    'validators',
+                )->getMessage())
                     ->atPath($path)
                     ->addViolation();
             }
@@ -159,7 +168,11 @@ final class OrganPageData
                 continue;
             }
 
-            $context->buildViolation('Fill in the English text.')
+            $context->buildViolation(t(
+                'Fill in the English text.',
+                [],
+                'validators',
+            )->getMessage())
                 ->atPath($path)
                 ->addViolation();
         }
