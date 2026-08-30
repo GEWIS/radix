@@ -117,7 +117,7 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
         $membership->setMailingList($list);
         $membership->setMember($member);
         $membership->setEmail(
-            $member->getEmail() ?? throw new LogicException('The seeded member has no e-mail address.'),
+            $member->getEmail() ?? throw new LogicException('The seeded member has no email address.'),
         );
 
         return $membership;

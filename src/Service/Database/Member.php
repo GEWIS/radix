@@ -13,6 +13,7 @@ use App\Entity\Database\AuditRenewal as AuditRenewalModel;
 use App\Entity\Database\EmailChangeLink as EmailChangeLinkModel;
 use App\Entity\Database\Enums\AddressTypes;
 use App\Entity\Database\Enums\AttentionReasons;
+use App\Entity\Database\Enums\GraduateConversionOutcome;
 use App\Entity\Database\Enums\MailingListMemberAction;
 use App\Entity\Database\Enums\MailingListMemberOrigin;
 use App\Entity\Database\Enums\MemberDetailAction;
@@ -20,6 +21,7 @@ use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Enums\PostalRegions;
 use App\Entity\Database\Enums\ProspectiveMemberFilter;
 use App\Entity\Database\Enums\Studies;
+use App\Entity\Database\GraduateConversionLink as GraduateConversionLinkModel;
 use App\Entity\Database\MailingList as MailingListModel;
 use App\Entity\Database\MailingListMember as MailingListMemberModel;
 use App\Entity\Database\Member as MemberModel;
@@ -29,12 +31,14 @@ use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Entity\Database\RenewalLink as RenewalLinkModel;
 use App\Entity\User\User;
 use App\Form\Database\Registration\RegistrationData;
+use App\Message\Database\GraduateRemovalRequested;
 use App\Message\Database\RefundProblemEmail;
 use App\Message\Database\RegistrationUpdate;
 use App\Message\Database\RegistrationUpdateEmail;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\AuditEntryRepository;
 use App\Repository\Database\EmailChangeLinkRepository;
+use App\Repository\Database\GraduateConversionLinkRepository;
 use App\Repository\Database\MailingListMemberRepository;
 use App\Repository\Database\MailingListRepository;
 use App\Repository\Database\MemberRepository;
@@ -69,6 +73,7 @@ class Member
         private readonly AuditEntryRepository $auditEntryRepository,
         private readonly MemberRepository $memberRepository,
         private readonly EmailChangeLinkRepository $emailChangeLinkRepository,
+        private readonly GraduateConversionLinkRepository $graduateConversionLinkRepository,
         private readonly ProspectiveMemberRepository $prospectiveMemberRepository,
         private readonly MailingListService $mailingListService,
         private readonly RenewalService $renewalService,
@@ -1209,8 +1214,23 @@ class Member
             $renewalAudit,
         );
         $this->memberRepository->persist($member);
+        $this->supersedeGraduateConversions($member);
 
         return $member;
+    }
+
+    /**
+     * An outstanding offer of graduate membership is about the ending that has just been settled, so following it
+     * would write the membership a second time. The secretary's bulk conversion goes through here, which is where
+     * the two meet.
+     */
+    private function supersedeGraduateConversions(MemberModel $member): void
+    {
+        foreach ($this->graduateConversionLinkRepository->findOutstandingForMember($member) as $link) {
+            $link->setOutcome(GraduateConversionOutcome::Superseded);
+            $link->setUsed(true);
+            $this->actionLinkRepository->persist($link);
+        }
     }
 
     private function persistAddressFromForm(
@@ -1293,6 +1313,7 @@ class Member
 
         /** @var array<value-of<AttentionReasons>, MemberModel[]> $combined */
         $combined = [];
+        $askedThemselves = $this->graduateConversionLinkRepository->findMembersWithAnOpenOffer();
 
         $combined[AttentionReasons::MissingEmail->value] = $this->memberRepository->findAttentionWithoutEmail();
         $combined[AttentionReasons::MissingStudentNumberOrdinary->value] =
@@ -1340,6 +1361,18 @@ class Member
 
             if ($reason->includeBulkGraduateConversion()) {
                 foreach ($combined[$reason->value] ?? [] as $member) {
+                    // A member who has been asked themselves is left out while their offer is open. They come back
+                    // once it expires unanswered, which is when the secretary is the one to settle it.
+                    if (
+                        in_array(
+                            $member->getLidnr(),
+                            $askedThemselves,
+                            true,
+                        )
+                    ) {
+                        continue;
+                    }
+
                     $bulkRenewalShortcuts['expiring_non_active'][] = $member->getLidnr();
                 }
             }
@@ -1420,6 +1453,49 @@ class Member
         $link->setUsed(true);
         $this->actionLinkRepository->persist($link);
         $this->memberRepository->persist($member);
+
+        return $member;
+    }
+
+    public function acceptGraduateConversion(
+        MemberModel $member,
+        GraduateConversionLinkModel $link,
+    ): MemberModel {
+        $link->setOutcome(GraduateConversionOutcome::Accepted);
+        $link->setUsed(true);
+        $this->actionLinkRepository->persist($link);
+
+        return $this->applyMembershipChange(
+            $member,
+            MembershipTypes::Graduate,
+        );
+    }
+
+    public function declineGraduateConversion(
+        MemberModel $member,
+        GraduateConversionLinkModel $link,
+        bool $removalRequested,
+    ): MemberModel {
+        $link->setOutcome(
+            $removalRequested
+                ? GraduateConversionOutcome::RemovalRequested
+                : GraduateConversionOutcome::Declined,
+        );
+        $link->setUsed(true);
+        $this->actionLinkRepository->persist($link);
+
+        $note = new AuditNoteModel();
+        $note->setNote($removalRequested
+            ? 'Declined to stay on as a graduate and asked for their data to be removed.'
+            : 'Declined to stay on as a graduate.');
+        $this->addAuditEntry(
+            $member,
+            $note,
+        );
+
+        if ($removalRequested) {
+            $this->bus->dispatch(new GraduateRemovalRequested($member->getLidnr()));
+        }
 
         return $member;
     }

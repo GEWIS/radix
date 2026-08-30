@@ -497,8 +497,8 @@
         <source>You cannot propose an activity for this body.</source>
         <target state="translated">Je kunt geen activiteit voorstellen voor dit orgaan.</target>
       </trans-unit>
-      <trans-unit id="KWcTrZE" resname="You cannot use your TU/e (student) e-mail address because if you leave or stop studying, we can no longer reach you about important announcements.">
-        <source>You cannot use your TU/e (student) e-mail address because if you leave or stop studying, we can no longer reach you about important announcements.</source>
+      <trans-unit id="c5LyyQZ" resname="You cannot use your TU/e (student) email address because if you leave or stop studying, we can no longer reach you about important announcements.">
+        <source>You cannot use your TU/e (student) email address because if you leave or stop studying, we can no longer reach you about important announcements.</source>
         <target state="translated">Je kunt je TU/e-(studenten)e-mailadres niet gebruiken, want als je vertrekt of stopt met studeren kunnen we je niet meer bereiken over belangrijke mededelingen.</target>
       </trans-unit>
       <trans-unit id="O_htvlR" resname="You have to agree to the Articles of Association and the Internal Regulations">

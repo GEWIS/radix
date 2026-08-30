@@ -219,6 +219,27 @@ join_renew:
         _locale: '%kernel.default_locale%'
     methods: [GET, POST]
 
+# Where the link in the ending-membership email points, and the page it hands over to. The same two steps as the
+# renewal above: the token is exchanged for a hash, and the page that asks answers at an address that carries nothing.
+join_graduate_claim:
+    path: '/{_locale}/graduate/{token}'
+    controller: App\Controller\Database\ProspectiveMemberController::graduateClaim
+    requirements:
+        _locale: '%app.locales%'
+        token: '[0-9a-f]{32}\.[0-9a-f]{96}'
+    defaults:
+        _locale: '%kernel.default_locale%'
+    methods: [GET]
+
+join_graduate:
+    path: '/{_locale}/graduate'
+    controller: App\Controller\Database\ProspectiveMemberController::graduate
+    requirements:
+        _locale: '%app.locales%'
+    defaults:
+        _locale: '%kernel.default_locale%'
+    methods: [GET, POST]
+
 # GET only, for the same reason as the sign-up address above: the form submits to the address the page answers at.
 join_renew_legacy_short:
     path: /renew/{token}

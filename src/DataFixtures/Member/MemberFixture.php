@@ -51,6 +51,8 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
     public const string REF_MEMBER_ATTN_EXTERNAL_ACTIVE = 'attn-external-active';
     public const string REF_MEMBER_ATTN_GRADUATE_ACTIVE = 'attn-graduate-active';
     public const string REF_MEMBER_ATTN_MISCLASSIFIED = 'attn-misclassified';
+    public const string REF_MEMBER_CONVERSION_TARGET = 'attn-conversion-target';
+    public const string REF_MEMBER_RENEWAL_TARGET = 'attn-renewal-target';
 
     #[Override]
     public function load(ObjectManager $manager): void
@@ -561,6 +563,47 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
                 3,
                 joinMonth: 11,
                 joinDay: 1,
+            ),
+        );
+
+        // Twenty days from whenever the seed was loaded, so both sweeps always have somebody to write to.
+        $expiringSoon = new DateTime()->modify('+20 days');
+
+        $this->addReference(
+            self::REF_MEMBER_CONVERSION_TARGET,
+            $this->makeAttentionMember(
+                $manager,
+                'C.',
+                'ÅTTN-F1',
+                'ConversionTarget',
+                23,
+                'conversiontarget@example.com',
+                $this->studentNumber(19),
+                Studies::BAM,
+                $this->associationYearChain(
+                    4,
+                    $expiringSoon,
+                ),
+            ),
+        );
+
+        $this->addReference(
+            self::REF_MEMBER_RENEWAL_TARGET,
+            $this->makeAttentionMember(
+                $manager,
+                'R.',
+                'ÅTTN-F2',
+                'RenewalTarget',
+                31,
+                'renewaltarget@example.com',
+                $this->studentNumber(20),
+                Studies::None,
+                $this->associationYearChain(
+                    5,
+                    $expiringSoon,
+                    MembershipTypes::Graduate,
+                    2,
+                ),
             ),
         );
     }

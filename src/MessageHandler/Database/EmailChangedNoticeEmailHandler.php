@@ -32,7 +32,7 @@ class EmailChangedNoticeEmailHandler
                 $message->getPreviousEmail(),
                 $member->getFullName(),
             ),
-            'Your e-mail address was changed (' . $member->getLidnr() . ')',
+            'Your email address was changed (' . $member->getLidnr() . ')',
             'database/email/email-changed.html.twig',
             [
                 'firstName' => $member->getFirstName(),

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Form\Database;
 
+use App\Entity\Database\GraduateConversionLink;
 use App\Entity\Database\Member;
-use App\Entity\Database\RenewalLink;
 use App\Form\DataTransformer\LowercaseTransformer;
 use App\Form\DataTransformer\OptInTransformer;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,14 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use function array_merge;
 use function Symfony\Component\Translation\t;
 
 /**
- * Renewal of a graduate membership, filled in by the member through a renewal link. Everything but the contact
- * details is fixed: those fields are disabled so that what is submitted for them cannot alter the member.
+ * Which button was pressed is the whole answer.
+ *
+ * @extends AbstractType<Member>
  */
-class MemberRenewalType extends AbstractType
+class MemberGraduateConversionType extends AbstractType
 {
     /**
      * @param array<string, mixed> $options
@@ -63,22 +62,9 @@ class MemberRenewalType extends AbstractType
             EmailType::class,
             [
                 'label' => t('Email Address'),
+                'help' => t('Use an address you keep after you stop studying.'),
                 'constraints' => [new Assert\NotBlank()],
             ],
-        );
-
-        // The new expiration follows from the renewal link, it is shown but never submitted.
-        $builder->add(
-            'expiration',
-            DateType::class,
-            array_merge(
-                self::fixedOptions(t('Renew until')),
-                [
-                    'widget' => 'single_text',
-                    'mapped' => false,
-                    'data' => $options['renewal_link']->getNewExpiration(),
-                ],
-            ),
         );
 
         $builder->add(
@@ -91,40 +77,26 @@ class MemberRenewalType extends AbstractType
         );
 
         $builder->add(
-            'privacy',
-            CheckboxType::class,
-            [
-                'label' => t(
-					// phpcs:ignore -- user-visible strings should not be split
-				'I have read the privacy statement of Gemeenschap van Wiskunde en Informatica Studenten and consent to the processing of my data.',
-                ),
-                'mapped' => false,
-                'constraints' => [new Assert\IsTrue(message: 'You have to consent to processing your data')],
-            ],
-        );
-
-        $builder->add(
-            'agreed',
-            CheckboxType::class,
-            [
-                'label' => t(
-					// phpcs:ignore -- user-visible strings should not be split
-				'I am familiar with the contents of the Articles of Association and the Internal Regulations of GEWIS and I would like to renew my status as a graduate',
-                ),
-                'mapped' => false,
-                'constraints' => [
-                    new Assert\IsTrue(
-						// phpcs:ignore -- user-visible strings should not be split
-					message: 'You have to agree to the Articles of Association and the Internal Regulations',
-                    ),
-                ],
-            ],
-        );
-
-        $builder->add(
-            'submit',
+            'accept',
             SubmitType::class,
-            ['label' => t('Renew')],
+            ['label' => t('Stay on as a graduate')],
+        );
+
+        $builder->add(
+            'decline',
+            SubmitType::class,
+            ['label' => t('End my membership')],
+        );
+
+        // The secretary acts on this: the register is not something a member deletes themselves.
+        $builder->add(
+            'removal',
+            CheckboxType::class,
+            [
+                'label' => t('Also ask the secretary to remove my data'),
+                'mapped' => false,
+                'required' => false,
+            ],
         );
 
         $builder->get('email')->addModelTransformer(new LowercaseTransformer());
@@ -136,10 +108,10 @@ class MemberRenewalType extends AbstractType
     {
         $resolver->setDefaults(['data_class' => Member::class]);
 
-        $resolver->setRequired('renewal_link');
+        $resolver->setRequired('conversion_link');
         $resolver->setAllowedTypes(
-            'renewal_link',
-            RenewalLink::class,
+            'conversion_link',
+            GraduateConversionLink::class,
         );
     }
 

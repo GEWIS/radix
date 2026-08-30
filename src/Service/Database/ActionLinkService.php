@@ -6,6 +6,7 @@ namespace App\Service\Database;
 
 use App\Entity\Database\ActionLink;
 use App\Entity\Database\EmailChangeLink;
+use App\Entity\Database\GraduateConversionLink;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\RenewalLink;
 use App\Repository\Database\ActionLinkRepository;
@@ -90,6 +91,39 @@ class ActionLinkService
             || $link->isUsed()
             || $link->linkExpired()
             || !$link->tokenMatches($split['verifier'])
+        ) {
+            return null;
+        }
+
+        return $link;
+    }
+
+    public function resolveGraduateConversion(string $token): ?GraduateConversionLink
+    {
+        $split = SplitToken::split($token);
+
+        if (null === $split) {
+            return null;
+        }
+
+        $link = $this->actionLinkRepository->findGraduateConversionBySelector($split['selector']);
+
+        if (
+            null === $link
+            || $link->isUsed()
+            || $link->linkExpired()
+            || !$link->tokenMatches($split['verifier'])
+        ) {
+            return null;
+        }
+
+        // The ending the offer was about has been settled since -- by the secretary's bulk conversion, or by the
+        // member somewhere else -- so following it would write the membership a second time.
+        $membership = $link->getMember()->getCurrentOrLastMembership();
+
+        if (
+            null === $membership
+            || $membership->getEndDate()->getTimestamp() !== $link->getCurrentExpiration()->getTimestamp()
         ) {
             return null;
         }

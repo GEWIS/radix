@@ -323,7 +323,7 @@ class MemberDetailsController extends AbstractController
 
         if ($email === $member->getEmail()) {
             $form->get('email')->addError(new FormError(
-                $this->translator->trans('This is already your e-mail address.'),
+                $this->translator->trans('This is already your email address.'),
             ));
 
             return null;
@@ -338,7 +338,7 @@ class MemberDetailsController extends AbstractController
             )
         ) {
             $form->get('email')->addError(new FormError(
-                $this->translator->trans('There already is a member with this e-mail address.'),
+                $this->translator->trans('There already is a member with this email address.'),
             ));
 
             return null;
@@ -361,7 +361,7 @@ class MemberDetailsController extends AbstractController
             AlertTypes::Info->value,
             $this->translator->trans(
 				// phpcs:ignore -- user-visible strings should not be split
-			'We have sent a message to your new e-mail address. Your address changes once you have followed the link in it.',
+			'We have sent a message to your new email address. Your address changes once you have followed the link in it.',
             ),
         );
 
