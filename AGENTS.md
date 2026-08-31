@@ -411,6 +411,15 @@ Two extraction traps:
   instead; Twig's `t()` is extracted and yields a `TranslatableMessage` the theme still translates. Put the
   parameters inside `t()` rather than in `help_translation_parameters`, because the `trans` filter refuses to take
   its own arguments alongside a `TranslatableMessage`.
+- **A validation message has to be written where the extractor can see it.** It reads `t('…')`,
+  `new TranslatableMessage('…')`, a `trans()` call, and the message arguments of a constraint that is written out
+  (`#[Assert\NotBlank(message: '…')]`, and our own constraints too — the visitor's class list is built from the
+  `validator.constraint_validator` services). It does not read a literal handed to `$context->buildViolation('…')`,
+  a literal passed on to a helper, or the default of a `$message` property on a constraint class. Those were deleted
+  by `--clean` on every run, which is how a message that is said on a Dutch page ends up rendering in English. So:
+  hand `buildViolation()` the key as `t('…', [], 'validators')->getMessage()`, give a helper that raises errors a
+  `TranslatableMessage` rather than a string, and put a constraint's messages in the attribute that applies it rather
+  than in a property default.
 - In form types, wrap user-facing labels and `invalid_message` strings with `t()`
   (`use function Symfony\Component\Translation\t;`). Symfony's PHP extractor does not recurse into `RepeatedType`'s
   `first_options` / `second_options`, so plain `'label' => 'My label'` strings nested there are silently skipped;

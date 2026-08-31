@@ -11093,6 +11093,10 @@
         <source>active</source>
         <target state="translated">actief</target>
       </trans-unit>
+      <trans-unit id="ST_rdFy" resname="active/inactive">
+        <source>active/inactive</source>
+        <target state="translated">actief/inactief</target>
+      </trans-unit>
       <trans-unit id="zxPuD2." resname="afgekeurd">
         <source>afgekeurd</source>
         <target state="translated">afgekeurd</target>
@@ -11268,6 +11272,10 @@
       <trans-unit id="POKPt1C" resname="never">
         <source>never</source>
         <target state="translated">nooit</target>
+      </trans-unit>
+      <trans-unit id="P.KH1.n" resname="non-active">
+        <source>non-active</source>
+        <target state="translated">niet-actief</target>
       </trans-unit>
       <trans-unit id="kItPvyq" resname="not on the website yet">
         <source>not on the website yet</source>

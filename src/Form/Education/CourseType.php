@@ -134,7 +134,11 @@ final class CourseType extends AbstractType
             return;
         }
 
-        $context->buildViolation('A course with this code already exists.')->addViolation();
+        $context->buildViolation(t(
+            'A course with this code already exists.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 
     /**
@@ -154,7 +158,11 @@ final class CourseType extends AbstractType
                 continue;
             }
 
-            $context->buildViolation('A course cannot be similar to itself.')->addViolation();
+            $context->buildViolation(t(
+                'A course cannot be similar to itself.',
+                [],
+                'validators',
+            )->getMessage())->addViolation();
 
             return;
         }

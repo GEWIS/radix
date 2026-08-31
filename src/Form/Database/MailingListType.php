@@ -202,7 +202,11 @@ class MailingListType extends AbstractType
             return;
         }
 
-        $context->buildViolation('Mailman and Listmonk mailing lists cannot both be set at the same time')
+        $context->buildViolation(t(
+            'Mailman and Listmonk mailing lists cannot both be set at the same time',
+            [],
+            'validators',
+        )->getMessage())
             ->atPath('listmonkList')
             ->addViolation();
     }

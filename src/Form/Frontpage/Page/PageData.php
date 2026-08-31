@@ -18,7 +18,11 @@ use function trim;
  * What the page form asks. Every field is kept as its two halves rather than as a localised text, so each language
  * can carry its own rule: a page is addressed by its own words, and the two addresses are checked separately.
  */
-#[UnclaimedPageAddress(groups: [PageData::STEP_ADDRESS])]
+#[UnclaimedPageAddress(
+    reservedMessage: 'The website already answers to this address, so a page cannot take it.',
+    takenMessage: 'Another page already answers to this address.',
+    groups: [PageData::STEP_ADDRESS],
+)]
 final class PageData
 {
     use HasFlowStep;

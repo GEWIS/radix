@@ -169,6 +169,10 @@ class BudgetType extends AbstractType
             return;
         }
 
-        $context->buildViolation('A budget or financial statement cannot be dated after the meeting.')->addViolation();
+        $context->buildViolation(t(
+            'A budget or financial statement cannot be dated after the meeting.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 }

@@ -40,23 +40,23 @@ enum AttentionReasons: string implements TranslatableInterface
             self::MissingStudentNumberOrdinary => new TranslatableMessage('Ordinary member without student number'),
             self::ExpiringExternalActive => self::expiring(
                 MembershipTypes::External,
-                'active',
+                new TranslatableMessage('active'),
             ),
             self::ExpiringExternalNonActive => self::expiring(
                 MembershipTypes::External,
-                'non-active',
+                new TranslatableMessage('non-active'),
             ),
             self::ExpiringOrdinaryActive => self::expiring(
                 MembershipTypes::Ordinary,
-                'active',
+                new TranslatableMessage('active'),
             ),
             self::ExpiringOrdinaryNonActive => self::expiring(
                 MembershipTypes::Ordinary,
-                'non-active',
+                new TranslatableMessage('non-active'),
             ),
             self::ExpiringGraduateActiveInactive => self::expiring(
                 MembershipTypes::Graduate,
-                'active/inactive',
+                new TranslatableMessage('active/inactive'),
             ),
             default => new TranslatableMessage('Unknown reason'),
         };
@@ -142,13 +142,13 @@ enum AttentionReasons: string implements TranslatableInterface
 
     private static function expiring(
         MembershipTypes $type,
-        string $membership,
+        TranslatableMessage $membership,
     ): TranslatableMessage {
         return new TranslatableMessage(
             '%type% %membership% member expiring soon',
             [
                 '%type%' => $type,
-                '%membership%' => new TranslatableMessage($membership),
+                '%membership%' => $membership,
             ],
         );
     }
