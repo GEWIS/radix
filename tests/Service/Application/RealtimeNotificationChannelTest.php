@@ -14,6 +14,7 @@ use App\Service\Application\NotificationContextResolver;
 use App\Service\Application\NotificationSubjectResolver;
 use App\Service\Application\RealtimeNotificationChannel;
 use App\Service\Application\RealtimeNotifier;
+use App\Service\Application\RealtimeTopics;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -177,7 +178,10 @@ final class RealtimeNotificationChannelTest extends TestCase
         );
 
         return new RealtimeNotificationChannel(
-            new RealtimeNotifier($hub),
+            new RealtimeNotifier(
+                $hub,
+                new RealtimeTopics('a secret that is only ever this test\'s'),
+            ),
             // Nobody names a subject here: these tests are about which topic a notification lands on and whether a
             // frozen label stands in for a subject, not about lookups.
             new NotificationSubjectResolver([]),

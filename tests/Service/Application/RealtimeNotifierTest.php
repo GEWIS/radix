@@ -7,6 +7,7 @@ namespace App\Tests\Service\Application;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Service\Application\RealtimeNotifier;
 use App\Service\Application\RealtimePayload;
+use App\Service\Application\RealtimeTopics;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -34,7 +35,12 @@ final class RealtimeNotifierTest extends TestCase
         );
         $update = $this->updates[0];
         self::assertSame(
-            ['gewis/session/main/series-abc'],
+            [
+                self::topics()->session(
+                    'main',
+                    'series-abc',
+                ),
+            ],
             $update->getTopics(),
         );
         self::assertTrue($update->isPrivate());
@@ -121,6 +127,14 @@ final class RealtimeNotifierTest extends TestCase
             },
         );
 
-        return new RealtimeNotifier($hub);
+        return new RealtimeNotifier(
+            $hub,
+            self::topics(),
+        );
+    }
+
+    private static function topics(): RealtimeTopics
+    {
+        return new RealtimeTopics('a secret that is only ever this test\'s');
     }
 }

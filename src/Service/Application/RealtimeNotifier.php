@@ -9,19 +9,19 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 
 use function json_encode;
-use function sprintf;
 
 use const JSON_THROW_ON_ERROR;
 
 /**
- * The single place server-to-client Mercure pushes go through. Topic strings match the subscribe topics minted in the
- * base layout. Session and user topics are per-principal so they are published privately (delivered only to a JWT that
- * lists the exact topic); the public topic is world-readable.
+ * The single place server-to-client Mercure pushes go through. Topics come from {@see RealtimeTopics}, which is also
+ * what the base layout subscribes through. Session and user topics are per-principal so they are published privately
+ * (delivered only to a JWT that lists the exact topic); the public topic is world-readable.
  */
 final class RealtimeNotifier
 {
     public function __construct(
         private readonly HubInterface $hub,
+        private readonly RealtimeTopics $topics,
     ) {
     }
 
@@ -31,8 +31,7 @@ final class RealtimeNotifier
         string $redirect,
     ): void {
         $this->publish(
-            sprintf(
-                'gewis/session/%s/%s',
+            $this->topics->session(
                 $firewallName,
                 $series,
             ),
@@ -50,8 +49,7 @@ final class RealtimeNotifier
         RealtimePayload $payload,
     ): void {
         $this->publish(
-            sprintf(
-                'gewis/user/%s/%s',
+            $this->topics->user(
                 $firewallName,
                 $userIdentifier,
             ),
@@ -68,7 +66,7 @@ final class RealtimeNotifier
     public function rotateInfimum(string $infimum): void
     {
         $this->publish(
-            'gewis/members',
+            RealtimeTopics::MEMBERS,
             [
                 'type' => RealtimeEventType::InfimumRotate->value,
                 'infimum' => $infimum,
@@ -80,7 +78,7 @@ final class RealtimeNotifier
     public function toPublic(RealtimePayload $payload): void
     {
         $this->publish(
-            'gewis/public',
+            RealtimeTopics::PUBLIC,
             $payload->toArray(),
             false,
         );
@@ -92,7 +90,7 @@ final class RealtimeNotifier
     public function reloadPublic(): void
     {
         $this->publish(
-            'gewis/public',
+            RealtimeTopics::PUBLIC,
             ['type' => RealtimeEventType::ForceReload->value],
             false,
         );

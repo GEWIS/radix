@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Service\Application;
 
 use App\Service\Application\RealtimeAuthorization;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Scheb\TwoFactorBundle\Security\Authentication\Token\TwoFactorToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -132,6 +133,53 @@ final class RealtimeAuthorizationTest extends KernelTestCase
             $this->topicsFor($token),
             $this->grantsFor($token),
         );
+    }
+
+    /**
+     * @param non-empty-string $path
+     */
+    #[DataProvider('grantRoutes')]
+    public function testTheGrantRouteFollowsTheFirewallThePageIsOn(
+        string $path,
+        string $route,
+    ): void {
+        self::bootKernel();
+        self::getContainer()->get('request_stack')->push(Request::create($path));
+
+        $realtime = self::getContainer()->get(RealtimeAuthorization::class);
+        self::assertInstanceOf(
+            RealtimeAuthorization::class,
+            $realtime,
+        );
+        self::assertSame(
+            $route,
+            $realtime->grantRoute(),
+        );
+    }
+
+    /**
+     * @return list<array{non-empty-string, string}>
+     */
+    public static function grantRoutes(): array
+    {
+        return [
+            [
+                '/en/',
+                'app_realtime_grant',
+            ],
+            [
+                '/en/user/security',
+                'app_realtime_grant',
+            ],
+            [
+                '/en/company/vacancies',
+                'app_company_realtime_grant',
+            ],
+            [
+                '/nl/company/security',
+                'app_company_realtime_grant',
+            ],
+        ];
     }
 
     /**

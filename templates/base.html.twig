@@ -98,7 +98,7 @@
         {% do realtime_authorize(realtime_grants()) %}
         <div data-controller="notifications"
              data-notifications-hub-url-value="{{ mercure(realtime_base) }}"
-             data-notifications-refresh-url-value="{{ path('app_realtime_grant') }}"
+             data-notifications-refresh-url-value="{{ path(realtime_grant_route()) }}"
              data-notifications-locale-value="{{ app.request.locale }}"></div>
         {% include 'partials/application/privacy-widget.html.twig' %}
         {# Load non-critical JS #}

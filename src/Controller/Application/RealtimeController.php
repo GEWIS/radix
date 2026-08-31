@@ -12,7 +12,8 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * Hands the browser a fresh subscribe cookie, so a tab whose own has expired need not reload the page for one.
  *
- * Open to anyone: what it grants is read from whoever is asking.
+ * Open to anyone: what it grants is read from whoever is asking, which is also why it answers at one address per
+ * firewall. See {@see \App\Security\User\Firewall::realtimeGrantRoute()}.
  */
 final class RealtimeController extends AbstractController
 {
@@ -23,6 +24,11 @@ final class RealtimeController extends AbstractController
     #[Route(
         path: '/realtime/grant',
         name: 'app_realtime_grant',
+        methods: ['GET'],
+    )]
+    #[Route(
+        path: '/company/realtime/grant',
+        name: 'app_company_realtime_grant',
         methods: ['GET'],
     )]
     public function __invoke(): Response

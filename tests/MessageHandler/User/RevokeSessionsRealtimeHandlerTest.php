@@ -7,6 +7,7 @@ namespace App\Tests\MessageHandler\User;
 use App\Message\User\RevokeSessionsRealtimeMessage;
 use App\MessageHandler\User\RevokeSessionsRealtimeHandler;
 use App\Service\Application\RealtimeNotifier;
+use App\Service\Application\RealtimeTopics;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -39,7 +40,10 @@ final class RevokeSessionsRealtimeHandlerTest extends TestCase
             ->willReturn('/en/user/login?reason=session_revoked');
 
         $handler = new RevokeSessionsRealtimeHandler(
-            new RealtimeNotifier($hub),
+            new RealtimeNotifier(
+                $hub,
+                self::topics(),
+            ),
             $urlGenerator,
         );
         $handler->__invoke(new RevokeSessionsRealtimeMessage('main', ['aaa', 'bbb']));
@@ -49,11 +53,21 @@ final class RevokeSessionsRealtimeHandlerTest extends TestCase
             $updates,
         );
         self::assertSame(
-            ['gewis/session/main/aaa'],
+            [
+                self::topics()->session(
+                    'main',
+                    'aaa',
+                ),
+            ],
             $updates[0]->getTopics(),
         );
         self::assertSame(
-            ['gewis/session/main/bbb'],
+            [
+                self::topics()->session(
+                    'main',
+                    'bbb',
+                ),
+            ],
             $updates[1]->getTopics(),
         );
         self::assertTrue($updates[0]->isPrivate());
@@ -68,9 +82,17 @@ final class RevokeSessionsRealtimeHandlerTest extends TestCase
         $urlGenerator->expects(self::never())->method('generate');
 
         $handler = new RevokeSessionsRealtimeHandler(
-            new RealtimeNotifier($hub),
+            new RealtimeNotifier(
+                $hub,
+                self::topics(),
+            ),
             $urlGenerator,
         );
         $handler->__invoke(new RevokeSessionsRealtimeMessage('nonexistent', ['aaa']));
+    }
+
+    private static function topics(): RealtimeTopics
+    {
+        return new RealtimeTopics('a secret that is only ever this test\'s');
     }
 }

@@ -53,6 +53,18 @@ enum Firewall: string
     }
 
     /**
+     * One per firewall, each answering inside its own firewall's pattern: a company user fetching a subscribe cookie
+     * from an address the main firewall answers is nobody there, and is handed a passer-by's cookie.
+     */
+    public function realtimeGrantRoute(): string
+    {
+        return match ($this) {
+            self::Main => 'app_realtime_grant',
+            self::Company => 'app_company_realtime_grant',
+        };
+    }
+
+    /**
      * The multi-factor enrolment route, or null for a firewall that has none (only main members enrol here).
      */
     public function mfaEnableRoute(): ?string

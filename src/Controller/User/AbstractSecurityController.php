@@ -24,6 +24,7 @@ use App\Security\User\HandlerRegistry;
 use App\Security\User\MfaPolicy;
 use App\Security\User\SudoMode;
 use App\Service\Application\AltchaSolutionGuard;
+use App\Service\Application\RealtimeAuthorization;
 use App\Service\User\AccountPasswordService;
 use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
@@ -75,6 +76,7 @@ abstract class AbstractSecurityController extends AbstractController
         protected readonly MultiFactorService $multiFactorService,
         protected readonly PasswordResetService $passwordResetService,
         protected readonly KnownDeviceRegistry $knownDevices,
+        protected readonly RealtimeAuthorization $realtime,
         protected readonly string $routePrefix,
         protected readonly UserTypes $userType,
     ) {
@@ -473,6 +475,7 @@ abstract class AbstractSecurityController extends AbstractController
         if ($currentSeries === $series) {
             $handler->clearRememberMeCookie();
             $request->getSession()->invalidate();
+            $this->realtime->revoke();
 
             return $this->redirectToRoute($this->routePrefix . 'login');
         }
@@ -539,6 +542,7 @@ abstract class AbstractSecurityController extends AbstractController
         );
         $this->registry->get($firewall)?->clearRememberMeCookie();
         $request->getSession()->invalidate();
+        $this->realtime->revoke();
 
         return $this->redirectToRoute($this->routePrefix . 'login');
     }

@@ -8,6 +8,7 @@ use App\Repository\User\SessionRepository;
 use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
 use App\Security\User\UserAgentParser;
+use App\Service\Application\RealtimeAuthorization;
 use App\Service\User\KnownDeviceRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -64,6 +65,7 @@ final class StaleSessionGuardListener
         private readonly UserAgentParser $userAgentParser,
         private readonly TokenStorageInterface $tokenStorage,
         private readonly KnownDeviceRegistry $knownDevices,
+        private readonly RealtimeAuthorization $realtime,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -220,6 +222,8 @@ final class StaleSessionGuardListener
         // the next request is silently re-authenticated -> this listener fires again -> infinite redirect loop.
         $this->tokenStorage->setToken(null);
         $event->getRequest()->getSession()->invalidate();
+
+        $this->realtime->revoke();
 
         $loginRoute = Firewall::tryFrom($firewall)?->loginRoute();
         if (null === $loginRoute) {

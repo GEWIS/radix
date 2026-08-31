@@ -10,6 +10,7 @@ use App\Entity\User\PasswordReset;
 use App\Entity\User\User;
 use App\Message\User\PasswordResetRequestEmail;
 use App\Security\User\HandlerRegistry;
+use App\Service\Application\RealtimeAuthorization;
 use App\Service\User\AccountPasswordService;
 use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
@@ -40,6 +41,7 @@ class CompanyUserController extends AbstractSecurityController
         MultiFactorService $multiFactorService,
         PasswordResetService $passwordResetService,
         KnownDeviceRegistry $knownDevices,
+        RealtimeAuthorization $realtime,
     ) {
         parent::__construct(
             $translator,
@@ -50,6 +52,7 @@ class CompanyUserController extends AbstractSecurityController
             $multiFactorService,
             $passwordResetService,
             $knownDevices,
+            $realtime,
             routePrefix: 'company_user_',
             userType: UserTypes::CompanyUser,
         );
