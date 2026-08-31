@@ -147,7 +147,8 @@ security:
         - { path: '^/(%app.locales%)/admin', roles: [ROLE_ACTIVE_MEMBER, ROLE_BOARD, ROLE_ADMIN, ROLE_DATABASE_READ_ONLY] }
         # Everything a representative needs before they have a session, which the rule below would otherwise send them
         # to the login page for, which is itself one of these paths.
-        - { path: '^/(%app.locales%)/company/(login|logout|forgot-password|reset-password|invite)', role: PUBLIC_ACCESS }
+        # `realtime/grant` is open on purpose: what a subscribe cookie grants is read from whoever asks for it.
+        - { path: '^/(%app.locales%)/company/(login|logout|forgot-password|reset-password|invite|realtime/grant)', role: PUBLIC_ACCESS }
         - { path: '^/(%app.locales%)/company', roles: [ROLE_COMPANY_USER] }
         # - { path: ^/profile, roles: ROLE_USER }
 

@@ -61,6 +61,16 @@ final class RealtimeControllerTest extends KernelTestCase
         );
     }
 
+    public function testTheCompanyFirewallHasAnAddressOfItsOwn(): void
+    {
+        $response = self::bootKernel()->handle(Request::create('/en/company/realtime/grant'));
+
+        self::assertSame(
+            Response::HTTP_NO_CONTENT,
+            $response->getStatusCode(),
+        );
+    }
+
     /**
      * @return string[]
      */

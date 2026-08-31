@@ -6,6 +6,7 @@ namespace App\Tests\Command\Frontpage;
 
 use App\Command\Frontpage\RotateInfimumCommand;
 use App\Service\Application\RealtimeNotifier;
+use App\Service\Application\RealtimeTopics;
 use App\Service\Frontpage\InfimumService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -99,7 +100,10 @@ final class RotateInfimumCommandTest extends TestCase
                 new MockHttpClient([$response]),
                 new ArrayAdapter(),
             ),
-            new RealtimeNotifier($hub),
+            new RealtimeNotifier(
+                $hub,
+                new RealtimeTopics('a secret that is only ever this test\'s'),
+            ),
             new NullLogger(),
         ));
     }

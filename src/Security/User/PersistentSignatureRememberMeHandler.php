@@ -20,10 +20,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\Signature\SignatureHasher;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeHandler;
@@ -35,8 +33,6 @@ use function count;
 use function explode;
 use function hash;
 use function hash_equals;
-use function hash_hmac;
-use function implode;
 use function random_bytes;
 use function rtrim;
 use function sprintf;
@@ -55,19 +51,9 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 {
     private const string COOKIE_DELIMITER = ':';
     private const string HASH_ALGO = 'sha256';
-    private const string HMAC_ALGO = 'sha256';
 
     /** Tabs woken together present the same token; without this, every one but the first looks like a replay. */
     private const int TOKEN_GRACE_SECONDS = 60;
-
-    private const array SIGNATURE_PROPERTIES = [
-        'password',
-        'passwordChangedOn',
-        'forceReloginAt',
-        'totpSecret',
-    ];
-
-    private readonly SignatureHasher $signatureHasher;
 
     /**
      * @param UserProviderInterface<UserInterface> $userProvider
@@ -82,9 +68,11 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         private readonly SecurityNotifier $securityNotifier,
         private readonly KnownDeviceRegistry $knownDevices,
         private readonly ClockInterface $clock,
+        private readonly CredentialsSignature $credentials,
+        private readonly SessionRowSignature $rowSignature,
         #[Autowire(param: 'kernel.secret')]
         #[SensitiveParameter]
-        private readonly string $secret,
+        string $secret,
         private readonly string $firewallName,
         private readonly int $tokenLifetime,
         string $cookieName,
@@ -108,12 +96,6 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                 'samesite' => Cookie::SAMESITE_LAX,
             ],
             $logger,
-        );
-
-        $this->signatureHasher = new SignatureHasher(
-            PropertyAccess::createPropertyAccessor(),
-            self::SIGNATURE_PROPERTIES,
-            $secret,
         );
     }
 
@@ -200,21 +182,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         }
 
         // Ensure integrity of the remember-me token.
-        $expectedSig = $this->computeRowSignature(
-            $session->getSeries(),
-            $session->getHashedToken(),
-            $session->getUserIdentifier(),
-            $session->getExpiresAt(),
-            $session->getPreviousHashedToken(),
-            $session->getPreviousTokenValidUntil(),
-        );
-
-        if (
-            !hash_equals(
-                $expectedSig,
-                $session->getSignature(),
-            )
-        ) {
+        if (!$this->rowSignature->verify($session)) {
             $this->logger?->warning(
                 'HMAC mismatch; possible DB tampering or kernel.secret rotation.',
                 [
@@ -234,30 +202,34 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $rawToken,
         );
 
-        // Cookie theft detection: a valid series with a token the row no longer holds means the cookie was consumed
-        // twice. Inside the grace window that is a tab that lost the race rather than a replay; outside it we cannot
-        // tell attacker from victim, so we burn every session for this user on this firewall.
         $raced = !hash_equals(
             $session->getHashedToken(),
             $presentedToken,
         );
 
-        if (
-            $raced
-            && !$this->withinGracePeriod(
-                $session->getPreviousHashedToken(),
-                $session->getPreviousTokenValidUntil(),
-                $presentedToken,
-            )
-        ) {
-            $this->reportTheft($session);
+        if ($raced) {
+            // A token this row has never held is forged rather than replayed. Reading it as theft would let anybody
+            // who learns a series sign the account out of every device by presenting rubbish alongside it.
+            if (
+                !hash_equals(
+                    $session->getPreviousHashedToken() ?? '',
+                    $presentedToken,
+                )
+            ) {
+                throw new AuthenticationException('Remember-me token is not recognised.');
+            }
+
+            // The token this row just replaced, presented past the window a second tab could still be holding it in.
+            if (!$this->withinGracePeriod($session->getPreviousTokenValidUntil())) {
+                $this->reportTheft($session);
+            }
         }
 
         // If any of the properties in the signature changed, detect that and force log out.
         if (
-            !hash_equals(
+            !$this->credentials->matches(
                 $session->getSignaturePropertiesHash(),
-                $this->computeUserPropertiesHash($user),
+                $user,
             )
         ) {
             $this->logger?->info(
@@ -266,7 +238,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                     'series' => $series,
                     'user' => $session->getUserIdentifier(),
                     'firewall' => $this->firewallName,
-                    'properties' => self::SIGNATURE_PROPERTIES,
+                    'properties' => CredentialsSignature::PROPERTIES,
                 ],
             );
             $this->entityManager->remove($session);
@@ -307,12 +279,9 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $session->getSeries(),
             $session->getHashedToken(),
             $newHashedToken,
-            $this->computeRowSignature(
-                $session->getSeries(),
+            $this->rowSignature->forRotation(
+                $session,
                 $newHashedToken,
-                $session->getUserIdentifier(),
-                $session->getExpiresAt(),
-                $session->getHashedToken(),
                 $validUntil,
             ),
             $validUntil,
@@ -324,11 +293,11 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $grace = $this->repository->findRotationGrace($session->getSeries());
 
             if (
-                !$this->withinGracePeriod(
-                    $grace['previousHashedToken'] ?? null,
-                    $grace['previousTokenValidUntil'] ?? null,
+                !hash_equals(
+                    $grace['previousHashedToken'] ?? '',
                     $presentedToken,
                 )
+                || !$this->withinGracePeriod($grace['previousTokenValidUntil'] ?? null)
             ) {
                 $this->reportTheft($session);
             }
@@ -343,23 +312,10 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         ));
     }
 
-    private function withinGracePeriod(
-        ?string $previousHashedToken,
-        ?DateTimeImmutable $validUntil,
-        string $presentedToken,
-    ): bool {
-        if (
-            null === $previousHashedToken
-            || null === $validUntil
-            || $validUntil <= $this->clock->now()
-        ) {
-            return false;
-        }
-
-        return hash_equals(
-            $previousHashedToken,
-            $presentedToken,
-        );
+    private function withinGracePeriod(?DateTimeImmutable $validUntil): bool
+    {
+        return null !== $validUntil
+            && $validUntil > $this->clock->now();
     }
 
     /** @throws CookieTheftException Always. */
@@ -427,6 +383,11 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                 2,
             );
 
+            // Returning the whole value as a series would walk past the guards that check for the absence of one.
+            if (2 !== count($parts)) {
+                return null;
+            }
+
             return $parts[0];
         } catch (Throwable) {
             return null;
@@ -452,12 +413,6 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             self::HASH_ALGO,
             $rawToken,
         );
-        $signature = $this->computeRowSignature(
-            $series,
-            $hashedToken,
-            $user->getUserIdentifier(),
-            $expiresAt,
-        );
 
         $userAgent = $request->headers->get(
             'User-Agent',
@@ -468,8 +423,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         $session = new Session();
         $session->setSeries($series);
         $session->setHashedToken($hashedToken);
-        $session->setSignature($signature);
-        $session->setSignaturePropertiesHash($this->computeUserPropertiesHash($user));
+        $session->setSignaturePropertiesHash($this->credentials->hash($user));
         $session->setFirewallName($this->firewallName);
         $session->setUserIdentifier($user->getUserIdentifier());
         $session->setCreatedAt($now);
@@ -481,6 +435,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         $session->setDeviceType($meta['type']);
         $session->setBrowser($meta['browser']);
         $session->setOperatingSystem($meta['operatingSystem']);
+        // Last: the signature covers every field above.
+        $session->setSignature($this->rowSignature->forRow($session));
 
         $this->entityManager->persist($session);
         $this->entityManager->flush();
@@ -530,51 +486,6 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $userIdentifier,
             NotificationType::SignIn,
             $request,
-        );
-    }
-
-    /**
-     * Expiry is tracked separately in the DB row. so we pass 0 to make the fingerprint stable across requests.
-     */
-    private function computeUserPropertiesHash(UserInterface $user): string
-    {
-        return $this->signatureHasher->computeSignatureHash(
-            $user,
-            0,
-        );
-    }
-
-    /** The replaced token is only signed once there is one, so rows written before it still verify. */
-    private function computeRowSignature(
-        string $series,
-        string $hashedToken,
-        string $userIdentifier,
-        DateTimeImmutable $expiresAt,
-        ?string $previousHashedToken = null,
-        ?DateTimeImmutable $previousTokenValidUntil = null,
-    ): string {
-        $fields = [
-            $series,
-            $hashedToken,
-            $userIdentifier,
-            $expiresAt->getTimestamp(),
-        ];
-
-        if (
-            null !== $previousHashedToken
-            && null !== $previousTokenValidUntil
-        ) {
-            $fields[] = $previousHashedToken;
-            $fields[] = $previousTokenValidUntil->getTimestamp();
-        }
-
-        return hash_hmac(
-            self::HMAC_ALGO,
-            implode(
-                ':',
-                $fields,
-            ),
-            $this->secret,
         );
     }
 

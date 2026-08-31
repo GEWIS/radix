@@ -37,6 +37,10 @@ class RealtimeExtension extends AbstractExtension
                 'realtime_authorize',
                 $this->realtime->authorize(...),
             ),
+            new TwigFunction(
+                'realtime_grant_route',
+                $this->realtime->grantRoute(...),
+            ),
         ];
     }
 }

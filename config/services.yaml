@@ -207,6 +207,18 @@ services:
             $transportLocator: '@messenger.receiver_locator'
             $failureTransportName: '%app.messenger.failure_transport%'
 
+    # Named against each firewall's own event dispatcher, which is where `LogoutEvent` is fired. Here rather than in
+    # `packages/session.yaml` with the rest of the session wiring, because the `App\` prototype above is loaded last
+    # and would replace a definition made there.
+    App\EventListener\User\ClearRealtimeGrantListener:
+        tags:
+            - name: kernel.event_listener
+              event: Symfony\Component\Security\Http\Event\LogoutEvent
+              dispatcher: security.event_dispatcher.main
+            - name: kernel.event_listener
+              event: Symfony\Component\Security\Http\Event\LogoutEvent
+              dispatcher: security.event_dispatcher.company
+
     # The external-application signing service uses the bundle-managed JWS builder and the association's key set. Both
     # are referenced by their bundle service id because several of each exist and autowiring cannot pick by type.
     App\Service\User\ExternalAppService:
