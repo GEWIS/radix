@@ -155,8 +155,10 @@
                 } only %}
             {% endif %}
 
-            {% if currentPoll is not null %}
-                {{ component('Frontpage:PollWidget', {'poll': currentPoll}) }}
+            {% if activePolls is not empty %}
+                {{ component('Frontpage:PollWidget', {'polls': activePolls}) }}
+            {% else %}
+                {% include 'partials/frontpage/last-poll-panel.html.twig' with {'poll': lastPoll} only %}
             {% endif %}
 
             {# The infimum is a members-only thing, and the topic it rotates over is subscribed to on the same terms. #}

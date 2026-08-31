@@ -1,0 +1,30 @@
+{#
+    Pages a panel through a set of things, one at a time, from its heading. Renders nothing for a set of one.
+
+    Pass `index` (0-based) and `total`, plus `previousLabel` and `nextLabel` naming what is being paged for a screen
+    reader. The controls call the live action `action` (default `show`) with the index to move to, which the component
+    is free to wrap round.
+#}
+{% set action = action|default('show') %}
+
+{% if total > 1 %}
+    <div class="panel-pager">
+        <button type="button" class="panel-pager-step"
+                data-action="live#action"
+                data-live-action-param="{{ action }}"
+                data-live-at-param="{{ index - 1 }}"
+                aria-label="{{ previousLabel }}">
+            <span class="fas fa-chevron-left" aria-hidden="true"></span>
+        </button>
+        <span class="panel-pager-position">
+            {{ '%at% of %of%'|trans({'%at%': index + 1, '%of%': total}) }}
+        </span>
+        <button type="button" class="panel-pager-step"
+                data-action="live#action"
+                data-live-action-param="{{ action }}"
+                data-live-at-param="{{ index + 1 }}"
+                aria-label="{{ nextLabel }}">
+            <span class="fas fa-chevron-right" aria-hidden="true"></span>
+        </button>
+    </div>
+{% endif %}

@@ -14,10 +14,12 @@
 {% set total = poll.totalVotesCount %}
 {% set leading = poll.leadingOption %}
 {% set daysLeft = this.daysLeft %}
+{% set running = this.polls|length %}
 
 <div{{ attributes }}>
     <div class="panel">
-        <div class="panel-heading">
+        {# The flex is on the heading itself: `.panel-heading > h3` is a direct-child selector. #}
+        <div class="panel-heading{{ detailed ? '' : ' d-flex justify-content-between align-items-baseline gap-2' }}">
             {% if detailed %}
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                     {% if poll.isActive %}
@@ -39,6 +41,13 @@
                 </p>
             {% else %}
                 <h3>{{ 'Poll'|trans }}</h3>
+
+                {% include 'partials/application/panel-pager.html.twig' with {
+                    'index': this.index,
+                    'total': running,
+                    'previousLabel': 'Previous poll'|trans,
+                    'nextLabel': 'Next poll'|trans,
+                } only %}
             {% endif %}
         </div>
 

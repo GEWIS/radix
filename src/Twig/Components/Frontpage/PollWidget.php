@@ -10,10 +10,12 @@ use App\Entity\Frontpage\PollOption;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Frontpage\PollRepository;
+use App\Repository\Frontpage\PollVoteRepository;
 use App\Service\Frontpage\PollService;
 use App\Twig\Components\Concerns\FlashesTrait;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use LogicException;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -28,6 +30,12 @@ use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Attribute\PostHydrate;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\TwigComponent\Attribute\PostMount;
+
+use function array_key_exists;
+use function array_values;
+use function count;
+use function intval;
 
 /**
  * A poll as it is shown and answered: the question, the answers to pick from, and how the association answered so far.
@@ -39,8 +47,8 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
  * Deliberately not gated as a whole, because a passer-by should still see what the association is being asked; they
  * simply get no controls, and {@see self::vote()} checks for itself rather than trusting that.
  *
- * Answering is a live action and nothing else, so a reader without JavaScript sees the question and the results but
- * cannot answer.
+ * Answering and paging are live actions and nothing else, so a reader without JavaScript sees the first question and
+ * the results but cannot answer or move on.
  */
 #[AsLiveComponent(
     name: 'Frontpage:PollWidget',
@@ -51,8 +59,12 @@ final class PollWidget
     use DefaultActionTrait;
     use FlashesTrait;
 
+    /** @var Poll[] */
     #[LiveProp]
-    public Poll $poll;
+    public array $polls = [];
+
+    #[LiveProp]
+    public int $index = 0;
 
     /** The poll's own page shows the whole card; the front page shows the short one. */
     #[LiveProp]
@@ -61,27 +73,78 @@ final class PollWidget
     /** Component-local, transient: what went wrong, shown on the render right after an answer. */
     public ?string $problem = null;
 
-    private bool $chosenResolved = false;
-    private ?PollOption $chosen = null;
+    /** @var array<int, PollOption|null> */
+    private array $chosen = [];
 
     public function __construct(
         private readonly Security $security,
         private readonly PollService $pollService,
         private readonly PollRepository $pollRepository,
+        private readonly PollVoteRepository $pollVoteRepository,
         private readonly TranslatorInterface $translator,
         private readonly RequestStack $requestStack,
         private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
+    #[PostMount]
+    public function openOnWhatIsUnanswered(): void
+    {
+        $user = $this->security->getUser();
+
+        if (
+            $this->detailed
+            || count($this->polls) < 2
+            || !$user instanceof User
+        ) {
+            return;
+        }
+
+        $ordered = array_values($this->polls);
+        $answered = $this->pollVoteRepository->answeredOf(
+            $ordered,
+            $user->getMember(),
+        );
+
+        foreach ($ordered as $at => $poll) {
+            if (
+                array_key_exists(
+                    intval($poll->getId()),
+                    $answered,
+                )
+            ) {
+                continue;
+            }
+
+            $this->index = $at;
+
+            return;
+        }
+    }
+
     /**
-     * A live action re-hydrates the poll bare, so the render after it would count every answer's votes one query at
+     * A live action re-hydrates the polls bare, so the render after it would count every answer's votes one query at
      * a time. The initial render is primed by whoever mounts the component instead.
      */
     #[PostHydrate]
     public function primeResults(): void
     {
-        $this->pollRepository->primeResults([$this->poll]);
+        $this->pollRepository->primeResults(array_values($this->polls));
+    }
+
+    public function poll(): Poll
+    {
+        return $this->polls[$this->index]
+            ?? throw new LogicException('The poll panel was mounted without a poll to show.');
+    }
+
+    #[LiveAction]
+    public function show(
+        #[LiveArg]
+        int $at,
+    ): void {
+        // Wraps, so neither control is ever dead.
+        $this->index = (($at % count($this->polls)) + count($this->polls)) % count($this->polls);
     }
 
     #[LiveAction]
@@ -93,13 +156,15 @@ final class PollWidget
             throw new AccessDeniedException();
         }
 
+        $poll = $this->poll();
+
         // Looked up outside the catch below: an AccessDeniedException is a RuntimeException too, and refusing an
         // answer that is not this poll's is not something to turn into a message about having already answered.
         $chosen = $this->find($option);
 
         try {
             $this->pollService->submitVote(
-                $this->poll,
+                $poll,
                 $chosen,
                 $this->member()->getMember(),
             );
@@ -107,46 +172,45 @@ final class PollWidget
             // A second tab answered while this one was deciding and the unique index caught it. The entity manager is
             // closed now, so this panel cannot be re-rendered: flash and send the reader to the poll, which reloads
             // it in its answered state on a fresh manager.
-            return $this->answeredElsewhere();
+            return $this->answeredElsewhere($poll);
         } catch (RuntimeException) {
             $this->problem = $this->translator->trans('You have already answered this poll.');
         }
 
         // The answer is what the render right after this is about, so what was resolved before it is out of date: the
         // results were counted on the way in, without the answer that has just been given.
-        $this->chosenResolved = false;
-        $this->chosen = null;
+        unset($this->chosen[intval($poll->getId())]);
         $this->primeResults();
 
         return null;
     }
 
-    /**
-     * The answer this reader gave, or null when they have not answered or are not signed in. Resolved once: the
-     * template asks for it, and so does every `canAnswer()` beside it.
-     */
     public function chosen(): ?PollOption
     {
-        if ($this->chosenResolved) {
-            return $this->chosen;
+        $id = intval($this->poll()->getId());
+
+        if (
+            array_key_exists(
+                $id,
+                $this->chosen,
+            )
+        ) {
+            return $this->chosen[$id];
         }
 
-        $this->chosenResolved = true;
         $user = $this->security->getUser();
 
-        if ($user instanceof User) {
-            $this->chosen = $this->pollService->votedOption(
-                $this->poll,
+        return $this->chosen[$id] = $user instanceof User
+            ? $this->pollService->votedOption(
+                $this->poll(),
                 $user->getMember(),
-            );
-        }
-
-        return $this->chosen;
+            )
+            : null;
     }
 
     public function canAnswer(): bool
     {
-        return $this->poll->isActive()
+        return $this->poll()->isActive()
             && $this->security->isGranted(UserRoles::User->value)
             && null === $this->chosen();
     }
@@ -156,11 +220,12 @@ final class PollWidget
      */
     public function daysLeft(): ?int
     {
-        $expiryDate = $this->poll->getExpiryDate();
+        $poll = $this->poll();
+        $expiryDate = $poll->getExpiryDate();
 
         if (
             null === $expiryDate
-            || !$this->poll->isActive()
+            || !$poll->isActive()
         ) {
             return null;
         }
@@ -168,7 +233,7 @@ final class PollWidget
         return new DateTime('today')->diff($expiryDate)->days;
     }
 
-    private function answeredElsewhere(): RedirectResponse
+    private function answeredElsewhere(Poll $poll): RedirectResponse
     {
         $this->flash(
             AlertTypes::Warning->value,
@@ -178,14 +243,14 @@ final class PollWidget
         return new RedirectResponse(
             $this->urlGenerator->generate(
                 'poll/view',
-                ['poll' => $this->poll->getId()],
+                ['poll' => $poll->getId()],
             ),
         );
     }
 
     private function find(int $option): PollOption
     {
-        foreach ($this->poll->getOptions() as $candidate) {
+        foreach ($this->poll()->getOptions() as $candidate) {
             if ($candidate->getId() !== $option) {
                 continue;
             }
