@@ -33,6 +33,9 @@
 	mercure {
 		transport bolt {
 			path /data/caddy/mercure.db
+			# 0 is no limit rather than no history, and cleanup has nothing to trim against. Past some size a
+			# subscriber resuming with a Last-Event-ID receives nothing at all, live updates included.
+			size {$MERCURE_BOLT_SIZE:10000}
 			{$MERCURE_BOLT_EXTRA_DIRECTIVES}
 		}
 		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
