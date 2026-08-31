@@ -108,7 +108,7 @@ final class RegistrationData
 
     #[Assert\NotBlank(groups: [self::STEP_ADDRESS])]
     #[Assert\Regex(
-        pattern: '/^[1-9]\d*(?:[ \/\-\#\.]?[a-zA-Z0-9]+)?$/',
+        pattern: '/^[1-9]\d*(?:[ \/\-\#\.]?[a-zA-Z0-9]+)*$/',
         groups: [self::STEP_ADDRESS],
     )]
     public ?string $number = null;

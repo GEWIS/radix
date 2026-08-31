@@ -84,7 +84,7 @@ class AddressType extends AbstractType
                 'label' => t('House Number'),
                 'constraints' => [
                     new NotBlank(),
-                    new Regex(pattern: '/^[1-9]\d*(?:[ \/\-\#\.]?[a-zA-Z0-9]+)?$/'),
+                    new Regex(pattern: '/^[1-9]\d*(?:[ \/\-\#\.]?[a-zA-Z0-9]+)*$/'),
                 ],
             ],
         );

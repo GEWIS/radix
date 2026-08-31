@@ -74,7 +74,7 @@ class AddressEditType extends AbstractType
                 'label' => t('House Number'),
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Regex(pattern: '/^[1-9]\d*(?:[ \/\-\#\.]?[a-zA-Z0-9]+)?$/'),
+                    new Assert\Regex(pattern: '/^[1-9]\d*(?:[ \/\-\#\.]?[a-zA-Z0-9]+)*$/'),
                 ],
             ],
         );
