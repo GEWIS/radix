@@ -2,9 +2,6 @@
 
 {% block page_title %}{{ customPage.title|localise_text|page_title }}{{ 'Pages'|trans|page_title }}{{ parent() }}{% endblock %}
 
-{# The cookie that lets the browser listen is minted in the base layout from every topic named here. #}
-{% block realtime_extra_topics %}{{ imageTopic }}{% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     {# The editor draws itself with this; without it the toolbar and the editing area render unstyled. #}
