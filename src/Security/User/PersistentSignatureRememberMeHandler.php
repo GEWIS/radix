@@ -12,6 +12,7 @@ use App\Service\User\SecurityNotifier;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SensitiveParameter;
@@ -56,6 +57,9 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
     private const string HASH_ALGO = 'sha256';
     private const string HMAC_ALGO = 'sha256';
 
+    /** Tabs woken together present the same token; without this, every one but the first looks like a replay. */
+    private const int TOKEN_GRACE_SECONDS = 60;
+
     private const array SIGNATURE_PROPERTIES = [
         'password',
         'passwordChangedOn',
@@ -77,6 +81,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         private readonly UserAgentParser $userAgentParser,
         private readonly SecurityNotifier $securityNotifier,
         private readonly KnownDeviceRegistry $knownDevices,
+        private readonly ClockInterface $clock,
         #[Autowire(param: 'kernel.secret')]
         #[SensitiveParameter]
         private readonly string $secret,
@@ -200,6 +205,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $session->getHashedToken(),
             $session->getUserIdentifier(),
             $session->getExpiresAt(),
+            $session->getPreviousHashedToken(),
+            $session->getPreviousTokenValidUntil(),
         );
 
         if (
@@ -222,36 +229,28 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             throw new AuthenticationException('Remember-me signature is invalid.');
         }
 
-        // Cookie theft detection: a valid series with a stale token means the cookie was consumed twice. The rotation
-        // below means whoever presented it first invalidated everyone else's copy; the loser shows up here with a token
-        // that no longer hashes to what is stored. We cannot tell attacker from victim, so we burn every session for
-        // this user on this firewall.
+        $presentedToken = hash(
+            self::HASH_ALGO,
+            $rawToken,
+        );
+
+        // Cookie theft detection: a valid series with a token the row no longer holds means the cookie was consumed
+        // twice. Inside the grace window that is a tab that lost the race rather than a replay; outside it we cannot
+        // tell attacker from victim, so we burn every session for this user on this firewall.
+        $raced = !hash_equals(
+            $session->getHashedToken(),
+            $presentedToken,
+        );
+
         if (
-            !hash_equals(
-                $session->getHashedToken(),
-                hash(
-                    self::HASH_ALGO,
-                    $rawToken,
-                ),
+            $raced
+            && !$this->withinGracePeriod(
+                $session->getPreviousHashedToken(),
+                $session->getPreviousTokenValidUntil(),
+                $presentedToken,
             )
         ) {
-            $this->logger?->emergency(
-                'Cookie theft detected! Invalidating ALL sessions for this user on this firewall.',
-                [
-                    'series' => $series,
-                    'user' => $session->getUserIdentifier(),
-                    'firewall' => $this->firewallName,
-                ],
-            );
-            $this->repository->deleteAllForUserOnFirewall(
-                $session->getUserIdentifier(),
-                $this->firewallName,
-            );
-            $this->entityManager->flush();
-
-            throw new CookieTheftException(
-                'Remember-me token was already consumed. All sessions on this firewall have been invalidated.',
-            );
+            $this->reportTheft($session);
         }
 
         // If any of the properties in the signature changed, detect that and force log out.
@@ -279,30 +278,110 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             );
         }
 
+        // Setting a cookie here would strand the one the winner already handed the browser.
+        if ($raced) {
+            $this->logger?->debug(
+                'Remember-me token was rotated by a concurrent request; accepted within the grace period.',
+                [
+                    'series' => $series,
+                    'user' => $session->getUserIdentifier(),
+                    'firewall' => $this->firewallName,
+                ],
+            );
+
+            return;
+        }
+
         // Rotate the token on every successful use. This is what makes the theft check above meaningful: an old raw
-        // token reappearing after rotation is the smoking gun. Without rotation, we could not distinguish legitimate
-        // reuse from a replayed stolen cookie.
+        // token reappearing after the grace period is the smoking gun. Without rotation, we could not distinguish
+        // legitimate reuse from a replayed stolen cookie.
         $newRawToken = $this->generateToken();
         $newHashedToken = hash(
             self::HASH_ALGO,
             $newRawToken,
         );
+        $now = $this->clock->now();
+        $validUntil = $now->modify('+' . self::TOKEN_GRACE_SECONDS . ' seconds');
 
-        $session->setHashedToken($newHashedToken);
-        $session->setSignature($this->computeRowSignature(
+        $rotated = $this->repository->rotateToken(
             $session->getSeries(),
+            $session->getHashedToken(),
             $newHashedToken,
-            $session->getUserIdentifier(),
-            $session->getExpiresAt(),
-        ));
-        $session->setLastUsedAt(new DateTimeImmutable());
-        $this->entityManager->flush();
+            $this->computeRowSignature(
+                $session->getSeries(),
+                $newHashedToken,
+                $session->getUserIdentifier(),
+                $session->getExpiresAt(),
+                $session->getHashedToken(),
+                $validUntil,
+            ),
+            $validUntil,
+            $now,
+        );
+
+        // Lost the write, so what this request holds has just become the previous token.
+        if (!$rotated) {
+            $grace = $this->repository->findRotationGrace($session->getSeries());
+
+            if (
+                !$this->withinGracePeriod(
+                    $grace['previousHashedToken'] ?? null,
+                    $grace['previousTokenValidUntil'] ?? null,
+                    $presentedToken,
+                )
+            ) {
+                $this->reportTheft($session);
+            }
+
+            return;
+        }
 
         $this->createCookie(new RememberMeDetails(
             $user->getUserIdentifier(),
             $session->getExpiresAt()->getTimestamp(),
             $series . self::COOKIE_DELIMITER . $newRawToken,
         ));
+    }
+
+    private function withinGracePeriod(
+        ?string $previousHashedToken,
+        ?DateTimeImmutable $validUntil,
+        string $presentedToken,
+    ): bool {
+        if (
+            null === $previousHashedToken
+            || null === $validUntil
+            || $validUntil <= $this->clock->now()
+        ) {
+            return false;
+        }
+
+        return hash_equals(
+            $previousHashedToken,
+            $presentedToken,
+        );
+    }
+
+    /** @throws CookieTheftException Always. */
+    private function reportTheft(Session $session): never
+    {
+        $this->logger?->emergency(
+            'Cookie theft detected! Invalidating ALL sessions for this user on this firewall.',
+            [
+                'series' => $session->getSeries(),
+                'user' => $session->getUserIdentifier(),
+                'firewall' => $this->firewallName,
+            ],
+        );
+        $this->repository->deleteAllForUserOnFirewall(
+            $session->getUserIdentifier(),
+            $this->firewallName,
+        );
+        $this->entityManager->flush();
+
+        throw new CookieTheftException(
+            'Remember-me token was already consumed. All sessions on this firewall have been invalidated.',
+        );
     }
 
     #[Override]
@@ -366,7 +445,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
     ): array {
         $series = $this->generateToken(44);
         $rawToken = $this->generateToken();
-        $expiresAt = new DateTimeImmutable('+' . $this->tokenLifetime . ' seconds');
+        $now = $this->clock->now();
+        $expiresAt = $now->modify('+' . $this->tokenLifetime . ' seconds');
 
         $hashedToken = hash(
             self::HASH_ALGO,
@@ -392,9 +472,9 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         $session->setSignaturePropertiesHash($this->computeUserPropertiesHash($user));
         $session->setFirewallName($this->firewallName);
         $session->setUserIdentifier($user->getUserIdentifier());
-        $session->setCreatedAt(new DateTimeImmutable());
+        $session->setCreatedAt($now);
         $session->setExpiresAt($expiresAt);
-        $session->setLastUsedAt(new DateTimeImmutable());
+        $session->setLastUsedAt($now);
         $session->setUserAgent($userAgent);
         $session->setIpAddress($request->getClientIp() ?? '');
         $session->setPhpSessionId($request->getSession()->getId());
@@ -464,25 +544,36 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         );
     }
 
+    /** The replaced token is only signed once there is one, so rows written before it still verify. */
     private function computeRowSignature(
         string $series,
         string $hashedToken,
         string $userIdentifier,
         DateTimeImmutable $expiresAt,
+        ?string $previousHashedToken = null,
+        ?DateTimeImmutable $previousTokenValidUntil = null,
     ): string {
-        $data = implode(
-            ':',
-            [
-                $series,
-                $hashedToken,
-                $userIdentifier,
-                $expiresAt->getTimestamp(),
-            ],
-        );
+        $fields = [
+            $series,
+            $hashedToken,
+            $userIdentifier,
+            $expiresAt->getTimestamp(),
+        ];
+
+        if (
+            null !== $previousHashedToken
+            && null !== $previousTokenValidUntil
+        ) {
+            $fields[] = $previousHashedToken;
+            $fields[] = $previousTokenValidUntil->getTimestamp();
+        }
 
         return hash_hmac(
             self::HMAC_ALGO,
-            $data,
+            implode(
+                ':',
+                $fields,
+            ),
             $this->secret,
         );
     }

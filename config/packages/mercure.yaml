@@ -1,5 +1,7 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 mercure:
+    # Named so it does not follow `framework.session.cookie_lifetime`; an hour is what it already was.
+    default_cookie_lifetime: 3600
     hubs:
         default:
             url: '%env(MERCURE_URL)%'

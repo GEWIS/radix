@@ -4,8 +4,6 @@
 
 {% block page_title %}{{ album.name|page_title }}{{ 'Photos'|trans|page_title }}{{ parent() }}{% endblock %}
 
-{% block realtime_extra_topics %}photo/album/{{ album.id }}/cover{% endblock %}
-
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item">
         <a href="{{ path('admin/photos/index') }}">

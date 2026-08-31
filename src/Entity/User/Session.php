@@ -58,6 +58,18 @@ class Session
     #[Column(type: Types::STRING)]
     private string $hashedToken;
 
+    #[Column(
+        type: Types::STRING,
+        nullable: true,
+    )]
+    private ?string $previousHashedToken = null;
+
+    #[Column(
+        type: Types::DATETIME_IMMUTABLE,
+        nullable: true,
+    )]
+    private ?DateTimeImmutable $previousTokenValidUntil = null;
+
     /**
      * HMAC of the immutable row fields. Detects DB tampering.
      */
@@ -152,6 +164,26 @@ class Session
     public function setHashedToken(string $hashedToken): void
     {
         $this->hashedToken = $hashedToken;
+    }
+
+    public function getPreviousHashedToken(): ?string
+    {
+        return $this->previousHashedToken;
+    }
+
+    public function setPreviousHashedToken(?string $previousHashedToken): void
+    {
+        $this->previousHashedToken = $previousHashedToken;
+    }
+
+    public function getPreviousTokenValidUntil(): ?DateTimeImmutable
+    {
+        return $this->previousTokenValidUntil;
+    }
+
+    public function setPreviousTokenValidUntil(?DateTimeImmutable $previousTokenValidUntil): void
+    {
+        $this->previousTokenValidUntil = $previousTokenValidUntil;
     }
 
     public function getSignature(): string

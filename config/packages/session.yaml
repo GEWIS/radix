@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 parameters:
     app.session_prefix: 'gws_sess_'
+    # Named rather than left to `session.gc_maxlifetime`, whose twenty-four minutes had an ordinary break ending in
+    # a remember-me re-authentication, and a token rotation with it.
+    app.session_ttl: 28800
 
 services:
     app.security.remember_me.main:
@@ -43,4 +46,4 @@ services:
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
             - '@Redis'
-            - { prefix: '%app.session_prefix%' }
+            - { prefix: '%app.session_prefix%', ttl: '%app.session_ttl%' }

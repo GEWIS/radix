@@ -36,6 +36,95 @@ class SessionRepository extends ServiceEntityRepository
         return $this->findOneBy(['series' => $series]);
     }
 
+    /** Conditional on the token read still being current, so two racing requests cannot overwrite one another. */
+    public function rotateToken(
+        string $series,
+        string $currentHashedToken,
+        string $newHashedToken,
+        string $signature,
+        DateTimeImmutable $previousTokenValidUntil,
+        DateTimeImmutable $lastUsedAt,
+    ): bool {
+        return 1 === $this->createQueryBuilder('s')
+            ->update()
+            ->set(
+                's.hashedToken',
+                ':new',
+            )
+            ->set(
+                's.signature',
+                ':signature',
+            )
+            ->set(
+                's.previousHashedToken',
+                ':previous',
+            )
+            ->set(
+                's.previousTokenValidUntil',
+                ':validUntil',
+            )
+            ->set(
+                's.lastUsedAt',
+                ':lastUsedAt',
+            )
+            ->where('s.series = :series')
+            ->andWhere('s.hashedToken = :current')
+            ->setParameter(
+                'new',
+                $newHashedToken,
+            )
+            ->setParameter(
+                'signature',
+                $signature,
+            )
+            ->setParameter(
+                'previous',
+                $currentHashedToken,
+            )
+            ->setParameter(
+                'validUntil',
+                $previousTokenValidUntil,
+            )
+            ->setParameter(
+                'lastUsedAt',
+                $lastUsedAt,
+            )
+            ->setParameter(
+                'series',
+                $series,
+            )
+            ->setParameter(
+                'current',
+                $currentHashedToken,
+            )
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Read past the identity map, so a caller that lost a conditional update sees what the winner wrote.
+     *
+     * @return array{previousHashedToken: string|null, previousTokenValidUntil: DateTimeImmutable|null}|null
+     */
+    public function findRotationGrace(string $series): ?array
+    {
+        /** @var array{previousHashedToken: string|null, previousTokenValidUntil: DateTimeImmutable|null}|null $row */
+        $row = $this->createQueryBuilder('s')
+            ->select(
+                's.previousHashedToken',
+                's.previousTokenValidUntil',
+            )
+            ->where('s.series = :series')
+            ->setParameter(
+                'series',
+                $series,
+            )
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $row;
+    }
+
     public function findOneByPhpSessionId(string $phpSessionId): ?Session
     {
         return $this->findOneBy(['phpSessionId' => $phpSessionId]);
