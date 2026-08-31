@@ -16,6 +16,7 @@ use App\ViewModel\Checker\Error\AnnulmentOfAnnulment;
 use App\ViewModel\Checker\Error\AnnulmentOfLaterDecision;
 use App\ViewModel\Checker\Error\DocumentDatedAfterMeeting;
 use App\ViewModel\Checker\Error\KeyGrantedInThePast;
+use App\ViewModel\Checker\Error\KeyGrantedLongerThanOneYear;
 use App\ViewModel\Checker\Error\KeyGrantedPastBoundary;
 use App\ViewModel\Checker\Error\KeyWithdrawnPastOriginalGranting;
 use App\ViewModel\Checker\Error\MemberExpiredButStillInOrgan;
@@ -88,6 +89,29 @@ class CheckerTest extends KernelTestCase
             $this->errorsAbout(
                 $this->checker->checkOrganFoundationMeetingType($meeting),
                 $committee,
+                OrganMeetingType::class,
+            ),
+        );
+    }
+
+    /**
+     * A voting committee counts the votes at a members' meeting, so a members' meeting is where it is founded.
+     */
+    public function testAcceptsAVotingCommitteeFoundedByAMembersMeeting(): void
+    {
+        $meeting = $this->build->meeting(MeetingTypes::ALV);
+        $votingCommittee = $this->build->foundOrgan(
+            $meeting,
+            'STC',
+            'Stemcommissie',
+            OrganTypes::SC,
+        );
+
+        self::assertSame(
+            [],
+            $this->errorsAbout(
+                $this->checker->checkOrganFoundationMeetingType($meeting),
+                $votingCommittee,
                 OrganMeetingType::class,
             ),
         );
@@ -300,6 +324,49 @@ class CheckerTest extends KernelTestCase
             $meeting,
             $this->build->member(),
             '2027-09-01',
+        );
+
+        self::assertSame(
+            [],
+            $this->errorsAbout(
+                $this->checker->checkKeyGrantingDuration($meeting),
+                $granting,
+            ),
+        );
+    }
+
+    /**
+     * Between January 1st, 2020 and BV 1749.15.1 a key code could not be granted for longer than a year.
+     */
+    public function testReportsAKeyCodeGrantedForLongerThanAYear(): void
+    {
+        $meeting = $this->build->meeting(date: '2021-07-15');
+        $granting = $this->build->grantKey(
+            $meeting,
+            $this->build->member(),
+            '2022-08-15',
+        );
+
+        self::assertCount(
+            1,
+            $this->errorsAbout(
+                $this->checker->checkKeyGrantingDuration($meeting),
+                $granting,
+                KeyGrantedLongerThanOneYear::class,
+            ),
+        );
+    }
+
+    /**
+     * That restriction did not exist before 2020, so a key code granted then may run for as long as it says.
+     */
+    public function testAcceptsAKeyCodeGrantedForLongerThanAYearBefore2020(): void
+    {
+        $meeting = $this->build->meeting(date: '2019-07-15');
+        $granting = $this->build->grantKey(
+            $meeting,
+            $this->build->member(),
+            '2020-08-15',
         );
 
         self::assertSame(

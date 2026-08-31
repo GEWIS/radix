@@ -266,8 +266,8 @@ class Checker
             $meetingType = $organ->getDecision()->getMeeting()->getType();
 
             // Chair's Meetings (VV) cannot be used to found an(y) organ. During General Members Meetings (ALV) only
-            // specific organs can be founded, namely: AVC, AVW, KCC, Fraternity, and RvA. Furthermore, these organ can
-            // only be founded in ALVs, not in any other meeting (except virtual meetings).
+            // specific organs can be founded, namely: AVC, AVW, KCC, Fraternity, RvA, and SC. Furthermore, these organ
+            // can only be founded in ALVs, not in any other meeting (except virtual meetings).
             //
             // However, this only holds after October 7, 2021, when the Internal Regulations of the association were
             // updated to reflect changes with respect to fraternities (before October 7, 2021, they could be founded
@@ -282,6 +282,7 @@ class Checker
                         && OrganTypes::Fraternity !== $organType
                         && OrganTypes::KCC !== $organType
                         && OrganTypes::RvA !== $organType
+                        && OrganTypes::SC !== $organType
                     )
                 )
             ) {
@@ -300,6 +301,7 @@ class Checker
                     && OrganTypes::Fraternity !== $organType
                     && OrganTypes::KCC !== $organType
                     && OrganTypes::RvA !== $organType
+                    && OrganTypes::SC !== $organType
                 )
             ) {
                 continue;
@@ -320,9 +322,10 @@ class Checker
     }
 
     /**
-     * Checks that key codes that have been granted do not expire too late. In accordance with the current Key Policy
-     * this means that a key code may not be granted for a period longer than a year nor may it be granted for a period
-     * that ends after September 1st of the next association year.
+     * Checks that key codes that have been granted do not expire too late. In accordance with the Key Policy this
+     * means that a key code may not be granted for a period that ends after September 1st of the next association
+     * year, and that a key code granted between January 1st, 2020 and July 1st, 2025 may not run for longer than a
+     * year.
      *
      * @return ErrorModel[]
      */
@@ -330,7 +333,9 @@ class Checker
     {
         $errors = [];
         $grantings = $this->keyService->getKeysGrantedDuringMeeting($meeting);
-        // With BV 1749.15.1 no more restrictions on max. one year.
+        // The max. one year restriction only applies to key codes granted from 2020-01-01 onwards, with BV 1749.15.1
+        // there are no more restrictions on max. one year.
+        $maxOneYearStart = new DateTime('2020-01-01 midnight');
         $maxOneYearCutOff = new DateTime('2025-07-01 midnight');
 
         // `$today` is when the meeting took place
@@ -346,7 +351,8 @@ class Checker
                 $errors[] = new ErrorModel\KeyGrantedInThePast($granting);
             } else {
                 if (
-                    $today < $maxOneYearCutOff
+                    $today >= $maxOneYearStart
+                    && $today < $maxOneYearCutOff
                     && $until > $todayNextYear
                 ) {
                     $errors[] = new ErrorModel\KeyGrantedLongerThanOneYear($granting);
