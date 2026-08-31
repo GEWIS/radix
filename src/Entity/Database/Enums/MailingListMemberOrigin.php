@@ -12,6 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 enum MailingListMemberOrigin: string implements TranslatableInterface
 {
     case Manual = 'manual';
+    case SelfService = 'self_service';
     case SyncMailman = 'sync_mailman';
     case SyncListmonk = 'sync_listmonk';
 
@@ -23,6 +24,7 @@ enum MailingListMemberOrigin: string implements TranslatableInterface
     {
         return match ($this) {
             self::Manual => new TranslatableMessage('manual'),
+            self::SelfService => new TranslatableMessage('by the member'),
             self::SyncMailman => new TranslatableMessage('mailman sync'),
             self::SyncListmonk => new TranslatableMessage('listmonk sync'),
         };

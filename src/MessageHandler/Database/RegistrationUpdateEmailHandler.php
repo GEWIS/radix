@@ -10,6 +10,7 @@ use App\Message\Database\RegistrationUpdateEmail;
 use App\Repository\Database\MemberRepository;
 use App\Repository\Database\ProspectiveMemberRepository;
 use App\Service\Application\Email as EmailService;
+use App\Service\Database\ActionLinkService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -25,6 +26,7 @@ class RegistrationUpdateEmailHandler
         private readonly MemberRepository $memberRepository,
         private readonly ProspectiveMemberRepository $prospectiveMemberRepository,
         private readonly EmailService $emailService,
+        private readonly ActionLinkService $actionLinkService,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly string $mailToSubscriptionAddress,
         private readonly string $mailToSubscriptionName,
@@ -60,13 +62,14 @@ class RegistrationUpdateEmailHandler
             'member' => $member,
             'firstName' => $member->getFirstName(),
             'lidnr' => $member->getLidnr(),
+            // Only a hash is kept, so this mints a new token and the link that went before stops working.
             'restartUrl' => null === $paymentLink
                 ? null
                 : $this->urlGenerator->generate(
                     'join_checkout_restart',
                     [
                         '_locale' => Languages::English->getLangParam(),
-                        'token' => $paymentLink->getToken(),
+                        'token' => $this->actionLinkService->reissue($paymentLink),
                     ],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),

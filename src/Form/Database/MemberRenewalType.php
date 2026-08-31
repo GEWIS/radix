@@ -62,7 +62,7 @@ class MemberRenewalType extends AbstractType
             'email',
             EmailType::class,
             [
-                'label' => t('E-mail Address'),
+                'label' => t('Email Address'),
                 'constraints' => [new Assert\NotBlank()],
             ],
         );

@@ -95,7 +95,11 @@ class WithdrawType extends AbstractType
             return;
         }
 
-        $context->buildViolation('Key code cannot be withdrawn in the past.')->addViolation();
+        $context->buildViolation(t(
+            'Key code cannot be withdrawn in the past.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 
     /**
@@ -116,7 +120,11 @@ class WithdrawType extends AbstractType
             return;
         }
 
-        $context->buildViolation('Key code cannot be withdrawn after its original expiration.')->addViolation();
+        $context->buildViolation(t(
+            'Key code cannot be withdrawn after its original expiration.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 
     private static function root(ExecutionContextInterface $context): ?FormInterface

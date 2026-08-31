@@ -128,7 +128,7 @@
             <div class="panel-body">
                 <dl class="registration-review mb-0">
                     {{ review.review_row('Name'|trans, data.fullName, 'personal', form) }}
-                    {{ review.review_row('E-mail Address'|trans, data.email, 'personal', form) }}
+                    {{ review.review_row('Email Address'|trans, data.email, 'personal', form) }}
                     {{ review.review_row('Birthdate'|trans, data.birth ? data.birth|date('Y-m-d') : null, 'personal', form) }}
                     {{ review.review_row('TU/e student number'|trans, data.studentNumber, 'study', form) }}
                     {{ review.review_row('Study'|trans, data.study ? data.study.value|trans : null, 'study', form) }}

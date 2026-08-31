@@ -9,6 +9,18 @@
         <source>A body cannot be allowed a negative number of activities.</source>
         <target state="translated">A body cannot be allowed a negative number of activities.</target>
       </trans-unit>
+      <trans-unit id="lf2h6s." resname="A body regulation cannot be dated after the meeting.">
+        <source>A body regulation cannot be dated after the meeting.</source>
+        <target state="translated">A body regulation cannot be dated after the meeting.</target>
+      </trans-unit>
+      <trans-unit id="FDMZyY6" resname="A budget or financial statement cannot be dated after the meeting.">
+        <source>A budget or financial statement cannot be dated after the meeting.</source>
+        <target state="translated">A budget or financial statement cannot be dated after the meeting.</target>
+      </trans-unit>
+      <trans-unit id="v6dftp4" resname="A course cannot be similar to itself.">
+        <source>A course cannot be similar to itself.</source>
+        <target state="translated">A course cannot be similar to itself.</target>
+      </trans-unit>
       <trans-unit id="6xn2oL6" resname="A course code contains only letters and digits.">
         <source>A course code contains only letters and digits.</source>
         <target state="translated">A course code contains only letters and digits.</target>
@@ -25,6 +37,10 @@
         <source>A course name is at most {{ limit }} characters.</source>
         <target state="translated">A course name is at most {{ limit }} characters.</target>
       </trans-unit>
+      <trans-unit id="EEuUEqJ" resname="A course with this code already exists.">
+        <source>A course with this code already exists.</source>
+        <target state="translated">A course with this code already exists.</target>
+      </trans-unit>
       <trans-unit id="rp3sXE8" resname="A day cannot end before it starts.">
         <source>A day cannot end before it starts.</source>
         <target state="translated">A day cannot end before it starts.</target>
@@ -40,6 +56,10 @@
       <trans-unit id="3T8qjGm" resname="A slug starts with a letter and contains only lowercase letters, digits, underscores and hyphens.">
         <source>A slug starts with a letter and contains only lowercase letters, digits, underscores and hyphens.</source>
         <target state="translated">A slug starts with a letter and contains only lowercase letters, digits, underscores and hyphens.</target>
+      </trans-unit>
+      <trans-unit id="YjuOqto" resname="A suspension cannot end before it starts.">
+        <source>A suspension cannot end before it starts.</source>
+        <target state="translated">A suspension cannot end before it starts.</target>
       </trans-unit>
       <trans-unit id="Z4xvutl" resname="Another company already uses this slug.">
         <source>Another company already uses this slug.</source>
@@ -81,9 +101,17 @@
         <source>Choose the job package this vacancy belongs to.</source>
         <target state="translated">Choose the job package this vacancy belongs to.</target>
       </trans-unit>
+      <trans-unit id="o89JiG4" resname="Choose when the draw happens.">
+        <source>Choose when the draw happens.</source>
+        <target state="translated">Choose when the draw happens.</target>
+      </trans-unit>
       <trans-unit id="SDwIA.h" resname="Describe how you addressed the requested changes before resubmitting.">
         <source>Describe how you addressed the requested changes before resubmitting.</source>
         <target state="translated">Describe how you addressed the requested changes before resubmitting.</target>
+      </trans-unit>
+      <trans-unit id="m5GjCVw" resname="Describe the allocation method.">
+        <source>Describe the allocation method.</source>
+        <target state="translated">Describe the allocation method.</target>
       </trans-unit>
       <trans-unit id="t.WZn.q" resname="Enter a 6-digit authenticator code or a 16-character lowercase-hex backup code.">
         <source>Enter a 6-digit authenticator code or a 16-character lowercase-hex backup code.</source>
@@ -92,6 +120,10 @@
       <trans-unit id="TLLxnao" resname="Enter a callback URL.">
         <source>Enter a callback URL.</source>
         <target>Enter a callback URL.</target>
+      </trans-unit>
+      <trans-unit id="GtRVfkG" resname="Enter a capacity of at least 1 for a limited-capacity list.">
+        <source>Enter a capacity of at least 1 for a limited-capacity list.</source>
+        <target state="translated">Enter a capacity of at least 1 for a limited-capacity list.</target>
       </trans-unit>
       <trans-unit id="iXcFJXc" resname="Enter a closing date and time.">
         <source>Enter a closing date and time.</source>
@@ -104,6 +136,10 @@
       <trans-unit id="Uf1hK4Z" resname="Enter a name.">
         <source>Enter a name.</source>
         <target state="translated">Enter a name.</target>
+      </trans-unit>
+      <trans-unit id="ysRKq0L" resname="Enter a positive number of hours.">
+        <source>Enter a positive number of hours.</source>
+        <target state="translated">Enter a positive number of hours.</target>
       </trans-unit>
       <trans-unit id="44WBSgF" resname="Enter a slug.">
         <source>Enter a slug.</source>
@@ -157,6 +193,10 @@
         <source>Enter the course name.</source>
         <target state="translated">Enter the course name.</target>
       </trans-unit>
+      <trans-unit id="xd8BEyI" resname="Enter the course this belongs to.">
+        <source>Enter the course this belongs to.</source>
+        <target state="translated">Enter the course this belongs to.</target>
+      </trans-unit>
       <trans-unit id="PaQzpFY" resname="Enter the date of this document.">
         <source>Enter the date of this document.</source>
         <target state="translated">Enter the date of this document.</target>
@@ -185,6 +225,10 @@
         <source>Enter the day this would start on.</source>
         <target state="translated">Enter the day this would start on.</target>
       </trans-unit>
+      <trans-unit id="Mjb2S2v" resname="Enter the external party policy URL.">
+        <source>Enter the external party policy URL.</source>
+        <target state="translated">Enter the external party policy URL.</target>
+      </trans-unit>
       <trans-unit id="471SL38" resname="Enter the first day of this round.">
         <source>Enter the first day of this round.</source>
         <target state="translated">Enter the first day of this round.</target>
@@ -193,9 +237,13 @@
         <source>Enter the last day of this round.</source>
         <target state="translated">Enter the last day of this round.</target>
       </trans-unit>
+      <trans-unit id="XYEvm8Q" resname="Enter the moment the list must be full by.">
+        <source>Enter the moment the list must be full by.</source>
+        <target state="translated">Enter the moment the list must be full by.</target>
+      </trans-unit>
       <trans-unit id="lTUvqlg" resname="Enter the title in both languages.">
         <source>Enter the title in both languages.</source>
-        <target></target>
+        <target state="translated">Enter the title in both languages.</target>
       </trans-unit>
       <trans-unit id="2X4xmPw" resname="Enter when bodies may start proposing.">
         <source>Enter when bodies may start proposing.</source>
@@ -237,13 +285,29 @@
         <source>Give this round a name.</source>
         <target state="translated">Give this round a name.</target>
       </trans-unit>
+      <trans-unit id="WLxP5.7" resname="Key code cannot be granted in the past.">
+        <source>Key code cannot be granted in the past.</source>
+        <target state="translated">Key code cannot be granted in the past.</target>
+      </trans-unit>
+      <trans-unit id="JPUWM0H" resname="Key code cannot be withdrawn after its original expiration.">
+        <source>Key code cannot be withdrawn after its original expiration.</source>
+        <target state="translated">Key code cannot be withdrawn after its original expiration.</target>
+      </trans-unit>
+      <trans-unit id="4zk0TKl" resname="Key code cannot be withdrawn in the past.">
+        <source>Key code cannot be withdrawn in the past.</source>
+        <target state="translated">Key code cannot be withdrawn in the past.</target>
+      </trans-unit>
+      <trans-unit id="beIGZxZ" resname="Mailman and Listmonk mailing lists cannot both be set at the same time">
+        <source>Mailman and Listmonk mailing lists cannot both be set at the same time</source>
+        <target state="translated">Mailman and Listmonk mailing lists cannot both be set at the same time</target>
+      </trans-unit>
       <trans-unit id="Dtm28Py" resname="Only one option can be preselected as the default.">
         <source>Only one option can be preselected as the default.</source>
         <target state="translated">Only one option can be preselected as the default.</target>
       </trans-unit>
       <trans-unit id="mc0AGDu" resname="Organ regulations can only be created for 'committee', 'fraternity', or 'financial audit committee'.">
         <source>Organ regulations can only be created for 'committee', 'fraternity', or 'financial audit committee'.</source>
-        <target></target>
+        <target state="translated">Organ regulations can only be created for 'committee', 'fraternity', or 'financial audit committee'.</target>
       </trans-unit>
       <trans-unit id="kt2r1Zi" resname="Pick the body that would host this activity.">
         <source>Pick the body that would host this activity.</source>
@@ -369,6 +433,10 @@
         <source>The website already answers to this address, so a page cannot take it.</source>
         <target state="translated">The website already answers to this address, so a page cannot take it.</target>
       </trans-unit>
+      <trans-unit id="huxgxH1" resname="There is no course with code &quot;{{ code }}&quot;.">
+        <source>There is no course with code "{{ code }}".</source>
+        <target state="translated">There is no course with code "{{ code }}".</target>
+      </trans-unit>
       <trans-unit id="fQO92TH" resname="This body already has a limit for this period.">
         <source>This body already has a limit for this period.</source>
         <target state="translated">This body already has a limit for this period.</target>
@@ -415,7 +483,7 @@
       </trans-unit>
       <trans-unit id="mUlGeaN" resname="Write the text in both languages.">
         <source>Write the text in both languages.</source>
-        <target></target>
+        <target state="translated">Write the text in both languages.</target>
       </trans-unit>
       <trans-unit id="fcfNWQJ" resname="You can only highlight your own vacancies that are currently shown on the website.">
         <source>You can only highlight your own vacancies that are currently shown on the website.</source>
@@ -429,13 +497,13 @@
         <source>You cannot propose an activity for this body.</source>
         <target state="translated">You cannot propose an activity for this body.</target>
       </trans-unit>
-      <trans-unit id="KWcTrZE" resname="You cannot use your TU/e (student) e-mail address because if you leave or stop studying, we can no longer reach you about important announcements.">
-        <source>You cannot use your TU/e (student) e-mail address because if you leave or stop studying, we can no longer reach you about important announcements.</source>
-        <target></target>
+      <trans-unit id="c5LyyQZ" resname="You cannot use your TU/e (student) email address because if you leave or stop studying, we can no longer reach you about important announcements.">
+        <source>You cannot use your TU/e (student) email address because if you leave or stop studying, we can no longer reach you about important announcements.</source>
+        <target state="translated">You cannot use your TU/e (student) email address because if you leave or stop studying, we can no longer reach you about important announcements.</target>
       </trans-unit>
       <trans-unit id="O_htvlR" resname="You have to agree to the Articles of Association and the Internal Regulations">
         <source>You have to agree to the Articles of Association and the Internal Regulations</source>
-        <target></target>
+        <target state="translated">You have to agree to the Articles of Association and the Internal Regulations</target>
       </trans-unit>
       <trans-unit id="vZye7vY" resname="You have to agree to the authorization statement.">
         <source>You have to agree to the authorization statement.</source>
@@ -443,11 +511,7 @@
       </trans-unit>
       <trans-unit id="HnYDKlp" resname="You have to consent to processing your data">
         <source>You have to consent to processing your data</source>
-        <target></target>
-      </trans-unit>
-      <trans-unit id="7IsK8li" resname="You may only assign an organising organ that you are installed in.">
-        <source>You may only assign an organising organ that you are installed in.</source>
-        <target>You may only assign an organising organ that you are installed in.</target>
+        <target state="translated">You have to consent to processing your data</target>
       </trans-unit>
       <trans-unit id=".XKorDo" resname="You must agree to the activity and alcohol policies to sign up.">
         <source>You must agree to the activity and alcohol policies to sign up.</source>

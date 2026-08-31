@@ -15,9 +15,24 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute(Attribute::TARGET_CLASS)]
 class UnclaimedPageAddress extends Constraint
 {
-    public string $reservedMessage = 'The website already answers to this address, so a page cannot take it.';
-
-    public string $takenMessage = 'Another page already answers to this address.';
+    /**
+     * The messages are given where the constraint is applied: a default here is invisible to the translation
+     * extractor, and `make translations` deletes what it cannot see.
+     *
+     * @param string[]|null $groups
+     */
+    public function __construct(
+        public string $reservedMessage,
+        public string $takenMessage,
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(
+            null,
+            $groups,
+            $payload,
+        );
+    }
 
     #[Override]
     public function getTargets(): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DataFixtures\Mailing;
 
 use App\DataFixtures\Member\MemberFixture;
+use App\DataFixtures\Member\MemberPopulationFixture;
 use App\Entity\Database\MailingList;
 use App\Entity\Database\MailingListMember;
 use App\Entity\Database\Member as MemberModel;
@@ -15,6 +16,8 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use LogicException;
 use Override;
+
+use function sprintf;
 
 /**
  * Who is on which list.
@@ -76,6 +79,33 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
 
         $manager->persist($this->subscribe($activities, $student));
 
+        // 8000 gets one list a member manages and one they do not, so the settings page shows both cases.
+        $signIn = $this->getReference(
+            sprintf(
+                'ledger-member-%d',
+                MemberPopulationFixture::ADMIN,
+            ),
+            MemberModel::class,
+        );
+
+        $carriedAcross = $this->subscribe(
+            $activities,
+            $signIn,
+        );
+        $carriedAcross->setToBeCreated(false);
+        $carriedAcross->setLastSyncOn();
+        $carriedAcross->setLastSyncSuccess(true);
+        $manager->persist($carriedAcross);
+
+        $announced = $this->subscribe(
+            $announcements,
+            $signIn,
+        );
+        $announced->setToBeCreated(false);
+        $announced->setLastSyncOn();
+        $announced->setLastSyncSuccess(true);
+        $manager->persist($announced);
+
         $manager->flush();
     }
 
@@ -87,7 +117,7 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
         $membership->setMailingList($list);
         $membership->setMember($member);
         $membership->setEmail(
-            $member->getEmail() ?? throw new LogicException('The seeded member has no e-mail address.'),
+            $member->getEmail() ?? throw new LogicException('The seeded member has no email address.'),
         );
 
         return $membership;
@@ -102,6 +132,7 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
         return [
             MailingListFixture::class,
             MemberFixture::class,
+            MemberPopulationFixture::class,
         ];
     }
 

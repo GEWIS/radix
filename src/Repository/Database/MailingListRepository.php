@@ -106,6 +106,17 @@ class MailingListRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return array<array-key, MailingList>
+     */
+    public function findAllSelfService(): array
+    {
+        return $this->findBy(
+            ['selfService' => true],
+            ['name' => 'ASC'],
+        );
+    }
+
+    /**
      * Find all default
      *
      * @return array<array-key, MailingList>

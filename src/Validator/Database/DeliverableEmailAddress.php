@@ -20,7 +20,7 @@ class DeliverableEmailAddress extends Constraint
     protected const array ERROR_NAMES = [self::NO_MX_RECORD_ERROR => 'NO_MX_RECORD_ERROR'];
 
     // phpcs:ignore -- user-visible strings should not be split
-    public string $message = 'Please check your e-mail address, \'{{ hostname }}\' does not appear to be able to receive e-mails. If you are certain that your e-mail address is correct, please contact the board.';
+    public string $message = 'Please check your email address, \'{{ hostname }}\' does not appear to be able to receive emails. If you are certain that your email address is correct, please contact the board.';
 
     /**
      * @param string[]|null        $groups

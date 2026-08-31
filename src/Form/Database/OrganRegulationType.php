@@ -186,6 +186,10 @@ class OrganRegulationType extends AbstractType
             return;
         }
 
-        $context->buildViolation('A body regulation cannot be dated after the meeting.')->addViolation();
+        $context->buildViolation(t(
+            'A body regulation cannot be dated after the meeting.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 }

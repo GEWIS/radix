@@ -1,0 +1,22 @@
+{% extends 'database/email/_base.html.twig' %}
+
+{% block emailTitle %}Removal requested{% endblock %}
+{% block preheader %}{% endblock %}
+{% block heading %}Membership notification{% endblock %}
+{% block subheading %}A leaving member asked to be removed{% endblock %}
+{% block body %}
+    <p>Dear secretary,</p>
+    <p>
+        <b>{{ member.getFullName }}</b> ({{ member.getLidnr }}) has decided not to stay on as a graduate, and asked
+        for their data to be removed.
+    </p>
+    <p>
+        Their membership runs out on its own; nothing has been removed. The member's record is
+        <a href="{{ url }}" style="color: #C40000; text-decoration: none;" target="_blank" rel="noopener nofollow">here</a>.
+    </p>
+    <p>
+        Kind regards,
+        <br>The GEWIS website
+    </p>
+{% endblock %}
+{% block footerNote %}You receive this message because you keep the register.{% endblock %}

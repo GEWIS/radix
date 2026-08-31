@@ -62,7 +62,6 @@ class RegisterStatusService implements ResetInterface
      *     total: int,
      *     paid: int,
      *   },
-     *   updates: int,
      *   syncPaused: bool,
      *   syncPausedUntil: ?DateTime,
      *   totalCount: int,
@@ -99,8 +98,7 @@ class RegisterStatusService implements ResetInterface
 
                 // Counted from the figures rather than asked for again: the bell and the dashboard then cannot state
                 // different numbers, and it saves running every one of those queries a second time.
-                $figures['totalCount'] = $figures['updates']
-                    + $figures['prospectives']['paid']
+                $figures['totalCount'] = $figures['prospectives']['paid']
                     + (int) $figures['syncPaused']
                     + (int) $figures['mailmanLastFetchOverdue']
                     + (int) $figures['listmonkLastFetchOverdue'];
@@ -132,7 +130,6 @@ class RegisterStatusService implements ResetInterface
             'graduates' => $data['graduates'],
             'expired' => $data['expired'],
             'prospectives' => $data['prospectives'],
-            'updates' => $data['updates'],
             'sync_paused' => $data['syncPaused'],
             'sync_paused_until' => $data['syncPausedUntil'],
             'mailman_last_fetch' => $data['mailmanLastFetch'],

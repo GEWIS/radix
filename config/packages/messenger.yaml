@@ -144,6 +144,11 @@ framework:
             # Stripe answers with a repeat of the same event) or a page that hangs on the MTA.
             'App\Message\Database\RegistrationUpdateEmail': high_priority
             'App\Message\Database\RefundProblemEmail': high_priority
+            # A member waiting on a page for a confirmation link, and the address that has just been replaced hearing
+            # that it was, are both worth little late.
+            'App\Message\Database\EmailChangeConfirmationEmail': high_priority
+            'App\Message\Database\EmailChangedNoticeEmail': high_priority
+            'App\Message\Database\GraduateRemovalRequested': normal_priority
             'App\Message\User\ExportUserDataMessage': bulk
             'App\Message\User\RevokeSessionsRealtimeMessage': high_priority
             # A security notice is worth little late, and it must not hold up whatever raised it.

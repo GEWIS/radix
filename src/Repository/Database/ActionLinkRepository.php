@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Repository\Database;
 
 use App\Entity\Database\ActionLink;
+use App\Entity\Database\EmailChangeLink;
+use App\Entity\Database\GraduateConversionLink;
 use App\Entity\Database\Member;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\RenewalLink;
@@ -26,7 +28,10 @@ class ActionLinkRepository extends ServiceEntityRepository
         );
     }
 
-    public function findPaymentByToken(string $token): ?PaymentLink
+    /**
+     * A selector is half a token: the caller checks the verifier against {@see ActionLink::tokenMatches()}.
+     */
+    public function findPaymentBySelector(string $selector): ?PaymentLink
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('pl, m')
@@ -38,11 +43,11 @@ class ActionLinkRepository extends ServiceEntityRepository
                 'pl.prospectiveMember',
                 'm',
             )
-            ->where('pl.token = :token');
+            ->where('pl.selector = :selector');
 
         $qb->setParameter(
-            ':token',
-            $token,
+            'selector',
+            $selector,
         );
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -66,7 +71,10 @@ class ActionLinkRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    public function findRenewalByToken(string $token): ?RenewalLink
+    /**
+     * As {@see self::findPaymentBySelector()}, for a renewal link.
+     */
+    public function findRenewalBySelector(string $selector): ?RenewalLink
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('rl, m')
@@ -78,14 +86,69 @@ class ActionLinkRepository extends ServiceEntityRepository
                 'rl.member',
                 'm',
             )
-            ->where('rl.token = :token');
+            ->where('rl.selector = :selector');
 
         $qb->setParameter(
-            ':token',
-            $token,
+            'selector',
+            $selector,
         );
 
         return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * As {@see self::findPaymentBySelector()}, for a change of e-mail address.
+     */
+    public function findEmailChangeBySelector(string $selector): ?EmailChangeLink
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('el, m')
+            ->from(
+                EmailChangeLink::class,
+                'el',
+            )
+            ->leftJoin(
+                'el.member',
+                'm',
+            )
+            ->where('el.selector = :selector');
+
+        $qb->setParameter(
+            'selector',
+            $selector,
+        );
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * As {@see self::findPaymentBySelector()}, for the offer to stay on as a graduate.
+     */
+    public function findGraduateConversionBySelector(string $selector): ?GraduateConversionLink
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('gl, m')
+            ->from(
+                GraduateConversionLink::class,
+                'gl',
+            )
+            ->leftJoin(
+                'gl.member',
+                'm',
+            )
+            ->where('gl.selector = :selector');
+
+        $qb->setParameter(
+            'selector',
+            $selector,
+        );
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function findByTempHash(string $tempHash): ?ActionLink
+    {
+        return $this->findOneBy(['tempHash' => $tempHash]);
     }
 
     /**

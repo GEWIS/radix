@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function array_map;
+use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
@@ -183,7 +184,11 @@ final class ActivityData
                 null !== $this->beginTime
                 && $this->beginTime <= $now
             ) {
-                $context->buildViolation('The activity must start in the future.')
+                $context->buildViolation(t(
+                    'The activity must start in the future.',
+                    [],
+                    'validators',
+                )->getMessage())
                     ->atPath('beginTime')
                     ->addViolation();
             }
@@ -193,7 +198,11 @@ final class ActivityData
                 && null !== $this->endTime
                 && $this->endTime <= $this->beginTime
             ) {
-                $context->buildViolation('The end time must be after the start time.')
+                $context->buildViolation(t(
+                    'The end time must be after the start time.',
+                    [],
+                    'validators',
+                )->getMessage())
                     ->atPath('endTime')
                     ->addViolation();
             }
@@ -208,7 +217,11 @@ final class ActivityData
             return;
         }
 
-        $context->buildViolation('The end time must be in the future.')
+        $context->buildViolation(t(
+            'The end time must be in the future.',
+            [],
+            'validators',
+        )->getMessage())
             ->atPath('endTime')
             ->addViolation();
     }
@@ -225,7 +238,11 @@ final class ActivityData
             !$this->languageDutch
             && !$this->languageEnglish
         ) {
-            $context->buildViolation('At least one language must be used.')
+            $context->buildViolation(t(
+                'At least one language must be used.',
+                [],
+                'validators',
+            )->getMessage())
                 ->atPath('languageDutch')
                 ->addViolation();
 

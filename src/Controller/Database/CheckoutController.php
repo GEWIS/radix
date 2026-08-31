@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
+use App\Controller\Application\NoLeakHeadersTrait;
+use App\Entity\Database\PaymentLink;
+use App\Service\Database\ActionLinkService;
 use App\Service\Database\CheckoutRestartFailure;
 use App\Service\Database\RegistrationService;
 use App\Service\Database\StripeService;
@@ -24,9 +27,12 @@ use function is_string;
  */
 final class CheckoutController extends AbstractController
 {
+    use NoLeakHeadersTrait;
+
     public function __construct(
         private readonly RegistrationService $registrationService,
         private readonly StripeService $stripeService,
+        private readonly ActionLinkService $actionLinkService,
     ) {
     }
 
@@ -80,20 +86,62 @@ final class CheckoutController extends AbstractController
         name: 'join_checkout_restart',
         requirements: [
             '_locale' => '%app.locales%',
-            'token' => '[a-zA-Z0-9_\-+]+',
+            'token' => '[0-9a-f]{32}\.[0-9a-f]{96}',
         ],
         defaults: ['_locale' => '%kernel.default_locale%'],
         methods: ['GET'],
     )]
     public function restart(string $token): Response
     {
-        $restart = $this->registrationService->restartCheckout($token);
+        $paymentLink = $this->actionLinkService->resolvePayment($token);
+
+        if (null === $paymentLink) {
+            return $this->render(
+                'database/join/checkout-restart.html.twig',
+                ['error' => false],
+            );
+        }
+
+        return $this->withNoLeakHeaders($this->redirectToRoute(
+            'join_checkout_restart_resume',
+            ['th' => $this->actionLinkService->claim($paymentLink)],
+        ));
+    }
+
+    #[Route(
+        path: '/{_locale}/checkout/restart',
+        name: 'join_checkout_restart_resume',
+        requirements: ['_locale' => '%app.locales%'],
+        defaults: ['_locale' => '%kernel.default_locale%'],
+        methods: ['GET'],
+    )]
+    public function restartResume(Request $request): Response
+    {
+        $tempHash = (string) $request->query->get(
+            'th',
+            '',
+        );
+        $paymentLink = '' === $tempHash
+            ? null
+            : $this->actionLinkService->findByTempHash($tempHash);
+
+        if (!$paymentLink instanceof PaymentLink) {
+            return $this->render(
+                'database/join/checkout-restart.html.twig',
+                ['error' => false],
+            );
+        }
+
+        // Single-use: spent before the checkout reopens, so a hash seen twice is acted on once.
+        $this->actionLinkService->consumeTempHash($paymentLink);
+
+        $restart = $this->registrationService->restartCheckout($paymentLink);
 
         if (is_string($restart)) {
-            return $this->redirect(
+            return $this->withNoLeakHeaders($this->redirect(
                 $restart,
                 Response::HTTP_SEE_OTHER,
-            );
+            ));
         }
 
         return $this->render(
@@ -142,18 +190,19 @@ final class CheckoutController extends AbstractController
                 '',
             ),
         );
-        $token = $prospectiveMember?->getPaymentLink()?->getToken();
+        // Only a hash is kept, so handing out a way back mints a new token and the previous link dies.
+        $paymentLink = $prospectiveMember?->getPaymentLink();
 
         return $this->render(
             'database/join/checkout-status.html.twig',
             [
                 'status' => $status,
                 'first_name' => $prospectiveMember?->getFirstName(),
-                'restart_url' => null === $token
+                'restart_url' => null === $paymentLink
                     ? null
                     : $this->generateUrl(
                         'join_checkout_restart',
-                        ['token' => $token],
+                        ['token' => $this->actionLinkService->reissue($paymentLink)],
                     ),
             ],
         );

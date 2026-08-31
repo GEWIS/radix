@@ -54,6 +54,8 @@ class MainScheduleTest extends KernelTestCase
         'app:user:purge-expired-sessions' => 'gdpr',
         'app:users:force-relogin' => 'cron',
         'check:database' => 'maintenance',
+        'check:membership:consistency' => 'maintenance',
+        'check:membership:conversion:graduate' => 'maintenance',
         'check:membership:renewal:graduate' => 'maintenance',
         'database:mailinglist:fetch all' => 'maintenance',
         'database:mailinglist:maintenance -f -vv' => 'maintenance',

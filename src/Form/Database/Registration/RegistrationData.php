@@ -72,7 +72,7 @@ final class RegistrationData
     #[Assert\Regex(
         pattern: '/\.tue\.nl$/i',
         // phpcs:ignore -- user-visible strings should not be split
-        message: 'You cannot use your TU/e (student) e-mail address because if you leave or stop studying, we can no longer reach you about important announcements.',
+        message: 'You cannot use your TU/e (student) email address because if you leave or stop studying, we can no longer reach you about important announcements.',
         match: false,
         groups: [self::STEP_PERSONAL],
     )]

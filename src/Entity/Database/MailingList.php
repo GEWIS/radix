@@ -59,6 +59,16 @@ class MailingList
     private bool $defaultSub;
 
     /**
+     * Whether a member may manage their own subscription. Separate from being on the sign-up form: a list that
+         * belongs to one year is offered when somebody joins but is nobody's to put themselves on later.
+     */
+    #[Column(
+        type: 'boolean',
+        options: ['default' => false],
+    )]
+    private bool $selfService = false;
+
+    /**
      * The corresponding mailman mailing list
      */
     #[OneToOne(
@@ -192,6 +202,16 @@ class MailingList
         $this->defaultSub = $default;
     }
 
+    public function getSelfService(): bool
+    {
+        return $this->selfService;
+    }
+
+    public function setSelfService(bool $selfService): void
+    {
+        $this->selfService = $selfService;
+    }
+
     /**
      * Get the matching mailman list, or null if none
      */
@@ -267,6 +287,7 @@ class MailingList
      *     en_description: string,
      *     defaultSub: bool,
      *     onForm: bool,
+     *     selfService: bool,
      *     mailmanList: ?string,
      *     listmonkList: ?int,
      * }
@@ -279,6 +300,7 @@ class MailingList
             'en_description' => $this->getEnDescription(),
             'defaultSub' => $this->getDefaultSub(),
             'onForm' => $this->getOnForm(),
+            'selfService' => $this->getSelfService(),
             'mailmanList' => $this->getMailmanList()?->getMailmanId(),
             'listmonkList' => $this->getListmonkList()?->getListmonkId(),
         ];

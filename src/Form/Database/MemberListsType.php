@@ -15,11 +15,15 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_combine;
+use function array_flip;
+use function array_intersect;
+use function array_intersect_key;
 use function array_keys;
-use function array_map;
 use function array_unique;
 use function array_values;
 use function in_array;
@@ -46,18 +50,32 @@ class MemberListsType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
+        $describe = true === $options['describe'];
         $subscriptions = $this->subscriptionStates($options['member']);
         $locked = $this->lockedLists($subscriptions);
-        $listNames = array_map(
-            static fn (MailingList $list): string => $list->getName(),
-            $this->mailingListRepository->findAll(),
+        $byName = [];
+
+        foreach ($options['lists'] ?? $this->mailingListRepository->findAll() as $list) {
+            $byName[$list->getName()] = $list;
+        }
+
+        $listNames = array_keys($byName);
+        // A list that is not on offer is not theirs to leave either, so it is never read as an unsubscribe.
+        $locked = array_values(array_intersect(
+            $locked,
+            $listNames,
+        ));
+        $subscriptions = array_intersect_key(
+            $subscriptions,
+            array_flip($listNames),
         );
 
         $builder->add(
             'lists',
             ChoiceType::class,
             [
-                'label' => t('Lists'),
+                // The member's own page says what the panel around it is for, so a legend there would say it twice.
+                'label' => $describe ? false : t('Lists'),
                 'expanded' => true,
                 'multiple' => true,
                 'required' => false,
@@ -66,13 +84,31 @@ class MemberListsType extends AbstractType
                     $listNames,
                 ),
                 'data' => array_keys($subscriptions),
+                'label_html' => $describe,
                 // Resolved while the view is built rather than at build time, so the state follows the request locale.
-                'choice_label' => function (string $name) use ($subscriptions): string {
-                    if (!isset($subscriptions[$name])) {
+                'choice_label' => function (
+                    string $name,
+                ) use (
+                    $subscriptions,
+                    $byName,
+                    $describe,
+                ): string|TranslatableInterface {
+                    $state = isset($subscriptions[$name])
+                        ? $this->stateMessage(...$subscriptions[$name])
+                        : null;
+
+                    if ($describe) {
+                        return new MailingListLabel(
+                            $byName[$name],
+                            $state,
+                        );
+                    }
+
+                    if (null === $state) {
                         return $name;
                     }
 
-                    return $name . ' (' . $this->stateLabel(...$subscriptions[$name]) . ')';
+                    return $name . ' (' . $state->trans($this->translator) . ')';
                 },
                 'choice_attr' => static function (string $name) use ($locked): array {
                     if (
@@ -87,7 +123,8 @@ class MemberListsType extends AbstractType
 
                     return ['disabled' => true];
                 },
-                'choice_translation_domain' => false,
+                // A described label is a translatable object, and only the theme's `trans` renders one.
+                'choice_translation_domain' => $describe ? null : false,
             ],
         );
 
@@ -127,6 +164,27 @@ class MemberListsType extends AbstractType
         $resolver->setAllowedTypes(
             'member',
             Member::class,
+        );
+
+        $resolver->setDefault(
+            'describe',
+            false,
+        );
+        $resolver->setAllowedTypes(
+            'describe',
+            'bool',
+        );
+
+        $resolver->setDefault(
+            'lists',
+            null,
+        );
+        $resolver->setAllowedTypes(
+            'lists',
+            [
+                'null',
+                MailingList::class . '[]',
+            ],
         );
     }
 
@@ -173,25 +231,25 @@ class MemberListsType extends AbstractType
         return $locked;
     }
 
-    private function stateLabel(
+    private function stateMessage(
         bool $toBeCreated,
         bool $toBeDeleted,
-    ): string {
+    ): TranslatableMessage {
         if (
             $toBeCreated
             && $toBeDeleted
         ) {
-            return $this->translator->trans('email address change pending');
+            return new TranslatableMessage('email address change pending');
         }
 
         if ($toBeDeleted) {
-            return $this->translator->trans('to be deleted');
+            return new TranslatableMessage('to be deleted');
         }
 
         if ($toBeCreated) {
-            return $this->translator->trans('to be created');
+            return new TranslatableMessage('to be created');
         }
 
-        return $this->translator->trans('synced');
+        return new TranslatableMessage('synced');
     }
 }

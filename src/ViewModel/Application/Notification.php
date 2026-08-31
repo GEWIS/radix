@@ -61,24 +61,6 @@ final readonly class Notification
             );
         }
 
-        if (0 < $data['updates']) {
-            $notifications[] = new self(
-                'fa-user-pen',
-                'info',
-                t(
-                    '%number% member updates pending',
-                    ['%number%' => $data['updates']],
-                ),
-                $approval,
-                t(
-                    '%number% members have requested a change to their data.',
-                    ['%number%' => $data['updates']],
-                ),
-                $review,
-                'member_update_index',
-            );
-        }
-
         // A paused sync is deliberate, but it stays visible so it is not forgotten about.
         if (true === $data['sync_paused']) {
             $notifications[] = new self(

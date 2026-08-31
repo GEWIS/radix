@@ -86,7 +86,11 @@ class GrantType extends AbstractType
             return;
         }
 
-        $context->buildViolation('Key code cannot be granted in the past.')->addViolation();
+        $context->buildViolation(t(
+            'Key code cannot be granted in the past.',
+            [],
+            'validators',
+        )->getMessage())->addViolation();
     }
 
     /**

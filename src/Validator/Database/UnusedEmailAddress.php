@@ -17,7 +17,7 @@ class UnusedEmailAddress extends Constraint
 
     protected const array ERROR_NAMES = [self::ALREADY_USED_ERROR => 'ALREADY_USED_ERROR'];
 
-    public string $message = 'There already is a member with this e-mail address.';
+    public string $message = 'There already is a member with this email address.';
 
     /**
      * @param string[]|null        $groups

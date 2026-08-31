@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\User;
 
 use App\Entity\Application\Traits\SelectorTokenTrait;
+use App\Entity\Application\Traits\TempHashTrait;
 use App\Entity\Decision\Member;
 use App\Entity\User\Enums\UserTypes;
 use App\Repository\User\PasswordResetRepository;
@@ -31,6 +32,7 @@ use InvalidArgumentException;
 class PasswordReset
 {
     use SelectorTokenTrait;
+    use TempHashTrait;
 
     #[Id]
     #[GeneratedValue]
@@ -58,22 +60,6 @@ class PasswordReset
         onDelete: 'CASCADE',
     )]
     private ?CompanyUser $companyUser = null;
-
-    /**
-     * Ephemeral hash linking the email-link click (stage 1) to the form-render request (stage 2). Cleared on first
-     * successful stage-2 read to enforce single-use. The original token never appears in the stage-2 URL.
-     */
-    #[Column(
-        type: Types::STRING,
-        nullable: true,
-    )]
-    protected ?string $tempHash = null;
-
-    #[Column(
-        type: Types::DATETIME_IMMUTABLE,
-        nullable: true,
-    )]
-    protected ?DateTimeImmutable $tempHashExpiresAt = null;
 
     public function __construct(
         DateTimeImmutable $expiresAt,
@@ -124,31 +110,5 @@ class PasswordReset
     public function getCompanyUser(): ?CompanyUser
     {
         return $this->companyUser;
-    }
-
-    public function getTempHash(): ?string
-    {
-        return $this->tempHash;
-    }
-
-    public function setTempHash(?string $tempHash): void
-    {
-        $this->tempHash = $tempHash;
-    }
-
-    public function getTempHashExpiresAt(): ?DateTimeImmutable
-    {
-        return $this->tempHashExpiresAt;
-    }
-
-    public function setTempHashExpiresAt(?DateTimeImmutable $tempHashExpiresAt): void
-    {
-        $this->tempHashExpiresAt = $tempHashExpiresAt;
-    }
-
-    public function isTempHashExpired(): bool
-    {
-        return null === $this->tempHashExpiresAt
-            || $this->tempHashExpiresAt <= new DateTimeImmutable('now');
     }
 }

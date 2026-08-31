@@ -1,0 +1,146 @@
+{% extends 'layout-sidebar.html.twig' %}
+
+{% block page_title %}{{ 'My details'|trans }}{% endblock %}
+
+{% block sidebar_label %}{{ app.user.member.getFullName }}{% endblock %}
+{% block sidebar %}
+    {% include 'partials/member-sidebar.html.twig' with {
+        'member': app.user.member,
+        'isSelf': true,
+        'activeRoute': 'details',
+    } %}
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Email address'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <p class="text-muted mb-2">
+                        {{ 'This is the address the association writes to, and the one you sign in with.'|trans }}
+                    </p>
+                    <dl class="row mb-3">
+                        <dt class="col-sm-4">{{ 'Current address'|trans }}</dt>
+                        <dd class="col-sm-8">{{ member.getEmail ?? '-' }}</dd>
+                    </dl>
+                    {{ form_start(emailForm, {
+                        'action': path('user_settings_details_index'),
+                        'method': 'POST',
+                    }) }}
+                        {{ form_row(emailForm.email) }}
+                        {{ form_widget(emailForm.submit, {'attr': {'class': 'btn-gewis-primary mt-2'}}) }}
+                    {{ form_end(emailForm) }}
+                </div>
+            </div>
+
+            <div class="panel mt-3">
+                <div class="panel-heading">
+                    <h3>{{ 'Mailing lists'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if selfServiceLists is empty %}
+                        <p class="mb-0 text-muted">
+                            {{ 'There are no mailing lists you can subscribe to yourself. The secretary can tell you which lists you are on.'|trans }}
+                        </p>
+                    {% elseif syncLocked %}
+                        {# While a synchronisation runs, the pending states these checkboxes write are being turned
+                           into real ones, and an edit made in between would be lost. #}
+                        <p class="mb-0">
+                            <span class="fas fa-hourglass-half"></span>
+                            {{ 'Your subscriptions are being synchronised. Please come back in a few minutes.'|trans }}
+                        </p>
+                    {% else %}
+                        {{ form_start(listsForm, {
+                            'action': path('user_settings_details_index'),
+                            'method': 'POST',
+                        }) }}
+                            {{ form_row(listsForm.lists) }}
+                            {{ form_widget(listsForm.submit, {'attr': {'class': 'btn-gewis-primary mt-2'}}) }}
+                        {{ form_end(listsForm) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Addresses'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <p class="text-muted mb-3">
+                        {{ 'Where you live and where your post should go. GEWIS writes to your mail address.'|trans }}
+                    </p>
+                    {% for row in addresses %}
+                        {% set address = row.address %}
+                        <div class="{{ loop.last ? '' : 'mb-3 pb-3 border-bottom' }}">
+                            <h4 class="h6">{{ row.type.getName|trans }}</h4>
+                            {% if address is null %}
+                                <p class="text-muted mb-2">{{ 'Not on file.'|trans }}</p>
+                                <a class="btn btn-sm btn-outline-gewis-primary"
+                                   href="{{ path('user_settings_details_address', {'type': row.type.value}) }}">
+                                    <span class="fas fa-plus"></span> {{ 'Add'|trans }}
+                                </a>
+                            {% else %}
+                                <p class="mb-2">
+                                    {{ address.getStreet }} {{ address.getNumber }}<br>
+                                    {{ address.getPostalCode }} {{ address.getCity }}<br>
+                                    {{ address.getCountry.value|lower|title }}
+                                    {% if address.getPhone is not empty %}
+                                        <br>{{ address.getPhone }}
+                                    {% endif %}
+                                </p>
+                                <a class="btn btn-sm btn-outline-gewis-primary"
+                                   href="{{ path('user_settings_details_address', {'type': row.type.value}) }}">
+                                    <span class="fas fa-pen"></span> {{ 'Edit'|trans }}
+                                </a>
+                                <a class="btn btn-sm btn-outline-danger"
+                                   href="{{ path('user_settings_details_address_remove', {'type': row.type.value}) }}">
+                                    <span class="fas fa-trash"></span> {{ 'Remove'|trans }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="panel mt-3">
+                <div class="panel-heading">
+                    <h3>{{ 'Membership details'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <dl class="row mb-2">
+                        <dt class="col-sm-5">{{ 'Membership number'|trans }}</dt>
+                        <dd class="col-sm-7">{{ member.getLidnr }}</dd>
+                        <dt class="col-sm-5">{{ 'Name'|trans }}</dt>
+                        <dd class="col-sm-7">{{ member.getFullName }}</dd>
+                        <dt class="col-sm-5">{{ 'Study'|trans }}</dt>
+                        <dd class="col-sm-7">{{ member.getStudy.getName|trans }}</dd>
+                        <dt class="col-sm-5">{{ 'Student number'|trans }}</dt>
+                        <dd class="col-sm-7">{{ member.getStudentNumber ?? '-' }}</dd>
+                        <dt class="col-sm-5">{{ 'Membership'|trans }}</dt>
+                        <dd class="col-sm-7">
+                            {% set membership = member.getCurrentOrLastMembership %}
+                            {% if membership is null %}
+                                -
+                            {% else %}
+                                {{ membership.getType.getName|trans }}
+                                {{ 'until'|trans }} {{ membership.getEndDate|date('d-m-Y') }}
+                            {% endif %}
+                        </dd>
+                    </dl>
+                    <p class="text-muted small mb-3">
+                        {{ 'The secretary keeps these. Write to them if any of it is wrong.'|trans }}
+                    </p>
+                    <h4 class="h6">{{ 'Your memberships'|trans }}</h4>
+                    {% include 'partials/membership-history.html.twig' with {
+                        'memberships': member.memberships,
+                    } only %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

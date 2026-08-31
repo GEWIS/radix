@@ -335,7 +335,7 @@ class Member
         if ($mailAddressExists) {
             throw new RuntimeException(
                 // phpcs:ignore -- user-visible strings should not be split
-                'The e-mail address cannot be updated while there are already (pending) registrations for this member using this email address. Please try again once all list updates have been processed.',
+                'The email address cannot be updated while there are already (pending) registrations for this member using this email address. Please try again once all list updates have been processed.',
             );
         }
 

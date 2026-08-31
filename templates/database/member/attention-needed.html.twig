@@ -49,6 +49,9 @@
             <p class="text-secondary">
                 {{ 'Each shortcut opens the bulk renewal form with these members already filled in. Renew the members who are still studying <strong>first</strong>.'|trans|raw }}
             </p>
+            <p class="text-secondary">
+                {{ 'Members who have been asked themselves whether they want to stay on as a graduate are left out until their own offer expires unanswered.'|trans }}
+            </p>
             <div class="d-flex flex-wrap gap-2">
                 {{ bulk.shortcut(
                     bulk_renewal_shortcuts.expiring_active,
