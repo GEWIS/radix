@@ -7,7 +7,9 @@ namespace App\Service\User;
 use App\Entity\User\Session;
 use App\Message\User\RevokeSessionsRealtimeMessage;
 use App\Repository\User\SessionRepository;
+use App\Security\User\CredentialsSignature;
 use App\Security\User\HandlerRegistry;
+use App\Security\User\SessionRowSignature;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Redis;
@@ -38,6 +40,8 @@ final class SessionManager
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $em,
         private readonly MessageBusInterface $messageBus,
+        private readonly CredentialsSignature $credentials,
+        private readonly SessionRowSignature $rowSignature,
         private readonly LoggerInterface $logger,
         #[Autowire(service: 'Redis')]
         private readonly Redis $redis,
@@ -211,6 +215,40 @@ final class SessionManager
         );
 
         return count($sessions);
+    }
+
+    /**
+     * Re-stamp the caller's own session after a credential change made from it, so that
+     * {@see \App\EventListener\User\StaleSessionGuardListener} does not sign it out with the ones it should.
+     */
+    public function refreshCredentials(
+        UserInterface $user,
+        Request $request,
+        string $firewallName,
+    ): void {
+        $series = $this->currentSeries(
+            $request,
+            $firewallName,
+        );
+
+        if (null === $series) {
+            return;
+        }
+
+        $session = $this->findSession(
+            $user,
+            $series,
+            $firewallName,
+        );
+
+        if (null === $session) {
+            return;
+        }
+
+        $session->setSignaturePropertiesHash($this->credentials->hash($user));
+        $session->setSignature($this->rowSignature->forRow($session));
+
+        $this->em->flush();
     }
 
     /**

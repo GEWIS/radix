@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Security\User;
 
+use App\Entity\User\User;
 use App\Repository\User\SessionRepository;
+use App\Security\User\CredentialsSignature;
 use App\Security\User\PersistentSignatureRememberMeHandler;
+use App\Security\User\SessionRowSignature;
 use App\Security\User\UserAgentParser;
 use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\SecurityNotifier;
@@ -17,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session as HttpSession;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -30,6 +34,7 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
 {
     private const string USER = '8001';
     private const string FIREWALL = 'main';
+    private const string SECRET = 'a secret that is only ever this test\'s';
 
     private MockClock $clock;
 
@@ -63,7 +68,9 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
             $this->securityNotifier(),
             $this->knownDevices(),
             $this->clock,
-            'a secret that is only ever this test\'s',
+            new CredentialsSignature(self::SECRET),
+            new SessionRowSignature(self::SECRET),
+            self::SECRET,
             self::FIREWALL,
             7776000,
             'GWS_USER_REMEMBERME',
@@ -133,6 +140,95 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
                 ),
             );
         }
+    }
+
+    public function testATokenTheRowHasNeverHeldIsRefusedWithoutBurningTheAccount(): void
+    {
+        $original = $this->signIn();
+
+        $forged = new RememberMeDetails(
+            self::USER,
+            $original->getExpires(),
+            $this->series($original) . ':not a token this row has ever held',
+        );
+
+        try {
+            $this->handler->consumeRememberMeCookie($forged);
+            self::fail('The forged cookie was accepted.');
+        } catch (CookieTheftException) {
+            self::fail('A token the row has never held was read as a stolen one.');
+        } catch (AuthenticationException) {
+            // Refused on its own, which is the whole of what should happen.
+        }
+
+        $this->nextRequest();
+        $this->handler->consumeRememberMeCookie($original);
+
+        self::assertNotNull($this->issuedCookie());
+    }
+
+    public function testACookieValueCarryingNoTokenNamesNoSeries(): void
+    {
+        $this->request->cookies->set(
+            'GWS_USER_REMEMBERME',
+            new RememberMeDetails(
+                self::USER,
+                $this->clock->now()->getTimestamp() + 3600,
+                'a value with no delimiter in it',
+            )->toString(),
+        );
+
+        self::assertNull($this->handler->getSeriesFromCookie($this->request));
+    }
+
+    public function testTheCookieAsIssuedNamesItsSeries(): void
+    {
+        $original = $this->signIn();
+        $this->request->cookies->set(
+            'GWS_USER_REMEMBERME',
+            $original->toString(),
+        );
+
+        self::assertSame(
+            $this->series($original),
+            $this->handler->getSeriesFromCookie($this->request),
+        );
+    }
+
+    public function testTheFingerprintOnTheRowMatchesTheAccountReloadedFromTheProvider(): void
+    {
+        $original = $this->signIn();
+        $this->entityManager->clear();
+
+        $row = $this->repository()->findOneBySeries($this->series($original));
+        self::assertNotNull($row);
+
+        self::assertTrue(new CredentialsSignature(self::SECRET)->matches(
+            $row->getSignaturePropertiesHash(),
+            $this->userProvider()->loadUserByIdentifier(self::USER),
+        ));
+    }
+
+    public function testANewPasswordLeavesEveryRowNoLongerMatchingTheAccount(): void
+    {
+        $original = $this->signIn();
+
+        $user = $this->userProvider()->loadUserByIdentifier(self::USER);
+        self::assertInstanceOf(
+            User::class,
+            $user,
+        );
+        $user->setPassword('a hash this account was not holding when it signed in');
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        $row = $this->repository()->findOneBySeries($this->series($original));
+        self::assertNotNull($row);
+
+        self::assertFalse(new CredentialsSignature(self::SECRET)->matches(
+            $row->getSignaturePropertiesHash(),
+            $this->userProvider()->loadUserByIdentifier(self::USER),
+        ));
     }
 
     private function signIn(): RememberMeDetails

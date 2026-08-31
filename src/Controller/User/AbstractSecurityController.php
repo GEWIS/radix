@@ -328,11 +328,10 @@ abstract class AbstractSecurityController extends AbstractController
             $target,
         );
 
-        // The same reason raiseSecurityNotice() forgets devices when a password is changed from /security: a reset is
-        // what somebody reaches for when they think their account has been reached, and a device an intruder was
-        // recognised on would go on signing in quietly afterwards.
-        $this->knownDevices->forget(
-            $target->getUserIdentifier(),
+        // A reset is what somebody reaches for when they think their account has been reached, so anything signed in
+        // on the old password goes, recognised devices included.
+        $this->sessionManager->terminateAll(
+            $target,
             $this->firewall($request),
         );
 
@@ -392,7 +391,7 @@ abstract class AbstractSecurityController extends AbstractController
                     strval($form->get('plainPassword')->getData()),
                 );
 
-                $this->raiseSecurityNotice(
+                $this->credentialsChanged(
                     $securityNotifier,
                     $user,
                     NotificationType::PasswordChanged,
@@ -739,7 +738,7 @@ abstract class AbstractSecurityController extends AbstractController
                     $plaintext,
                 );
 
-                $this->raiseSecurityNotice(
+                $this->credentialsChanged(
                     $securityNotifier,
                     $user,
                     NotificationType::MfaEnabled,
@@ -842,7 +841,7 @@ abstract class AbstractSecurityController extends AbstractController
             $plaintext,
         );
 
-        $this->raiseSecurityNotice(
+        $this->credentialsChanged(
             $securityNotifier,
             $user,
             NotificationType::BackupCodesRegenerated,
@@ -889,7 +888,7 @@ abstract class AbstractSecurityController extends AbstractController
 
         $this->multiFactorService->disable($user);
 
-        $this->raiseSecurityNotice(
+        $this->credentialsChanged(
             $securityNotifier,
             $user,
             NotificationType::MfaDisabled,
@@ -1038,14 +1037,10 @@ abstract class AbstractSecurityController extends AbstractController
     }
 
     /**
-     * Tell whoever owns the account that the way they sign in has changed. Not something they asked for and not
-     * something they can turn off, which is rather the point of a security notice.
-     *
-     * Every device the account was recognised on is forgotten at the same time, so the next sign-in from any of them
-     * is announced. Whether the member is securing an account they believe has been reached or an intruder got there
-     * first, nothing should stay trusted across a change like this.
+     * Whether the member is securing an account they believe has been reached or an intruder got there first, nothing
+     * should stay signed in or stay trusted across a change to the way in.
      */
-    private function raiseSecurityNotice(
+    private function credentialsChanged(
         SecurityNotifier $securityNotifier,
         User|CompanyUser $user,
         NotificationType $type,
@@ -1056,6 +1051,19 @@ abstract class AbstractSecurityController extends AbstractController
         if (null === $firewall) {
             return;
         }
+
+        $this->sessionManager->terminateAllExceptCurrent(
+            $user,
+            $request,
+            $firewall->value,
+        );
+
+        // Without this the guard on the next request reads the caller's own session as one of the stale ones.
+        $this->sessionManager->refreshCredentials(
+            $user,
+            $request,
+            $firewall->value,
+        );
 
         $this->knownDevices->forget(
             $user->getUserIdentifier(),

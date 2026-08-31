@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventListener\User;
 
 use App\Repository\User\SessionRepository;
+use App\Security\User\CredentialsSignature;
 use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
 use App\Security\User\UserAgentParser;
@@ -65,6 +66,7 @@ final class StaleSessionGuardListener
         private readonly UserAgentParser $userAgentParser,
         private readonly TokenStorageInterface $tokenStorage,
         private readonly KnownDeviceRegistry $knownDevices,
+        private readonly CredentialsSignature $credentials,
         private readonly RealtimeAuthorization $realtime,
         private readonly ?LoggerInterface $logger = null,
     ) {
@@ -134,6 +136,35 @@ final class StaleSessionGuardListener
         // Cross-firewall token replay attempt (a cookie from one firewall on another firewall's URL). Refuse -> leave
         // the data alone and let the request fall through unauthenticated.
         if ($managedSession->getFirewallName() !== $firewall) {
+            return;
+        }
+
+        // The remember-me handler makes the same comparison, but only on a request that hands it the cookie, which a
+        // device with a live PHP session never makes: Valkey pushes that session's expiry forward on every request,
+        // so without this a password reset would leave whoever it was meant to shut out signed in.
+        $user = $this->security->getUser();
+        if (
+            null !== $user
+            && !$this->credentials->matches(
+                $managedSession->getSignaturePropertiesHash(),
+                $user,
+            )
+        ) {
+            $this->logger?->info(
+                'Account credentials changed since this session was opened -> tearing down session.',
+                [
+                    'series' => $series,
+                    'user' => $managedSession->getUserIdentifier(),
+                    'firewall' => $firewall,
+                ],
+            );
+            $this->entityManager->remove($managedSession);
+            $this->entityManager->flush();
+            $this->forceLogout(
+                $firewall,
+                $event,
+            );
+
             return;
         }
 
