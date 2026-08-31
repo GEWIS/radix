@@ -112,7 +112,7 @@ final class SessionManager
 
         // Same guard as terminateAllExceptCurrent(): if a zombie row points at the live PHP session ID, destroying it
         // would wipe the caller's session in Valkey and silently log them out (and, via remember-me, drop them back at
-        // the sudo-confirm prompt because _sudo_granted_at lived on the wiped session). So, we must drop the DB row but
+        // the sudo-confirm prompt because the sudo grant lived on the wiped session). So, we must drop the DB row but
         // skip the destroy(). No real-time revocation either: this is the caller's own device and the controller
         // already logs it out.
         if ($session->getPhpSessionId() === $request->getSession()->getId()) {
@@ -259,7 +259,7 @@ final class SessionManager
      * response header to clear the session cookie - regardless of which session ID was destroyed.
      *
      * So calling that here would silently log the caller out (their cookie gets deleted), then remember-me would
-     * re-auth them into a fresh session with no `_sudo_granted_at`, dropping them at the sudo-confirm prompt.
+     * re-auth them into a fresh session holding no sudo grant, dropping them at the sudo-confirm prompt.
      *
      * Deleting the key directly hits Valkey only and leaves the caller's cookie alone. `DEL` is a no-op if the key is
      * already gone.
