@@ -1,11 +1,14 @@
 {% set announcements = active_announcements() %}
 <div aria-live="polite" aria-atomic="true" class="position-sticky announcement-banner" data-controller="dismissible">
     <div class="toast-container top-0 start-50 translate-middle-x p-3">
-        {% if maintenance_status() == enum('App\\Entity\\Application\\Enums\\MaintenanceStatus').ReadOnly %}
+        {% if maintenance_status() == enum('App\\Entity\\Application\\Enums\\MaintenanceStatus').ReadOnly and not is_granted('ROLE_ADMIN') %}
             {#
                 Deliberately without an announcement id: the controller only remembers a dismissal it can name,
                 so this one lasts the page and is back on the next load. `show` stays on the markup rather than
                 being left to the controller, so that a site in read-only mode still says so without JavaScript.
+
+                An admin does not get this one: their writes are not refused, and the notice above the page already
+                tells them they are bypassing maintenance.
             #}
             <div class="toast toast-warning show" role="alert" aria-live="assertive" aria-atomic="true"
                  data-dismissible-target="banner">
