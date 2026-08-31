@@ -1397,10 +1397,6 @@
         <source>Are you sure %name%?</source>
         <target state="translated">Are you sure %name%?</target>
       </trans-unit>
-      <trans-unit id="1qT9z3I" resname="Are you sure that you are younger than 10 years?">
-        <source>Are you sure that you are younger than 10 years?</source>
-        <target state="translated">Are you sure that you are younger than 10 years?</target>
-      </trans-unit>
       <trans-unit id="1oKKl9I" resname="Are you sure that you want to remove %name%?">
         <source>Are you sure that you want to remove %name%?</source>
         <target state="translated">Are you sure that you want to remove %name%?</target>
@@ -2700,10 +2696,6 @@
       <trans-unit id="CsK9OMt" resname="Decision Already Exists">
         <source>Decision Already Exists</source>
         <target state="translated">Decision Already Exists</target>
-      </trans-unit>
-      <trans-unit id="gMlhZh1" resname="Decision Cannot Be Removed">
-        <source>Decision Cannot Be Removed</source>
-        <target state="translated">Decision Cannot Be Removed</target>
       </trans-unit>
       <trans-unit id="CVPhJMS" resname="Decision Number">
         <source>Decision Number</source>
@@ -4801,10 +4793,6 @@
         <source>Link virtual counterpart</source>
         <target state="translated">Link virtual counterpart</target>
       </trans-unit>
-      <trans-unit id="Nlj5zvt" resname="Link virtual decision">
-        <source>Link virtual decision</source>
-        <target state="translated">Link virtual decision</target>
-      </trans-unit>
       <trans-unit id="Dz0Nyiu" resname="Links">
         <source>Links</source>
         <target state="translated">Links</target>
@@ -5032,6 +5020,10 @@
       <trans-unit id="Zqc1Y9t" resname="Manage library">
         <source>Manage library</source>
         <target state="translated">Manage library</target>
+      </trans-unit>
+      <trans-unit id="jtGgAWS" resname="Manage maintenance">
+        <source>Manage maintenance</source>
+        <target state="translated">Manage maintenance</target>
       </trans-unit>
       <trans-unit id="0AZrzL3" resname="Manage vacancies">
         <source>Manage vacancies</source>
@@ -7173,10 +7165,6 @@
         <source>Registered %date%</source>
         <target state="translated">Registered %date%</target>
       </trans-unit>
-      <trans-unit id="NKWFupb" resname="Registration">
-        <source>Registration</source>
-        <target state="translated">Registration</target>
-      </trans-unit>
       <trans-unit id="mMYpEzb" resname="Regulations">
         <source>Regulations</source>
         <target state="translated">Regulations</target>
@@ -7400,14 +7388,6 @@
       <trans-unit id="0GpRD.b" resname="Repeat password">
         <source>Repeat password</source>
         <target state="translated">Repeat password</target>
-      </trans-unit>
-      <trans-unit id=".0FEbsd" resname="Repeated by %type% %number%.%point%.%decision%">
-        <source>Repeated by %type% %number%.%point%.%decision%</source>
-        <target state="translated">Repeated by %type% %number%.%point%.%decision%</target>
-      </trans-unit>
-      <trans-unit id="DvFM3dn" resname="Repeats %type% %number%.%point%.%decision%">
-        <source>Repeats %type% %number%.%point%.%decision%</source>
-        <target state="translated">Repeats %type% %number%.%point%.%decision%</target>
       </trans-unit>
       <trans-unit id="FcC7urS" resname="Reply">
         <source>Reply</source>
@@ -8364,10 +8344,6 @@
       <trans-unit id="QWpfKJT" resname="Sub-albums">
         <source>Sub-albums</source>
         <target state="translated">Sub-albums</target>
-      </trans-unit>
-      <trans-unit id="kHSUQoK" resname="Sub-category">
-        <source>Sub-category</source>
-        <target state="translated">Sub-category</target>
       </trans-unit>
       <trans-unit id="y01Hddz" resname="Subject">
         <source>Subject</source>
@@ -9413,10 +9389,6 @@
         <source>This course is listed but empty. If you kept your notes, sending them in takes a minute and saves the next cohort a weekend.</source>
         <target state="translated">This course is listed but empty. If you kept your notes, sending them in takes a minute and saves the next cohort a weekend.</target>
       </trans-unit>
-      <trans-unit id="jUse04l" resname="This decision cannot be said to repeat that one.">
-        <source>This decision cannot be said to repeat that one.</source>
-        <target state="translated">This decision cannot be said to repeat that one.</target>
-      </trans-unit>
       <trans-unit id="I6hgvcK" resname="This decision has already been annulled.">
         <source>This decision has already been annulled.</source>
         <target state="translated">This decision has already been annulled.</target>
@@ -9728,10 +9700,6 @@
       <trans-unit id="PKYtYdw" resname="Title and content">
         <source>Title and content</source>
         <target state="translated">Title and content</target>
-      </trans-unit>
-      <trans-unit id="mdHmLw3" resname="To pay the membership fee you must accept Stripe's privacy policy.">
-        <source>To pay the membership fee you must accept Stripe's privacy policy.</source>
-        <target state="translated">To pay the membership fee you must accept Stripe's privacy policy.</target>
       </trans-unit>
       <trans-unit id="swKwU_O" resname="Today">
         <source>Today</source>
@@ -10525,10 +10493,6 @@
         <source>Which is basically the same thing.</source>
         <target state="translated">Which is basically the same thing.</target>
       </trans-unit>
-      <trans-unit id="kv89K6a" resname="Which virtual decision repeats this?">
-        <source>Which virtual decision repeats this?</source>
-        <target state="translated">Which virtual decision repeats this?</target>
-      </trans-unit>
       <trans-unit id="WRiNbfh" resname="Who and when">
         <source>Who and when</source>
         <target state="translated">Who and when</target>
@@ -10689,6 +10653,14 @@
         <source>You are signed up.</source>
         <target>You are signed up.</target>
       </trans-unit>
+      <trans-unit id="jBpTPXS" resname="You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.">
+        <source>You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.</source>
+        <target state="translated">You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.</target>
+      </trans-unit>
+      <trans-unit id="hknXgHb" resname="You are using administrator privileges to bypass maintenance mode; the website is read-only for everyone else.">
+        <source>You are using administrator privileges to bypass maintenance mode; the website is read-only for everyone else.</source>
+        <target state="translated">You are using administrator privileges to bypass maintenance mode; the website is read-only for everyone else.</target>
+      </trans-unit>
       <trans-unit id="0oN.eFV" resname="You assumed it was here. It was not. Q.E.D.">
         <source>You assumed it was here. It was not. Q.E.D.</source>
         <target state="translated">You assumed it was here. It was not. Q.E.D.</target>
@@ -10716,10 +10688,6 @@
       <trans-unit id="lYm3sZp" resname="You cannot authorize yourself.">
         <source>You cannot authorize yourself.</source>
         <target state="translated">You cannot authorize yourself.</target>
-      </trans-unit>
-      <trans-unit id="FLbmfMo" resname="You cannot become a member of the association without agreeing to the terms.">
-        <source>You cannot become a member of the association without agreeing to the terms.</source>
-        <target state="translated">You cannot become a member of the association without agreeing to the terms.</target>
       </trans-unit>
       <trans-unit id="ewDvGAp" resname="You cannot sign in to this account at this moment. Contact the board for more information.">
         <source>You cannot sign in to this account at this moment. Contact the board for more information.</source>
@@ -11416,10 +11384,6 @@
       <trans-unit id="q7soSeR" resname="the secretary of GEWIS">
         <source>the secretary of GEWIS</source>
         <target>the secretary of GEWIS</target>
-      </trans-unit>
-      <trans-unit id="Ga2SNrG" resname="things need attention">
-        <source>things need attention</source>
-        <target state="translated">things need attention</target>
       </trans-unit>
       <trans-unit id=".Jt3caL" resname="this activity">
         <source>this activity</source>

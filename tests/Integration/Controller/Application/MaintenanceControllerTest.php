@@ -43,6 +43,33 @@ final class MaintenanceControllerTest extends DatabaseTestCase
         );
     }
 
+    public function testAdminIsRemindedTheyAreBypassingReadOnlyMaintenance(): void
+    {
+        self::assertStringContainsString(
+            'You are using administrator privileges to bypass maintenance mode; the website is read-only for everyone else.', // phpcs:ignore Generic.Files.LineLength.TooLong -- user-visible strings should not be split
+            $this->renderIndexDuring(MaintenanceStatus::ReadOnly),
+        );
+    }
+
+    public function testAdminIsRemindedTheyAreBypassingFullMaintenance(): void
+    {
+        self::assertStringContainsString(
+            'You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.', // phpcs:ignore Generic.Files.LineLength.TooLong -- user-visible strings should not be split
+            $this->renderIndexDuring(MaintenanceStatus::Full),
+        );
+    }
+
+    public function testAdminSeesTheUsualNoticeWhenNoMaintenanceIsInEffect(): void
+    {
+        $this->authenticateAdmin();
+        $this->pushRequest();
+
+        self::assertStringContainsString(
+            'You are currently using administrator privileges to use the website!',
+            (string) $this->controller()->index()->getContent(),
+        );
+    }
+
     public function testCreatePageRenders(): void
     {
         $this->authenticateAdmin();
@@ -58,6 +85,19 @@ final class MaintenanceControllerTest extends DatabaseTestCase
             'Schedule maintenance',
             (string) $response->getContent(),
         );
+    }
+
+    private function renderIndexDuring(MaintenanceStatus $status): string
+    {
+        $this->authenticateAdmin();
+        $this->pushRequest();
+
+        $window = new MaintenanceWindow();
+        $window->setStatus($status);
+        $this->entityManager->persist($window);
+        $this->entityManager->flush();
+
+        return (string) $this->controller()->index()->getContent();
     }
 
     private function controller(): MaintenanceController

@@ -68,6 +68,11 @@ body {
         color: var(--#{$prefix}warning-text-emphasis);
     }
 
+    &.maintenance-notice {
+        background-color: var(--#{$prefix}warning-bg-subtle);
+        color: var(--#{$prefix}warning-text-emphasis);
+    }
+
     > p {
         margin: 0;
     }

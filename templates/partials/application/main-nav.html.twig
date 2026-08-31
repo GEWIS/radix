@@ -468,12 +468,35 @@
         </div>
     {% endif %}
     {% if is_granted('ROLE_ADMIN') %}
-        <div class="special-notice admin-notice sticky-top">
-            <p class="text-center">
-                <strong>
-                    {{ 'You are currently using administrator privileges to use the website!'|trans }}
-                </strong>
-            </p>
-        </div>
+        {% set maintenance = maintenance_status() %}
+        {% if maintenance == enum('App\\Entity\\Application\\Enums\\MaintenanceStatus').None %}
+            <div class="special-notice admin-notice sticky-top">
+                <p class="text-center">
+                    <strong>
+                        {{ 'You are currently using administrator privileges to use the website!'|trans }}
+                    </strong>
+                </p>
+            </div>
+        {% else %}
+            {#
+                An admin is the only one who gets here while maintenance is on, because everybody else is either on the
+                maintenance page or having their writes refused. Say so in place of the usual administrator notice,
+                rather than next to it, so the notices do not stack up any further.
+            #}
+            <div class="special-notice maintenance-notice sticky-top">
+                <p class="text-center">
+                    <strong>
+                        {% if maintenance == enum('App\\Entity\\Application\\Enums\\MaintenanceStatus').Full %}
+                            {{ 'You are using administrator privileges to bypass maintenance mode; the website is closed to everyone else.'|trans }}
+                        {% else %}
+                            {{ 'You are using administrator privileges to bypass maintenance mode; the website is read-only for everyone else.'|trans }}
+                        {% endif %}
+                        <a href="{{ path('admin/maintenance') }}">
+                            {{ 'Manage maintenance'|trans }}
+                        </a>
+                    </strong>
+                </p>
+            </div>
+        {% endif %}
     {% endif %}
 {% endif %}
