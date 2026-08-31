@@ -54,7 +54,8 @@ final readonly class HomePageService
      * @return array{
      *     activities: Activity[],
      *     newsFeed: NewsItem[],
-     *     currentPoll: Poll|null,
+     *     activePolls: list<Poll>,
+     *     lastPoll: Poll|null,
      *     weeklyPhoto: WeeklyPhoto|null,
      *     weeklyPublicPath: string|null,
      *     birthdayTags: MemberTag[],
@@ -64,6 +65,7 @@ final readonly class HomePageService
     public function getHomePageData(): array
     {
         $weeklyPhoto = $this->weeklyPhotoRepository->getCurrentPhotoOfTheWeek();
+        $activePolls = $this->pollRepository->findActivePolls();
 
         // Who has a birthday today is only shown to members, and finding out costs a date calculation over every
         // member plus a photo lookup for each of them, so a passer-by is not made to pay for a panel they never see.
@@ -89,7 +91,10 @@ final readonly class HomePageService
         return [
             'activities' => $this->activityRepository->findUpcoming(),
             'newsFeed' => $this->newsItemRepository->findFeed(limit: self::NEWS_LIMIT),
-            'currentPoll' => $this->pollRepository->findCurrentPoll(),
+            'activePolls' => $activePolls,
+            'lastPoll' => [] === $activePolls
+                ? $this->pollRepository->findMostRecentlyClosed()
+                : null,
             'weeklyPhoto' => $weeklyPhoto,
             'weeklyPublicPath' => null === $weeklyPhoto
                 ? null

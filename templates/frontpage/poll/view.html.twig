@@ -49,7 +49,7 @@
     {% else %}
         <div class="row">
             <div class="col-lg-8">
-                {{ component('Frontpage:PollWidget', {'poll': poll, 'detailed': true}) }}
+                {{ component('Frontpage:PollWidget', {'polls': [poll], 'detailed': true}) }}
 
                 {# The component's own IsGranted only guards its actions over HTTP, so the mount is gated here. #}
                 {% if is_granted('ROLE_USER') %}

@@ -221,6 +221,10 @@
         <source>%actor% withdrew the invitation for %detail%</source>
         <target state="translated">%actor% heeft de uitnodiging voor %detail% ingetrokken</target>
       </trans-unit>
+      <trans-unit id="3UU4Fuo" resname="%at% of %of%">
+        <source>%at% of %of%</source>
+        <target state="translated">%at% van %of%</target>
+      </trans-unit>
       <trans-unit id="Rq5XstT" resname="%browser% on %system%">
         <source>%browser% on %system%</source>
         <target state="translated">%browser% op %system%</target>
@@ -5577,6 +5581,10 @@
         <source>Next month</source>
         <target state="translated">Volgende maand</target>
       </trans-unit>
+      <trans-unit id="h.Ulx.u" resname="Next poll">
+        <source>Next poll</source>
+        <target state="translated">Volgende poll</target>
+      </trans-unit>
       <trans-unit id="wd1MvZW" resname="No">
         <source>No</source>
         <target>Nee</target>
@@ -5820,6 +5828,14 @@
       <trans-unit id="xD4Of.e" resname="No poll has been agreed to yet.">
         <source>No poll has been agreed to yet.</source>
         <target state="translated">Er is nog geen poll goedgekeurd.</target>
+      </trans-unit>
+      <trans-unit id="JK2cS.c" resname="No poll is running right now. Any member can put a question to the association.">
+        <source>No poll is running right now. Any member can put a question to the association.</source>
+        <target state="translated">Er loopt op dit moment geen poll. Ieder lid kan een vraag aan de vereniging voorleggen.</target>
+      </trans-unit>
+      <trans-unit id="OObEImO" resname="No poll is running right now. The last one asked:">
+        <source>No poll is running right now. The last one asked:</source>
+        <target state="translated">Er loopt op dit moment geen poll. De laatste vroeg:</target>
       </trans-unit>
       <trans-unit id="mmkXeDi" resname="No poll matches what you are looking for.">
         <source>No poll matches what you are looking for.</source>
@@ -6824,6 +6840,10 @@
       <trans-unit id="oiwk.U9" resname="Previous month">
         <source>Previous month</source>
         <target state="translated">Vorige maand</target>
+      </trans-unit>
+      <trans-unit id="8t_jGKE" resname="Previous poll">
+        <source>Previous poll</source>
+        <target state="translated">Vorige poll</target>
       </trans-unit>
       <trans-unit id="1X7oKCl" resname="Previously a member of">
         <source>Previously a member of</source>

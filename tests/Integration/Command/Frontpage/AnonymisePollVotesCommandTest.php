@@ -96,7 +96,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
      */
     public function testARunningPollIsLeftAlone(): void
     {
-        $running = self::getContainer()->get(PollRepository::class)->findCurrentPoll();
+        $running = self::getContainer()->get(PollRepository::class)->findActivePolls()[0] ?? null;
         self::assertInstanceOf(
             Poll::class,
             $running,

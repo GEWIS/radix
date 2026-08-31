@@ -26,7 +26,7 @@ use Doctrine\Persistence\ObjectManager;
 use Override;
 
 /**
- * One of every kind of poll there is: the one that is running, one that has closed, one the board still has to look at
+ * One of every kind of poll there is: two that are running, one that has closed, one the board still has to look at
  * and one it turned down. Between them the front page, the archive, the review queue and the "ask again" route all
  * have something to show without anybody clicking a poll through the workflow by hand.
  *
@@ -38,6 +38,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
     public function load(ObjectManager $manager): void
     {
         $this->live($manager);
+        $this->alsoRunning($manager);
         $this->closed($manager);
         $this->awaitingReview($manager);
         $this->rejected($manager);
@@ -151,6 +152,52 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             $reaction->setType($type);
             $comment->addReaction($reaction);
             $manager->persist($reaction);
+        }
+    }
+
+    /**
+     * A second question running alongside the first, so the front page has something to page to.
+     */
+    private function alsoRunning(ObjectManager $manager): void
+    {
+        $poll = $this->poll(
+            $manager,
+            8009,
+            'Should the association room stay open during the exam weeks?',
+            'Moet de GEWIS-ruimte open blijven tijdens de tentamenweken?',
+            [
+                [
+                    'Yes, it is where everybody studies',
+                    'Ja, daar studeert iedereen',
+                ],
+                [
+                    'No, it is too busy to work in',
+                    'Nee, het is er te druk om te werken',
+                ],
+            ],
+            RevisionStatus::Approved,
+            new DateTime('+5 weeks'),
+        );
+
+        $revision = $poll->getCurrentRevision();
+        if (null === $revision) {
+            return;
+        }
+
+        $options = $revision->getOptions()->getValues();
+
+        $tallies = [
+            8014 => 0,
+            8015 => 0,
+            8016 => 1,
+        ];
+
+        foreach ($tallies as $lidnr => $index) {
+            $vote = new PollVote();
+            $vote->setPoll($poll);
+            $vote->setPollOption($options[$index]);
+            $vote->setRespondent($this->member($lidnr));
+            $manager->persist($vote);
         }
     }
 

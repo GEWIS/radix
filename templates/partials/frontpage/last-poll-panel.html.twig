@@ -1,0 +1,36 @@
+{# Pass `poll`: the question that closed most recently, or null when the association has never been asked one. #}
+<div class="panel">
+    <div class="panel-heading">
+        <h3>{{ 'Poll'|trans }}</h3>
+    </div>
+
+    <div class="panel-body">
+        {% if poll is not null %}
+            <p class="text-muted mb-2">{{ 'No poll is running right now. The last one asked:'|trans }}</p>
+            <p class="fw-semibold mb-2">
+                <a href="{{ path('poll/view', {'poll': poll.id}) }}">{{ poll.question|localise_text }}</a>
+            </p>
+
+            {% include 'partials/frontpage/poll-results.html.twig' with {
+                'poll': poll,
+                'limit': 3,
+                'compact': true,
+            } only %}
+        {% else %}
+            <p class="text-muted mb-0">
+                {{ 'No poll is running right now. Any member can put a question to the association.'|trans }}
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="panel-footer">
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('poll/request') }}" class="panel-footer-link">
+                {{ 'Request a poll'|trans }}
+            </a>
+        {% endif %}
+        <a href="{{ path('poll/index') }}" class="panel-footer-link">
+            {{ 'All polls'|trans }}
+        </a>
+    </div>
+</div>

@@ -53,11 +53,11 @@ class PollController extends AbstractController
     public function index(): Response
     {
         // The archive component keeps the whole of this page's state in the query string, so the only thing handed to
-        // this page is the poll that is running: it sits above the archive and is the same one whatever is searched
-        // for, which is why it is not the component's to fetch again on every keystroke.
+        // this page is what is running: it sits above the archive and is the same whatever is searched for, which is
+        // why it is not the component's to fetch again on every keystroke.
         return $this->render(
             'frontpage/poll/index.html.twig',
-            ['current' => $this->pollRepository->findCurrentPoll()],
+            ['activePolls' => $this->pollRepository->findActivePolls()],
         );
     }
 

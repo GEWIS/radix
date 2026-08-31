@@ -32,18 +32,43 @@ class PollRepository extends ServiceEntityRepository
     }
 
     /**
-     * The question the association is being asked at the moment. Approving a poll is also scheduling it, so of the
-     * questions the board has agreed to this is the one whose closing date lies furthest into the future.
+     * The front page leads with the first of these, so the order is a contract: soonest to close first.
+     *
+     * @return list<Poll>
      */
-    public function findCurrentPoll(): ?Poll
+    public function findActivePolls(): array
     {
-        // The limit is applied without the answers joined in: a fetch-join would make it count rows rather than
-        // polls. What the one poll needs to render is loaded straight after.
         $polls = $this->createQueryBuilder('p')
             ->where('p.liveRevision IS NOT NULL')
             ->andWhere('p.expiryDate > CURRENT_DATE()')
             ->orderBy(
                 'p.expiryDate',
+                'ASC',
+            )
+            ->addOrderBy(
+                'p.id',
+                'ASC',
+            )
+            ->getQuery()
+            ->getResult();
+
+        $this->primeResults($polls);
+
+        return $polls;
+    }
+
+    public function findMostRecentlyClosed(): ?Poll
+    {
+        // The limit is applied without the answers joined in: a fetch-join would make it count rows rather than polls.
+        $polls = $this->createQueryBuilder('p')
+            ->where('p.liveRevision IS NOT NULL')
+            ->andWhere('p.expiryDate <= CURRENT_DATE()')
+            ->orderBy(
+                'p.expiryDate',
+                'DESC',
+            )
+            ->addOrderBy(
+                'p.id',
                 'DESC',
             )
             ->setMaxResults(1)

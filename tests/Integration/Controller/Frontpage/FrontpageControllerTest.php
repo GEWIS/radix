@@ -7,8 +7,10 @@ namespace App\Tests\Integration\Controller\Frontpage;
 use App\Controller\Frontpage\FrontpageController;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
+use App\Repository\Frontpage\PollRepository;
 use App\Service\Frontpage\HomePageService;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -53,8 +55,27 @@ final class FrontpageControllerTest extends DatabaseTestCase
         $data = self::getContainer()->get(HomePageService::class)->getHomePageData();
 
         self::assertNotEmpty($data['newsFeed']);
-        self::assertNotNull($data['currentPoll']);
+        self::assertNotEmpty($data['activePolls']);
         self::assertNotEmpty($data['activities']);
+    }
+
+    public function testWithNothingRunningThePollPanelFallsBackToTheLastQuestion(): void
+    {
+        foreach (self::getContainer()->get(PollRepository::class)->findActivePolls() as $poll) {
+            $poll->setExpiryDate(new DateTime('-1 day'));
+        }
+
+        $this->entityManager->flush();
+        $this->pushRequest();
+
+        $data = self::getContainer()->get(HomePageService::class)->getHomePageData();
+        self::assertEmpty($data['activePolls']);
+        self::assertNotNull($data['lastPoll']);
+
+        self::assertStringContainsString(
+            'No poll is running right now.',
+            strval($this->controller()->index()->getContent()),
+        );
     }
 
     /**

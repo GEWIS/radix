@@ -177,7 +177,7 @@ final class PollCommentsTest extends DatabaseTestCase
 
     private function livePoll(): Poll
     {
-        $poll = self::getContainer()->get(PollRepository::class)->findCurrentPoll();
+        $poll = self::getContainer()->get(PollRepository::class)->findActivePolls()[0] ?? null;
         self::assertInstanceOf(
             Poll::class,
             $poll,

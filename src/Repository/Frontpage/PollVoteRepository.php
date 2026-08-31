@@ -41,6 +41,43 @@ class PollVoteRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param list<Poll> $polls
+     *
+     * @return array<int, true>
+     */
+    public function answeredOf(
+        array $polls,
+        Member $member,
+    ): array {
+        if ([] === $polls) {
+            return [];
+        }
+
+        $answered = [];
+
+        $rows = $this->createQueryBuilder('v')
+            ->select('IDENTITY(v.poll) AS pollId')
+            ->where('v.poll IN (:polls)')
+            ->andWhere('v.respondent = :member')
+            ->setParameter(
+                'polls',
+                $polls,
+            )
+            ->setParameter(
+                'member',
+                $member->getLidnr(),
+            )
+            ->getQuery()
+            ->getScalarResult();
+
+        foreach ($rows as $row) {
+            $answered[intval($row['pollId'])] = true;
+        }
+
+        return $answered;
+    }
+
+    /**
      * How many votes each answer of a poll holds, keyed by answer id, counted in one query. Answers nobody picked are
      * absent. This is what the tallies are built from before the votes themselves go.
      *

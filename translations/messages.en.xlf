@@ -221,6 +221,10 @@
         <source>%actor% withdrew the invitation for %detail%</source>
         <target state="translated">%actor% withdrew the invitation for %detail%</target>
       </trans-unit>
+      <trans-unit id="3UU4Fuo" resname="%at% of %of%">
+        <source>%at% of %of%</source>
+        <target state="translated">%at% of %of%</target>
+      </trans-unit>
       <trans-unit id="Rq5XstT" resname="%browser% on %system%">
         <source>%browser% on %system%</source>
         <target state="translated">%browser% on %system%</target>
@@ -5577,6 +5581,10 @@
         <source>Next month</source>
         <target state="translated">Next month</target>
       </trans-unit>
+      <trans-unit id="h.Ulx.u" resname="Next poll">
+        <source>Next poll</source>
+        <target state="translated">Next poll</target>
+      </trans-unit>
       <trans-unit id="wd1MvZW" resname="No">
         <source>No</source>
         <target>No</target>
@@ -5820,6 +5828,14 @@
       <trans-unit id="xD4Of.e" resname="No poll has been agreed to yet.">
         <source>No poll has been agreed to yet.</source>
         <target state="translated">No poll has been agreed to yet.</target>
+      </trans-unit>
+      <trans-unit id="JK2cS.c" resname="No poll is running right now. Any member can put a question to the association.">
+        <source>No poll is running right now. Any member can put a question to the association.</source>
+        <target state="translated">No poll is running right now. Any member can put a question to the association.</target>
+      </trans-unit>
+      <trans-unit id="OObEImO" resname="No poll is running right now. The last one asked:">
+        <source>No poll is running right now. The last one asked:</source>
+        <target state="translated">No poll is running right now. The last one asked:</target>
       </trans-unit>
       <trans-unit id="mmkXeDi" resname="No poll matches what you are looking for.">
         <source>No poll matches what you are looking for.</source>
@@ -6824,6 +6840,10 @@
       <trans-unit id="oiwk.U9" resname="Previous month">
         <source>Previous month</source>
         <target state="translated">Previous month</target>
+      </trans-unit>
+      <trans-unit id="8t_jGKE" resname="Previous poll">
+        <source>Previous poll</source>
+        <target state="translated">Previous poll</target>
       </trans-unit>
       <trans-unit id="1X7oKCl" resname="Previously a member of">
         <source>Previously a member of</source>
