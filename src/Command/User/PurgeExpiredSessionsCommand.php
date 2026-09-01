@@ -6,6 +6,8 @@ namespace App\Command\User;
 
 use App\Command\HoldsRunLockTrait;
 use App\Repository\User\KnownDeviceRepository;
+use App\Repository\User\KnownDeviceTokenRepository;
+use App\Repository\User\KnownNetworkRepository;
 use App\Repository\User\SessionRepository;
 use App\Service\User\KnownDeviceRegistry;
 use DateTimeImmutable;
@@ -40,12 +42,17 @@ final class PurgeExpiredSessionsCommand extends Command
      */
     private const string SESSION_IDLE = '-30 days';
 
-    /** Devices stop being recognised at this age regardless; this only clears the rows out behind that. */
+    /**
+     * Devices, networks and device cookies stop being recognised at this age regardless; this only clears the rows
+     * out behind that.
+     */
     private const string DEVICE_IDLE = KnownDeviceRegistry::RETENTION;
 
     public function __construct(
         private readonly SessionRepository $repository,
         private readonly KnownDeviceRepository $knownDeviceRepository,
+        private readonly KnownNetworkRepository $knownNetworkRepository,
+        private readonly KnownDeviceTokenRepository $knownDeviceTokenRepository,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $em,
     ) {
@@ -77,11 +84,14 @@ final class PurgeExpiredSessionsCommand extends Command
 
         $expired = $this->repository->deleteExpired();
         $idle = $this->repository->deleteIdleSince(new DateTimeImmutable(self::SESSION_IDLE));
-        $devices = $this->knownDeviceRepository->deleteSeenBefore(new DateTimeImmutable(self::DEVICE_IDLE));
+        $before = new DateTimeImmutable(self::DEVICE_IDLE);
+        $devices = $this->knownDeviceRepository->deleteSeenBefore($before)
+            + $this->knownNetworkRepository->deleteSeenBefore($before)
+            + $this->knownDeviceTokenRepository->deleteSeenBefore($before);
         $this->em->flush();
 
         $io->success(sprintf(
-            'Purged %d expired and %d idle session%s, and forgot %d device%s.',
+            'Purged %d expired and %d idle session%s, and forgot %d thing%s recognition rested on.',
             $expired,
             $idle,
             1 !== $idle ? 's' : '',

@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Service\User;
 
 use App\Entity\User\KnownDevice;
+use App\Entity\User\KnownDeviceToken;
+use App\Entity\User\KnownNetwork;
 use App\Repository\User\KnownDeviceRepository;
+use App\Repository\User\KnownDeviceTokenRepository;
+use App\Repository\User\KnownNetworkRepository;
 use App\Service\User\KnownDeviceRegistry;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 final class KnownDeviceRegistryTest extends DatabaseTestCase
@@ -21,6 +26,38 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         . '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
     private const string FIREFOX = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0';
+
+    /** Reserved addresses on two different networks, in no IP database and never routed. */
+    private const string HOME = '192.0.2.10';
+
+    private const string CAMPUS = '198.51.100.10';
+
+    /**
+     * Twenty browsers that differ in nothing but the languages they ask for, which is enough: the languages are part
+     * of the device key. Quality values would not be, {@see Request::getLanguages()} strips them.
+     */
+    private const array LANGUAGES = [
+        'aa',
+        'ab',
+        'af',
+        'am',
+        'ar',
+        'az',
+        'be',
+        'bg',
+        'bn',
+        'bs',
+        'ca',
+        'cs',
+        'cy',
+        'da',
+        'de',
+        'el',
+        'eo',
+        'es',
+        'et',
+        'eu',
+    ];
 
     /**
      * The first sign-in from a device is announced and every one after it is not.
@@ -51,6 +88,87 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         self::assertFalse($this->recognise(
             $registry,
             $this->request(self::FIREFOX),
+        ));
+    }
+
+    public function testAKnownDeviceOnANewNetworkIsAnnounced(): void
+    {
+        $registry = $this->registry();
+
+        $this->recognise(
+            $registry,
+            $this->request(
+                self::CHROME,
+                self::HOME,
+            ),
+        );
+
+        self::assertFalse($this->recognise(
+            $registry,
+            $this->request(
+                self::CHROME,
+                self::CAMPUS,
+            ),
+        ));
+    }
+
+    /**
+     * The reason device and network are learned apart. The laptop was only ever seen at home and the phone only ever
+     * on campus, yet the laptop's first sign-in on campus raises no notice: the device is known, and the network was
+     * made known by the phone. One key over both would announce every such pairing for the rest of a membership.
+     */
+    public function testAKnownDeviceIsRecognisedOnANetworkAnotherDeviceMadeKnown(): void
+    {
+        $registry = $this->registry();
+
+        $this->recognise(
+            $registry,
+            $this->request(
+                self::CHROME,
+                self::HOME,
+            ),
+        );
+        $this->recognise(
+            $registry,
+            $this->request(
+                self::FIREFOX,
+                self::CAMPUS,
+            ),
+        );
+
+        self::assertTrue($this->recognise(
+            $registry,
+            $this->request(
+                self::CHROME,
+                self::CAMPUS,
+            ),
+        ));
+    }
+
+    /**
+     * The cookie recognises the browser itself, wherever it goes: a member on a network never seen before is not
+     * written to as long as the browser can present what it was handed at an earlier sign-in.
+     */
+    public function testAPresentedCookieIsRecognisedOnANetworkNeverSeenBefore(): void
+    {
+        $registry = $this->registry();
+        $first = $this->request(
+            self::CHROME,
+            self::HOME,
+        );
+
+        $this->recognise(
+            $registry,
+            $first,
+        );
+
+        self::assertTrue($this->recognise(
+            $registry,
+            $this->request(
+                self::CHROME,
+                '203.0.113.1',
+                $this->issuedCookieValue($first),
+            ),
         ));
     }
 
@@ -137,7 +255,8 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
     }
 
     /**
-     * On a new password, a second factor turned off, or every other session being signed out, nothing stays trusted.
+     * On a new password, a second factor turned off, or every other session being signed out, nothing stays trusted,
+     * the cookies out in the world included.
      */
     public function testForgettingLeavesNothingRecognised(): void
     {
@@ -148,6 +267,8 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
             $registry,
             $request,
         );
+        $cookie = $this->issuedCookieValue($request);
+
         $registry->forget(
             self::USER,
             self::FIREWALL,
@@ -158,9 +279,21 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
             0,
             $this->devices(),
         );
+        self::assertCount(
+            0,
+            $this->networks(),
+        );
+        self::assertCount(
+            0,
+            $this->tokens(),
+        );
         self::assertFalse($this->recognise(
             $registry,
-            $request,
+            $this->request(
+                self::CHROME,
+                self::HOME,
+                $cookie,
+            ),
         ));
     }
 
@@ -176,11 +309,11 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
             $registry->recognise(
                 self::USER,
                 self::FIREWALL,
-                // A different network each time: the same browser on twenty addresses of one /24 is deliberately one
-                // device, which is what the fingerprint tests cover.
+                // A different set of languages each time: the languages are part of the device key, where the
+                // network deliberately is not.
                 $this->request(
                     self::CHROME,
-                    '192.0.' . $i . '.10',
+                    languages: self::LANGUAGES[$i],
                 ),
             );
         }
@@ -198,21 +331,48 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         $registry->recognise(
             self::USER,
             self::FIREWALL,
-            $this->request(
-                self::FIREFOX,
-                '203.0.113.1',
-            ),
+            $this->request(self::FIREFOX),
         );
 
         self::assertCount(
             20,
             $this->devices(),
         );
-        self::assertNull($this->repository()->findOneByFingerprint(
+        self::assertNull($this->deviceRepository()->findOneByFingerprint(
             self::USER,
             self::FIREWALL,
             $fingerprint,
         ));
+    }
+
+    /**
+     * Every sign-in without a cookie mints one, so the browsers that never bring theirs back (a member working in
+     * private windows) would otherwise pile up rows forever. They sink to the bottom of the least-recently-seen order
+     * and make way first.
+     */
+    public function testTheOldestCookieMakesWayOnceTheCapIsReached(): void
+    {
+        $registry = $this->registry();
+
+        for ($i = 0; $i < 21; $i++) {
+            $registry->recognise(
+                self::USER,
+                self::FIREWALL,
+                $this->request(self::CHROME),
+            );
+
+            // Each sign-in a day apart, so the least-recently-seen order is well defined.
+            foreach ($this->tokens() as $token) {
+                $token->setLastSeenAt($token->getLastSeenAt()->modify('-1 day'));
+            }
+
+            $this->entityManager->flush();
+        }
+
+        self::assertCount(
+            20,
+            $this->tokens(),
+        );
     }
 
     private function recognise(
@@ -226,19 +386,50 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         );
     }
 
+    /**
+     * The value {@see KnownDeviceRegistry::recognise()} left to be set as the device cookie, as the browser would
+     * carry it to the next sign-in.
+     */
+    private function issuedCookieValue(Request $request): string
+    {
+        $cookie = $request->attributes->get(KnownDeviceRegistry::COOKIE_ATTRIBUTE);
+        self::assertInstanceOf(
+            Cookie::class,
+            $cookie,
+        );
+
+        $value = $cookie->getValue();
+        self::assertNotNull($value);
+
+        return $value;
+    }
+
     private function request(
         string $userAgent,
-        string $address = '192.0.2.10',
+        string $address = self::HOME,
+        ?string $cookie = null,
+        string $languages = 'nl-NL,nl;q=0.9,en;q=0.8',
     ): Request {
         $request = new Request();
         $request->headers->set(
             'User-Agent',
             $userAgent,
         );
+        $request->headers->set(
+            'Accept-Language',
+            $languages,
+        );
         $request->server->set(
             'REMOTE_ADDR',
             $address,
         );
+
+        if (null !== $cookie) {
+            $request->cookies->set(
+                'GWS_USER_DEVICE',
+                $cookie,
+            );
+        }
 
         return $request;
     }
@@ -246,7 +437,31 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
     /** @return KnownDevice[] */
     private function devices(): array
     {
-        return $this->repository()->findAllByUser(self::USER);
+        return $this->deviceRepository()->findAllByUser(self::USER);
+    }
+
+    /** @return KnownNetwork[] */
+    private function networks(): array
+    {
+        $repository = self::getContainer()->get(KnownNetworkRepository::class);
+        self::assertInstanceOf(
+            KnownNetworkRepository::class,
+            $repository,
+        );
+
+        return $repository->findAllByUser(self::USER);
+    }
+
+    /** @return KnownDeviceToken[] */
+    private function tokens(): array
+    {
+        $repository = self::getContainer()->get(KnownDeviceTokenRepository::class);
+        self::assertInstanceOf(
+            KnownDeviceTokenRepository::class,
+            $repository,
+        );
+
+        return $repository->findAllByUser(self::USER);
     }
 
     private function onlyDevice(): KnownDevice
@@ -260,7 +475,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         return $devices[0];
     }
 
-    private function repository(): KnownDeviceRepository
+    private function deviceRepository(): KnownDeviceRepository
     {
         $repository = self::getContainer()->get(KnownDeviceRepository::class);
         self::assertInstanceOf(

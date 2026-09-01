@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace App\Repository\User;
 
-use App\Entity\User\KnownDevice;
+use App\Entity\User\KnownNetwork;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends KnownFactRepository<KnownDevice>
+ * @extends KnownFactRepository<KnownNetwork>
  */
-class KnownDeviceRepository extends KnownFactRepository
+class KnownNetworkRepository extends KnownFactRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct(
             $registry,
-            KnownDevice::class,
+            KnownNetwork::class,
         );
     }
 
     /**
-     * The device matching this fingerprint, however long ago it was last seen.
+     * The network matching this fingerprint, however long ago it was last seen.
      *
      * Whether it is recent enough to count as recognised is the caller's decision. A stale row must still be found,
      * because the unique constraint would refuse a second one beside it.
@@ -30,11 +30,11 @@ class KnownDeviceRepository extends KnownFactRepository
         string $userIdentifier,
         string $firewallName,
         string $fingerprint,
-    ): ?KnownDevice {
-        return $this->createQueryBuilder('d')
-            ->where('d.userIdentifier = :uid')
-            ->andWhere('d.firewallName = :fw')
-            ->andWhere('d.fingerprint = :fp')
+    ): ?KnownNetwork {
+        return $this->createQueryBuilder('n')
+            ->where('n.userIdentifier = :uid')
+            ->andWhere('n.firewallName = :fw')
+            ->andWhere('n.fingerprint = :fp')
             ->setParameter(
                 'uid',
                 $userIdentifier,

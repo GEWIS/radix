@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Security\User;
 
 use App\Security\User\DeviceFingerprint;
+use App\Security\User\IpNetworkResolver;
 use App\Security\User\UserAgentParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,190 +31,103 @@ final class DeviceFingerprintTest extends TestCase
     public function testABrowserUpdateIsTheSameDevice(): void
     {
         self::assertSame(
-            $this->fingerprint(
-                self::CHROME_124,
-                '192.0.2.10',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-            ),
+            $this->device(self::CHROME_124),
+            $this->device(self::CHROME_140),
         );
     }
 
     public function testADifferentBrowserIsADifferentDevice(): void
     {
         self::assertNotSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-            ),
-            $this->fingerprint(
-                self::FIREFOX_140,
-                '192.0.2.10',
-            ),
+            $this->device(self::CHROME_140),
+            $this->device(self::FIREFOX_140),
         );
     }
 
     public function testADifferentSystemIsADifferentDevice(): void
     {
         self::assertNotSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-            ),
-            $this->fingerprint(
-                self::CHROME_ON_ANDROID,
-                '192.0.2.10',
-            ),
+            $this->device(self::CHROME_140),
+            $this->device(self::CHROME_ON_ANDROID),
         );
     }
 
     /**
-     * A router handing out a different address on the same network is the same device in the same place.
+     * The point of keeping the network out of the device key: a laptop is the same laptop at home, on campus and on a
+     * phone's hotspot, and were the address part of the key each pairing would be announced as a new device.
      */
-    public function testAnotherAddressOnTheSameIpv4NetworkIsTheSameDevice(): void
+    public function testMovingBetweenNetworksIsTheSameDevice(): void
     {
         self::assertSame(
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
                 '192.0.2.10',
             ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.240',
-            ),
-        );
-    }
-
-    public function testAnotherNetworkIsADifferentDevice(): void
-    {
-        self::assertNotSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-            ),
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
                 '198.51.100.10',
             ),
         );
     }
 
-    /**
-     * IPv4 written as IPv6 is still IPv4, and it arrives that way from a dual-stack listener or a proxy that forwards
-     * what it was given. Read as an IPv6 address it would be cut to ten zero bytes, which is the same network for
-     * everybody who reaches us like this.
-     */
-    public function testIpv4WrittenAsIpv6IsTheSameDevice(): void
-    {
-        self::assertSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '::ffff:192.0.2.10',
-            ),
-        );
-    }
-
-    public function testAnotherNetworkWrittenAsIpv6IsStillADifferentDevice(): void
+    public function testAnotherNetworkIsAnotherNetwork(): void
     {
         self::assertNotSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '::ffff:192.0.2.10',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '::ffff:198.51.100.10',
-            ),
+            $this->network('192.0.2.10'),
+            $this->network('198.51.100.10'),
         );
     }
 
     /**
-     * IPv6 privacy addressing rewrites the host part about once a day, so anything narrower than the /64 would make
-     * every member on IPv6 a new device every morning.
+     * A router handing out a different address on the same network is the same place.
      */
-    public function testAnIpv6HostRotationIsTheSameDevice(): void
+    public function testAnotherAddressOnTheSameNetworkIsTheSameNetwork(): void
     {
         self::assertSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '2001:db8:1234:5678:1111:2222:3333:4444',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '2001:db8:1234:5678:aaaa:bbbb:cccc:dddd',
-            ),
-        );
-    }
-
-    public function testAnotherIpv6SubnetIsADifferentDevice(): void
-    {
-        self::assertNotSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '2001:db8:1234:5678::1',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '2001:db8:1234:9999::1',
-            ),
+            $this->network('192.0.2.10'),
+            $this->network('192.0.2.240'),
         );
     }
 
     /**
-     * The same address written the long way round is the same address, which is why it is packed before it is cut.
-     */
-    public function testAnIpv6AddressIsReadIndependentlyOfHowItIsSpelled(): void
-    {
-        self::assertSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '2001:db8:1234:5678::1',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '2001:0db8:1234:5678:0000:0000:0000:0001',
-            ),
-        );
-    }
-
-    /**
-     * Unlike the languages, an address that does not parse must not read as a network of its own: it is what an
-     * attacker would vary to look like somebody else's network.
+     * An address that does not parse is no network at all rather than a network of its own: it is what an attacker
+     * would vary to look like somebody else's network, and recognition must not vouch for it.
      */
     public function testAMalformedAddressIsNoNetworkAtAll(): void
     {
-        self::assertSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                'not-an-address',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                null,
-            ),
+        self::assertNull($this->network('not-an-address'));
+        self::assertNull($this->network(null));
+    }
+
+    /**
+     * The two hashes are fed the same secret, so they must never be able to collide: a network fingerprint that could
+     * equal a device fingerprint would let one table vouch for the other.
+     */
+    public function testADeviceFingerprintIsNeverANetworkFingerprint(): void
+    {
+        $described = $this->describe(
+            self::CHROME_140,
+            '192.0.2.10',
+        );
+
+        self::assertNotSame(
+            $described['device'],
+            $described['network'],
         );
     }
 
     /**
-     * What tells apart two people who are otherwise the same browser on the same system on one network.
+     * What tells apart two people who are otherwise the same browser on the same system.
      */
     public function testAnotherSetOfLanguagesIsADifferentDevice(): void
     {
         self::assertNotSame(
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: 'nl-NL,nl;q=0.9,en;q=0.8',
             ),
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: 'en-GB,en;q=0.9',
             ),
         );
@@ -226,14 +140,12 @@ final class DeviceFingerprintTest extends TestCase
     public function testTheLanguagesAreReadIndependentlyOfHowTheyAreSpelled(): void
     {
         self::assertSame(
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: 'nl-NL,nl;q=0.9,en;q=0.8',
             ),
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: 'nl-NL, NL;q=0.90, EN;q=0.80',
             ),
         );
@@ -245,25 +157,22 @@ final class DeviceFingerprintTest extends TestCase
      */
     public function testABrowserThatAsksForNoLanguagesIsStillOneDevice(): void
     {
-        $absent = $this->fingerprint(
+        $absent = $this->device(
             self::CHROME_140,
-            '192.0.2.10',
             languages: null,
         );
 
         self::assertSame(
             $absent,
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: '',
             ),
         );
         self::assertSame(
             $absent,
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: '   ',
             ),
         );
@@ -275,14 +184,12 @@ final class DeviceFingerprintTest extends TestCase
     public function testAskingForNoLanguagesIsNotTheSameAsAskingForSome(): void
     {
         self::assertNotSame(
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: null,
             ),
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: 'nl-NL,nl;q=0.9,en;q=0.8',
             ),
         );
@@ -294,54 +201,81 @@ final class DeviceFingerprintTest extends TestCase
      */
     public function testAnUnparseableSetOfLanguagesIsCarriedWithoutUpset(): void
     {
-        $garbled = $this->fingerprint(
+        $garbled = $this->device(
             self::CHROME_140,
-            '192.0.2.10',
             languages: '???',
         );
 
         self::assertSame(
             $garbled,
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: '???',
             ),
         );
         self::assertNotSame(
             $garbled,
-            $this->fingerprint(
+            $this->device(
                 self::CHROME_140,
-                '192.0.2.10',
                 languages: null,
             ),
         );
     }
 
     /**
-     * The key is keyed on the application secret, so the same device on two installations does not share one.
+     * Both keys are keyed on the application secret, so the same device on two installations does not share one.
      */
-    public function testTheSecretChangesTheFingerprint(): void
+    public function testTheSecretChangesBothFingerprints(): void
     {
+        $one = $this->describe(
+            self::CHROME_140,
+            '192.0.2.10',
+        );
+        $other = $this->describe(
+            self::CHROME_140,
+            '192.0.2.10',
+            'another secret',
+        );
+
         self::assertNotSame(
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-            ),
-            $this->fingerprint(
-                self::CHROME_140,
-                '192.0.2.10',
-                'another secret',
-            ),
+            $one['device'],
+            $other['device'],
+        );
+        self::assertNotSame(
+            $one['network'],
+            $other['network'],
         );
     }
 
-    private function fingerprint(
+    private function device(
+        string $userAgent,
+        ?string $address = '192.0.2.10',
+        ?string $languages = 'nl-NL,nl;q=0.9,en;q=0.8',
+    ): string {
+        return $this->describe(
+            $userAgent,
+            $address,
+            languages: $languages,
+        )['device'];
+    }
+
+    private function network(?string $address): ?string
+    {
+        return $this->describe(
+            self::CHROME_140,
+            $address,
+        )['network'];
+    }
+
+    /**
+     * @return array{device: string, network: ?string, browser: ?string, operatingSystem: ?string}
+     */
+    private function describe(
         string $userAgent,
         ?string $address,
         string $secret = 'a secret',
         ?string $languages = 'nl-NL,nl;q=0.9,en;q=0.8',
-    ): string {
+    ): array {
         $request = new Request();
         $request->headers->set(
             'User-Agent',
@@ -364,7 +298,8 @@ final class DeviceFingerprintTest extends TestCase
 
         return new DeviceFingerprint(
             new UserAgentParser(),
+            new IpNetworkResolver('/nonexistent'),
             $secret,
-        )->describe($request)['fingerprint'];
+        )->describe($request);
     }
 }

@@ -38,6 +38,7 @@ RUN <<-EOF
         gd \
         gmp \
         intl \
+        maxminddb \
         opcache \
         pcntl \
         pdo_mysql \

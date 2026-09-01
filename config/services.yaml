@@ -26,6 +26,11 @@ parameters:
     # The transport a message lands on once every retry is spent. Named here rather than in `messenger.yaml` alone
     # because the administration's queue page reads the same transport back, and the two must not drift apart.
     app.messenger.failure_transport: 'failed'
+    # Where the IP-to-ASN and IP-to-Country databases live that device recognition reduces addresses through. On the
+    # shared `data` volume, so the copies `app:user:update-ip-databases` fetches on a worker are the ones the
+    # application reads. The path may be empty until that command has run once; recognition then falls back to
+    # address prefixes.
+    app.geoip.directory: '%kernel.project_dir%/data/geoip'
     # Fallback contact for board/committee correspondence with no more specific sender/reply-to (e.g. a bulk email to
     # an activity's sign-ups when the organising organ has no public email).
     app.email.internal_affairs: 'cib@gewis.nl'

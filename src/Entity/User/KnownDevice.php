@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\User;
 
-use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Repository\User\KnownDeviceRepository;
-use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -21,7 +19,8 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * This is the memory {@see Session} cannot be: a session row is deleted on sign-out and left unusable by a closed
  * private window, so it says which devices are signed in and never which have been seen before.
  *
- * Nothing here decides whether somebody may sign in, only whether they are told about it afterwards.
+ * Deliberately says nothing about where the device was: the network it arrived from is learned separately as
+ * {@see KnownNetwork}, so that a laptop first seen at home is not a stranger the day it is opened on campus.
  *
  * @phpstan-type KnownDeviceGdprArrayType = array{
  *     firewall: string,
@@ -34,28 +33,11 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 #[Entity(repositoryClass: KnownDeviceRepository::class)]
 #[UniqueConstraint(fields: ['userIdentifier', 'firewallName', 'fingerprint'])]
 #[Index(fields: ['lastSeenAt'])]
-class KnownDevice
+class KnownDevice extends KnownFact
 {
-    use IdentifiableTrait;
-
     /**
-     * The account this device was seen on (a membership number or an email address), the same value
-     * {@see Session::$userIdentifier} holds.
-     */
-    #[Column(type: Types::STRING)]
-    private string $userIdentifier;
-
-    /**
-     * Which Symfony firewall the device was seen on. Recognition is scoped per firewall for the reason sessions are:
-     * the two account spaces are unrelated.
-     */
-    #[Column(type: Types::STRING)]
-    private string $firewallName;
-
-    /**
-     * Keyed HMAC of the browser family, the operating system family, the network the request came from and the
-     * languages it asks for. Hashed rather than stored plainly, so this table does not become a second record of where
-     * every member has been and what they read.
+     * Keyed HMAC of the browser family, the operating system family and the languages it asks for. Hashed rather than
+     * stored plainly, so this table does not become a second record of what every member reads with.
      */
     #[Column(type: Types::STRING)]
     private string $fingerprint;
@@ -75,32 +57,6 @@ class KnownDevice
         nullable: true,
     )]
     private ?string $operatingSystem = null;
-
-    #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $firstSeenAt;
-
-    #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $lastSeenAt;
-
-    public function getUserIdentifier(): string
-    {
-        return $this->userIdentifier;
-    }
-
-    public function setUserIdentifier(string $userIdentifier): void
-    {
-        $this->userIdentifier = $userIdentifier;
-    }
-
-    public function getFirewallName(): string
-    {
-        return $this->firewallName;
-    }
-
-    public function setFirewallName(string $firewallName): void
-    {
-        $this->firewallName = $firewallName;
-    }
 
     public function getFingerprint(): string
     {
@@ -130,26 +86,6 @@ class KnownDevice
     public function setOperatingSystem(?string $operatingSystem): void
     {
         $this->operatingSystem = $operatingSystem;
-    }
-
-    public function getFirstSeenAt(): DateTimeImmutable
-    {
-        return $this->firstSeenAt;
-    }
-
-    public function setFirstSeenAt(DateTimeImmutable $firstSeenAt): void
-    {
-        $this->firstSeenAt = $firstSeenAt;
-    }
-
-    public function getLastSeenAt(): DateTimeImmutable
-    {
-        return $this->lastSeenAt;
-    }
-
-    public function setLastSeenAt(DateTimeImmutable $lastSeenAt): void
-    {
-        $this->lastSeenAt = $lastSeenAt;
     }
 
     /**
