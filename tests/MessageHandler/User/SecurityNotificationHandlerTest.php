@@ -34,7 +34,7 @@ use function count;
 
 /**
  * @phpstan-type OriginShape array{
- *     browser?: string, system?: string, address?: string, network?: string, country?: string,
+ *     browser?: string, system?: string, address?: string, network?: string, location?: string,
  * }
  */
 final class SecurityNotificationHandlerTest extends TestCase
@@ -44,7 +44,7 @@ final class SecurityNotificationHandlerTest extends TestCase
         'system' => 'Windows 11',
         'address' => '192.0.2.1',
         'network' => 'SURF B.V. (AS1161)',
-        'country' => 'The Netherlands',
+        'location' => 'Eindhoven, The Netherlands',
     ];
 
     /** @var list<Notification> */
@@ -155,8 +155,8 @@ final class SecurityNotificationHandlerTest extends TestCase
                     'value' => 'SURF B.V. (AS1161)',
                 ],
                 [
-                    'label' => 'Country',
-                    'value' => 'The Netherlands',
+                    'label' => 'Location',
+                    'value' => 'Eindhoven, The Netherlands',
                 ],
             ],
             $this->sent[0]->getContext()['details'],

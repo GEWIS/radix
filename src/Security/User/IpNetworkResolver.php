@@ -14,6 +14,7 @@ use function file_exists;
 use function inet_ntop;
 use function inet_pton;
 use function is_array;
+use function is_int;
 use function is_string;
 use function sprintf;
 use function strlen;
@@ -21,17 +22,19 @@ use function substr;
 
 /**
  * Reduces an IP address to names for the network it sits on: the autonomous system announcing it (the whole
- * university is one AS, a home ISP another) and the raw address prefix. The AS lookup is against a local database
- * fetched by {@see \App\Command\User\UpdateIpDatabasesCommand}, so no address leaves this machine; without the
- * database only the prefix answers, which is also why the reader is opened per lookup rather than held across
- * requests.
+ * university is one AS, a home ISP another) and the raw address prefix. The lookups are against local databases
+ * fetched by {@see \App\Command\User\UpdateIpDatabasesCommand}, so no address leaves this machine; without them only
+ * the prefix answers, which is also why the readers are opened per lookup rather than held across requests.
+ *
+ * The databases are MaxMind's GeoLite editions where a deployment has credentials and IPLocate's free files where it
+ * does not, and the two spell their records differently, which is what the field lists below absorb.
  */
 final readonly class IpNetworkResolver
 {
     public const string ASN_DATABASE = 'ip-to-asn.mmdb';
 
     /** Display only, never part of recognition: a "network" as wide as a country would vouch for every attacker in it. */
-    public const string COUNTRY_DATABASE = 'ip-to-country.mmdb';
+    public const string LOCATION_DATABASE = 'ip-to-location.mmdb';
 
     private const string MAPPED_V4_PREFIX = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff";
 
@@ -70,6 +73,7 @@ final readonly class IpNetworkResolver
                 self::ASN_DATABASE,
                 $canonical,
             ),
+            'autonomous_system_number',
             'asn',
         );
 
@@ -110,13 +114,13 @@ final readonly class IpNetworkResolver
         );
         $organisation = self::field(
             $record,
+            'autonomous_system_organization',
             'org',
-        ) ?? self::field(
-            $record,
             'name',
         );
         $asn = self::field(
             $record,
+            'autonomous_system_number',
             'asn',
         );
 
@@ -134,9 +138,10 @@ final readonly class IpNetworkResolver
     }
 
     /**
-     * The country an address sits in, as somebody would recognise it in a security notice, e.g. "The Netherlands".
+     * Where an address is, as somebody would recognise it in a security notice: "Eindhoven, The Netherlands" from a
+     * city database, the country alone from a country-only one, null when neither answers.
      */
-    public function countryName(?string $address): ?string
+    public function locationName(?string $address): ?string
     {
         $packed = self::pack($address);
 
@@ -150,13 +155,36 @@ final readonly class IpNetworkResolver
             return null;
         }
 
-        return self::field(
-            $this->record(
-                self::COUNTRY_DATABASE,
-                $canonical,
-            ),
-            'country_name',
+        $record = $this->record(
+            self::LOCATION_DATABASE,
+            $canonical,
         );
+
+        if (!is_array($record)) {
+            return null;
+        }
+
+        $city = self::field(
+            $record['city']['names'] ?? null,
+            'en',
+        );
+        $country = self::field(
+            $record,
+            'country_name',
+        ) ?? self::field(
+            $record['country']['names'] ?? null,
+            'en',
+        );
+
+        if (null === $country) {
+            return $city;
+        }
+
+        return null !== $city ? sprintf(
+            '%s, %s',
+            $city,
+            $country,
+        ) : $country;
     }
 
     /**
@@ -225,19 +253,32 @@ final readonly class IpNetworkResolver
         }
     }
 
+    /**
+     * The first of the spellings the record answers to, GeoLite's integers included.
+     */
     private static function field(
         mixed $record,
-        string $field,
+        string ...$fields,
     ): ?string {
-        if (
-            !is_array($record)
-            || !isset($record[$field])
-            || !is_string($record[$field])
-            || '' === $record[$field]
-        ) {
+        if (!is_array($record)) {
             return null;
         }
 
-        return $record[$field];
+        foreach ($fields as $field) {
+            $value = $record[$field] ?? null;
+
+            if (is_int($value)) {
+                return (string) $value;
+            }
+
+            if (
+                is_string($value)
+                && '' !== $value
+            ) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

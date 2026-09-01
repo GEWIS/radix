@@ -26,9 +26,13 @@ parameters:
     # The transport a message lands on once every retry is spent. Named here rather than in `messenger.yaml` alone
     # because the administration's queue page reads the same transport back, and the two must not drift apart.
     app.messenger.failure_transport: 'failed'
-    # On the shared `data` volume, so the IP-to-ASN database `app:user:update-ip-databases` fetches on a worker is
-    # the one the application reads; empty until that command has run once.
+    # On the shared `data` volume, so the IP databases `app:user:update-ip-databases` fetches on a worker are the
+    # ones the application reads; the entrypoint seeds them from the image until that command has run once.
     app.geoip.directory: '%kernel.project_dir%/data/geoip'
+    # MaxMind credentials for that command. Set in compose for a deployment that has them; empty falls back to
+    # IPLocate's free databases, which name networks and countries but no cities.
+    env(MAXMIND_ACCOUNT_ID): ''
+    env(MAXMIND_LICENSE_KEY): ''
     # Fallback contact for board/committee correspondence with no more specific sender/reply-to (e.g. a bulk email to
     # an activity's sign-ups when the organising organ has no public email).
     app.email.internal_affairs: 'cib@gewis.nl'

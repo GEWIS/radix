@@ -6,10 +6,15 @@ FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_up
 
 # The IP databases device recognition and security notices read, baked in so the file is always present: a first
 # start never waits on their host being up. The entrypoint seeds the `data` volume from these (the volume mounts
-# over /app/data, so they must live outside it) and app:user:update-ip-databases keeps the volume copy fresh.
+# over /app/data, so they must live outside it) and app:user:update-ip-databases keeps the volume copy fresh, from
+# MaxMind's GeoLite editions where a deployment has credentials. Always IPLocate here: GeoLite downloads are capped
+# per day and need a key, which a build must not embed. Pinned to a commit so the layer caches; IPLocate rebuilds
+# daily, and an unpinned URL would fetch some ninety megabytes on every build. The pin only ages this seed.
+ARG IPLOCATE_REVISION=8709782118044da2208506dc8f161af34d6dc7e0
 FROM scratch AS radix_geoip
-ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/main/ip-to-asn/ip-to-asn.mmdb /ip-to-asn.mmdb
-ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/main/ip-to-country/ip-to-country.mmdb /ip-to-country.mmdb
+ARG IPLOCATE_REVISION
+ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-asn/ip-to-asn.mmdb /ip-to-asn.mmdb
+ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-country/ip-to-country.mmdb /ip-to-location.mmdb
 
 # Radix Base Image
 FROM frankenphp_upstream AS radix_app_base
@@ -85,7 +90,6 @@ ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 ###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
-COPY --link --from=radix_geoip / /usr/local/share/radix/geoip/
 COPY --link docker/app/frankenphp/conf.d/10-radix.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link docker/app/healthcheck.php /usr/local/bin/healthcheck.php

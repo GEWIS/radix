@@ -100,10 +100,12 @@ final class IpNetworkResolverTest extends TestCase
         );
     }
 
-    public function testWithoutTheDatabaseNoNetworkHasAName(): void
+    public function testWithoutTheDatabasesNothingHasAName(): void
     {
         self::assertNull(new IpNetworkResolver('/nonexistent')->networkName('192.0.2.10'));
         self::assertNull(new IpNetworkResolver('/nonexistent')->networkName('not-an-address'));
+        self::assertNull(new IpNetworkResolver('/nonexistent')->locationName('192.0.2.10'));
+        self::assertNull(new IpNetworkResolver('/nonexistent')->locationName('not-an-address'));
     }
 
     /**

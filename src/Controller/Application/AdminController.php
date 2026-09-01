@@ -9,6 +9,7 @@ use App\Repository\Application\AnnouncementRepository;
 use App\Service\Application\MaintenanceStatusProvider;
 use App\Service\Application\RegisterStatusService;
 use App\Service\Application\ReviewQueueProviderInterface;
+use App\Service\User\IpDatabaseStatusProvider;
 use App\ViewModel\Application\Notification;
 use App\ViewModel\Application\ReviewQueueRow;
 use App\ViewModel\Application\ReviewQueueSummary;
@@ -53,6 +54,7 @@ class AdminController extends AbstractController
         private readonly AnnouncementRepository $announcementRepository,
         private readonly MaintenanceStatusProvider $maintenanceStatusProvider,
         private readonly RegisterStatusService $registerStatus,
+        private readonly IpDatabaseStatusProvider $ipDatabaseStatus,
     ) {
     }
 
@@ -103,6 +105,9 @@ class AdminController extends AbstractController
                     : [],
                 'maintenance' => $isAdmin
                     ? $this->maintenanceStatusProvider->status()
+                    : null,
+                'ipDatabases' => $isAdmin
+                    ? $this->ipDatabaseStatus->status()
                     : null,
                 'showsAdministration' => $isAdmin,
                 // Only assembled for a reader who administers the register: it is several queries, and the section

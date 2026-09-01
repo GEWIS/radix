@@ -11485,6 +11485,26 @@
         <source>¹ This permission will add more properties to existing entities that can already be requested.</source>
         <target state="translated">¹ Deze permissie voegt meer eigenschappen toe aan bestaande entiteiten die al opgevraagd kunnen worden.</target>
       </trans-unit>
+      <trans-unit id="dyTVOrJ" resname="IP databases">
+        <source>IP databases</source>
+        <target state="translated">IP-databases</target>
+      </trans-unit>
+      <trans-unit id="D63Kb1y" resname="The databases are missing.">
+        <source>The databases are missing.</source>
+        <target state="translated">De databases ontbreken.</target>
+      </trans-unit>
+      <trans-unit id="wxO6sHk" resname="Not refreshed since %date%.">
+        <source>Not refreshed since %date%.</source>
+        <target state="translated">Niet ververst sinds %date%.</target>
+      </trans-unit>
+      <trans-unit id="zdCHZef" resname="Refreshed %date%.">
+        <source>Refreshed %date%.</source>
+        <target state="translated">Ververst op %date%.</target>
+      </trans-unit>
+      <trans-unit id="3Gewnwz" resname="IP address data by">
+        <source>IP address data by</source>
+        <target state="translated">IP-adresgegevens door</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

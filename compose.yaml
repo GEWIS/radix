@@ -32,6 +32,8 @@ x-app-environment: &app_environment
     # Set to any non-empty value to serve the maintenance page to everyone, admins included, for work done before the
     # application can serve properly. App-level maintenance is set through the admin interface instead.
     MAINTENANCE: "${MAINTENANCE:-}"
+    MAXMIND_ACCOUNT_ID: "${MAXMIND_ACCOUNT_ID:-}"
+    MAXMIND_LICENSE_KEY: "${MAXMIND_LICENSE_KEY:-}"
     # Names this container's log file under data/logs (see monolog.yaml). Each worker below states its own, so they
     # do not rotate one another's file; replicas of one worker do share theirs.
     LOG_NAME: "${LOG_NAME:-app}"

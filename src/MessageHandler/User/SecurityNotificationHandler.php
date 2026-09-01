@@ -128,7 +128,7 @@ class SecurityNotificationHandler
      * The time is written out the way somebody reads a date, with the zone named, since a notice whose whole purpose
      * is "was this you at that moment" is worth nothing in a format that has to be decoded first.
      *
-     * @param array{browser?: string, system?: string, address?: string, network?: string, country?: string} $origin
+     * @param array{browser?: string, system?: string, address?: string, network?: string, location?: string} $origin
      *
      * @return list<array{label: string, value: string}>
      */
@@ -148,7 +148,7 @@ class SecurityNotificationHandler
             'system' => 'Operating system',
             'address' => 'IP address',
             'network' => 'Network',
-            'country' => 'Country',
+            'location' => 'Location',
         ];
 
         foreach ($labels as $key => $label) {

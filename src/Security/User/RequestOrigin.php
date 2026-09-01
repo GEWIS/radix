@@ -25,7 +25,7 @@ final readonly class RequestOrigin
     }
 
     /**
-     * @return array{browser?: string, system?: string, address?: string, network?: string, country?: string}
+     * @return array{browser?: string, system?: string, address?: string, network?: string, location?: string}
      */
     public function describe(Request $request): array
     {
@@ -37,19 +37,19 @@ final readonly class RequestOrigin
             $meta['operatingSystem'],
             $address,
             $this->networkResolver->networkName($address),
-            $this->networkResolver->countryName($address),
+            $this->networkResolver->locationName($address),
         );
     }
 
     /**
-     * @return array{browser?: string, system?: string, address?: string, network?: string, country?: string}
+     * @return array{browser?: string, system?: string, address?: string, network?: string, location?: string}
      */
     public static function parts(
         ?string $browser,
         ?string $system,
         ?string $address,
         ?string $network = null,
-        ?string $country = null,
+        ?string $location = null,
     ): array {
         $origin = [];
 
@@ -59,7 +59,7 @@ final readonly class RequestOrigin
                 'system' => $system,
                 'address' => $address,
                 'network' => $network,
-                'country' => $country,
+                'location' => $location,
             ] as $key => $value
         ) {
             if (
