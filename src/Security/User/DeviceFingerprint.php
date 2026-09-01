@@ -8,23 +8,14 @@ use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 
+use function array_map;
 use function hash_hmac;
 use function implode;
 
 /**
- * Reduces a request to the two coarse descriptions {@see \App\Service\User\KnownDeviceRegistry} keys recognition on:
- * what kind of device this is (the browser family, the operating system family and the languages it asks for) and
- * where it is ({@see IpNetworkResolver}). The two are hashed apart because they are learned apart: a device first
- * seen at home must still be that device on campus, and a network, once seen, covers every device the account is
- * known on.
- *
- * Versions are left out because Chrome and Firefox move a major version every few weeks, which would announce a new
- * device to everybody each time; the operating system version is only known at all when the browser sent
- * `Sec-CH-UA-Platform-Version`, which Firefox and Safari never do.
- *
- * What is left is a weak signal: on one campus network a great many people are the same browser on the same system.
- * It decides only whether a sign-in that has already succeeded is written to somebody about, never whether they may
- * sign in.
+ * Reduces a request to the fingerprints {@see \App\Service\User\KnownDeviceRegistry} keys recognition on: what kind
+ * of device this is and the networks it could be said to be on, hashed apart because they are learned apart. Browser
+ * and OS versions are left out of the device key so a routine update does not read as a new device.
  */
 final readonly class DeviceFingerprint
 {
@@ -40,16 +31,14 @@ final readonly class DeviceFingerprint
     }
 
     /**
-     * The stored fingerprints, alongside the names the device one was derived from so a member can be shown a device
-     * they recognise. The network is null when the address does not parse: an unnameable network is one recognition
-     * cannot vouch for, not one of its own.
+     * `networks` is empty when the address does not parse: an unnameable network is one recognition cannot vouch
+     * for, not one of its own.
      *
-     * @return array{device: string, network: ?string, browser: ?string, operatingSystem: ?string}
+     * @return array{device: string, networks: list<string>, browser: ?string, operatingSystem: ?string}
      */
     public function describe(Request $request): array
     {
         $meta = $this->userAgentParser->parseRequest($request);
-        $network = $this->networkResolver->identify($request->getClientIp());
 
         return [
             'device' => $this->hash(
@@ -60,9 +49,12 @@ final readonly class DeviceFingerprint
                     self::languages($request),
                 ],
             ),
-            'network' => '' === $network ? null : $this->hash(
-                'network',
-                [$network],
+            'networks' => array_map(
+                fn (string $identifier): string => $this->hash(
+                    'network',
+                    [$identifier],
+                ),
+                $this->networkResolver->identify($request->getClientIp()),
             ),
             'browser' => $meta['browser'],
             'operatingSystem' => $meta['operatingSystem'],
@@ -70,8 +62,8 @@ final readonly class DeviceFingerprint
     }
 
     /**
-     * Keyed on the application secret so the same device on two installations does not share a fingerprint, and
-     * prefixed with what is being hashed so a device fingerprint can never collide with a network one.
+     * Keyed on the application secret and prefixed with what is being hashed, so installations never share a
+     * fingerprint and a device fingerprint can never collide with a network one.
      *
      * @param list<string> $parts
      */
@@ -93,14 +85,8 @@ final readonly class DeviceFingerprint
     }
 
     /**
-     * The languages the browser asks for, in the order it asks for them.
-     *
-     * Read through Symfony's parsing rather than off the header, so that the same preferences written with different
-     * quality values or casing are the same preferences. A browser that states none lands on the empty string, which
-     * is a device of its own rather than one matching everybody.
-     *
-     * It is what tells apart two people who are otherwise the same browser on the same system, which is where the
-     * rest of this key is weakest.
+     * Read through Symfony's parsing so the same preferences spelled differently compare equal; a browser that
+     * states none lands on the empty string, a device of its own rather than one matching everybody.
      */
     private static function languages(Request $request): string
     {

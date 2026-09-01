@@ -20,30 +20,36 @@ final readonly class RequestOrigin
 
     public function __construct(
         private UserAgentParser $userAgentParser,
+        private IpNetworkResolver $networkResolver,
     ) {
     }
 
     /**
-     * @return array{browser?: string, system?: string, address?: string}
+     * @return array{browser?: string, system?: string, address?: string, network?: string, country?: string}
      */
     public function describe(Request $request): array
     {
         $meta = $this->userAgentParser->parseRequest($request);
+        $address = $request->getClientIp();
 
         return self::parts(
             $meta['browser'],
             $meta['operatingSystem'],
-            $request->getClientIp(),
+            $address,
+            $this->networkResolver->networkName($address),
+            $this->networkResolver->countryName($address),
         );
     }
 
     /**
-     * @return array{browser?: string, system?: string, address?: string}
+     * @return array{browser?: string, system?: string, address?: string, network?: string, country?: string}
      */
     public static function parts(
         ?string $browser,
         ?string $system,
         ?string $address,
+        ?string $network = null,
+        ?string $country = null,
     ): array {
         $origin = [];
 
@@ -52,6 +58,8 @@ final readonly class RequestOrigin
                 'browser' => $browser,
                 'system' => $system,
                 'address' => $address,
+                'network' => $network,
+                'country' => $country,
             ] as $key => $value
         ) {
             if (

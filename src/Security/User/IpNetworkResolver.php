@@ -15,37 +15,24 @@ use function inet_ntop;
 use function inet_pton;
 use function is_array;
 use function is_string;
+use function sprintf;
 use function strlen;
 use function substr;
 
 /**
- * Reduces an IP address to the widest name for where it is that still tells one place from another: the autonomous
- * system announcing it, failing that the country, failing that the address prefix.
- *
- * The prefix alone is what {@see \App\Entity\User\KnownNetwork} would be keyed on in effect, and it is far too narrow
- * for how our members live: the university announces whole /16s that eduroam scatters people across per building, and
- * carriers hand phones a different range daily. The AS collapses each of those to a single name (all of the TU/e is
- * one AS, a home subscription's ISP another, a carrier a third), so an account settles on a handful of networks
- * within days and keeps them for years.
- *
- * The lookups are against IPLocate's freely licensed databases on the local disk (see
- * {@see \App\Command\User\UpdateIpDatabasesCommand}), so no address ever leaves this machine to be resolved. Read
- * through `MaxMind\Db\Reader`; the databases are MaxMind-format but not MaxMind's own, which is why the typed `GeoIp2`
- * wrapper with its database-type checks is of no use here. Opened per lookup rather than held: recognition runs once
- * per sign-in and once per three minutes of activity, opening parses only the metadata, and holding a reader would be
- * one more piece of state to carry across requests in worker mode, and one that would have to notice the update
- * command renaming a fresh file over the path.
- *
- * A missing or unreadable database quietly falls through to the next layer rather than failing: this feeds a
- * fingerprint that only decides whether a sign-in is written to somebody about, and the databases are absent
- * everywhere the update command has not run, which is every development machine.
+ * Reduces an IP address to names for the network it sits on: the autonomous system announcing it (the whole
+ * university is one AS, a home ISP another) and the raw address prefix. The AS lookup is against a local database
+ * fetched by {@see \App\Command\User\UpdateIpDatabasesCommand}, so no address leaves this machine; without the
+ * database only the prefix answers, which is also why the reader is opened per lookup rather than held across
+ * requests.
  */
 final readonly class IpNetworkResolver
 {
     public const string ASN_DATABASE = 'ip-to-asn.mmdb';
+
+    /** Display only, never part of recognition: a "network" as wide as a country would vouch for every attacker in it. */
     public const string COUNTRY_DATABASE = 'ip-to-country.mmdb';
 
-    /** What an IPv4 address looks like once it has been written as an IPv6 one: ten zero bytes and then `ffff`. */
     private const string MAPPED_V4_PREFIX = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff";
 
     public function __construct(
@@ -56,31 +43,141 @@ final readonly class IpNetworkResolver
     }
 
     /**
-     * The network identifier for an address: `as:` and the AS number, `cc:` and the country, `pfx:` and the packed
-     * address prefix (three octets of an IPv4 address, the first four groups of an IPv6 one), or the empty string for
-     * an address that does not parse.
+     * Every name for the network this address sits on, widest first: `as:` and the AS number when the database
+     * answers, always the `pfx:` prefix (three octets of IPv4, the first four groups of IPv6), and nothing at all
+     * for an address that does not parse. An attacker varies the address, so a malformed one must not read as a
+     * network of its own.
      *
-     * Packed before anything else, so that the many spellings of the same address all reduce to the same answer, and
-     * so a malformed `X-Forwarded-For` cannot read as a network of its own: it is what an attacker would vary to look
-     * like somebody else's network.
+     * @return list<string>
      */
-    public function identify(?string $address): string
+    public function identify(?string $address): array
+    {
+        $packed = self::pack($address);
+
+        if (null === $packed) {
+            return [];
+        }
+
+        $canonical = inet_ntop($packed);
+
+        if (false === $canonical) {
+            return [];
+        }
+
+        $identifiers = [];
+        $asn = self::field(
+            $this->record(
+                self::ASN_DATABASE,
+                $canonical,
+            ),
+            'asn',
+        );
+
+        if (null !== $asn) {
+            $identifiers[] = 'as:' . $asn;
+        }
+
+        $identifiers[] = 'pfx:' . bin2hex(substr(
+            $packed,
+            0,
+            4 === strlen($packed) ? 3 : 8,
+        ));
+
+        return $identifiers;
+    }
+
+    /**
+     * The network as somebody would recognise it in a security notice, e.g. "SURF B.V. (AS1161)", or null when the
+     * database cannot name it.
+     */
+    public function networkName(?string $address): ?string
+    {
+        $packed = self::pack($address);
+
+        if (null === $packed) {
+            return null;
+        }
+
+        $canonical = inet_ntop($packed);
+
+        if (false === $canonical) {
+            return null;
+        }
+
+        $record = $this->record(
+            self::ASN_DATABASE,
+            $canonical,
+        );
+        $organisation = self::field(
+            $record,
+            'org',
+        ) ?? self::field(
+            $record,
+            'name',
+        );
+        $asn = self::field(
+            $record,
+            'asn',
+        );
+
+        if (null === $organisation) {
+            return null !== $asn
+                ? 'AS' . $asn
+                : null;
+        }
+
+        return null !== $asn ? sprintf(
+            '%s (AS%s)',
+            $organisation,
+            $asn,
+        ) : $organisation;
+    }
+
+    /**
+     * The country an address sits in, as somebody would recognise it in a security notice, e.g. "The Netherlands".
+     */
+    public function countryName(?string $address): ?string
+    {
+        $packed = self::pack($address);
+
+        if (null === $packed) {
+            return null;
+        }
+
+        $canonical = inet_ntop($packed);
+
+        if (false === $canonical) {
+            return null;
+        }
+
+        return self::field(
+            $this->record(
+                self::COUNTRY_DATABASE,
+                $canonical,
+            ),
+            'country_name',
+        );
+    }
+
+    /**
+     * IPv4 arrives written as `::ffff:1.2.3.4` from dual-stack listeners; unmapped so it reads as the IPv4 address
+     * it is.
+     */
+    private static function pack(?string $address): ?string
     {
         if (
             null === $address
             || '' === $address
         ) {
-            return '';
+            return null;
         }
 
         $packed = @inet_pton($address);
 
         if (false === $packed) {
-            return '';
+            return null;
         }
 
-        // A dual-stack listener, or a proxy that forwards what it was given, hands us IPv4 written as
-        // `::ffff:1.2.3.4`. Unmapped so the databases and the prefix both see the IPv4 address it is.
         if (
             self::MAPPED_V4_PREFIX === substr(
                 $packed,
@@ -94,44 +191,13 @@ final readonly class IpNetworkResolver
             );
         }
 
-        $canonical = inet_ntop($packed);
-
-        if (false === $canonical) {
-            return '';
-        }
-
-        $asn = $this->lookup(
-            self::ASN_DATABASE,
-            $canonical,
-            'asn',
-        );
-
-        if (null !== $asn) {
-            return 'as:' . $asn;
-        }
-
-        $country = $this->lookup(
-            self::COUNTRY_DATABASE,
-            $canonical,
-            'country_code',
-        );
-
-        if (null !== $country) {
-            return 'cc:' . $country;
-        }
-
-        return 'pfx:' . bin2hex(substr(
-            $packed,
-            0,
-            4 === strlen($packed) ? 3 : 8,
-        ));
+        return $packed;
     }
 
-    private function lookup(
+    private function record(
         string $database,
         string $address,
-        string $field,
-    ): ?string {
+    ): mixed {
         $path = $this->directory . '/' . $database;
 
         if (!file_exists($path)) {
@@ -142,7 +208,7 @@ final readonly class IpNetworkResolver
             $reader = new Reader($path);
 
             try {
-                $record = $reader->get($address);
+                return $reader->get($address);
             } finally {
                 $reader->close();
             }
@@ -157,7 +223,12 @@ final readonly class IpNetworkResolver
 
             return null;
         }
+    }
 
+    private static function field(
+        mixed $record,
+        string $field,
+    ): ?string {
         if (
             !is_array($record)
             || !isset($record[$field])

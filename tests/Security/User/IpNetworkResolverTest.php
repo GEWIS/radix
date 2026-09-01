@@ -8,16 +8,15 @@ use App\Security\User\IpNetworkResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The layer below the databases: what an address reduces to when neither the ASN nor the country file is on disk,
- * which is every development machine and the test suite. The addresses used here are reserved ones that no database
- * would answer for either, so these answers hold with the files present too.
+ * Without the ASN database on disk, which is every development machine and the test suite. The addresses are
+ * reserved ones the database would not answer for either, so these answers hold with the file present too.
  */
 final class IpNetworkResolverTest extends TestCase
 {
     public function testAnIpv4AddressReducesToItsFirstThreeOctets(): void
     {
         self::assertSame(
-            'pfx:c00002',
+            ['pfx:c00002'],
             $this->identify('192.0.2.10'),
         );
     }
@@ -39,9 +38,8 @@ final class IpNetworkResolverTest extends TestCase
     }
 
     /**
-     * IPv4 written as IPv6 is still IPv4, and it arrives that way from a dual-stack listener or a proxy that forwards
-     * what it was given. Read as an IPv6 address it would be cut to ten zero bytes, which is the same network for
-     * everybody who reaches us like this.
+     * Read as IPv6, mapped IPv4 would be cut to ten zero bytes: the same network for everybody arriving through a
+     * dual-stack listener.
      */
     public function testIpv4WrittenAsIpv6IsTheSameNetwork(): void
     {
@@ -56,8 +54,8 @@ final class IpNetworkResolverTest extends TestCase
     }
 
     /**
-     * IPv6 privacy addressing rewrites the host part about once a day, so anything narrower than the /64 would make
-     * every member on IPv6 a new network every morning.
+     * IPv6 privacy addressing rewrites the host part about once a day; narrower than the /64 would be a new network
+     * every morning.
      */
     public function testAnIpv6HostRotationIsTheSameNetwork(): void
     {
@@ -75,9 +73,6 @@ final class IpNetworkResolverTest extends TestCase
         );
     }
 
-    /**
-     * The same address written the long way round is the same address, which is why it is packed before it is cut.
-     */
     public function testAnIpv6AddressIsReadIndependentlyOfHowItIsSpelled(): void
     {
         self::assertSame(
@@ -87,26 +82,34 @@ final class IpNetworkResolverTest extends TestCase
     }
 
     /**
-     * An address that does not parse must not read as a network of its own: it is what an attacker would vary to look
-     * like somebody else's network.
+     * An attacker varies the address, so a malformed one must not read as a network of its own.
      */
     public function testAMalformedAddressIsNoNetworkAtAll(): void
     {
         self::assertSame(
-            '',
+            [],
             $this->identify('not-an-address'),
         );
         self::assertSame(
-            '',
+            [],
             $this->identify(null),
         );
         self::assertSame(
-            '',
+            [],
             $this->identify(''),
         );
     }
 
-    private function identify(?string $address): string
+    public function testWithoutTheDatabaseNoNetworkHasAName(): void
+    {
+        self::assertNull(new IpNetworkResolver('/nonexistent')->networkName('192.0.2.10'));
+        self::assertNull(new IpNetworkResolver('/nonexistent')->networkName('not-an-address'));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function identify(?string $address): array
     {
         return new IpNetworkResolver('/nonexistent')->identify($address);
     }

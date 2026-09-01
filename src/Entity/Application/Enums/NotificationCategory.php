@@ -66,7 +66,9 @@ enum NotificationCategory implements TranslatableInterface
         return match ($this) {
             self::Albums => new TranslatableMessage('When photos of an event are published'),
             self::Activities => new TranslatableMessage('New activities you can sign up for'),
-            self::SignIns => new TranslatableMessage('Every time your account is signed in'),
+            self::SignIns => new TranslatableMessage(
+                'When your account is signed in from an unrecognised device or location',
+            ),
             self::AccountSecurity => new TranslatableMessage('When the way you sign in changes'),
             self::DataExports => new TranslatableMessage('When a data export you asked for is ready'),
             self::ActivityReviews => new TranslatableMessage('When an activity is waiting to be reviewed'),

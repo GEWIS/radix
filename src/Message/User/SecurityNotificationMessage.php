@@ -18,7 +18,7 @@ use DateTimeImmutable;
 final readonly class SecurityNotificationMessage
 {
     /**
-     * @param array{browser?: string, system?: string, address?: string} $origin
+     * @param array{browser?: string, system?: string, address?: string, network?: string, country?: string} $origin
      */
     public function __construct(
         private string $firewallName,
@@ -45,7 +45,7 @@ final readonly class SecurityNotificationMessage
     }
 
     /**
-     * @return array{browser?: string, system?: string, address?: string}
+     * @return array{browser?: string, system?: string, address?: string, network?: string, country?: string}
      */
     public function getOrigin(): array
     {

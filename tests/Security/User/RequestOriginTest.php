@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Security\User;
 
+use App\Security\User\IpNetworkResolver;
 use App\Security\User\RequestOrigin;
 use App\Security\User\UserAgentParser;
 use PHPUnit\Framework\TestCase;
@@ -111,6 +112,9 @@ final class RequestOriginTest extends TestCase
             $userAgent,
         );
 
-        return new RequestOrigin(new UserAgentParser())->describe($request);
+        return new RequestOrigin(
+            new UserAgentParser(),
+            new IpNetworkResolver('/nonexistent'),
+        )->describe($request);
     }
 }

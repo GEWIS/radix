@@ -18,6 +18,7 @@ use App\Service\User\KnownDeviceRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use RuntimeException;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -206,6 +207,24 @@ final class KnownDeviceRegistryTest extends TestCase
             'the-raw-token',
             $cookie->getValue(),
         );
+    }
+
+    /**
+     * A cookie whose row was never written would name nothing, so nothing may be handed out when the flush fails.
+     */
+    public function testNoCookieIsHandedOutWhenNothingWasWritten(): void
+    {
+        $entityManager = self::createStub(EntityManagerInterface::class);
+        $entityManager->method('flush')->willThrowException(new RuntimeException('database gone'));
+
+        $request = $this->request();
+
+        self::assertFalse($this->registry(entityManager: $entityManager)->recognise(
+            'somebody',
+            'main',
+            $request,
+        ));
+        self::assertNull($request->attributes->get(KnownDeviceRegistry::COOKIE_ATTRIBUTE));
     }
 
     public function testWorkingInADeviceKeepsItsFactsRecognised(): void

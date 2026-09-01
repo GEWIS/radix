@@ -4,6 +4,13 @@ ARG FRANKENPHP_VERSION=1.12
 
 FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_upstream
 
+# The IP databases device recognition and security notices read, baked in so the file is always present: a first
+# start never waits on their host being up. The entrypoint seeds the `data` volume from these (the volume mounts
+# over /app/data, so they must live outside it) and app:user:update-ip-databases keeps the volume copy fresh.
+FROM scratch AS radix_geoip
+ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/main/ip-to-asn/ip-to-asn.mmdb /ip-to-asn.mmdb
+ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/main/ip-to-country/ip-to-country.mmdb /ip-to-country.mmdb
+
 # Radix Base Image
 FROM frankenphp_upstream AS radix_app_base
 
@@ -78,6 +85,7 @@ ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 ###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
+COPY --link --from=radix_geoip / /usr/local/share/radix/geoip/
 COPY --link docker/app/frankenphp/conf.d/10-radix.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link docker/app/healthcheck.php /usr/local/bin/healthcheck.php
@@ -194,6 +202,8 @@ COPY --from=radix_app_builder /usr/local/etc/php/php.ini /usr/local/etc/php/php.
 COPY --from=radix_app_builder /usr/local/etc/php/app.conf.d /usr/local/etc/php/app.conf.d
 
 COPY --from=radix_app_builder /etc/frankenphp/Caddyfile /etc/frankenphp/Caddyfile
+
+COPY --from=radix_geoip / /usr/local/share/radix/geoip/
 
 # CA certificates for TLS, file/libmagic for Symfony MIME type detection
 COPY --from=radix_app_builder /usr/share/ca-certificates /usr/share/ca-certificates

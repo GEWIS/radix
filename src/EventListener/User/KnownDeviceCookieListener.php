@@ -10,8 +10,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * Attaches the device cookie {@see KnownDeviceRegistry::recognise()} left on the request. Recognition runs inside the
- * remember-me handler, which holds no response; Symfony's own remember-me cookie rides the same relay, but its request
+ * Attaches the device cookie {@see KnownDeviceRegistry::recognise()} left on the request; Symfony's remember-me
  * attribute carries exactly one cookie, so this one has an attribute and a listener of its own.
  */
 #[AsEventListener(event: ResponseEvent::class)]

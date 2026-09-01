@@ -13,16 +13,9 @@ use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * A cookie handed to a browser at sign-in, so that the browser itself can say it has been here before.
- *
- * This is the one exact answer recognition has. The fingerprint describes a kind of browser and the network a place,
- * and both are shared with everybody alike; the cookie names the very browser profile, wherever it goes. It is no
- * credential: it is only ever consulted after a sign-in has already succeeded, and only suppresses the notice for the
- * one account it was minted on, so a stolen one is worth nothing without the password it rode along with.
- *
- * A browser that keeps no cookies simply never presents one and is carried by the fingerprint instead. The rows such
- * browsers leave behind are never presented again, sink to the bottom of the least-recently-seen order, and are the
- * first out when the cap is reached.
+ * A cookie handed to a browser at sign-in, so the browser itself can say it has been here before, wherever it goes.
+ * It is no credential: it only suppresses the notice for the one account it was minted on, so a stolen one is worth
+ * nothing without the password it rode along with.
  *
  * @phpstan-type KnownDeviceTokenGdprArrayType = array{
  *     firewall: string,
@@ -37,16 +30,10 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 #[Index(fields: ['lastSeenAt'])]
 class KnownDeviceToken extends KnownFact
 {
-    /**
-     * Keyed HMAC of the random value the cookie carries. Hashed so that reading this table does not yield cookies
-     * that would quiet the notices on somebody else's account.
-     */
+    /** Keyed HMAC, so reading this table yields no cookie that would quiet somebody's notices. */
     #[Column(type: Types::STRING)]
     private string $tokenHash;
 
-    /**
-     * Kept for display: what a member would recognise this cookie's browser as in their data export.
-     */
     #[Column(
         type: Types::STRING,
         nullable: true,
@@ -90,8 +77,6 @@ class KnownDeviceToken extends KnownFact
     }
 
     /**
-     * The hash is left out, meaning nothing to the reader.
-     *
      * @return KnownDeviceTokenGdprArrayType
      */
     public function toGdprArray(): array

@@ -73,8 +73,8 @@ final class DeviceFingerprintTest extends TestCase
     public function testAnotherNetworkIsAnotherNetwork(): void
     {
         self::assertNotSame(
-            $this->network('192.0.2.10'),
-            $this->network('198.51.100.10'),
+            $this->networks('192.0.2.10'),
+            $this->networks('198.51.100.10'),
         );
     }
 
@@ -84,8 +84,8 @@ final class DeviceFingerprintTest extends TestCase
     public function testAnotherAddressOnTheSameNetworkIsTheSameNetwork(): void
     {
         self::assertSame(
-            $this->network('192.0.2.10'),
-            $this->network('192.0.2.240'),
+            $this->networks('192.0.2.10'),
+            $this->networks('192.0.2.240'),
         );
     }
 
@@ -95,8 +95,14 @@ final class DeviceFingerprintTest extends TestCase
      */
     public function testAMalformedAddressIsNoNetworkAtAll(): void
     {
-        self::assertNull($this->network('not-an-address'));
-        self::assertNull($this->network(null));
+        self::assertSame(
+            [],
+            $this->networks('not-an-address'),
+        );
+        self::assertSame(
+            [],
+            $this->networks(null),
+        );
     }
 
     /**
@@ -110,9 +116,9 @@ final class DeviceFingerprintTest extends TestCase
             '192.0.2.10',
         );
 
-        self::assertNotSame(
+        self::assertNotContains(
             $described['device'],
-            $described['network'],
+            $described['networks'],
         );
     }
 
@@ -242,8 +248,8 @@ final class DeviceFingerprintTest extends TestCase
             $other['device'],
         );
         self::assertNotSame(
-            $one['network'],
-            $other['network'],
+            $one['networks'],
+            $other['networks'],
         );
     }
 
@@ -259,16 +265,19 @@ final class DeviceFingerprintTest extends TestCase
         )['device'];
     }
 
-    private function network(?string $address): ?string
+    /**
+     * @return list<string>
+     */
+    private function networks(?string $address): array
     {
         return $this->describe(
             self::CHROME_140,
             $address,
-        )['network'];
+        )['networks'];
     }
 
     /**
-     * @return array{device: string, network: ?string, browser: ?string, operatingSystem: ?string}
+     * @return array{device: string, networks: list<string>, browser: ?string, operatingSystem: ?string}
      */
     private function describe(
         string $userAgent,

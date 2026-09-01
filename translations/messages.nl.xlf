@@ -3421,9 +3421,9 @@
         <source>Every question the association has been asked, and how it answered.</source>
         <target state="translated">Elke vraag die aan de vereniging is gesteld, en hoe zij die beantwoordde.</target>
       </trans-unit>
-      <trans-unit id="4ADZXUU" resname="Every time your account is signed in">
-        <source>Every time your account is signed in</source>
-        <target state="translated">Elke keer dat er op je account wordt ingelogd</target>
+      <trans-unit id="4ADZXUU" resname="When your account is signed in from an unrecognised device or location">
+        <source>When your account is signed in from an unrecognised device or location</source>
+        <target state="translated">Wanneer er op je account wordt ingelogd vanaf een onbekend apparaat of onbekende locatie</target>
       </trans-unit>
       <trans-unit id="xMd0Hq2" resname="Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.">
         <source>Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.</source>
@@ -10801,13 +10801,13 @@
         <source>Your account is ready, but your company has no running contract with GEWIS. You can sign in once the board has entered it.</source>
         <target state="translated">Je account is klaar, maar je bedrijf heeft geen lopend contract met GEWIS. Je kunt inloggen zodra het bestuur dit heeft ingevoerd.</target>
       </trans-unit>
-      <trans-unit id="FSsHSES" resname="Your account was signed in %count% times.">
-        <source>Your account was signed in %count% times.</source>
-        <target state="translated">Er is %count% keer op je account ingelogd.</target>
+      <trans-unit id="FSsHSES" resname="Your account was signed in %count% times from an unrecognised device or location.">
+        <source>Your account was signed in %count% times from an unrecognised device or location.</source>
+        <target state="translated">Er is %count% keer op je account ingelogd vanaf een onbekend apparaat of onbekende locatie.</target>
       </trans-unit>
-      <trans-unit id="1rTGsTd" resname="Your account was signed in from %name%.">
-        <source>Your account was signed in from %name%.</source>
-        <target state="translated">Er is op je account ingelogd vanaf %name%.</target>
+      <trans-unit id="1rTGsTd" resname="Your account was signed in from an unrecognised device: %name%.">
+        <source>Your account was signed in from an unrecognised device: %name%.</source>
+        <target state="translated">Er is op je account ingelogd vanaf een onbekend apparaat: %name%.</target>
       </trans-unit>
       <trans-unit id="ezCRuLS" resname="Your answer">
         <source>Your answer</source>

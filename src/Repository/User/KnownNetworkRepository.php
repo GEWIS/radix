@@ -21,33 +21,18 @@ class KnownNetworkRepository extends KnownFactRepository
     }
 
     /**
-     * The network matching this fingerprint, however long ago it was last seen.
-     *
-     * Whether it is recent enough to count as recognised is the caller's decision. A stale row must still be found,
-     * because the unique constraint would refuse a second one beside it.
+     * However long ago it was last seen: freshness is the caller's decision, and a stale row must still be found or
+     * the unique constraint refuses the second one beside it.
      */
     public function findOneByFingerprint(
         string $userIdentifier,
         string $firewallName,
         string $fingerprint,
     ): ?KnownNetwork {
-        return $this->createQueryBuilder('n')
-            ->where('n.userIdentifier = :uid')
-            ->andWhere('n.firewallName = :fw')
-            ->andWhere('n.fingerprint = :fp')
-            ->setParameter(
-                'uid',
-                $userIdentifier,
-            )
-            ->setParameter(
-                'fw',
-                $firewallName,
-            )
-            ->setParameter(
-                'fp',
-                $fingerprint,
-            )
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->findOneBy([
+            'userIdentifier' => $userIdentifier,
+            'firewallName' => $firewallName,
+            'fingerprint' => $fingerprint,
+        ]);
     }
 }

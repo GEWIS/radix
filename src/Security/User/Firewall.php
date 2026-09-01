@@ -76,8 +76,7 @@ enum Firewall: string
     }
 
     /**
-     * The cookie that marks a browser as one this firewall's account has signed in from before. Named beside the
-     * remember-me cookies (`GWS_USER_REMEMBERME`, `GWS_COMPANY_REMEMBERME`) in `config/packages/session.yaml`.
+     * Marks a browser as one this firewall's account has signed in from before.
      */
     public function deviceCookieName(): string
     {

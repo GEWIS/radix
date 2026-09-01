@@ -9,9 +9,6 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
- * The queries every kind of known fact answers alike: devices, networks and device tokens are all rows of an account
- * on a firewall with a last-seen date, and they are counted, capped and swept the same way.
- *
  * As with sessions, every query that reads or deletes facts for a user MUST also filter by firewallName: a fact
  * recognised on `main` says nothing about the same browser arriving at `company`.
  *

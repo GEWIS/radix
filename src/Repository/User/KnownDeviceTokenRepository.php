@@ -21,33 +21,18 @@ class KnownDeviceTokenRepository extends KnownFactRepository
     }
 
     /**
-     * The token matching this hash, however long ago it was last seen.
-     *
-     * Whether it is recent enough to count as recognised is the caller's decision. Scoped to the account even though
-     * the hash alone would find it: a cookie replayed against another account must find nothing.
+     * Scoped to the account even though the hash alone would find it: a cookie replayed against another account must
+     * find nothing.
      */
     public function findOneByTokenHash(
         string $userIdentifier,
         string $firewallName,
         string $tokenHash,
     ): ?KnownDeviceToken {
-        return $this->createQueryBuilder('t')
-            ->where('t.userIdentifier = :uid')
-            ->andWhere('t.firewallName = :fw')
-            ->andWhere('t.tokenHash = :th')
-            ->setParameter(
-                'uid',
-                $userIdentifier,
-            )
-            ->setParameter(
-                'fw',
-                $firewallName,
-            )
-            ->setParameter(
-                'th',
-                $tokenHash,
-            )
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->findOneBy([
+            'userIdentifier' => $userIdentifier,
+            'firewallName' => $firewallName,
+            'tokenHash' => $tokenHash,
+        ]);
     }
 }
