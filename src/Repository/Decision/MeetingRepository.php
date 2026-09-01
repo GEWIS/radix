@@ -108,6 +108,40 @@ class MeetingRepository extends ServiceEntityRepository
     }
 
     /**
+     * The meetings a search prompt addresses: the one it names, or every meeting carrying that number when the prompt
+     * left the type out.
+     *
+     * @return Meeting[]
+     */
+    public function findByReference(
+        ?MeetingTypes $type,
+        int $number,
+    ): array {
+        $qb = $this->createQueryBuilder('m');
+        $qb->where('m.number = :number')
+            ->orderBy(
+                'm.date',
+                'DESC',
+            )
+            ->setParameter(
+                ':number',
+                $number,
+            );
+
+        if (null !== $type) {
+            $qb->andWhere('m.type = :type')
+                ->setParameter(
+                    ':type',
+                    $type->value,
+                );
+        }
+
+        $this->selectOneToOneSides($qb);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Find all meetings that have taken place.
      *
      * @param int $limit The amount of results

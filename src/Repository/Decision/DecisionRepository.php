@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository\Decision;
 
-use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Decision;
 use App\Service\Decision\DecisionSearchQuery;
+use App\Service\Decision\MeetingReference;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,12 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use function addcslashes;
 use function assert;
 use function implode;
-use function is_numeric;
-use function preg_match;
 use function sprintf;
-use function strval;
-
-use const PREG_UNMATCHED_AS_NULL;
 
 /**
  * @extends ServiceEntityRepository<Decision>
@@ -35,9 +30,10 @@ class DecisionRepository extends ServiceEntityRepository
     }
 
     /**
-     * Search decisions: every included term must appear in the Dutch or English text, no excluded term may, and an
-     * optional meeting type narrows the text matches. Alongside the text match, the prompt is checked for a meeting
-     * reference such as "BV 123.4.5", which matches those decisions directly.
+     * Search decisions: every included term must appear in the Dutch or English text, no excluded term may, and the
+     * `type:` and `meeting:` filters narrow the text matches to one meeting type and one meeting. Alongside the text
+     * match, a meeting the prompt spells out ("BV 123.4.5") matches those decisions directly, and they are answered
+     * with first: the meeting asked for must not be pushed past the result cap by the decisions that mention it.
      *
      * @return Decision[]
      */
@@ -76,10 +72,6 @@ class DecisionRepository extends ServiceEntityRepository
             ->leftJoin(
                 'm.minutes',
                 'decisionMinutes',
-            )
-            ->orderBy(
-                'm.date',
-                'DESC',
             )
             ->setMaxResults(100);
 
@@ -122,13 +114,23 @@ class DecisionRepository extends ServiceEntityRepository
             );
         }
 
+        if (null !== $search->meeting) {
+            $textParts[] = $this->referenceCondition(
+                $qb,
+                $search->meeting,
+                'filter',
+            );
+        }
+
         if ([] !== $textParts) {
-            // A virtual decision that names the decision it belongs to is that decision said a second time, and
-            // showing both is what made the same organ membership turn up twice. The one taken in a real meeting is
-            // the one that answers, so the other is left out of the text match. Added inside this branch, because on
-            // its own it would match every decision there is; a prompt that names a virtual decision by its own
-            // reference still finds it, through the condition below.
-            $textParts[] = 'counterpart.number IS NULL';
+            if (null === $search->meeting) {
+                // A virtual decision that names the decision it belongs to is that decision said a second time, and
+                // showing both is what made the same organ membership turn up twice. The one taken in a real meeting
+                // is the one that answers, so the other is left out of the text match. Added inside this branch,
+                // because on its own it would match every decision there is; a prompt that asks for a meeting, either
+                // by naming it or by filtering on it, is asking for what that meeting decided and gets it.
+                $textParts[] = 'counterpart.number IS NULL';
+            }
 
             $conditions[] = '(' . implode(
                 ' AND ',
@@ -136,12 +138,34 @@ class DecisionRepository extends ServiceEntityRepository
             ) . ')';
         }
 
-        $reference = $this->referenceCondition(
-            $qb,
-            $search->remainder,
-        );
-        if (null !== $reference) {
+        if (null !== $search->reference) {
+            $reference = $this->referenceCondition(
+                $qb,
+                $search->reference,
+                'reference',
+            );
             $conditions[] = $reference;
+
+            // The decisions asked for, ahead of the ones that only mention them. Ordering by the date alone leaves
+            // the meeting itself last, where the cap can cut it off entirely: "BV 1" answers with a century of
+            // decisions that happen to contain a 1 before it reaches the meeting.
+            $qb->addSelect(sprintf(
+                'CASE WHEN %s THEN 0 ELSE 1 END AS HIDDEN referenceRank',
+                $reference,
+            ))
+                ->orderBy(
+                    'referenceRank',
+                    'ASC',
+                )
+                ->addOrderBy(
+                    'm.date',
+                    'DESC',
+                );
+        } else {
+            $qb->orderBy(
+                'm.date',
+                'DESC',
+            );
         }
 
         if ([] === $conditions) {
@@ -251,85 +275,62 @@ class DecisionRepository extends ServiceEntityRepository
     }
 
     /**
-     * The DQL condition matching a meeting reference in the prompt, with its parameters bound; null when the prompt
-     * contains none.
+     * The DQL matching one meeting reference, with its parameters bound under a prefix of their own so that the
+     * filter and the spelled-out reference can both appear in the same query.
      */
     private function referenceCondition(
         QueryBuilder $qb,
-        string $remainder,
-    ): ?string {
-        // Start by matching meeting type and meeting number, then we also match additional meeting points and decision
-        // numbers. Both the Dutch and English abbreviation for the meeting types can be used.
-        //
-        // To make it usable, we also split the meeting type and meeting number match into two separate capture groups.
-        // In total there are four capture groups.
-        //
-        // Example:
-        // BV 123.456.789
-        //
-        // Result:
-        // array(5) {
-        //     [0]=> string(14) "BV 123.456.789"
-        //     [1]=> string(2) "BV"
-        //     [2]=> string(3) "123"
-        //     [3]=> string(3) "456"
-        //     [4]=> string(3) "789"
-        // }
-        $meetingRegex = '/(?:(' . implode(
-            '|',
-            MeetingTypes::getSearchableStrings(),
-        ) . ')'
-            . ' ([0-9]+))(?:.([0-9]+))?(?:.([0-9]+))?/';
-        $meetingInfo = [];
-        if (
-            1 === preg_match(
-                $meetingRegex,
-                $remainder,
-                $meetingInfo,
-                PREG_UNMATCHED_AS_NULL,
-            )
-        ) {
-            $meetingType = MeetingTypes::tryFromSearch(strval($meetingInfo[1]));
-            $meetingNumber = (int) $meetingInfo[2];
+        MeetingReference $reference,
+        string $prefix,
+    ): string {
+        $parts = [];
 
-            $where = 'd.meeting_type = :meeting_type AND d.meeting_number = :meeting_number';
-            if (null !== $meetingInfo[3]) {
-                $where .= ' AND d.point = :point';
-                $qb->setParameter(
-                    'point',
-                    (int) $meetingInfo[3],
-                );
-            }
-
-            if (null !== $meetingInfo[4]) {
-                $where .= ' AND d.number = :number';
-                $qb->setParameter(
-                    'number',
-                    (int) $meetingInfo[4],
-                );
-            }
-
-            $qb->setParameter(
-                'meeting_type',
-                $meetingType->value,
-            )
-                ->setParameter(
-                    'meeting_number',
-                    $meetingNumber,
-                );
-
-            return '(' . $where . ')';
-        }
-
-        if (is_numeric($remainder)) {
-            $qb->setParameter(
-                'meeting_number',
-                (int) $remainder,
+        // Absent from a reference that gives a number without a type, which addresses every meeting numbered that.
+        if (null !== $reference->type) {
+            $parts[] = sprintf(
+                'd.meeting_type = :%stype',
+                $prefix,
             );
-
-            return '(d.meeting_number = :meeting_number)';
+            $qb->setParameter(
+                $prefix . 'type',
+                $reference->type->value,
+            );
         }
 
-        return null;
+        $parts[] = sprintf(
+            'd.meeting_number = :%snumber',
+            $prefix,
+        );
+        $qb->setParameter(
+            $prefix . 'number',
+            $reference->number,
+        );
+
+        if (null !== $reference->point) {
+            $parts[] = sprintf(
+                'd.point = :%spoint',
+                $prefix,
+            );
+            $qb->setParameter(
+                $prefix . 'point',
+                $reference->point,
+            );
+        }
+
+        if (null !== $reference->decision) {
+            $parts[] = sprintf(
+                'd.number = :%sdecision',
+                $prefix,
+            );
+            $qb->setParameter(
+                $prefix . 'decision',
+                $reference->decision,
+            );
+        }
+
+        return '(' . implode(
+            ' AND ',
+            $parts,
+        ) . ')';
     }
 }

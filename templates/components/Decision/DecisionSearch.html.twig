@@ -8,7 +8,7 @@
                    value="{{ this.q }}">
             <div class="form-text">
                 {{ 'Searches the decision texts and understands meeting references such as “GMM 214” or “BM 1805.3.1”.'|trans }}
-                {{ 'Use “quotes” for exact phrases, -word to exclude, and type:bm to limit to one meeting type.'|trans }}
+                {{ 'Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.'|trans }}
             </div>
         </div>
     </div>
@@ -72,6 +72,10 @@
                                 {% endif %}
                             </div>
                         </div>
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            {{ 'No decisions of this meeting match your search.'|trans }}
+                        </p>
                     {% endfor %}
                 </div>
             </div>

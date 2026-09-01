@@ -5685,6 +5685,10 @@
         <source>No decisions match your search.</source>
         <target state="translated">Geen besluiten gevonden voor je zoekopdracht.</target>
       </trans-unit>
+      <trans-unit id="d_jUs16" resname="No decisions of this meeting match your search.">
+        <source>No decisions of this meeting match your search.</source>
+        <target state="translated">Geen besluiten van deze vergadering gevonden voor je zoekopdracht.</target>
+      </trans-unit>
       <trans-unit id="pnfksD." resname="No documents have been published for this meeting yet.">
         <source>No documents have been published for this meeting yet.</source>
         <target state="translated">Er zijn nog geen documenten gepubliceerd voor deze vergadering.</target>
@@ -10001,9 +10005,9 @@
         <source>Uploads appear here with their details guessed, ready to be checked.</source>
         <target state="translated">Uploads verschijnen hier met geraden gegevens, klaar om te worden gecontroleerd.</target>
       </trans-unit>
-      <trans-unit id="qsAU93m" resname="Use “quotes” for exact phrases, -word to exclude, and type:bm to limit to one meeting type.">
-        <source>Use “quotes” for exact phrases, -word to exclude, and type:bm to limit to one meeting type.</source>
-        <target state="translated">Gebruik “aanhalingstekens” voor exacte zinnen, -woord om uit te sluiten en type:bm om te beperken tot een vergadertype.</target>
+      <trans-unit id="dd.2oLj" resname="Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.">
+        <source>Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.</source>
+        <target state="translated">Gebruik “aanhalingstekens” voor exacte zinnen, -woord om uit te sluiten, type:bm om te beperken tot een vergadertype en meeting:1805 om te beperken tot een vergadering.</target>
       </trans-unit>
       <trans-unit id="iZjhacb" resname="Used by %count% meeting|Used by %count% meetings">
         <source>Used by %count% meeting|Used by %count% meetings</source>

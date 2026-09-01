@@ -8,6 +8,7 @@ use App\Entity\Decision\Decision;
 use App\Entity\Decision\Meeting;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Decision\DecisionRepository;
+use App\Repository\Decision\MeetingRepository;
 use App\Service\Decision\DecisionSearchQuery;
 use App\Service\Decision\DecisionSearchQueryParser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -53,10 +54,14 @@ final class DecisionSearch
      */
     private ?array $virtualCounterparts = null;
 
+    /** @var list<Meeting>|null */
+    private ?array $namedMeetings = null;
+
     private ?DecisionSearchQuery $parsedQuery = null;
 
     public function __construct(
         private readonly DecisionRepository $decisionRepository,
+        private readonly MeetingRepository $meetingRepository,
         private readonly DecisionSearchQueryParser $queryParser,
     ) {
     }
@@ -67,13 +72,25 @@ final class DecisionSearch
     }
 
     /**
-     * The results grouped per meeting, in the order the search returned them (newest meeting first).
+     * The results grouped per meeting, in the order the search returned them (newest meeting first), led by the
+     * meeting the prompt asks for.
      *
      * @return list<array{meeting: Meeting, decisions: list<Decision>}>
      */
     public function getResultsByMeeting(): array
     {
         $groups = [];
+
+        // Someone typing a meeting is looking for that meeting, so it stands at the top of the answer whether or not
+        // anything in it matched. Without this a meeting that decided nothing, or nothing matching, can only be found
+        // through the decisions elsewhere that mention it.
+        foreach ($this->getNamedMeetings() as $meeting) {
+            $groups[spl_object_id($meeting)] = [
+                'meeting' => $meeting,
+                'decisions' => [],
+            ];
+        }
+
         foreach ($this->getResults() as $decision) {
             $meeting = $decision->getMeeting();
             $key = spl_object_id($meeting);
@@ -122,6 +139,33 @@ final class DecisionSearch
     public function getHighlightTerms(): array
     {
         return $this->getParsedQuery()->includeTerms;
+    }
+
+    /**
+     * The meetings the prompt addresses, of those that exist.
+     *
+     * @return list<Meeting>
+     */
+    private function getNamedMeetings(): array
+    {
+        if (!$this->hasQuery()) {
+            return [];
+        }
+
+        if (null !== $this->namedMeetings) {
+            return $this->namedMeetings;
+        }
+
+        $reference = $this->getParsedQuery()->namedMeeting();
+
+        if (null === $reference) {
+            return $this->namedMeetings = [];
+        }
+
+        return $this->namedMeetings = array_values($this->meetingRepository->findByReference(
+            $reference->type,
+            $reference->number,
+        ));
     }
 
     /**

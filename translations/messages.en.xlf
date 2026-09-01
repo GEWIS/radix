@@ -5685,6 +5685,10 @@
         <source>No decisions match your search.</source>
         <target state="translated">No decisions match your search.</target>
       </trans-unit>
+      <trans-unit id="d_jUs16" resname="No decisions of this meeting match your search.">
+        <source>No decisions of this meeting match your search.</source>
+        <target state="translated">No decisions of this meeting match your search.</target>
+      </trans-unit>
       <trans-unit id="pnfksD." resname="No documents have been published for this meeting yet.">
         <source>No documents have been published for this meeting yet.</source>
         <target state="translated">No documents have been published for this meeting yet.</target>
@@ -10001,9 +10005,9 @@
         <source>Uploads appear here with their details guessed, ready to be checked.</source>
         <target state="translated">Uploads appear here with their details guessed, ready to be checked.</target>
       </trans-unit>
-      <trans-unit id="qsAU93m" resname="Use “quotes” for exact phrases, -word to exclude, and type:bm to limit to one meeting type.">
-        <source>Use “quotes” for exact phrases, -word to exclude, and type:bm to limit to one meeting type.</source>
-        <target state="translated">Use “quotes” for exact phrases, -word to exclude, and type:bm to limit to one meeting type.</target>
+      <trans-unit id="dd.2oLj" resname="Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.">
+        <source>Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.</source>
+        <target state="translated">Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.</target>
       </trans-unit>
       <trans-unit id="iZjhacb" resname="Used by %count% meeting|Used by %count% meetings">
         <source>Used by %count% meeting|Used by %count% meetings</source>

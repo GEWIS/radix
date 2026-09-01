@@ -13,6 +13,7 @@ use Override;
 
 use function array_values;
 use function count;
+use function sprintf;
 
 final class DecisionRepositoryTest extends DatabaseTestCase
 {
@@ -177,5 +178,132 @@ final class DecisionRepositoryTest extends DatabaseTestCase
     public function testAllBareWordsMustMatch(): void
     {
         self::assertEmpty($this->search('wordt xyzzynope'));
+    }
+
+    /**
+     * A reference is written by hand, and it used to answer only when it was typed the way the register writes it:
+     * `bv 1800` fell through to the text search, which finds every decision mentioning the meeting but not one of
+     * the decisions the meeting took.
+     */
+    public function testAMeetingReferenceIsReadHoweverItWasTyped(): void
+    {
+        $expected = $this->references($this->search('BM 1800'));
+
+        self::assertNotEmpty($expected);
+
+        foreach (
+            [
+                'bm 1800',
+                'BV 1800',
+                'bv 1800',
+                'Bv 1800',
+            ] as $prompt
+        ) {
+            self::assertSame(
+                $expected,
+                $this->references($this->search($prompt)),
+                sprintf(
+                    'Searching for "%s" should answer with the decisions of that meeting.',
+                    $prompt,
+                ),
+            );
+        }
+    }
+
+    /**
+     * The decisions of the meeting asked for stand ahead of the ones that only mention it, so that the result cap
+     * cannot cut off the meeting itself.
+     */
+    public function testTheDecisionsOfTheMeetingAskedForComeFirst(): void
+    {
+        // The seeded annulment in BV 1804 names the decision it annuls, so it matches "BV 1801" on its text alone.
+        $results = $this->references($this->search('BV 1801'));
+
+        self::assertSame(
+            [
+                'BV 1801.1.1',
+                'BV 1804.1.1',
+            ],
+            $results,
+        );
+    }
+
+    public function testTheMeetingFilterNarrowsToThatMeeting(): void
+    {
+        self::assertSame(
+            ['BV 1801.1.1'],
+            $this->references($this->search('type:bm meeting:1801')),
+        );
+
+        self::assertSame(
+            ['BV 1800.2.1'],
+            $this->references($this->search('meeting:1800.2')),
+        );
+    }
+
+    /**
+     * A number without a type addresses every meeting carrying it, until `type:` says which one is meant. Without
+     * that, "type:bm 1" answered with the first agenda point of the first GMM as readily as with board meeting 1.
+     */
+    public function testTheTypeFilterNarrowsABareNumber(): void
+    {
+        $results = $this->references($this->search('type:bm 1'));
+
+        self::assertNotEmpty($results);
+        self::assertSame(
+            'BV 1.1.1',
+            $results[0],
+        );
+
+        foreach ($this->search('type:bm 1') as $decision) {
+            self::assertSame(
+                MeetingTypes::BV,
+                $decision->getMeeting()->getType(),
+            );
+        }
+    }
+
+    /**
+     * Unlike a spelled-out reference, the filter is a filter: it narrows the text match instead of standing beside
+     * it, so the decisions that merely mention the meeting are left out.
+     */
+    public function testTheMeetingFilterCombinesWithTheTextSearch(): void
+    {
+        self::assertSame(
+            ['BV 1801.1.1'],
+            $this->references($this->search('meeting:1801 begroting')),
+        );
+
+        self::assertEmpty($this->search('meeting:1801 xyzzynope'));
+    }
+
+    /**
+     * The text search leaves a virtual decision out, because it repeats one taken in a real meeting. Asking for the
+     * virtual meeting itself is asking for what it put on the record.
+     */
+    public function testTheMeetingFilterReachesAVirtualMeeting(): void
+    {
+        $results = $this->search('type:virt meeting:1');
+
+        self::assertCount(
+            1,
+            $results,
+        );
+        self::assertNotNull($results[0]->getCounterpart());
+    }
+
+    /**
+     * @param Decision[] $decisions
+     *
+     * @return list<string>
+     */
+    private function references(array $decisions): array
+    {
+        $references = [];
+        foreach ($decisions as $decision) {
+            $references[] = DecisionRepository::key($decision);
+        }
+
+        return $references;
     }
 }
