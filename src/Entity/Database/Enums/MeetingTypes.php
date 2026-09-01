@@ -13,6 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use function array_column;
 use function array_map;
 use function array_merge;
+use function strtoupper;
 
 /**
  * Enum for the different address types.
@@ -104,8 +105,13 @@ enum MeetingTypes: string implements TranslatableInterface
         ];
     }
 
+    /**
+     * The meeting type a search prompt names, however it was typed: a reference is written by hand, and `bv 1749`
+     * addresses the same meeting as `BV 1749`.
+     */
     public static function tryFromSearch(string $input): MeetingTypes
     {
+        $input = strtoupper($input);
         $value = self::tryFrom($input);
 
         if (null !== $value) {
