@@ -1,0 +1,229 @@
+name: NPM Client
+
+# The client is generated from the committed `openapi.yaml`, which `ApiDocumentationTest` keeps in step with the
+# application, so nothing here has to boot it. A tag publishes the version it names; a push to main publishes a
+# snapshot under the `dev` tag, whose version says which release it is built on and how far past it that commit is.
+on:
+    push:
+        branches:
+            - main
+        tags:
+            - 'v*.*.*'
+    # No `paths` on the push above, or a release tag whose commit happened to touch neither would publish nothing.
+    # A pull request has no such worry and is filtered, because most of them cannot affect the client at all.
+    pull_request:
+        paths:
+            - 'openapi.yaml'
+            - 'packages/radix-client/**'
+            - '.github/workflows/client-publish.yml'
+
+# Cancel running jobs that have become stale through updates to the ref (e.g., pushes to a pull request).
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    # Only a pull request's verification is worth superseding. Cancelling a run that is mid-publish leaves the
+    # registry holding a version this repository has no record of deciding to release.
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+env:
+    IS_RELEASE: ${{ format('{0}', startsWith(github.ref, 'refs/tags/')) }}
+
+jobs:
+    # A pull request builds the client without publishing it. `ApiDocumentationTest` compares the document to the
+    # application and says nothing about whether a client can be generated from it, so a schema the generator or
+    # `tsc` refuses would otherwise only surface after the merge, on main.
+    verify:
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        defaults:
+            run:
+                working-directory: packages/radix-client
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+                with:
+                    persist-credentials: false
+
+            -   name: Set up pnpm
+                uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+                with:
+                    # Read relative to the repository root, which holds no package.json; without this the action
+                    # finds no version to install and fails before anything else runs.
+                    package_json_file: packages/radix-client/package.json
+
+            -   name: Set up Node
+                uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+                with:
+                    node-version-file: packages/radix-client/.nvmrc
+                    cache: pnpm
+                    cache-dependency-path: packages/radix-client/pnpm-lock.yaml
+
+            -   name: Set up Java
+                uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+                with:
+                    distribution: temurin
+                    java-version: '17'
+
+            -   name: Install
+                run: pnpm install --frozen-lockfile --ignore-scripts
+
+            -   name: Generate and build
+                run: |
+                    pnpm run generate
+                    pnpm run build
+                    pnpm run smoke
+
+    publish:
+        if: github.event_name == 'push'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            # Publishing with provenance signs the package against this workflow run, so npm can state where the
+            # tarball came from. It needs a token from GitHub's OIDC provider.
+            id-token: write
+        defaults:
+            run:
+                working-directory: packages/radix-client
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+                with:
+                    # The snapshot version is worked out from the last release tag and the distance to it, neither
+                    # of which a shallow clone has.
+                    fetch-depth: 0
+                    persist-credentials: false
+
+            -   name: Decide whether there is anything to publish
+                id: decide
+                working-directory: .
+                env:
+                    BEFORE: ${{ github.event.before }}
+                run: |
+                    if [ "$IS_RELEASE" = 'true' ]; then
+                        echo 'publish=true' >> "$GITHUB_OUTPUT"
+                        exit 0
+                    fi
+
+                    # A first push to the branch has no `before` to compare against, so it publishes rather than
+                    # guessing. Every other push publishes only when the contract or the package itself moved:
+                    # the client is generated, so a commit that touches neither produces the same tarball twice.
+                    if [ -z "$BEFORE" ] || [ "$BEFORE" = '0000000000000000000000000000000000000000' ]; then
+                        echo 'publish=true' >> "$GITHUB_OUTPUT"
+                    elif git diff --quiet "$BEFORE" "$GITHUB_SHA" -- openapi.yaml packages/radix-client; then
+                        echo 'publish=false' >> "$GITHUB_OUTPUT"
+                    else
+                        echo 'publish=true' >> "$GITHUB_OUTPUT"
+                    fi
+
+            -   name: Set up pnpm
+                if: steps.decide.outputs.publish == 'true'
+                uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+                with:
+                    # Read relative to the repository root, which holds no package.json; without this the action
+                    # finds no version to install and fails before anything else runs.
+                    package_json_file: packages/radix-client/package.json
+
+            -   name: Set up Node
+                if: steps.decide.outputs.publish == 'true'
+                uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+                with:
+                    node-version-file: packages/radix-client/.nvmrc
+                    registry-url: 'https://registry.npmjs.org'
+                    cache: pnpm
+                    cache-dependency-path: packages/radix-client/pnpm-lock.yaml
+
+            -   name: Set up Java
+                if: steps.decide.outputs.publish == 'true'
+                # The generator is a jar; the CLI only fetches and runs it.
+                uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+                with:
+                    distribution: temurin
+                    java-version: '17'
+
+            -   name: Install
+                if: steps.decide.outputs.publish == 'true'
+                # --ignore-scripts because the generator's only install script prints a donation banner; the jar it
+                # actually runs is fetched on the first `generate`.
+                run: pnpm install --frozen-lockfile --ignore-scripts
+
+            -   name: Generate and build
+                if: steps.decide.outputs.publish == 'true'
+                run: |
+                    pnpm run generate
+                    pnpm run build
+                    pnpm run smoke
+
+            -   name: Work out the version and the tag it goes under
+                id: version
+                if: steps.decide.outputs.publish == 'true'
+                env:
+                    REF_NAME: ${{ github.ref_name }}
+                    PACKAGE: '@gewis/radix-client'
+                run: |
+                    # What `latest` names today, and empty when the package does not exist yet. `npm view` exits
+                    # non-zero for both a missing package and a missing tag, so neither is allowed to end the run.
+                    current="$(npm view "$PACKAGE" dist-tags.latest 2>/dev/null || true)"
+
+                    if [ "$IS_RELEASE" != 'true' ]; then
+                        # A prerelease of the last release rather than of a guessed next one: which version comes
+                        # after this commit is not decided yet, and naming one here would publish a claim about a
+                        # release that may never carry that number.
+                        if ! last="$(git describe --tags --abbrev=0 --match 'v*.*.*' 2>/dev/null)"; then
+                            echo 'No release tag is reachable, so there is no release to name a snapshot after.'
+                            echo 'skip=true' >> "$GITHUB_OUTPUT"
+                            exit 0
+                        fi
+
+                        # npm sets no `latest` when the first publish of a package carries another tag, and then
+                        # `npm install @gewis/radix-client` resolves nothing at all. The first version published
+                        # has to be a release.
+                        if [ -z "$current" ]; then
+                            echo 'This package has no release on npm yet, so a snapshot would leave it without a'
+                            echo '`latest` for `npm install` to resolve. Tag a release first.'
+                            echo 'skip=true' >> "$GITHUB_OUTPUT"
+                            exit 0
+                        fi
+
+                        distance="$(git rev-list --count "$last..HEAD")"
+                        # `g` before the SHA: an all-digit short SHA with a leading zero is not a valid semver
+                        # prerelease identifier, and `npm version` refuses it.
+                        echo "version=${last#v}-dev.$distance.g$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+                        echo 'tag=dev' >> "$GITHUB_OUTPUT"
+                        exit 0
+                    fi
+
+                    version="${REF_NAME#v}"
+                    echo "version=$version" >> "$GITHUB_OUTPUT"
+
+                    # `v*.*.*` also matches `v5.4.0-rc.1`, which must not become what everybody installs.
+                    case "$version" in
+                        *-*)
+                            echo 'tag=next' >> "$GITHUB_OUTPUT"
+                            exit 0
+                            ;;
+                    esac
+
+                    # A hotfix on an older line is still a release, but moving `latest` back onto it downgrades
+                    # every consumer who asked for no version at all. It publishes under its own tag instead.
+                    if [ -n "$current" ] && [ "$current" != "$version" ] \
+                        && [ "$(printf '%s\n%s\n' "$current" "$version" | sort -V | tail -1)" = "$current" ]; then
+                        echo "$version is older than the published $current, so it does not take `latest`."
+                        echo 'tag=previous' >> "$GITHUB_OUTPUT"
+                    else
+                        echo 'tag=latest' >> "$GITHUB_OUTPUT"
+                    fi
+
+            -   name: Publish to npm
+                if: steps.decide.outputs.publish == 'true' && steps.version.outputs.skip != 'true'
+                env:
+                    VERSION: ${{ steps.version.outputs.version }}
+                    DIST_TAG: ${{ steps.version.outputs.tag }}
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                # `npm publish` rather than pnpm's: signing the package against this workflow run is an npm CLI
+                # feature, and `pnpm publish` has no way to ask for it.
+                run: |
+                    npm version "$VERSION" --no-git-tag-version --allow-same-version
+                    npm publish --tag "$DIST_TAG"

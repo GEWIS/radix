@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist/esm",
+    "module": "ES2022",
+    // Declarations for this build too. With only the CommonJS ones, the `import` condition would serve types that
+    // sit under the package's `"type": "commonjs"`, which is the mismatch attw reports as types masquerading as
+    // CJS: a consumer on node16 resolution runs ESM and type-checks it as CJS.
+    "declaration": true,
+    "declarationMap": true
+  }
+}

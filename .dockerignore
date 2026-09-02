@@ -36,6 +36,10 @@
 coverage/
 data/
 docs/
+# The published API client. It is generated from openapi.yaml and has nothing to do with the application image,
+# which carries no Node; without this its manifest ships inside it and an image scanner reports npm advisories
+# against a PHP application.
+packages/
 public/bundles/
 tests/
 var/

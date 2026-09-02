@@ -48,6 +48,19 @@ updates:
         cooldown:
             default-days: 7
 
+    # The published API client, the one npm manifest in the repository. Both CI jobs install from the lockfile, so
+    # without this its pins are what gets built and shipped to every consumer for as long as nobody remembers it.
+    -   package-ecosystem: "npm"
+        directory: "/packages/radix-client"
+        schedule:
+            interval: "weekly"
+        open-pull-requests-limit: 10
+        cooldown:
+            default-days: 7
+            semver-major-days: 30
+            semver-minor-days: 7
+            semver-patch-days: 7
+
     -   package-ecosystem: "github-actions"
         directory: "/"
         schedule:

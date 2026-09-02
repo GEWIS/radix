@@ -191,7 +191,8 @@ locale-dependent output (translations, date formatting) depends on the locale-pr
   **SWC strips types but does not type-check** — there is no `tsc` or eslint gate, so type errors surface at runtime.
   Be precise with DOM/Stimulus typings and verify behaviour in the browser (see Validating changes below).
 - Sass lives in `assets/styles/`; third-party JS is vendored under `assets/vendor/` (asset-mapper, no `package.json`
-  and no npm). In dev, the entrypoint watches `assets/` and recompiles.
+  and no npm). In dev, the entrypoint watches `assets/` and recompiles. The one `package.json` in the repository is
+  `packages/radix-client/`, which is the published API client and has nothing to do with the application's own assets.
 
 ## Security & users
 
@@ -307,6 +308,12 @@ type, so a string is silently no bound at all, which is an endpoint shipped with
 operation that declares no bound gets no version parameter and no 406, because `MinimumVersionProvider` enforces
 nothing for it and the document must not claim otherwise. That one rule is also why the member endpoints predating the
 versioned contract keep answering without a version: they declare no bound, and none should be added to them.
+
+`packages/radix-client/` is the **published TypeScript client**, `@gewis/radix-client` on npm. It is generated from
+the committed `openapi.yaml` by `openapi-generator`, so nothing about it needs a running application, and none of it
+is written by hand: `make client` regenerates and builds it, and `.github/workflows/client-publish.yml` publishes the
+version a tag names, plus a `dev` snapshot from main. A tightening of the document (an enum instead of a bare string,
+an error envelope pinned to its status) is a tightening of the client's types, which is the reason to prefer them.
 
 Swagger UI answers on **`/api-docs`**, deliberately outside `^/api`: a browser cannot send an `Authorization` header
 on the first navigation, so behind the bearer wall the page could never render. It is public, because `openapi.yaml`

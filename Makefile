@@ -27,7 +27,7 @@ SYMFONY_TEST = $(DOCKER_COMP) exec -T -e APP_ENV=test app bin/console
 # Misc
 .DEFAULT_GOAL   = help
 .PHONY          : help seed translations igor openapi lint lint-fix lint-fix-all lint-twig phpstan phpstan-pr \
-                  test test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
+                  client test test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
                   buildmatomo buildpgadmin setuplocalenv up upprod start startprod stop logs bash exec composer \
                   sf cc migrate migrate-to migration-up \
                   migration-down migration-diff preparemailman preparelistmonk stripewebhooksecret
@@ -80,6 +80,13 @@ igor: ## Run Igor (static linter to validate Symfony project for the persistent 
 openapi: ## Regenerate openapi.yaml from the application
 	@$(SYMFONY) api:openapi:export --yaml --output=openapi.yaml
 	@$(DOCKER) cp "$$($(DOCKER_COMP) ps -q app)":/app/openapi.yaml ./openapi.yaml
+
+# Runs on the host rather than in the container: the application image carries no Node and no Java, and the client
+# is generated from the committed document, so nothing here needs the stack to be up.
+# --ignore-scripts because the generator's only install script prints a donation banner; the jar it actually runs
+# is fetched on the first `generate`.
+client: ## Regenerate and build the TypeScript API client in packages/radix-client
+	@cd packages/radix-client && pnpm install --frozen-lockfile --ignore-scripts && pnpm run generate && pnpm run build && pnpm run smoke
 
 lint: ## Linter using PHP_CodeSniffer
 	@$(PHP) ./vendor/bin/phpcs -p

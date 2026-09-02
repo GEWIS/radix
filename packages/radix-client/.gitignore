@@ -1,0 +1,5 @@
+/dist/
+/generated/
+/node_modules/
+# `pnpm pack` leaves the tarball it built here.
+/*.tgz

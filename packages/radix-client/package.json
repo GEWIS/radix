@@ -1,0 +1,68 @@
+{
+  "name": "@gewis/radix-client",
+  "version": "0.0.0-development",
+  "description": "TypeScript client for the GEWIS API, generated from the OpenAPI document radix publishes",
+  "license": "GPL-3.0-only",
+  "author": "GEWIS <abc@gewis.nl>",
+  "homepage": "https://github.com/GEWIS/radix/tree/main/packages/radix-client#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GEWIS/radix.git",
+    "directory": "packages/radix-client"
+  },
+  "bugs": {
+    "url": "https://github.com/GEWIS/radix/issues"
+  },
+  "keywords": [
+    "gewis",
+    "radix",
+    "openapi",
+    "api-client"
+  ],
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./openapi.json": "./dist/openapi.json",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/",
+    "generated/*.ts",
+    "LICENSE.txt"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate": "openapi-generator-cli generate && node scripts/emit-contract.mjs && node scripts/patch-generated.mjs",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.esm.json && node scripts/esm-extensions.mjs && node scripts/emit-openapi-json.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "clean": "rm -rf generated dist"
+  },
+  "dependencies": {
+    "axios": "^1.7.0"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "2.41.0",
+    "typescript": "~5.9.3",
+    "yaml": "^2.9.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "packageManager": "pnpm@11.25.0"
+}
