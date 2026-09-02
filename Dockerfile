@@ -11,8 +11,8 @@ FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_up
 
 FROM scratch AS radix_geoip
 ARG IPLOCATE_REVISION
-ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-asn/ip-to-asn.mmdb /ip-to-asn.mmdb
-ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-country/ip-to-country.mmdb /ip-to-location.mmdb
+ADD --chmod=444 https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-asn/ip-to-asn.mmdb /ip-to-asn.mmdb
+ADD --chmod=444 https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-country/ip-to-country.mmdb /ip-to-location.mmdb
 
 # Radix Base Image
 FROM frankenphp_upstream AS radix_app_base
