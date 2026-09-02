@@ -7,6 +7,7 @@ namespace App\Service\Career;
 use App\Entity\Application\RevisableInterface;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\VacancyRevision;
+use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
 use DateTime;
 use Override;
@@ -46,7 +47,7 @@ final readonly class VacancyStaleRevisionPolicy implements StaleRevisionPolicyIn
     }
 
     #[Override]
-    public function deletionBlockedBy(RevisableInterface $revisable): ?string
+    public function deletionBlockedBy(RevisableInterface $revisable): ?StaleRevisionDeletionBlock
     {
         return null;
     }

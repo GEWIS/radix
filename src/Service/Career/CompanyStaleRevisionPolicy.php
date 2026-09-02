@@ -9,6 +9,7 @@ use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyRevision;
 use App\Repository\User\CompanyUserRepository;
+use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
 use DateTime;
 use Override;
@@ -44,18 +45,18 @@ final readonly class CompanyStaleRevisionPolicy implements StaleRevisionPolicyIn
     }
 
     #[Override]
-    public function deletionBlockedBy(RevisableInterface $revisable): ?string
+    public function deletionBlockedBy(RevisableInterface $revisable): ?StaleRevisionDeletionBlock
     {
         if (!$revisable instanceof Company) {
             return null;
         }
 
         if (!$revisable->getPackages()->isEmpty()) {
-            return 'it has already been sold a package';
+            return StaleRevisionDeletionBlock::hard('it has already been sold a package');
         }
 
         if ($this->companyUserRepository->count(['company' => $revisable]) > 0) {
-            return 'a representative still has an account for it';
+            return StaleRevisionDeletionBlock::hard('a representative still has an account for it');
         }
 
         return null;

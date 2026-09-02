@@ -5,13 +5,22 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Command\Application;
 
 use App\Entity\Activity\Activity;
+use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityRevision;
+use App\Entity\Activity\Enums\SignupFieldTypes;
+use App\Entity\Activity\Signup;
+use App\Entity\Activity\SignupField;
+use App\Entity\Activity\SignupFieldValue;
+use App\Entity\Activity\SignupList;
+use App\Entity\Activity\SignupOption;
+use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyRevision;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
+use App\Entity\Decision\Member;
 use App\Entity\Decision\OrganInformation;
 use App\Entity\Decision\OrganInformationRevision;
 use App\Entity\Frontpage\Poll;
@@ -420,14 +429,169 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * @param array<string, bool|string> $input
+     * Sign-ups belong to a live revision's lists, so sign-ups on an activity nobody ever approved are a state that is
+     * not supposed to arise. A scheduled run will not guess at them: it skips the activity and says why, every night.
      */
-    private function executeCommand(array $input = []): void
+    public function testKeepsAStaleActivityThatSomehowHasSignups(): void
     {
+        $draft = $this->aNeverApprovedActivityDraftWithASignup();
+        $activityId = (int) $draft->getActivity()->getId();
+
+        $this->executeCommand();
+
+        self::assertNotNull(
+            $this->entityManager->getRepository(Activity::class)->find($activityId),
+        );
+    }
+
+    /**
+     * Forced, the same activity goes, and takes its lists, its sign-ups and the answers on them with it. The sign-ups
+     * are the point: they are not reachable from anywhere on the site once the activity they hang off was never
+     * approved, so an operator who has read a dry run may clear them out rather than have them skipped for good.
+     */
+    public function testForceDeletesAStaleActivityTogetherWithItsSignups(): void
+    {
+        $draft = $this->aNeverApprovedActivityDraftWithASignup();
+        $activityId = (int) $draft->getActivity()->getId();
+        $signupId = (int) $this->theSignupOn($draft)->getId();
+
+        $this->executeCommand(['--force' => true]);
+
+        self::assertNull(
+            $this->entityManager->getRepository(Activity::class)->find($activityId),
+        );
+        self::assertNull(
+            $this->entityManager->getRepository(Signup::class)->find($signupId),
+        );
+        // The answer rows name a field and an option that go in the same flush, so the removal is only correct if
+        // they are unlinked in the right order; a stray answer would fail the foreign key rather than survive.
+        self::assertSame(
+            0,
+            $this->countFieldValuesFor($signupId),
+        );
+    }
+
+    /**
+     * Forcing widens what may go, not how far back the cleanup looks. An activity with sign-ups that nobody has
+     * walked away from yet is nothing to do with `--force`.
+     */
+    public function testForceStillOnlyReachesWhatIsAlreadyStale(): void
+    {
+        $draft = $this->aNeverApprovedActivityDraftWithASignup();
+        $activityId = (int) $draft->getActivity()->getId();
+        $this->backdate(
+            ActivityRevision::class,
+            (int) $draft->getId(),
+            ['updatedAt' => new DateTime('-2 days')],
+        );
+
+        $this->executeCommand(['--force' => true]);
+
+        self::assertNotNull(
+            $this->entityManager->getRepository(Activity::class)->find($activityId),
+        );
+    }
+
+    /**
+     * A forced dry run is how an operator sees what forcing would take before they answer for it, so it has to report
+     * the same removal and still change nothing.
+     */
+    public function testAForcedDryRunReportsTheActivityButLeavesItStanding(): void
+    {
+        $draft = $this->aNeverApprovedActivityDraftWithASignup();
+        $activityId = (int) $draft->getActivity()->getId();
+
+        $this->executeCommand([
+            '--force' => true,
+            '--dry-run' => true,
+        ]);
+
+        self::assertNotNull(
+            $this->entityManager->getRepository(Activity::class)->find($activityId),
+        );
+    }
+
+    /**
+     * The confirmation is the only thing standing between a typed `--force` and sign-ups that cannot be brought back,
+     * so declining it has to leave the run exactly where a run without the option would.
+     */
+    public function testDecliningTheConfirmationForcesNothing(): void
+    {
+        $draft = $this->aNeverApprovedActivityDraftWithASignup();
+        $activityId = (int) $draft->getActivity()->getId();
+
+        $this->executeCommand(
+            ['--force' => true],
+            ['no'],
+            true,
+        );
+
+        self::assertNotNull(
+            $this->entityManager->getRepository(Activity::class)->find($activityId),
+        );
+    }
+
+    /**
+     * Forcing is not a way past every domain. What a company was sold is somebody else's arrangement, and the option
+     * an operator reaches for to clear out unreachable sign-ups does not touch it.
+     */
+    public function testForceDoesNotOverruleADomainThatRefusesOutright(): void
+    {
+        $company = $this->anApprovedCompanyWithAPackage();
+        $live = $company->getCurrentRevision();
+        self::assertInstanceOf(
+            CompanyRevision::class,
+            $live,
+        );
+
+        $draft = $this->cloneAsDraft($live);
+        $company->setLiveRevision(null);
+        $this->entityManager->flush();
+        $companyId = (int) $company->getId();
+        $this->backdate(
+            CompanyRevision::class,
+            (int) $draft->getId(),
+            ['updatedAt' => new DateTime('-100 days')],
+        );
+
+        $this->executeCommand(['--force' => true]);
+
+        self::assertNotNull(
+            $this->entityManager->getRepository(Company::class)->find($companyId),
+        );
+    }
+
+    /**
+     * Runs non-interactively by default, as the schedule does. A case that means to answer the forced run's
+     * confirmation hands in what to answer with and says so.
+     *
+     * @param array<string, bool|string> $input
+     * @param string[]                   $answers
+     */
+    private function executeCommand(
+        array $input = [],
+        array $answers = [],
+        bool $interactive = false,
+    ): void {
         $this->assertCommandIsSuccessful(static::runCommand(
             'app:application:delete-stale-revisions',
             $input,
+            $answers,
+            $interactive,
         ));
+    }
+
+    /**
+     * How many answers are still filed against a sign-up. Asked of the connection rather than the ORM, because the
+     * point is what survived in the database after the run removed the rows.
+     */
+    private function countFieldValuesFor(int $signupId): int
+    {
+        return (int) $this->entityManager->getConnection()->fetchOne(
+            'SELECT COUNT(*) FROM ' . $this->entityManager->getClassMetadata(SignupFieldValue::class)->getTableName()
+            . ' WHERE signup_id = ?',
+            [$signupId],
+        );
     }
 
     private function fileStorage(): FileStorage
@@ -667,5 +831,111 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         );
 
         return $revision;
+    }
+
+    /**
+     * A stale, never-approved activity carrying a sign-up with an answer on it: the state a scheduled run refuses to
+     * touch and a forced one clears.
+     *
+     * The seed has none, and could not sensibly have one — sign-ups are migrated onto a revision when it is approved,
+     * so nothing in the normal course of things puts one on a chain that never was. It is built here instead, answer
+     * and all, so that the removal is asked to unlink a field value from both the sign-up and the option it chose.
+     */
+    private function aNeverApprovedActivityDraftWithASignup(): ActivityRevision
+    {
+        $draft = $this->aNeverApprovedActivityDraft();
+
+        $signupList = new SignupList();
+        $signupList->setName(
+            new ActivityLocalisedText(
+                'Attendees',
+                'Aanwezigen',
+            ),
+        );
+        $signupList->setRevision($draft);
+        $draft->addSignupList($signupList);
+
+        $field = new SignupField();
+        $field->setName(
+            new ActivityLocalisedText(
+                'Preference',
+                'Voorkeur',
+            ),
+        );
+        $field->setType(SignupFieldTypes::Choice);
+        $field->setPosition(0);
+
+        $option = new SignupOption();
+        $option->setValue(
+            new ActivityLocalisedText(
+                'Either',
+                'Maakt niet uit',
+            ),
+        );
+        $option->setPosition(0);
+        $field->addOption($option);
+        $signupList->addField($field);
+
+        $signup = new UserSignup();
+        $signup->setSignupList($signupList);
+        $signup->setUser($this->aMember());
+        $signupList->getSignUps()->add($signup);
+
+        $fieldValue = new SignupFieldValue();
+        $fieldValue->setSignup($signup);
+        $fieldValue->setField($field);
+        $fieldValue->setOption($option);
+        $signup->getFieldValues()->add($fieldValue);
+
+        $this->entityManager->persist($signupList);
+        $this->entityManager->persist($signup);
+        $this->entityManager->persist($fieldValue);
+        $this->entityManager->flush();
+
+        // After the flush, so the write does not restamp what the ageing just set. The activity is put in the past as
+        // well: a list is not abandoned while the evening it belongs to is still to come, forced or not.
+        $this->backdate(
+            ActivityRevision::class,
+            (int) $draft->getId(),
+            [
+                'beginTime' => new DateTime('-2 months'),
+                'endTime' => new DateTime('-2 months +1 hour'),
+                'updatedAt' => new DateTime('-40 days'),
+            ],
+        );
+
+        return $draft;
+    }
+
+    /**
+     * The single sign-up {@see self::aNeverApprovedActivityDraftWithASignup()} put on the draft.
+     */
+    private function theSignupOn(ActivityRevision $draft): Signup
+    {
+        $signupList = $draft->getSignupLists()->first();
+        self::assertInstanceOf(
+            SignupList::class,
+            $signupList,
+        );
+
+        $signup = $signupList->getSignUps()->first();
+        self::assertInstanceOf(
+            Signup::class,
+            $signup,
+        );
+
+        return $signup;
+    }
+
+    private function aMember(): Member
+    {
+        $member = $this->entityManager->getRepository(Member::class)->findOneBy([]);
+        self::assertInstanceOf(
+            Member::class,
+            $member,
+            'The seed is expected to contain at least one member.',
+        );
+
+        return $member;
     }
 }

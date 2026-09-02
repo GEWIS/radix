@@ -38,11 +38,15 @@ interface StaleRevisionPolicyInterface
     public function keepUntil(RevisionInterface $revision): ?DateTime;
 
     /**
-     * Why this never-approved aggregate has to stay standing anyway, phrased for a log line, or null when it may go
-     * together with its chain. It is the last thing asked before rows are removed, so answer from what the aggregate
-     * carries — sign-ups, votes, a sold package — rather than from what it is.
+     * Why this never-approved aggregate has to stay standing anyway, or null when it may go together with its chain.
+     * It is the last thing asked before rows are removed, so answer from what the aggregate carries — sign-ups,
+     * votes, a sold package — rather than from what it is.
+     *
+     * An objection also says whether an operator running the cleanup by hand may overrule it; see
+     * {@see StaleRevisionDeletionBlock}. Hold out for {@see StaleRevisionDeletionBlock::hard()} when what would go
+     * with the aggregate belongs to somebody else.
      */
-    public function deletionBlockedBy(RevisableInterface $revisable): ?string;
+    public function deletionBlockedBy(RevisableInterface $revisable): ?StaleRevisionDeletionBlock;
 
     /**
      * Every stored file path this revision names, so that whatever nothing points at any more can be reclaimed with
