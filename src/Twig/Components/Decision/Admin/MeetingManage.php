@@ -59,12 +59,17 @@ use function trim;
  *
  * Like the sign-up overview this component writes to the database, so it re-asserts access on every action: a live
  * request is independent of the gated page that embedded the component.
+ *
+ * A board member keeps a meeting: its agenda, the documents filed under it, the reference selection, the time and
+ * place, and the minutes. What was decided in it belongs to the register instead, so the actions that write to the
+ * ledger ask for the register administrator on top of that, and the decisions tab offers a board member nothing but
+ * the list.
  */
 #[AsLiveComponent(
     name: 'Decision:Admin:MeetingManage',
     template: 'components/Decision/Admin/MeetingManage.html.twig',
 )]
-#[IsGranted(UserRoles::DatabaseAdmin->value)]
+#[IsGranted(UserRoles::Board->value)]
 final class MeetingManage
 {
     use DefaultActionTrait;
@@ -466,7 +471,7 @@ final class MeetingManage
         #[LiveArg]
         int $number,
     ): void {
-        $this->assertAccess();
+        $this->assertLedgerAccess();
 
         try {
             $deleted = $this->databaseMeetingService->deleteDecision(
@@ -526,7 +531,7 @@ final class MeetingManage
         #[LiveArg]
         int $virtualDecision,
     ): void {
-        $this->assertAccess();
+        $this->assertLedgerAccess();
 
         $type = MeetingTypes::tryFrom($virtualType);
 
@@ -569,7 +574,7 @@ final class MeetingManage
         #[LiveArg]
         int $virtualDecision,
     ): void {
-        $this->assertAccess();
+        $this->assertLedgerAccess();
 
         $type = MeetingTypes::tryFrom($virtualType);
 
@@ -727,9 +732,24 @@ final class MeetingManage
     private function assertAccess(): void
     {
         if (
-            $this->security->isGranted(UserRoles::DatabaseAdmin->value)
+            $this->security->isGranted(UserRoles::Board->value)
             && $this->security->isGranted(SudoVoter::ATTRIBUTE)
         ) {
+            return;
+        }
+
+        throw new AccessDeniedException();
+    }
+
+    /**
+     * What is decided in a meeting is the register's record rather than the board's, so writing to it asks for the
+     * register administrator where the rest of this component asks for a board seat.
+     */
+    private function assertLedgerAccess(): void
+    {
+        $this->assertAccess();
+
+        if ($this->security->isGranted(UserRoles::DatabaseAdmin->value)) {
             return;
         }
 
