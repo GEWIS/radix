@@ -8,6 +8,55 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.3.0](https://github.com/GEWIS/radix/tree/v5.3.0) (2026-09-02)
+
+* Added recognition of the devices an account has signed in from, so coming back on one of them no longer sends a security notice. A device is known by a long-lived cookie, and where that is refused or cleared by the browser family, the operating system family and the languages the request asks for, with the network taken separately and at the level of the autonomous system. Every address in `TUE_IP_RANGES` reduces to one campus network first, because the internal side of the university's NAT reaches us on shared space that no database names and whose prefixes rotate.
+* Added `app:user:update-ip-databases`, which refreshes the address databases twice a week. With `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY` set it fetches the GeoLite ASN and City editions, which puts "Eindhoven, The Netherlands" in a security notice rather than the country alone; without them it keeps to IPLocate's free files, which know no cities. The dashboard says how old the databases are and turns red when the runs are failing or the files are missing, and the security page credits both sources, as their licences ask.
+* Added an image browser to the editor for custom pages, so an image uploaded for a page can be found again instead of being lost the moment it is taken back out of the text. An image can only be placed once the sizes the website serves have been rendered, which a worker reports over Mercure, and removing one throws away its cached variants as well. `app:page:migrate-images` files the images of the pages that already exist, and `app:page:prune-images` clears out daily what was uploaded to a page that was never finished.
+* Added `meeting:` to the decision search, which takes a meeting number and optionally a point and a decision number, and puts the meeting it asks for at the top of the results.
+* Added deletion of a stored query to the register, and reworked the way the stored queries are listed and picked.
+* Added the English text of a free-text decision as a required field, since there was never a way to submit one and every such decision was read in English as the notice that the secretary had not done their job. Existing decisions without a translation can be filled in from the same form.
+* Added keyboard navigation to tagging a photo. The arrows move through the suggestions and `Enter` takes the highlighted one, `Shift` and `Enter` goes to placing instead, where the arrows move a crosshair over the photo. A letter each for the rest of the toolbar while a photo is open, and `Escape` now backs out of the suggestions and then out of the field before it closes the viewer.
+* Added a notice to an administrator reading the website while maintenance is on, which says whether the site is closed or read-only for everybody else and links to the maintenance page. It stands in place of the usual administrator notice rather than beside it.
+* Added the rainbow navigation bar back for the board, in colours of its own in the dark theme so that it is not a wall of neon.
+* Added a mark on the photo of the week in the album grids: a gold ring, a star in the corner and a sheen that sweeps over the thumbnail every few seconds, where the old website gave it a bigger thumbnail.
+* Improved sudo mode by asking for it once for everything under `/{_locale}/admin` rather than per controller and per method, and by granting it for a while on signing in, as GitHub does.
+* Improved the realtime notifications by holding one connection per browser instead of one per tab. Whichever tab wins a Web Lock opens the connection and passes what arrives to the rest over a `BroadcastChannel`, so a notification is drawn once and dismissing it dismisses it everywhere. Closing that tab hands the connection to the next one without either of them arranging anything, and a tab on its way into the back/forward cache stands down.
+* Improved seeding, which drops and rebuilds both schemas so that it returns a clean state rather than whatever was left of the previous one.
+* Improved the image handling in CI, which tested against GD while every other environment runs libvips.
+* Improved the caching of the migration check in CI, which cached one of the two things it was asked to.
+* Changed the Mercure authorization to be granted per URI template instead of being written fresh on every render, so a second tab on another page no longer replaces the topics the first one is listening to. It can also be refreshed without reloading the page.
+* Fixed an issue where the topic a device listened on to be signed out remotely was the remember-me series itself, which is not something to publish.
+* Fixed an issue where a device with more than one tab open read as a replayed remember-me cookie and was signed out of every device the account was signed in on. The token a rotation replaces is now accepted for another minute, and a rotation only writes when the row still holds the token that was read.
+* Fixed an issue where the sudo grants of both firewalls were kept in one place with nothing to tell them apart.
+* Fixed an issue where the other sessions of an account were left open when the way into that account changed.
+* Fixed an issue where resetting a password over email left every device recognised, although that is the way in somebody takes when they think their account has been reached. Changing the password from the security page and turning a second factor on or off already forgot them.
+* Fixed an issue where a device stopped being recognised the moment its session lapsed, so an account signing in again after ninety days of daily use was told about a new device.
+* Fixed an issue where a session that had not been used for thirty days was kept until the ninety-day cleaning.
+* Fixed an issue where the front page and the poll archive showed the poll closing furthest away and dropped the rest, although approving a poll is also scheduling it and nothing stops the board from agreeing to a second question while the first one is open. Both now show every poll that is still running, the one closing first at the front.
+* Fixed an issue where the poll panel on the front page rendered nothing at all when no poll was running, which left the page without a way through to the archive. It falls back to the question that closed most recently and how it went.
+* Fixed an issue where the board could not keep its own meetings. The agenda, the documents filed under a meeting and its minutes are the board's; what was decided in it stays with the register.
+* Fixed an issue where the checker refused a Sports Council founded in a General Members Meeting, and where it held a key code granted before 2020 to a term of at most a year.
+* Fixed an issue where a house number of more than two parts was refused.
+* Fixed an issue where the board functions of a member were not shown on their profile, which was missed in the move to Symfony.
+* Fixed an issue where a birthday photo linked to the album it came from rather than to the album of the member it is of, and where the photos were shown in the same order every time.
+* Fixed an issue where the link for ordering a book was wrong.
+* Fixed an issue where user-visible messages were written where the extractor cannot see them, which left them untranslated.
+* Fixed an issue where the Mercure hub kept a history of what it had sent.
+* Fixed an issue where the development environment named the Mercure hub at an address it does not answer on.
+* Fixed a number of styling issues on the dashboard, the navigation bar, the profile and the photo pages, among them elements fighting over what sits on top and a few that did not hold up in the dark theme.
+
+### [v5.2.1](https://github.com/GEWIS/radix/tree/v5.2.1) (2026-08-27)
+
+* Added `failed_fallback` on RabbitMQ for a failure that cannot be written to the database, which `app:messenger:recover-failures` moves back into `failed` every ten minutes. Losing an envelope now takes both stores being unreachable at once.
+* Added a connection timeout to both database connections, which bounds the attempt to connect but cannot end a query that has already started.
+* Improved the workers, which no longer end their process when the broker goes away: a receive that throws yields nothing, so the worker sleeps and asks again in the process it already has. Only receiving is caught, as a failing acknowledgement has to stay an error or a message the broker will hand out again is reported as handled.
+* Improved the entrypoint, which no longer exits on an unreachable database, so a container restarted during an outage comes up to serve the maintenance page instead of crash-looping. It records that it did not migrate and leaves a retry behind, and the healthcheck stays red until both databases answer with nothing left to migrate.
+* Improved the restart of a worker by keeping an opcache file cache, so it no longer costs a full recompile.
+* Changed `/health` to answer the container's own probe over the loopback and nothing else, as it opens both connections on every request and during an outage that is two connect timeouts holding one of the eight FrankenPHP worker threads.
+* Changed the production log to the shared `data` volume, with a copy on stderr, because `var/` belongs to a single container and is orphaned with it.
+* Fixed an issue where a scheduled command whose retries were spent took the website and the host under it down. The failure was written to `failed`, which is the database that was unreachable, the exception left the worker loop, `messenger:consume` exited before the message was rejected, and RabbitMQ handed it straight back to the container Docker had just restarted.
+
 ### [v5.2.0](https://github.com/GEWIS/radix/tree/v5.2.0) (2026-08-26)
 
 * Added a queue overview to the administration, which reports what each transport holds and lists the messages that failed, without acknowledging, retrying or removing any of them.

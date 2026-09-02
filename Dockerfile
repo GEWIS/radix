@@ -1,16 +1,14 @@
 #syntax=docker/dockerfile:1
 ARG PHP_VERSION=8.5
 ARG FRANKENPHP_VERSION=1.12
+# The IP databases device recognition and security notices read, baked in so a first start never waits on their
+# host. They live outside /app/data because the volume mounts over it; the entrypoint seeds that volume from them
+# and app:user:update-ip-databases keeps it fresh. Pinned to a commit so the layer caches, as IPLocate rebuilds
+# daily. Keep this above the first `FROM`, or the stage below redeclares it empty and the URL 404s.
+ARG IPLOCATE_REVISION=8709782118044da2208506dc8f161af34d6dc7e0
 
 FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_upstream
 
-# The IP databases device recognition and security notices read, baked in so the file is always present: a first
-# start never waits on their host being up. The entrypoint seeds the `data` volume from these (the volume mounts
-# over /app/data, so they must live outside it) and app:user:update-ip-databases keeps the volume copy fresh, from
-# MaxMind's GeoLite editions where a deployment has credentials. Always IPLocate here: GeoLite downloads are capped
-# per day and need a key, which a build must not embed. Pinned to a commit so the layer caches; IPLocate rebuilds
-# daily, and an unpinned URL would fetch some ninety megabytes on every build. The pin only ages this seed.
-ARG IPLOCATE_REVISION=8709782118044da2208506dc8f161af34d6dc7e0
 FROM scratch AS radix_geoip
 ARG IPLOCATE_REVISION
 ADD https://media.githubusercontent.com/media/iplocate/ip-address-databases/${IPLOCATE_REVISION}/ip-to-asn/ip-to-asn.mmdb /ip-to-asn.mmdb
