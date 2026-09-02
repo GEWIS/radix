@@ -30,6 +30,12 @@ use function sprintf;
  *
  * What that means per domain, and what may not be removed regardless, is the domain's own to say through a
  * {@see \App\Service\Application\StaleRevisionPolicyInterface}; {@see StaleRevisionCleaner} does the rest.
+ *
+ * A domain that refuses to let an aggregate go says whether the refusal may be overruled, and `--force` overrules the
+ * ones that may be. In practice that is the activity whose sign-up lists have sign-ups on them: an activity nobody
+ * ever approved is not reachable from anywhere on the site, so neither are the sign-ups on it, and the pair sits in
+ * the skipped column of every nightly run for good. A vote, a comment, a sold package and a representative's account
+ * are not overruled by anything, forced or not.
  */
 #[AsCommand(
     name: 'app:application:delete-stale-revisions',
@@ -62,6 +68,12 @@ final class DeleteStaleRevisionsCommand extends Command
             InputOption::VALUE_NONE,
             'Report what would be removed without changing anything.',
         );
+        $this->addOption(
+            'force',
+            null,
+            InputOption::VALUE_NONE,
+            'Also remove abandoned activities that have sign-ups on them, which a scheduled run leaves standing.',
+        );
     }
 
     #[Override]
@@ -87,23 +99,41 @@ final class DeleteStaleRevisionsCommand extends Command
             $output,
         );
         $dryRun = true === $input->getOption('dry-run');
+        $force = true === $input->getOption('force');
         $cutoff = new DateTime(sprintf('-%d days', self::STALE_AFTER_DAYS));
 
+        // Only the run that is actually going to do it asks. A dry run reports what forcing would reach, which is the
+        // list an operator wants in front of them before answering this, and answering "no" here would hide it.
+        if (
+            $force
+            && !$dryRun
+            && !$io->confirm(
+                'Forcing removes abandoned activities together with the sign-ups on them, which cannot be undone. '
+                . 'Do you want to continue?',
+                !$input->isInteractive(),
+            )
+        ) {
+            return Command::SUCCESS;
+        }
+
         $this->logger->info(sprintf(
-            'Cleaning up revisions left untouched since %s.%s',
+            'Cleaning up revisions left untouched since %s.%s%s',
             $cutoff->format('Y-m-d'),
             $dryRun ? ' (dry-run)' : '',
+            $force ? ' (forced)' : '',
         ));
 
         $report = $this->staleRevisionCleaner->clean(
             $cutoff,
             $dryRun,
+            $force,
         );
 
         $message = sprintf(
-            'Reverted %d revision(s) to live, deleted %d abandoned, skipped %d, reclaimed %d file(s).%s',
+            'Reverted %d revision(s) to live, deleted %d abandoned (%d forced), skipped %d, reclaimed %d file(s).%s',
             $report->reverted,
             $report->deleted,
+            $report->forced,
             $report->skipped,
             $report->filesReclaimed,
             $dryRun ? ' (dry-run; nothing changed)' : '',

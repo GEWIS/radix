@@ -29,6 +29,11 @@ use function sprintf;
  * thing it describes has happened yet, what would make removing it wrong, and which stored files would be orphaned by
  * removing a revision. Nothing here knows what an activity, a vacancy or a poll is.
  *
+ * A forced run overrules the objections a domain marked {@see StaleRevisionDeletionBlock::forceable()} and leaves the
+ * rest standing, which is why an objection carries that answer rather than the caller deciding per domain. Nothing
+ * else about the run changes: a forced run still only reaches heads that are stale, unapproved and never approved,
+ * so `--force` widens what may go and never how far back the cleanup looks.
+ *
  * Files are reclaimed last, after the rows that named them are committed, because {@see FileStorage::remove()} asks
  * every domain whether the path is still referenced and must be answered from committed state. A crash between the
  * two leaves a file nothing points at, which costs disk and nothing else; the opposite order would take the bytes
@@ -52,15 +57,18 @@ final readonly class StaleRevisionCleaner
 
     /**
      * Clean up everything abandoned since the cutoff. A dry run counts and logs exactly what a real run would do, and
-     * touches neither the database nor the storage.
+     * touches neither the database nor the storage; a forced run additionally removes the aggregates whose domain
+     * objected in a way it said may be overruled.
      */
     public function clean(
         DateTime $cutoff,
         bool $dryRun = false,
+        bool $force = false,
     ): StaleRevisionCleanupReport {
         $now = new DateTime();
         $reverted = 0;
         $deleted = 0;
+        $forced = 0;
         $skipped = 0;
 
         /** @var list<string> $orphanedPaths */
@@ -110,18 +118,28 @@ final readonly class StaleRevisionCleaner
                     continue;
                 }
 
+                // What the domain objected to, once it is going ahead anyway; null when it did not object at all.
+                $overruled = null;
+
                 $blockedBy = $policy->deletionBlockedBy($revisable);
                 if (null !== $blockedBy) {
-                    ++$skipped;
-                    $this->logger->warning(sprintf(
-                        '%s #%d: abandoned %s revision kept because %s.',
-                        $revisable->getResourceId(),
-                        $revisable->getId() ?? 0,
-                        $revision->getStatus()->value,
-                        $blockedBy,
-                    ));
+                    if (
+                        !$force
+                        || !$blockedBy->forceable
+                    ) {
+                        ++$skipped;
+                        $this->logger->warning(sprintf(
+                            '%s #%d: abandoned %s revision kept because %s.',
+                            $revisable->getResourceId(),
+                            $revisable->getId() ?? 0,
+                            $revision->getStatus()->value,
+                            $blockedBy->reason,
+                        ));
 
-                    continue;
+                        continue;
+                    }
+
+                    $overruled = $blockedBy->reason;
                 }
 
                 foreach ($revisable->getRevisions() as $chained) {
@@ -135,11 +153,25 @@ final readonly class StaleRevisionCleaner
                 }
 
                 ++$deleted;
-                $this->logger->info(sprintf(
-                    '%s #%d: deleted entirely (never approved, abandoned as %s).',
+
+                if (null === $overruled) {
+                    $this->logger->info(sprintf(
+                        '%s #%d: deleted entirely (never approved, abandoned as %s).',
+                        $revisable->getResourceId(),
+                        $revisable->getId() ?? 0,
+                        $revision->getStatus()->value,
+                    ));
+
+                    continue;
+                }
+
+                ++$forced;
+                $this->logger->warning(sprintf(
+                    '%s #%d: deleted entirely on a forced run (never approved, abandoned as %s) even though %s.',
                     $revisable->getResourceId(),
                     $revisable->getId() ?? 0,
                     $revision->getStatus()->value,
+                    $overruled,
                 ));
             }
         }
@@ -150,6 +182,7 @@ final readonly class StaleRevisionCleaner
             return new StaleRevisionCleanupReport(
                 $reverted,
                 $deleted,
+                $forced,
                 $skipped,
                 0,
             );
@@ -160,6 +193,7 @@ final readonly class StaleRevisionCleaner
         return new StaleRevisionCleanupReport(
             $reverted,
             $deleted,
+            $forced,
             $skipped,
             $this->reclaim($orphanedPaths),
         );

@@ -7,6 +7,7 @@ namespace App\Service\Decision;
 use App\Entity\Application\RevisableInterface;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Decision\OrganInformationRevision;
+use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
 use DateTime;
 use Override;
@@ -38,7 +39,7 @@ final readonly class OrganPageStaleRevisionPolicy implements StaleRevisionPolicy
     }
 
     #[Override]
-    public function deletionBlockedBy(RevisableInterface $revisable): ?string
+    public function deletionBlockedBy(RevisableInterface $revisable): ?StaleRevisionDeletionBlock
     {
         return null;
     }

@@ -8,6 +8,7 @@ use App\Entity\Application\RevisableInterface;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Frontpage\Poll;
 use App\Entity\Frontpage\PollRevision;
+use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
 use DateTime;
 use Override;
@@ -51,20 +52,20 @@ final readonly class PollStaleRevisionPolicy implements StaleRevisionPolicyInter
     }
 
     #[Override]
-    public function deletionBlockedBy(RevisableInterface $revisable): ?string
+    public function deletionBlockedBy(RevisableInterface $revisable): ?StaleRevisionDeletionBlock
     {
         if (!$revisable instanceof Poll) {
             return null;
         }
 
         if (!$revisable->getComments()->isEmpty()) {
-            return 'it has already been commented on';
+            return StaleRevisionDeletionBlock::hard('it has already been commented on');
         }
 
         foreach ($revisable->getRevisions() as $revision) {
             foreach ($revision->getOptions() as $option) {
                 if ($option->getVotesCount() > 0) {
-                    return 'somebody has already voted on it';
+                    return StaleRevisionDeletionBlock::hard('somebody has already voted on it');
                 }
             }
         }
