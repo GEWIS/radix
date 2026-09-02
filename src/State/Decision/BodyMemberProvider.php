@@ -106,7 +106,7 @@ final readonly class BodyMemberProvider implements ProviderInterface
             $resources[] = new BodyMemberResource(
                 lidnr: $member->getLidnr(),
                 fullName: $member->getFullName(),
-                function: $installation->getFunction()->value,
+                function: $installation->getFunction(),
                 installDate: $installation->getInstallDate()->format(DateTimeInterface::ATOM),
                 dischargeDate: $installation->getDischargeDate()?->format(DateTimeInterface::ATOM),
                 current: $installation->isCurrent(),

@@ -9,7 +9,6 @@ use ApiPlatform\State\ProviderInterface;
 use App\EventListener\Api\VendorAcceptListener;
 use App\Service\Report\ApiService;
 use Override;
-use PHLAK\SemVer\Version as SemanticVersion;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,12 +44,17 @@ final readonly class MinimumVersionProvider implements ProviderInterface
         array $uriVariables = [],
         array $context = [],
     ): object|array|null {
-        $minimum = $operation->getExtraProperties()[ApiVersion::MINIMUM] ?? null;
+        $extra = $operation->getExtraProperties();
+        $minimum = $extra[ApiVersion::MINIMUM] ?? null;
+        $maximum = $extra[ApiVersion::MAXIMUM] ?? null;
 
-        if (is_string($minimum)) {
+        if ($minimum instanceof ApiVersion) {
+            // The upper bound is optional, and an operation without one answers every version from its minimum
+            // onwards. Deprecation carries no bound at all: it is stated in the document and enforced by nothing,
+            // so a consumer that has not moved yet keeps being served.
             $this->apiService->assertVersion(
-                new SemanticVersion($minimum),
-                null,
+                $minimum,
+                $maximum instanceof ApiVersion ? $maximum : null,
                 $this->negotiated($context),
             );
         }

@@ -288,13 +288,25 @@ never answers 400.
 A permission that names people is enforced twice — as the operation gate, and as a row filter for deleted members
 (`ApiPermissions::MembersDeleted`) applied in the query rather than to the page, or the totals stop matching.
 
-**Everything added when the API moved onto API Platform requires a contract version**, declared either as
-`Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` or as `X-Api-Version: 5.0.0` — the second exists because
-OpenAPI requires tooling to ignore an `Accept` parameter, so Swagger UI cannot send the first. A new operation says
-so with `extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT]` and
-`App\State\Api\MinimumVersionProvider` enforces it, after the permission check and before the read. The member
-endpoints that predate the versioned contract keep answering without one; that list is
-`ApiOpenApiFactory::UNVERSIONED_PATHS` and it does not grow.
+**Everything added when the API moved onto API Platform requires a contract version**, declared either as `Accept:
+application/vnd.gewis.gewisdb+json;version=5.0.0` or as `X-Api-Version: 5.0.0` — the second exists because OpenAPI
+requires tooling to ignore an `Accept` parameter, so Swagger UI cannot send the first. The header states the contract
+the **consumer** was written against; what an **endpoint** requires is declared per operation, as `extraProperties:
+[ApiVersion::MINIMUM => ApiVersion::V5_0_0]`, optionally with `ApiVersion::MAXIMUM` for one kept alive only until its
+consumers have moved and `ApiVersion::DEPRECATED` to mark it deprecated in the document.
+`App\State\Api\MinimumVersionProvider` enforces the range, after the permission check and before the read, and
+`ApiOpenApiFactory` publishes it as `x-gewis-version-minimum` so a generated client reads the bound rather than the
+prose. **A bound is always a literal**, frozen at the release it describes: a shared constant would move every release
+and retroactively refuse every consumer of every endpoint declaring it, which is why `ApiVersion` holds no release
+version at all, and neither does the configuration: `info.version` is the newest bound any operation declares, worked
+out by the factory, so it moves when the contract does and at no other time. The release is the git tag and stays
+there. The two function lists are not resources and carry the oldest bound the API still enforces,
+`ApiService::FUNCTIONS_MINIMUM_VERSION`, which is why that constant seeds the calculation rather than a number written
+into the factory. **A bound is an `ApiVersion` case, never a string**: both the provider and the factory match on the
+type, so a string is silently no bound at all, which is an endpoint shipped with no gate and nothing saying so. An
+operation that declares no bound gets no version parameter and no 406, because `MinimumVersionProvider` enforces
+nothing for it and the document must not claim otherwise. That one rule is also why the member endpoints predating the
+versioned contract keep answering without a version: they declare no bound, and none should be added to them.
 
 Swagger UI answers on **`/api-docs`**, deliberately outside `^/api`: a browser cannot send an `Authorization` header
 on the first navigation, so behind the bearer wall the page could never render. It is public, because `openapi.yaml`

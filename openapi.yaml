@@ -36,7 +36,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/Activity' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -44,7 +44,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -58,6 +62,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -70,6 +78,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get activities'
       description: 'The publicly visible activities, paged. Upcoming ones by default, the one starting soonest first; `past=true` asks for the ones that have already finished, the most recent first. `category` narrows to a single category and `organ` to the body organising it, by its identifier; a `category` naming no known category is ignored rather than refused. A cancelled activity is listed, with `cancelled` set; an activity the board unpublished is not listed at all.'
       parameters:
@@ -87,11 +105,11 @@ paths:
         -
           name: category
           in: query
-          description: 'Narrow the list to a single category, e.g. `social-drink` or `career`, as `category` on an activity states it. A value naming no known category is ignored rather than refused.'
+          description: 'Narrow the list to a single category, as `category` on an activity states it. A value naming no known category is ignored rather than refused.'
           required: false
           deprecated: false
           schema:
-            type: string
+            $ref: '#/components/schemas/ActivityCategoryEnum'
           style: form
           explode: true
         -
@@ -131,7 +149,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -140,6 +158,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/activities/{id}':
     get:
       operationId: api_activity
@@ -156,20 +175,28 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/Activity' }
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such resource, or none the principal may see.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -183,6 +210,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -195,6 +226,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get an activity'
       description: 'A single activity by identifier. An activity that has never been approved, and one the board has unpublished, are both not public and answer 404 — the same as an identifier that names nothing.'
       parameters:
@@ -211,7 +252,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -220,6 +261,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/photos/albums/{id}/photos':
     get:
       operationId: api_photos_album_photos
@@ -231,7 +273,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '200':
           description: 'AlbumPhoto collection'
           content:
@@ -242,7 +288,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/AlbumPhoto' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -250,7 +296,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -264,6 +314,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -276,6 +330,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get the photos of an album'
       description: 'The photos of one published album, oldest first, paged. Photos of a sub-album belong to that sub-album and are read from its own collection. An album that does not exist, or that has not been published, is a missing resource.'
       parameters:
@@ -316,7 +380,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -325,6 +389,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   /api/boards:
     get:
       operationId: api_boards
@@ -341,7 +406,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/BoardMember' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -349,7 +414,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -363,6 +432,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -375,6 +448,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get board installations'
       description: 'Every member currently serving on the board, newest installation first, paged. Set `includeFormer` to also get the installations that have been released or discharged; they are told apart by `current`.'
       parameters:
@@ -416,7 +499,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -425,6 +508,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   /api/bodies:
     get:
       operationId: api_bodies
@@ -441,7 +525,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/Body' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -449,7 +533,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -463,6 +551,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -475,17 +567,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get bodies'
       description: 'The bodies of the association, paged and ordered by abbreviation. Only the bodies that still exist, unless `includeAbrogated` asks for the abrogated ones as well; `type` narrows the list to one kind of body, and a value naming no kind is ignored rather than refused.'
       parameters:
         -
           name: type
           in: query
-          description: 'Narrow the list to one kind of body: `committee`, `avc`, `fraternity`, `kcc`, `avw`, `rva` or `sc`. A value naming no kind of body is ignored rather than refused.'
+          description: 'Narrow the list to one kind of body. A value naming no kind of body is ignored rather than refused.'
           required: false
           deprecated: false
           schema:
-            type: string
+            $ref: '#/components/schemas/BodyTypeEnum'
           style: form
           explode: true
         -
@@ -526,7 +628,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -535,6 +637,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/bodies/{id}':
     get:
       operationId: api_body
@@ -551,20 +654,28 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/Body' }
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such resource, or none the principal may see.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -578,6 +689,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -590,6 +705,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get a body'
       description: 'A single body by id, abrogated or not: a consumer that already holds the id is asking about that body in particular, and whether it still exists is the answer rather than the question. An id no body is stored under is a missing resource: 404.'
       parameters:
@@ -606,7 +731,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -615,6 +740,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/bodies/{id}/members':
     get:
       operationId: api_body_members
@@ -626,7 +752,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '200':
           description: 'BodyMember collection'
           content:
@@ -637,7 +767,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/BodyMember' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -645,7 +775,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -659,6 +793,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -671,6 +809,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get the members of a body'
       description: 'Everyone currently installed in the body, paged and ordered by membership number. Set `includeDischarged` to also get the installations that have ended; they are told apart by `current`. An id no body is stored under is a missing resource (404) rather than an empty page, so a consumer syncing a group can tell a body nobody sits in from a body that does not exist.'
       parameters:
@@ -722,7 +870,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -731,6 +879,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   /api/example404:
     get:
       operationId: example404
@@ -746,6 +895,26 @@ paths:
                 type: string
         '404':
           description: 'What any address under `/api` that answers nothing looks like.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-router-no-match
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
           content:
             application/json:
               schema:
@@ -765,6 +934,16 @@ paths:
               description: 'The challenge, always `Bearer realm="/api"`.'
               schema:
                 type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'What a failing endpoint looks like.'
           content:
@@ -789,26 +968,51 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/FunctionList' }
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
-          content:
-            application/json:
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                type: string
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '406':
           description: 'The `Accept` header named no API version, named one this endpoint does not serve, or could not be parsed.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -827,13 +1031,14 @@ paths:
           schema:
             type: string
             examples:
-              - 5.0.0
+              - 4.3.3
           style: simple
           explode: false
       security:
         -
           api_auth:
             - boards_functionslist_read
+      x-gewis-version-minimum: 4.3.3
   /api/organFunctions:
     get:
       operationId: getOrganFunctions
@@ -850,26 +1055,51 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/FunctionList' }
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
-          content:
-            application/json:
+          headers:
+            WWW-Authenticate:
+              description: 'The challenge, always `Bearer realm="/api"`.'
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                type: string
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '406':
           description: 'The `Accept` header named no API version, named one this endpoint does not serve, or could not be parsed.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -888,13 +1118,14 @@ paths:
           schema:
             type: string
             examples:
-              - 5.0.0
+              - 4.3.3
           style: simple
           explode: false
       security:
         -
           api_auth:
             - organs_functionslist_read
+      x-gewis-version-minimum: 4.3.3
   /api:
     get:
       operationId: getHealthAtRoot
@@ -919,7 +1150,21 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -957,7 +1202,21 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -986,7 +1245,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/Keyholder' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -994,7 +1253,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1008,6 +1271,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1020,6 +1287,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get keyholders'
       description: "Every member who currently holds a key to the association's rooms, paged. Set `includeExpired` to also get the grantings that have expired or been withdrawn; they are told apart by `current`."
       parameters:
@@ -1061,7 +1338,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1070,6 +1347,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   /api/mailing-lists:
     get:
       operationId: api_mailing_lists
@@ -1086,7 +1364,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/MailingList' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1094,7 +1372,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1108,6 +1390,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1120,6 +1406,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get mailing lists'
       description: 'Every mailing list the association keeps, paged and ordered by name.'
       parameters:
@@ -1150,7 +1446,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1159,6 +1455,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/mailing-lists/{name}':
     get:
       operationId: api_mailing_list
@@ -1175,20 +1472,28 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/MailingList' }
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such resource, or none the principal may see.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1202,6 +1507,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1214,6 +1523,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get a mailing list'
       description: 'A single mailing list by the name that identifies it. A name no list is stored under is a missing resource: 404.'
       parameters:
@@ -1230,7 +1549,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1239,6 +1558,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/mailing-lists/{name}/members':
     get:
       operationId: api_mailing_list_members
@@ -1250,7 +1570,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '200':
           description: 'MailingListMember collection'
           content:
@@ -1261,7 +1585,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/MailingListMember' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1269,7 +1593,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1283,6 +1611,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1295,6 +1627,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get the subscribers of a mailing list'
       description: 'Everyone currently subscribed to the named mailing list, paged and ordered by membership number. A name no list is stored under is a missing resource (404) rather than an empty page, so a consumer can tell a list nobody is on from a list that does not exist. A subscription belonging to a deleted member is part of the page only for a principal holding `members_deleted`.'
       parameters:
@@ -1335,7 +1677,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1344,6 +1686,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   /api/members:
     get:
       operationId: api_members
@@ -1360,7 +1703,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/Member' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1368,7 +1711,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1382,6 +1729,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1442,7 +1793,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/Member' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1450,7 +1801,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1464,6 +1819,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1524,7 +1883,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/Member' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1532,7 +1891,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1546,6 +1909,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1558,6 +1925,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get members celebrating a birthday'
       description: 'Members whose birthday falls today, or within the next `days` days. Members who asked for their birthday not to be published are never part of this list.'
       parameters:
@@ -1601,7 +1978,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1610,6 +1987,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/members/{lidnr}':
     get:
       operationId: api_member
@@ -1628,14 +2006,18 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/Member' }
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1649,6 +2031,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1679,7 +2065,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '200':
           description: 'MemberBody collection'
           content:
@@ -1690,7 +2080,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/MemberBody' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1698,7 +2088,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1712,6 +2106,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1724,6 +2122,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get the bodies a member is installed in'
       description: 'Every body the member currently sits in, paged and ordered by abbreviation. Set `includeDischarged` to also get the installations that have ended; they are told apart by `current`. A membership number no member is stored under is a missing resource (404) rather than an empty page, so a consumer can tell a member who sits in nothing from one that does not exist.'
       parameters:
@@ -1775,7 +2183,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1784,6 +2192,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/photos/{id}/image/{variant}':
     get:
       operationId: getPhotoImage
@@ -1809,19 +2218,43 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such photo, no such rendition, or the album it belongs to is not published.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '503':
           description: 'The rendition exists but is not generated yet; its generation has been queued. Retry after the number of seconds in the `Retry-After` header.'
           content:
             text/plain:
               schema:
                 type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
       summary: 'Get a rendition of a photo'
       description: "Album originals are private and are served signed at `/img`, which is outside this API's firewall, so a bearer token cannot fetch one there. This serves the same bytes where the token does authenticate."
       parameters:
@@ -1865,7 +2298,7 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { type: array, items: { $ref: '#/components/schemas/PhotoAlbum' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
         '403':
@@ -1873,7 +2306,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1887,6 +2324,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1899,6 +2340,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get photo albums'
       description: 'Every published photo album, sub-albums included, most recent first. An album with no date sorts last.'
       parameters:
@@ -1929,7 +2380,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -1938,6 +2389,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/photos/albums/{id}':
     get:
       operationId: api_photos_album
@@ -1954,20 +2406,28 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/PhotoAlbum' }
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such resource, or none the principal may see.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -1981,6 +2441,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -1993,6 +2457,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get a photo album'
       description: 'A single published photo album with the published albums below it. Its photos are paged, and are read from `/api/photos/albums/{id}/photos`, which `photosUrl` addresses.'
       parameters:
@@ -2009,7 +2483,7 @@ paths:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -2018,6 +2492,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
   '/api/photos/albums/{id}/cover/{variant}':
     get:
       operationId: getAlbumCover
@@ -2043,19 +2518,43 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such album, no cover generated for it, no such rendition, or the album is not published.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '503':
           description: 'The rendition exists but is not generated yet; its generation has been queued. Retry after the number of seconds in the `Retry-After` header.'
           content:
             text/plain:
               schema:
                 type: string
+        '429':
+          description: 'The principal asked for more than it is allowed in a minute. `Retry-After` says how long to wait.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
+        '500':
+          description: 'Something went wrong. Most likely permanently.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
       summary: 'Get a rendition of an album cover'
       description: "A cover is a mosaic generated from the album rather than one of its photos, so it has no address among them. Served here for the same reason the photo renditions are: `/img` is outside this API's firewall."
       parameters:
@@ -2099,20 +2598,28 @@ paths:
                   - status
                   - data
                 properties:
-                  status: { $ref: '#/components/schemas/ResponseStatusEnum' }
+                  status: { type: string, enum: [success] }
                   data: { $ref: '#/components/schemas/PhotoOfTheWeek' }
         '403':
           description: 'The principal does not hold the permission this endpoint needs.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorForbidden'
+              example:
+                status: forbidden
+                error:
+                  type: User\Model\Exception\NotAllowed
         '404':
           description: 'No such resource, or none the principal may see.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseError'
+                $ref: '#/components/schemas/ResponseErrorNotFound'
+              example:
+                status: notfound
+                error:
+                  type: error-resource-not-found
         '401':
           description: 'No bearer token was given, or it is not known. The body is empty.'
           headers:
@@ -2126,6 +2633,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              example:
+                status: error
+                error:
+                  type: error-rate-limited
         '500':
           description: 'Something went wrong. Most likely permanently.'
           content:
@@ -2138,13 +2649,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseError'
+              examples:
+                App\Exception\Report\VersionExpected:
+                  summary: 'The consumer stated none.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionExpected } }
+                App\Exception\Report\VersionIncompatible:
+                  summary: 'The consumer stated one this endpoint does not serve.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionIncompatible } }
+                App\Exception\Report\VersionFormat:
+                  summary: 'The consumer stated one that could not be parsed.'
+                  value: { status: error, error: { type: Database\Model\Exception\VersionFormat } }
       summary: 'Get the photo of the week'
       description: 'The photo that won the vote of the week that just passed, with the address its public copy is served from. A week nobody voted in, and a photo of the week that has been hidden, are both a missing resource.'
       parameters:
         -
           name: X-Api-Version
           in: header
-          description: 'The contract version this consumer speaks. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
+          description: 'The contract this consumer was written against, which is a property of the consumer rather than of this endpoint. This one answers 5.0.0 and every release after it. Required: this endpoint did not exist before the contract was versioned. `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` says the same thing, but OpenAPI requires tooling to ignore an `Accept` parameter, so it cannot be offered here.'
           required: true
           deprecated: false
           schema:
@@ -2153,6 +2674,7 @@ paths:
               - 5.0.0
           style: simple
           explode: false
+      x-gewis-version-minimum: 5.0.0
 components:
   schemas:
     Activity:
@@ -2217,8 +2739,8 @@ components:
           description: 'When the activity ends, in the `Y-m-d\TH:i:sP` format.'
           type: string
         category:
-          description: 'The single category the activity is filed under, e.g. `social-drink` or `career`. `uncategorised` is only ever carried by activities that predate categories.'
-          type: string
+          description: 'The single category the activity is filed under. `uncategorised` is only ever carried by activities that predate categories.'
+          $ref: '#/components/schemas/ActivityCategoryEnum'
         organ:
           description: 'The body organising the activity, or null when no body does.'
           type:
@@ -2342,7 +2864,7 @@ components:
           type: string
         function:
           description: 'The function held. It is in Dutch because that is the language the decision was made in; `/boardFunctions` lists every value there is with its translations.'
-          type: string
+          $ref: '#/components/schemas/BoardFunctionEnum'
         installDate:
           description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.'
           type: string
@@ -2372,8 +2894,8 @@ components:
         name:
           type: string
         type:
-          description: 'The kind of body: one of `committee`, `avc`, `fraternity`, `kcc`, `avw`, `rva` or `sc`.'
-          type: string
+          description: 'The kind of body.'
+          $ref: '#/components/schemas/BodyTypeEnum'
         foundationDate:
           description: 'When the founding decision took effect, in the `Y-m-d\TH:i:sP` format.'
           type: string
@@ -2396,7 +2918,7 @@ components:
           type: string
         function:
           description: 'The function held in the body. It is in Dutch because that is the language the decision was made in and the register stores it verbatim; `/organFunctions` lists every value there is with its translations.'
-          type: string
+          $ref: '#/components/schemas/OrganFunctionEnum'
         installDate:
           description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.'
           type: string
@@ -2408,39 +2930,6 @@ components:
         current:
           description: 'Whether the member sits in the body today. Always true unless `includeDischarged` asked for the installations that have ended.'
           type: boolean
-    Error:
-      type: object
-      description: 'A representation of common errors.'
-      properties:
-        title:
-          readOnly: true
-          description: 'A short, human-readable summary of the problem.'
-          type:
-            - string
-            - 'null'
-        detail:
-          readOnly: true
-          description: 'A human-readable explanation specific to this occurrence of the problem.'
-          type:
-            - string
-            - 'null'
-        status:
-          type:
-            - integer
-            - 'null'
-          examples:
-            - 404
-          default: 400
-        instance:
-          readOnly: true
-          description: 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.'
-          type:
-            - string
-            - 'null'
-        type:
-          readOnly: true
-          description: 'A URI reference that identifies the problem type'
-          type: string
     Keyholder:
       type: object
       description: "A member holding a key to the association's rooms. Currently valid grants by default; `includeExpired` asks for the ones that have run out or been withdrawn."
@@ -2528,7 +3017,7 @@ components:
                   id: { type: integer }
                   abbreviation: { type: string }
               function:
-                type: string
+                $ref: '#/components/schemas/OrganFunctionEnum'
               installDate:
                 type: string
                 format: date-time
@@ -2566,10 +3055,12 @@ components:
             - boolean
             - 'null'
         membership_type:
-          description: 'One of `ordinary`, `external`, `graduate` or `honorary`.'
-          type:
-            - string
-            - 'null'
+          description: 'The kind of membership the member holds.'
+          anyOf:
+            -
+              $ref: '#/components/schemas/MembershipTypeEnum'
+            -
+              type: 'null'
     MemberBody:
       type: object
       description: 'A member installed in a body, seen from the member.'
@@ -2585,10 +3076,10 @@ components:
             name:
               type: string
             type:
-              type: string
+              $ref: '#/components/schemas/BodyTypeEnum'
         function:
           description: 'The function held in the body. It is in Dutch because that is the language the decision was made in and the register stores it verbatim; `/organFunctions` lists every value there is with its translations.'
-          type: string
+          $ref: '#/components/schemas/OrganFunctionEnum'
         installDate:
           description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.'
           type: string
@@ -2709,13 +3200,79 @@ components:
           type:
             - string
             - 'null'
-    ResponseStatusEnum:
+    ActivityCategoryEnum:
       type: string
       enum:
-        - success
-        - error
-        - forbidden
-        - notfound
+        - active-social
+        - announcement
+        - career
+        - competition
+        - conference
+        - cultural
+        - education
+        - external
+        - interest-list
+        - interest-meeting
+        - meeting
+        - party
+        - promo-merch
+        - recreational
+        - save-the-date
+        - social-drink
+        - sports
+        - weekend
+        - workshop
+        - other
+        - uncategorised
+    BodyTypeEnum:
+      type: string
+      enum:
+        - committee
+        - avc
+        - fraternity
+        - kcc
+        - avw
+        - rva
+        - sc
+    MembershipTypeEnum:
+      type: string
+      enum:
+        - ordinary
+        - external
+        - graduate
+        - honorary
+    BoardFunctionEnum:
+      type: string
+      enum:
+        - Voorzitter
+        - Secretaris
+        - Penningmeester
+        - 'Commissaris Onderwijs'
+        - 'Commissaris Externe Betrekkingen'
+        - 'Commissaris Interne Betrekkingen'
+        - Onderwijscommissaris
+        - PR-Functionaris
+        - Vice-Voorzitter
+        - 'Brand Manager'
+        - 'Commissaris Carrièreontwikkeling en Externe Betrekkingen'
+        - 'Commissaris Digitale Infrastructuur'
+        - 'Commissaris Kennisbeheer'
+        - 'Commissaris Innovatie'
+        - 'Commissaris Verenigingsontwikkeling'
+        - 'Commissaris Digitale Innovatie'
+    OrganFunctionEnum:
+      type: string
+      enum:
+        - Voorzitter
+        - Secretaris
+        - Penningmeester
+        - Vice-Voorzitter
+        - Opperhoofd
+        - PR-Functionaris
+        - Tafelvoetbalcoordinator
+        - Inkoper
+        - Lid
+        - 'Inactief Lid'
     ResponseError:
       type: object
       required:
@@ -2723,14 +3280,52 @@ components:
         - error
       properties:
         status:
-          $ref: '#/components/schemas/ResponseStatusEnum'
+          type: string
+          enum:
+            - error
         error:
           type: object
           properties:
             type:
               type: string
-              examples:
-                - error-router-no-match
+            exception:
+              type:
+                - string
+                - 'null'
+    ResponseErrorForbidden:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: string
+          enum:
+            - forbidden
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            exception:
+              type:
+                - string
+                - 'null'
+    ResponseErrorNotFound:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: string
+          enum:
+            - notfound
+        error:
+          type: object
+          properties:
+            type:
+              type: string
             exception:
               type:
                 - string
@@ -2759,7 +3354,9 @@ components:
         - sync_paused
       properties:
         status:
-          $ref: '#/components/schemas/ResponseStatusEnum'
+          type: string
+          enum:
+            - success
         healthy:
           type: boolean
         sync_paused:

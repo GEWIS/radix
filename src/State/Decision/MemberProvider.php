@@ -294,7 +294,7 @@ final readonly class MemberProvider implements ProviderInterface
             )
                 ? $member->isKeyholder()
                 : null,
-            membershipType: $member->getType()->value,
+            membershipType: $member->getType(),
         );
     }
 

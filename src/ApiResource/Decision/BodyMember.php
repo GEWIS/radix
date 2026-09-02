@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
+use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\User\Enums\ApiPermissions;
 use App\State\Api\ApiVersion;
 use App\State\Decision\BodyMemberProvider;
@@ -57,7 +58,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::BodyMembersR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::BodyMembersR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_COLLECTION,
         ),
     ],
@@ -78,8 +79,9 @@ final readonly class BodyMember
             description: 'The function held in the body. It is in Dutch because that is the language the decision '
                 . 'was made in and the register stores it verbatim; `/organFunctions` lists every value there is '
                 . 'with its translations.',
+            openapiContext: ['$ref' => '#/components/schemas/OrganFunctionEnum'],
         )]
-        public string $function,
+        public InstallationFunctions $function,
         #[SerializedName('installDate')]
         #[ApiProperty(description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.')]
         public string $installDate,

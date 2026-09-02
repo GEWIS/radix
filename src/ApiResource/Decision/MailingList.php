@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::MailingListsR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::MailingListsR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_COLLECTION,
         ),
         new Get(
@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::MailingListsR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::MailingListsR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_ITEM,
         ),
     ],

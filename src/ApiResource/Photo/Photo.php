@@ -43,7 +43,7 @@ use App\State\Photo\AlbumPhotoProvider;
             security: "is_granted('" . ApiPermissions::PhotoAlbumsR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::PhotoAlbumsR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_ALBUM_COLLECTION,
         ),
     ],

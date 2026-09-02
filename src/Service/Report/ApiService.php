@@ -11,6 +11,7 @@ use App\Exception\Report\VersionExpected as VersionExpectedException;
 use App\Exception\Report\VersionFormat as VersionFormatException;
 use App\Exception\Report\VersionIncompatible as VersionIncompatibleException;
 use App\Service\Application\Config as ConfigService;
+use App\State\Api\ApiVersion;
 use DateTime;
 use PHLAK\SemVer\Enums\Compare as SemanticCompare;
 use PHLAK\SemVer\Exceptions\InvalidVersionException;
@@ -25,9 +26,10 @@ use function preg_replace;
 class ApiService
 {
     /**
-     * The release that introduced the function lists; consumers on an older contract are turned away.
+     * The release that introduced the function lists; consumers on an older contract are turned away. Public because
+     * the document states the same bound, and the two saying different things is the bug.
      */
-    private const string FUNCTIONS_MINIMUM_VERSION = 'v4.3.3';
+    public const ApiVersion FUNCTIONS_MINIMUM_VERSION = ApiVersion::V4_3_3;
 
     public function __construct(
         private readonly ConfigService $configService,
@@ -45,7 +47,7 @@ class ApiService
     public function getOrganFunctions(?string $acceptHeader): array
     {
         $this->assertVersion(
-            new SemanticVersion(self::FUNCTIONS_MINIMUM_VERSION),
+            self::FUNCTIONS_MINIMUM_VERSION,
             null,
             $acceptHeader,
         );
@@ -62,7 +64,7 @@ class ApiService
     public function getBoardFunctions(?string $acceptHeader): array
     {
         $this->assertVersion(
-            new SemanticVersion(self::FUNCTIONS_MINIMUM_VERSION),
+            self::FUNCTIONS_MINIMUM_VERSION,
             null,
             $acceptHeader,
         );
@@ -140,10 +142,15 @@ class ApiService
      * @throws VersionExpectedException if not allowed.
      */
     public function assertVersion(
-        SemanticVersion $lower,
-        ?SemanticVersion $upper,
+        ApiVersion $lower,
+        ?ApiVersion $upper,
         ?string $acceptHeader,
     ): void {
+        $lowerBound = new SemanticVersion($lower->value);
+        $upperBound = null === $upper
+            ? null
+            : new SemanticVersion($upper->value);
+
         if (null === $acceptHeader) {
             throw new VersionExpectedException();
         }
@@ -168,27 +175,27 @@ class ApiService
 
         if (
             $given->lt(
-                $lower,
+                $lowerBound,
                 SemanticCompare::PATCH,
             )
         ) {
             throw new VersionIncompatibleException(
-                $lower,
-                $upper,
+                $lowerBound,
+                $upperBound,
                 $given,
             );
         }
 
         if (
-            null !== $upper
+            null !== $upperBound
             && $given->gt(
-                $upper,
+                $upperBound,
                 SemanticCompare::PATCH,
             )
         ) {
             throw new VersionIncompatibleException(
-                $lower,
-                $upper,
+                $lowerBound,
+                $upperBound,
                 $given,
             );
         }

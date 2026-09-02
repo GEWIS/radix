@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
+use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\User\Enums\ApiPermissions;
 use App\State\Api\ApiVersion;
 use App\State\Decision\MemberProvider;
@@ -95,7 +96,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::MembersBirthdaysR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::MembersBirthdaysR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_BIRTHDAYS,
         ),
         new Get(
@@ -205,7 +206,7 @@ final readonly class Member
                                 'abbreviation' => ['type' => 'string'],
                             ],
                         ],
-                        'function' => ['type' => 'string'],
+                        'function' => ['$ref' => '#/components/schemas/OrganFunctionEnum'],
                         'installDate' => [
                             'type' => 'string',
                             'format' => 'date-time',
@@ -245,8 +246,16 @@ final readonly class Member
         public ?bool $keyholder = null,
         #[Groups([self::GROUP_TYPE])]
         #[SerializedName('membership_type')]
-        #[ApiProperty(description: 'One of `ordinary`, `external`, `graduate` or `honorary`.')]
-        public ?string $membershipType = null,
+        #[ApiProperty(
+            description: 'The kind of membership the member holds.',
+            openapiContext: [
+                'anyOf' => [
+                    ['$ref' => '#/components/schemas/MembershipTypeEnum'],
+                    ['type' => 'null'],
+                ],
+            ],
+        )]
+        public ?MembershipTypes $membershipType = null,
     ) {
     }
 }

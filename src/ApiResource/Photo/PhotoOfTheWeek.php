@@ -29,7 +29,7 @@ use App\State\Photo\PhotoOfTheWeekProvider;
             security: "is_granted('" . ApiPermissions::PhotoOfTheWeekR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::PhotoOfTheWeekR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_ITEM,
         ),
     ],
