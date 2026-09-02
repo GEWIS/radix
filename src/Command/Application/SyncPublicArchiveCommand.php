@@ -6,7 +6,7 @@ namespace App\Command\Application;
 
 use App\Command\HoldsRunLockTrait;
 use Override;
-use phpseclib3\Net\SFTP;
+use phpseclib4\Net\SFTP;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -40,9 +40,8 @@ final class SyncPublicArchiveCommand extends Command
     private const int CONNECT_TIMEOUT_SECONDS = 30;
 
     /**
-     * Unfortunately, phpseclib defines SFTP file types as global constants, but they do this at runtime. So to please
-     * our static analysers, we mirror the small subset we care about as class constants and compare against the numeric
-     * values phpseclib places in rawlist()['type']
+     * phpseclib marks its own SFTP file type constants internal, so we mirror the small subset we care about as class
+     * constants and compare against the numeric values it places in rawlist()['type']
      */
     private const int SFTP_TYPE_REGULAR = 1;
     private const int SFTP_TYPE_DIRECTORY = 2;
@@ -173,10 +172,18 @@ final class SyncPublicArchiveCommand extends Command
         string $localDir,
         array &$stats,
     ): void {
-        $entries = $sftp->rawlist($remoteDir);
-
-        if (false === $entries) {
-            throw new RuntimeException(sprintf('Could not list remote directory: %s', $remoteDir));
+        // phpseclib reports failure by throwing, so the paths are wrapped to keep the remote location in the message.
+        try {
+            $entries = $sftp->rawlist($remoteDir);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                sprintf(
+                    'Could not list remote directory: %s',
+                    $remoteDir,
+                ),
+                0,
+                $e,
+            );
         }
 
         foreach ($entries as $name => $attrs) {
@@ -218,13 +225,20 @@ final class SyncPublicArchiveCommand extends Command
                 continue;
             }
 
-            if (
-                false === $sftp->get(
+            try {
+                $sftp->get(
                     $remotePath,
                     $localPath,
-                )
-            ) {
-                throw new RuntimeException(sprintf('Failed to download remote file: %s', $remotePath));
+                );
+            } catch (Throwable $e) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Failed to download remote file: %s',
+                        $remotePath,
+                    ),
+                    0,
+                    $e,
+                );
             }
 
             $stats['files']++;

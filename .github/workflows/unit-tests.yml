@@ -27,7 +27,7 @@ jobs:
         # dama/doctrine-test-bundle rolls every test back so one schema and one seed serve the whole run.
         services:
             postgresql:
-                image: postgres:16
+                image: postgres:17
                 env:
                     POSTGRES_USER: gewisdb
                     POSTGRES_PASSWORD: gewisdb

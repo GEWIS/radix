@@ -173,6 +173,9 @@ services:
             - source: init_gewis_test_db
               target: /docker-entrypoint-initdb.d/gewis-test.sh
               mode: 0644
+            - source: init_mailman_db
+              target: /docker-entrypoint-initdb.d/mailman.sh
+              mode: 0644
         networks:
             - radix_network
         healthcheck:
@@ -195,10 +198,10 @@ services:
             - target: 80
               published: 8080
               protocol: tcp
-    # The ledger. Mailman and Listmonk keep their own databases on the same server; neither creates one and
-    # `POSTGRES_DB` only covers the application's own, so they are made on first boot (see `init_postgres_databases`).
+    # The ledger. Listmonk keeps its own database on the same server; it does not create one and `POSTGRES_DB` only
+    # covers the application's own, so it is made on first boot (see `init_postgres_databases`).
     postgresql:
-        image: postgres:${POSTGRES_VERSION:-16}-alpine
+        image: postgres:${POSTGRES_VERSION:-17}-alpine
         restart: unless-stopped
         # The development containers are configured entirely from `.env.local`; `.env` holds nothing they need.
         env_file:
@@ -242,6 +245,10 @@ services:
             - target: 80
               published: 8081
               protocol: tcp
+    # Mailman keeps its database on MariaDB rather than beside the ledger. The 0.5 images ship a PostgreSQL 16 client
+    # and wait for the database with `psql -c '\l'`, which fails against 17 because `pg_database.daticulocale` was
+    # renamed to `datlocale`, so the container never gets past its wait loop. The MySQL path waits on `mysqladmin
+    # ping` instead, which has no such coupling.
     mailman-core:
         image: maxking/mailman-core:0.5
         restart: unless-stopped
@@ -249,12 +256,12 @@ services:
         volumes:
             - mailman_core:/opt/mailman/
         depends_on:
-            postgresql:
+            mariadb:
                 condition: service_healthy
         environment:
-            DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql/${POSTGRES_MAILMAN_DATABASE}"
-            DATABASE_TYPE: postgres
-            DATABASE_CLASS: mailman.database.postgresql.PostgreSQLDatabase
+            DATABASE_URL: "mysql+pymysql://${MAILMAN_DATABASE_USERNAME:-mailman}:${MAILMAN_DATABASE_PASSWORD:-mailman}@mariadb/${MAILMAN_DATABASE_DBNAME:-mailman}?charset=utf8mb4"
+            DATABASE_TYPE: mysql
+            DATABASE_CLASS: mailman.database.mysql.MySQLDatabase
             HYPERKITTY_API_KEY: somerandomapikeythatiobviouslydidnotcreatemyself
             MAILMAN_DOMAIN: "${SERVER_HOSTNAME}"
             SMTP_HOST: mailer
@@ -271,14 +278,14 @@ services:
         restart: unless-stopped
         hostname: mailman-web
         depends_on:
-            postgresql:
+            mariadb:
                 condition: service_healthy
         volumes:
             - mailman_web:/opt/mailman-web-data/
             - mailman_static:/opt/mailman-web-data/static/
         environment:
-            DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql/${POSTGRES_MAILMAN_DATABASE}"
-            DATABASE_TYPE: postgres
+            DATABASE_URL: "mysql://${MAILMAN_DATABASE_USERNAME:-mailman}:${MAILMAN_DATABASE_PASSWORD:-mailman}@mariadb/${MAILMAN_DATABASE_DBNAME:-mailman}"
+            DATABASE_TYPE: mysql
             DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,mailmanw
             HYPERKITTY_API_KEY: somerandomapikeythatiobviouslydidnotcreatemyself
             SECRET_KEY: anotherandomkeythatiobviouslydidnotcreatemyself
@@ -383,13 +390,21 @@ configs:
                 CREATE DATABASE IF NOT EXISTS `${DOCTRINE_WEB_DATABASE:-gewis}_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;
                 GRANT ALL PRIVILEGES ON `${DOCTRINE_WEB_DATABASE:-gewis}_test`.* TO '${DOCTRINE_WEB_USER:-gewis}'@'%';
             EOF
-    # The databases Mailman and Listmonk keep beside the ledger. The ledger's own database is the one the image
-    # creates from `POSTGRES_DB`; the test database is made by `make test-prepare`, which owns the schema in it.
+    # Mailman keeps its own database and user here. Both the core and the web front end share it, and Mailman needs
+    # utf8mb4 throughout, so the database is created with it rather than the server default.
+    init_mailman_db:
+        content: |
+            mysql_note "Creating Mailman database and user"
+            docker_process_sql <<'EOF'
+                CREATE DATABASE `${MAILMAN_DATABASE_DBNAME:-mailman}` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+                CREATE USER '${MAILMAN_DATABASE_USERNAME:-mailman}'@'%' IDENTIFIED BY '${MAILMAN_DATABASE_PASSWORD:-mailman}';
+                GRANT ALL PRIVILEGES ON `${MAILMAN_DATABASE_DBNAME:-mailman}`.* TO '${MAILMAN_DATABASE_USERNAME:-mailman}'@'%';
+            EOF
+    # The database Listmonk keeps beside the ledger. The ledger's own database is the one the image creates from
+    # `POSTGRES_DB`; the test database is made by `make test-prepare`, which owns the schema in it.
     init_postgres_databases:
         content: |
             psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER:-gewisdb}" <<-PGSQL
-                CREATE DATABASE ${POSTGRES_MAILMAN_DATABASE:-gewisdb_mailman};
-                GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_MAILMAN_DATABASE:-gewisdb_mailman} TO ${POSTGRES_USER:-gewisdb};
                 CREATE DATABASE ${POSTGRES_LISTMONK_DATABASE:-gewisdb_listmonk};
                 GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_LISTMONK_DATABASE:-gewisdb_listmonk} TO ${POSTGRES_USER:-gewisdb};
             PGSQL
