@@ -72,12 +72,49 @@ jobs:
                 with:
                     persist-credentials: false
 
-            # php-vips dlopens this at runtime; without it the only image driver cannot load and every test that
-            # touches an image fails.
-            -   name: Install libvips
+            # php-vips dlopens libvips at runtime; without it the only image driver cannot load and every test that
+            # touches an image fails. The course document pipeline shells out to `pdftoppm` and draws its watermark in
+            # DejaVu Sans Bold; every other environment gets those from the image, but PHPUnit runs on the bare runner.
+            # Together they pull in some 9.5 MB of archives, and the mirror the runners point at regularly collapses to
+            # a few tens of kB/s, which has cost this job over four minutes on its own. The archives are keyed on the
+            # exact versions apt resolves, so the mirror is only asked for them when those versions change.
+            -   name: Resolve the packages to install
+                id: apt
                 run: |
+                    set -o pipefail
                     sudo apt-get update
-                    sudo apt-get install -y --no-install-recommends libvips42t64
+                    apt-get install --no-install-recommends --print-uris --yes \
+                      fonts-dejavu-core libvips42t64 poppler-utils \
+                      | awk '/\.deb/ { gsub(/'"'"'/, "", $1); print $1, $2 }' \
+                      | sort > "${RUNNER_TEMP}/debs.txt"
+                    echo "key=$(sha256sum "${RUNNER_TEMP}/debs.txt" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+            -   name: Cache the package archives
+                id: apt-cache
+                uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+                with:
+                    path: ${{ runner.temp }}/debs
+                    key: apt-${{ runner.os }}-${{ steps.apt.outputs.key }}
+
+            -   name: Download the package archives
+                if: steps.apt-cache.outputs.cache-hit != 'true'
+                # In parallel, because the throttling is per connection: what takes minutes one file at a time comes
+                # down in seconds over eight of them.
+                run: |
+                    mkdir -p "${RUNNER_TEMP}/debs"
+                    cd "${RUNNER_TEMP}/debs"
+                    xargs -P 8 -n 2 sh -c 'curl -fsSL -o "$2" "$1"' _ < "${RUNNER_TEMP}/debs.txt"
+
+            -   name: Install libvips, poppler, and the watermark font
+                run: |
+                    shopt -s nullglob
+                    debs=("${RUNNER_TEMP}"/debs/*.deb)
+                    if [ ${#debs[@]} -gt 0 ]; then
+                        sudo apt-get install -y --no-install-recommends "${debs[@]}"
+                    fi
+                    # An empty list is what a renamed package looks like, and the tests would fail much later with an
+                    # unhelpful `dlopen` error, so check here instead.
+                    dpkg -s fonts-dejavu-core libvips42t64 poppler-utils > /dev/null
 
             -   name: Install PHP
                 uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
@@ -162,13 +199,6 @@ jobs:
                     sudo chmod +x /usr/local/bin/swc
                     bin/console sass:build
                     bin/console typescript:build
-
-            -   name: Install poppler and the watermark font
-                # The course document pipeline shells out to `pdftoppm` and draws its watermark in DejaVu Sans Bold.
-                # Every other environment gets both from the image, but PHPUnit runs on the bare runner here.
-                run: |
-                    sudo apt-get update
-                    sudo apt-get install -y --no-install-recommends fonts-dejavu-core poppler-utils
 
             -   name: Run PHPUnit
                 env:
