@@ -74,4 +74,15 @@ enum Firewall: string
             self::Company => null,
         };
     }
+
+    /**
+     * Marks a browser as one this firewall's account has signed in from before.
+     */
+    public function deviceCookieName(): string
+    {
+        return match ($this) {
+            self::Main => 'GWS_USER_DEVICE',
+            self::Company => 'GWS_COMPANY_DEVICE',
+        };
+    }
 }

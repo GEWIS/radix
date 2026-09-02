@@ -3421,9 +3421,9 @@
         <source>Every question the association has been asked, and how it answered.</source>
         <target state="translated">Every question the association has been asked, and how it answered.</target>
       </trans-unit>
-      <trans-unit id="4ADZXUU" resname="Every time your account is signed in">
-        <source>Every time your account is signed in</source>
-        <target state="translated">Every time your account is signed in</target>
+      <trans-unit id="4ADZXUU" resname="When your account is signed in from an unrecognised device or location">
+        <source>When your account is signed in from an unrecognised device or location</source>
+        <target state="translated">When your account is signed in from an unrecognised device or location</target>
       </trans-unit>
       <trans-unit id="xMd0Hq2" resname="Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.">
         <source>Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.</source>
@@ -10801,13 +10801,13 @@
         <source>Your account is ready, but your company has no running contract with GEWIS. You can sign in once the board has entered it.</source>
         <target state="translated">Your account is ready, but your company has no running contract with GEWIS. You can sign in once the board has entered it.</target>
       </trans-unit>
-      <trans-unit id="FSsHSES" resname="Your account was signed in %count% times.">
-        <source>Your account was signed in %count% times.</source>
-        <target state="translated">Your account was signed in %count% times.</target>
+      <trans-unit id="FSsHSES" resname="Your account was signed in %count% times from an unrecognised device or location.">
+        <source>Your account was signed in %count% times from an unrecognised device or location.</source>
+        <target state="translated">Your account was signed in %count% times from an unrecognised device or location.</target>
       </trans-unit>
-      <trans-unit id="1rTGsTd" resname="Your account was signed in from %name%.">
-        <source>Your account was signed in from %name%.</source>
-        <target state="translated">Your account was signed in from %name%.</target>
+      <trans-unit id="1rTGsTd" resname="Your account was signed in from an unrecognised device: %name%.">
+        <source>Your account was signed in from an unrecognised device: %name%.</source>
+        <target state="translated">Your account was signed in from an unrecognised device: %name%.</target>
       </trans-unit>
       <trans-unit id="ezCRuLS" resname="Your answer">
         <source>Your answer</source>
@@ -11484,6 +11484,26 @@
       <trans-unit id="dch67pJ" resname="¹ This permission will add more properties to existing entities that can already be requested.">
         <source>¹ This permission will add more properties to existing entities that can already be requested.</source>
         <target state="translated">¹ This permission will add more properties to existing entities that can already be requested.</target>
+      </trans-unit>
+      <trans-unit id="dyTVOrJ" resname="IP databases">
+        <source>IP databases</source>
+        <target state="translated">IP databases</target>
+      </trans-unit>
+      <trans-unit id="D63Kb1y" resname="The databases are missing.">
+        <source>The databases are missing.</source>
+        <target state="translated">The databases are missing.</target>
+      </trans-unit>
+      <trans-unit id="wxO6sHk" resname="Not refreshed since %date%.">
+        <source>Not refreshed since %date%.</source>
+        <target state="translated">Not refreshed since %date%.</target>
+      </trans-unit>
+      <trans-unit id="zdCHZef" resname="Refreshed %date%.">
+        <source>Refreshed %date%.</source>
+        <target state="translated">Refreshed %date%.</target>
+      </trans-unit>
+      <trans-unit id="3Gewnwz" resname="IP address data by">
+        <source>IP address data by</source>
+        <target state="translated">IP address data by</target>
       </trans-unit>
     </body>
   </file>

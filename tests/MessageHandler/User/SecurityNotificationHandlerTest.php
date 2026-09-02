@@ -32,12 +32,19 @@ use function array_fill;
 use function array_map;
 use function count;
 
+/**
+ * @phpstan-type OriginShape array{
+ *     browser?: string, system?: string, address?: string, network?: string, location?: string,
+ * }
+ */
 final class SecurityNotificationHandlerTest extends TestCase
 {
     private const array ORIGIN = [
         'browser' => 'Chrome 124',
         'system' => 'Windows 11',
         'address' => '192.0.2.1',
+        'network' => 'SURF B.V. (AS1161)',
+        'location' => 'Eindhoven, The Netherlands',
     ];
 
     /** @var list<Notification> */
@@ -80,7 +87,7 @@ final class SecurityNotificationHandlerTest extends TestCase
             $this->sent[0]->getTo()[0]->getAddress(),
         );
         self::assertSame(
-            'New sign-in to your GEWIS account',
+            'Sign-in to your GEWIS account from an unrecognised device',
             $this->sent[0]->getSubject(),
         );
         self::assertSame(
@@ -111,7 +118,8 @@ final class SecurityNotificationHandlerTest extends TestCase
         $this->handler()($this->message());
 
         self::assertSame(
-            'Your GEWIS account (ada@example.com) was used to sign in to the GEWIS website.',
+            'Your GEWIS account (ada@example.com) was used to sign in to the GEWIS website from a device or'
+                . ' location it has not signed in from recently.',
             $this->sent[0]->getContext()['summary'],
         );
     }
@@ -141,6 +149,14 @@ final class SecurityNotificationHandlerTest extends TestCase
                 [
                     'label' => 'IP address',
                     'value' => '192.0.2.1',
+                ],
+                [
+                    'label' => 'Network',
+                    'value' => 'SURF B.V. (AS1161)',
+                ],
+                [
+                    'label' => 'Location',
+                    'value' => 'Eindhoven, The Netherlands',
                 ],
             ],
             $this->sent[0]->getContext()['details'],
@@ -248,7 +264,7 @@ final class SecurityNotificationHandlerTest extends TestCase
     }
 
     /**
-     * @param array{browser?: string, system?: string, address?: string}|null $origin
+     * @param OriginShape|null $origin
      */
     private function message(
         string $firewallName = 'main',

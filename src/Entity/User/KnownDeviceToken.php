@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\User;
 
-use App\Repository\User\KnownDeviceRepository;
+use App\Repository\User\KnownDeviceTokenRepository;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -13,10 +13,11 @@ use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * A kind of device an account has already signed in from. Where it was is learned separately as {@see KnownNetwork},
- * so a laptop first seen at home is not a stranger the day it is opened on campus.
+ * A cookie handed to a browser at sign-in, so the browser itself can say it has been here before, wherever it goes.
+ * It is no credential: it only suppresses the notice for the one account it was minted on, so a stolen one is worth
+ * nothing without the password it rode along with.
  *
- * @phpstan-type KnownDeviceGdprArrayType = array{
+ * @phpstan-type KnownDeviceTokenGdprArrayType = array{
  *     firewall: string,
  *     browser: ?string,
  *     operatingSystem: ?string,
@@ -24,16 +25,15 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  *     lastSeenAt: string,
  * }
  */
-#[Entity(repositoryClass: KnownDeviceRepository::class)]
-#[UniqueConstraint(fields: ['userIdentifier', 'firewallName', 'fingerprint'])]
+#[Entity(repositoryClass: KnownDeviceTokenRepository::class)]
+#[UniqueConstraint(fields: ['userIdentifier', 'firewallName', 'tokenHash'])]
 #[Index(fields: ['lastSeenAt'])]
-class KnownDevice extends KnownFact
+class KnownDeviceToken extends KnownFact
 {
-    /** Keyed HMAC, so this table is not a record of what every member reads with. */
+    /** Keyed HMAC, so reading this table yields no cookie that would quiet somebody's notices. */
     #[Column(type: Types::STRING)]
-    private string $fingerprint;
+    private string $tokenHash;
 
-    /** Display only; a version inside the fingerprint would make every browser update a new device. */
     #[Column(
         type: Types::STRING,
         nullable: true,
@@ -46,14 +46,14 @@ class KnownDevice extends KnownFact
     )]
     private ?string $operatingSystem = null;
 
-    public function getFingerprint(): string
+    public function getTokenHash(): string
     {
-        return $this->fingerprint;
+        return $this->tokenHash;
     }
 
-    public function setFingerprint(string $fingerprint): void
+    public function setTokenHash(string $tokenHash): void
     {
-        $this->fingerprint = $fingerprint;
+        $this->tokenHash = $tokenHash;
     }
 
     public function getBrowser(): ?string
@@ -77,7 +77,7 @@ class KnownDevice extends KnownFact
     }
 
     /**
-     * @return KnownDeviceGdprArrayType
+     * @return KnownDeviceTokenGdprArrayType
      */
     public function toGdprArray(): array
     {

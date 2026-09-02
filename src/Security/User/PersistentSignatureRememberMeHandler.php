@@ -28,15 +28,11 @@ use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeHandler;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Throwable;
 
-use function base64_encode;
 use function count;
 use function explode;
 use function hash;
 use function hash_equals;
-use function random_bytes;
-use function rtrim;
 use function sprintf;
-use function strtr;
 use function trim;
 
 /**
@@ -267,7 +263,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         // Rotate the token on every successful use. This is what makes the theft check above meaningful: an old raw
         // token reappearing after the grace period is the smoking gun. Without rotation, we could not distinguish
         // legitimate reuse from a replayed stolen cookie.
-        $newRawToken = $this->generateToken();
+        $newRawToken = UrlSafeToken::generate();
         $newHashedToken = hash(
             self::HASH_ALGO,
             $newRawToken,
@@ -404,8 +400,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         UserInterface $user,
         Request $request,
     ): array {
-        $series = $this->generateToken(44);
-        $rawToken = $this->generateToken();
+        $series = UrlSafeToken::generate(44);
+        $rawToken = UrlSafeToken::generate();
         $now = $this->clock->now();
         $expiresAt = $now->modify('+' . $this->tokenLifetime . ' seconds');
 
@@ -486,21 +482,6 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $userIdentifier,
             NotificationType::SignIn,
             $request,
-        );
-    }
-
-    /**
-     * @param positive-int $bytes
-     */
-    private function generateToken(int $bytes = 32): string
-    {
-        return rtrim(
-            strtr(
-                base64_encode(random_bytes($bytes)),
-                '+/',
-                '-_',
-            ),
-            '=',
         );
     }
 }

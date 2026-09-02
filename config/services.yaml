@@ -26,6 +26,18 @@ parameters:
     # The transport a message lands on once every retry is spent. Named here rather than in `messenger.yaml` alone
     # because the administration's queue page reads the same transport back, and the two must not drift apart.
     app.messenger.failure_transport: 'failed'
+    # On the shared `data` volume, so the IP databases `app:user:update-ip-databases` fetches on a worker are the
+    # ones the application reads; the entrypoint seeds them from the image until that command has run once.
+    app.geoip.directory: '%kernel.project_dir%/data/geoip'
+    # MaxMind credentials for that command. Set in compose for a deployment that has them; empty falls back to
+    # IPLocate's free databases, which name networks and countries but no cities.
+    env(MAXMIND_ACCOUNT_ID): ''
+    env(MAXMIND_LICENSE_KEY): ''
+    # Device recognition reduces every address in these ranges to the one campus network. The internal side of the
+    # university's NAT hands out shared space (100.64.0.0/10) that no public database names and whose prefixes
+    # rotate, so on its own it would be a new network every few days. Its own parameter rather than a reuse of
+    # education's, so the two may diverge.
+    app.user.campus_ranges: '%env(csv:TUE_IP_RANGES)%'
     # Fallback contact for board/committee correspondence with no more specific sender/reply-to (e.g. a bulk email to
     # an activity's sign-ups when the organising organ has no public email).
     app.email.internal_affairs: 'cib@gewis.nl'

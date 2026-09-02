@@ -18,6 +18,8 @@ use App\Repository\Photo\ProfilePhotoRepository;
 use App\Repository\Photo\VoteRepository;
 use App\Repository\User\ExternalAppAuthenticationRepository;
 use App\Repository\User\KnownDeviceRepository;
+use App\Repository\User\KnownDeviceTokenRepository;
+use App\Repository\User\KnownNetworkRepository;
 use App\Repository\User\SessionRepository;
 use App\Repository\User\UserRepository;
 
@@ -36,6 +38,8 @@ class GdprService
         private readonly ProfilePhotoRepository $profilePhotoRepository,
         private readonly SessionRepository $sessionRepository,
         private readonly KnownDeviceRepository $knownDeviceRepository,
+        private readonly KnownNetworkRepository $knownNetworkRepository,
+        private readonly KnownDeviceTokenRepository $knownDeviceTokenRepository,
         private readonly ExternalAppAuthenticationRepository $externalAppAuthenticationRepository,
         private readonly UserSignupRepository $signupRepository,
         private readonly AuthorizationRepository $authorizationRepository,
@@ -79,6 +83,14 @@ class GdprService
                 'known_devices' => array_map(
                     static fn ($device) => $device->toGdprArray(),
                     $this->knownDeviceRepository->findAllByUser(strval($lidnr)),
+                ),
+                'known_networks' => array_map(
+                    static fn ($network) => $network->toGdprArray(),
+                    $this->knownNetworkRepository->findAllByUser(strval($lidnr)),
+                ),
+                'known_device_cookies' => array_map(
+                    static fn ($token) => $token->toGdprArray(),
+                    $this->knownDeviceTokenRepository->findAllByUser(strval($lidnr)),
                 ),
                 'external_applications' => array_map(
                     static fn ($authentication) => $authentication->toGdprArray(),

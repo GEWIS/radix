@@ -201,7 +201,7 @@ enum NotificationType: string
                 ['%count%' => $count],
             ),
             self::SignIn => new TranslatableMessage(
-                'Your account was signed in %count% times.',
+                'Your account was signed in %count% times from an unrecognised device or location.',
                 ['%count%' => $count],
             ),
             self::PasswordChanged, self::MfaEnabled,
@@ -356,7 +356,7 @@ enum NotificationType: string
                 ['%name%' => $name],
             ),
             self::SignIn => new TranslatableMessage(
-                'Your account was signed in from %name%.',
+                'Your account was signed in from an unrecognised device: %name%.',
                 ['%name%' => $name],
             ),
             self::PasswordChanged => new TranslatableMessage(
@@ -450,7 +450,7 @@ enum NotificationType: string
             self::PollRevisionAwaitingReview, self::ActivityProposalAwaitingDecision,
             self::ActivityProposalScheduled, self::ActivityProposalDeclined,
             self::ActivityProposalBudgetDue, self::ActivityProposalLapsed => null,
-            self::SignIn => 'New sign-in to your GEWIS account',
+            self::SignIn => 'Sign-in to your GEWIS account from an unrecognised device',
             self::PasswordChanged => 'Your GEWIS password was changed',
             self::MfaEnabled => 'Two-factor authentication enabled on your GEWIS account',
             self::MfaDisabled => 'Two-factor authentication disabled on your GEWIS account',
@@ -478,7 +478,8 @@ enum NotificationType: string
             self::PollRevisionAwaitingReview, self::ActivityProposalAwaitingDecision,
             self::ActivityProposalScheduled, self::ActivityProposalDeclined,
             self::ActivityProposalBudgetDue, self::ActivityProposalLapsed => null,
-            self::SignIn => 'Your GEWIS account (%s) was used to sign in to the GEWIS website.',
+            self::SignIn => 'Your GEWIS account (%s) was used to sign in to the GEWIS website from a device or'
+                . ' location it has not signed in from recently.',
             self::PasswordChanged => 'The password of your GEWIS account (%s) was changed.',
             self::MfaEnabled => 'Two-factor authentication was enabled on your GEWIS account (%s).',
             self::MfaDisabled => 'Two-factor authentication was disabled on your GEWIS account (%s).',

@@ -8,35 +8,22 @@ use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 
-use function bin2hex;
+use function array_map;
 use function hash_hmac;
 use function implode;
-use function inet_pton;
-use function strlen;
-use function substr;
 
 /**
- * Reduces a request to the coarse description of a device that {@see \App\Entity\User\KnownDevice} is keyed on: the
- * browser family, the operating system family, the network the request arrived from and the languages it asks for.
- *
- * Versions are left out because Chrome and Firefox move a major version every few weeks, which would announce a new
- * device to everybody each time; the operating system version is only known at all when the browser sent
- * `Sec-CH-UA-Platform-Version`, which Firefox and Safari never do. The address is cut to its network because IPv6
- * privacy addressing rotates the host part daily and mobile networks reassign constantly.
- *
- * What is left is a weak signal: on one campus network a great many people are the same browser on the same system. It
- * decides only whether a sign-in that has already succeeded is written to somebody about, never whether they may sign
- * in.
+ * Reduces a request to the fingerprints {@see \App\Service\User\KnownDeviceRegistry} keys recognition on: what kind
+ * of device this is and the networks it could be said to be on, hashed apart because they are learned apart. Browser
+ * and OS versions are left out of the device key so a routine update does not read as a new device.
  */
 final readonly class DeviceFingerprint
 {
     private const string HMAC_ALGO = 'sha256';
 
-    /** What an IPv4 address looks like once it has been written as an IPv6 one: ten zero bytes and then `ffff`. */
-    private const string MAPPED_V4_PREFIX = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff";
-
     public function __construct(
         private UserAgentParser $userAgentParser,
+        private IpNetworkResolver $networkResolver,
         #[Autowire(param: 'kernel.secret')]
         #[SensitiveParameter]
         private string $secret,
@@ -44,30 +31,30 @@ final readonly class DeviceFingerprint
     }
 
     /**
-     * The stored fingerprint, alongside the names it was derived from so a member can be shown a device they
-     * recognise.
+     * `networks` is empty when the address does not parse: an unnameable network is one recognition cannot vouch
+     * for, not one of its own.
      *
-     * @return array{fingerprint: string, browser: ?string, operatingSystem: ?string}
+     * @return array{device: string, networks: list<string>, browser: ?string, operatingSystem: ?string}
      */
     public function describe(Request $request): array
     {
         $meta = $this->userAgentParser->parseRequest($request);
 
-        $parts = [
-            UserAgentParser::family($meta['browser']) ?? '',
-            UserAgentParser::family($meta['operatingSystem']) ?? '',
-            self::network($request->getClientIp()),
-            self::languages($request),
-        ];
-
         return [
-            'fingerprint' => hash_hmac(
-                self::HMAC_ALGO,
-                implode(
-                    "\0",
-                    $parts,
+            'device' => $this->hash(
+                'device',
+                [
+                    UserAgentParser::family($meta['browser']) ?? '',
+                    UserAgentParser::family($meta['operatingSystem']) ?? '',
+                    self::languages($request),
+                ],
+            ),
+            'networks' => array_map(
+                fn (string $identifier): string => $this->hash(
+                    'network',
+                    [$identifier],
                 ),
-                $this->secret,
+                $this->networkResolver->identify($request->getClientIp()),
             ),
             'browser' => $meta['browser'],
             'operatingSystem' => $meta['operatingSystem'],
@@ -75,14 +62,31 @@ final readonly class DeviceFingerprint
     }
 
     /**
-     * The languages the browser asks for, in the order it asks for them.
+     * Keyed on the application secret and prefixed with what is being hashed, so installations never share a
+     * fingerprint and a device fingerprint can never collide with a network one.
      *
-     * Read through Symfony's parsing rather than off the header, for the reason the address is packed before it is
-     * cut: the same preferences written with different quality values or casing are the same preferences. A browser
-     * that states none lands on the empty string, which is a device of its own rather than one matching everybody.
-     *
-     * It is what tells apart two people who are otherwise the same browser on the same system on one network, which is
-     * where the rest of this key is weakest.
+     * @param list<string> $parts
+     */
+    private function hash(
+        string $kind,
+        array $parts,
+    ): string {
+        return hash_hmac(
+            self::HMAC_ALGO,
+            implode(
+                "\0",
+                [
+                    $kind,
+                    ...$parts,
+                ],
+            ),
+            $this->secret,
+        );
+    }
+
+    /**
+     * Read through Symfony's parsing so the same preferences spelled differently compare equal; a browser that
+     * states none lands on the empty string, a device of its own rather than one matching everybody.
      */
     private static function languages(Request $request): string
     {
@@ -90,50 +94,5 @@ final readonly class DeviceFingerprint
             ',',
             $request->getLanguages(),
         );
-    }
-
-    /**
-     * The network an address sits on: the first three octets of an IPv4 address, the first four groups of an IPv6 one.
-     *
-     * Packed first, so that the many spellings of the same IPv6 address all reduce to the same bytes. An address that
-     * does not parse yields an empty network rather than being passed through, which keeps a malformed
-     * `X-Forwarded-For` from reading as a device of its own.
-     */
-    private static function network(?string $address): string
-    {
-        if (
-            null === $address
-            || '' === $address
-        ) {
-            return '';
-        }
-
-        $packed = @inet_pton($address);
-
-        if (false === $packed) {
-            return '';
-        }
-
-        // A dual-stack listener, or a proxy that forwards what it was given, hands us IPv4 written as `::ffff:1.2.3.4`.
-        // That packs to sixteen bytes whose first ten are zero, so cutting it to eight would put every address that
-        // arrives this way on one network and leave the fingerprint with three parts instead of four.
-        if (
-            self::MAPPED_V4_PREFIX === substr(
-                $packed,
-                0,
-                12,
-            )
-        ) {
-            $packed = substr(
-                $packed,
-                12,
-            );
-        }
-
-        return bin2hex(substr(
-            $packed,
-            0,
-            4 === strlen($packed) ? 3 : 8,
-        ));
     }
 }

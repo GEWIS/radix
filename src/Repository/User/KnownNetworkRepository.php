@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Repository\User;
 
-use App\Entity\User\KnownDevice;
+use App\Entity\User\KnownNetwork;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends KnownFactRepository<KnownDevice>
+ * @extends KnownFactRepository<KnownNetwork>
  */
-class KnownDeviceRepository extends KnownFactRepository
+class KnownNetworkRepository extends KnownFactRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct(
             $registry,
-            KnownDevice::class,
+            KnownNetwork::class,
         );
     }
 
@@ -28,7 +28,7 @@ class KnownDeviceRepository extends KnownFactRepository
         string $userIdentifier,
         string $firewallName,
         string $fingerprint,
-    ): ?KnownDevice {
+    ): ?KnownNetwork {
         return $this->findOneBy([
             'userIdentifier' => $userIdentifier,
             'firewallName' => $firewallName,

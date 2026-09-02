@@ -118,6 +118,17 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		done
 	fi
 
+	# The `data` volume mounts over the copies baked into the image, so an empty volume is seeded from them here:
+	# the file is then always present, at worst as old as the image. The twice-weekly app:user:update-ip-databases run
+	# replaces the volume copy with a fresh one.
+	for database in ip-to-asn.mmdb ip-to-location.mmdb; do
+		if [ ! -f "data/geoip/$database" ] && [ -f "/usr/local/share/radix/geoip/$database" ]; then
+			mkdir -p data/geoip
+			cp "/usr/local/share/radix/geoip/$database" "data/geoip/$database"
+			echo "Seeded data/geoip/$database from the image."
+		fi
+	done
+
 	echo 'PHP app ready!'
 fi
 

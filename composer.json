@@ -37,6 +37,7 @@
         "league/commonmark": "^2.9.0",
         "league/flysystem-bundle": "^3.7",
         "matomo/device-detector": "^6.5.1",
+        "maxmind-db/reader": "^1.13",
         "nelmio/cors-bundle": "^2.6.1",
         "nelmio/security-bundle": "^3.9",
         "nikic/php-parser": "^5.8.0",
