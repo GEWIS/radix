@@ -159,7 +159,7 @@ x-app-environment: &app_environment
     GOMAXPROCS: "${GOMAXPROCS:-4}"
     # Go sizes its heap against the machine, not the cgroup, so without this the collector does not react before the
     # container is killed at APP_MEMORY_LIMIT. Set below that limit, since it bounds the Go heap only.
-    GOMEMLIMIT: "${GOMEMLIMIT:-1600MiB}"
+    GOMEMLIMIT: "${GOMEMLIMIT:-1000MiB}"
     # libvips defaults its pool to the core count, which costs a core per encode with no gain on a single web-sized
     # image. Scale IMAGE_WORKER_REPLICAS instead, which the container limits can bound.
     VIPS_CONCURRENCY: "${VIPS_CONCURRENCY:-1}"
@@ -200,7 +200,7 @@ x-worker-deploy: &worker_deploy
     resources:
         limits:
             cpus: "${WORKER_CPU_LIMIT:-1.0}"
-            memory: "${WORKER_MEMORY_LIMIT:-512m}"
+            memory: "${WORKER_MEMORY_LIMIT:-384m}"
     update_config:
         parallelism: 1
         delay: 15s
@@ -236,7 +236,7 @@ services:
             resources:
                 limits:
                     cpus: "${APP_CPU_LIMIT:-4.0}"
-                    memory: "${APP_MEMORY_LIMIT:-2g}"
+                    memory: "${APP_MEMORY_LIMIT:-1.5g}"
         volumes:
             - caddy_data:/data
             - caddy_config:/config
@@ -292,7 +292,7 @@ services:
             resources:
                 limits:
                     cpus: "${IMAGE_WORKER_CPU_LIMIT:-2.0}"
-                    memory: "${IMAGE_WORKER_MEMORY_LIMIT:-1536m}"
+                    memory: "${IMAGE_WORKER_MEMORY_LIMIT:-512m}"
         # `--limit=64` rather than the 16 this started at: every restart reboots a kernel, which is noise next to one
         # encode but real overhead against a queue of hundreds of thousands. `--memory-limit` is the actual guard.
         command: [ "bin/console", "messenger:consume", "images", "-vv", "--time-limit=600", "--limit=64", "--memory-limit=512M" ]
