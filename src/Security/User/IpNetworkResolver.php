@@ -7,6 +7,7 @@ namespace App\Security\User;
 use MaxMind\Db\Reader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Throwable;
 
 use function bin2hex;
@@ -38,9 +39,18 @@ final readonly class IpNetworkResolver
 
     private const string MAPPED_V4_PREFIX = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff";
 
+    private const string CAMPUS_IDENTIFIER = 'campus';
+
+    private const string CAMPUS_NAME = 'TU/e campus';
+
+    /**
+     * @param list<string> $campusRanges
+     */
     public function __construct(
         #[Autowire('%app.geoip.directory%')]
         private string $directory,
+        #[Autowire('%app.user.campus_ranges%')]
+        private array $campusRanges = [],
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -68,6 +78,20 @@ final readonly class IpNetworkResolver
         }
 
         $identifiers = [];
+
+        // Both sides of the campus NAT reduce to one name before anything else: the internal side's CGNAT addresses
+        // (RFC 6598) are in no database and rotate through prefixes, so without this a member on the internal Wi-Fi
+        // would be a new network every few days. Prepended rather than replacing, so what was learned by AS or
+        // prefix keeps answering.
+        if (
+            IpUtils::checkIp(
+                $canonical,
+                $this->campusRanges,
+            )
+        ) {
+            $identifiers[] = self::CAMPUS_IDENTIFIER;
+        }
+
         $asn = self::field(
             $this->record(
                 self::ASN_DATABASE,
@@ -106,6 +130,15 @@ final readonly class IpNetworkResolver
 
         if (false === $canonical) {
             return null;
+        }
+
+        if (
+            IpUtils::checkIp(
+                $canonical,
+                $this->campusRanges,
+            )
+        ) {
+            return self::CAMPUS_NAME;
         }
 
         $record = $this->record(

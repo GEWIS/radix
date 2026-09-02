@@ -100,6 +100,56 @@ final class IpNetworkResolverTest extends TestCase
         );
     }
 
+    /**
+     * The internal side of the campus NAT hands out rotating shared-space addresses no database names, so every
+     * campus address must reduce to the one campus network, with what a public one would have learned kept behind
+     * it.
+     */
+    public function testEverySideOfTheCampusNatIsTheOneCampusNetwork(): void
+    {
+        $resolver = new IpNetworkResolver(
+            '/nonexistent',
+            [
+                '192.0.2.0/24',
+                '100.64.0.0/10',
+            ],
+        );
+
+        self::assertSame(
+            [
+                'campus',
+                'pfx:c00002',
+            ],
+            $resolver->identify('192.0.2.10'),
+        );
+        self::assertSame(
+            'campus',
+            $resolver->identify('100.64.1.2')[0],
+        );
+        self::assertSame(
+            $resolver->identify('100.64.1.2')[0],
+            $resolver->identify('100.127.200.9')[0],
+        );
+        self::assertSame(
+            'TU/e campus',
+            $resolver->networkName('192.0.2.10'),
+        );
+    }
+
+    public function testOffCampusNothingChanges(): void
+    {
+        $resolver = new IpNetworkResolver(
+            '/nonexistent',
+            ['192.0.2.0/24'],
+        );
+
+        self::assertSame(
+            ['pfx:c63364'],
+            $resolver->identify('198.51.100.10'),
+        );
+        self::assertNull($resolver->networkName('198.51.100.10'));
+    }
+
     public function testWithoutTheDatabasesNothingHasAName(): void
     {
         self::assertNull(new IpNetworkResolver('/nonexistent')->networkName('192.0.2.10'));
