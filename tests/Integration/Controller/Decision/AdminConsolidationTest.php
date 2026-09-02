@@ -93,7 +93,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
         );
     }
 
-    public function testABoardMemberWhoIsNotTheSecretaryIsOfferedNoWayToChangeAMeeting(): void
+    public function testABoardMemberWhoIsNotTheSecretaryKeepsTheMeetingButNotItsDecisions(): void
     {
         $this->authenticate(
             self::BOARD_MEMBER,
@@ -109,7 +109,12 @@ final class AdminConsolidationTest extends DatabaseTestCase
             ),
         );
 
-        // The board reads a meeting; keeping its record is the secretary's job.
+        // The agenda, the documents filed under it and the minutes are the board's to keep.
+        self::assertStringContainsString(
+            'Add agenda point',
+            $content,
+        );
+        // What was decided is shown to them, and changing it is the secretary's job.
         self::assertStringContainsString(
             'Decision',
             $content,

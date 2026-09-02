@@ -270,10 +270,37 @@ final class MeetingManageTest extends DatabaseTestCase
         self::assertNotNull($component->savedAt);
     }
 
-    public function testActionsRequireTheDatabaseAdministratorRole(): void
+    public function testTheBoardKeepsTheAgendaAndItsDocuments(): void
     {
-        // Minuting a meeting is the register administrator's job; a board seat on its own is not enough.
+        // Keeping a meeting is the board's job, so a board seat is all its agenda and its documents ask for.
         $this->authenticate(['ROLE_BOARD']);
+        $component = $this->manageFor();
+
+        $before = $component->getView()->points;
+        $component->addPoint();
+
+        self::assertCount(
+            count($before) + 1,
+            $component->getView()->points,
+        );
+    }
+
+    public function testWritingToTheLedgerRequiresTheDatabaseAdministratorRole(): void
+    {
+        // What was decided in a meeting is the register's record; a board seat on its own is not enough for it.
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->manageFor();
+
+        $this->expectException(AccessDeniedException::class);
+        $component->deleteDecision(
+            1,
+            1,
+        );
+    }
+
+    public function testActionsRequireMoreThanAnActiveMemberRole(): void
+    {
+        $this->authenticate(['ROLE_ACTIVE_MEMBER']);
         $component = $this->manageFor();
 
         $this->expectException(AccessDeniedException::class);
@@ -283,7 +310,7 @@ final class MeetingManageTest extends DatabaseTestCase
     public function testActionsRequireSudoMode(): void
     {
         $this->authenticate(
-            ['ROLE_DATABASE_ADMIN'],
+            ['ROLE_BOARD'],
             sudo: false,
         );
         $component = $this->manageFor();
@@ -296,7 +323,10 @@ final class MeetingManageTest extends DatabaseTestCase
      * @param list<string> $roles
      */
     private function authenticate(
-        array $roles = ['ROLE_DATABASE_ADMIN'],
+        array $roles = [
+            'ROLE_BOARD',
+            'ROLE_DATABASE_ADMIN',
+        ],
         bool $sudo = true,
     ): void {
         $user = $this->entityManager->getRepository(User::class)->find(8000);

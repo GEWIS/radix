@@ -27,14 +27,7 @@
     </div>
     <p class="text-muted mb-3">{{ meeting.date|format_date('full') }}</p>
 
-    {# A meeting the projection knows and the ledger does not has no decisions to show; it still has its documents. #}
-    {% if decisions is defined and not is_granted('ROLE_DATABASE_ADMIN') %}
-        {% include 'decision/admin/meetings/decisions.html.twig' %}
-    {% endif %}
-
-    {% if is_granted('ROLE_DATABASE_ADMIN') %}
-        {{ component('Decision:Admin:MeetingManage', {'type': type, 'number': number}) }}
-    {% endif %}
+    {{ component('Decision:Admin:MeetingManage', {'type': type, 'number': number}) }}
 
     {% include 'partials/application/confirm-modal.html.twig' %}
     {# A virtual decision has no virtual counterpart of its own, so a virtual meeting has no use for the lookup. #}

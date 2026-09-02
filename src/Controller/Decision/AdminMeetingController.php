@@ -13,7 +13,6 @@ use App\Repository\Decision\AuthorizationRepository;
 use App\Repository\Decision\MeetingPointRepository;
 use App\Repository\Decision\MeetingRepository;
 use App\Service\Application\FileStorageException;
-use App\Service\Database\Meeting as MeetingService;
 use App\Service\Decision\MeetingDocumentService;
 use App\Service\Decision\MeetingMinutesService;
 use App\Service\Decision\VersionLabelSuggester;
@@ -43,12 +42,11 @@ use function trim;
  * {@see \App\Twig\Components\Decision\Admin\MeetingManage} live component.
  *
  * The upload endpoints deliberately carry no CSRF token: they are not form submits but XHR calls, and access is
- * guarded by the database administrator requirement each of them carries (the photo upload endpoint set this
- * precedent).
+ * guarded by the board requirement each of them carries (the photo upload endpoint set this precedent).
  *
- * Minuting a meeting is the register administrator's job rather than the board's: what is decided, what is uploaded
- * and what is minuted are one record, kept by whoever keeps the register. The authorizations below are the exception,
- * being about who may vote at a meeting rather than about its record, so those stay with the board.
+ * Keeping a meeting is the board's job: its agenda, the documents filed under it and its minutes. What was decided in
+ * it is the register's record instead, so the decisions the management component offers are the register
+ * administrator's alone.
  */
 #[Route(
     path: '/admin/meetings',
@@ -77,7 +75,6 @@ class AdminMeetingController extends AbstractController
         private readonly MeetingMinutesService $meetingMinutesService,
         private readonly VersionLabelSuggester $versionLabelSuggester,
         private readonly TranslatorInterface $translator,
-        private readonly MeetingService $meetingService,
     ) {
     }
 
@@ -228,40 +225,8 @@ class AdminMeetingController extends AbstractController
                 'meeting' => $meeting,
                 'type' => $type,
                 'number' => $number,
-                // Only the read-only list needs the ledger's decisions here; the component asks the ledger itself.
-                ...($this->isGranted(UserRoles::DatabaseAdmin->value) ? [] : $this->decisions(
-                    $type,
-                    $number,
-                )),
             ],
         );
-    }
-
-    /**
-     * The ledger's view of a meeting.
-     *
-     * @return array<string, mixed>
-     */
-    private function decisions(
-        MeetingTypes $type,
-        int $number,
-    ): array {
-        $view = $this->meetingService->getMeetingView(
-            $type,
-            $number,
-        );
-
-        // A meeting the projection knows and the ledger does not is not an error here: the page still has documents
-        // to show, it just has nothing to say about decisions.
-        if (null === $view) {
-            return [];
-        }
-
-        return [
-            'ledgerMeeting' => $view->meeting,
-            'decisions' => $view->decisions,
-            'next_decision_numbers' => $view->nextDecisionNumbers,
-        ];
     }
 
     #[Route(
@@ -273,7 +238,7 @@ class AdminMeetingController extends AbstractController
         ],
         methods: ['POST'],
     )]
-    #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    #[IsGranted(UserRoles::Board->value)]
     public function uploadDocument(
         Request $request,
         MeetingTypes $type,
@@ -333,7 +298,7 @@ class AdminMeetingController extends AbstractController
         requirements: ['document' => '\d+'],
         methods: ['POST'],
     )]
-    #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    #[IsGranted(UserRoles::Board->value)]
     public function uploadDocumentVersion(
         Request $request,
         MeetingDocument $document,
@@ -366,7 +331,7 @@ class AdminMeetingController extends AbstractController
         ],
         methods: ['POST'],
     )]
-    #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    #[IsGranted(UserRoles::Board->value)]
     public function uploadMinutes(
         Request $request,
         MeetingTypes $type,
