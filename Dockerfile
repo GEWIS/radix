@@ -5,7 +5,7 @@ ARG FRANKENPHP_VERSION=1.12
 # host. They live outside /app/data because the volume mounts over it; the entrypoint seeds that volume from them
 # and app:user:update-ip-databases keeps it fresh. Pinned to a commit so the layer caches, as IPLocate rebuilds
 # daily. Keep this above the first `FROM`, or the stage below redeclares it empty and the URL 404s.
-ARG IPLOCATE_REVISION=8709782118044da2208506dc8f161af34d6dc7e0
+ARG IPLOCATE_REVISION=8d999672f98f983a88462a50969d7d2389dea36e
 
 FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_upstream
 

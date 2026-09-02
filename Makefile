@@ -29,7 +29,7 @@ SYMFONY_TEST = $(DOCKER_COMP) exec -T -e APP_ENV=test app bin/console
 .PHONY          : help seed translations igor openapi lint lint-fix lint-fix-all lint-twig phpstan phpstan-pr \
                   test test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
                   buildmatomo buildpgadmin setuplocalenv up upprod start startprod stop logs bash exec composer \
-                  sf cc getvendordir migrate migrate-to migration-up \
+                  sf cc migrate migrate-to migration-up \
                   migration-down migration-diff preparemailman preparelistmonk stripewebhooksecret
 LAST_COMMIT     := $(shell git rev-parse --short HEAD 2>/dev/null || echo abcabcabc)
 HOST_UID        := $(shell id -u)
@@ -180,13 +180,6 @@ bash: ## Connect to the FrankenPHP container
 exec: ## Run a command in the FrankenPHP container, example: make exec cmd="ls -la"
 	@$(eval cmd ?=)
 	@$(PHP_CONT) $(cmd)
-
-# vendor/ lives in the image rather than the bind mount, so it is copied out for the IDE to index.
-getvendordir: ## Copy vendor/ and the composer files out of the container, for the IDE to index
-	@rm -Rf ./vendor
-	@$(DOCKER_COMP) cp app:/app/vendor ./vendor
-	@$(DOCKER_COMP) cp app:/app/composer.json ./
-	@$(DOCKER_COMP) cp app:/app/composer.lock ./
 
 ## —— Composer —————————————————————————————————————————————————————————————————
 composer: ## Run composer, pass the parameter "c=" to run a given command, example: make composer c='req symfony/orm-pack'

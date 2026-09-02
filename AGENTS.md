@@ -454,8 +454,8 @@ missing production variable, and `composer dump-env prod` would bake it into the
 
 Hot reload covers almost everything in dev: FrankenPHP reloads the workers on source changes, and the dev entrypoint
 (`docker/web/docker-entrypoint.sh`) watches `assets/` to rebuild Sass and the asset map. You should very rarely need
-`make cc` or a container restart — reach for them only if something genuinely will not budge. `vendor/` lives in the
-image rather than the bind mount; `make getvendordir` copies it out for the IDE to index.
+`make cc` or a container restart — reach for them only if something genuinely will not budge. `vendor/` sits in the
+bind mount, so the IDE indexes the same directory the container installs into.
 
 Development mail is caught by MailPit; other locally exposed services are listed in `README.md`, with their ports in
 `compose.override.yaml`.

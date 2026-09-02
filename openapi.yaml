@@ -10,11 +10,14 @@ info:
     url: 'https://github.com/GEWIS/radix/blob/main/LICENSE.txt'
   version: 5.0.0
 servers:
-  - url: 'https://gewis.nl'
+  -
+    url: 'https://gewis.nl'
     description: 'Production environment'
-  - url: 'https://test.gewis.nl'
+  -
+    url: 'https://test.gewis.nl'
     description: 'Test environment'
-  - url: 'http://localhost'
+  -
+    url: 'http://localhost'
     description: 'Local environment'
 paths:
   /api/activities:
@@ -2795,29 +2798,41 @@ security:
   -
     api_auth: []
 tags:
-  - name: Activity
+  -
+    name: Activity
     description: 'An activity, as its live (approved) revision describes it. A cancelled activity is still listed, with `cancelled` set; one the board unpublished is not listed at all. Every human-readable field is an {en, nl} pair, and a value the organiser never filled in is null rather than substituted from the other language.'
-  - name: BoardMember
+  -
+    name: BoardMember
     description: 'A board installation. Current ones by default; `includeFormer` asks for the boards that came before.'
-  - name: Body
+  -
+    name: Body
     description: 'A body of the association: a committee, a fraternity, an advisory board, or any other organ a decision founded. The register calls it an organ; the API calls it a body. An abbreviation is reused when a body is founded again years later, so the identifier is the only stable handle on one.'
-  - name: BodyMember
+  -
+    name: BodyMember
     description: 'A member installed in a body, seen from the body. A member holding two functions in the same body is two rows.'
-  - name: Keyholder
+  -
+    name: Keyholder
     description: "A member holding a key to the association's rooms. Currently valid grants by default; `includeExpired` asks for the ones that have run out or been withdrawn."
-  - name: MailingList
+  -
+    name: MailingList
     description: 'A mailing list of the association. The name is its identifier, and it is case-sensitive.'
-  - name: MailingListMember
+  -
+    name: MailingListMember
     description: 'A subscription to a mailing list. A member subscribed under two addresses is two rows, which is why the membership number does not identify one.'
-  - name: Member
+  -
+    name: Member
     description: 'A member of the association. Which fields are present depends on the permissions the token carries: a field it may not see is absent rather than null.'
-  - name: MemberBody
+  -
+    name: MemberBody
     description: 'A member installed in a body, seen from the member.'
-  - name: PhotoAlbum
+  -
+    name: PhotoAlbum
     description: "A published photo album. Sub-albums are listed alongside their parents and carry their parent's identifier, so a consumer can rebuild the tree from one listing."
-  - name: AlbumPhoto
+  -
+    name: AlbumPhoto
     description: 'A photo in a published album. Reached through its album, which is what decides whether it may be seen.'
-  - name: PhotoOfTheWeek
+  -
+    name: PhotoOfTheWeek
     description: 'The photo the association voted best of the week that just passed. Its public copy needs no token; a hidden photo of the week is a missing resource.'
 externalDocs:
   description: 'Contribute to this API'
