@@ -84,8 +84,10 @@ services:
             # checkout on the host. Without it a breakpoint is hit but the IDE cannot say which file it is in.
             PHP_IDE_CONFIG: "${PHP_IDE_CONFIG:-serverName=localhost}"
         ports:
+            # Published through a variable so a rootless Docker, which cannot bind below 1024, can move it. The URLs
+            # built from `APP_URL` in `.env.local` have to name the same port; see the note there.
             - target: 80
-              published: 80
+              published: "${APP_PORT:-80}"
               protocol: tcp
         extra_hosts:
             - "host.docker.internal:host-gateway"
@@ -153,8 +155,10 @@ services:
         networks:
             - radix_network
         ports:
+            # As with the application: a variable so a rootless Docker can move it off a privileged port.
+            # `MATOMO_DOMAIN` in `.env.local` has to name the same port.
             - target: 80
-              published: 82
+              published: "${MATOMO_PORT:-82}"
               protocol: tcp
         depends_on:
             mariadb:
