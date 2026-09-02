@@ -97,7 +97,15 @@ You will need at least:
 
 PHP, Composer, and all other runtime tooling live inside the Docker image, no need to install them yourself.
 
-It is possible to use [rootless docker](https://docs.docker.com/engine/security/rootless/) on many Linux systems. For this, install `uidmap`, ensure IP forwarding is enabled, run `dockerd-rootless-setuptool.sh install` and set the `DOCKER_HOST` variable in your profile (e.g. `.bashrc`).
+It is possible to use [rootless docker](https://docs.docker.com/engine/security/rootless/) on many Linux systems. For this, install `uidmap`, ensure IP forwarding is enabled, run `dockerd-rootless-setuptool.sh install` and set the `DOCKER_HOST` variable in your profile (e.g. `.bashrc`). Note that a rootless daemon cannot bind a port below 1024, which is where the application (80) and Matomo (82) are published by default. Move them in your `.env.local`:
+
+```
+APP_PORT=8000
+APP_URL=http://localhost:8000
+MATOMO_PORT=8082
+```
+
+`APP_URL` is what the URLs in that file are built from, so the application is reached on `http://localhost:8000/` and everywhere the documentation below says `http://localhost/` you read that instead. Alternatively, allow the low ports on the host once with `sudo sysctl net.ipv4.ip_unprivileged_port_start=80` (persist it in `/etc/sysctl.d/`) and leave the ports as they are.
 
 ### Installation
 To set up radix locally, follow these steps:
