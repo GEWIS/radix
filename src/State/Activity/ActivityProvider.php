@@ -191,7 +191,7 @@ final readonly class ActivityProvider implements ProviderInterface
             costs: $this->text($revision->getCosts()),
             beginTime: $beginTime->format(DateTimeInterface::ATOM),
             endTime: $endTime->format(DateTimeInterface::ATOM),
-            category: $revision->getCategory()->value,
+            category: $revision->getCategory(),
             organ: $this->organ($revision),
             company: $this->company($revision),
             requireGEFLITST: $revision->getRequireGEFLITST(),

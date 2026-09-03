@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.17.0",
+    "generators": {
+      "radix-client": {
+        "generatorName": "typescript-axios",
+        "inputSpec": "../../openapi.yaml",
+        "output": "generated",
+        "openapiNormalizer": {
+          "REFACTOR_ALLOF_WITH_PROPERTIES_ONLY": true
+        },
+        "additionalProperties": {
+          "useSingleRequestParameter": true,
+          "supportsES6": true,
+          "enumPropertyNaming": "PascalCase"
+        }
+      }
+    }
+  }
+}

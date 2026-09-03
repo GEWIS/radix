@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Entity\Database\Enums\BoardFunctions;
 use App\Entity\User\Enums\ApiPermissions;
 use App\State\Api\ApiVersion;
 use App\State\Decision\BoardMemberProvider;
@@ -43,7 +44,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::BoardsR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::BoardsR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_COLLECTION,
         ),
     ],
@@ -63,8 +64,9 @@ final readonly class BoardMember
         #[ApiProperty(
             description: 'The function held. It is in Dutch because that is the language the decision was made in; '
                 . '`/boardFunctions` lists every value there is with its translations.',
+            openapiContext: ['$ref' => '#/components/schemas/BoardFunctionEnum'],
         )]
-        public string $function,
+        public BoardFunctions $function,
         #[SerializedName('installDate')]
         #[ApiProperty(description: 'When the installation took effect, in the `Y-m-d\TH:i:sP` format.')]
         public string $installDate,

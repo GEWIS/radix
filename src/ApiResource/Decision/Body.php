@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\User\Enums\ApiPermissions;
 use App\State\Api\ApiVersion;
 use App\State\Decision\BodyProvider;
@@ -33,9 +34,9 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
                     new Parameter(
                         name: 'type',
                         in: 'query',
-                        description: 'Narrow the list to one kind of body: `committee`, `avc`, `fraternity`, `kcc`, '
-                            . '`avw`, `rva` or `sc`. A value naming no kind of body is ignored rather than refused.',
-                        schema: ['type' => 'string'],
+                        description: 'Narrow the list to one kind of body. A value naming no kind of body is '
+                            . 'ignored rather than refused.',
+                        schema: ['$ref' => '#/components/schemas/BodyTypeEnum'],
                     ),
                     new Parameter(
                         name: 'includeAbrogated',
@@ -52,7 +53,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::BodiesR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::BodiesR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_COLLECTION,
         ),
         new Get(
@@ -67,7 +68,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
             security: "is_granted('" . ApiPermissions::BodiesR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::BodiesR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_ITEM,
         ),
     ],
@@ -95,9 +96,10 @@ final readonly class Body
         public string $name,
         #[SerializedName('type')]
         #[ApiProperty(
-            description: 'The kind of body: one of `committee`, `avc`, `fraternity`, `kcc`, `avw`, `rva` or `sc`.',
+            description: 'The kind of body.',
+            openapiContext: ['$ref' => '#/components/schemas/BodyTypeEnum'],
         )]
-        public string $type,
+        public OrganTypes $type,
         #[SerializedName('foundationDate')]
         #[ApiProperty(description: 'When the founding decision took effect, in the `Y-m-d\TH:i:sP` format.')]
         public string $foundationDate,

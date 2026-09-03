@@ -51,11 +51,11 @@ final class ApiExceptionListener
     private const string API_PREFIX = '/api';
 
     /** A request that matched no route at all. */
-    private const string TYPE_NO_ROUTE = 'error-router-no-match';
+    public const string TYPE_NO_ROUTE = 'error-router-no-match';
 
-    private const string TYPE_NOT_FOUND = 'error-resource-not-found';
+    public const string TYPE_NOT_FOUND = 'error-resource-not-found';
 
-    private const string TYPE_RATE_LIMITED = 'error-rate-limited';
+    public const string TYPE_RATE_LIMITED = 'error-rate-limited';
 
     /**
      * How the API names each failure it can report.
@@ -65,7 +65,7 @@ final class ApiExceptionListener
      * here rather than derived from `::class` — and why they live at the wire boundary rather than on the
      * exceptions, which have no business knowing their JSON name.
      */
-    private const array TYPES = [
+    public const array TYPES = [
         NotAllowed::class => 'User\\Model\\Exception\\NotAllowed',
         VersionExpected::class => 'Database\\Model\\Exception\\VersionExpected',
         VersionFormat::class => 'Database\\Model\\Exception\\VersionFormat',

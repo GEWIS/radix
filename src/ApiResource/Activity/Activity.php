@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\User\Enums\ApiPermissions;
 use App\State\Activity\ActivityProvider;
 use App\State\Api\ApiVersion;
@@ -74,10 +75,9 @@ use App\State\Api\ApiVersion;
                     new Parameter(
                         name: 'category',
                         in: 'query',
-                        description: 'Narrow the list to a single category, e.g. `social-drink` or `career`, as '
-                            . '`category` on an activity states it. A value naming no known category is ignored '
-                            . 'rather than refused.',
-                        schema: ['type' => 'string'],
+                        description: 'Narrow the list to a single category, as `category` on an activity states it. '
+                            . 'A value naming no known category is ignored rather than refused.',
+                        schema: ['$ref' => '#/components/schemas/ActivityCategoryEnum'],
                     ),
                     new Parameter(
                         name: 'organ',
@@ -91,7 +91,7 @@ use App\State\Api\ApiVersion;
             security: "is_granted('" . ApiPermissions::ActivitiesR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::ActivitiesR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_COLLECTION,
         ),
         new Get(
@@ -106,7 +106,7 @@ use App\State\Api\ApiVersion;
             security: "is_granted('" . ApiPermissions::ActivitiesR->value . "')",
             securityMessage: 'Permission `' . ApiPermissions::ActivitiesR->value
                 . '` is needed but is not currently held.',
-            extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT],
+            extraProperties: [ApiVersion::MINIMUM => ApiVersion::V5_0_0],
             name: self::OPERATION_ITEM,
         ),
     ],
@@ -178,10 +178,11 @@ final readonly class Activity
         #[ApiProperty(description: 'When the activity ends, in the `Y-m-d\TH:i:sP` format.')]
         public string $endTime,
         #[ApiProperty(
-            description: 'The single category the activity is filed under, e.g. `social-drink` or `career`. '
-                . '`uncategorised` is only ever carried by activities that predate categories.',
+            description: 'The single category the activity is filed under. `uncategorised` is only ever carried by '
+                . 'activities that predate categories.',
+            openapiContext: ['$ref' => '#/components/schemas/ActivityCategoryEnum'],
         )]
-        public string $category,
+        public ActivityCategories $category,
         #[ApiProperty(
             description: 'The body organising the activity, or null when no body does.',
             openapiContext: [

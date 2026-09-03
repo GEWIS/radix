@@ -143,7 +143,7 @@ final readonly class BodyProvider implements ProviderInterface
             id: $id,
             abbreviation: $body->getAbbr(),
             name: $body->getName(),
-            type: $body->getType()->value,
+            type: $body->getType(),
             foundationDate: $body->getFoundationDate()->format(DateTimeInterface::ATOM),
             abrogationDate: $body->getAbrogationDate()?->format(DateTimeInterface::ATOM),
             active: !$body->isAbrogated(),

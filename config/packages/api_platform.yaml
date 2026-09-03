@@ -1,7 +1,9 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 api_platform:
     title: GEWIS API
-    version: 5.0.0
+    # No `version` here. What versions this document is the contract it describes, which is the newest version any
+    # operation requires, and `ApiOpenApiFactory` works that out from the bounds the operations declare. A release
+    # number would be a second thing to keep honest that nothing reads.
 
     # The entrypoint would answer on a bare `/api`, which is the health endpoint.
     enable_entrypoint: false

@@ -98,7 +98,7 @@ final readonly class BoardMemberProvider implements ProviderInterface
         return new BoardMemberResource(
             lidnr: $member->getLidnr(),
             fullName: $member->getFullName(),
-            function: $installation->getFunction()->value,
+            function: $installation->getFunction(),
             installDate: $installation->getInstallDate()->format(DateTimeInterface::ATOM),
             releaseDate: $installation->getReleaseDate()?->format(DateTimeInterface::ATOM),
             dischargeDate: $installation->getDischargeDate()?->format(DateTimeInterface::ATOM),
