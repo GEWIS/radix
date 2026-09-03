@@ -15,11 +15,14 @@ import { Controller } from '@hotwired/stimulus';
  *       <div data-signup-list-target="custom">…</div>
  *     </div>
  *   </div>
+ *
+ * A field tagged `required` is the one its block exists to ask for, so it is required exactly while that block is
+ * shown; the server holds a list to the same rule (see SignupListType::validateAllocationMethod).
  */
 export default class extends Controller {
     static targets = [
         'limited', 'capacity', 'methodBlock', 'method',
-        'conditional', 'rule', 'cutoffAt', 'durationHours', 'external', 'custom',
+        'conditional', 'rule', 'cutoffAt', 'durationHours', 'external', 'custom', 'required',
     ];
 
     declare readonly hasLimitedTarget: boolean;
@@ -28,6 +31,7 @@ export default class extends Controller {
     declare readonly methodTarget: HTMLSelectElement;
     declare readonly hasRuleTarget: boolean;
     declare readonly ruleTarget: HTMLSelectElement;
+    declare readonly requiredTargets: (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
 
     connect(): void {
         this.apply();
@@ -46,6 +50,8 @@ export default class extends Controller {
         this.setHidden('custom', !(limited && 'custom' === method));
         this.setHidden('cutoffAt', !(conditional && 'if-full-before' === rule));
         this.setHidden('durationHours', !(conditional && 'after-duration-open' === rule));
+
+        this.markRequired();
     }
 
     setHidden(name: string, hidden: boolean): void {
@@ -53,5 +59,14 @@ export default class extends Controller {
         if (target instanceof HTMLElement) {
             target.hidden = hidden;
         }
+    }
+
+    // Only the label is marked, with the same asterisk every other required field carries: a field that is not asked
+    // for is still submitted (hidden, not disabled) and is cleared server-side, so the browser must not refuse it.
+    markRequired(): void {
+        this.requiredTargets.forEach((field) => {
+            const asked = null === field.closest('[hidden]');
+            Array.from(field.labels ?? []).forEach((label) => { label.classList.toggle('required', asked); });
+        });
     }
 }

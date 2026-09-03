@@ -11,15 +11,18 @@ use DateTime;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function is_array;
 use function Symfony\Component\Translation\t;
 use function trim;
 
@@ -63,9 +66,33 @@ class SignupListsStepType extends AbstractType
         );
 
         $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            $this->rememberLists(...),
+        );
+        $builder->addEventListener(
             FormEvents::POST_SUBMIT,
             $this->validateLists(...),
         );
+    }
+
+    /**
+     * Tell the fields which languages the activity is written in, so the step can disable the ones that are off and
+     * mark the ones that are on as required. They are answered a step earlier, where the `localised-fields` Stimulus
+     * controller reads them off the checkboxes themselves; here it is handed the answer.
+     *
+     * @param FormInterface<mixed> $form
+     * @param array<string, mixed> $options
+     */
+    #[Override]
+    public function buildView(
+        FormView $view,
+        FormInterface $form,
+        array $options,
+    ): void {
+        $activity = $form->getParent()?->getData();
+
+        $view->vars['language_dutch'] = !$activity instanceof ActivityData || $activity->languageDutch;
+        $view->vars['language_english'] = !$activity instanceof ActivityData || $activity->languageEnglish;
     }
 
     #[Override]
@@ -77,12 +104,37 @@ class SignupListsStepType extends AbstractType
         ]);
     }
 
+    /**
+     * Keep what the step was filled in with on the data object, which is what the flow carries between the steps: the
+     * lists themselves hang off the revision, and that is built afresh on every request.
+     */
+    private function rememberLists(FormEvent $event): void
+    {
+        $activity = $event->getForm()->getParent()?->getData();
+
+        if (!$activity instanceof ActivityData) {
+            return;
+        }
+
+        $submitted = $event->getData();
+        $lists = is_array($submitted)
+            ? ($submitted['signupLists'] ?? [])
+            : [];
+
+        $activity->signupListsSubmission = is_array($lists)
+            ? $lists
+            : [];
+    }
+
     private function validateLists(FormEvent $event): void
     {
         $form = $event->getForm();
         $activity = $form->getParent()?->getData();
 
-        if (!$activity instanceof ActivityData) {
+        if (
+            !$activity instanceof ActivityData
+            || !self::isHandedIn($form)
+        ) {
             return;
         }
 
@@ -118,6 +170,35 @@ class SignupListsStepType extends AbstractType
                 );
             }
         }
+    }
+
+    /**
+     * Whether the step is being handed in rather than only filled back in. Nothing is clicked while the step is
+     * restored from what it last held, and the back button asks for what was filled in to be kept rather than to be
+     * correct (it turns the validator off the same way, but these checks are made by hand and would still run).
+     *
+     * @param FormInterface<mixed> $form
+     */
+    private static function isHandedIn(FormInterface $form): bool
+    {
+        $root = $form->getRoot();
+
+        if (!$root instanceof FormFlowInterface) {
+            return true;
+        }
+
+        $button = $root->getClickedButton();
+
+        if (!$button instanceof FormInterface) {
+            return false;
+        }
+
+        // A button that asks for no groups asks for no checks; `false` is normalised to the empty list before it
+        // reaches here, which is the same thing the validator itself reads.
+        $groups = $button->getConfig()->getOption('validation_groups');
+
+        return [] !== $groups
+            && false !== $groups;
     }
 
     /**

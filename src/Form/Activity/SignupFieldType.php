@@ -16,7 +16,11 @@ use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function strval;
 use function Symfony\Component\Translation\t;
@@ -102,11 +106,89 @@ class SignupFieldType extends AbstractType
             static fn (?int $value): string => strval($value ?? 0),
             static fn (?string $value): int => (int) $value,
         ));
+
+        // After binding, drop the bounds only the number type uses, so a question whose type changed cannot keep
+        // values nothing shows any more and the cloner would carry into future revisions.
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            $this->clearInapplicableBounds(...),
+        );
     }
 
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => SignupField::class]);
+        $resolver->setDefaults([
+            'data_class' => SignupField::class,
+            // A number is answered within bounds, so a question of that type has to name them; validated at the
+            // object level so the rule can depend on the chosen type.
+            'constraints' => [new Callback($this->validateBounds(...))],
+        ]);
+    }
+
+    public function validateBounds(
+        mixed $field,
+        ExecutionContextInterface $context,
+    ): void {
+        if (
+            !$field instanceof SignupField
+            || SignupFieldTypes::Number !== $field->getType()
+        ) {
+            return;
+        }
+
+        $minimum = $field->getMinimumValue();
+        $maximum = $field->getMaximumValue();
+
+        if (null === $minimum) {
+            $context->buildViolation(t(
+                'Enter the lowest value that may be entered.',
+                [],
+                'validators',
+            )->getMessage())
+                ->atPath('minimumValue')
+                ->addViolation();
+        }
+
+        if (null === $maximum) {
+            $context->buildViolation(t(
+                'Enter the highest value that may be entered.',
+                [],
+                'validators',
+            )->getMessage())
+                ->atPath('maximumValue')
+                ->addViolation();
+        }
+
+        if (
+            null === $minimum
+            || null === $maximum
+            || $maximum >= $minimum
+        ) {
+            return;
+        }
+
+        $context->buildViolation(t(
+            'The highest value must not be below the lowest value.',
+            [],
+            'validators',
+        )->getMessage())
+            ->atPath('maximumValue')
+            ->addViolation();
+    }
+
+    private function clearInapplicableBounds(FormEvent $event): void
+    {
+        $field = $event->getData();
+
+        if (
+            !$field instanceof SignupField
+            || SignupFieldTypes::Number === $field->getType()
+        ) {
+            return;
+        }
+
+        $field->setMinimumValue(null);
+        $field->setMaximumValue(null);
     }
 }

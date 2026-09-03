@@ -233,9 +233,17 @@
         <source>Enter the first day of this round.</source>
         <target state="translated">Vul de eerste dag van deze ronde in.</target>
       </trans-unit>
+      <trans-unit id="KQ5ibtN" resname="Enter the highest value that may be entered.">
+        <source>Enter the highest value that may be entered.</source>
+        <target state="translated">Vul de hoogste waarde in die ingevuld mag worden.</target>
+      </trans-unit>
       <trans-unit id="Rc4ASTv" resname="Enter the last day of this round.">
         <source>Enter the last day of this round.</source>
         <target state="translated">Vul de laatste dag van deze ronde in.</target>
+      </trans-unit>
+      <trans-unit id="rsivIdg" resname="Enter the lowest value that may be entered.">
+        <source>Enter the lowest value that may be entered.</source>
+        <target state="translated">Vul de laagste waarde in die ingevuld mag worden.</target>
       </trans-unit>
       <trans-unit id="XYEvm8Q" resname="Enter the moment the list must be full by.">
         <source>Enter the moment the list must be full by.</source>
@@ -392,6 +400,10 @@
       <trans-unit id="Oed6bKp" resname="The full name may not be longer than {{ limit }} characters.">
         <source>The full name may not be longer than {{ limit }} characters.</source>
         <target>De volledige naam mag niet langer zijn dan {{ limit }} tekens.</target>
+      </trans-unit>
+      <trans-unit id="ouZkavm" resname="The highest value must not be below the lowest value.">
+        <source>The highest value must not be below the lowest value.</source>
+        <target state="translated">De hoogste waarde mag niet lager zijn dan de laagste waarde.</target>
       </trans-unit>
       <trans-unit id="SHUCT3j" resname="The last day of the round must not be before the first.">
         <source>The last day of the round must not be before the first.</source>

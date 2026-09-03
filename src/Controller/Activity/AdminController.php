@@ -33,6 +33,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -125,9 +126,12 @@ class AdminController extends AbstractController
                 $this->translator,
             );
 
+            $form = $flow->getStepForm();
+            $this->restoreSignupLists($form);
+
             return $this->render(
                 'activity/admin/create.html.twig',
-                ['form' => $flow->getStepForm()],
+                ['form' => $form],
             );
         }
 
@@ -303,10 +307,13 @@ class AdminController extends AbstractController
                 $this->translator,
             );
 
+            $form = $flow->getStepForm();
+            $this->restoreSignupLists($form);
+
             return $this->render(
                 'activity/admin/edit.html.twig',
                 [
-                    'form' => $flow->getStepForm(),
+                    'form' => $form,
                     'activity' => $activity,
                     'comments' => $this->commentRepository->findThreadForActivity($activity),
                 ],
@@ -377,6 +384,35 @@ class AdminController extends AbstractController
         );
 
         return $this->redirectToRoute('admin/activities/index');
+    }
+
+    /**
+     * Fill the sign-up lists step back in with what it last held. The lists are edited on the revision, which is built
+     * afresh on every request and so arrives empty; only what the step was filled in with travels along in the flow.
+     * Handing that back to the step is what turns it into lists again, so a step that is returned to is the step that
+     * was left.
+     *
+     * @param FormInterface<mixed> $form
+     */
+    private function restoreSignupLists(FormInterface $form): void
+    {
+        if (!$form->has(ActivityData::STEP_SIGNUP_LISTS)) {
+            return;
+        }
+
+        $step = $form->get(ActivityData::STEP_SIGNUP_LISTS);
+        $data = $form->getData();
+
+        // A step that was just handed in already holds what was typed into it, right down to what was rejected.
+        if (
+            $step->isSubmitted()
+            || !$data instanceof ActivityData
+            || null === $data->signupListsSubmission
+        ) {
+            return;
+        }
+
+        $step->submit([ActivityData::STEP_SIGNUP_LISTS => $data->signupListsSubmission]);
     }
 
     /**

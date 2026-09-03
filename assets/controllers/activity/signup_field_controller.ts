@@ -10,9 +10,12 @@ import { Controller } from '@hotwired/stimulus';
  *                data-action="change->signup-field#defaultChanged">...</div>
  * </div>
  * ```
+ *
+ * A field tagged `required` is one its block exists to ask for, so it is required exactly while that block is shown;
+ * the server holds a question to the same rule (see SignupFieldType::validateBounds).
  */
 export default class extends Controller {
-    static targets = ['type', 'number', 'choice', 'defaultOption'];
+    static targets = ['type', 'number', 'choice', 'defaultOption', 'required'];
 
     declare readonly typeTarget: HTMLSelectElement;
     declare readonly hasNumberTarget: boolean;
@@ -20,6 +23,7 @@ export default class extends Controller {
     declare readonly hasChoiceTarget: boolean;
     declare readonly choiceTarget: HTMLElement;
     declare readonly defaultOptionTargets: HTMLInputElement[];
+    declare readonly requiredTargets: (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
 
     connect(): void {
         // Only set visibility on connect (an existing field keeps its saved options); seeding/clearing is user-driven.
@@ -48,6 +52,17 @@ export default class extends Controller {
         if (this.hasChoiceTarget) {
             this.choiceTarget.hidden = 'choice' !== type;
         }
+
+        this.markRequired();
+    }
+
+    // Only the label is marked, with the same asterisk every other required field carries: a field that is not asked
+    // for is still submitted (hidden, not disabled) and is cleared server-side, so the browser must not refuse it.
+    markRequired(): void {
+        this.requiredTargets.forEach((field) => {
+            const asked = null === field.closest('[hidden]');
+            Array.from(field.labels ?? []).forEach((label) => { label.classList.toggle('required', asked); });
+        });
     }
 
     /**
