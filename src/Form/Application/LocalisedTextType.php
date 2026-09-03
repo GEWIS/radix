@@ -11,8 +11,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function array_key_exists;
+use function is_array;
 use function Symfony\Component\Translation\t;
 
 /**
@@ -69,6 +73,49 @@ class LocalisedTextType extends AbstractType
                     },
                 ],
             );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            $this->keepAbsentLanguages(...),
+        );
+    }
+
+    /**
+     * A language that is switched off is disabled in the browser and so is never handed in. Read that absence as "no
+     * answer" rather than as an erasure, the way the flat per-language fields elsewhere keep whatever a language that
+     * is off already had.
+     */
+    private function keepAbsentLanguages(FormEvent $event): void
+    {
+        $submitted = $event->getData();
+        $text = $event->getForm()->getData();
+
+        if (
+            !is_array($submitted)
+            || !$text instanceof LocalisedTextModel
+        ) {
+            return;
+        }
+
+        foreach (
+            [
+                'valueNL' => $text->getValueNL(),
+                'valueEN' => $text->getValueEN(),
+            ] as $child => $current
+        ) {
+            if (
+                array_key_exists(
+                    $child,
+                    $submitted,
+                )
+            ) {
+                continue;
+            }
+
+            $submitted[$child] = $current;
+        }
+
+        $event->setData($submitted);
     }
 
     #[Override]

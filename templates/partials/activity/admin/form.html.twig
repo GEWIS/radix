@@ -116,7 +116,10 @@
         </div>
     </div>
 {% else %}
-    <div class="row">
+    {# The language checkboxes live on the previous step, so the controller is handed their answer instead. #}
+    <div class="row" data-controller="localised-fields"
+         data-localised-fields-dutch-value="{{ form.signupLists.vars.language_dutch ? 'true' : 'false' }}"
+         data-localised-fields-english-value="{{ form.signupLists.vars.language_english ? 'true' : 'false' }}">
         <div class="col-md-12">
             <div class="panel">
                 <div class="panel-heading">

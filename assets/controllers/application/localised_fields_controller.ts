@@ -11,9 +11,13 @@ type LocalisedField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
  *   - the checkboxes:  data-localised-fields-target="dutchToggle" | "englishToggle"
  *                      data-action="localised-fields#apply"
  *   - the inputs:      data-localised-fields-target="dutch" | "english"
+ *
+ * Where the checkboxes are not on the page — a later step of a form flow answers them on an earlier one — the answer
+ * is carried as data-localised-fields-dutch-value / -english-value instead. With neither, every language is on.
  */
 export default class extends Controller {
     static targets = ['dutchToggle', 'englishToggle', 'dutch', 'english'];
+    static values = { dutch: Boolean, english: Boolean };
 
     declare readonly hasDutchToggleTarget: boolean;
     declare readonly dutchToggleTarget: HTMLInputElement;
@@ -21,6 +25,10 @@ export default class extends Controller {
     declare readonly englishToggleTarget: HTMLInputElement;
     declare readonly dutchTargets: LocalisedField[];
     declare readonly englishTargets: LocalisedField[];
+    declare readonly hasDutchValue: boolean;
+    declare readonly dutchValue: boolean;
+    declare readonly hasEnglishValue: boolean;
+    declare readonly englishValue: boolean;
 
     connect(): void {
         this.apply();
@@ -47,10 +55,18 @@ export default class extends Controller {
     }
 
     dutchEnabled(): boolean {
-        return !this.hasDutchToggleTarget || this.dutchToggleTarget.checked;
+        if (this.hasDutchToggleTarget) {
+            return this.dutchToggleTarget.checked;
+        }
+
+        return !this.hasDutchValue || this.dutchValue;
     }
 
     englishEnabled(): boolean {
-        return !this.hasEnglishToggleTarget || this.englishToggleTarget.checked;
+        if (this.hasEnglishToggleTarget) {
+            return this.englishToggleTarget.checked;
+        }
+
+        return !this.hasEnglishValue || this.englishValue;
     }
 }

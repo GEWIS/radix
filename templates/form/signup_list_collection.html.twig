@@ -25,8 +25,10 @@
                             'data-signup-list-target': 'limited',
                             'data-action': 'change->signup-list#apply',
                         }}) }}
+                        {# The `required` target marks the field its block exists to ask for, so it carries the
+                           asterisk exactly while that block is shown. #}
                         <div data-signup-list-target="capacity">
-                            {{ form_row(child.capacity) }}
+                            {{ form_row(child.capacity, {'attr': {'data-signup-list-target': 'required'}}) }}
                         </div>
                         <div data-signup-list-target="methodBlock">
                             {{ form_row(child.allocationMethod, {'attr': {
@@ -35,19 +37,23 @@
                             }}) }}
                             <div data-signup-list-target="conditional">
                                 {{ form_row(child.drawCutoffRule, {'attr': {
-                                    'data-signup-list-target': 'rule',
+                                    'data-signup-list-target': 'rule required',
                                     'data-action': 'change->signup-list#apply',
                                 }}) }}
-                                <div data-signup-list-target="cutoffAt">{{ form_row(child.drawCutoffAt) }}</div>
-                                <div data-signup-list-target="durationHours">{{ form_row(child.drawAfterDurationHours) }}</div>
+                                <div data-signup-list-target="cutoffAt">
+                                    {{ form_row(child.drawCutoffAt, {'attr': {'data-signup-list-target': 'required'}}) }}
+                                </div>
+                                <div data-signup-list-target="durationHours">
+                                    {{ form_row(child.drawAfterDurationHours, {'attr': {'data-signup-list-target': 'required'}}) }}
+                                </div>
                             </div>
                             <div data-signup-list-target="external">
-                                {{ form_row(child.externalPolicyUrl) }}
+                                {{ form_row(child.externalPolicyUrl, {'attr': {'data-signup-list-target': 'required'}}) }}
                                 {{ form_row(child.externalForceOrdering) }}
                                 {{ form_row(child.externalPaymentByExternal) }}
                             </div>
                             <div data-signup-list-target="custom">
-                                {{ form_row(child.customMethodDescription) }}
+                                {{ form_row(child.customMethodDescription, {'attr': {'data-signup-list-target': 'required'}}) }}
                             </div>
                         </div>
                     </div>
@@ -125,10 +131,11 @@
                     }}) }}</div>
                     <div class="col-md-6">{{ form_row(child.isSensitive) }}</div>
                 </div>
+                {# Both bounds are what the number type exists to ask for, so they carry the asterisk while shown. #}
                 <div data-signup-field-target="number">
                     <div class="row">
-                        <div class="col-md-6">{{ form_row(child.minimumValue) }}</div>
-                        <div class="col-md-6">{{ form_row(child.maximumValue) }}</div>
+                        <div class="col-md-6">{{ form_row(child.minimumValue, {'attr': {'data-signup-field-target': 'required'}}) }}</div>
+                        <div class="col-md-6">{{ form_row(child.maximumValue, {'attr': {'data-signup-field-target': 'required'}}) }}</div>
                     </div>
                 </div>
                 <div data-signup-field-target="choice">

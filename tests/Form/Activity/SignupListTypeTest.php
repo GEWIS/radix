@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Form\Activity;
 
 use App\Entity\Activity\ActivityLocalisedText;
+use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\DrawCutoffRule;
 use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
@@ -192,6 +194,131 @@ final class SignupListTypeTest extends TypeTestCase
         );
         // An unchecked "default" checkbox is simply absent from the submission and maps to false.
         self::assertFalse($options[1]->isDefault());
+    }
+
+    /**
+     * The settings an allocation method needs are required only for the method that needs them, which is what the
+     * editor draws by revealing a block at a time. These pin the same rule on the server, where a submission that
+     * skipped the editor also lands.
+     */
+    public function testAConditionalDrawMustSayWhenItIsDrawn(): void
+    {
+        $form = $this->submitList(['allocationMethod' => AllocationMethod::ConditionalDraw->value]);
+
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('drawCutoffRule')->getErrors(),
+        );
+    }
+
+    public function testADrawOnAFullListMustSayWhatItMustBeFullBy(): void
+    {
+        $form = $this->submitList([
+            'allocationMethod' => AllocationMethod::ConditionalDraw->value,
+            'drawCutoffRule' => DrawCutoffRule::IfFullBefore->value,
+        ]);
+
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('drawCutoffAt')->getErrors(),
+        );
+    }
+
+    public function testADrawAfterATimeOpenMustSayHowLong(): void
+    {
+        $form = $this->submitList([
+            'allocationMethod' => AllocationMethod::ConditionalDraw->value,
+            'drawCutoffRule' => DrawCutoffRule::AfterDurationOpen->value,
+        ]);
+
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('drawAfterDurationHours')->getErrors(),
+        );
+    }
+
+    public function testAnExternalPartyMustLinkItsPolicy(): void
+    {
+        $form = $this->submitList(['allocationMethod' => AllocationMethod::ExternalParty->value]);
+
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('externalPolicyUrl')->getErrors(),
+        );
+    }
+
+    public function testACustomMethodMustBeDescribed(): void
+    {
+        $form = $this->submitList(['allocationMethod' => AllocationMethod::Custom->value]);
+
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('customMethodDescription')->getErrors(),
+        );
+    }
+
+    /**
+     * A method asks only for its own settings: an unlimited list is held to none of them.
+     */
+    public function testAnUnlimitedListIsAskedForNoAllocationSettings(): void
+    {
+        $form = $this->submitList([
+            'limitedCapacity' => null,
+            'capacity' => '',
+            'allocationMethod' => AllocationMethod::ConditionalDraw->value,
+        ]);
+
+        self::assertTrue(
+            $form->isValid(),
+            (string) $form->getErrors(true),
+        );
+    }
+
+    public function testADrawThatSaysWhenItHappensIsAccepted(): void
+    {
+        $form = $this->submitList([
+            'allocationMethod' => AllocationMethod::ConditionalDraw->value,
+            'drawCutoffRule' => DrawCutoffRule::IfFullBefore->value,
+            'drawCutoffAt' => '2030-01-15T12:00',
+        ]);
+
+        self::assertTrue(
+            $form->isValid(),
+            (string) $form->getErrors(true),
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     *
+     * @return FormInterface<mixed>
+     */
+    private function submitList(array $overrides): FormInterface
+    {
+        $form = $this->factory->create(
+            SignupListType::class,
+            $this->list(),
+        );
+
+        $form->submit($overrides + [
+            'name' => [
+                'valueNL' => 'Naam',
+                'valueEN' => 'Name',
+            ],
+            'openDate' => '2030-01-01T12:00',
+            'closeDate' => '2030-02-01T12:00',
+            'limitedCapacity' => '1',
+            'capacity' => '10',
+            'allocationMethod' => AllocationMethod::FirstComeFirstServed->value,
+            'fields' => [],
+        ]);
+
+        return $form;
     }
 
     private function listWithSignUp(): SignupList

@@ -104,6 +104,16 @@ final class ActivityData
 
     public ?string $descriptionEN = null;
 
+    /**
+     * What the sign-up lists step was last filled in with, kept verbatim. The lists themselves are edited on the
+     * revision, and that is built afresh on every request, so this is the only thing about them that survives the
+     * step being left and returned to. Null until the step has been visited, which is not the same as it having
+     * been emptied.
+     *
+     * @var array<array-key, mixed>|null
+     */
+    public ?array $signupListsSubmission = null;
+
     public static function fromRevision(
         ActivityRevision $revision,
         bool $scheduleLocked,
