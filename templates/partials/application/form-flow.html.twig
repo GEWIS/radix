@@ -8,31 +8,112 @@
         ...the current step...
         {{ flow.navigation(form) }}
 #}
-{% macro tab_content(form, name, step) %}
-    <span class="form-stepper__num">{{ step.position }}</span>
-    <span class="form-stepper__label">{{ form.vars.step_labels[name]|default(name)|trans }}</span>
+{% macro goto(form, step, label, attributes) %}
+    <button type="submit" formnovalidate
+            name="{{ form.goto.vars.full_name }}" value="{{ step }}"
+            {% for name, value in attributes|default({}) %}{{ name }}="{{ value }}" {% endfor %}>{{ label }}</button>
 {% endmacro %}
 
 {% macro stepper(form) %}
     {% import _self as self %}
-    {% set current = form_flow_step_index(form) %}
+    {% set stepper = form.vars.stepper %}
+    {# The jump button is drawn by hand, once per step it can reach, so form_end() must not emit it as well. #}
+    {% do form.goto.setRendered %}
     <ol class="form-stepper" role="tablist">
-        {% for name, step in form.vars.visible_steps %}
+        {% for step in stepper.top %}
             <li class="form-stepper__step" role="presentation">
-                {% if step.index < current and form.previous is defined %}
-                    <button type="submit" class="form-stepper__btn is-complete" role="tab" formnovalidate
-                            name="{{ form.previous.vars.full_name }}" value="{{ name }}">
-                        {{ self.tab_content(form, name, step) }}
-                    </button>
+                {% if 'complete' == step.state and form.goto is defined %}
+                    {{ self.goto(form, step.name, self.tab_content(step), {
+                        'class': 'form-stepper__btn is-complete',
+                        'role': 'tab',
+                    }) }}
                 {% else %}
-                    <span class="form-stepper__btn{{ step.is_current_step ? ' active' }}" role="tab"
-                          {% if step.is_current_step %}aria-current="step"{% endif %}>
-                        {{ self.tab_content(form, name, step) }}
+                    <span class="form-stepper__btn{{ 'current' == step.state ? ' active' }}" role="tab"
+                          {% if 'current' == step.state %}aria-current="step"{% endif %}>
+                        {{ self.tab_content(step) }}
                     </span>
                 {% endif %}
             </li>
         {% endfor %}
     </ol>
+
+    {% if stepper.group is not null %}
+        {{ self.group_bar(form, stepper.group) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro tab_content(step) %}
+    <span class="form-stepper__num">{{ step.position }}</span>
+    <span class="form-stepper__label">{{ step.label|trans }}</span>
+{% endmacro %}
+
+{% macro group_bar(form, group) %}
+    {% import _self as self %}
+    <div class="form-stepper-group">
+        <div class="dropdown">
+            <button type="button" class="form-stepper-group__current dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                {% if group.number is not null %}
+                    <span class="signup-list-badge">{{ group.number }}</span>
+                {% endif %}
+                <span class="form-stepper-group__naming">
+                    <span class="form-stepper-group__name">{{ group.label }}</span>
+                    <span class="form-stepper-group__position">
+                        {{ '%position% of %total%'|trans({'%position%': group.position, '%total%': group.total}) }}
+                    </span>
+                </span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><h6 class="dropdown-header">{{ 'Jump to sign-up list'|trans }}</h6></li>
+                {% for sibling in group.siblings %}
+                    <li>
+                        {% set naming %}
+                            {% if sibling.number is not null %}
+                                <span class="signup-list-badge signup-list-badge--muted">{{ sibling.number }}</span>
+                            {% endif %}
+                            <span class="flex-grow-1 text-truncate">{{ sibling.label }}</span>
+                            {% if sibling.state is not null %}
+                                <span class="text-body-secondary small">{{ sibling.state }}</span>
+                            {% endif %}
+                        {% endset %}
+                        {{ self.goto(form, sibling.name, naming, {
+                            'class': 'dropdown-item d-flex align-items-center gap-2' ~ (sibling.current ? ' active' : ''),
+                        }) }}
+                    </li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li>{{ self.goto(form, group.overview, 'All sign-up lists'|trans, {'class': 'dropdown-item text-gewis-primary'}) }}</li>
+            </ul>
+        </div>
+
+        <ul class="nav nav-pills" role="tablist">
+            {% for step in group.steps %}
+                {% set marked %}
+                    <span class="badge">{{ step.position }}</span>{{ step.label|trans }}
+                {% endset %}
+                <li class="nav-item" role="presentation">
+                    {% if 'current' == step.state %}
+                        <span class="nav-link active{{ step.done ? ' is-done' }}" role="tab"
+                              aria-current="step">{{ marked }}</span>
+                    {% else %}
+                        {{ self.goto(form, step.name, marked, {
+                            'class': 'nav-link' ~ (step.done ? ' is-done' : ''),
+                            'role': 'tab',
+                        }) }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <span class="form-stepper-group__nav">
+            {% if group.previous is not null %}
+                {{ self.goto(form, group.previous, 'Previous list'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
+            {% endif %}
+            {% if group.next is not null %}
+                {{ self.goto(form, group.next, 'Next list'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
+            {% endif %}
+        </span>
+    </div>
 {% endmacro %}
 
 {% macro navigation(form, cancel_url = null, cancel_label = null) %}

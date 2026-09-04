@@ -6,6 +6,7 @@ namespace App\Service\Activity;
 
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityRevision;
+use App\Entity\Activity\SignupList;
 use App\Entity\Decision\Member;
 use App\Entity\User\User;
 use App\Service\Application\EditLockService;
@@ -45,6 +46,43 @@ final readonly class ActivityAdminService
         }
 
         $this->facilityNotifier->created($revision);
+    }
+
+    /**
+     * Saved straight away, because the steps that fill a list in are built from the lists the revision has: a list that
+     * only existed in a submission would have no steps to be filled in on.
+     */
+    public function addSignupList(ActivityRevision $revision): SignupList
+    {
+        $list = new SignupList();
+
+        $revision->addSignupList($list);
+        $this->entityManager->persist($list);
+        $this->entityManager->flush();
+
+        return $list;
+    }
+
+    public function saveSignupLists(ActivityRevision $revision): void
+    {
+        foreach ($revision->getSignupLists() as $list) {
+            $this->entityManager->persist($list);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function removeSignupList(SignupList $list): bool
+    {
+        if ($list->hasLineageSignUps()) {
+            return false;
+        }
+
+        $list->getRevision()->removeSignupList($list);
+        $this->entityManager->remove($list);
+        $this->entityManager->flush();
+
+        return true;
     }
 
     /**

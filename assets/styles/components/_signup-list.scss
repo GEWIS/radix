@@ -1,0 +1,120 @@
+.signup-list-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 0.45rem;
+    background-color: var(--#{$prefix}form-stepper-accent-subtle, #{rgba($gewis-red, 0.12)});
+    color: $gewis-red;
+    font-size: 0.7rem;
+    font-weight: 800;
+
+    &--muted {
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+        border-radius: 0.4rem;
+        background-color: var(--#{$prefix}secondary-bg);
+        color: var(--#{$prefix}secondary-color);
+        font-size: 0.65rem;
+    }
+}
+
+.signup-list-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--#{$prefix}border-color);
+    border-radius: 0.875rem;
+    background-color: var(--#{$prefix}body-bg);
+
+    &__name {
+        font-size: 0.97rem;
+        font-weight: 700;
+    }
+
+    &__part {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: var(--#{$prefix}secondary-color);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+            color: $gewis-red;
+            text-decoration: none;
+        }
+
+        &::before {
+            content: '';
+            inline-size: 0.55rem;
+            block-size: 0.55rem;
+            border: 1px solid currentcolor;
+            border-radius: 50%;
+        }
+
+        &.is-done::before {
+            border-color: #{$nav-pills-badge-done-bg};
+            background-color: #{$nav-pills-badge-done-bg};
+        }
+    }
+
+    &__remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 2.125rem;
+        block-size: 2.125rem;
+        border: 1px solid var(--#{$prefix}border-color);
+        border-radius: 0.625rem;
+        background: transparent;
+        color: var(--#{$prefix}secondary-color);
+
+        &:hover {
+            border-color: $gewis-red;
+            background-color: #{rgba($gewis-red, 0.06)};
+            color: $gewis-red;
+        }
+    }
+}
+
+.signup-list-empty {
+    padding: 1.875rem;
+    border: 1px dashed var(--#{$prefix}border-color);
+    border-radius: 0.875rem;
+    text-align: center;
+}
+
+.signup-list-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.05rem;
+    border: 1px dashed var(--#{$prefix}border-color);
+    border-radius: 0.7rem;
+    background: transparent;
+    color: $gewis-red;
+    font-size: 0.85rem;
+    font-weight: 700;
+
+    &:hover {
+        border-color: $gewis-red;
+        background-color: #{rgba($gewis-red, 0.06)};
+        color: $gewis-red;
+    }
+}
+
+@include color-mode(gewis-night) {
+    .signup-list-row__part.is-done::before {
+        border-color: #{$nav-pills-badge-done-bg-dark};
+        background-color: #{$nav-pills-badge-done-bg-dark};
+    }
+}

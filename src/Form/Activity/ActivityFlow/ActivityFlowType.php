@@ -5,18 +5,39 @@ declare(strict_types=1);
 namespace App\Form\Activity\ActivityFlow;
 
 use App\Entity\Activity\ActivityRevision;
+use App\Entity\Activity\SignupList;
+use App\Entity\Application\Enums\Languages;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\Flow\AbstractStepperFlowType;
 use Override;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function sprintf;
 use function Symfony\Component\Translation\t;
+use function trim;
 
 /**
  * The activity form. Everything is staged with the working revision and only goes live on approval.
  */
 class ActivityFlowType extends AbstractStepperFlowType
 {
+    public static function listStep(
+        SignupList $list,
+        SignupListSection $section,
+    ): string {
+        return $section->keyFor($list);
+    }
+
+    public static function listGroup(SignupList $list): string
+    {
+        return sprintf(
+            'list:%s',
+            $list->getLineageId()->toRfc4122(),
+        );
+    }
+
     /**
      * @param array<string, mixed> $options
      */
@@ -44,16 +65,31 @@ class ActivityFlowType extends AbstractStepperFlowType
                 ActivityData::STEP_DETAILS,
                 DetailsStepType::class,
             )
-            // Bound to the revision itself: the sign-up lists are a tree of records with their own editor rather
-            // than something the data object carries between the steps.
             ->addStep(
                 ActivityData::STEP_SIGNUP_LISTS,
-                SignupListsStepType::class,
+                SignupListInventoryStepType::class,
                 [
                     'mapped' => false,
                     'data' => $options['revision'],
                 ],
             );
+
+        foreach (self::listsOf($options['revision']) as $list) {
+            foreach (SignupListSection::order() as $section) {
+                $builder->addStep(
+                    self::listStep(
+                        $list,
+                        $section,
+                    ),
+                    SignupListStepType::class,
+                    [
+                        'mapped' => false,
+                        'data' => $list,
+                        'section' => $section,
+                    ],
+                );
+            }
+        }
     }
 
     #[Override]
@@ -64,16 +100,62 @@ class ActivityFlowType extends AbstractStepperFlowType
         $resolver->setDefaults([
             'data_class' => ActivityData::class,
             'finish_label' => t('Save draft'),
+            'finish_from' => ActivityData::STEP_SIGNUP_LISTS,
             'schedule_locked' => false,
             'company_editable' => true,
             'bound_organ_id' => null,
             'revision' => null,
-            'step_labels' => [
-                ActivityData::STEP_GENERAL => t('General information'),
-                ActivityData::STEP_DETAILS => t('Details'),
-                ActivityData::STEP_SIGNUP_LISTS => t('Sign-up lists'),
-            ],
         ]);
+
+        $resolver->setDefault(
+            'step_labels',
+            static function (Options $options): array {
+                $labels = [
+                    ActivityData::STEP_GENERAL => t('General information'),
+                    ActivityData::STEP_DETAILS => t('Details'),
+                    ActivityData::STEP_SIGNUP_LISTS => t('Sign-up lists'),
+                ];
+
+                foreach (self::listsOf($options['revision']) as $list) {
+                    foreach (SignupListSection::order() as $section) {
+                        $labels[self::listStep(
+                            $list,
+                            $section,
+                        )] = $section;
+                    }
+                }
+
+                return $labels;
+            },
+        );
+
+        $resolver->setDefault(
+            'step_groups',
+            static function (Options $options): array {
+                $groups = [];
+                $position = 0;
+                foreach (self::listsOf($options['revision']) as $list) {
+                    ++$position;
+                    foreach (SignupListSection::order() as $section) {
+                        $groups[self::listStep(
+                            $list,
+                            $section,
+                        )] = [
+                            'under' => ActivityData::STEP_SIGNUP_LISTS,
+                            'group' => self::listGroup($list),
+                            'label' => self::listLabel(
+                                $list,
+                                $position,
+                            ),
+                            'number' => $position,
+                            'done' => $section->isFilledIn($list),
+                        ];
+                    }
+                }
+
+                return $groups;
+            },
+        );
 
         $resolver->setAllowedTypes(
             'schedule_locked',
@@ -98,5 +180,35 @@ class ActivityFlowType extends AbstractStepperFlowType
                 'null',
             ],
         );
+    }
+
+    /**
+     * @return list<SignupList>
+     */
+    private static function listsOf(mixed $revision): array
+    {
+        if (!$revision instanceof ActivityRevision) {
+            return [];
+        }
+
+        return $revision->getSignupLists()->getValues();
+    }
+
+    /**
+     * What a list is called in the stepper. A list that has not been named yet is numbered instead, so it can still
+     * be told apart from the others.
+     */
+    private static function listLabel(
+        SignupList $list,
+        int $position,
+    ): string {
+        $name = trim($list->getName()->getText(Languages::current()) ?? '');
+
+        return '' === $name
+            ? sprintf(
+                'Sign-up list %d',
+                $position,
+            )
+            : $name;
     }
 }

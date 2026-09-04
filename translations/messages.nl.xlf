@@ -353,6 +353,10 @@
         <source>%count% polls have been requested.</source>
         <target state="translated">Er zijn %count% polls aangevraagd.</target>
       </trans-unit>
+      <trans-unit id="HXC9ItS" resname="%count% question|%count% questions">
+        <source>%count% question|%count% questions</source>
+        <target>%count% vraag|%count% vragen</target>
+      </trans-unit>
       <trans-unit id="JaLYS7G" resname="%count% reference document selected|%count% reference documents selected">
         <source>%count% reference document selected|%count% reference documents selected</source>
         <target state="translated">%count% referentiedocument geselecteerd|%count% referentiedocumenten geselecteerd</target>
@@ -500,6 +504,10 @@
       <trans-unit id="Xl7akVH" resname="%package% runs out on %date%">
         <source>%package% runs out on %date%</source>
         <target state="translated">%package% verloopt op %date%</target>
+      </trans-unit>
+      <trans-unit id="fXgCut0" resname="%position% of %total%">
+        <source>%position% of %total%</source>
+        <target>%position% van %total%</target>
       </trans-unit>
       <trans-unit id="HJnAXpg" resname="%remaining% of %maximum%">
         <source>%remaining% of %maximum%</source>
@@ -845,10 +853,6 @@
         <source>Activity is being edited</source>
         <target state="translated">Activiteit wordt bewerkt</target>
       </trans-unit>
-      <trans-unit id="T8fAn0A" resname="Activity saved as a draft. Submit it for review when you are ready.">
-        <source>Activity saved as a draft. Submit it for review when you are ready.</source>
-        <target state="translated">Activiteit opgeslagen als concept. Dien het ter beoordeling in wanneer je er klaar voor bent.</target>
-      </trans-unit>
       <trans-unit id="5rGNJkS" resname="Activity submitted for review.">
         <source>Activity submitted for review.</source>
         <target state="translated">Activiteit ingediend ter beoordeling.</target>
@@ -1181,6 +1185,10 @@
         <source>All sessions except this one will be signed out immediately.</source>
         <target state="translated">Alle sessies, behalve deze, worden onmiddellijk beëindigd.</target>
       </trans-unit>
+      <trans-unit id="PowDAK." resname="All sign-up lists">
+        <source>All sign-up lists</source>
+        <target>Alle inschrijflijsten</target>
+      </trans-unit>
       <trans-unit id="nA25Dva" resname="All subscribers">
         <source>All subscribers</source>
         <target>Alle inschrijvers</target>
@@ -1192,6 +1200,10 @@
       <trans-unit id="CdVO0Gm" resname="All years">
         <source>All years</source>
         <target state="translated">Alle jaren</target>
+      </trans-unit>
+      <trans-unit id="wt2iCCE" resname="Allocation">
+        <source>Allocation</source>
+        <target>Toewijzing</target>
       </trans-unit>
       <trans-unit id="_jGMIZg" resname="Allocation method">
         <source>Allocation method</source>
@@ -1659,6 +1671,10 @@
       </trans-unit>
       <trans-unit id="rWM97hF" resname="Basic">
         <source>Basic</source>
+        <target>Basis</target>
+      </trans-unit>
+      <trans-unit id="VOhwkJI" resname="Basics">
+        <source>Basics</source>
         <target>Basis</target>
       </trans-unit>
       <trans-unit id="6lQYTVL" resname="Be the first to upload">
@@ -4101,6 +4117,10 @@
         <source>Has not said whether they want the Supremum.</source>
         <target state="translated">Heeft niet aangegeven of ze de Supremum willen ontvangen.</target>
       </trans-unit>
+      <trans-unit id="q2JnEC6" resname="Has subscribers">
+        <source>Has subscribers</source>
+        <target>Heeft inschrijvingen</target>
+      </trans-unit>
       <trans-unit id="yTvE6dJ" resname="Have a GEWIS account? Log in to sign up.">
         <source>Have a GEWIS account? Log in to sign up.</source>
         <target>Heb je een GEWIS-account? Log in om je in te schrijven.</target>
@@ -4636,6 +4656,10 @@
       <trans-unit id="FPIW94w" resname="Jobs">
         <source>Jobs</source>
         <target>Vacatures</target>
+      </trans-unit>
+      <trans-unit id="mWdoT4O" resname="Jump to sign-up list">
+        <source>Jump to sign-up list</source>
+        <target>Ga naar inschrijflijst</target>
       </trans-unit>
       <trans-unit id="DGalwXb" resname="KCC">
         <source>KCC</source>
@@ -5513,6 +5537,10 @@
         <source>Name (Sync)</source>
         <target state="translated">Naam (Sync)</target>
       </trans-unit>
+      <trans-unit id="z3HIGz0" resname="Name the list and say when it is open. Everything else about this list comes later.">
+        <source>Name the list and say when it is open. Everything else about this list comes later.</source>
+        <target>Geef de lijst een naam en zeg wanneer die open is. De rest van deze lijst komt later.</target>
+      </trans-unit>
       <trans-unit id="fPcPc7X" resname="Name this query">
         <source>Name this query</source>
         <target state="translated">Geef deze query een naam</target>
@@ -5628,6 +5656,10 @@
       <trans-unit id="gefhnBC" resname="Next">
         <source>Next</source>
         <target state="translated">Volgende</target>
+      </trans-unit>
+      <trans-unit id="CmMUgVt" resname="Next list">
+        <source>Next list</source>
+        <target>Volgende lijst</target>
       </trans-unit>
       <trans-unit id="O3MH35V" resname="Next month">
         <source>Next month</source>
@@ -5920,6 +5952,10 @@
       <trans-unit id="aQlndVq" resname="No rows">
         <source>No rows</source>
         <target state="translated">Geen rijen</target>
+      </trans-unit>
+      <trans-unit id="4DqZPti" resname="No sign-up lists">
+        <source>No sign-up lists</source>
+        <target>Geen inschrijflijsten</target>
       </trans-unit>
       <trans-unit id="oY5RMDD" resname="No sign-ups found.">
         <source>No sign-ups found.</source>
@@ -6385,9 +6421,9 @@
         <source>Option calendar</source>
         <target state="translated">Optiekalender</target>
       </trans-unit>
-      <trans-unit id="bVgiLEK" resname="Optional. A sign-up list with subscribers can no longer be changed structurally.">
-        <source>Optional. A sign-up list with subscribers can no longer be changed structurally.</source>
-        <target state="translated">Optioneel. Een inschrijflijst met inschrijvingen kan niet meer structureel worden gewijzigd.</target>
+      <trans-unit id="hK6n_7V" resname="Optional. Add the lists you need here; each one then gets its own steps for the basics, the allocation and the questions. A list with subscribers can no longer be changed structurally.">
+        <source>Optional. Add the lists you need here; each one then gets its own steps for the basics, the allocation and the questions. A list with subscribers can no longer be changed structurally.</source>
+        <target>Optioneel. Voeg hier de lijsten toe die je nodig hebt; elke lijst krijgt daarna eigen stappen voor de basis, de toewijzing en de vragen. Een lijst met inschrijvingen kan niet meer structureel worden gewijzigd.</target>
       </trans-unit>
       <trans-unit id="PK.ZLoC" resname="Or enter this secret in your app manually:">
         <source>Or enter this secret in your app manually:</source>
@@ -6604,6 +6640,14 @@
       <trans-unit id="CJZXCgf" resname="Penningmeester">
         <source>Penningmeester</source>
         <target state="translated">Penningmeester</target>
+      </trans-unit>
+      <trans-unit id="yP0YJYC" resname="People have signed up for this list, so it can no longer be removed.">
+        <source>People have signed up for this list, so it can no longer be removed.</source>
+        <target>Er hebben zich mensen ingeschreven voor deze lijst, dus die kan niet meer worden verwijderd.</target>
+      </trans-unit>
+      <trans-unit id="hsPgdUT" resname="People will simply see the activity in the calendar. Add a list if you need registrations.">
+        <source>People will simply see the activity in the calendar. Add a list if you need registrations.</source>
+        <target>Mensen zien de activiteit gewoon in de agenda. Voeg een lijst toe als je inschrijvingen nodig hebt.</target>
       </trans-unit>
       <trans-unit id="hPqPyLn" resname="Per page">
         <source>Per page</source>
@@ -6909,6 +6953,10 @@
         <source>Previous</source>
         <target state="translated">Vorige</target>
       </trans-unit>
+      <trans-unit id="8AKfOKm" resname="Previous list">
+        <source>Previous list</source>
+        <target>Vorige lijst</target>
+      </trans-unit>
       <trans-unit id="oiwk.U9" resname="Previous month">
         <source>Previous month</source>
         <target state="translated">Vorige maand</target>
@@ -7092,6 +7140,10 @@
       <trans-unit id="W1WJHfF" resname="Question">
         <source>Question</source>
         <target state="translated">Vraag</target>
+      </trans-unit>
+      <trans-unit id="Rx5irUP" resname="Questions">
+        <source>Questions</source>
+        <target>Vragen</target>
       </trans-unit>
       <trans-unit id="kkOf_T8" resname="Questions about your profile, vacancies, banner or package all go here.">
         <source>Questions about your profile, vacancies, banner or package all go here.</source>
@@ -7560,6 +7612,10 @@
       <trans-unit id="NS2db7A" resname="Reserved">
         <source>Reserved</source>
         <target state="translated">Gereserveerd</target>
+      </trans-unit>
+      <trans-unit id="v2.1x1b" resname="Reserved seats">
+        <source>Reserved seats</source>
+        <target>Gereserveerde plaatsen</target>
       </trans-unit>
       <trans-unit id="gHvOyV9" resname="Reset MFA">
         <source>Reset MFA</source>
@@ -8241,9 +8297,9 @@
         <source>Sign-up closes:</source>
         <target>Inschrijving sluit:</target>
       </trans-unit>
-      <trans-unit id="MUlHXYF" resname="Sign-up list">
-        <source>Sign-up list</source>
-        <target state="translated">Inschrijflijst</target>
+      <trans-unit id="6MX7525" resname="Sign-up list %position%">
+        <source>Sign-up list %position%</source>
+        <target>Inschrijflijst %position%</target>
       </trans-unit>
       <trans-unit id="JiavS3V" resname="Sign-up lists">
         <source>Sign-up lists</source>
@@ -8768,6 +8824,10 @@
       <trans-unit id="Poo2BZL" resname="The activity revision was updated.">
         <source>The activity revision was updated.</source>
         <target state="translated">De activiteitsrevisie is bijgewerkt.</target>
+      </trans-unit>
+      <trans-unit id="_JiwvKL" resname="The activity starts on %date%.">
+        <source>The activity starts on %date%.</source>
+        <target>De activiteit begint op %date%.</target>
       </trans-unit>
       <trans-unit id="Zd0APHr" resname="The address">
         <source>The address</source>
@@ -9645,6 +9705,10 @@
         <source>This label is still used by a vacancy, so it cannot be removed.</source>
         <target state="translated">Dit label wordt nog door een vacature gebruikt en kan daarom niet verwijderd worden.</target>
       </trans-unit>
+      <trans-unit id="zRRdI4A" resname="This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.">
+        <source>This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.</source>
+        <target>Deze lijst heeft al inschrijvingen, dus de structuur ligt vast. Het sluitmoment en de teksten kunnen nog worden gewijzigd.</target>
+      </trans-unit>
       <trans-unit id="SyPSgf9" resname="This meeting has no decisions (yet).">
         <source>This meeting has no decisions (yet).</source>
         <target state="translated">Deze vergadering heeft (nog) geen besluiten.</target>
@@ -9964,6 +10028,10 @@
       <trans-unit id="m9I6BGv" resname="Turn off the balloons, snow, and fireworks across the website.">
         <source>Turn off the balloons, snow, and fireworks across the website.</source>
         <target>Schakel de ballonnen, sneeuw en het vuurwerk op de hele website uit.</target>
+      </trans-unit>
+      <trans-unit id="Yv_VVml" resname="Turn on only the orders you need. Where several are on, the coarser one decides first.">
+        <source>Turn on only the orders you need. Where several are on, the coarser one decides first.</source>
+        <target>Zet alleen de volgordes aan die je nodig hebt. Staan er meerdere aan, dan beslist de grofste eerst.</target>
       </trans-unit>
       <trans-unit id="DaAfpuA" resname="Turn this proposal down?">
         <source>Turn this proposal down?</source>
@@ -10549,6 +10617,10 @@
         <source>What it is</source>
         <target state="translated">Wat het is</target>
       </trans-unit>
+      <trans-unit id="5FHRi2t" resname="What people are asked when they sign up for this list.">
+        <source>What people are asked when they sign up for this list.</source>
+        <target>Wat mensen wordt gevraagd als ze zich inschrijven voor deze lijst.</target>
+      </trans-unit>
       <trans-unit id="o2OJeNf" resname="What runs out or starts before %date%.">
         <source>What runs out or starts before %date%.</source>
         <target state="translated">Wat afloopt of begint voor %date%.</target>
@@ -10625,6 +10697,10 @@
         <source>When an activity is waiting to be reviewed</source>
         <target state="translated">Wanneer een activiteit wacht op beoordeling</target>
       </trans-unit>
+      <trans-unit id="WkPK0Y9" resname="When people can sign up. It has to close before the activity starts.">
+        <source>When people can sign up. It has to close before the activity starts.</source>
+        <target>Wanneer mensen zich kunnen inschrijven. De lijst moet sluiten voordat de activiteit begint.</target>
+      </trans-unit>
       <trans-unit id="AS1e.sj" resname="When photos of an event are published">
         <source>When photos of an event are published</source>
         <target>Wanneer foto's van een activiteit worden gepubliceerd</target>
@@ -10685,6 +10761,10 @@
         <source>Who do you want to authorize?</source>
         <target state="translated">Wie wil je machtigen?</target>
       </trans-unit>
+      <trans-unit id="Znl_ncY" resname="Who gets a place when there are more sign-ups than seats.">
+        <source>Who gets a place when there are more sign-ups than seats.</source>
+        <target>Wie een plaats krijgt als er meer inschrijvingen dan plaatsen zijn.</target>
+      </trans-unit>
       <trans-unit id="JqvdByI" resname="Who may read it">
         <source>Who may read it</source>
         <target state="translated">Wie het mag lezen</target>
@@ -10696,6 +10776,10 @@
       <trans-unit id="mfe.B6z" resname="Who may read this page">
         <source>Who may read this page</source>
         <target state="translated">Wie deze pagina mag lezen</target>
+      </trans-unit>
+      <trans-unit id="Cfuvr45" resname="Who may sign up, and what other people are shown about the list.">
+        <source>Who may sign up, and what other people are shown about the list.</source>
+        <target>Wie zich mag inschrijven, en wat anderen over de lijst te zien krijgen.</target>
       </trans-unit>
       <trans-unit id="OyOkpbP" resname="Who to renew">
         <source>Who to renew</source>

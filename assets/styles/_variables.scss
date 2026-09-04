@@ -154,6 +154,10 @@ $nav-pills-badge-bg-dark: $body-secondary-bg-dark;
 $nav-pills-badge-active-color: $gewis-red;
 $nav-pills-badge-active-bg: rgba($gewis-red, 0.08);
 $nav-pills-badge-active-bg-dark: rgba($gewis-red, 0.16);
+$nav-pills-badge-done-bg: $success;
+$nav-pills-badge-done-color: $white;
+$nav-pills-badge-done-bg-dark: $success-text-emphasis-dark;
+$nav-pills-badge-done-color-dark: $success-bg-subtle-dark;
 
 // The breadcrumb bar is a surface laid over the page canvas, the same relationship a panel has to it, so it takes
 // the surface colour in each theme rather than a shade of the canvas it would disappear into.

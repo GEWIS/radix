@@ -285,11 +285,15 @@ final readonly class ActivityProvider implements ProviderInterface
             $id = $signupList->getId();
             assert(null !== $id);
 
+            $openDate = $signupList->getOpenDate();
+            $closeDate = $signupList->getCloseDate();
+            assert(null !== $openDate && null !== $closeDate);
+
             $signupLists[] = [
                 'id' => $id,
                 'name' => $this->text($signupList->getName()),
-                'openDate' => $signupList->getOpenDate()->format(DateTimeInterface::ATOM),
-                'closeDate' => $signupList->getCloseDate()->format(DateTimeInterface::ATOM),
+                'openDate' => $openDate->format(DateTimeInterface::ATOM),
+                'closeDate' => $closeDate->format(DateTimeInterface::ATOM),
                 'onlyGEWIS' => $signupList->getOnlyGEWIS(),
                 'limitedCapacity' => $signupList->getLimitedCapacity(),
                 'capacity' => $signupList->getCapacity(),

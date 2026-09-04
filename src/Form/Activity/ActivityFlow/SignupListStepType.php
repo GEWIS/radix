@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Form\Activity\ActivityFlow;
 
-use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\Enums\SignupFieldTypes;
+use App\Entity\Activity\SignupList;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Activity\SignupListType;
 use DateTime;
 use Override;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -22,21 +22,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-use function is_array;
+use function assert;
 use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
- * Edited on the revision itself rather than through the flow's data object: a tree of records with its own editor,
- * asked for on the last step. The windows are judged against the schedule and the languages the data object carries
- * by the time this step is reached.
- *
- * @extends AbstractType<ActivityRevision>
+ * @extends AbstractType<SignupList>
  */
-class SignupListsStepType extends AbstractType
+class SignupListStepType extends AbstractType
 {
     public function __construct(private readonly TranslatorInterface $translator)
     {
+    }
+
+    #[Override]
+    public function getParent(): string
+    {
+        return SignupListType::class;
     }
 
     /**
@@ -47,38 +49,15 @@ class SignupListsStepType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
-        $builder->add(
-            'signupLists',
-            CollectionType::class,
-            [
-                'label' => t('Sign-up lists'),
-                'entry_type' => SignupListType::class,
-                'entry_options' => ['label' => false],
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'prototype' => true,
-                'prototype_name' => '__list__',
-                // Render each list as a collapsible panel (see the `signup_list_collection` form theme); the nested
-                // field/option collections keep the generic `collection` theme.
-                'block_prefix' => 'signup_list_collection',
-            ],
-        );
-
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            $this->rememberLists(...),
-        );
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
-            $this->validateLists(...),
+            $this->check(...),
         );
     }
 
     /**
      * Tell the fields which languages the activity is written in, so the step can disable the ones that are off and
-     * mark the ones that are on as required. They are answered a step earlier, where the `localised-fields` Stimulus
-     * controller reads them off the checkboxes themselves; here it is handed the answer.
+     * mark the ones that are on as required.
      *
      * @param FormInterface<mixed> $form
      * @param array<string, mixed> $options
@@ -89,8 +68,16 @@ class SignupListsStepType extends AbstractType
         FormInterface $form,
         array $options,
     ): void {
-        $activity = $form->getParent()?->getData();
+        $activity = $form->getRoot()->getData();
 
+        $section = $options['section'];
+        assert($section instanceof SignupListSection);
+
+        $view->vars['section'] = $section;
+        $view->vars['section_description'] = $section->description($this->translator);
+        $view->vars['activity_begins'] = $activity instanceof ActivityData
+            ? $activity->beginTime
+            : null;
         $view->vars['language_dutch'] = !$activity instanceof ActivityData || $activity->languageDutch;
         $view->vars['language_english'] = !$activity instanceof ActivityData || $activity->languageEnglish;
     }
@@ -98,38 +85,16 @@ class SignupListsStepType extends AbstractType
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => ActivityRevision::class,
-            'label' => false,
-        ]);
+        $resolver->setDefault(
+            'label',
+            false,
+        );
     }
 
-    /**
-     * Keep what the step was filled in with on the data object, which is what the flow carries between the steps: the
-     * lists themselves hang off the revision, and that is built afresh on every request.
-     */
-    private function rememberLists(FormEvent $event): void
-    {
-        $activity = $event->getForm()->getParent()?->getData();
-
-        if (!$activity instanceof ActivityData) {
-            return;
-        }
-
-        $submitted = $event->getData();
-        $lists = is_array($submitted)
-            ? ($submitted['signupLists'] ?? [])
-            : [];
-
-        $activity->signupListsSubmission = is_array($lists)
-            ? $lists
-            : [];
-    }
-
-    private function validateLists(FormEvent $event): void
+    private function check(FormEvent $event): void
     {
         $form = $event->getForm();
-        $activity = $form->getParent()?->getData();
+        $activity = $form->getRoot()->getData();
 
         if (
             !$activity instanceof ActivityData
@@ -138,37 +103,62 @@ class SignupListsStepType extends AbstractType
             return;
         }
 
-        $now = new DateTime();
+        match ($form->getConfig()->getOption('section')) {
+            SignupListSection::Basics => $this->checkBasics(
+                $form,
+                $activity,
+            ),
+            SignupListSection::Questions => $this->checkQuestions(
+                $form,
+                $activity,
+            ),
+            default => null,
+        };
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    private function checkBasics(
+        FormInterface $form,
+        ActivityData $activity,
+    ): void {
         $beginTime = null !== $activity->beginTime
             ? DateTime::createFromInterface($activity->beginTime)
             : null;
 
-        foreach ($form->get('signupLists') as $listForm) {
-            $this->validateWindow(
-                $listForm,
-                $now,
-                $beginTime,
-            );
+        $this->validateWindow(
+            $form,
+            new DateTime(),
+            $beginTime,
+        );
+        $this->requireLocalisedText(
+            $form->get('name'),
+            $activity,
+        );
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    private function checkQuestions(
+        FormInterface $form,
+        ActivityData $activity,
+    ): void {
+        foreach ($form->get('fields') as $fieldForm) {
             $this->requireLocalisedText(
-                $listForm->get('name'),
+                $fieldForm->get('name'),
                 $activity,
             );
 
-            foreach ($listForm->get('fields') as $fieldForm) {
-                $this->requireLocalisedText(
-                    $fieldForm->get('name'),
-                    $activity,
-                );
-
-                if (SignupFieldTypes::Choice !== $fieldForm->get('type')->getData()) {
-                    continue;
-                }
-
-                $this->validateOptions(
-                    $fieldForm,
-                    $activity,
-                );
+            if (SignupFieldTypes::Choice !== $fieldForm->get('type')->getData()) {
+                continue;
             }
+
+            $this->validateOptions(
+                $fieldForm,
+                $activity,
+            );
         }
     }
 

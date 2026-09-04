@@ -1,0 +1,78 @@
+{% import 'partials/application/form-flow.html.twig' as flow %}
+
+{% set step = form.signupLists %}
+<div class="panel">
+    <div class="panel-heading">
+        <h3>{{ 'Sign-up lists'|trans }}</h3>
+        <p class="text-muted small mb-0">
+            {{ 'Optional. Add the lists you need here; each one then gets its own steps for the basics, the allocation and the questions. A list with subscribers can no longer be changed structurally.'|trans }}
+        </p>
+    </div>
+    <div class="panel-body">
+        <div class="d-flex flex-column gap-3">
+            {% for list in step.vars.lists %}
+                <div class="signup-list-row">
+                    <div class="flex-grow-1 d-flex flex-column gap-2" style="min-width:0">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="signup-list-badge">{{ list.position }}</span>
+                            <span class="signup-list-row__name">{{ list.name }}</span>
+                            {% if list.locked %}
+                                <span class="badge badge-tag">
+                                    <span class="fas fa-lock" aria-hidden="true"></span>
+                                    {{ 'Has subscribers'|trans }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if list.chips is not empty %}
+                            <div class="d-flex align-items-center gap-1 flex-wrap">
+                                {% for chip in list.chips %}
+                                    <span class="badge badge-tag">{{ chip }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            {% for section in list.steps %}
+                                {{ flow.goto(form, section.step, section.label, {
+                                    'class': 'signup-list-row__part' ~ (section.done ? ' is-done' : ''),
+                                }) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        {{ flow.goto(form, list.steps|first.step, 'Open'|trans, {'class': 'btn btn-sm btn-gewis-primary'}) }}
+                        {% if not list.locked %}
+                            <button type="submit" class="signup-list-row__remove"
+                                    formnovalidate formmethod="post"
+                                    formaction="{{ path('admin/activities/signup_list_remove', {
+                                        'activity': activity.id,
+                                        'list': list.id,
+                                        'flow': form.vars.flow_key,
+                                    }) }}"
+                                    name="_csrf_token" value="{{ csrf_token('activity_signup_lists-' ~ activity.id) }}"
+                                    aria-label="{{ 'Remove sign-up list'|trans }}">
+                                <span class="far fa-trash-can" aria-hidden="true"></span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="signup-list-empty">
+                    <div class="fw-semibold">{{ 'No sign-up lists'|trans }}</div>
+                    <div class="small text-body-secondary">
+                        {{ 'People will simply see the activity in the calendar. Add a list if you need registrations.'|trans }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="signup-list-add mt-3"
+                formnovalidate formmethod="post"
+                formaction="{{ path('admin/activities/signup_list_add', {
+                    'activity': activity.id,
+                    'flow': form.vars.flow_key,
+                }) }}"
+                name="_csrf_token" value="{{ csrf_token('activity_signup_lists-' ~ activity.id) }}">
+            <span class="fas fa-plus" aria-hidden="true"></span> {{ 'Add a sign-up list'|trans }}
+        </button>
+    </div>
+</div>

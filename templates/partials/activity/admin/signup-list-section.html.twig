@@ -1,0 +1,153 @@
+{% import 'form/signup_list_collection.html.twig' as helper %}
+
+{% set fields = form[step] %}
+{% set section = fields.vars.section.value %}
+
+{% if fields.vars.frozen %}
+    <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+        <span class="fas fa-lock mt-1" aria-hidden="true"></span>
+        <div>
+            {{ 'This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.'|trans }}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'basics' == section %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Name'|trans }}</h3>
+                    <p class="text-muted small mb-0">{{ fields.vars.section_description }}</p>
+                </div>
+                <div class="panel-body" data-controller="localised-fields"
+                     data-localised-fields-dutch-value="{{ fields.vars.language_dutch ? 'true' : 'false' }}"
+                     data-localised-fields-english-value="{{ fields.vars.language_english ? 'true' : 'false' }}">
+                    {{ form_row(fields.name) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Sign-up window'|trans }}</h3>
+                    <p class="text-muted small mb-0">{{ 'When people can sign up. It has to close before the activity starts.'|trans }}</p>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">{{ form_row(fields.openDate) }}</div>
+                        <div class="col-md-6">{{ form_row(fields.closeDate) }}</div>
+                    </div>
+                    {% if fields.vars.activity_begins is not null %}
+                        <p class="form-text mb-0">
+                            {{ 'The activity starts on %date%.'|trans({
+                                '%date%': fields.vars.activity_begins|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                            }) }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ 'Visibility'|trans }}</h3>
+                    <p class="text-muted small mb-0">{{ 'Who may sign up, and what other people are shown about the list.'|trans }}</p>
+                </div>
+                <div class="panel-body">
+                    {{ form_row(fields.onlyGEWIS) }}
+                    {{ form_row(fields.displaySubscribedNumber) }}
+                    {{ form_row(fields.promoted) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ form_rest(fields) }}
+{% else %}
+<div class="panel">
+    <div class="panel-heading">
+        <h3>{{ fields.vars.section|trans }}</h3>
+        <p class="text-muted small mb-0">{{ fields.vars.section_description }}</p>
+    </div>
+    <div class="panel-body">
+        {% if 'allocation' == section %}
+            <div data-controller="signup-list">
+                {{ form_row(fields.limitedCapacity, {'attr': {
+                    'data-signup-list-target': 'limited',
+                    'data-action': 'change->signup-list#apply',
+                }}) }}
+                <div class="row" data-signup-list-target="capacity">
+                    <div class="col-md-4">
+                        {{ form_row(fields.capacity, {'attr': {'data-signup-list-target': 'required'}}) }}
+                    </div>
+                    <div class="col-md-8" data-signup-list-target="methodBlock">
+                        {{ form_row(fields.allocationMethod, {'attr': {
+                            'data-signup-list-target': 'method',
+                            'data-action': 'change->signup-list#apply',
+                        }}) }}
+                    </div>
+                </div>
+                <div data-signup-list-target="methodBlock">
+                    <div data-signup-list-target="conditional">
+                        {{ form_row(fields.drawCutoffRule, {'attr': {
+                            'data-signup-list-target': 'rule required',
+                            'data-action': 'change->signup-list#apply',
+                        }}) }}
+                        <div data-signup-list-target="cutoffAt">
+                            {{ form_row(fields.drawCutoffAt, {'attr': {'data-signup-list-target': 'required'}}) }}
+                        </div>
+                        <div data-signup-list-target="durationHours">
+                            {{ form_row(fields.drawAfterDurationHours, {'attr': {'data-signup-list-target': 'required'}}) }}
+                        </div>
+                    </div>
+                    <div data-signup-list-target="external">
+                        {{ form_row(fields.externalPolicyUrl, {'attr': {'data-signup-list-target': 'required'}}) }}
+                        {{ form_row(fields.externalForceOrdering) }}
+                        {{ form_row(fields.externalPaymentByExternal) }}
+                    </div>
+                    <div data-signup-list-target="custom">
+                        {{ form_row(fields.customMethodDescription, {'attr': {'data-signup-list-target': 'required'}}) }}
+                    </div>
+                    <div data-signup-list-target="priority">
+                        <hr>
+                        <h6>{{ 'Priority'|trans }}</h6>
+                        <p class="form-text mt-0">
+                            {{ 'Turn on only the orders you need. Where several are on, the coarser one decides first.'|trans }}
+                        </p>
+                        {% set membership_settings %}
+                            {{ form_row(fields.membershipPriorityMode, {'attr': {
+                                'data-signup-list-target': 'mode required',
+                                'data-action': 'change->signup-list#apply',
+                            }}) }}
+                        {% endset %}
+                        {{ helper.tier_modifier(fields.membershipTierOrder, fields.vars.membershipTierOrderTiers, 'Serve some members before others'|trans, membership_settings) }}
+                        {{ helper.tier_modifier(fields.programTypeOrder, fields.vars.programTypeOrderTiers, 'Serve some study phases before others'|trans) }}
+                        {{ helper.tier_modifier(fields.cohortTierOrder, fields.vars.cohortTierOrderTiers, 'Serve some cohorts before others'|trans) }}
+                        <hr>
+                        <h6>{{ 'Reserved seats'|trans }}</h6>
+                        <p class="form-text mt-0">
+                            {{ 'Seats taken out of the draw before anything else is allocated.'|trans }}
+                        </p>
+                        <div class="row">
+                            <div class="col-md-4">{{ form_row(fields.organisingCommitteeSeats) }}</div>
+                        </div>
+                        <label class="form-label">{{ 'Guaranteed roles'|trans }}</label>
+                        <p class="form-text mt-0">
+                            {{ 'A role is handed out on the sign-ups page once sign-up has closed, and the draw makes up whatever is short.'|trans }}
+                        </p>
+                        {{ form_row(fields.roles) }}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div data-controller="localised-fields"
+                 data-localised-fields-dutch-value="{{ fields.vars.language_dutch ? 'true' : 'false' }}"
+                 data-localised-fields-english-value="{{ fields.vars.language_english ? 'true' : 'false' }}">
+                {{ form_row(fields.fields) }}
+            </div>
+        {% endif %}
+
+        {{ form_rest(fields) }}
+    </div>
+</div>
+{% endif %}

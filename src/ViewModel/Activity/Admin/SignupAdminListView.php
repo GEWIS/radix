@@ -48,8 +48,8 @@ final readonly class SignupAdminListView
     public function __construct(
         public int $listId,
         public string $name,
-        public DateTime $openDate,
-        public DateTime $closeDate,
+        public ?DateTime $openDate,
+        public ?DateTime $closeDate,
         public bool $onlyGEWIS,
         public bool $displaySubscribedNumber,
         public bool $limitedCapacity,

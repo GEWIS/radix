@@ -4,164 +4,137 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Form\Activity;
 
+use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityRevision;
-use App\Entity\Activity\Enums\AllocationMethod;
 use App\Entity\Activity\SignupList;
 use App\Form\Activity\ActivityFlow\ActivityData;
 use App\Form\Activity\ActivityFlow\ActivityFlowType;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityDraftFactory;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTime;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 
-/**
- * The sign-up lists step. It is the one step that is not filled into the flow's data object but onto the revision,
- * which is built afresh on every request, so leaving the step and returning to it is what these pin.
- */
+use function array_slice;
+
 final class ActivityFlowTypeTest extends DatabaseTestCase
 {
-    public function testHandingInTheStepRequiresTheEnabledLanguages(): void
+    public function testEachSignupListGetsThreeStepsOfItsOwn(): void
     {
-        $flow = $this->submitLists(
-            ['name' => ['valueEN' => '']],
-            'finish',
-        );
-
-        self::assertFalse($flow->isValid());
-        self::assertNotCount(
-            0,
-            $this->firstList($flow)->get('name')->get('valueEN')->getErrors(),
-        );
-    }
-
-    /**
-     * Going back asks for what was filled in to be kept, not for it to be correct: a half-written list must not hold
-     * the organiser on the step it is trying to leave.
-     */
-    public function testGoingBackIsNotBlockedByTheStepsOwnChecks(): void
-    {
-        $flow = $this->submitLists(
-            ['name' => ['valueEN' => '']],
-            'previous',
-        );
-
-        self::assertTrue(
-            $flow->isValid(),
-            (string) $flow->getErrors(true),
-        );
-    }
-
-    /**
-     * What the step was filled in with lands on the data object, which is the only thing the flow carries from one
-     * step to the next.
-     */
-    public function testLeavingTheStepRemembersWhatItHeld(): void
-    {
-        $data = $this->data();
-
-        $this->submitLists(
-            [],
-            'previous',
-            $data,
-        );
-
-        self::assertIsArray($data->signupListsSubmission);
-        self::assertCount(
-            1,
-            $data->signupListsSubmission,
-        );
-    }
-
-    /**
-     * Returning to the step hands that back, which is what turns it into lists again on the fresh revision.
-     */
-    public function testReturningToTheStepFillsItBackIn(): void
-    {
-        $data = $this->data();
-
-        $this->submitLists(
-            [],
-            'previous',
-            $data,
-        );
-
-        $revision = $this->revision();
-        $flow = $this->build(
-            $data,
-            $revision,
-        );
-
-        $flow->get(ActivityData::STEP_SIGNUP_LISTS)->submit(
-            [ActivityData::STEP_SIGNUP_LISTS => $data->signupListsSubmission],
-        );
-
-        $lists = $revision->getSignupLists();
-        self::assertCount(
-            1,
-            $lists,
-        );
-
-        $list = $lists->first();
-        self::assertInstanceOf(
-            SignupList::class,
-            $list,
-        );
-        self::assertSame(
+        $revision = $this->revisionWithLists(
             'Dinner',
-            $list->getName()->getValueEN(),
+            'Drinks',
         );
+
+        $steps = $this->build($revision)->getCursor()->getSteps();
+
+        self::assertSame(
+            [
+                ActivityData::STEP_GENERAL,
+                ActivityData::STEP_DETAILS,
+                ActivityData::STEP_SIGNUP_LISTS,
+            ],
+            array_slice(
+                $steps,
+                0,
+                3,
+            ),
+        );
+
+        $lists = $revision->getSignupLists()->getValues();
+        self::assertSame(
+            [
+                ActivityFlowType::listStep(
+                    $lists[0],
+                    SignupListSection::Basics,
+                ),
+                ActivityFlowType::listStep(
+                    $lists[0],
+                    SignupListSection::Allocation,
+                ),
+                ActivityFlowType::listStep(
+                    $lists[0],
+                    SignupListSection::Questions,
+                ),
+                ActivityFlowType::listStep(
+                    $lists[1],
+                    SignupListSection::Basics,
+                ),
+                ActivityFlowType::listStep(
+                    $lists[1],
+                    SignupListSection::Allocation,
+                ),
+                ActivityFlowType::listStep(
+                    $lists[1],
+                    SignupListSection::Questions,
+                ),
+            ],
+            array_slice(
+                $steps,
+                3,
+            ),
+        );
+    }
+
+    public function testRemovingAListLeavesTheOtherListsStepsAlone(): void
+    {
+        $revision = $this->revisionWithLists(
+            'Dinner',
+            'Drinks',
+        );
+        $lists = $revision->getSignupLists()->getValues();
+        $second = ActivityFlowType::listStep(
+            $lists[1],
+            SignupListSection::Basics,
+        );
+
+        self::assertContains(
+            $second,
+            $this->build($revision)->getCursor()->getSteps(),
+        );
+
+        $revision->removeSignupList($lists[0]);
+
+        self::assertContains(
+            $second,
+            $this->build($revision)->getCursor()->getSteps(),
+        );
+    }
+
+    public function testAnActivityWithoutListsHasNothingBeyondTheOverview(): void
+    {
+        self::assertSame(
+            [
+                ActivityData::STEP_GENERAL,
+                ActivityData::STEP_DETAILS,
+                ActivityData::STEP_SIGNUP_LISTS,
+            ],
+            $this->build($this->revisionWithLists())->getCursor()->getSteps(),
+        );
+    }
+
+    public function testTheOverviewCarriesNothingButItsOwnMarker(): void
+    {
+        $step = $this->build($this->revisionWithLists('Dinner'))->get(ActivityData::STEP_SIGNUP_LISTS);
+
+        self::assertCount(
+            1,
+            $step,
+        );
+        self::assertTrue($step->has('open'));
+        self::assertFalse($step->get('open')->getConfig()->getMapped());
     }
 
     /**
-     * @param array<string, mixed> $overrides
+     * @return FormFlowInterface<mixed>
      */
-    private function submitLists(
-        array $overrides,
-        string $button,
-        ?ActivityData $data = null,
-    ): FormFlowInterface {
-        $flow = $this->build(
-            $data ?? $this->data(),
-            $this->revision(),
-        );
-
-        $flow->submit([
-            ActivityData::STEP_SIGNUP_LISTS => [
-                'signupLists' => [$overrides +
-                [
-                    'name' => ['valueEN' => 'Dinner'],
-                    'openDate' => '2030-01-01T12:00',
-                    'closeDate' => '2030-02-01T12:00',
-                    'allocationMethod' => AllocationMethod::FirstComeFirstServed->value,
-                    'fields' => [],
-                ],
-                ],
-            ],
-            $button => '',
-        ]);
-
-        return $flow;
-    }
-
-    private function data(): ActivityData
+    private function build(ActivityRevision $revision): FormFlowInterface
     {
         $data = new ActivityData();
         $data->step = ActivityData::STEP_SIGNUP_LISTS;
 
-        return $data;
-    }
-
-    private function revision(): ActivityRevision
-    {
-        return self::getContainer()->get(ActivityDraftFactory::class)->newRevision();
-    }
-
-    private function build(
-        ActivityData $data,
-        ActivityRevision $revision,
-    ): FormFlowInterface {
         $flow = self::getContainer()->get(FormFactoryInterface::class)->create(
             ActivityFlowType::class,
             $data,
@@ -179,11 +152,26 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
         return $flow;
     }
 
-    /**
-     * @return FormInterface<mixed>
-     */
-    private function firstList(FormFlowInterface $flow): FormInterface
+    private function revisionWithLists(string ...$names): ActivityRevision
     {
-        return $flow->get(ActivityData::STEP_SIGNUP_LISTS)->get('signupLists')->get('0');
+        $activity = self::getContainer()->get(ActivityDraftFactory::class)->newActivity(null);
+        $revision = $activity->getCurrentRevision();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $revision,
+        );
+
+        foreach ($names as $name) {
+            $list = new SignupList();
+            $list->setName(new ActivityLocalisedText(
+                $name,
+                $name,
+            ));
+            $list->setOpenDate(new DateTime('2030-01-01 12:00'));
+            $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+            $revision->addSignupList($list);
+        }
+
+        return $revision;
     }
 }

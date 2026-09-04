@@ -35,15 +35,11 @@
 {% macro signup_list_body(list, previous) %}
     {% import 'partials/application/revision-diff.html.twig' as diffmacro %}
     {% import _self as listmacro %}
+    {# A list that has been added but not filled in has no window yet, so neither moment is printed as though it
+       were a date somebody chose. #}
     <div class="small mb-1">
-        <span class="text-muted">{{ 'Opens'|trans }}:</span> {{ list.openDate|date('M j, Y H:i') }}
-        {% if previous is not null and previous.openDate != list.openDate %}
-            <del class="text-danger">{{ previous.openDate|date('M j, Y H:i') }}</del>
-        {% endif %}
-        <span class="text-muted ms-2">{{ 'Closes'|trans }}:</span> {{ list.closeDate|date('M j, Y H:i') }}
-        {% if previous is not null and previous.closeDate != list.closeDate %}
-            <del class="text-danger">{{ previous.closeDate|date('M j, Y H:i') }}</del>
-        {% endif %}
+        {{ listmacro.value_row('Opens'|trans, previous is null or previous.openDate is null ? null : previous.openDate|date('M j, Y H:i'), list.openDate is null ? null : list.openDate|date('M j, Y H:i')) }}
+        {{ listmacro.value_row('Closes'|trans, previous is null or previous.closeDate is null ? null : previous.closeDate|date('M j, Y H:i'), list.closeDate is null ? null : list.closeDate|date('M j, Y H:i')) }}
     </div>
 
     {% set flags %}

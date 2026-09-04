@@ -12,12 +12,14 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupRole;
 use App\Form\Activity\ActivityFlow\ActivityData;
 use App\Form\Activity\ActivityFlow\ActivityFlowType;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityDraftFactory;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTime;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
 
 use function str_contains;
@@ -26,24 +28,19 @@ use function substr_count;
 
 final class SignupListTemplatesTest extends DatabaseTestCase
 {
-    public function testTheEditorRendersEveryPriorityModifier(): void
+    public function testTheAllocationStepRendersEveryPriorityModifier(): void
     {
-        // Through newActivity(), because a list only renders as part of an activity: the editor asks the activity
-        // whether it has already started before it decides what may still be changed.
-        $activity = self::getContainer()->get(ActivityDraftFactory::class)->newActivity(null);
-        $revision = $activity->getCurrentRevision();
-        self::assertInstanceOf(
-            ActivityRevision::class,
-            $revision,
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+        $step = ActivityFlowType::listStep(
+            $list,
+            SignupListSection::Allocation,
         );
-        $revision->addSignupList($this->list());
 
-        $flow = $this->flow($revision);
-        $view = $flow->get(ActivityData::STEP_SIGNUP_LISTS)->get('signupLists')->createView();
-
-        $html = $this->twig()
-            ->createTemplate('{{ form_widget(form) }}')
-            ->render(['form' => $view]);
+        $html = $this->renderStep(
+            $revision,
+            $step,
+        );
 
         // Each modifier is a tier-order control with its tiers in the order the list serves them.
         self::assertSame(
@@ -121,6 +118,156 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         );
     }
 
+    public function testTheWindowSaysWhenTheActivityStarts(): void
+    {
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+
+        $this->pushRequest();
+
+        $html = $this->twig()->render(
+            'partials/activity/admin/signup-list-section.html.twig',
+            [
+                'form' => $this->flow(
+                    $revision,
+                    ActivityFlowType::listStep(
+                        $list,
+                        SignupListSection::Basics,
+                    ),
+                    $this->answered(),
+                )->createView(),
+                'step' => ActivityFlowType::listStep(
+                    $list,
+                    SignupListSection::Basics,
+                ),
+            ],
+        );
+
+        self::assertStringContainsString(
+            'The activity starts on',
+            $html,
+        );
+        self::assertStringContainsString(
+            '1 Jun. 2030 18:00',
+            $html,
+        );
+    }
+
+    public function testAStepAsksForItsOwnSectionOnly(): void
+    {
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+
+        $basics = $this->renderStep(
+            $revision,
+            ActivityFlowType::listStep(
+                $list,
+                SignupListSection::Basics,
+            ),
+        );
+
+        self::assertStringContainsString(
+            'closeDate',
+            $basics,
+        );
+        self::assertStringNotContainsString(
+            'allocationMethod',
+            $basics,
+        );
+        self::assertStringNotContainsString(
+            'data-controller="tier-order"',
+            $basics,
+        );
+    }
+
+    public function testAPartIsMarkedOnceItHoldsWhatItNeeds(): void
+    {
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+        $list->setOpenDate(null);
+        $list->setCloseDate(null);
+
+        $this->pushRequest();
+
+        $html = $this->twig()->render(
+            'partials/activity/admin/form.html.twig',
+            [
+                'form' => $this->flow(
+                    $revision,
+                    ActivityFlowType::listStep(
+                        $list,
+                        SignupListSection::Allocation,
+                    ),
+                )->createView(),
+                'activity' => $revision->getActivity(),
+            ],
+        );
+
+        self::assertStringContainsString(
+            'nav-link is-done',
+            $html,
+        );
+        self::assertStringContainsString(
+            '2/3',
+            $html,
+        );
+    }
+
+    public function testTheJumpButtonIsNotAlsoEmittedAtTheEndOfTheForm(): void
+    {
+        $html = $this->renderForm(SignupListSection::Allocation);
+
+        self::assertStringNotContainsString(
+            'id="activity_flow_goto"',
+            $html,
+        );
+    }
+
+    public function testTheHeaderShowsTheListBeingFilledInAndItsOwnSteps(): void
+    {
+        $html = $this->renderForm(SignupListSection::Allocation);
+
+        self::assertStringContainsString(
+            'form-stepper-group',
+            $html,
+        );
+        self::assertStringContainsString(
+            'nav nav-pills',
+            $html,
+        );
+        self::assertSame(
+            3,
+            substr_count(
+                $html,
+                'nav-item',
+            ),
+        );
+        self::assertStringContainsString(
+            'nav-link active',
+            $html,
+        );
+        self::assertStringContainsString(
+            'nav-link is-done',
+            $html,
+        );
+        self::assertStringContainsString(
+            '3/3',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Participants',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Jump to sign-up list',
+            $html,
+        );
+        self::assertStringContainsString(
+            'All sign-up lists',
+            $html,
+        );
+    }
+
     public function testTheReviewDiffShowsTheAllocationSettingsAndWhatTheyWere(): void
     {
         $previous = $this->list();
@@ -170,7 +317,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     {
         $list = new SignupList();
         $list->setName(new ActivityLocalisedText(
-            'Deelnemers',
+            'Participants',
             'Participants',
         ));
         $list->setOpenDate(new DateTime('2030-01-01 12:00'));
@@ -193,10 +340,54 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         return $list;
     }
 
-    private function flow(ActivityRevision $revision): FormFlowInterface
+    private function renderForm(SignupListSection $section): string
     {
+        $revision = $this->revisionWithList();
+        $activity = $revision->getActivity();
+        $list = $revision->getSignupLists()->getValues()[0];
+        $step = ActivityFlowType::listStep(
+            $list,
+            $section,
+        );
+
+        $this->pushRequest();
+
+        return $this->twig()->render(
+            'partials/activity/admin/form.html.twig',
+            [
+                'form' => $this->flow(
+                    $revision,
+                    $step,
+                )->createView(),
+                'activity' => $activity,
+            ],
+        );
+    }
+
+    private function renderStep(
+        ActivityRevision $revision,
+        string $step,
+    ): string {
+        $flow = $this->flow(
+            $revision,
+            $step,
+        );
+
+        return $this->twig()->render(
+            'partials/activity/admin/signup-list-section.html.twig',
+            [
+                'form' => $flow->createView(),
+                'step' => $step,
+            ],
+        );
+    }
+
+    private function flow(
+        ActivityRevision $revision,
+        string $step = ActivityData::STEP_SIGNUP_LISTS,
+    ): FormFlowInterface {
         $data = new ActivityData();
-        $data->step = ActivityData::STEP_SIGNUP_LISTS;
+        $data->step = $step;
 
         $flow = self::getContainer()->get(FormFactoryInterface::class)->create(
             ActivityFlowType::class,
@@ -213,6 +404,26 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         );
 
         return $flow;
+    }
+
+    private function revisionWithList(): ActivityRevision
+    {
+        $activity = self::getContainer()->get(ActivityDraftFactory::class)->newActivity(null);
+        $revision = $activity->getCurrentRevision();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $revision,
+        );
+        $revision->addSignupList($this->list());
+
+        return $revision;
+    }
+
+    private function pushRequest(): void
+    {
+        $request = new Request();
+        $request->setSession(self::getContainer()->get('session.factory')->createSession());
+        self::getContainer()->get('request_stack')->push($request);
     }
 
     private function twig(): Environment

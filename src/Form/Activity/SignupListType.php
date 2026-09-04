@@ -13,6 +13,7 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupRole;
 use App\Entity\Application\PriorityTierInterface;
 use App\Entity\Database\Enums\ProgramType;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\LocalisedTextType;
 use App\Form\DisablesFieldsTrait;
 use DateTime;
@@ -31,6 +32,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -41,6 +43,7 @@ use function array_keys;
 use function array_map;
 use function array_pad;
 use function array_sum;
+use function assert;
 use function explode;
 use function implode;
 use function strval;
@@ -98,6 +101,56 @@ class SignupListType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
+        $section = $options['section'];
+        assert($section instanceof SignupListSection);
+
+        match ($section) {
+            SignupListSection::Basics => $this->addBasics($builder),
+            SignupListSection::Allocation => $this->addAllocation($builder),
+            SignupListSection::Questions => $this->addQuestions($builder),
+        };
+
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            $this->freezeWhenActivityStarted(...),
+        );
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            $this->freezeWhenSubscribed(...),
+        );
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            $this->freezeWhenDrawn(...),
+        );
+
+        if (SignupListSection::Basics === $options['section']) {
+            $builder->addEventListener(
+                FormEvents::POST_SET_DATA,
+                $this->disableOpenDateWhenOpened(...),
+            );
+            $builder->addEventListener(
+                FormEvents::POST_SET_DATA,
+                $this->disableCloseDateWhenClosed(...),
+            );
+        }
+
+        if (SignupListSection::Allocation !== $options['section']) {
+            return;
+        }
+
+        // Only the section that renders these may clear them, and a hidden input must not keep settings the cloner
+        // would carry into every future revision.
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            $this->clearInapplicableAllocation(...),
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface<?SignupList> $builder
+     */
+    private function addBasics(FormBuilderInterface $builder): void
+    {
         $builder
             ->add(
                 'name',
@@ -111,15 +164,6 @@ class SignupListType extends AbstractType
                     'label' => t('Opens'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter an opening date and time.')],
-                    // The entity setter is non-nullable; an empty submission maps to null and would TypeError during
-                    // data mapping (before NotBlank runs). Skip the write when empty so NotBlank reports it instead.
-                    'setter' => static function (SignupList $list, ?DateTime $value): void {
-                        if (null === $value) {
-                            return;
-                        }
-
-                        $list->setOpenDate($value);
-                    },
                 ],
             )
             ->add(
@@ -129,13 +173,6 @@ class SignupListType extends AbstractType
                     'label' => t('Closes'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter a closing date and time.')],
-                    'setter' => static function (SignupList $list, ?DateTime $value): void {
-                        if (null === $value) {
-                            return;
-                        }
-
-                        $list->setCloseDate($value);
-                    },
                 ],
             )
             ->add(
@@ -154,6 +191,22 @@ class SignupListType extends AbstractType
                     'required' => false,
                 ],
             )
+            ->add(
+                'promoted',
+                CheckboxType::class,
+                [
+                    'label' => t('Promoted'),
+                    'required' => false,
+                ],
+            );
+    }
+
+    /**
+     * @param FormBuilderInterface<?SignupList> $builder
+     */
+    private function addAllocation(FormBuilderInterface $builder): void
+    {
+        $builder
             ->add(
                 'limitedCapacity',
                 CheckboxType::class,
@@ -346,15 +399,15 @@ class SignupListType extends AbstractType
                     'prototype_name' => '__role__',
                     'block_prefix' => 'signup_role_collection',
                 ],
-            )
-            ->add(
-                'promoted',
-                CheckboxType::class,
-                [
-                    'label' => t('Promoted'),
-                    'required' => false,
-                ],
-            )
+            );
+    }
+
+    /**
+     * @param FormBuilderInterface<?SignupList> $builder
+     */
+    private function addQuestions(FormBuilderInterface $builder): void
+    {
+        $builder
             ->add(
                 'fields',
                 CollectionType::class,
@@ -371,44 +424,31 @@ class SignupListType extends AbstractType
                     'block_prefix' => 'signup_field_collection',
                 ],
             );
-
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->freezeWhenActivityStarted(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->freezeWhenSubscribed(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->freezeWhenDrawn(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->disableOpenDateWhenOpened(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->disableCloseDateWhenClosed(...),
-        );
-        // After binding, drop any per-method settings that do not apply to the chosen method (or to an unlimited
-        // list), so hidden inputs cannot persist stale config that the cloner would carry into future revisions.
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            $this->clearInapplicableAllocation(...),
-        );
     }
 
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => SignupList::class,
-            // A limited-capacity list must carry a positive capacity; validated at the object level so the rule can
-            // depend on the limitedCapacity flag.
-            'constraints' => [new Callback($this->validateCapacity(...))],
-        ]);
+        $resolver->setDefaults(['data_class' => SignupList::class]);
+
+        $resolver->setRequired('section');
+        $resolver->setAllowedTypes(
+            'section',
+            SignupListSection::class,
+        );
+
+        // Only the section that renders a field may report an error against it: an error whose path names a field
+        // that is not on screen is mapped onto the form itself, which leaves the organiser nothing to correct.
+        $resolver->setDefault(
+            'constraints',
+            function (Options $options): array {
+                if (SignupListSection::Allocation !== $options['section']) {
+                    return [];
+                }
+
+                return [new Callback($this->validateCapacity(...))];
+            },
+        );
     }
 
     public function validateCapacity(
@@ -774,6 +814,10 @@ class SignupListType extends AbstractType
         $view->vars['frozen'] = $this->hasLiveSignUps($list)
             || $this->activityStarted($list);
 
+        if (SignupListSection::Allocation !== $options['section']) {
+            return;
+        }
+
         foreach (self::allocationVars($list) as $name => $value) {
             $view->vars[$name] = $value;
         }
@@ -875,8 +919,28 @@ class SignupListType extends AbstractType
             return;
         }
 
-        $form = $event->getForm();
-        foreach ([...self::FROZEN_FIELDS, ...self::METHOD_FIELDS] as $name) {
+        $this->disableFields(
+            $event->getForm(),
+            [
+                ...self::FROZEN_FIELDS,
+                ...self::METHOD_FIELDS,
+            ],
+        );
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     * @param list<string>         $names
+     */
+    private function disableFields(
+        FormInterface $form,
+        array $names,
+    ): void {
+        foreach ($names as $name) {
+            if (!$form->has($name)) {
+                continue;
+            }
+
             $this->disableField(
                 $form,
                 $name,
@@ -892,51 +956,7 @@ class SignupListType extends AbstractType
      */
     private function hasLiveSignUps(?SignupList $list): bool
     {
-        return $this->holdsForLiveLineage(
-            $list,
-            static fn (SignupList $candidate): bool => $candidate->hasSignUps(),
-        );
-    }
-
-    /**
-     * The shared lineage walk behind {@see self::hasLiveSignUps()} and {@see self::isLiveDrawn()}: whether a predicate
-     * holds for this list, or (when it is a draft clone whose own state is still empty because sign-ups/draws live
-     * on the live revision until approval) for the live revision's list it descends from (matched by
-     * {@see SignupList::getLineageId()}). The collection prototype has no bound list (`null`), for which this is false.
-     *
-     * @param callable(SignupList): bool $predicate
-     */
-    private function holdsForLiveLineage(
-        ?SignupList $list,
-        callable $predicate,
-    ): bool {
-        if (!$list instanceof SignupList) {
-            return false;
-        }
-
-        if ($predicate($list)) {
-            return true;
-        }
-
-        if (!$list->hasRevision()) {
-            return false;
-        }
-
-        $live = $list->getRevision()->getActivity()->getLiveRevision();
-        if (null === $live) {
-            return false;
-        }
-
-        foreach ($live->getSignupLists() as $liveList) {
-            if (
-                $liveList->getLineageId()->equals($list->getLineageId())
-                && $predicate($liveList)
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return (bool) $list?->hasLineageSignUps();
     }
 
     /**
@@ -953,25 +973,23 @@ class SignupListType extends AbstractType
             return;
         }
 
-        $form = $event->getForm();
-        foreach ([...self::METHOD_FIELDS, 'capacity'] as $name) {
-            $this->disableField(
-                $form,
-                $name,
-            );
-        }
+        $this->disableFields(
+            $event->getForm(),
+            [
+                ...self::METHOD_FIELDS,
+                'capacity',
+            ],
+        );
     }
 
     /**
      * Whether this list, or its live lineage counterpart, has had its draw performed (and locked). Like
-     * {@see self::hasLiveSignUps()} a draft clone carries the lock forward, so the same lineage walk is used.
+     * {@see self::hasLiveSignUps()} a draft clone carries the lock forward.
      */
     private function isLiveDrawn(?SignupList $list): bool
     {
-        return $this->holdsForLiveLineage(
-            $list,
-            static fn (SignupList $candidate): bool => $candidate->isDrawLocked(),
-        );
+        return (bool) $list?->isDrawLocked()
+            || (bool) $list?->liveCounterpart()?->isDrawLocked();
     }
 
     /**
@@ -1073,18 +1091,17 @@ class SignupListType extends AbstractType
         $list->setHeldMembershipSeats([] === $held ? null : $held);
     }
 
-    /**
-     * Re-add `openDate` as `disabled` once a (persisted) sign-up list has opened, so a passed opening date can no
-     * longer be moved; only a newly-set opening date must be in the future. A brand-new list (no id yet) is always
-     * editable.
-     */
     private function disableOpenDateWhenOpened(FormEvent $event): void
     {
         $list = $event->getData();
+        $live = $list instanceof SignupList
+            ? $list->liveCounterpart()
+            : null;
         if (
-            !$list instanceof SignupList
-            || !$list->hasRevision()
-            || $list->getOpenDate() > new DateTime()
+            null === $live
+            || !$event->getForm()->has('openDate')
+            || null === $live->getOpenDate()
+            || $live->getOpenDate() > new DateTime()
         ) {
             return;
         }
@@ -1095,18 +1112,17 @@ class SignupListType extends AbstractType
         );
     }
 
-    /**
-     * Re-add `closeDate` as `disabled` once a (persisted) sign-up list has closed, so a passed closing date can no
-     * longer be moved. While the list is still open or upcoming the closing date stays editable, so it can be
-     * extended; a brand-new list (no id yet) is always editable.
-     */
     private function disableCloseDateWhenClosed(FormEvent $event): void
     {
         $list = $event->getData();
+        $live = $list instanceof SignupList
+            ? $list->liveCounterpart()
+            : null;
         if (
-            !$list instanceof SignupList
-            || !$list->hasRevision()
-            || $list->getCloseDate() > new DateTime()
+            null === $live
+            || !$event->getForm()->has('closeDate')
+            || null === $live->getCloseDate()
+            || $live->getCloseDate() > new DateTime()
         ) {
             return;
         }

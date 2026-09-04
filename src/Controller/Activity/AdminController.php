@@ -33,7 +33,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -120,37 +120,204 @@ class AdminController extends AbstractController
         );
         $flow->handleRequest($request);
 
-        if (!$flow->isFinished()) {
-            $this->flashRejectedStep(
-                $flow,
-                $this->translator,
+        // The clicked button is handled here, which is what moves the flow on, so the step is only known afterwards.
+        $form = $flow->getStepForm();
+
+        if (ActivityData::STEP_SIGNUP_LISTS === $flow->getCursor()->getCurrentStep()) {
+            $collected = $flow->getData();
+            assert($collected instanceof ActivityData);
+            $this->activityFormMapper->apply(
+                $collected,
+                $revision,
             );
 
-            $form = $flow->getStepForm();
-            $this->restoreSignupLists($form);
+            $this->activityAdminService->create($activity);
 
-            return $this->render(
-                'activity/admin/create.html.twig',
-                ['form' => $form],
+            return $this->redirectToRoute(
+                'admin/activities/edit',
+                [
+                    'activity' => $activity->getId(),
+                    'flow' => $run,
+                ],
             );
         }
 
-        $collected = $flow->getData();
-        assert($collected instanceof ActivityData);
-        $this->activityFormMapper->apply(
-            $collected,
-            $revision,
+        if ($this->stepWasHandedIn($flow)) {
+            return $this->redirectToRoute(
+                'admin/activities/create',
+                ['flow' => $run],
+            );
+        }
+
+        $this->flashRejectedStep(
+            $flow,
+            $this->translator,
         );
 
-        $this->activityAdminService->create($activity);
-        $flow->reset();
+        return $this->render(
+            'activity/admin/create.html.twig',
+            ['form' => $form],
+        );
+    }
 
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('Activity saved as a draft. Submit it for review when you are ready.'),
+    /**
+     * Remember, server-side, the version this edit started from, so the optimistic-lock check on save cannot be
+     * bypassed by tampering a submitted field. Once per run of the form: every step ends in a redirect, and stamping
+     * on the requests that follow would walk the version past a change somebody else made while the form was open.
+     */
+    private function stampEditVersion(
+        Request $request,
+        FormFlowInterface $flow,
+        Activity $activity,
+        ActivityRevision $revision,
+        string $run,
+    ): void {
+        $session = $request->getSession();
+        $key = $this->editVersionKey($activity);
+
+        if (
+            $flow->isSubmitted()
+            || null === $revision->getId()
+            || $run === $session->get($key . '.run')
+        ) {
+            return;
+        }
+
+        $session->set(
+            $key,
+            $revision->getVersion(),
+        );
+        $session->set(
+            $key . '.run',
+            $run,
+        );
+    }
+
+    /**
+     * Whether the request handed a step in, which is answered with a redirect rather than a page: refreshing a page
+     * reached by a POST sends that POST again, and a submission the flow cannot place lands on whichever step it has
+     * since moved to, emptying every field of one nobody filled in.
+     */
+    private function stepWasHandedIn(FormFlowInterface $flow): bool
+    {
+        return $flow->isSubmitted()
+            && $flow->isValid()
+            && !$flow->isFinished();
+    }
+
+    #[Route(
+        path: '/{activity}/signup-lists/add',
+        name: 'signup_list_add',
+        requirements: ['activity' => '\d+'],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        id: new Expression('"activity_signup_lists-" ~ args["activity"].getId()'),
+        tokenKey: '_csrf_token',
+    )]
+    public function addSignupList(
+        Request $request,
+        #[CurrentUser]
+        User $user,
+        Activity $activity,
+    ): Response {
+        $revision = $this->draftBeingEdited(
+            $activity,
+            $user,
         );
 
-        return $this->redirectToRoute('admin/activities/index');
+        if ($revision instanceof ActivityRevision) {
+            $this->activityAdminService->addSignupList($revision);
+        }
+
+        return $this->backToEditor(
+            $request,
+            $activity,
+        );
+    }
+
+    #[Route(
+        path: '/{activity}/signup-lists/{list}/remove',
+        name: 'signup_list_remove',
+        requirements: [
+            'activity' => '\d+',
+            'list' => '\d+',
+        ],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        id: new Expression('"activity_signup_lists-" ~ args["activity"].getId()'),
+        tokenKey: '_csrf_token',
+    )]
+    public function removeSignupList(
+        Request $request,
+        #[CurrentUser]
+        User $user,
+        Activity $activity,
+        SignupList $list,
+    ): Response {
+        $revision = $this->draftBeingEdited(
+            $activity,
+            $user,
+        );
+
+        if (
+            $revision instanceof ActivityRevision
+            && $list->getRevision() === $revision
+            && !$this->activityAdminService->removeSignupList($list)
+        ) {
+            $this->addFlash(
+                AlertTypes::Warning->value,
+                $this->translator->trans('People have signed up for this list, so it can no longer be removed.'),
+            );
+        }
+
+        return $this->backToEditor(
+            $request,
+            $activity,
+        );
+    }
+
+    private function backToEditor(
+        Request $request,
+        Activity $activity,
+    ): RedirectResponse {
+        $parameters = ['activity' => $activity->getId()];
+        $run = $request->query->getString('flow');
+
+        if ('' !== $run) {
+            $parameters['flow'] = $run;
+        }
+
+        return $this->redirectToRoute(
+            'admin/activities/edit',
+            $parameters,
+        );
+    }
+
+    private function draftBeingEdited(
+        Activity $activity,
+        User $user,
+    ): ?ActivityRevision {
+        $this->denyAccessUnlessGranted(
+            RevisionVoter::SUBMIT,
+            $activity,
+        );
+
+        $revision = $activity->getCurrentRevision();
+
+        if (
+            !$revision instanceof ActivityRevision
+            || ReviseRefusal::AlreadyADraft !== $revision->getStatus()->reviseRefusal()
+            || null !== $this->editLockService->blockingLock(
+                $activity,
+                $user,
+            )
+        ) {
+            return null;
+        }
+
+        return $revision;
     }
 
     #[Route(
@@ -290,15 +457,27 @@ class AdminController extends AbstractController
         $flow->handleRequest($request);
 
         if (!$flow->isFinished()) {
-            if (
-                !$flow->isSubmitted()
-                && null !== $revision->getId()
-            ) {
-                // Remember, server-side, the version this edit started from, so the optimistic-lock check on save
-                // cannot be bypassed by tampering a client-submitted field.
-                $request->getSession()->set(
-                    $this->editVersionKey($activity),
-                    $revision->getVersion(),
+            $this->stampEditVersion(
+                $request,
+                $flow,
+                $activity,
+                $revision,
+                $run,
+            );
+
+            // The clicked button is handled here, which is what moves the flow on, so this comes before the
+            // step it ended up on is answered with anything.
+            $form = $flow->getStepForm();
+
+            if ($this->stepWasHandedIn($flow)) {
+                $this->activityAdminService->saveSignupLists($revision);
+
+                return $this->redirectToRoute(
+                    'admin/activities/edit',
+                    [
+                        'activity' => $activity->getId(),
+                        'flow' => $run,
+                    ],
                 );
             }
 
@@ -306,9 +485,6 @@ class AdminController extends AbstractController
                 $flow,
                 $this->translator,
             );
-
-            $form = $flow->getStepForm();
-            $this->restoreSignupLists($form);
 
             return $this->render(
                 'activity/admin/edit.html.twig',
@@ -376,6 +552,7 @@ class AdminController extends AbstractController
             $user,
         );
         $request->getSession()->remove($this->editVersionKey($activity));
+        $request->getSession()->remove($this->editVersionKey($activity) . '.run');
         $flow->reset();
 
         $this->addFlash(
@@ -384,35 +561,6 @@ class AdminController extends AbstractController
         );
 
         return $this->redirectToRoute('admin/activities/index');
-    }
-
-    /**
-     * Fill the sign-up lists step back in with what it last held. The lists are edited on the revision, which is built
-     * afresh on every request and so arrives empty; only what the step was filled in with travels along in the flow.
-     * Handing that back to the step is what turns it into lists again, so a step that is returned to is the step that
-     * was left.
-     *
-     * @param FormInterface<mixed> $form
-     */
-    private function restoreSignupLists(FormInterface $form): void
-    {
-        if (!$form->has(ActivityData::STEP_SIGNUP_LISTS)) {
-            return;
-        }
-
-        $step = $form->get(ActivityData::STEP_SIGNUP_LISTS);
-        $data = $form->getData();
-
-        // A step that was just handed in already holds what was typed into it, right down to what was rejected.
-        if (
-            $step->isSubmitted()
-            || !$data instanceof ActivityData
-            || null === $data->signupListsSubmission
-        ) {
-            return;
-        }
-
-        $step->submit([ActivityData::STEP_SIGNUP_LISTS => $data->signupListsSubmission]);
     }
 
     /**

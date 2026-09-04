@@ -92,8 +92,10 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     {
         $list = new SignupList();
         $list->setName($source->getName()->copy());
-        $list->setOpenDate(clone $source->getOpenDate());
-        $list->setCloseDate(clone $source->getCloseDate());
+        $openDate = $source->getOpenDate();
+        $closeDate = $source->getCloseDate();
+        $list->setOpenDate(null !== $openDate ? clone $openDate : null);
+        $list->setCloseDate(null !== $closeDate ? clone $closeDate : null);
         $list->setOnlyGEWIS($source->getOnlyGEWIS());
         $list->setDisplaySubscribedNumber($source->getDisplaySubscribedNumber());
         $list->setLimitedCapacity($source->getLimitedCapacity());

@@ -3,18 +3,6 @@
     cursor: pointer;
 }
 
-// A CSS counter numbers the collapsible list and question panels so collapsed ones stay distinguishable; it
-// reflows as entries are added or removed (see form_collection_controller.ts). The prototype lives in a data
-// attribute and is not counted.
-.signup-list-collection {
-    counter-reset: signup-list;
-
-    .signup-list-number::before {
-        counter-increment: signup-list;
-        content: counter(signup-list);
-    }
-}
-
 .signup-field-collection {
     counter-reset: signup-field;
 

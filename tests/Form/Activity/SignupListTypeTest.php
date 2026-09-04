@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Form\Activity;
 
+use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityLocalisedText;
+use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\Enums\AllocationMethod;
 use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
@@ -13,12 +15,15 @@ use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
+use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Database\Enums\ProgramType;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Activity\SignupFieldType;
 use App\Form\Activity\SignupListType;
 use App\Form\Activity\SignupOptionType;
 use App\Form\Activity\SignupRoleType;
 use App\Form\Application\LocalisedTextType;
+use DateTime;
 use Override;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -67,8 +72,8 @@ final class SignupListTypeTest extends TypeTestCase
 
     public function testAllocationMethodIsFrozenOnceTheListHasSignUps(): void
     {
-        $form = $this->factory->create(
-            SignupListType::class,
+        $form = $this->section(
+            SignupListSection::Allocation,
             $this->listWithSignUp(),
         );
 
@@ -97,10 +102,19 @@ final class SignupListTypeTest extends TypeTestCase
             );
         }
 
-        // The capacity stays editable so seats can still be adjusted; likewise the safe metadata.
+        self::assertFalse(
+            $this->isDisabled(
+                $form,
+                'capacity',
+            ),
+        );
+
+        $basics = $this->section(
+            SignupListSection::Basics,
+            $this->listWithSignUp(),
+        );
         foreach (
             [
-                'capacity',
                 'closeDate',
                 'displaySubscribedNumber',
                 'promoted',
@@ -108,7 +122,7 @@ final class SignupListTypeTest extends TypeTestCase
         ) {
             self::assertFalse(
                 $this->isDisabled(
-                    $form,
+                    $basics,
                     $name,
                 ),
                 sprintf(
@@ -121,8 +135,8 @@ final class SignupListTypeTest extends TypeTestCase
 
     public function testAllocationMethodStaysEditableWhileTheListHasNoSignUps(): void
     {
-        $form = $this->factory->create(
-            SignupListType::class,
+        $form = $this->section(
+            SignupListSection::Allocation,
             $this->list(),
         );
 
@@ -138,8 +152,8 @@ final class SignupListTypeTest extends TypeTestCase
     public function testSubmittedFieldAndOptionOrderAndDefaultAreMappedOntoTheEntities(): void
     {
         $list = $this->list();
-        $form = $this->factory->create(
-            SignupListType::class,
+        $form = $this->section(
+            SignupListSection::Questions,
             $list,
         );
 
@@ -462,8 +476,8 @@ final class SignupListTypeTest extends TypeTestCase
 
     public function testThePriorityModifiersAreFrozenOnceTheListHasSignUps(): void
     {
-        $form = $this->factory->create(
-            SignupListType::class,
+        $form = $this->section(
+            SignupListSection::Allocation,
             $this->listWithSignUp(),
         );
 
@@ -488,6 +502,61 @@ final class SignupListTypeTest extends TypeTestCase
                 ),
             );
         }
+    }
+
+    public function testAListWithNoWindowIsNotFilledIn(): void
+    {
+        $list = new SignupList();
+
+        self::assertNull($list->getOpenDate());
+        self::assertNull($list->getCloseDate());
+        self::assertFalse($list->isOpen());
+        self::assertFalse($list->isClosed());
+        self::assertFalse(SignupListSection::Basics->isFilledIn($list));
+    }
+
+    public function testAListWithANameAndAWindowIsFilledIn(): void
+    {
+        $list = $this->list();
+        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
+        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+
+        self::assertTrue(SignupListSection::Basics->isFilledIn($list));
+    }
+
+    public function testAMembersOnlyListDoesNotOfferTheNonMemberTier(): void
+    {
+        $list = $this->list();
+        $list->setOnlyGEWIS(true);
+        $list->setMembershipTierOrder(array_map(
+            static fn (MembershipTier $tier): array => [$tier],
+            MembershipTier::defaultOrder(),
+        ));
+
+        self::assertSame(
+            [
+                [MembershipTier::Ordinary],
+                [MembershipTier::External],
+                [MembershipTier::Honorary],
+                [MembershipTier::Graduate],
+            ],
+            $list->getMembershipTierOrder(),
+        );
+
+        $form = $this->section(
+            SignupListSection::Allocation,
+            $list,
+        );
+
+        self::assertSame(
+            [
+                [MembershipTier::Ordinary],
+                [MembershipTier::External],
+                [MembershipTier::Honorary],
+                [MembershipTier::Graduate],
+            ],
+            $form->createView()->vars['membershipTierOrderTiers'],
+        );
     }
 
     public function testSeatsAreNotHeldForNonMembersOnAMembersOnlyList(): void
@@ -520,6 +589,87 @@ final class SignupListTypeTest extends TypeTestCase
         );
     }
 
+    public function testTheWindowOfAListThatIsNotLiveStaysEditable(): void
+    {
+        $list = $this->list();
+        $list->setOpenDate(new DateTime('-1 week'));
+        $list->setCloseDate(new DateTime('-1 day'));
+        $this->attachToDraft($list);
+
+        $form = $this->section(
+            SignupListSection::Basics,
+            $list,
+        );
+
+        self::assertFalse(
+            $this->isDisabled(
+                $form,
+                'openDate',
+            ),
+        );
+        self::assertFalse(
+            $this->isDisabled(
+                $form,
+                'closeDate',
+            ),
+        );
+    }
+
+    public function testTheWindowOfALiveListThatHasOpenedIsFixed(): void
+    {
+        $list = $this->list();
+        $this->attachToDraft(
+            $list,
+            live: true,
+        );
+
+        $form = $this->section(
+            SignupListSection::Basics,
+            $list,
+        );
+
+        self::assertTrue(
+            $this->isDisabled(
+                $form,
+                'openDate',
+            ),
+        );
+        self::assertTrue(
+            $this->isDisabled(
+                $form,
+                'closeDate',
+            ),
+        );
+    }
+
+    private function attachToDraft(
+        SignupList $list,
+        bool $live = false,
+    ): void {
+        $activity = new Activity();
+
+        $draft = new ActivityRevision();
+        $activity->addRevision($draft);
+        $activity->setCurrentRevision($draft);
+        $draft->addSignupList($list);
+
+        if (!$live) {
+            return;
+        }
+
+        $liveRevision = new ActivityRevision();
+        $liveRevision->setStatus(RevisionStatus::Approved);
+        $activity->addRevision($liveRevision);
+        $activity->setLiveRevision($liveRevision);
+
+        $liveList = new SignupList();
+        $liveList->setName(new ActivityLocalisedText());
+        $liveList->setLineageId($list->getLineageId());
+        $liveList->setOpenDate(new DateTime('-1 week'));
+        $liveList->setCloseDate(new DateTime('-1 day'));
+        $liveRevision->addSignupList($liveList);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      *
@@ -529,26 +679,33 @@ final class SignupListTypeTest extends TypeTestCase
         array $overrides,
         ?SignupList $list = null,
     ): FormInterface {
-        $form = $this->factory->create(
-            SignupListType::class,
+        $form = $this->section(
+            SignupListSection::Allocation,
             $list ?? $this->list(),
         );
 
         $form->submit($overrides + [
-            'name' => [
-                'valueNL' => 'Naam',
-                'valueEN' => 'Name',
-            ],
-            'openDate' => '2030-01-01T12:00',
-            'closeDate' => '2030-02-01T12:00',
             'limitedCapacity' => '1',
             'capacity' => '10',
             'allocationMethod' => AllocationMethod::FirstComeFirstServed->value,
-            'fields' => [],
             'roles' => [],
         ]);
 
         return $form;
+    }
+
+    /**
+     * @return FormInterface<mixed>
+     */
+    private function section(
+        SignupListSection $section,
+        SignupList $list,
+    ): FormInterface {
+        return $this->factory->create(
+            SignupListType::class,
+            $list,
+            ['section' => $section],
+        );
     }
 
     private function listWithSignUp(): SignupList

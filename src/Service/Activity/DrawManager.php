@@ -220,7 +220,10 @@ final readonly class DrawManager
                 continue;
             }
 
-            if ($subscribedAt <= $cutoff) {
+            if (
+                null !== $cutoff
+                && $subscribedAt <= $cutoff
+            ) {
                 $pool[] = $signup;
                 continue;
             }

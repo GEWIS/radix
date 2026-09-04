@@ -8,6 +8,7 @@ use Override;
 use Symfony\Component\Form\Flow\AbstractFlowType;
 use Symfony\Component\Form\Flow\DataStorage\SessionDataStorage;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\Form\Flow\FormFlowCursor;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\Type\FinishFlowType;
 use Symfony\Component\Form\Flow\Type\NextFlowType;
@@ -17,6 +18,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function array_key_exists;
+use function array_keys;
+use function array_search;
+use function array_values;
+use function count;
 use function sprintf;
 use function Symfony\Component\Translation\t;
 
@@ -28,6 +34,15 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
 {
     public function __construct(private readonly RequestStack $requestStack)
     {
+    }
+
+    public static function storageKey(string $flowKey): string
+    {
+        return sprintf(
+            '_sf_formflow.%s.%s',
+            static::class,
+            $flowKey,
+        );
     }
 
     /**
@@ -59,8 +74,36 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
             ->add(
                 'finish',
                 FinishFlowType::class,
-                ['label' => $options['finish_label']],
+                [
+                    'label' => $options['finish_label'],
+                    // Symfony offers finishing on the last step alone, which a flow whose tail is built from
+                    // records has no meaningful version of: naming a step says everything that has to be
+                    // answered has been by here.
+                    'include_if' => static function (FormFlowCursor $cursor) use ($options): bool {
+                        $from = array_search(
+                            $options['finish_from'],
+                            $cursor->getSteps(),
+                            true,
+                        );
+
+                        return false === $from
+                            ? $cursor->isLastStep()
+                            : $cursor->getStepIndex() >= $from;
+                    },
+                ],
+            )
+            ->add(
+                'goto',
+                GoToStepFlowType::class,
+                ['label' => false],
             );
+
+        // A stored step may have lost its record; landing on the last step that is always there beats refusing.
+        $builder->setStepAccessor(new KnownStepAccessor(
+            $builder->getStepAccessor(),
+            $builder,
+            $options['finish_from'],
+        ));
     }
 
     /**
@@ -72,7 +115,189 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
         FormFlowInterface $form,
         array $options,
     ): void {
+        $view->vars['flow_key'] = $options['flow_key'];
         $view->vars['step_labels'] = $options['step_labels'];
+        $view->vars['stepper'] = $this->stepper(
+            $view,
+            $form,
+            $options['step_groups'],
+        );
+    }
+
+    /**
+     * @param FormFlowInterface<mixed>            $form
+     * @param array<string, array<string, mixed>> $groups
+     *
+     * @return array{
+     *     top: list<array{name: string, label: mixed, position: int, state: string}>,
+     *     group: ?array<string, mixed>,
+     * }
+     */
+    private function stepper(
+        FormView $view,
+        FormFlowInterface $form,
+        array $groups,
+    ): array {
+        /** @var array<string, array{index: int}> $visible */
+        $visible = $view->vars['visible_steps'] ?? [];
+        $data = $form->getData();
+        $cursor = $form->getCursor();
+        $current = $cursor->getCurrentStep();
+        $currentIndex = $cursor->getStepIndex();
+        $under = $groups[$current]['under'] ?? null;
+
+        $top = [];
+        $position = 0;
+        foreach ($visible as $name => $step) {
+            if (
+                array_key_exists(
+                    $name,
+                    $groups,
+                )
+            ) {
+                continue;
+            }
+
+            ++$position;
+            $top[] = [
+                'name' => $name,
+                'label' => $view->vars['step_labels'][$name] ?? $name,
+                'position' => $position,
+                'state' => $this->state(
+                    $name === $under,
+                    $step['index'],
+                    $currentIndex,
+                ),
+            ];
+        }
+
+        return [
+            'top' => $top,
+            'group' => null === $under
+                ? null
+                : $this->group(
+                    $view,
+                    $visible,
+                    $groups,
+                    $current,
+                    $currentIndex,
+                ),
+        ];
+    }
+
+    private function state(
+        bool $holdsCurrent,
+        int $index,
+        int $currentIndex,
+    ): string {
+        if (
+            $holdsCurrent
+            || $index === $currentIndex
+        ) {
+            return 'current';
+        }
+
+        return $index < $currentIndex
+            ? 'complete'
+            : 'upcoming';
+    }
+
+    /**
+     * @param list<array{done: bool}> $steps
+     */
+    private function progress(array $steps): string
+    {
+        $done = 0;
+        foreach ($steps as $step) {
+            if (!$step['done']) {
+                continue;
+            }
+
+            ++$done;
+        }
+
+        return sprintf(
+            '%d/%d',
+            $done,
+            count($steps),
+        );
+    }
+
+    /**
+     * @param array<string, array{index: int}>    $visible
+     * @param array<string, array<string, mixed>> $groups
+     *
+     * @return array<string, mixed>
+     */
+    private function group(
+        FormView $view,
+        array $visible,
+        array $groups,
+        string $current,
+        int $currentIndex,
+    ): array {
+        $key = $groups[$current]['group'];
+
+        $byGroup = [];
+        $siblings = [];
+        foreach ($visible as $name => $step) {
+            $group = $groups[$name] ?? null;
+            if (null === $group) {
+                continue;
+            }
+
+            if (
+                !array_key_exists(
+                    $group['group'],
+                    $siblings,
+                )
+            ) {
+                $siblings[$group['group']] = [
+                    'name' => $name,
+                    'label' => $group['label'],
+                    'number' => $group['number'] ?? null,
+                    'current' => $group['group'] === $key,
+                ];
+                $byGroup[$group['group']] = [];
+            }
+
+            $byGroup[$group['group']][] = [
+                'name' => $name,
+                'label' => $view->vars['step_labels'][$name] ?? $name,
+                'position' => count($byGroup[$group['group']]) + 1,
+                'done' => (bool) ($group['done'] ?? false),
+                'state' => $this->state(
+                    false,
+                    $step['index'],
+                    $currentIndex,
+                ),
+            ];
+        }
+
+        $steps = $byGroup[$key];
+        foreach ($siblings as $group => $sibling) {
+            $siblings[$group]['state'] = $this->progress($byGroup[$group]);
+        }
+
+        $order = array_keys($siblings);
+        $at = (int) array_search(
+            $key,
+            $order,
+            true,
+        );
+
+        return [
+            'label' => $groups[$current]['label'],
+            'number' => $groups[$current]['number'] ?? null,
+            'state' => $this->progress($steps),
+            'overview' => $groups[$current]['under'],
+            'position' => $at + 1,
+            'total' => count($order),
+            'steps' => $steps,
+            'siblings' => array_values($siblings),
+            'previous' => isset($order[$at - 1]) ? $siblings[$order[$at - 1]]['name'] : null,
+            'next' => isset($order[$at + 1]) ? $siblings[$order[$at + 1]]['name'] : null,
+        ];
     }
 
     #[Override]
@@ -85,12 +310,27 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
             'auto_reset' => false,
             'finish_label' => t('Save'),
             'step_labels' => [],
+            'finish_from' => null,
+            'step_groups' => [],
             'flow_key' => null,
         ]);
 
         $resolver->setAllowedTypes(
             'step_labels',
             'array',
+        );
+
+        $resolver->setAllowedTypes(
+            'step_groups',
+            'array',
+        );
+
+        $resolver->setAllowedTypes(
+            'finish_from',
+            [
+                'null',
+                'string',
+            ],
         );
 
         $resolver->setAllowedTypes(
@@ -111,11 +351,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                 }
 
                 return new SessionDataStorage(
-                    sprintf(
-                        '_sf_formflow.%s.%s',
-                        static::class,
-                        $options['flow_key'],
-                    ),
+                    static::storageKey($options['flow_key']),
                     $this->requestStack,
                 );
             },

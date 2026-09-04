@@ -52,8 +52,8 @@ use const PHP_INT_MAX;
  *     id: ?int,
  *     name: ?string,
  *     nameEn: ?string,
- *     openDate: DateTime,
- *     closeDate: DateTime,
+ *     openDate: ?DateTime,
+ *     closeDate: ?DateTime,
  *     onlyGEWIS: bool,
  *     displaySubscribedNumber: bool,
  *     limitedCapacity: bool,
@@ -82,8 +82,8 @@ use const PHP_INT_MAX;
  * @phpstan-type SignupListGdprArrayType = array{
  *     id: ?int,
  *     name: ImportedLocalisedTextGdprArrayType,
- *     openDate: string,
- *     closeDate: string,
+ *     openDate: ?string,
+ *     closeDate: ?string,
  *     onlyGEWIS: bool,
  *     displaySubscribedNumber: bool,
  *     limitedCapacity: bool,
@@ -161,17 +161,17 @@ class SignupList
     )]
     private ActivityLocalisedText $name;
 
-    /**
-     * The date and time the SignupList is open for signups.
-     */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $openDate;
+    #[Column(
+        type: Types::DATETIME_MUTABLE,
+        nullable: true,
+    )]
+    private ?DateTime $openDate = null;
 
-    /**
-     * The date and time after which the SignupList is no longer open.
-     */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $closeDate;
+    #[Column(
+        type: Types::DATETIME_MUTABLE,
+        nullable: true,
+    )]
+    private ?DateTime $closeDate = null;
 
     /**
      * When subscribers were told this was about to close, so they are told once rather than every time the reminder
@@ -388,6 +388,7 @@ class SignupList
         mappedBy: 'signupList',
         targetEntity: Signup::class,
         orphanRemoval: true,
+        fetch: 'EXTRA_LAZY',
     )]
     #[OrderBy(value: ['id' => 'ASC'])]
     private Collection $signUps;
@@ -412,8 +413,6 @@ class SignupList
         // Initialise the required scalars/relations so a freshly-formed (not-yet-hydrated) list is form-ready;
         // Doctrine bypasses the constructor when hydrating, so existing rows keep their persisted values.
         $this->name = new ActivityLocalisedText();
-        $this->openDate = new DateTime();
-        $this->closeDate = new DateTime();
         // A brand-new list starts its own lineage; the cloner copies this id onto each clone.
         $this->lineageId = Uuid::v4();
     }
@@ -440,6 +439,41 @@ class SignupList
     public function hasSignUps(): bool
     {
         return !$this->signUps->isEmpty();
+    }
+
+    /**
+     * A draft clone's own sign-ups stay on the live revision until approval migrates them, so anything that must not
+     * disturb people who have already committed looks through the lineage rather than at this copy.
+     */
+    public function hasLineageSignUps(): bool
+    {
+        return $this->hasSignUps()
+            || (bool) $this->liveCounterpart()?->hasSignUps();
+    }
+
+    /**
+     * The live revision's list this one descends from (matched by lineage), or null when there is none. A draft's
+     * own sign-ups and draw state stay empty until approval, so anything about people or windows already shown to
+     * members is answered by the counterpart.
+     */
+    public function liveCounterpart(): ?SignupList
+    {
+        if (!$this->hasRevision()) {
+            return null;
+        }
+
+        $live = $this->revision->getActivity()->getLiveRevision();
+        if (null === $live) {
+            return null;
+        }
+
+        foreach ($live->getSignupLists() as $liveList) {
+            if ($liveList->getLineageId()->equals($this->lineageId)) {
+                return $liveList;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -530,7 +564,7 @@ class SignupList
     /**
      * Returns the opening DateTime of this SignupList.
      */
-    public function getOpenDate(): DateTime
+    public function getOpenDate(): ?DateTime
     {
         return $this->openDate;
     }
@@ -538,7 +572,7 @@ class SignupList
     /**
      * Sets the opening DateTime of this SignupList.
      */
-    public function setOpenDate(DateTime $openDate): void
+    public function setOpenDate(?DateTime $openDate): void
     {
         $this->openDate = $openDate;
     }
@@ -556,7 +590,7 @@ class SignupList
         $this->remindedAt = $remindedAt;
     }
 
-    public function getCloseDate(): DateTime
+    public function getCloseDate(): ?DateTime
     {
         return $this->closeDate;
     }
@@ -564,7 +598,7 @@ class SignupList
     /**
      * Sets the closing DateTime of this SignupList.
      */
-    public function setCloseDate(DateTime $closeDate): void
+    public function setCloseDate(?DateTime $closeDate): void
     {
         $this->closeDate = $closeDate;
     }
@@ -577,9 +611,16 @@ class SignupList
      */
     public function isOpen(): bool
     {
+        if (
+            null === $this->openDate
+            || null === $this->closeDate
+        ) {
+            return false;
+        }
+
         $now = new DateTime('now');
 
-        return $now >= $this->getOpenDate() && $now < $this->getCloseDate();
+        return $now >= $this->openDate && $now < $this->closeDate;
     }
 
     /**
@@ -589,7 +630,8 @@ class SignupList
      */
     public function isClosed(): bool
     {
-        return new DateTime('now') >= $this->getCloseDate();
+        return null !== $this->closeDate
+            && new DateTime('now') >= $this->closeDate;
     }
 
     /**
@@ -701,11 +743,12 @@ class SignupList
             DrawCutoffRule::OnClose => $this->closeDate,
             DrawCutoffRule::IfFullBefore => $this->drawCutoffAt,
             DrawCutoffRule::AfterDurationOpen => null === $this->drawAfterDurationHours
-                ? null
-                : (clone $this->openDate)->modify(sprintf(
-                    '+%d hours',
-                    $this->drawAfterDurationHours,
-                )),
+                || null === $this->openDate
+                    ? null
+                    : (clone $this->openDate)->modify(sprintf(
+                        '+%d hours',
+                        $this->drawAfterDurationHours,
+                    )),
             null => null,
         };
     }
@@ -1290,8 +1333,8 @@ class SignupList
         return [
             'id' => $this->getId(),
             'name' => $this->getName()->toGdprArray(),
-            'openDate' => $this->getOpenDate()->format(DateTimeInterface::ATOM),
-            'closeDate' => $this->getCloseDate()->format(DateTimeInterface::ATOM),
+            'openDate' => $this->getOpenDate()?->format(DateTimeInterface::ATOM),
+            'closeDate' => $this->getCloseDate()?->format(DateTimeInterface::ATOM),
             'onlyGEWIS' => $this->getOnlyGEWIS(),
             'displaySubscribedNumber' => $this->getDisplaySubscribedNumber(),
             'limitedCapacity' => $this->getLimitedCapacity(),
