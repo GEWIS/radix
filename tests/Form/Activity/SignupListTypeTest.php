@@ -6,13 +6,18 @@ namespace App\Tests\Form\Activity;
 
 use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
+use App\Entity\Database\Enums\ProgramType;
 use App\Form\Activity\SignupFieldType;
 use App\Form\Activity\SignupListType;
 use App\Form\Activity\SignupOptionType;
+use App\Form\Activity\SignupRoleType;
 use App\Form\Application\LocalisedTextType;
 use Override;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -22,6 +27,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
+use function array_map;
 use function sprintf;
 
 /**
@@ -45,7 +51,7 @@ final class SignupListTypeTest extends TypeTestCase
     }
 
     /**
-     * @return list<SignupListType|LocalisedTextType|SignupFieldType|SignupOptionType>
+     * @return list<SignupListType|LocalisedTextType|SignupFieldType|SignupOptionType|SignupRoleType>
      */
     #[Override]
     protected function getTypes(): array
@@ -55,6 +61,7 @@ final class SignupListTypeTest extends TypeTestCase
             new LocalisedTextType(),
             new SignupFieldType(),
             new SignupOptionType(),
+            new SignupRoleType(),
         ];
     }
 
@@ -293,16 +300,238 @@ final class SignupListTypeTest extends TypeTestCase
         );
     }
 
+    public function testAMembershipOrderIsStoredAsTiersAndAsksHowItIsApplied(): void
+    {
+        $list = $this->list();
+        $form = $this->submitList(
+            ['membershipTierOrder' => 'non-member,ordinary,graduate'],
+            $list,
+        );
+
+        self::assertSame(
+            [
+                [MembershipTier::NonMember],
+                [MembershipTier::Ordinary],
+                [MembershipTier::Graduate],
+                [
+                    MembershipTier::External,
+                    MembershipTier::Honorary,
+                ],
+            ],
+            $list->getMembershipTierOrder(),
+        );
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('membershipPriorityMode')->getErrors(),
+        );
+    }
+
+    public function testTiersJoinedByAPlusShareARank(): void
+    {
+        $list = $this->list();
+        $form = $this->submitList(
+            [
+                'membershipTierOrder' => 'ordinary+external+honorary+graduate,non-member',
+                'membershipPriorityMode' => MembershipPriorityMode::Ordering->value,
+            ],
+            $list,
+        );
+
+        self::assertSame(
+            [
+                [
+                    MembershipTier::Ordinary,
+                    MembershipTier::External,
+                    MembershipTier::Honorary,
+                    MembershipTier::Graduate,
+                ],
+                [MembershipTier::NonMember],
+            ],
+            $list->getMembershipTierOrder(),
+        );
+        self::assertSame(
+            'ordinary+external+honorary+graduate,non-member',
+            $form->get('membershipTierOrder')->getData(),
+        );
+    }
+
+    public function testAnOrderThatNamesNoTierIsTheModifierSwitchedOff(): void
+    {
+        $list = $this->list();
+        $form = $this->submitList(
+            [
+                'membershipTierOrder' => '',
+                'cohortTierOrder' => 'nonsense',
+                'programTypeOrder' => 'bachelor,master,doctorate,other',
+            ],
+            $list,
+        );
+
+        self::assertNull($list->getMembershipTierOrder());
+        self::assertNull($list->getCohortTierOrder());
+        self::assertSame(
+            [
+                [ProgramType::Bachelor],
+                [ProgramType::Master],
+                [ProgramType::Doctorate],
+                [ProgramType::Other],
+            ],
+            $list->getProgramTypeOrder(),
+        );
+        self::assertTrue(
+            $form->isValid(),
+            (string) $form->getErrors(true),
+        );
+    }
+
+    public function testAnIncompleteOrderIsCompletedWithTheTiersItLeftOut(): void
+    {
+        $list = $this->list();
+        $this->submitList(
+            ['cohortTierOrder' => 'unknown'],
+            $list,
+        );
+
+        self::assertSame(
+            [
+                [CohortTier::Unknown],
+                [CohortTier::FirstYear],
+                [CohortTier::SecondYear],
+                [CohortTier::Senior],
+            ],
+            $list->getCohortTierOrder(),
+        );
+    }
+
+    public function testNoMoreSeatsMayBeHeldThanTheListHasToGiveOut(): void
+    {
+        $form = $this->submitList([
+            'capacity' => '10',
+            'membershipTierOrder' => 'ordinary:8,graduate:2,non-member:0',
+            'membershipPriorityMode' => MembershipPriorityMode::ReservedSeats->value,
+            'organisingCommitteeSeats' => '3',
+        ]);
+
+        self::assertFalse($form->isValid());
+        self::assertNotCount(
+            0,
+            $form->get('capacity')->getErrors(),
+        );
+    }
+
+    public function testHeldSeatsAreDroppedWhenTheOrderIsNotAppliedByHoldingThem(): void
+    {
+        $list = $this->list();
+        $this->submitList(
+            [
+                'membershipTierOrder' => 'ordinary:4,graduate,non-member',
+                'membershipPriorityMode' => MembershipPriorityMode::Ordering->value,
+            ],
+            $list,
+        );
+
+        self::assertNull($list->getHeldMembershipSeats());
+        self::assertSame(
+            [],
+            $list->getMembershipSeats(),
+        );
+    }
+
+    public function testAManualMethodKeepsNoPriorityModifiers(): void
+    {
+        $list = $this->list();
+        $this->submitList(
+            [
+                'allocationMethod' => AllocationMethod::Custom->value,
+                'customMethodDescription' => 'The board decides.',
+                'membershipTierOrder' => 'member,graduate,non-member',
+                'membershipPriorityMode' => MembershipPriorityMode::Ordering->value,
+                'cohortTierOrder' => 'first-year,second-year,third-year-and-above,unknown',
+                'organisingCommitteeSeats' => '2',
+            ],
+            $list,
+        );
+
+        self::assertNull($list->getMembershipTierOrder());
+        self::assertNull($list->getMembershipPriorityMode());
+        self::assertNull($list->getCohortTierOrder());
+        self::assertNull($list->getOrganisingCommitteeSeats());
+        self::assertFalse($list->hasPriorityModifiers());
+    }
+
+    public function testThePriorityModifiersAreFrozenOnceTheListHasSignUps(): void
+    {
+        $form = $this->factory->create(
+            SignupListType::class,
+            $this->listWithSignUp(),
+        );
+
+        foreach (
+            [
+                'membershipTierOrder',
+                'membershipPriorityMode',
+                'cohortTierOrder',
+                'programTypeOrder',
+                'organisingCommitteeSeats',
+                'roles',
+            ] as $name
+        ) {
+            self::assertTrue(
+                $this->isDisabled(
+                    $form,
+                    $name,
+                ),
+                sprintf(
+                    'Expected "%s" to be frozen once the list has sign-ups.',
+                    $name,
+                ),
+            );
+        }
+    }
+
+    public function testSeatsAreNotHeldForNonMembersOnAMembersOnlyList(): void
+    {
+        $list = $this->list();
+        $list->setOnlyGEWIS(true);
+
+        $this->submitList(
+            [
+                'membershipTierOrder' => 'ordinary:4,graduate,non-member:2',
+                'membershipPriorityMode' => MembershipPriorityMode::ReservedSeats->value,
+            ],
+            $list,
+        );
+
+        // The list is members-only, so the rank the non-members stood on is gone and the seats held for it with it.
+        self::assertSame(
+            [MembershipTier::Ordinary->value => 4],
+            $list->getHeldMembershipSeats(),
+        );
+        // The tiers the order left out are appended as the one rank the association would rank them on, and that
+        // rank holds nothing until somebody says otherwise.
+        self::assertSame(
+            [
+                MembershipTier::Ordinary->value => 4,
+                MembershipTier::Graduate->value => 0,
+                MembershipTier::External->value . '+' . MembershipTier::Honorary->value => 0,
+            ],
+            $list->getMembershipSeats(),
+        );
+    }
+
     /**
      * @param array<string, mixed> $overrides
      *
      * @return FormInterface<mixed>
      */
-    private function submitList(array $overrides): FormInterface
-    {
+    private function submitList(
+        array $overrides,
+        ?SignupList $list = null,
+    ): FormInterface {
         $form = $this->factory->create(
             SignupListType::class,
-            $this->list(),
+            $list ?? $this->list(),
         );
 
         $form->submit($overrides + [
@@ -316,6 +545,7 @@ final class SignupListTypeTest extends TypeTestCase
             'capacity' => '10',
             'allocationMethod' => AllocationMethod::FirstComeFirstServed->value,
             'fields' => [],
+            'roles' => [],
         ]);
 
         return $form;

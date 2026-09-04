@@ -14,7 +14,9 @@ use DateTime;
 final readonly class SignupAdminRow
 {
     /**
-     * @param list<array{value: string}> $cells one per sign-up field, already formatted and in field order
+     * @param list<array{value: string}> $cells    one per sign-up field, already formatted and in field order
+     * @param list<string>               $priority why this subscriber ranks where they do, one label per thing the
+     *                                             list ranks on, in the order the draw weighs them
      */
     public function __construct(
         public int $signupId,
@@ -29,6 +31,11 @@ final readonly class SignupAdminRow
         public bool $present,
         public bool $drawn,
         public array $cells,
+        public array $priority = [],
+        public ?int $roleId = null,
+        // Installed in the organ organising this activity, so a seat was held off the top for them. Not a tier
+        // somebody is ranked in, which is why it is said apart from the priority labels.
+        public bool $organisingBody = false,
     ) {
     }
 }

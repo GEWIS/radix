@@ -14,7 +14,10 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\ActivityRevisionComment;
 use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\Signup;
@@ -22,20 +25,29 @@ use App\Entity\Activity\SignupField;
 use App\Entity\Activity\SignupFieldValue;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupOption;
+use App\Entity\Activity\SignupRole;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Career\Company;
+use App\Entity\Database\Enums\ProgramType;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Entity\User\User;
+use App\Service\Activity\AdmissionOrder;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Override;
 
+use function array_map;
+use function assert;
+use function count;
+use function in_array;
 use function is_array;
+use function sprintf;
 
 /**
  * @phpstan-type SignupListSeedType = array{
@@ -48,10 +60,20 @@ use function is_array;
  *     capacity?: int,
  *     allocationMethod?: AllocationMethod,
  *     drawCutoffRule?: DrawCutoffRule,
+ *     drawCutoffAt?: string,
+ *     drawAfterDurationHours?: int,
  *     externalPolicyUrl?: string,
  *     customMethodDescription?: string,
+ *     draw?: bool,
  *     drawnAt?: string,
  *     drawnBy?: int,
+ *     membershipTierOrder?: list<list<MembershipTier>>,
+ *     membershipPriorityMode?: MembershipPriorityMode,
+ *     membershipSeats?: array<string, int>,
+ *     cohortTierOrder?: list<list<CohortTier>>,
+ *     programTypeOrder?: list<list<ProgramType>>,
+ *     organisingCommitteeSeats?: int,
+ *     roles?: list<array{name: string, minimum: int}>,
  *     promoted?: bool,
  *     presenceTaken?: bool,
  *     fields?: list<array<string, mixed>>,
@@ -74,11 +96,15 @@ use function is_array;
  *     company?: string,
  *     cancelled?: bool,
  *     unpublished?: bool,
+ *     organ?: string,
  *     signupLists?: list<SignupListSeedType>,
  * }
  */
 class ActivityFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    /** @var list<array{Signup, DateTime}> the sign-ups whose moment is written once they have an id */
+    private array $signedUpAt = [];
+
     #[Override]
     public function load(ObjectManager $manager): void
     {
@@ -256,6 +282,16 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         'drawnAt' => '-4 weeks 12:00',
                         'drawnBy' => 8025,
                         'presenceTaken' => true,
+                        'membershipTierOrder' => [
+                            [
+                                MembershipTier::Ordinary,
+                                MembershipTier::External,
+                                MembershipTier::Honorary,
+                                MembershipTier::Graduate,
+                            ],
+                            [MembershipTier::NonMember],
+                        ],
+                        'membershipPriorityMode' => MembershipPriorityMode::Ordering,
                         // A closed, past, limited-capacity list exercising the full flow: 3 admitted (capacity 3) of
                         // whom 2 attended and 1 was a no-show, plus 2 on the waiting list (one a non-member external),
                         // an obvious backfill opportunity. Also covers extra fields and mixed membership types.
@@ -518,6 +554,14 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         'capacity' => 2,
                         'allocationMethod' => AllocationMethod::ConditionalDraw,
                         'drawCutoffRule' => DrawCutoffRule::OnClose,
+                        // Closed but not yet drawn, so the organiser can still hand the role out on the sign-ups
+                        // page and see the draw make up the shortfall.
+                        'roles' => [
+                            [
+                                'name' => 'Driver',
+                                'minimum' => 1,
+                            ],
+                        ],
                         'subscribers' => [
                             8005,
                             8006,
@@ -856,6 +900,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     ],
                 ],
             ],
+            ...$this->allocationMatrix(),
         ];
 
         foreach ($activities as $data) {
@@ -880,6 +925,16 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
             foreach ($data['labels'] ?? [] as $labelReference) {
                 $revision->addLabel($this->getReference($labelReference, ActivityLabel::class));
+            }
+
+            // The organ behind the activity, which is what the seats held for the organising body are read against.
+            if (isset($data['organ'])) {
+                $revision->setOrgan(
+                    $this->getReference(
+                        $data['organ'],
+                        Organ::class,
+                    ),
+                );
             }
 
             // The organising company (a reviewable, display-only field) surfaces on that company's career detail page.
@@ -943,7 +998,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     ];
                 }
 
-                foreach ($signupListData['subscribers'] ?? [] as $subscriber) {
+                $signups = [];
+                foreach ($signupListData['subscribers'] ?? [] as $index => $subscriber) {
                     // A subscriber is either a bare lidnr or a richer array with presence and field answers.
                     $entry = is_array($subscriber)
                         ? $subscriber
@@ -957,7 +1013,24 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     // apply this same rule (drawn = !limitedCapacity) when it creates sign-ups.
                     $signup->setDrawn($entry['drawn'] ?? !$signupList->getLimitedCapacity());
                     $signup->setPresent($entry['present'] ?? false);
+                    // A role is handed out by the organiser once sign-up has closed, so the draw has something to
+                    // make up the shortfall from.
+                    if (isset($entry['role'])) {
+                        foreach ($signupList->getRoles() as $role) {
+                            if ($role->getName() !== $entry['role']) {
+                                continue;
+                            }
+
+                            $signup->setRole($role);
+                        }
+                    }
+
+                    $signups[] = $signup;
                     $manager->persist($signup);
+                    $this->signedUp(
+                        $signup,
+                        $index,
+                    );
 
                     $this->addFieldAnswers(
                         $signup,
@@ -967,16 +1040,20 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     );
                 }
 
-                foreach ($signupListData['externals'] ?? [] as $external) {
+                foreach ($signupListData['externals'] ?? [] as $index => $external) {
                     $signup = new ExternalSignup();
                     $signup->setSignupList($signupList);
                     $signup->setFullName($external['fullName']);
                     $signup->setEmail($external['email']);
                     // No token rows are seeded, so seeded externals are confirmed subscribers, mirroring the
                     // organiser-add path; without the stamp they would count as unverified everywhere.
-                    $signup->setVerifiedAt(new DateTime());
+                    $signup->setVerifiedAt($this->signedUp(
+                        $signup,
+                        count($signupListData['subscribers'] ?? []) + $index,
+                    ));
                     $signup->setDrawn($external['drawn']);
                     $signup->setPresent($external['present']);
+                    $signups[] = $signup;
                     $manager->persist($signup);
 
                     $this->addFieldAnswers(
@@ -986,12 +1063,523 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         $manager,
                     );
                 }
+
+                // A list that says it has been drawn carries the outcome the draw itself would produce: the pool in
+                // the order the modifiers put it in, the first capacity of it admitted, and everybody holding the
+                // place they were given. Seeding that by hand would be seeding a claim about the algorithm.
+                if ($signupListData['draw'] ?? false) {
+                    $capacity = $signupList->getCapacity() ?? 0;
+                    $position = 0;
+
+                    foreach (
+                        new AdmissionOrder()->arrange(
+                            $signupList,
+                            $signups,
+                        ) as $signup
+                    ) {
+                        $signup->setDrawn($position < $capacity);
+                        $signup->setDrawPosition(++$position);
+                    }
+
+                    continue;
+                }
+
+                // A list whose sign-ups say by hand who was admitted keeps that, with the admitted ones in front.
+                if (!$signupList->isDrawLocked()) {
+                    continue;
+                }
+
+                $position = 0;
+                foreach ([true, false] as $admitted) {
+                    foreach ($signups as $signup) {
+                        if ($signup->isDrawn() !== $admitted) {
+                            continue;
+                        }
+
+                        $signup->setDrawPosition(++$position);
+                    }
+                }
             }
         }
 
         $this->loadWorkflowExamples($manager);
 
         $manager->flush();
+
+        // The entity stamps its creation on persist, so the moments the sign-ups were made are written afterwards.
+        assert($manager instanceof EntityManagerInterface);
+        foreach ($this->signedUpAt as [$signup, $at]) {
+            $manager->getConnection()->update(
+                'Signup',
+                [
+                    'createdAt' => $at->format('Y-m-d H:i:s'),
+                    'updatedAt' => $at->format('Y-m-d H:i:s'),
+                ],
+                ['id' => $signup->getId()],
+            );
+        }
+    }
+
+    /**
+     * When a sign-up was made: a few minutes into its list's window, one after the other, so a list that has closed
+     * or been drawn holds sign-ups from before that moment rather than from the moment the seed ran. A list that
+     * has not opened yet keeps the seeding moment, which is all a sign-up on it could have.
+     */
+    private function signedUp(
+        Signup $signup,
+        int $index,
+    ): DateTime {
+        $openDate = $signup->getSignupList()->getOpenDate();
+        $now = new DateTime();
+
+        if (
+            null === $openDate
+            || $openDate > $now
+        ) {
+            return $now;
+        }
+
+        $at = (clone $openDate)->modify(sprintf(
+            '+%d minutes',
+            $index + 1,
+        ));
+        if ($at > $now) {
+            return $now;
+        }
+
+        $this->signedUpAt[] = [
+            $signup,
+            $at,
+        ];
+
+        return $at;
+    }
+
+    /**
+     * The allocation matrix: every way of deciding who gets a place, in every state a list can be in, so each of the
+     * board's screens can be looked at before, at and after the moment the places are handed out. Coded the way the
+     * members requiring attention are: the letter says what the list does, the number how far along it is.
+     *
+     * @return list<ActivitySeedType>
+     */
+    private function allocationMatrix(): array
+    {
+        // Enough of a cast that a ranking shows: ordinary members of four generations, an external member, an
+        // honorary member, a graduate, a master student and somebody doing a doctorate.
+        $cast = [
+            8005,
+            8010,
+            8006,
+            8100,
+            8115,
+            21,
+            8155,
+            22,
+            8007,
+        ];
+        $guests = [
+            [
+                'fullName' => 'Wietske Groen',
+                'email' => 'wietske@example.org',
+                'drawn' => false,
+                'present' => false,
+                'answers' => [],
+            ],
+            [
+                'fullName' => 'Bram de Ruiter',
+                'email' => 'bram@example.org',
+                'drawn' => false,
+                'present' => false,
+                'answers' => [],
+            ],
+        ];
+
+        $membership = [
+            'membershipTierOrder' => [
+                [
+                    MembershipTier::Ordinary,
+                    MembershipTier::External,
+                    MembershipTier::Honorary,
+                ],
+                [MembershipTier::Graduate],
+                [MembershipTier::NonMember],
+            ],
+        ];
+        $roles = [
+            'roles' => [
+                [
+                    'name' => 'Driver',
+                    'minimum' => 2,
+                ],
+            ],
+        ];
+
+        $configs = [
+            'A' => [
+                'does' => [
+                    'en' => 'Members first',
+                    'nl' => 'Leden eerst',
+                ],
+                'says' => [
+                    'en' => 'Anybody may sign up, and the places go to the members before the outside world.',
+                    'nl' => 'Iedereen mag zich inschrijven en de plaatsen gaan naar de leden voor de buitenwereld.',
+                ],
+                'method' => AllocationMethod::FirstComeFirstServed,
+                'settings' => $membership + ['membershipPriorityMode' => MembershipPriorityMode::Ordering],
+            ],
+            'B' => [
+                'does' => [
+                    'en' => 'Seats held back',
+                    'nl' => 'Gereserveerde plaatsen',
+                ],
+                'says' => [
+                    'en' => 'Seats are held for the organising body and for each rank of the membership order; what '
+                        . 'is left over is open to everybody.',
+                    'nl' => 'Er zijn plaatsen gereserveerd voor het organiserende orgaan en voor elke groep van de '
+                        . 'ledenvolgorde; wat overblijft is voor iedereen.',
+                ],
+                'organ' => 'organ-keur',
+                'capacity' => 8,
+                // First-come-first-served, so the board runs the draw itself: a conditional draw that is due is
+                // drawn by the scheduler within the minute, and there would be no closed-and-waiting state to look
+                // at. The modifiers act on either method the same way.
+                'method' => AllocationMethod::FirstComeFirstServed,
+                'settings' => $membership + [
+                    'membershipPriorityMode' => MembershipPriorityMode::ReservedSeats,
+                    'membershipSeats' => [
+                        'ordinary+external+honorary' => 3,
+                        'graduate' => 1,
+                        'non-member' => 1,
+                    ],
+                    'organisingCommitteeSeats' => 2,
+                ],
+                'subscribers' => [
+                    8025,
+                    8026,
+                    ...$cast,
+                ],
+            ],
+            'C' => [
+                'does' => [
+                    'en' => 'First years first',
+                    'nl' => 'Eerstejaars eerst',
+                ],
+                'says' => [
+                    'en' => 'The newest members are meant to have the places, so the cohort decides.',
+                    'nl' => 'De nieuwste leden horen de plaatsen te krijgen, dus het cohort beslist.',
+                ],
+                'onlyGEWIS' => true,
+                'method' => AllocationMethod::FirstComeFirstServed,
+                'settings' => [
+                    'cohortTierOrder' => [
+                        [CohortTier::FirstYear],
+                        [CohortTier::SecondYear],
+                        [CohortTier::Senior],
+                        [CohortTier::Unknown],
+                    ],
+                ],
+            ],
+            'D' => [
+                'does' => [
+                    'en' => 'Master students first',
+                    'nl' => 'Masterstudenten eerst',
+                ],
+                'says' => [
+                    'en' => 'The material is aimed at the master, so the phase of the study decides. The draw runs a '
+                        . 'day after the list opens rather than at its close.',
+                    'nl' => 'De stof is op de master gericht, dus de fase van de studie beslist. Er wordt een dag na '
+                        . 'het openen geloot in plaats van bij het sluiten.',
+                ],
+                'onlyGEWIS' => true,
+                'method' => AllocationMethod::ConditionalDraw,
+                'settings' => [
+                    'programTypeOrder' => [
+                        [ProgramType::Master],
+                        [ProgramType::Doctorate],
+                        [ProgramType::Bachelor],
+                        [ProgramType::Other],
+                    ],
+                    'drawCutoffRule' => DrawCutoffRule::AfterDurationOpen,
+                    'drawAfterDurationHours' => 24,
+                ],
+                'states' => [
+                    1,
+                    4,
+                    3,
+                ],
+                'perState' => [
+                    3 => ['drawnAt' => '-20 days 12:00'],
+                    4 => ['drawnAt' => '-6 days 12:00'],
+                ],
+            ],
+            'E' => [
+                'does' => [
+                    'en' => 'A guaranteed role',
+                    'nl' => 'Een gegarandeerde rol',
+                ],
+                'says' => [
+                    'en' => 'The activity cannot go ahead without two drivers, so two of the places are guaranteed '
+                        . 'to them. The roles are handed out once sign-up has closed, and the draw waits for that.',
+                    'nl' => 'De activiteit kan niet doorgaan zonder twee chauffeurs, dus twee plaatsen zijn voor hen '
+                        . 'gegarandeerd. De rollen worden na het sluiten uitgedeeld en de loting wacht daarop.',
+                ],
+                'onlyGEWIS' => true,
+                'method' => AllocationMethod::ConditionalDraw,
+                'settings' => $roles + ['drawCutoffRule' => DrawCutoffRule::OnClose],
+                'roleHolders' => [
+                    8155,
+                    8007,
+                ],
+            ],
+            'F' => [
+                'does' => [
+                    'en' => 'Everything at once',
+                    'nl' => 'Alles tegelijk',
+                ],
+                'says' => [
+                    'en' => 'An order, seats held for the organising body, and a role the activity cannot go ahead '
+                        . 'without, all on the one list. The draw runs at the moment the organiser named.',
+                    'nl' => 'Een volgorde, plaatsen voor het organiserende orgaan en een rol waar de activiteit niet '
+                        . 'zonder kan, allemaal op dezelfde lijst. Er wordt geloot op het moment dat de organisator '
+                        . 'heeft genoemd.',
+                ],
+                'organ' => 'organ-keur',
+                'capacity' => 6,
+                'method' => AllocationMethod::ConditionalDraw,
+                'settings' => $membership + $roles + [
+                    'membershipPriorityMode' => MembershipPriorityMode::Ordering,
+                    'organisingCommitteeSeats' => 1,
+                    'cohortTierOrder' => [
+                        [CohortTier::FirstYear],
+                        [CohortTier::SecondYear],
+                        [CohortTier::Senior],
+                        [CohortTier::Unknown],
+                    ],
+                    'drawCutoffRule' => DrawCutoffRule::IfFullBefore,
+                ],
+                'subscribers' => [
+                    8025,
+                    ...$cast,
+                ],
+                'roleHolders' => [
+                    8155,
+                    8100,
+                ],
+                // A list that guarantees a role is drawn by hand once it has closed, so it never stands drawn
+                // while sign-up is still running, whatever its own moment says.
+                'perState' => [
+                    1 => ['drawCutoffAt' => '+3 days 12:00'],
+                    2 => ['drawCutoffAt' => '-1 day 12:00'],
+                    3 => ['drawCutoffAt' => '-4 days 12:00'],
+                ],
+            ],
+            'G' => [
+                'does' => [
+                    'en' => 'Nothing at all',
+                    'nl' => 'Niets bijzonders',
+                ],
+                'says' => [
+                    'en' => 'A limited list that ranks nobody and holds nothing back, which is what the draw was '
+                        . 'before any of this.',
+                    'nl' => 'Een beperkte lijst die niemand rangschikt en niets reserveert, zoals de loting was voor '
+                        . 'dit alles.',
+                ],
+                'method' => AllocationMethod::FirstComeFirstServed,
+                'settings' => [],
+            ],
+            'H' => [
+                'does' => [
+                    'en' => 'The committee decides',
+                    'nl' => 'De commissie beslist',
+                ],
+                'says' => [
+                    'en' => 'The committee picks who comes along, so nothing here is ranked or drawn at all.',
+                    'nl' => 'De commissie kiest wie er meegaat, dus hier wordt niets gerangschikt of geloot.',
+                ],
+                'onlyGEWIS' => true,
+                'method' => AllocationMethod::Custom,
+                'settings' => [
+                    'customMethodDescription' => 'The committee picks a group that can share four cars.',
+                ],
+                'states' => [
+                    1,
+                    2,
+                ],
+            ],
+            'I' => [
+                'does' => [
+                    'en' => 'Somebody else decides',
+                    'nl' => 'Iemand anders beslist',
+                ],
+                'says' => [
+                    'en' => 'The places are handed out elsewhere, so this list only says who put their name down.',
+                    'nl' => 'De plaatsen worden elders uitgedeeld, dus deze lijst zegt alleen wie zich heeft '
+                        . 'opgegeven.',
+                ],
+                'method' => AllocationMethod::ExternalParty,
+                'settings' => ['externalPolicyUrl' => 'https://example.org/tickets'],
+                'states' => [
+                    1,
+                    2,
+                ],
+            ],
+        ];
+
+        $states = [
+            1 => [
+                'is' => [
+                    'en' => 'still open',
+                    'nl' => 'nog open',
+                ],
+                'says' => [
+                    'en' => 'Sign-up is still running and nothing has been decided.',
+                    'nl' => 'De inschrijving loopt nog en er is nog niets beslist.',
+                ],
+                'openDate' => '-4 hours',
+                'closeDate' => '+6 days 18:00',
+            ],
+            2 => [
+                'is' => [
+                    'en' => 'closed, nobody admitted yet',
+                    'nl' => 'gesloten, nog niemand toegelaten',
+                ],
+                'says' => [
+                    'en' => 'Sign-up has closed and the places have not been handed out yet.',
+                    'nl' => 'De inschrijving is gesloten en de plaatsen zijn nog niet uitgedeeld.',
+                ],
+                'openDate' => '-3 weeks 12:00',
+                'closeDate' => '-2 hours',
+            ],
+            3 => [
+                'is' => [
+                    'en' => 'closed and drawn',
+                    'nl' => 'gesloten en geloot',
+                ],
+                'says' => [
+                    'en' => 'The places have been handed out, so the waiting list stands in the order it was ranked '
+                        . 'in.',
+                    'nl' => 'De plaatsen zijn uitgedeeld, dus de wachtlijst staat in de volgorde waarin er '
+                        . 'gerangschikt is.',
+                ],
+                'openDate' => '-3 weeks 12:00',
+                'closeDate' => '-2 days 18:00',
+                'draw' => true,
+                'drawnAt' => '-2 days 18:00',
+                'drawnBy' => 8025,
+            ],
+            4 => [
+                'is' => [
+                    'en' => 'drawn while still open',
+                    'nl' => 'geloot terwijl nog open',
+                ],
+                'says' => [
+                    'en' => 'The draw ran at its own moment, well before sign-up closes, so anybody signing up now '
+                        . 'joins the waiting list behind the people who were in at that moment.',
+                    'nl' => 'De loting is op het eigen moment gedaan, ruim voordat de inschrijving sluit, dus wie '
+                        . 'zich nu opgeeft komt achter de mensen die er toen bij waren op de wachtlijst.',
+                ],
+                'openDate' => '-1 week 12:00',
+                'closeDate' => '+2 days 18:00',
+                'draw' => true,
+                'drawnAt' => '-5 days 12:00',
+            ],
+        ];
+
+        $activities = [];
+        $day = 2;
+
+        foreach ($configs as $letter => $config) {
+            foreach ($config['states'] ?? [1, 2, 3] as $number) {
+                $state = $states[$number];
+                $onlyGEWIS = $config['onlyGEWIS'] ?? false;
+                $subscribers = $config['subscribers'] ?? $cast;
+                // The roles are handed out once sign-up has closed, which is before the draw rather than with it.
+                $holders = 1 === $number
+                    ? []
+                    : $config['roleHolders'] ?? [];
+
+                $activities[] = [
+                    'creator' => 8025,
+                    ...isset($config['organ']) ? ['organ' => $config['organ']] : [],
+                    'status' => RevisionStatus::Approved,
+                    'beginTime' => sprintf(
+                        '+%d days 18:00',
+                        $day,
+                    ),
+                    'endTime' => sprintf(
+                        '+%d days 22:00',
+                        $day++,
+                    ),
+                    'category' => ActivityCategories::Recreational,
+                    'requireGEFLITST' => false,
+                    'requireZettle' => false,
+                    'name' => [
+                        'en' => sprintf(
+                            'ÅLLOC-%s%d %s, %s',
+                            $letter,
+                            $number,
+                            $config['does']['en'],
+                            $state['is']['en'],
+                        ),
+                        'nl' => sprintf(
+                            'ÅLLOC-%s%d %s, %s',
+                            $letter,
+                            $number,
+                            $config['does']['nl'],
+                            $state['is']['nl'],
+                        ),
+                    ],
+                    'location' => [
+                        'en' => 'Nexus',
+                        'nl' => 'Nexus',
+                    ],
+                    'costs' => [
+                        'en' => 'Free',
+                        'nl' => 'Gratis',
+                    ],
+                    'description' => [
+                        'en' => $config['says']['en'] . ' ' . $state['says']['en'],
+                        'nl' => $config['says']['nl'] . ' ' . $state['says']['nl'],
+                    ],
+                    'signupLists' => [
+                        [
+                            'name' => [
+                                'en' => 'Attendance',
+                                'nl' => 'Aanwezigheid',
+                            ],
+                            'openDate' => $state['openDate'],
+                            'closeDate' => $state['closeDate'],
+                            'onlyGEWIS' => $onlyGEWIS,
+                            'displaySubscribedNumber' => true,
+                            'limitedCapacity' => true,
+                            'capacity' => $config['capacity'] ?? 4,
+                            'allocationMethod' => $config['method'],
+                            ...$config['settings'],
+                            ...$state['draw'] ?? false ? [
+                                'draw' => true,
+                                'drawnAt' => $state['drawnAt'],
+                                ...isset($state['drawnBy']) ? ['drawnBy' => $state['drawnBy']] : [],
+                            ] : [],
+                            ...$config['perState'][$number] ?? [],
+                            'subscribers' => array_map(
+                                static fn (int $lidnr): array => [
+                                    'member' => $lidnr,
+                                    ...in_array(
+                                        $lidnr,
+                                        $holders,
+                                        true,
+                                    ) ? ['role' => 'Driver'] : [],
+                                ],
+                                $subscribers,
+                            ),
+                            'externals' => $onlyGEWIS ? [] : $guests,
+                        ],
+                    ],
+                ];
+            }
+        }
+
+        return $activities;
     }
 
     /**
@@ -1275,15 +1863,36 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         $signupList->setCapacity($data['capacity'] ?? null);
         $signupList->setAllocationMethod($data['allocationMethod'] ?? AllocationMethod::FirstComeFirstServed);
         $signupList->setDrawCutoffRule($data['drawCutoffRule'] ?? null);
+        $signupList->setDrawCutoffAt(isset($data['drawCutoffAt']) ? new DateTime($data['drawCutoffAt']) : null);
+        $signupList->setDrawAfterDurationHours($data['drawAfterDurationHours'] ?? null);
         $signupList->setExternalPolicyUrl($data['externalPolicyUrl'] ?? null);
         $signupList->setCustomMethodDescription($data['customMethodDescription'] ?? null);
         $signupList->setPromoted($data['promoted'] ?? false);
         $signupList->setPresenceTaken($data['presenceTaken'] ?? false);
+        $signupList->setMembershipTierOrder($data['membershipTierOrder'] ?? null);
+        $signupList->setMembershipPriorityMode($data['membershipPriorityMode'] ?? null);
+        $signupList->setHeldMembershipSeats($data['membershipSeats'] ?? null);
+        $signupList->setCohortTierOrder($data['cohortTierOrder'] ?? null);
+        $signupList->setProgramTypeOrder($data['programTypeOrder'] ?? null);
+        $signupList->setOrganisingCommitteeSeats($data['organisingCommitteeSeats'] ?? null);
 
-        // A list that has already been drawn carries its lock + audit (a board member, by lidnr).
-        if (isset($data['drawnAt'], $data['drawnBy'])) {
+        $position = 0;
+        foreach ($data['roles'] ?? [] as $role) {
+            $signupRole = new SignupRole();
+            $signupRole->setName($role['name']);
+            $signupRole->setMinimum($role['minimum']);
+            $signupRole->setPosition($position++);
+            $signupList->addRole($signupRole);
+        }
+
+        // A list that has already been drawn carries its lock and its audit: a board member by lidnr, or nobody at
+        // all, which is what an automated draw leaves behind.
+        if (isset($data['drawnAt'])) {
             $signupList->setDrawnAt(new DateTime($data['drawnAt']));
-            $signupList->setDrawnBy($this->getReference('member-' . $data['drawnBy'], Member::class));
+
+            if (isset($data['drawnBy'])) {
+                $signupList->setDrawnBy($this->getReference('member-' . $data['drawnBy'], Member::class));
+            }
         }
 
         return $signupList;

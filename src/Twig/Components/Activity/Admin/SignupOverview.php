@@ -197,12 +197,24 @@ final class SignupOverview
             )
             ->getResult();
 
-        // Every answer with its field and option in one query, so displayValueForField() never lazy-loads per row.
+        // Every answer with its field and option, and the sign-up's own role, in one query, so neither
+        // displayValueForField() nor the role column lazy-loads per row.
         $this->entityManager
             ->createQuery(
-                'SELECT s, fv, f, o FROM ' . Signup::class . ' s'
-                . ' LEFT JOIN s.fieldValues fv LEFT JOIN fv.field f LEFT JOIN fv.option o'
+                'SELECT s, fv, f, o, r FROM ' . Signup::class . ' s'
+                . ' LEFT JOIN s.fieldValues fv LEFT JOIN fv.field f LEFT JOIN fv.option o LEFT JOIN s.role r'
                 . ' WHERE s.signupList IN (:lists)',
+            )
+            ->setParameter(
+                'lists',
+                $lists,
+            )
+            ->getResult();
+
+        // The lists' roles, or the role picker is one lazy load per list.
+        $this->entityManager
+            ->createQuery(
+                'SELECT sl, r FROM ' . SignupList::class . ' sl LEFT JOIN sl.roles r WHERE sl IN (:lists)',
             )
             ->setParameter(
                 'lists',
@@ -337,6 +349,45 @@ final class SignupOverview
             $signup->setPresent(false);
         }
 
+        $this->entityManager->flush();
+    }
+
+    #[LiveAction]
+    public function assignRole(
+        #[LiveArg]
+        int $signupId,
+        #[LiveArg]
+        int $roleId,
+    ): void {
+        $this->assertAccess();
+
+        $signup = $this->findOwnedSignup($signupId);
+        if (null === $signup) {
+            return;
+        }
+
+        $list = $signup->getSignupList();
+        if (
+            !$list->isClosed()
+            || $list->isDrawLocked()
+            || $list->getActivity()->isFrozen()
+            || !$this->admissionOpen()
+        ) {
+            return;
+        }
+
+        $chosen = null;
+        foreach ($list->getRoles() as $role) {
+            if ($role->getId() !== $roleId) {
+                continue;
+            }
+
+            $chosen = $role;
+
+            break;
+        }
+
+        $signup->setRole($signup->getRole() === $chosen ? null : $chosen);
         $this->entityManager->flush();
     }
 

@@ -9,11 +9,14 @@ use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\Enums\ActivityCategories;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupField;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupOption;
+use App\Entity\Activity\SignupRole;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Career\Company;
 use App\Entity\Decision\Member;
@@ -265,6 +268,68 @@ final class ActivityRevisionClonerTest extends TestCase
         self::assertTrue($draftOption->isDefault());
     }
 
+    public function testCarriesThePriorityModifiersAndDeepClonesTheRoles(): void
+    {
+        $source = $this->approvedSource();
+        $sourceList = $source->getSignupLists()->getValues()[0];
+
+        $draft = $this->cloner->cloneAsDraft($source);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $draft,
+        );
+
+        $draftList = $draft->getSignupLists()->getValues()[0];
+
+        self::assertSame(
+            [
+                [MembershipTier::NonMember],
+                [MembershipTier::Ordinary],
+                [MembershipTier::Graduate],
+                [
+                    MembershipTier::External,
+                    MembershipTier::Honorary,
+                ],
+            ],
+            $draftList->getMembershipTierOrder(),
+        );
+        self::assertSame(
+            MembershipPriorityMode::ReservedSeats,
+            $draftList->getMembershipPriorityMode(),
+        );
+        self::assertSame(
+            [MembershipTier::Ordinary->value => 3],
+            $draftList->getHeldMembershipSeats(),
+        );
+        self::assertSame(
+            2,
+            $draftList->getOrganisingCommitteeSeats(),
+        );
+
+        $sourceRole = $sourceList->getRoles()->getValues()[0];
+        $draftRole = $draftList->getRoles()->getValues()[0];
+        self::assertNotSame(
+            $sourceRole,
+            $draftRole,
+        );
+        self::assertSame(
+            'Driver',
+            $draftRole->getName(),
+        );
+        self::assertSame(
+            4,
+            $draftRole->getMinimum(),
+        );
+        self::assertSame(
+            1,
+            $draftRole->getPosition(),
+        );
+        self::assertSame(
+            $draftList,
+            $draftRole->getSignupList(),
+        );
+    }
+
     private function assertCopiedNotShared(
         ActivityLocalisedText $source,
         ActivityLocalisedText $draft,
@@ -358,6 +423,21 @@ final class ActivityRevisionClonerTest extends TestCase
         $option->setIsDefault(true);
         $field->addOption($option);
         $list->addField($field);
+
+        $role = new SignupRole();
+        $role->setName('Driver');
+        $role->setMinimum(4);
+        $role->setPosition(1);
+        $list->addRole($role);
+
+        $list->setMembershipTierOrder([
+            [MembershipTier::NonMember],
+            [MembershipTier::Ordinary],
+            [MembershipTier::Graduate],
+        ]);
+        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedSeats);
+        $list->setHeldMembershipSeats([MembershipTier::Ordinary->value => 3]);
+        $list->setOrganisingCommitteeSeats(2);
 
         $signup = new ExternalSignup();
         $signup->setSignupList($list);

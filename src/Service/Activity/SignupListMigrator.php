@@ -115,6 +115,15 @@ final readonly class SignupListMigrator
             ) {
                 return 'the fields of a sign-up list with sign-ups were changed';
             }
+
+            if (
+                !$this->rolesMatch(
+                    $oldList,
+                    $newList,
+                )
+            ) {
+                return 'the roles of a sign-up list with sign-ups were changed';
+            }
         }
 
         return null;
@@ -171,6 +180,29 @@ final readonly class SignupListMigrator
         return true;
     }
 
+    private function rolesMatch(
+        SignupList $oldList,
+        SignupList $newList,
+    ): bool {
+        $oldRoles = $oldList->getRoles()->getValues();
+        $newRoles = $newList->getRoles()->getValues();
+
+        if (count($oldRoles) !== count($newRoles)) {
+            return false;
+        }
+
+        foreach ($oldRoles as $i => $oldRole) {
+            if (
+                $oldRole->getName() !== $newRoles[$i]->getName()
+                || $oldRole->getMinimum() !== $newRoles[$i]->getMinimum()
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Whether two fields carry the same options, in the same order and with the same labels.
      */
@@ -213,6 +245,14 @@ final readonly class SignupListMigrator
     ): void {
         $oldFields = $oldList->getFields()->getValues();
         $newFields = $newList->getFields()->getValues();
+        $newRoles = $newList->getRoles()->getValues();
+
+        // The roles map across by ordinal for the same reason the fields do, and a sign-up that holds one must keep it:
+        // the old revision's role rows go away with it.
+        $roleIndex = [];
+        foreach ($oldList->getRoles()->getValues() as $i => $oldRole) {
+            $roleIndex[spl_object_id($oldRole)] = $i;
+        }
 
         // structureMatches() has already proven the layouts are identical and equally ordered, so a field/option maps
         // to its clone purely by ordinal. Index the old fields and their options once (by object id) instead of an
@@ -229,6 +269,12 @@ final readonly class SignupListMigrator
 
         foreach ($oldList->getSignUps() as $signup) {
             $signup->setSignupList($newList);
+
+            $oldRole = $signup->getRole();
+            if (null !== $oldRole) {
+                $j = $roleIndex[spl_object_id($oldRole)] ?? null;
+                $signup->setRole(null === $j ? null : $newRoles[$j]);
+            }
 
             foreach ($signup->getFieldValues() as $fieldValue) {
                 $i = $fieldIndex[spl_object_id($fieldValue->getField())] ?? null;

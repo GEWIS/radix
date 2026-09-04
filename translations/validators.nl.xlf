@@ -97,6 +97,10 @@
         <source>Choose an organising company, or say there is none.</source>
         <target state="translated">Kies een organiserend bedrijf, of geef aan dat er geen is.</target>
       </trans-unit>
+      <trans-unit id="XlDOtLj" resname="Choose how the membership tiers are served.">
+        <source>Choose how the membership tiers are served.</source>
+        <target>Kies hoe de lidmaatschapsgroepen bediend worden.</target>
+      </trans-unit>
       <trans-unit id="NrVT1pI" resname="Choose the job package this vacancy belongs to.">
         <source>Choose the job package this vacancy belongs to.</source>
         <target state="translated">Kies het vacaturepakket waar deze vacature bij hoort.</target>
@@ -261,6 +265,10 @@
         <source>Enter when proposing closes.</source>
         <target state="translated">Vul in wanneer voorstellen indienen sluit.</target>
       </trans-unit>
+      <trans-unit id="vhbzV_h" resname="Enter zero or more seats.">
+        <source>Enter zero or more seats.</source>
+        <target>Vul nul of meer plaatsen in.</target>
+      </trans-unit>
       <trans-unit id="B9r0Hn5" resname="Error">
         <source>Error</source>
         <target>Fout</target>
@@ -293,6 +301,10 @@
         <source>Give this round a name.</source>
         <target state="translated">Geef deze ronde een naam.</target>
       </trans-unit>
+      <trans-unit id="Hmh0Dzs" resname="Hold at least one seat for the organising body, or hold none at all.">
+        <source>Hold at least one seat for the organising body, or hold none at all.</source>
+        <target>Reserveer minstens één plaats voor het organiserende orgaan, of reserveer er geen.</target>
+      </trans-unit>
       <trans-unit id="WLxP5.7" resname="Key code cannot be granted in the past.">
         <source>Key code cannot be granted in the past.</source>
         <target state="translated">Een sleutelcode kan niet in het verleden worden uitgegeven.</target>
@@ -308,6 +320,14 @@
       <trans-unit id="beIGZxZ" resname="Mailman and Listmonk mailing lists cannot both be set at the same time">
         <source>Mailman and Listmonk mailing lists cannot both be set at the same time</source>
         <target state="translated">Een Mailman- en een Listmonk-mailinglijst kunnen niet allebei tegelijk worden ingesteld</target>
+      </trans-unit>
+      <trans-unit id="flUO1Ky" resname="More seats are held than the list has to give out.">
+        <source>More seats are held than the list has to give out.</source>
+        <target>Er zijn meer plaatsen gereserveerd dan de lijst te vergeven heeft.</target>
+      </trans-unit>
+      <trans-unit id="Yg_k.o3" resname="Name the role.">
+        <source>Name the role.</source>
+        <target>Geef de rol een naam.</target>
       </trans-unit>
       <trans-unit id="Dtm28Py" resname="Only one option can be preselected as the default.">
         <source>Only one option can be preselected as the default.</source>
@@ -420,6 +440,10 @@
       <trans-unit id="XWYGJxG" resname="The name should be at most {{ limit }} characters.">
         <source>The name should be at most {{ limit }} characters.</source>
         <target state="translated">De naam mag hoogstens {{ limit }} tekens lang zijn.</target>
+      </trans-unit>
+      <trans-unit id="Tx6GC3B" resname="The roles together guarantee more seats than the list has.">
+        <source>The roles together guarantee more seats than the list has.</source>
+        <target>De rollen garanderen samen meer plaatsen dan de lijst heeft.</target>
       </trans-unit>
       <trans-unit id="k8QayhA" resname="The sign-up list must close before the activity starts.">
         <source>The sign-up list must close before the activity starts.</source>

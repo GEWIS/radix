@@ -8,6 +8,7 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\SignupField;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupOption;
+use App\Entity\Activity\SignupRole;
 use App\Entity\Application\AbstractRevision;
 use App\Entity\Application\RevisionInterface;
 use App\Workflow\AbstractRevisionCloner;
@@ -113,6 +114,12 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
         $list->setExternalForceOrdering($source->getExternalForceOrdering());
         $list->setExternalPaymentByExternal($source->getExternalPaymentByExternal());
         $list->setCustomMethodDescription($source->getCustomMethodDescription());
+        $list->setMembershipTierOrder($source->getMembershipTierOrder());
+        $list->setMembershipPriorityMode($source->getMembershipPriorityMode());
+        $list->setHeldMembershipSeats($source->getHeldMembershipSeats());
+        $list->setCohortTierOrder($source->getCohortTierOrder());
+        $list->setProgramTypeOrder($source->getProgramTypeOrder());
+        $list->setOrganisingCommitteeSeats($source->getOrganisingCommitteeSeats());
         $list->setPresenceTaken($source->isPresenceTaken());
         $list->setPromoted($source->isPromoted());
         // Carry the lineage forward so approval can migrate the live sign-ups onto this clone.
@@ -122,7 +129,21 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
             $list->addField($this->copySignupField($field));
         }
 
+        foreach ($source->getRoles() as $role) {
+            $list->addRole($this->copySignupRole($role));
+        }
+
         return $list;
+    }
+
+    private function copySignupRole(SignupRole $source): SignupRole
+    {
+        $role = new SignupRole();
+        $role->setName($source->getName());
+        $role->setMinimum($source->getMinimum());
+        $role->setPosition($source->getPosition());
+
+        return $role;
     }
 
     private function copySignupField(SignupField $source): SignupField

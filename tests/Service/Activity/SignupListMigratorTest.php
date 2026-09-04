@@ -14,6 +14,7 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupOption;
 use App\Entity\Decision\Member;
 use App\Service\Activity\SignupListMigrator;
+use App\Tests\Support\BuildsSignupRoles;
 use DateTime;
 use Override;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,8 @@ use Symfony\Component\Uid\Uuid;
  */
 final class SignupListMigratorTest extends TestCase
 {
+    use BuildsSignupRoles;
+
     private SignupListMigrator $migrator;
 
     #[Override]
@@ -617,6 +620,72 @@ final class SignupListMigratorTest extends TestCase
             $outgoing,
             $incoming,
         );
+    }
+
+    public function testMovesASignupsRoleOntoTheClonesRole(): void
+    {
+        $lineage = Uuid::v4();
+        $outgoingList = $this->listWith($lineage);
+        $incomingList = $this->listWith($lineage);
+        $outgoingRole = $this->role(
+            $outgoingList,
+            'Driver',
+            2,
+        );
+        $incomingRole = $this->role(
+            $incomingList,
+            'Driver',
+            2,
+        );
+
+        $signup = new ExternalSignup();
+        $signup->setSignupList($outgoingList);
+        $signup->setRole($outgoingRole);
+        $outgoingList->getSignUps()->add($signup);
+
+        $outgoing = $this->revisionWith($outgoingList);
+        $incoming = $this->revisionWith($incomingList);
+
+        self::assertTrue($this->migrator->isMigratable(
+            $outgoing,
+            $incoming,
+        ));
+
+        $this->migrator->migrate(
+            $outgoing,
+            $incoming,
+        );
+
+        self::assertSame(
+            $incomingRole,
+            $signup->getRole(),
+        );
+    }
+
+    public function testRefusesToMigrateWhenARoleGuaranteeChanged(): void
+    {
+        $lineage = Uuid::v4();
+        $outgoingList = $this->listWith($lineage);
+        $incomingList = $this->listWith($lineage);
+        $this->role(
+            $outgoingList,
+            'Driver',
+            2,
+        );
+        $this->role(
+            $incomingList,
+            'Driver',
+            4,
+        );
+
+        $signup = new ExternalSignup();
+        $signup->setSignupList($outgoingList);
+        $outgoingList->getSignUps()->add($signup);
+
+        self::assertFalse($this->migrator->isMigratable(
+            $this->revisionWith($outgoingList),
+            $this->revisionWith($incomingList),
+        ));
     }
 
     private function revisionWith(SignupList $list): ActivityRevision

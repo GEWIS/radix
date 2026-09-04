@@ -5,8 +5,14 @@ declare(strict_types=1);
 namespace App\Form\Activity;
 
 use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\SignupList;
+use App\Entity\Activity\SignupRole;
+use App\Entity\Application\PriorityTierInterface;
+use App\Entity\Database\Enums\ProgramType;
 use App\Form\Application\LocalisedTextType;
 use App\Form\DisablesFieldsTrait;
 use DateTime;
@@ -16,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -31,6 +38,11 @@ use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function array_keys;
+use function array_map;
+use function array_pad;
+use function array_sum;
+use function explode;
+use function implode;
 use function strval;
 use function Symfony\Component\Translation\t;
 use function trim;
@@ -73,6 +85,12 @@ class SignupListType extends AbstractType
         'externalForceOrdering',
         'externalPaymentByExternal',
         'customMethodDescription',
+        'membershipTierOrder',
+        'membershipPriorityMode',
+        'cohortTierOrder',
+        'programTypeOrder',
+        'organisingCommitteeSeats',
+        'roles',
     ];
 
     #[Override]
@@ -235,6 +253,101 @@ class SignupListType extends AbstractType
                 ],
             )
             ->add(
+                'membershipTierOrder',
+                HiddenType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'getter' => static fn (SignupList $list): string => self::membershipAsString($list),
+                    'setter' => static function (
+                        SignupList $list,
+                        ?string $value,
+                    ): void {
+                        self::membershipFromString(
+                            $list,
+                            $value,
+                        );
+                    },
+                ],
+            )
+            ->add(
+                'membershipPriorityMode',
+                EnumType::class,
+                [
+                    'label' => t('How the membership order is applied'),
+                    'class' => MembershipPriorityMode::class,
+                    'required' => false,
+                    'placeholder' => t('Choose how the tiers are served'),
+                ],
+            )
+            ->add(
+                'cohortTierOrder',
+                HiddenType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'getter' => static fn (SignupList $list): string => self::orderAsString(
+                        $list->getCohortTierOrder(),
+                    ),
+                    'setter' => static function (
+                        SignupList $list,
+                        ?string $value,
+                    ): void {
+                        /** @var ?list<list<CohortTier>> $order */
+                        $order = self::orderFromString(
+                            $value,
+                            CohortTier::class,
+                        );
+                        $list->setCohortTierOrder($order);
+                    },
+                ],
+            )
+            ->add(
+                'programTypeOrder',
+                HiddenType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'getter' => static fn (SignupList $list): string => self::orderAsString(
+                        $list->getProgramTypeOrder(),
+                    ),
+                    'setter' => static function (
+                        SignupList $list,
+                        ?string $value,
+                    ): void {
+                        /** @var ?list<list<ProgramType>> $order */
+                        $order = self::orderFromString(
+                            $value,
+                            ProgramType::class,
+                        );
+                        $list->setProgramTypeOrder($order);
+                    },
+                ],
+            )
+            ->add(
+                'organisingCommitteeSeats',
+                IntegerType::class,
+                [
+                    'label' => t('Seats held for the organising body'),
+                    'required' => false,
+                ],
+            )
+            ->add(
+                'roles',
+                CollectionType::class,
+                [
+                    'label' => false,
+                    'entry_type' => SignupRoleType::class,
+                    'entry_options' => ['label' => false],
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'by_reference' => false,
+                    'prototype' => true,
+                    'prototype_name' => '__role__',
+                    'block_prefix' => 'signup_role_collection',
+                ],
+            )
+            ->add(
                 'promoted',
                 CheckboxType::class,
                 [
@@ -327,6 +440,241 @@ class SignupListType extends AbstractType
             $list,
             $context,
         );
+        $this->validatePriorityModifiers(
+            $list,
+            $context,
+        );
+    }
+
+    private function validatePriorityModifiers(
+        SignupList $list,
+        ExecutionContextInterface $context,
+    ): void {
+        if ($list->getAllocationMethod()->isManual()) {
+            return;
+        }
+
+        $capacity = $list->getCapacity() ?? 0;
+
+        if (
+            null !== $list->getMembershipTierOrder()
+            && null === $list->getMembershipPriorityMode()
+        ) {
+            $context->buildViolation(t(
+                'Choose how the membership tiers are served.',
+                [],
+                'validators',
+            )->getMessage())
+                ->atPath('membershipPriorityMode')
+                ->addViolation();
+        }
+
+        $reserved = 0;
+        if (MembershipPriorityMode::ReservedSeats === $list->getMembershipPriorityMode()) {
+            foreach ($list->getMembershipSeats() as $seats) {
+                if ($seats >= 0) {
+                    $reserved += $seats;
+
+                    continue;
+                }
+
+                $context->buildViolation(t(
+                    'Enter zero or more seats.',
+                    [],
+                    'validators',
+                )->getMessage())
+                    ->atPath('membershipTierOrder')
+                    ->addViolation();
+            }
+        }
+
+        $committee = $list->getOrganisingCommitteeSeats();
+        if (null !== $committee) {
+            if ($committee < 1) {
+                $context->buildViolation(t(
+                    'Hold at least one seat for the organising body, or hold none at all.',
+                    [],
+                    'validators',
+                )->getMessage())
+                    ->atPath('organisingCommitteeSeats')
+                    ->addViolation();
+            } else {
+                $reserved += $committee;
+            }
+        }
+
+        if (
+            $capacity >= 1
+            && $reserved > $capacity
+        ) {
+            $context->buildViolation(t(
+                'More seats are held than the list has to give out.',
+                [],
+                'validators',
+            )->getMessage())
+                ->atPath('capacity')
+                ->addViolation();
+        }
+
+        $guaranteed = array_sum(array_map(
+            static fn (SignupRole $role): int => $role->getMinimum(),
+            $list->getRoles()->toArray(),
+        ));
+        if (
+            $capacity < 1
+            || $guaranteed <= $capacity
+        ) {
+            return;
+        }
+
+        $context->buildViolation(t(
+            'The roles together guarantee more seats than the list has.',
+            [],
+            'validators',
+        )->getMessage())
+            ->atPath('roles')
+            ->addViolation();
+    }
+
+    /**
+     * The membership order as the control holds it: the ranks in turn, the tiers of a rank joined, and the seats
+     * held for a rank written behind it. The seats belong to the rank rather than to a tier, because the tiers of a
+     * rank are admitted together and share what is held for them.
+     */
+    private static function membershipAsString(SignupList $list): string
+    {
+        $ranks = [];
+        foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
+            $tiers = self::orderAsString([$rank]);
+            $seats = $list->getMembershipSeatsForRank($rank);
+
+            $ranks[] = null === $seats
+                ? $tiers
+                : $tiers . ':' . $seats;
+        }
+
+        return implode(
+            ',',
+            $ranks,
+        );
+    }
+
+    private static function membershipFromString(
+        SignupList $list,
+        ?string $value,
+    ): void {
+        $order = [];
+        $seats = [];
+
+        foreach (
+            explode(
+                ',',
+                $value ?? '',
+            ) as $part
+        ) {
+            [
+                $names, $held
+            ] = array_pad(
+                explode(
+                    ':',
+                    $part,
+                    2,
+                ),
+                2,
+                null,
+            );
+
+            /** @var ?list<list<MembershipTier>> $rank */
+            $rank = self::orderFromString(
+                $names,
+                MembershipTier::class,
+            );
+
+            if (null === $rank) {
+                continue;
+            }
+
+            $order[] = $rank[0];
+
+            if (
+                null === $held
+                || '' === trim($held)
+            ) {
+                continue;
+            }
+
+            $seats[SignupList::rankKey($rank[0])] = (int) trim($held);
+        }
+
+        $list->setMembershipTierOrder([] === $order ? null : $order);
+        $list->setHeldMembershipSeats([] === $seats ? null : $seats);
+    }
+
+    /**
+     * @param ?list<list<PriorityTierInterface>> $order
+     */
+    private static function orderAsString(?array $order): string
+    {
+        if (null === $order) {
+            return '';
+        }
+
+        return implode(
+            ',',
+            array_map(
+                static fn (array $rank): string => implode(
+                    '+',
+                    array_map(
+                        static fn (PriorityTierInterface $tier): string => strval($tier->value),
+                        $rank,
+                    ),
+                ),
+                $order,
+            ),
+        );
+    }
+
+    /**
+     * @param class-string<PriorityTierInterface> $tier
+     *
+     * @return ?list<list<PriorityTierInterface>>
+     */
+    private static function orderFromString(
+        ?string $value,
+        string $tier,
+    ): ?array {
+        $order = [];
+        foreach (
+            explode(
+                ',',
+                $value ?? '',
+            ) as $rank
+        ) {
+            $tiers = [];
+            foreach (
+                explode(
+                    '+',
+                    $rank,
+                ) as $name
+            ) {
+                $case = $tier::tryFrom(trim($name));
+                if (null === $case) {
+                    continue;
+                }
+
+                $tiers[] = $case;
+            }
+
+            if ([] === $tiers) {
+                continue;
+            }
+
+            $order[] = $tiers;
+        }
+
+        return [] === $order
+            ? null
+            : $order;
     }
 
     /**
@@ -425,6 +773,42 @@ class SignupListType extends AbstractType
         $list = $form->getData();
         $view->vars['frozen'] = $this->hasLiveSignUps($list)
             || $this->activityStarted($list);
+
+        foreach (self::allocationVars($list) as $name => $value) {
+            $view->vars[$name] = $value;
+        }
+    }
+
+    /**
+     * What the allocation section shows for a list, or for the collection prototype, which has no bound list.
+     *
+     * @return array<string, mixed>
+     */
+    private static function allocationVars(?SignupList $list): array
+    {
+        return [
+            'membershipTierOrderTiers' => null === $list
+                ? MembershipTier::defaultRanks()
+                : $list->getMembershipTierOrder() ?? self::ranksOf($list->membershipTiers()),
+            'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
+            'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
+            'onlyGEWIS' => $list?->getOnlyGEWIS() ?? true,
+            // The seats held for each rank of the membership order, which the control asks for on the rank itself.
+            'membershipSeats' => $list?->getHeldMembershipSeats() ?? [],
+        ];
+    }
+
+    /**
+     * @param list<PriorityTierInterface> $tiers
+     *
+     * @return list<list<PriorityTierInterface>>
+     */
+    private static function ranksOf(array $tiers): array
+    {
+        return array_map(
+            static fn (PriorityTierInterface $tier): array => [$tier],
+            $tiers,
+        );
     }
 
     /**
@@ -636,11 +1020,57 @@ class SignupListType extends AbstractType
             $list->setExternalPaymentByExternal(false);
         }
 
-        if (AllocationMethod::Custom === $method) {
+        if (AllocationMethod::Custom !== $method) {
+            $list->setCustomMethodDescription(null);
+        }
+
+        $this->clearInapplicablePriority($list);
+    }
+
+    /**
+     * Drop the priority modifiers a list cannot act on: all of them where admission is not decided here, the held
+     * seats where the membership order is not applied by holding them, and the study phase and the cohort on a list
+     * anybody may sign up for.
+     */
+    private function clearInapplicablePriority(SignupList $list): void
+    {
+        if (
+            !$list->getLimitedCapacity()
+            || $list->getAllocationMethod()->isManual()
+        ) {
+            $list->setMembershipTierOrder(null);
+            $list->setCohortTierOrder(null);
+            $list->setProgramTypeOrder(null);
+            $list->setOrganisingCommitteeSeats(null);
+
+            foreach ($list->getRoles()->toArray() as $role) {
+                $list->removeRole($role);
+            }
+        }
+
+        if (null === $list->getMembershipTierOrder()) {
+            $list->setMembershipPriorityMode(null);
+        }
+
+        if (MembershipPriorityMode::ReservedSeats !== $list->getMembershipPriorityMode()) {
+            $list->setHeldMembershipSeats(null);
+
             return;
         }
 
-        $list->setCustomMethodDescription(null);
+        // A number held for a rank the order no longer has is a guarantee nothing shows, and the cloner would carry
+        // it into every future revision.
+        $held = [];
+        foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
+            $seats = $list->getMembershipSeatsForRank($rank);
+            if (null === $seats) {
+                continue;
+            }
+
+            $held[SignupList::rankKey($rank)] = $seats;
+        }
+
+        $list->setHeldMembershipSeats([] === $held ? null : $held);
     }
 
     /**

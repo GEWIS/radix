@@ -47,6 +47,11 @@
                         }) }}
                     </small>
                 {% endif %}
+                {% for order in list.priority %}
+                    <small class="text-muted d-block">
+                        {{ 'Places are given out in this order: %order%.'|trans({'%order%': order}) }}
+                    </small>
+                {% endfor %}
             {% endif %}
         </span>
         <span class="fas fa-chevron-down panel-collapse-chevron"></span>

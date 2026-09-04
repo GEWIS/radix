@@ -6,14 +6,18 @@ namespace App\ViewModel\Activity\Admin;
 
 use App\Entity\Activity\Enums\AllocationMethod;
 use App\Entity\Activity\ExternalSignup;
+use App\Entity\Activity\Signup;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\Languages;
+use App\Util\Activity\SignupTiers;
 use DateTime;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function array_key_exists;
 use function in_array;
 use function mb_stripos;
+use function sprintf;
 use function trim;
 
 /**
@@ -33,6 +37,13 @@ final readonly class SignupAdminListView
      * @param int                                              $visibleFieldCount number of non-hidden field columns
      * @param SignupAdminRow[]                                 $rows              the subscribers, optionally narrowed
      *                                                                            by the quick filter
+     * @param list<array{id: int, name: string, minimum: int}> $roles             the parts this activity cannot go
+     *                                                                           ahead without, in the order the draw
+     *                                                                           makes up their shortfall
+     * @param list<string>                                     $priorityOrders    the orders this list admits in, best
+     *                                                                           first, one sentence each
+     * @param list<string>                                     $reservedSeats     the seats held back, one per thing
+     *                                                                           they are held for
      */
     public function __construct(
         public int $listId,
@@ -62,6 +73,11 @@ final readonly class SignupAdminListView
         public array $fieldColumns,
         public int $visibleFieldCount,
         public array $rows,
+        public array $roles = [],
+        public bool $canAssignRoles = false,
+        public bool $hasPriority = false,
+        public array $priorityOrders = [],
+        public array $reservedSeats = [],
     ) {
     }
 
@@ -104,13 +120,31 @@ final readonly class SignupAdminListView
 
         $needle = trim($filter);
 
+        $roles = [];
+        foreach ($signupList->getRoles() as $role) {
+            $roles[] = [
+                'id' => $role->getId() ?? 0,
+                'name' => $role->getName(),
+                'minimum' => $role->getMinimum(),
+            ];
+        }
+
+        $committee = null === $signupList->getOrganisingCommitteeSeats()
+            ? []
+            : SignupTiers::organisingCommittee($signupList);
+        $ranksOn = [
+            'membership' => null !== $signupList->getMembershipTierOrder(),
+            'program' => null !== $signupList->getProgramTypeOrder(),
+            'cohort' => null !== $signupList->getCohortTierOrder(),
+        ];
+
         $rows = [];
         $position = 1;
         $subscriberCount = 0;
         $presentCount = 0;
         $admittedCount = 0;
         $selectedCount = 0;
-        foreach ($signupList->getSignUps() as $signup) {
+        foreach ($signupList->getSignUpsInAdmissionOrder() as $signup) {
             // Hide externals that have not confirmed their email: not real subscribers, must not be counted or drawn. A
             // confirmed sign-up is exactly one with a set verification moment (manual entries have it set immediately).
             if (
@@ -194,6 +228,17 @@ final readonly class SignupAdminListView
                 present: $signup->isPresent(),
                 drawn: $signup->isDrawn(),
                 cells: $cells,
+                priority: self::priorityLabels(
+                    $ranksOn,
+                    $signup,
+                    $translator,
+                ),
+                roleId: $signup->getRole()?->getId(),
+                organisingBody: $signup instanceof UserSignup
+                    && array_key_exists(
+                        $signup->getUser()->getLidnr(),
+                        $committee,
+                    ),
             );
         }
 
@@ -224,6 +269,95 @@ final readonly class SignupAdminListView
             fieldColumns: $fieldColumns,
             visibleFieldCount: $visibleFieldCount,
             rows: $rows,
+            roles: $roles,
+            canAssignRoles: [] !== $roles
+                && $signupList->isClosed()
+                && !$signupList->isDrawLocked()
+                && !$signupList->getActivity()->isFrozen(),
+            hasPriority: $signupList->hasPriorityModifiers(),
+            priorityOrders: SignupTiers::orderTexts(
+                $signupList,
+                $translator,
+            ),
+            reservedSeats: self::reservedSeats(
+                $signupList,
+                $translator,
+            ),
         );
+    }
+
+    /**
+     * The seats this list holds back before it admits anybody: a number for a membership tier, for the organising
+     * body, or for a role the activity cannot go ahead without.
+     *
+     * @return list<string>
+     */
+    private static function reservedSeats(
+        SignupList $signupList,
+        TranslatorInterface $translator,
+    ): array {
+        $held = [];
+
+        foreach ($signupList->getMembershipTierOrder() ?? [] as $rank) {
+            $seats = $signupList->getMembershipSeats()[SignupList::rankKey($rank)] ?? 0;
+            if ($seats < 1) {
+                continue;
+            }
+
+            $held[] = sprintf(
+                '%s: %d',
+                SignupTiers::orderText(
+                    [$rank],
+                    $translator,
+                ) ?? '',
+                $seats,
+            );
+        }
+
+        $committee = $signupList->getOrganisingCommitteeSeats();
+        if (null !== $committee) {
+            $held[] = sprintf(
+                '%s: %d',
+                $translator->trans('Organising body'),
+                $committee,
+            );
+        }
+
+        foreach ($signupList->getRoles() as $role) {
+            $held[] = sprintf(
+                '%s: %d',
+                $role->getName(),
+                $role->getMinimum(),
+            );
+        }
+
+        return $held;
+    }
+
+    /**
+     * @param array{membership: bool, program: bool, cohort: bool} $ranksOn
+     *
+     * @return list<string>
+     */
+    private static function priorityLabels(
+        array $ranksOn,
+        Signup $signup,
+        TranslatorInterface $translator,
+    ): array {
+        $labels = [];
+
+        if ($ranksOn['membership']) {
+            $labels[] = SignupTiers::membership($signup)->trans($translator);
+        }
+
+        if ($ranksOn['program']) {
+            $labels[] = SignupTiers::program($signup)->trans($translator);
+        }
+
+        if ($ranksOn['cohort']) {
+            $labels[] = SignupTiers::cohort($signup)->trans($translator);
+        }
+
+        return $labels;
     }
 }

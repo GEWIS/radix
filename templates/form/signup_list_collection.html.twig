@@ -3,7 +3,68 @@
    adding an entry clones it with its placeholder (`__list__` / `__field__`) replaced by a fresh index,
    keeping the collapse target ids unique. #}
 
+{% macro tier_modifier(field, ranks, label, settings, seats = null) %}
+    {% set on = field.vars.value is not empty %}
+    <div class="mb-3" data-controller="tier-order">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="{{ field.vars.id }}_switch"
+                   data-tier-order-target="toggle" data-action="change->tier-order#toggle"
+                   {% if on %}checked{% endif %}{% if field.vars.disabled %} disabled{% endif %}>
+            <label class="form-check-label" for="{{ field.vars.id }}_switch">{{ label }}</label>
+        </div>
+        <div class="ms-4 mt-2" data-tier-order-target="panel"{% if not on %} hidden{% endif %}>
+            {{ form_widget(field, {'attr': {'data-tier-order-target': 'value'}}) }}
+            <ol class="tier-order list-unstyled mb-0" data-tier-order-target="entries"
+                data-action="dragover->tier-order#dragOver drop->tier-order#drop">
+                {% for rank in ranks %}
+                    {% set rankKey = rank|map(tier => tier.value)|join('+') %}
+                    {% for tier in rank %}
+                        <li class="tier-order-entry d-flex align-items-center gap-2 border rounded px-2 py-1 mb-1{{ not loop.first ? ' tier-order-entry--tied' }}"
+                            data-tier-order-target="entry" data-tier-order-value-param="{{ tier.value }}"
+                            data-tier-order-tied-param="{{ not loop.first ? '1' : '0' }}"
+                            {% if not field.vars.disabled %}draggable="true"
+                            data-action="dragstart->tier-order#dragStart dragend->tier-order#dragEnd"{% endif %}>
+                            <span class="tier-order-rank" data-tier-order-target="rank" aria-hidden="true"></span>
+                            {% if not field.vars.disabled %}
+                                <span class="sortable-handle" role="button" aria-label="{{ 'Reorder tier'|trans }}">
+                                    <span class="fas fa-arrows-up-down"></span>
+                                </span>
+                            {% endif %}
+                            <span class="flex-grow-1">{{ tier|trans }}</span>
+                            {% if seats is not null %}
+                                {# The seats are held for the rank rather than for one tier, so the number sits on
+                                   the row the rank starts on and the tiers tied to it share what it says. #}
+                                <span class="tier-order-seats" data-tier-order-target="seatsBox"
+                                      data-signup-list-target="membershipSeats">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                           aria-label="{{ 'Seats held for this rank'|trans }}"
+                                           data-tier-order-target="seats"
+                                           data-action="input->tier-order#write"
+                                           value="{{ loop.first ? seats[rankKey]|default('') }}"
+                                           {% if field.vars.disabled %}disabled{% endif %}>
+                                </span>
+                            {% endif %}
+                            {% if not field.vars.disabled %}
+                                <button type="button" class="tier-order-tie" data-tier-order-target="tie"
+                                        data-action="tier-order#tie"
+                                        title="{{ 'Admit this tier together with the one above it'|trans }}"
+                                        aria-label="{{ 'Admit this tier together with the one above it'|trans }}">
+                                    <span class="fas fa-link" aria-hidden="true"></span>
+                                </button>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ol>
+            <p class="form-text mb-0">{{ 'Tiers on the same number are admitted together.'|trans }}</p>
+            {{ settings|default('') }}
+        </div>
+    </div>
+{% endmacro %}
+
 {% macro signup_list_panel(child, collapse_id, remove_label) %}
+    {# A macro sees none of the template's imports, so the priority modifiers it renders are imported here. #}
+    {% import _self as helper %}
     <div class="panel mb-3" data-form-collection-target="entry">
         <button type="button"
                 class="panel-heading panel-collapse-toggle d-flex justify-content-between align-items-center gap-2 w-100 border-0 bg-transparent text-start"
@@ -54,6 +115,30 @@
                             </div>
                             <div data-signup-list-target="custom">
                                 {{ form_row(child.customMethodDescription, {'attr': {'data-signup-list-target': 'required'}}) }}
+                            </div>
+                            {# Only shown where this application decides admission itself; the other methods hand the
+                               decision to somebody else, so a priority here would never be acted on. #}
+                            <div data-signup-list-target="priority">
+                                <hr>
+                                <h6>{{ 'Priority'|trans }}</h6>
+                                {% set membership_settings %}
+                                    {{ form_row(child.membershipPriorityMode, {'attr': {
+                                        'data-signup-list-target': 'mode required',
+                                        'data-action': 'change->signup-list#apply',
+                                    }}) }}
+                                    <div data-signup-list-target="membershipSeats">
+                                        {{ form_row(child.membershipSeatsMember, {'attr': {'data-signup-list-target': 'required'}}) }}
+                                        {{ form_row(child.membershipSeatsGraduate, {'attr': {'data-signup-list-target': 'required'}}) }}
+                                        {{ form_row(child.membershipSeatsNonMember, {'attr': {'data-signup-list-target': 'required'}}) }}
+                                    </div>
+                                {% endset %}
+                                {{ helper.tier_modifier(child.membershipTierOrder, child.vars.membershipTierOrderTiers, 'Serve some members before others'|trans, membership_settings) }}
+                                {{ helper.tier_modifier(child.programTypeOrder, child.vars.programTypeOrderTiers, 'Serve some study phases before others'|trans) }}
+                                {{ helper.tier_modifier(child.cohortTierOrder, child.vars.cohortTierOrderTiers, 'Serve some cohorts before others'|trans) }}
+                                {{ form_row(child.organisingCommitteeSeats) }}
+                                <label class="form-label">{{ 'Guaranteed roles'|trans }}</label>
+                                <p class="form-text mt-0">{{ 'A role is handed out on the sign-ups page once sign-up has closed, and the draw makes up whatever is short.'|trans }}</p>
+                                {{ form_row(child.roles) }}
                             </div>
                         </div>
                     </div>
@@ -154,30 +239,48 @@
     </div>
 {% endmacro %}
 
-{% block signup_field_collection_widget %}
+{% macro collection_entry(kind, child, remove_label) %}
     {% import _self as helper %}
-    {% set has_prototype = allow_add and prototype is defined and prototype is not null %}
-    {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__field__' %}
-    {% set remove_label = 'Remove question'|trans %}
-    <div id="{{ id }}" class="signup-field-collection"
-         data-controller="form-collection{% if not disabled %} sortable{% endif %}"
+    {% if 'field' == kind %}
+        {{ helper.signup_field_panel(child, child.vars.id ~ '-collapse', remove_label) }}
+    {% elseif 'role' == kind %}
+        {{ helper.signup_role_entry(child, remove_label) }}
+    {% else %}
+        {{ helper.signup_option_entry(child, remove_label) }}
+    {% endif %}
+{% endmacro %}
+
+{# The scaffold every collection on a list shares: the prototype the add button clones, the entries in a sortable
+   wrapper, and the add button itself. A frozen list's collection is disabled and ignores its submissions, so neither
+   adding nor reordering is offered on one. #}
+{% macro collection(form, kind, add_label, remove_label) %}
+    {% import _self as helper %}
+    {% set has_prototype = form.vars.allow_add and form.vars.prototype is defined and form.vars.prototype is not null %}
+    {% set placeholder = has_prototype ? (form.vars.prototype.vars.name|split('[')|last|trim(']')) : '__' ~ kind ~ '__' %}
+    <div id="{{ form.vars.id }}" class="signup-{{ kind }}-collection"
+         data-controller="form-collection{% if not form.vars.disabled %} sortable{% endif %}"
          data-form-collection-prototype-name-value="{{ placeholder }}"
          {% if has_prototype %}
-             data-form-collection-prototype-value="{{ helper.signup_field_panel(prototype, prototype.vars.id ~ '-collapse', remove_label)|e('html_attr') }}"
+             data-form-collection-prototype-value="{{ helper.collection_entry(kind, form.vars.prototype, remove_label)|e('html_attr') }}"
          {% endif %}>
         <div data-form-collection-target="entries" data-sortable-target="entries"
              data-action="dragover->sortable#dragOver drop->sortable#drop">
             {% for child in form %}
-                {{ helper.signup_field_panel(child, child.vars.id ~ '-collapse', remove_label) }}
+                {{ helper.collection_entry(kind, child, remove_label) }}
             {% endfor %}
         </div>
-        {# A frozen list's fields collection is disabled and ignores its submissions, so don't offer to add either. #}
-        {% if allow_add and not disabled %}
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-action="form-collection#add">
-                <span class="fas fa-plus"></span> {{ 'Add a question'|trans }}
+        {% if form.vars.allow_add and not form.vars.disabled %}
+            <button type="button" class="btn btn-sm btn-outline-secondary{{ 'field' != kind ? ' mt-2' }}"
+                    data-action="form-collection#add">
+                <span class="fas fa-plus"></span> {{ add_label }}
             </button>
         {% endif %}
     </div>
+{% endmacro %}
+
+{% block signup_field_collection_widget %}
+    {% import _self as helper %}
+    {{ helper.collection(form, 'field', 'Add a question'|trans, 'Remove question'|trans) }}
 {% endblock %}
 
 {% macro signup_option_entry(child, remove_label) %}
@@ -203,28 +306,35 @@
     </div>
 {% endmacro %}
 
+{% macro signup_role_entry(child, remove_label) %}
+    <div class="d-flex align-items-start gap-2 border rounded p-3 mb-2" data-form-collection-target="entry">
+        {% if not child.vars.disabled %}
+            <span class="sortable-handle mt-2" draggable="true"
+                  data-action="dragstart->sortable#dragStart dragend->sortable#dragEnd"
+                  role="button" aria-label="{{ 'Reorder role'|trans }}">
+                <span class="fas fa-arrows-up-down"></span>
+            </span>
+        {% endif %}
+        <div class="flex-grow-1">
+            {{ form_row(child.name) }}
+            {{ form_row(child.minimum) }}
+            {{ form_rest(child) }}
+            {% if not child.vars.disabled %}
+                <button type="button" class="btn btn-sm btn-outline-gewis-primary mt-2"
+                        data-action="form-collection#remove">
+                    <span class="fas fa-trash"></span> {{ remove_label }}
+                </button>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% block signup_role_collection_widget %}
+    {% import _self as helper %}
+    {{ helper.collection(form, 'role', 'Add a role'|trans, 'Remove role'|trans) }}
+{% endblock %}
+
 {% block signup_option_collection_widget %}
     {% import _self as helper %}
-    {% set has_prototype = allow_add and prototype is defined and prototype is not null %}
-    {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__option__' %}
-    {% set add_label = add_label|default('Add option'|trans) %}
-    {% set remove_label = remove_label|default('Remove option'|trans) %}
-    <div id="{{ id }}" class="signup-option-collection"
-         data-controller="form-collection{% if not disabled %} sortable{% endif %}"
-         data-form-collection-prototype-name-value="{{ placeholder }}"
-         {% if has_prototype %}
-             data-form-collection-prototype-value="{{ helper.signup_option_entry(prototype, remove_label)|e('html_attr') }}"
-         {% endif %}>
-        <div data-form-collection-target="entries" data-sortable-target="entries"
-             data-action="dragover->sortable#dragOver drop->sortable#drop">
-            {% for child in form %}
-                {{ helper.signup_option_entry(child, remove_label) }}
-            {% endfor %}
-        </div>
-        {% if allow_add and not disabled %}
-            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-action="form-collection#add">
-                <span class="fas fa-plus"></span> {{ add_label }}
-            </button>
-        {% endif %}
-    </div>
+    {{ helper.collection(form, 'option', add_label|default('Add option'|trans), remove_label|default('Remove option'|trans)) }}
 {% endblock %}

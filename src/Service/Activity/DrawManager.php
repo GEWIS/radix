@@ -34,6 +34,7 @@ final readonly class DrawManager
     public function __construct(
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
+        private AdmissionOrder $admissionOrder,
     ) {
     }
 
@@ -161,7 +162,8 @@ final readonly class DrawManager
 
     /**
      * Admit the first capacity of the (pre-ordered) sign-ups, waitlist the rest (clearing their attendance), then
-     * lock the draw with an audit stamp. The draw is a one-shot event and cannot be re-run; later adjustments are
+     * lock the draw with an audit stamp. Everybody keeps the place the draw gave them, so the waiting list stays in
+     * the order it was ranked in. The draw is a one-shot event and cannot be re-run; later adjustments are
      * manual ({@see \App\Twig\Components\Activity\Admin\SignupOverview::toggleAdmission()}).
      *
      * @param Signup[] $orderedSignups the cutoff pool (shuffled for a lottery) followed by the latecomers in
@@ -177,6 +179,7 @@ final readonly class DrawManager
         foreach ($orderedSignups as $signup) {
             $admitted = $position < $capacity;
             $signup->setDrawn($admitted);
+            $signup->setDrawPosition($position + 1);
             if (!$admitted) {
                 $signup->setPresent(false);
             }
@@ -232,6 +235,11 @@ final readonly class DrawManager
             $pool = array_values(new Randomizer()->shuffleArray($pool));
         }
 
+        $pool = $this->admissionOrder->arrange(
+            $list,
+            $pool,
+        );
+
         usort(
             $late,
             static function (array $a, array $b): int {
@@ -247,7 +255,10 @@ final readonly class DrawManager
             $pool[] = $entry[1];
         }
 
-        return $pool;
+        return $this->admissionOrder->guaranteeRoles(
+            $list,
+            $pool,
+        );
     }
 
     /**

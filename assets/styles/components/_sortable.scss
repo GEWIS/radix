@@ -9,6 +9,74 @@
     }
 }
 
-[data-form-collection-target="entry"].dragging {
+[data-form-collection-target="entry"].dragging,
+[data-tier-order-target="entry"].dragging {
     opacity: 0.5;
+}
+
+.tier-order-entry {
+    cursor: grab;
+    background-color: var(--#{$prefix}tertiary-bg);
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    // A tier admitted together with the one above sits against it, so a rank reads as one block rather than as two
+    // rows that happen to carry the same number.
+    &--tied {
+        margin-block-start: -0.35rem;
+        border-start-start-radius: 0;
+        border-start-end-radius: 0;
+    }
+
+    &:has(+ &--tied) {
+        border-end-start-radius: 0;
+        border-end-end-radius: 0;
+    }
+}
+
+.tier-order-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: 0.375rem;
+    background-color: var(--#{$prefix}form-stepper-accent-subtle, #{rgba($gewis-red, 0.12)});
+    color: $gewis-red;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.tier-order-seats {
+    inline-size: 4.5rem;
+    flex: none;
+
+    // A tier tied to the one above shares its seats, so it asks for none of its own.
+    &.is-tied {
+        visibility: hidden;
+    }
+}
+
+.tier-order-tie {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--#{$prefix}secondary-color);
+
+    &[aria-pressed="true"] {
+        background-color: var(--#{$prefix}form-stepper-accent-subtle, #{rgba($gewis-red, 0.12)});
+        color: $gewis-red;
+    }
+
+    &:hover {
+        color: $gewis-red;
+    }
 }

@@ -9,6 +9,7 @@ use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\Languages;
+use App\Util\Activity\SignupTiers;
 use DateTime;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,6 +28,8 @@ final readonly class SignupListView
      *                                member-facing announcement)
      * @param string[]    $fieldNames column headers (localised), one per sign-up field
      * @param SignupRow[] $rows       populated only when $canViewDetails
+     * @param string[]    $priority   the orders this list serves its places in, best first, one sentence each; these
+     *                                are part of the deal somebody signs up under, so they are said before they do
      */
     public function __construct(
         public int $listId,
@@ -49,6 +52,7 @@ final readonly class SignupListView
         public bool $hasSensitiveField,
         public array $fieldNames,
         public array $rows,
+        public array $priority = [],
     ) {
     }
 
@@ -69,7 +73,7 @@ final readonly class SignupListView
         // Hide externals that have not confirmed their email yet from both the count and the rows. A confirmed sign-up
         // is exactly one whose verification moment is set (manually-added externals have it set immediately).
         $visibleSignups = [];
-        foreach ($signupList->getSignUps() as $signup) {
+        foreach ($signupList->getSignUpsInAdmissionOrder() as $signup) {
             if (
                 $signup instanceof ExternalSignup
                 && null === $signup->getVerifiedAt()
@@ -149,6 +153,10 @@ final readonly class SignupListView
             hasSensitiveField: $signupList->hasSensitiveField(),
             fieldNames: $fieldNames,
             rows: $rows,
+            priority: SignupTiers::orderTexts(
+                $signupList,
+                $translator,
+            ),
         );
     }
 }

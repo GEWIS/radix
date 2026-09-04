@@ -182,6 +182,18 @@
                                 </button>
                             {% endif %}
                         </div>
+                        {% if list.priorityOrders is not empty or list.reservedSeats is not empty %}
+                            <div class="d-flex flex-wrap align-items-center gap-2 mt-2 small">
+                                {% for order in list.priorityOrders %}
+                                    <span class="badge badge-tag">{{ order }}</span>
+                                {% endfor %}
+                                {% for seats in list.reservedSeats %}
+                                    <span class="badge badge-warning">
+                                        <span class="fas fa-bookmark" aria-hidden="true"></span> {{ seats }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <small class="text-muted d-block mt-2">
                             {% if list.frozen %}
                                 {{ 'This activity is cancelled or unpublished, so sign-up actions are frozen.'|trans }}
@@ -345,6 +357,12 @@
                                             <th>{{ field.name }}</th>
                                         {% endif %}
                                     {% endfor %}
+                                    {% if list.hasPriority %}
+                                        <th>{{ 'Priority'|trans }}</th>
+                                    {% endif %}
+                                    {% if list.roles is not empty %}
+                                        <th>{{ 'Role'|trans }}</th>
+                                    {% endif %}
                                     {% if list.limitedCapacity %}
                                         <th class="text-center">{{ 'Admitted'|trans }}</th>
                                     {% endif %}
@@ -380,6 +398,43 @@
                                                 <td>{{ row.cells[loop.index0].value }}</td>
                                             {% endif %}
                                         {% endfor %}
+                                        {% if list.hasPriority %}
+                                            <td class="small">
+                                                {# A seat held off the top rather than a tier somebody is ranked in,
+                                                   so it is said in its own colour. #}
+                                                {% if row.organisingBody %}
+                                                    <span class="badge badge-gewis-primary">
+                                                        <span class="fas fa-users" aria-hidden="true"></span>
+                                                        {{ 'Organising body'|trans }}
+                                                    </span>
+                                                {% endif %}
+                                                {% for label in row.priority %}
+                                                    <span class="badge badge-secondary">{{ label }}</span>
+                                                {% else %}
+                                                    {% if not row.organisingBody %}
+                                                        <span class="text-muted">{{ 'N/A'|trans }}</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                        {% endif %}
+                                        {% if list.roles is not empty %}
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Role'|trans }}">
+                                                    {% for role in list.roles %}
+                                                        <button type="button"
+                                                                class="btn {{ role.id == row.roleId ? 'btn-gewis-primary' : 'btn-outline-secondary' }}"
+                                                                {{ list.canAssignRoles ? '' : 'disabled' }}
+                                                                aria-pressed="{{ role.id == row.roleId ? 'true' : 'false' }}"
+                                                                data-action="live#action"
+                                                                data-live-action-param="assignRole"
+                                                                data-live-signup-id-param="{{ row.signupId }}"
+                                                                data-live-role-id-param="{{ role.id }}">
+                                                            {{ role.name }}
+                                                        </button>
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
+                                        {% endif %}
                                         {% if list.limitedCapacity %}
                                             <td class="text-center">
                                                 <div class="form-check form-switch d-inline-block mb-0">
@@ -405,7 +460,7 @@
                                     </tr>
                                 {% else %}
                                     <tr>
-                                        <td colspan="{{ (list.limitedCapacity ? 8 : 7) + list.visibleFieldCount }}" class="text-center text-muted py-3">
+                                        <td colspan="{{ (list.limitedCapacity ? 8 : 7) + (list.hasPriority ? 1 : 0) + (list.roles is not empty ? 1 : 0) + list.visibleFieldCount }}" class="text-center text-muted py-3">
                                             {{ 'No sign-ups yet.'|trans }}
                                         </td>
                                     </tr>

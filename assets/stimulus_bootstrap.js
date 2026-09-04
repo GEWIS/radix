@@ -29,6 +29,7 @@ import ExternalAppSigningController from './controllers/user/external_app_signin
 import ActivityItemController from './controllers/activity/activity_item_controller.ts';
 import SignupFieldController from './controllers/activity/signup_field_controller.ts';
 import SignupListController from './controllers/activity/signup_list_controller.ts';
+import TierOrderController from './controllers/activity/tier_order_controller.ts';
 
 // Frontpage-specific controllers.
 import BirthdayRotatorController from './controllers/frontpage/birthday_rotator_controller.ts';
@@ -97,6 +98,7 @@ app.register('external-app-signing', ExternalAppSigningController);
 app.register('activity-item', ActivityItemController);
 app.register('signup-field', SignupFieldController);
 app.register('signup-list', SignupListController);
+app.register('tier-order', TierOrderController);
 
 app.register('birthday-rotator', BirthdayRotatorController);
 app.register('infimum', InfimumController);

@@ -22,7 +22,8 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
     static targets = [
         'limited', 'capacity', 'methodBlock', 'method',
-        'conditional', 'rule', 'cutoffAt', 'durationHours', 'external', 'custom', 'required',
+        'conditional', 'rule', 'cutoffAt', 'durationHours', 'external', 'custom',
+        'priority', 'mode', 'membershipSeats', 'required',
     ];
 
     declare readonly hasLimitedTarget: boolean;
@@ -31,6 +32,8 @@ export default class extends Controller {
     declare readonly methodTarget: HTMLSelectElement;
     declare readonly hasRuleTarget: boolean;
     declare readonly ruleTarget: HTMLSelectElement;
+    declare readonly hasModeTarget: boolean;
+    declare readonly modeTarget: HTMLSelectElement;
     declare readonly requiredTargets: (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
 
     connect(): void {
@@ -42,6 +45,8 @@ export default class extends Controller {
         const method = this.hasMethodTarget ? this.methodTarget.value : '';
         const rule = this.hasRuleTarget ? this.ruleTarget.value : '';
         const conditional = limited && 'conditional-draw' === method;
+        const mode = this.hasModeTarget ? this.modeTarget.value : '';
+        const allocates = limited && ('first-come-first-served' === method || 'conditional-draw' === method);
 
         this.setHidden('capacity', !limited);
         this.setHidden('methodBlock', !limited);
@@ -50,15 +55,21 @@ export default class extends Controller {
         this.setHidden('custom', !(limited && 'custom' === method));
         this.setHidden('cutoffAt', !(conditional && 'if-full-before' === rule));
         this.setHidden('durationHours', !(conditional && 'after-duration-open' === rule));
+        this.setHidden('priority', !allocates);
+        this.setHidden('membershipSeats', 'reserved-seats' !== mode);
 
         this.markRequired();
     }
 
     setHidden(name: string, hidden: boolean): void {
-        const target = this.targets.find(name);
-        if (target instanceof HTMLElement) {
+        // Every one of them: the seats held per rank are one target per row of the membership order.
+        this.targets.findAll(name).forEach((target) => {
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+
             target.hidden = hidden;
-        }
+        });
     }
 
     // Only the label is marked, with the same asterisk every other required field carries: a field that is not asked
