@@ -15,6 +15,7 @@ use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityDraftFactory;
 use App\Tests\Integration\DatabaseTestCase;
+use App\Tests\Support\AnswersActivityForm;
 use DateTime;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
@@ -28,6 +29,8 @@ use function substr_count;
 
 final class SignupListTemplatesTest extends DatabaseTestCase
 {
+    use AnswersActivityForm;
+
     public function testTheAllocationStepRendersEveryPriorityModifier(): void
     {
         $revision = $this->revisionWithList();
@@ -134,7 +137,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
                         $list,
                         SignupListSection::Basics,
                     ),
-                    $this->answered(),
+                    $this->answered(ActivityData::STEP_GENERAL),
                 )->createView(),
                 'step' => ActivityFlowType::listStep(
                     $list,
@@ -209,6 +212,56 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         );
         self::assertStringContainsString(
             '2/3',
+            $html,
+        );
+    }
+
+    public function testAStepWhoseQuestionsAreAnsweredCanBeGoneToFromTheHeader(): void
+    {
+        $revision = $this->revisionWithList();
+        $activity = $revision->getActivity();
+
+        $this->pushRequest();
+
+        $flow = $this->flow(
+            $revision,
+            ActivityData::STEP_GENERAL,
+            $this->answered(ActivityData::STEP_GENERAL),
+        );
+
+        $html = $this->twig()->render(
+            'partials/activity/admin/form.html.twig',
+            [
+                'form' => $flow->createView(),
+                'activity' => $activity,
+            ],
+        );
+
+        self::assertStringContainsString(
+            'value="' . ActivityData::STEP_SIGNUP_LISTS . '"',
+            $html,
+        );
+    }
+
+    public function testAStepThatIsNotAnsweredYetIsNotOffered(): void
+    {
+        $revision = $this->revisionWithList();
+
+        $this->pushRequest();
+
+        $html = $this->twig()->render(
+            'partials/activity/admin/form.html.twig',
+            [
+                'form' => $this->flow(
+                    $revision,
+                    ActivityData::STEP_GENERAL,
+                )->createView(),
+                'activity' => $revision->getActivity(),
+            ],
+        );
+
+        self::assertStringNotContainsString(
+            'value="' . ActivityData::STEP_SIGNUP_LISTS . '"',
             $html,
         );
     }
@@ -385,8 +438,9 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     private function flow(
         ActivityRevision $revision,
         string $step = ActivityData::STEP_SIGNUP_LISTS,
+        ?ActivityData $data = null,
     ): FormFlowInterface {
-        $data = new ActivityData();
+        $data ??= new ActivityData();
         $data->step = $step;
 
         $flow = self::getContainer()->get(FormFactoryInterface::class)->create(

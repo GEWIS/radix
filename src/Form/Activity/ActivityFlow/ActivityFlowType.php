@@ -11,6 +11,9 @@ use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\Flow\AbstractStepperFlowType;
 use Override;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\Form\Flow\FormFlowInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -88,6 +91,54 @@ class ActivityFlowType extends AbstractStepperFlowType
                         'section' => $section,
                     ],
                 );
+            }
+        }
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            fn (FormEvent $event) => $this->refuseAnUnfinishedList(
+                $event,
+                $options['revision'],
+            ),
+        );
+    }
+
+    private function refuseAnUnfinishedList(
+        FormEvent $event,
+        mixed $revision,
+    ): void {
+        $flow = $event->getForm();
+
+        if (
+            !$flow instanceof FormFlowInterface
+            || !$this->isFinishing($flow)
+        ) {
+            return;
+        }
+
+        $position = 0;
+        foreach (self::listsOf($revision) as $list) {
+            ++$position;
+            foreach (SignupListSection::order() as $section) {
+                if ($section->isFilledIn($list)) {
+                    continue;
+                }
+
+                $this->refuse(
+                    $flow,
+                    $this->translator->trans(
+                        'This cannot be saved yet: the %part% of %list% is not filled in.',
+                        [
+                            '%part%' => $section->trans($this->translator),
+                            '%list%' => self::listLabel(
+                                $list,
+                                $position,
+                            ),
+                        ],
+                    ),
+                );
+
+                return;
             }
         }
     }

@@ -22,9 +22,9 @@
     <ol class="form-stepper" role="tablist">
         {% for step in stepper.top %}
             <li class="form-stepper__step" role="presentation">
-                {% if 'complete' == step.state and form.goto is defined %}
+                {% if 'current' != step.state and step.reachable and form.goto is defined %}
                     {{ self.goto(form, step.name, self.tab_content(step), {
-                        'class': 'form-stepper__btn is-complete',
+                        'class': 'form-stepper__btn' ~ ('complete' == step.state ? ' is-complete' : ''),
                         'role': 'tab',
                     }) }}
                 {% else %}

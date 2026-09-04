@@ -9605,6 +9605,14 @@
         <source>This body no longer organises activities.</source>
         <target state="translated">This body no longer organises activities.</target>
       </trans-unit>
+      <trans-unit id="XPTtXP1" resname="This cannot be saved yet: %step% is not filled in.">
+        <source>This cannot be saved yet: %step% is not filled in.</source>
+        <target>This cannot be saved yet: %step% is not filled in.</target>
+      </trans-unit>
+      <trans-unit id="ov4YTdZ" resname="This cannot be saved yet: the %part% of %list% is not filled in.">
+        <source>This cannot be saved yet: the %part% of %list% is not filled in.</source>
+        <target>This cannot be saved yet: the %part% of %list% is not filled in.</target>
+      </trans-unit>
       <trans-unit id="qITaaEH" resname="This company has no packages.">
         <source>This company has no packages.</source>
         <target state="translated">This company has no packages.</target>

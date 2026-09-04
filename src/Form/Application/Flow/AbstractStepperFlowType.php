@@ -6,6 +6,7 @@ namespace App\Form\Application\Flow;
 
 use Override;
 use Symfony\Component\Form\Flow\AbstractFlowType;
+use Symfony\Component\Form\Flow\ButtonFlowInterface;
 use Symfony\Component\Form\Flow\DataStorage\SessionDataStorage;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Flow\FormFlowCursor;
@@ -13,16 +14,23 @@ use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\Type\FinishFlowType;
 use Symfony\Component\Form\Flow\Type\NextFlowType;
 use Symfony\Component\Form\Flow\Type\PreviousFlowType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_key_exists;
 use function array_keys;
 use function array_search;
 use function array_values;
 use function count;
+use function is_object;
 use function sprintf;
 use function Symfony\Component\Translation\t;
 
@@ -32,8 +40,11 @@ use function Symfony\Component\Translation\t;
  */
 abstract class AbstractStepperFlowType extends AbstractFlowType
 {
-    public function __construct(private readonly RequestStack $requestStack)
-    {
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly ValidatorInterface $validator,
+        protected readonly TranslatorInterface $translator,
+    ) {
     }
 
     public static function storageKey(string $flowKey): string
@@ -104,6 +115,102 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
             $builder,
             $options['finish_from'],
         ));
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            fn (FormEvent $event) => $this->refuseAnUnfinishedForm(
+                $event,
+                $options['step_labels'],
+            ),
+        );
+    }
+
+    /**
+     * Handing a step in judges that step alone, so a step that is left behind is never judged again. Finishing is the
+     * one moment the whole thing has to be true at once, and the step that is wanting is named, because it is not the
+     * step on screen and there is nothing on screen for the message to point at.
+     *
+     * @param array<string, mixed> $labels
+     */
+    private function refuseAnUnfinishedForm(
+        FormEvent $event,
+        array $labels,
+    ): void {
+        $flow = $event->getForm();
+        $data = $event->getData();
+
+        if (
+            !$flow instanceof FormFlowInterface
+            || !is_object($data)
+        ) {
+            return;
+        }
+
+        if (!$this->isFinishing($flow)) {
+            return;
+        }
+
+        foreach ($flow->getCursor()->getSteps() as $step) {
+            if (
+                0 === count($this->validator->validate(
+                    $data,
+                    null,
+                    [$step],
+                ))
+            ) {
+                continue;
+            }
+
+            $this->refuse(
+                $flow,
+                $this->translator->trans(
+                    'This cannot be saved yet: %step% is not filled in.',
+                    [
+                        '%step%' => $this->label(
+                            $labels,
+                            $step,
+                        ),
+                    ],
+                ),
+            );
+
+            return;
+        }
+    }
+
+    /**
+     * @param FormFlowInterface<mixed> $flow
+     */
+    protected function isFinishing(FormFlowInterface $flow): bool
+    {
+        $button = $flow->getClickedButton();
+
+        return $button instanceof ButtonFlowInterface
+            && $button->isFinishAction();
+    }
+
+    /**
+     * @param FormFlowInterface<mixed> $flow
+     */
+    protected function refuse(
+        FormFlowInterface $flow,
+        string $message,
+    ): void {
+        $flow->addError(new FormError($message));
+    }
+
+    /**
+     * @param array<string, mixed> $labels
+     */
+    private function label(
+        array $labels,
+        string $step,
+    ): string {
+        $label = $labels[$step] ?? $step;
+
+        return $label instanceof TranslatableInterface
+            ? $label->trans($this->translator)
+            : (string) $label;
     }
 
     /**
@@ -141,9 +248,13 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
         /** @var array<string, array{index: int}> $visible */
         $visible = $view->vars['visible_steps'] ?? [];
         $data = $form->getData();
+        $reachable = $this->reachable(
+            $visible,
+            $data,
+            $currentIndex = $form->getCursor()->getStepIndex(),
+        );
         $cursor = $form->getCursor();
         $current = $cursor->getCurrentStep();
-        $currentIndex = $cursor->getStepIndex();
         $under = $groups[$current]['under'] ?? null;
 
         $top = [];
@@ -163,6 +274,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                 'name' => $name,
                 'label' => $view->vars['step_labels'][$name] ?? $name,
                 'position' => $position,
+                'reachable' => $reachable[$name] ?? false,
                 'state' => $this->state(
                     $name === $under,
                     $step['index'],
@@ -183,6 +295,41 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                     $currentIndex,
                 ),
         ];
+    }
+
+    /**
+     * Which steps may be moved to straight away: a step is offered as soon as every step before it holds together.
+     * Judged by the very rules the flow judges a step by when it is handed in, the group named after it, so this
+     * cannot drift from what the form itself would accept.
+     *
+     * @param array<string, array{index: int}> $visible
+     *
+     * @return array<string, bool>
+     */
+    private function reachable(
+        array $visible,
+        mixed $data,
+        int $currentIndex,
+    ): array {
+        $reachable = [];
+        $behind = true;
+
+        foreach ($visible as $name => $step) {
+            $reachable[$name] = $behind || $step['index'] <= $currentIndex;
+
+            if (!$behind) {
+                continue;
+            }
+
+            $behind = !is_object($data)
+                || 0 === count($this->validator->validate(
+                    $data,
+                    null,
+                    [$name],
+                ));
+        }
+
+        return $reachable;
     }
 
     private function state(

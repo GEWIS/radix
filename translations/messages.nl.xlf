@@ -9605,6 +9605,14 @@
         <source>This body no longer organises activities.</source>
         <target state="translated">Dit orgaan organiseert geen activiteiten meer.</target>
       </trans-unit>
+      <trans-unit id="XPTtXP1" resname="This cannot be saved yet: %step% is not filled in.">
+        <source>This cannot be saved yet: %step% is not filled in.</source>
+        <target>Dit kan nog niet worden opgeslagen: %step% is niet ingevuld.</target>
+      </trans-unit>
+      <trans-unit id="ov4YTdZ" resname="This cannot be saved yet: the %part% of %list% is not filled in.">
+        <source>This cannot be saved yet: the %part% of %list% is not filled in.</source>
+        <target>Dit kan nog niet worden opgeslagen: de %part% van %list% is niet ingevuld.</target>
+      </trans-unit>
       <trans-unit id="qITaaEH" resname="This company has no packages.">
         <source>This company has no packages.</source>
         <target state="translated">Dit bedrijf heeft geen pakketten.</target>

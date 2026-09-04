@@ -12,6 +12,7 @@ use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityDraftFactory;
 use App\Tests\Integration\DatabaseTestCase;
+use App\Tests\Support\AnswersActivityForm;
 use DateTime;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
@@ -21,6 +22,8 @@ use function array_slice;
 
 final class ActivityFlowTypeTest extends DatabaseTestCase
 {
+    use AnswersActivityForm;
+
     public function testEachSignupListGetsThreeStepsOfItsOwn(): void
     {
         $revision = $this->revisionWithLists(
@@ -127,13 +130,66 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
         self::assertFalse($step->get('open')->getConfig()->getMapped());
     }
 
+    public function testFinishingIsRefusedWhileAnEarlierStepIsWanting(): void
+    {
+        $revision = $this->revisionWithLists();
+        $data = $this->answered(ActivityData::STEP_SIGNUP_LISTS);
+        $data->nameEN = null;
+
+        $flow = $this->build(
+            $revision,
+            $data,
+        );
+        $flow->submit([
+            'finish' => '',
+        ]);
+
+        self::assertFalse($flow->isFinished());
+        self::assertStringContainsString(
+            'Details',
+            (string) $flow->getErrors(),
+        );
+    }
+
+    public function testFinishingIsRefusedWhileASignupListIsUnfinished(): void
+    {
+        $revision = $this->revisionWithLists('');
+
+        $flow = $this->build(
+            $revision,
+            $this->answered(ActivityData::STEP_SIGNUP_LISTS),
+        );
+        $flow->submit(['finish' => '']);
+
+        self::assertFalse($flow->isFinished());
+        self::assertStringContainsString(
+            'Basics',
+            (string) $flow->getErrors(),
+        );
+    }
+
+    public function testFinishingIsAllowedWhenEveryStepHoldsTogether(): void
+    {
+        $flow = $this->build(
+            $this->revisionWithLists(),
+            $this->answered(ActivityData::STEP_SIGNUP_LISTS),
+        );
+        $flow->submit([
+            'finish' => '',
+        ]);
+
+        self::assertTrue($flow->isFinished());
+    }
+
     /**
      * @return FormFlowInterface<mixed>
      */
-    private function build(ActivityRevision $revision): FormFlowInterface
-    {
-        $data = new ActivityData();
-        $data->step = ActivityData::STEP_SIGNUP_LISTS;
+    private function build(
+        ActivityRevision $revision,
+        ?ActivityData $data = null,
+    ): FormFlowInterface {
+        $data ??= new ActivityData();
+        $data->step ??= ActivityData::STEP_SIGNUP_LISTS;
 
         $flow = self::getContainer()->get(FormFactoryInterface::class)->create(
             ActivityFlowType::class,

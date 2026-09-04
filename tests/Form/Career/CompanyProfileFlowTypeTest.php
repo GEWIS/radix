@@ -22,6 +22,7 @@ use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validation;
 
@@ -54,7 +55,11 @@ final class CompanyProfileFlowTypeTest extends TypeTestCase
     protected function getTypes(): array
     {
         return [
-            new CompanyProfileFlowType(new RequestStack()),
+            new CompanyProfileFlowType(
+                new RequestStack(),
+                Validation::createValidator(),
+                new IdentityTranslator(),
+            ),
             new IdentityStepType(),
             new ProfileStepType(),
             new ContactStepType(),
