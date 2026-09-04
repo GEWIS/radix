@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\EventListener\Report;
 
 use App\Entity\Database\Enums\InstallationFunctions;
+use App\Entity\Database\Enums\Studies;
 use App\Entity\Database\SubDecision\Other;
 use App\Entity\Decision\Decision as ReportDecision;
 use App\Entity\Decision\Meeting as ReportMeeting;
@@ -63,6 +64,25 @@ class ProjectionTest extends KernelTestCase
         self::assertSame(
             $member->getEmail(),
             $projected->getEmail(),
+        );
+    }
+
+    /**
+     * The study is only recorded in the ledger, so the website can only order sign-ups by program if the projection
+     * carries it along.
+     */
+    public function testWritingAMemberWritesTheirStudy(): void
+    {
+        $member = $this->build->member();
+        $member->setStudy(Studies::MCSE);
+        $this->ledger->flush();
+
+        $projected = $this->report->getRepository(ReportMember::class)->find($member->getLidnr());
+
+        self::assertNotNull($projected);
+        self::assertSame(
+            Studies::MCSE,
+            $projected->getStudy(),
         );
     }
 

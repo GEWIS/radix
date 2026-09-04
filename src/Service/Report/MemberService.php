@@ -80,6 +80,7 @@ class MemberService
         $reportMember->setFirstName($member->getFirstName());
         $reportMember->setGeneration($member->getGeneration());
         $reportMember->setType($member->getCurrentOrLastMembership()?->getType() ?? MembershipTypes::Graduate);
+        $reportMember->setStudy($member->getStudy());
         $reportMember->setMembershipEndsOn($member->getMembershipEndsOn());
         $reportMember->setExpiration($member->getExpiration());
         $reportMember->setBirth($member->getBirth());

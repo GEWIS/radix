@@ -8,6 +8,7 @@ use App\Doctrine\Query\Queryable;
 use App\Entity\Database\Enums\BoardFunctions;
 use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Database\Enums\MembershipTypes;
+use App\Entity\Database\Enums\Studies;
 use App\Entity\Decision\SubDecision\Installation;
 use App\Entity\Photo\MemberTag as MemberTagModel;
 use App\Entity\User\User as UserModel;
@@ -41,6 +42,7 @@ use function array_reduce;
  *     birth: string,
  *     generation: int,
  *     type: string,
+ *     study: string,
  *     changedOn: string,
  *     membershipEndsOn: ?string,
  *     expiration: string,
@@ -130,6 +132,18 @@ class Member
         enumType: MembershipTypes::class,
     )]
     private MembershipTypes $type;
+
+    /**
+     * The program the member is enrolled in.
+     *
+     * Members who joined before the study was recorded, who are not studying, or who follow a program outside M&CS
+     * fall into the special cases of {@see Studies}.
+     */
+    #[Column(
+        type: Types::STRING,
+        enumType: Studies::class,
+    )]
+    private Studies $study = Studies::Unknown;
 
     /**
      * Last changed date of membership.
@@ -430,6 +444,22 @@ class Member
     public function setType(MembershipTypes $type): void
     {
         $this->type = $type;
+    }
+
+    /**
+     * Get the study.
+     */
+    public function getStudy(): Studies
+    {
+        return $this->study;
+    }
+
+    /**
+     * Set the study.
+     */
+    public function setStudy(Studies $study): void
+    {
+        $this->study = $study;
     }
 
     /**
@@ -845,6 +875,7 @@ class Member
             'birth' => $this->getBirth()->format(DateTimeInterface::ATOM),
             'generation' => $this->getGeneration(),
             'type' => $this->getType()->value,
+            'study' => $this->getStudy()->value,
             'changedOn' => $this->getChangedOn()->format(DateTimeInterface::ATOM),
             'membershipEndsOn' => $this->getMembershipEndsOn()?->format(DateTimeInterface::ATOM),
             'expiration' => $this->getExpiration()->format(DateTimeInterface::ATOM),
