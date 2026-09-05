@@ -1,9 +1,9 @@
 {% import _self as outlinemacro %}
 
-{% macro section_url(key) %}
+{% macro section_url(key, parameter = 'section') %}
     {# Off the address itself rather than off the route, so a screen reached under any name keeps whatever else it
        was asked with. #}
-    {{- app.request.pathInfo }}?{{ app.request.query.all|merge({'section': key})|url_encode -}}
+    {{- app.request.pathInfo }}?{{ app.request.query.all|merge({(parameter): key})|url_encode -}}
 {% endmacro %}
 
 {% macro count(step) %}

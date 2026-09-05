@@ -10,6 +10,7 @@ use App\Entity\User\CompanyUser;
 use App\Entity\User\User;
 use App\Security\Application\RevisionVoter;
 use App\Security\User\SudoVoter;
+use App\ViewModel\Application\Review\ReviewBaseline;
 use App\ViewModel\Application\Review\ReviewOutline;
 use App\ViewModel\Application\Review\RevisionAudience;
 use App\ViewModel\Application\RevisionActions;
@@ -31,6 +32,8 @@ use function trim;
 abstract class AbstractRevisionReviewController extends AbstractRevisionController
 {
     public const string SECTION_KEY = 'section';
+
+    public const string BASELINE_KEY = 'against';
 
     /**
      * The template this domain renders its review screen with.
@@ -95,7 +98,13 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
     ): Response {
         $actions = $this->revisionActions($revision);
         $form ??= $this->createDecisionForm($actions);
-        $previous = $revision->getPreviousRevision();
+        $request = $this->requestStack->getCurrentRequest();
+
+        $baseline = ReviewBaseline::resolve(
+            $revision,
+            strval($request?->query->get(self::BASELINE_KEY) ?? ''),
+        );
+        $previous = $baseline->revision;
         $sections = $this->revisionDescribers->describe(
             $revision,
             $previous,
@@ -103,7 +112,7 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
 
         $section = ReviewOutline::sectionFor(
             $sections,
-            strval($this->requestStack->getCurrentRequest()?->query->get(self::SECTION_KEY) ?? ''),
+            strval($request?->query->get(self::SECTION_KEY) ?? ''),
         );
         $outline = ReviewOutline::of(
             $sections,
@@ -116,6 +125,7 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
             [
                 'revision' => $revision,
                 'previous' => $previous,
+                'baseline' => $baseline,
                 'sections' => $sections,
                 'section' => $section,
                 'outline' => $outline,

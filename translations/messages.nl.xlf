@@ -2297,6 +2297,10 @@
         <source>Company profiles</source>
         <target state="translated">Bedrijfsprofielen</target>
       </trans-unit>
+      <trans-unit id="_hOvrYb" resname="Compared with">
+        <source>Compared with</source>
+        <target state="translated">Vergeleken met</target>
+      </trans-unit>
       <trans-unit id="HqZJjC4" resname="Compared with revision #%number%.">
         <source>Compared with revision #%number%.</source>
         <target state="translated">Vergeleken met revisie #%number%.</target>
@@ -6144,10 +6148,6 @@
       <trans-unit id="H4tw96s" resname="Not tied to an agenda point; these apply to the meeting as a whole.">
         <source>Not tied to an agenda point; these apply to the meeting as a whole.</source>
         <target state="translated">Niet gekoppeld aan een agendapunt; deze gelden voor de vergadering als geheel.</target>
-      </trans-unit>
-      <trans-unit id="TylM_JW" resname="Not used in this revision.">
-        <source>Not used in this revision.</source>
-        <target state="translated">Niet gebruikt in deze revisie.</target>
       </trans-unit>
       <trans-unit id="Z458ldp" resname="Not used yet">
         <source>Not used yet</source>
@@ -11541,6 +11541,10 @@
         <source>listmonk sync</source>
         <target state="translated">listmonk-synchronisatie</target>
       </trans-unit>
+      <trans-unit id="nDxG2oM" resname="live">
+        <source>live</source>
+        <target state="translated">live</target>
+      </trans-unit>
       <trans-unit id="je93_Nv" resname="live %number%">
         <source>live %number%</source>
         <target state="translated">live %number%</target>
@@ -11640,6 +11644,10 @@
       <trans-unit id="iP7D8YD" resname="rev. #%n%">
         <source>rev. #%n%</source>
         <target state="translated">rev. #%n%</target>
+      </trans-unit>
+      <trans-unit id="M6lahGB" resname="revision #%number%">
+        <source>revision #%number%</source>
+        <target state="translated">revisie #%number%</target>
       </trans-unit>
       <trans-unit id="NdlEWZ3" resname="selected">
         <source>selected</source>

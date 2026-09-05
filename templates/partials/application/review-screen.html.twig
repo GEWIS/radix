@@ -48,11 +48,20 @@
                     'live': revision.liveCounterpart ? revision.liveCounterpart.revisionNumber : null,
                 } only %}
                 <br>
-                <span class="small">
-                    {% if previous is not null %}
+                <span class="small review-baseline">
+                    {% if baseline.choices is empty %}
+                        {{ firstRevisionNote }}
+                    {% elseif not baseline.isChoice %}
                         {{ 'Compared with revision #%number%.'|trans({'%number%': previous.revisionNumber}) }}
                     {% else %}
-                        {{ firstRevisionNote }}
+                        {{ 'Compared with'|trans }}
+                        {% for choice in baseline.choices %}
+                            <a class="badge {{ choice.current ? 'badge-gewis-primary' : 'badge-tag' }}"
+                               href="{{ outlinemacro.section_url(choice.key, 'against') }}">
+                                {{ 'revision #%number%'|trans({'%number%': choice.revisionNumber}) }}
+                                {%- if choice.live %} ({{ 'live'|trans }}){% endif -%}
+                            </a>
+                        {% endfor %}
                     {% endif %}
                 </span>
             </p>
