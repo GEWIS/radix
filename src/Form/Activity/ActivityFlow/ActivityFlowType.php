@@ -6,9 +6,9 @@ namespace App\Form\Activity\ActivityFlow;
 
 use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\SignupList;
-use App\Entity\Application\Enums\Languages;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\Flow\AbstractStepperFlowType;
+use App\Util\Activity\SignupListRule;
 use Override;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Flow\FormFlowInterface;
@@ -19,7 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use function sprintf;
 use function Symfony\Component\Translation\t;
-use function trim;
 
 /**
  * The activity form. Everything is staged with the working revision and only goes live on approval.
@@ -116,31 +115,30 @@ class ActivityFlowType extends AbstractStepperFlowType
             return;
         }
 
-        $position = 0;
-        foreach (self::listsOf($revision) as $list) {
-            ++$position;
-            foreach (SignupListSection::order() as $section) {
-                if ($section->isFilledIn($list)) {
-                    continue;
-                }
-
-                $this->refuse(
-                    $flow,
-                    $this->translator->trans(
-                        'This cannot be saved yet: the %part% of %list% is not filled in.',
-                        [
-                            '%part%' => $section->trans($this->translator),
-                            '%list%' => self::listLabel(
-                                $list,
-                                $position,
-                            ),
-                        ],
-                    ),
-                );
-
-                return;
-            }
+        if (!$revision instanceof ActivityRevision) {
+            return;
         }
+
+        $unfinished = SignupListRule::firstUnfinished($revision);
+
+        if (null === $unfinished) {
+            return;
+        }
+
+        $this->refuse(
+            $flow,
+            $this->translator->trans(
+                'This cannot be saved yet: the %part% of %list% is not filled in.',
+                [
+                    '%part%' => $unfinished['section']->trans($this->translator),
+                    '%list%' => SignupListRule::label(
+                        $unfinished['list'],
+                        $unfinished['position'],
+                        $this->translator,
+                    ),
+                ],
+            ),
+        );
     }
 
     #[Override]
@@ -182,7 +180,7 @@ class ActivityFlowType extends AbstractStepperFlowType
 
         $resolver->setDefault(
             'step_groups',
-            static function (Options $options): array {
+            function (Options $options): array {
                 $groups = [];
                 $position = 0;
                 foreach (self::listsOf($options['revision']) as $list) {
@@ -194,9 +192,10 @@ class ActivityFlowType extends AbstractStepperFlowType
                         )] = [
                             'under' => ActivityData::STEP_SIGNUP_LISTS,
                             'group' => self::listGroup($list),
-                            'label' => self::listLabel(
+                            'label' => SignupListRule::label(
                                 $list,
                                 $position,
+                                $this->translator,
                             ),
                             'number' => $position,
                             'done' => $section->isFilledIn($list),
@@ -243,23 +242,5 @@ class ActivityFlowType extends AbstractStepperFlowType
         }
 
         return $revision->getSignupLists()->getValues();
-    }
-
-    /**
-     * What a list is called in the stepper. A list that has not been named yet is numbered instead, so it can still
-     * be told apart from the others.
-     */
-    private static function listLabel(
-        SignupList $list,
-        int $position,
-    ): string {
-        $name = trim($list->getName()->getText(Languages::current()) ?? '');
-
-        return '' === $name
-            ? sprintf(
-                'Sign-up list %d',
-                $position,
-            )
-            : $name;
     }
 }

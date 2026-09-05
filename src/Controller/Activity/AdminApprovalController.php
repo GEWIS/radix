@@ -13,6 +13,7 @@ use App\Entity\User\User;
 use App\Repository\Activity\ActivityRevisionCommentRepository;
 use App\Service\Activity\SignupListMigrator;
 use App\Util\Activity\PastActivityRule;
+use App\Util\Activity\SignupListRule;
 use App\ViewModel\Application\RevisionActions;
 use Override;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -206,6 +207,8 @@ class AdminApprovalController extends AbstractRevisionReviewController
             $revision,
         );
 
+        $unfinished = SignupListRule::firstUnfinished($revision);
+
         return [
             'activity' => $revision->getActivity(),
             'comments' => $this->commentRepository->findThreadForActivity($revision->getActivity()),
@@ -216,6 +219,14 @@ class AdminApprovalController extends AbstractRevisionReviewController
                 $revision,
                 $revision->getPreviousRevision(),
             ),
+            'unfinishedSignupList' => null === $unfinished ? null : [
+                'name' => SignupListRule::label(
+                    $unfinished['list'],
+                    $unfinished['position'],
+                    $this->translator,
+                ),
+                'part' => $unfinished['section']->trans($this->translator),
+            ],
         ];
     }
 

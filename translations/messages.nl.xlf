@@ -3205,6 +3205,10 @@
         <source>Edit the %type% package</source>
         <target state="translated">%type%-pakket bewerken</target>
       </trans-unit>
+      <trans-unit id="DOJ2A06" resname="Edit the activity to finish the list, or remove it.">
+        <source>Edit the activity to finish the list, or remove it.</source>
+        <target state="translated">Bewerk de activiteit om de lijst af te maken, of verwijder de lijst.</target>
+      </trans-unit>
       <trans-unit id="Lb8PGCv" resname="Edit the draft">
         <source>Edit the draft</source>
         <target state="translated">Concept bewerken</target>
@@ -8788,6 +8792,10 @@
       <trans-unit id="B053q6m" resname="That upload could not be published; check what it says.">
         <source>That upload could not be published; check what it says.</source>
         <target state="translated">Die upload kon niet worden gepubliceerd; controleer wat erbij staat.</target>
+      </trans-unit>
+      <trans-unit id="esnqMPj" resname="The %part% of %list% has not been filled in, so this activity cannot be submitted or approved yet.">
+        <source>The %part% of %list% has not been filled in, so this activity cannot be submitted or approved yet.</source>
+        <target state="translated">De %part% van %list% is niet ingevuld, dus deze activiteit kan nog niet worden ingediend of goedgekeurd.</target>
       </trans-unit>
       <trans-unit id="s5IkPEB" resname="The GEWIS website is open-source! Check out the repository on &lt;a href=&quot;https://github.com/GEWIS/radix&quot; target=&quot;_blank&quot;&gt;&lt;span class=&quot;fab fa-github&quot;&gt;&lt;/span&gt;&amp;nbsp;GitHub&lt;/a&gt;%build%. Or visit our &lt;a href=&quot;https://github.com/GEWIS&quot; target=&quot;_blank&quot;&gt;organisation&lt;/a&gt; for more of our awesome open-source projects.">
         <source>The GEWIS website is open-source! Check out the repository on &lt;a href="https://github.com/GEWIS/radix" target="_blank"&gt;&lt;span class="fab fa-github"&gt;&lt;/span&gt;&amp;nbsp;GitHub&lt;/a&gt;%build%. Or visit our &lt;a href="https://github.com/GEWIS" target="_blank"&gt;organisation&lt;/a&gt; for more of our awesome open-source projects.</source>

@@ -44,12 +44,19 @@
         'activityPassed': activityPassed,
         'debutMissed': debutMissed,
         'migrationBlocked': migrationBlocked,
+        'unfinishedSignupList': unfinishedSignupList,
     } only %}
         {% block review_body %}
             {% include 'partials/activity/signup-list-diff.html.twig' with {'signupListDiff': signupListDiff} only %}
         {% endblock %}
 
         {% block review_notices %}
+            {% if unfinishedSignupList is not null %}
+                <div class="alert alert-warning small">
+                    {{ 'The %part% of %list% has not been filled in, so this activity cannot be submitted or approved yet.'|trans({'%part%': unfinishedSignupList.part, '%list%': unfinishedSignupList.name}) }}
+                    {{ 'Edit the activity to finish the list, or remove it.'|trans }}
+                </div>
+            {% endif %}
             {% if activityPassed %}
                 <div class="alert alert-warning small">
                     {% if debutMissed %}

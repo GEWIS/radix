@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\ViewModel\Activity\Admin;
 
 use App\Entity\Activity\SignupList;
-use App\Entity\Application\Enums\Languages;
 use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
+use App\Util\Activity\SignupListRule;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function count;
-use function trim;
 
 final readonly class SignupListOverviewRow
 {
@@ -37,9 +36,6 @@ final readonly class SignupListOverviewRow
         bool $locked,
         TranslatorInterface $translator,
     ): self {
-        $language = Languages::current();
-        $name = trim($list->getName()->getText($language) ?? '');
-
         $steps = [];
         foreach (SignupListSection::order() as $section) {
             $step = ActivityFlowType::listStep(
@@ -57,12 +53,11 @@ final readonly class SignupListOverviewRow
         return new self(
             id: $list->getId() ?? 0,
             position: $position,
-            name: '' === $name
-                ? $translator->trans(
-                    'Sign-up list %position%',
-                    ['%position%' => $position],
-                )
-                : $name,
+            name: SignupListRule::label(
+                $list,
+                $position,
+                $translator,
+            ),
             locked: $locked,
             chips: self::chips(
                 $list,

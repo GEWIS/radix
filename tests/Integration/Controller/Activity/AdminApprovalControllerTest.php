@@ -6,12 +6,15 @@ namespace App\Tests\Integration\Controller\Activity;
 
 use App\Controller\Activity\AdminApprovalController;
 use App\Entity\Activity\Activity;
+use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityRevision;
+use App\Entity\Activity\SignupList;
 use App\Entity\Application\EditLock;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\User\User;
 use App\Repository\Application\EditLockRepository;
+use App\Security\User\SudoMode;
 use App\Service\Activity\ActivityRevisionCloner;
 use App\Service\Application\EditLockService;
 use App\Tests\Integration\DatabaseTestCase;
@@ -118,6 +121,46 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
 
         $this->expectException(AccessDeniedException::class);
         $this->controller()->discard($draft);
+    }
+
+    public function testTheReviewScreenSaysWhichListWasLeftUnfinished(): void
+    {
+        $draft = $this->aNeverApprovedDraft();
+        $list = new SignupList();
+        $list->setName(new ActivityLocalisedText());
+        $draft->addSignupList($list);
+
+        $this->authenticateAsBoardWithSudo();
+
+        $html = (string) $this->controller()->review($draft)->getContent();
+
+        self::assertStringContainsString(
+            'Sign-up list 1',
+            $html,
+        );
+        self::assertStringContainsString(
+            'cannot be submitted or approved yet',
+            $html,
+        );
+    }
+
+    private function authenticateAsBoardWithSudo(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+
+        $session = $this->pushRequestWithSession();
+        $request = self::getContainer()->get('request_stack')->getCurrentRequest();
+        self::assertInstanceOf(
+            Request::class,
+            $request,
+        );
+        // A sudo grant is only read back off a session the request already carried, so the cookie has to be there.
+        $request->cookies->set(
+            $session->getName(),
+            'test',
+        );
+
+        self::getContainer()->get(SudoMode::class)->grant();
     }
 
     private function controller(): AdminApprovalController
