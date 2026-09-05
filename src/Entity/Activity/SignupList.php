@@ -1006,6 +1006,10 @@ class SignupList
      */
     public function getCohortTierOrder(): ?array
     {
+        if (!$this->onlyGEWIS) {
+            return null;
+        }
+
         return self::tierOrder(
             $this->cohortTierOrder,
             CohortTier::class,
@@ -1025,6 +1029,10 @@ class SignupList
      */
     public function getProgramTypeOrder(): ?array
     {
+        if (!$this->onlyGEWIS) {
+            return null;
+        }
+
         return self::tierOrder(
             $this->programTypeOrder,
             ProgramType::class,
@@ -1074,9 +1082,10 @@ class SignupList
 
     public function hasPriorityModifiers(): bool
     {
-        return null !== $this->membershipTierOrder
-            || null !== $this->cohortTierOrder
-            || null !== $this->programTypeOrder
+        // Through the getters: an order the list can no longer act on is stored but not held.
+        return null !== $this->getMembershipTierOrder()
+            || null !== $this->getCohortTierOrder()
+            || null !== $this->getProgramTypeOrder()
             || null !== $this->organisingCommitteeSeats
             || !$this->roles->isEmpty();
     }

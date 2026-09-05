@@ -20,7 +20,7 @@ enum MembershipPriorityMode: string implements TranslatableInterface
     ): string {
         return match ($this) {
             self::Ordering => $translator->trans(
-                'Serve the tiers in order',
+                'Admit the tiers in order',
                 locale: $locale,
             ),
             self::ReservedSeats => $translator->trans(

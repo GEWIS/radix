@@ -97,9 +97,9 @@
         <source>Choose an organising company, or say there is none.</source>
         <target state="translated">Choose an organising company, or say there is none.</target>
       </trans-unit>
-      <trans-unit id="XlDOtLj" resname="Choose how the membership tiers are served.">
-        <source>Choose how the membership tiers are served.</source>
-        <target>Choose how the membership tiers are served.</target>
+      <trans-unit id="afkV7G8" resname="Choose how the membership tiers are admitted.">
+        <source>Choose how the membership tiers are admitted.</source>
+        <target state="translated">Choose how the membership tiers are admitted.</target>
       </trans-unit>
       <trans-unit id="NrVT1pI" resname="Choose the job package this vacancy belongs to.">
         <source>Choose the job package this vacancy belongs to.</source>

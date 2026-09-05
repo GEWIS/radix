@@ -330,7 +330,7 @@ class SignupListType extends AbstractType
                     'label' => t('How the membership order is applied'),
                     'class' => MembershipPriorityMode::class,
                     'required' => false,
-                    'placeholder' => t('Choose how the tiers are served'),
+                    'placeholder' => t('Choose how the tiers are admitted'),
                 ],
             )
             ->add(
@@ -501,7 +501,7 @@ class SignupListType extends AbstractType
             && null === $list->getMembershipPriorityMode()
         ) {
             $context->buildViolation(t(
-                'Choose how the membership tiers are served.',
+                'Choose how the membership tiers are admitted.',
                 [],
                 'validators',
             )->getMessage())
@@ -1064,6 +1064,11 @@ class SignupListType extends AbstractType
             foreach ($list->getRoles()->toArray() as $role) {
                 $list->removeRole($role);
             }
+        }
+
+        if (!$list->getOnlyGEWIS()) {
+            $list->setCohortTierOrder(null);
+            $list->setProgramTypeOrder(null);
         }
 
         if (null === $list->getMembershipTierOrder()) {

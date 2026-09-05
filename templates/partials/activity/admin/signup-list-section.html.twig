@@ -120,9 +120,21 @@
                                 'data-action': 'change->signup-list#apply',
                             }}) }}
                         {% endset %}
-                        {{ helper.tier_modifier(fields.membershipTierOrder, fields.vars.membershipTierOrderTiers, 'Serve some members before others'|trans, membership_settings) }}
-                        {{ helper.tier_modifier(fields.programTypeOrder, fields.vars.programTypeOrderTiers, 'Serve some study phases before others'|trans) }}
-                        {{ helper.tier_modifier(fields.cohortTierOrder, fields.vars.cohortTierOrderTiers, 'Serve some cohorts before others'|trans) }}
+                        {{ helper.tier_modifier(
+                            fields.membershipTierOrder,
+                            fields.vars.membershipTierOrderTiers,
+                            'Admit some members before others'|trans,
+                            membership_settings,
+                            fields.vars.membershipSeats,
+                        ) }}
+                        {% if fields.vars.onlyGEWIS %}
+                            {{ helper.tier_modifier(fields.programTypeOrder, fields.vars.programTypeOrderTiers, 'Admit some study phases before others'|trans) }}
+                            {{ helper.tier_modifier(fields.cohortTierOrder, fields.vars.cohortTierOrderTiers, 'Admit some cohorts before others'|trans) }}
+                        {% else %}
+                            {# Left merely undrawn, a field comes back out of form_rest() at the foot of the form. #}
+                            {% do fields.programTypeOrder.setRendered %}
+                            {% do fields.cohortTierOrder.setRendered %}
+                        {% endif %}
                         <hr>
                         <h6>{{ 'Reserved seats'|trans }}</h6>
                         <p class="form-text mt-0">

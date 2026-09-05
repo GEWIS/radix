@@ -45,17 +45,12 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             $step,
         );
 
-        // Each modifier is a tier-order control with its tiers in the order the list serves them.
         self::assertSame(
             3,
             substr_count(
                 $html,
                 'data-controller="tier-order"',
             ),
-        );
-        self::assertStringContainsString(
-            'data-tier-order-value-param="non-member"',
-            $html,
         );
         self::assertStringContainsString(
             'data-tier-order-value-param="third-year-and-above"',
@@ -72,9 +67,14 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             ),
             (int) strpos(
                 $html,
-                'data-tier-order-value-param="non-member"',
+                'data-tier-order-value-param="graduate"',
             ),
         );
+        self::assertStringNotContainsString(
+            'data-tier-order-value-param="non-member"',
+            $html,
+        );
+        // The seats are asked for on the rank they are held for, inside the order itself.
         self::assertStringContainsString(
             'data-tier-order-target="seats"',
             $html,
@@ -117,6 +117,41 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         );
         self::assertStringContainsString(
             'tier-order-entry--tied',
+            $html,
+        );
+    }
+
+    public function testAnOpenListIsNotOfferedTheStudyPhaseOrTheCohort(): void
+    {
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+        $list->setOnlyGEWIS(false);
+
+        $html = $this->renderStep(
+            $revision,
+            ActivityFlowType::listStep(
+                $list,
+                SignupListSection::Allocation,
+            ),
+        );
+
+        self::assertSame(
+            1,
+            substr_count(
+                $html,
+                'data-controller="tier-order"',
+            ),
+        );
+        self::assertStringNotContainsString(
+            'data-tier-order-value-param="bachelor"',
+            $html,
+        );
+        self::assertStringNotContainsString(
+            'data-tier-order-value-param="third-year-and-above"',
+            $html,
+        );
+        self::assertStringContainsString(
+            'data-tier-order-value-param="non-member"',
             $html,
         );
     }
@@ -375,12 +410,12 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         ));
         $list->setOpenDate(new DateTime('2030-01-01 12:00'));
         $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+        $list->setOnlyGEWIS(true);
         $list->setLimitedCapacity(true);
         $list->setCapacity(10);
         $list->setMembershipTierOrder([
-            [MembershipTier::NonMember],
-            [MembershipTier::Ordinary],
             [MembershipTier::Graduate],
+            [MembershipTier::Ordinary],
         ]);
         $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedSeats);
         $list->setHeldMembershipSeats([MembershipTier::Ordinary->value => 2]);

@@ -208,9 +208,10 @@ final class AdmissionOrderTest extends TestCase
         );
     }
 
-    public function testMasterStudentsCanBeServedBeforeBachelorStudents(): void
+    public function testMasterStudentsCanBeAdmittedBeforeBachelorStudents(): void
     {
         $list = $this->list();
+        $list->setOnlyGEWIS(true);
         $list->setProgramTypeOrder([
             [ProgramType::Master],
             [ProgramType::Bachelor],
@@ -246,14 +247,18 @@ final class AdmissionOrderTest extends TestCase
         );
     }
 
-    public function testFreshmenCanBeServedFirst(): void
+    public function testFreshmenCanBeAdmittedFirst(): void
     {
         $list = $this->list();
+        $list->setOnlyGEWIS(true);
         $list->setCohortTierOrder(self::ranks(CohortTier::defaultOrder()));
 
         $current = AssociationYear::fromDate(new DateTime())->getYear();
         $pool = [
-            $this->external('external'),
+            $this->member(
+                'no-cohort',
+                generation: 0,
+            ),
             $this->member(
                 'senior',
                 generation: $current - 4,
@@ -273,7 +278,7 @@ final class AdmissionOrderTest extends TestCase
                 'freshman',
                 'second-year',
                 'senior',
-                'external',
+                'no-cohort',
             ],
             $this->arrange(
                 $list,

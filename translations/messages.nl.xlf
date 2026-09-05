@@ -1057,6 +1057,26 @@
         <source>Admit people by hand with the toggles below.</source>
         <target>Laat mensen handmatig toe met de schakelaars hieronder.</target>
       </trans-unit>
+      <trans-unit id="w5kXrky" resname="Admit some cohorts before others">
+        <source>Admit some cohorts before others</source>
+        <target state="translated">Sommige generaties eerder toelaten dan andere</target>
+      </trans-unit>
+      <trans-unit id="vk4PXFr" resname="Admit some members before others">
+        <source>Admit some members before others</source>
+        <target state="translated">Sommige leden eerder toelaten dan andere</target>
+      </trans-unit>
+      <trans-unit id="ZzobUA3" resname="Admit some study phases before others">
+        <source>Admit some study phases before others</source>
+        <target state="translated">Sommige studiefasen eerder toelaten dan andere</target>
+      </trans-unit>
+      <trans-unit id="rZCri9_" resname="Admit the tiers in order">
+        <source>Admit the tiers in order</source>
+        <target state="translated">De groepen op volgorde toelaten</target>
+      </trans-unit>
+      <trans-unit id="phJn6n2" resname="Admit this tier together with the one above it">
+        <source>Admit this tier together with the one above it</source>
+        <target state="translated">Deze groep tegelijk toelaten met de groep erboven</target>
+      </trans-unit>
       <trans-unit id="_Evwb08" resname="Admitted">
         <source>Admitted</source>
         <target>Toegelaten</target>
@@ -2029,9 +2049,9 @@
         <source>Choose an option</source>
         <target>Kies een optie</target>
       </trans-unit>
-      <trans-unit id="NCcCAUZ" resname="Choose how the tiers are served">
-        <source>Choose how the tiers are served</source>
-        <target>Kies hoe de groepen bediend worden</target>
+      <trans-unit id="dL0l59Z" resname="Choose how the tiers are admitted">
+        <source>Choose how the tiers are admitted</source>
+        <target state="translated">Kies hoe de groepen worden toegelaten</target>
       </trans-unit>
       <trans-unit id="vZloDGs" resname="Choose when the draw happens">
         <source>Choose when the draw happens</source>
@@ -8124,22 +8144,6 @@
       <trans-unit id="94BV7cN" resname="Sensitive (only visible to the board and organiser)">
         <source>Sensitive (only visible to the board and organiser)</source>
         <target state="translated">Gevoelig (alleen zichtbaar voor het bestuur en de organisator)</target>
-      </trans-unit>
-      <trans-unit id="KJeGhvV" resname="Serve some cohorts before others">
-        <source>Serve some cohorts before others</source>
-        <target>Sommige generaties voor andere bedienen</target>
-      </trans-unit>
-      <trans-unit id="XyctnSG" resname="Serve some members before others">
-        <source>Serve some members before others</source>
-        <target>Sommige leden voor andere bedienen</target>
-      </trans-unit>
-      <trans-unit id="7AvZ9u0" resname="Serve some study phases before others">
-        <source>Serve some study phases before others</source>
-        <target>Sommige studiefasen voor andere bedienen</target>
-      </trans-unit>
-      <trans-unit id="vGapTXQ" resname="Serve the tiers in order">
-        <source>Serve the tiers in order</source>
-        <target>De groepen op volgorde bedienen</target>
       </trans-unit>
       <trans-unit id="K84Ihek" resname="Sessions">
         <source>Sessions</source>

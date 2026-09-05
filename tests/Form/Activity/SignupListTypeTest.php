@@ -373,6 +373,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAnOrderThatNamesNoTierIsTheModifierSwitchedOff(): void
     {
         $list = $this->list();
+        $list->setOnlyGEWIS(true);
         $form = $this->submitList(
             [
                 'membershipTierOrder' => '',
@@ -399,9 +400,28 @@ final class SignupListTypeTest extends TypeTestCase
         );
     }
 
+    public function testAnOpenListRanksOnNeitherStudyPhaseNorCohort(): void
+    {
+        $list = $this->list();
+        $list->setOnlyGEWIS(false);
+
+        $this->submitList(
+            [
+                'cohortTierOrder' => 'first-year,second-year,third-year-and-above,unknown',
+                'programTypeOrder' => 'master,bachelor,doctorate,other',
+            ],
+            $list,
+        );
+
+        self::assertNull($list->getCohortTierOrder());
+        self::assertNull($list->getProgramTypeOrder());
+        self::assertFalse($list->hasPriorityModifiers());
+    }
+
     public function testAnIncompleteOrderIsCompletedWithTheTiersItLeftOut(): void
     {
         $list = $this->list();
+        $list->setOnlyGEWIS(true);
         $this->submitList(
             ['cohortTierOrder' => 'unknown'],
             $list,
