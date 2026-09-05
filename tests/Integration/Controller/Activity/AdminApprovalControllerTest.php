@@ -8,6 +8,7 @@ use App\Controller\Activity\AdminApprovalController;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityRevision;
+use App\Entity\Activity\ActivityRevisionEdit;
 use App\Entity\Activity\SignupList;
 use App\Entity\Application\EditLock;
 use App\Entity\Application\Enums\AlertTypes;
@@ -18,6 +19,7 @@ use App\Security\User\SudoMode;
 use App\Service\Activity\ActivityRevisionCloner;
 use App\Service\Application\EditLockService;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTime;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -123,6 +125,74 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
 
         $this->expectException(AccessDeniedException::class);
         $this->controller()->discard($draft);
+    }
+
+    public function testDiscardTakesTheEditTrailWithIt(): void
+    {
+        $activity = $this->anApprovedActivityWithoutSignupLists();
+        $live = $activity->getLiveRevision();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $live,
+        );
+
+        $draft = $this->cloner()->cloneAsDraft($live);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $draft,
+        );
+        $this->entityManager->persist($draft);
+
+        $draft->setLastEditedBy($this->user(8025));
+        $list = new SignupList();
+        $list->setName(new ActivityLocalisedText(
+            'Deelnemers',
+            'Participants',
+        ));
+        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
+        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+        $draft->addSignupList($list);
+
+        $edit = new ActivityRevisionEdit();
+        $edit->setRevision($draft);
+        $edit->setEditor($this->user(8025));
+        $edit->setEditedAt(new DateTime());
+        $edit->setChangedFields(['name']);
+        $this->entityManager->persist($edit);
+        $this->entityManager->flush();
+
+        $draftId = (int) $draft->getId();
+        $this->entityManager->clear();
+        $draft = $this->entityManager->getRepository(ActivityRevision::class)->find($draftId);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $draft,
+        );
+
+        $this->authenticate(['ROLE_BOARD']);
+        $this->pushRequestWithSession();
+
+        $this->controller()->discard($draft);
+
+        self::assertNull(
+            $this->entityManager->getRepository(ActivityRevision::class)->find($draftId),
+        );
+        self::assertSame(
+            [],
+            $this->entityManager->createQueryBuilder()
+                ->select('e')
+                ->from(
+                    ActivityRevisionEdit::class,
+                    'e',
+                )
+                ->where('IDENTITY(e.revision) = :revision')
+                ->setParameter(
+                    'revision',
+                    $draftId,
+                )
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     public function testTheReviewScreenSaysWhichListWasLeftUnfinished(): void

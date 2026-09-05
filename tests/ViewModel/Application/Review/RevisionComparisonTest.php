@@ -6,24 +6,25 @@ namespace App\Tests\ViewModel\Application\Review;
 
 use App\Entity\Activity\ActivityLocalisedText;
 use App\ViewModel\Application\Review\RevisionAudience;
+use App\ViewModel\Application\Review\RevisionChangeKind;
 use App\ViewModel\Application\Review\RevisionComparison;
 use App\ViewModel\Application\Review\RevisionDateRange;
 use App\ViewModel\Application\Review\RevisionField;
-use App\ViewModel\Application\Review\RevisionChangeKind;
 use App\ViewModel\Application\Review\RevisionFieldKind;
 use App\ViewModel\Application\Review\RevisionFieldValue;
 use App\ViewModel\Application\Review\RevisionFlag;
-use App\ViewModel\Application\Review\RevisionTag;
 use App\ViewModel\Application\Review\RevisionSection;
+use App\ViewModel\Application\Review\RevisionTag;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatableMessage;
+
+use function array_values;
 
 /**
  * What the author of a revision is shown against what its reviewer is shown, and when a value counts as changed. Both
  * decide what a reader sees, and both were previously spread across four templates that had quietly drifted apart.
  */
-use function array_values;
 
 final class RevisionComparisonTest extends TestCase
 {
