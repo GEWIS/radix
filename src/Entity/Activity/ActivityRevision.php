@@ -61,6 +61,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -76,6 +77,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -91,6 +93,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -106,6 +109,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(

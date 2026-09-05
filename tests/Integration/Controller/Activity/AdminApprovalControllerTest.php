@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use function str_contains;
+
 /**
  * The review controller is thin glue over already-tested pieces (the workflow, {@see RevisionDiscarder},
  * {@see EditLockService}, {@see \App\Form\Application\ReviewDecisionType}); these pin its own discard action, the
@@ -144,6 +146,38 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         );
     }
 
+    public function testTheReviewScreenReadsNoLocalisedTextOnItsOwn(): void
+    {
+        $revision = $this->aRevisionWithSignupLists();
+
+        $this->authenticateAsBoardWithSudo();
+        $holder = self::getContainer()->get('doctrine.debug_data_holder');
+        $holder->reset();
+
+        $this->controller()->review($revision);
+
+        $texts = 0;
+        foreach ($holder->getData() as $queries) {
+            foreach ($queries as $query) {
+                if (
+                    !str_contains(
+                        $query['sql'],
+                        'FROM ActivityLocalisedText',
+                    )
+                ) {
+                    continue;
+                }
+
+                ++$texts;
+            }
+        }
+
+        self::assertSame(
+            0,
+            $texts,
+        );
+    }
+
     private function authenticateAsBoardWithSudo(): void
     {
         $this->authenticate(['ROLE_BOARD']);
@@ -250,6 +284,31 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         );
 
         return $activity;
+    }
+
+    private function aRevisionWithSignupLists(): ActivityRevision
+    {
+        $revision = $this->entityManager->createQueryBuilder()
+            ->select('r')
+            ->from(
+                ActivityRevision::class,
+                'r',
+            )
+            ->where('SIZE(r.signupLists) > 0')
+            ->orderBy(
+                'SIZE(r.signupLists)',
+                'DESC',
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $revision,
+            'The seed is expected to contain a revision with sign-up lists.',
+        );
+
+        return $revision;
     }
 
     private function aNeverApprovedDraft(): ActivityRevision
