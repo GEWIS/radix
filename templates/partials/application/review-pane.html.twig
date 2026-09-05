@@ -1,0 +1,88 @@
+{% import _self as panemacro %}
+
+{% macro cell(field, value) %}
+    <div class="review-cell">
+        <div class="review-cell__box{{ 'long-text' == field.kind.value ? ' review-cell__box--lines' }}">
+            {% include 'partials/application/revision-field.html.twig' with {'field': field, 'value': value} only %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro language_head() %}
+    <div class="review-row review-row--head">
+        <div class="review-row__label"></div>
+        <div class="review-row__cells review-row__cells--pair">
+            <div class="review-cell__lang"><span class="flag-icon flag-icon-nl"></span> {{ 'Dutch'|trans }}</div>
+            <div class="review-cell__lang"><span class="flag-icon flag-icon-en"></span> {{ 'English'|trans }}</div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro row(field, wholesale) %}
+    {% import _self as self %}
+    {% set kind = field.changeKind %}
+    <div class="review-row{{ 'same' == kind.value ? ' is-unchanged' }}">
+        <div class="review-row__label">
+            <span>{{ field.label|trans }}</span>
+            {% if 'same' != kind.value and not wholesale|default(false) %}
+                <span class="badge {{ kind.badgeClass }} align-self-start">{{ kind|trans }}</span>
+            {% endif %}
+        </div>
+        <div class="review-row__cells{{ field.localised ? ' review-row__cells--pair' }}">
+            {% for value in field.values %}
+                {{ self.cell(field, value) }}
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro rows(fields, wholesale) %}
+    {% import _self as self %}
+    <div class="review-rows">
+        {% set named = false %}
+        {% for field in fields %}
+            {% if field.localised and not named %}
+                {{ self.language_head() }}
+                {% set named = true %}
+            {% endif %}
+            {{ self.row(field, wholesale|default(false)) }}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% set changed = section.changeCount %}
+{% set wholesale = section.group is not null and section.group.kind.value in ['added', 'removed'] %}
+<div class="panel review-pane{{ wholesale ? ' review-pane--' ~ section.group.kind.value }}">
+    <div class="panel-heading review-pane__heading">
+        <div>
+            <h3>{{ section.heading|trans }}</h3>
+            <p class="text-muted small mb-0">
+                {% if section.description is not null %}{{ section.description }}{% endif %}
+                {% if changed > 0 %}
+                    {{ '%changed% of %total% changed in this revision; the rest is left as it was.'|trans({
+                        '%changed%': changed,
+                        '%total%': section.itemCount,
+                    }) }}
+                {% else %}
+                    {{ 'Nothing here changed in this revision.'|trans }}
+                {% endif %}
+            </p>
+        </div>
+        <span class="review-legend">
+            <span class="badge badge-danger"><s>{{ 'removed'|trans }}</s></span>
+            <span class="badge badge-success">{{ 'added'|trans }}</span>
+        </span>
+    </div>
+    <div class="panel-body review-pane__body">
+        {% if section.entries is not empty %}
+            {% include 'partials/application/review-entries.html.twig' with {
+                'entries': section.entries,
+                'wholesale': wholesale,
+            } only %}
+        {% elseif section.fields is empty %}
+            <p class="text-muted small mb-0">{{ 'Nothing is filled in here.'|trans }}</p>
+        {% else %}
+            {{ panemacro.rows(section.fields, wholesale) }}
+        {% endif %}
+    </div>
+</div>

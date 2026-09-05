@@ -8,20 +8,24 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 use function array_filter;
 use function array_values;
+use function count;
 
-/**
- * One panel of a comparison. Fields that are written per language are laid out in the language columns underneath
- * whatever the section says once, which is the order every review screen already used by hand.
- */
 final readonly class RevisionSection
 {
     /**
+     * @param string              $key     names the section in an address, so a reviewer can be sent to it and come
+     *                                     back to it; stable across revisions
      * @param list<RevisionField> $fields
+     * @param list<RevisionEntry> $entries
      */
     public function __construct(
+        public string $key,
         public TranslatableInterface $heading,
         public array $fields,
         public RevisionAudience $audience = RevisionAudience::Everyone,
+        public array $entries = [],
+        public ?RevisionSectionGroup $group = null,
+        public ?string $description = null,
     ) {
     }
 
@@ -47,6 +51,33 @@ final readonly class RevisionSection
         ));
     }
 
+    public function changeCount(): int
+    {
+        if ([] !== $this->entries) {
+            return count(array_filter(
+                $this->entries,
+                static fn (RevisionEntry $entry): bool => $entry->kind->isChange(),
+            ));
+        }
+
+        return count(array_filter(
+            $this->fields,
+            static fn (RevisionField $field): bool => $field->changeKind()->isChange(),
+        ));
+    }
+
+    public function itemCount(): int
+    {
+        return [] !== $this->entries
+            ? count($this->entries)
+            : count($this->fields);
+    }
+
+    public function hasChanges(): bool
+    {
+        return $this->changeCount() > 0;
+    }
+
     /**
      * The same section with only the fields {@see $audience} is allowed to see, or null when that leaves nothing.
      */
@@ -61,14 +92,22 @@ final readonly class RevisionSection
             static fn (RevisionField $field): bool => $audience->canSee($field->audience),
         ));
 
-        if ([] === $fields) {
+        if (
+            [] === $fields
+            && [] === $this->entries
+            && null === $this->group
+        ) {
             return null;
         }
 
         return new self(
+            $this->key,
             $this->heading,
             $fields,
             $this->audience,
+            $this->entries,
+            $this->group,
+            $this->description,
         );
     }
 }

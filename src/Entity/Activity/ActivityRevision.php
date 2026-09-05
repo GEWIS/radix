@@ -251,6 +251,21 @@ class ActivityRevision extends AbstractRevision
         return $this->signupLists;
     }
 
+    /**
+     * The lists by the lineage they carry, which is how a list is told apart across revisions.
+     *
+     * @return array<string, SignupList>
+     */
+    public function getSignupListsByLineage(): array
+    {
+        $byLineage = [];
+        foreach ($this->signupLists as $list) {
+            $byLineage[$list->getLineageId()->toRfc4122()] = $list;
+        }
+
+        return $byLineage;
+    }
+
     public function addSignupList(SignupList $signupList): void
     {
         if ($this->signupLists->contains($signupList)) {

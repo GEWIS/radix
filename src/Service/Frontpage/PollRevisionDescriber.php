@@ -67,6 +67,7 @@ final class PollRevisionDescriber extends AbstractRevisionDescriber
 
         return [
             new RevisionSection(
+                'question',
                 t('Question'),
                 [
                     $this->localisedField(
@@ -78,6 +79,7 @@ final class PollRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'answers',
                 t('Answers'),
                 $answers,
             ),

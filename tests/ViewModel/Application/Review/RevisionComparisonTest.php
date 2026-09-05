@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\ViewModel\Application\Review;
 
+use App\Entity\Activity\ActivityLocalisedText;
 use App\ViewModel\Application\Review\RevisionAudience;
 use App\ViewModel\Application\Review\RevisionComparison;
 use App\ViewModel\Application\Review\RevisionDateRange;
 use App\ViewModel\Application\Review\RevisionField;
+use App\ViewModel\Application\Review\RevisionChangeKind;
 use App\ViewModel\Application\Review\RevisionFieldKind;
 use App\ViewModel\Application\Review\RevisionFieldValue;
+use App\ViewModel\Application\Review\RevisionFlag;
+use App\ViewModel\Application\Review\RevisionTag;
 use App\ViewModel\Application\Review\RevisionSection;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +23,8 @@ use Symfony\Component\Translation\TranslatableMessage;
  * What the author of a revision is shown against what its reviewer is shown, and when a value counts as changed. Both
  * decide what a reader sees, and both were previously spread across four templates that had quietly drifted apart.
  */
+use function array_values;
+
 final class RevisionComparisonTest extends TestCase
 {
     public function testAnAuthorIsNotShownAReviewerOnlySection(): void
@@ -107,6 +113,85 @@ final class RevisionComparisonTest extends TestCase
         self::assertTrue($changed->isChanged());
     }
 
+    public function testASetOfSwitchesNobodyTouchedHasNotChanged(): void
+    {
+        $unchanged = $this->flagField(
+            new RevisionFlag(
+                new TranslatableMessage('GEFLITST'),
+                false,
+                false,
+            ),
+            new RevisionFlag(
+                new TranslatableMessage('Zettle'),
+                true,
+                true,
+            ),
+        );
+        $changed = $this->flagField(
+            new RevisionFlag(
+                new TranslatableMessage('GEFLITST'),
+                false,
+                true,
+            ),
+        );
+
+        self::assertSame(
+            RevisionChangeKind::Same,
+            $unchanged->changeKind(),
+        );
+        self::assertSame(
+            RevisionChangeKind::Changed,
+            $changed->changeKind(),
+        );
+    }
+
+    public function testLabelsAreComparedByWhichOnesTheyAreRatherThanByTheirOrder(): void
+    {
+        $reordered = new RevisionFieldValue(
+            [
+                $this->tag(1),
+                $this->tag(2),
+            ],
+            [
+                $this->tag(2),
+                $this->tag(1),
+            ],
+        );
+        $swapped = new RevisionFieldValue(
+            [$this->tag(1)],
+            [$this->tag(3)],
+        );
+
+        self::assertFalse($reordered->isChanged());
+        self::assertTrue($swapped->isChanged());
+    }
+
+    private function tag(int $id): RevisionTag
+    {
+        return new RevisionTag(
+            $id,
+            new ActivityLocalisedText(
+                'Label',
+                'Label',
+            ),
+        );
+    }
+
+    private function flagField(RevisionFlag ...$flags): RevisionField
+    {
+        return new RevisionField(
+            new TranslatableMessage('Facilities'),
+            RevisionFieldKind::Flag,
+            [
+                new RevisionFieldValue(
+                    null,
+                    array_values($flags),
+                ),
+            ],
+            true,
+        );
+    }
+
     /**
      * A field is only comparable once there is an earlier revision to compare it against, and the renderer shows a
      * change only for a field that is.
@@ -135,15 +220,18 @@ final class RevisionComparisonTest extends TestCase
     {
         return new RevisionComparison([
             new RevisionSection(
+                'everybody',
                 new TranslatableMessage('Everybody'),
                 [$this->textField('Slogan')],
             ),
             new RevisionSection(
+                'reviewers',
                 new TranslatableMessage('Reviewers'),
                 [$this->textField('Internal note')],
                 RevisionAudience::ReviewerOnly,
             ),
             new RevisionSection(
+                'mixed',
                 new TranslatableMessage('Mixed'),
                 [
                     $this->textField('Shared'),

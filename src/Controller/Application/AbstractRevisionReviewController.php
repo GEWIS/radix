@@ -10,6 +10,7 @@ use App\Entity\User\CompanyUser;
 use App\Entity\User\User;
 use App\Security\Application\RevisionVoter;
 use App\Security\User\SudoVoter;
+use App\ViewModel\Application\Review\ReviewOutline;
 use App\ViewModel\Application\Review\RevisionAudience;
 use App\ViewModel\Application\RevisionActions;
 use Symfony\Component\Form\FormInterface;
@@ -29,6 +30,8 @@ use function trim;
  */
 abstract class AbstractRevisionReviewController extends AbstractRevisionController
 {
+    public const string SECTION_KEY = 'section';
+
     /**
      * The template this domain renders its review screen with.
      */
@@ -93,16 +96,33 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
         $actions = $this->revisionActions($revision);
         $form ??= $this->createDecisionForm($actions);
         $previous = $revision->getPreviousRevision();
+        $sections = $this->revisionDescribers->describe(
+            $revision,
+            $previous,
+        )->sectionsFor($this->reviewAudience());
+
+        $section = ReviewOutline::sectionFor(
+            $sections,
+            strval($this->requestStack->getCurrentRequest()?->query->get(self::SECTION_KEY) ?? ''),
+        );
+        $outline = ReviewOutline::of(
+            $sections,
+            null === $section ? '' : $section->key,
+            $this->translator,
+        );
 
         return $this->render(
             $this->reviewTemplate(),
             [
                 'revision' => $revision,
                 'previous' => $previous,
-                'sections' => $this->revisionDescribers->describe(
-                    $revision,
-                    $previous,
-                )->sectionsFor($this->reviewAudience()),
+                'sections' => $sections,
+                'section' => $section,
+                'outline' => $outline,
+                'nextChange' => ReviewOutline::nextChangeAfter(
+                    $sections,
+                    $outline->activeKey,
+                ),
                 'decisionForm' => $form->createView(),
                 'canDiscard' => $actions->isDiscardable,
                 ...$this->reviewContext(

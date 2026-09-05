@@ -18,6 +18,12 @@ final readonly class RevisionDateRange
     ) {
     }
 
+    public function holds(): bool
+    {
+        return null !== $this->start
+            || null !== $this->end;
+    }
+
     public function equals(self $other): bool
     {
         return $this->timestamp($this->start) === $this->timestamp($other->start)

@@ -17,13 +17,12 @@ use Override;
 use function assert;
 use function Symfony\Component\Translation\t;
 
-/**
- * What an activity is, when and where it happens and what it asks the association for. Its sign-up lists are not here:
- * they are a structure of their own, matched by lineage rather than compared field by field, and the activity review
- * screen renders them itself.
- */
 final class ActivityRevisionDescriber extends AbstractRevisionDescriber
 {
+    public function __construct(private readonly SignupListSections $signupLists)
+    {
+    }
+
     #[Override]
     protected function revisionClass(): string
     {
@@ -44,6 +43,7 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
 
         return [
             new RevisionSection(
+                'general',
                 t('General information'),
                 [
                     $this->field(
@@ -116,6 +116,7 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'details',
                 t('Details'),
                 [
                     $this->localisedField(
@@ -144,6 +145,11 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                         RevisionFieldKind::LongText,
                     ),
                 ],
+            ),
+            ...$this->signupLists->sections(
+                $revision,
+                $previous,
+                $comparable,
             ),
         ];
     }

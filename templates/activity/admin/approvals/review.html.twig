@@ -27,6 +27,9 @@
         'revision': revision,
         'previous': previous,
         'sections': sections,
+        'section': section,
+        'outline': outline,
+        'nextChange': nextChange,
         'comments': comments,
         'decisionForm': decisionForm,
         'canDiscard': canDiscard,
@@ -40,16 +43,11 @@
         'discardAction': path('admin/activities/approvals/discard', {'revision': revision.getId}),
         'discardToken': csrf_token('activity_discard-' ~ revision.getId),
         'discardBody': 'The changes in this draft will be lost and the activity will return to its live version.'|trans,
-        'signupListDiff': signupListDiff,
         'activityPassed': activityPassed,
         'debutMissed': debutMissed,
         'migrationBlocked': migrationBlocked,
         'unfinishedSignupList': unfinishedSignupList,
     } only %}
-        {% block review_body %}
-            {% include 'partials/activity/signup-list-diff.html.twig' with {'signupListDiff': signupListDiff} only %}
-        {% endblock %}
-
         {% block review_notices %}
             {% if unfinishedSignupList is not null %}
                 <div class="alert alert-warning small">

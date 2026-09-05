@@ -1,0 +1,96 @@
+{% import _self as outlinemacro %}
+
+{% macro section_url(key) %}
+    {# Off the address itself rather than off the route, so a screen reached under any name keeps whatever else it
+       was asked with. #}
+    {{- app.request.pathInfo }}?{{ app.request.query.all|merge({'section': key})|url_encode -}}
+{% endmacro %}
+
+{% macro count(step) %}
+    {%- if step.changeCount > 0 -%}
+        <span class="review-outline__count">{{ step.changeCount }}</span>
+    {%- endif -%}
+{% endmacro %}
+
+<ol class="form-stepper review-outline" role="tablist">
+    {% for step in outline.topSteps %}
+        <li class="form-stepper__step" role="presentation">
+            <a class="form-stepper__btn{{ step.active ? ' active' : (step.passed ? ' is-complete') }}" role="tab"
+               {% if step.active %}aria-current="step"{% endif %}
+               href="{{ outlinemacro.section_url(step.key) }}">
+                <span class="form-stepper__num">
+                    {{ step.position }}{{ outlinemacro.count(step) }}
+                </span>
+                <span class="form-stepper__label">{{ step.label }}</span>
+                {% if step.sub is not null %}
+                    <span class="review-outline__sub">{{ step.sub }}</span>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+</ol>
+
+{% if outline.groupBar is not null %}
+    {% set bar = outline.groupBar %}
+    <div class="form-stepper-group">
+        <div class="dropdown">
+            <button type="button" class="form-stepper-group__current dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <span class="signup-list-badge">{{ bar.position }}</span>
+                <span class="form-stepper-group__naming">
+                    <span class="form-stepper-group__name">{{ bar.group.label }}</span>
+                    <span class="form-stepper-group__position">
+                        {{ '%position% of %total%'|trans({'%position%': bar.position, '%total%': bar.total}) }}
+                    </span>
+                </span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><h6 class="dropdown-header">{{ bar.group.collectionLabel|trans }}</h6></li>
+                {% for sibling in bar.siblings %}
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2{{ sibling.current ? ' active' }}"
+                           href="{{ outlinemacro.section_url(sibling.key) }}">
+                            <span class="signup-list-badge signup-list-badge--muted">{{ sibling.position }}</span>
+                            <span class="flex-grow-1 text-truncate">{{ sibling.label }}</span>
+                            <span class="text-body-secondary small">
+                                {{ sibling.changeCount > 0
+                                    ? '%count% changed'|trans({'%count%': sibling.changeCount})
+                                    : 'Unchanged'|trans }}
+                            </span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <ul class="nav nav-pills" role="tablist">
+            {% for step in bar.steps %}
+                {% set marked %}
+                    <span class="badge">{{ step.position }}</span>{{ step.label }}
+                    {%- if step.changeCount > 0 %}
+                        <span class="badge review-outline__changed">{{ step.changeCount }}</span>
+                    {%- endif %}
+                {% endset %}
+                <li class="nav-item" role="presentation">
+                    {% if step.active %}
+                        <span class="nav-link active" role="tab" aria-current="step">{{ marked }}</span>
+                    {% else %}
+                        <a class="nav-link" role="tab"
+                           href="{{ outlinemacro.section_url(step.key) }}">{{ marked }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <span class="form-stepper-group__nav">
+            {% if bar.previousKey is not null %}
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="{{ outlinemacro.section_url(bar.previousKey) }}">{{ 'Previous'|trans }}</a>
+            {% endif %}
+            {% if bar.nextKey is not null %}
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="{{ outlinemacro.section_url(bar.nextKey) }}">{{ 'Next'|trans }}</a>
+            {% endif %}
+        </span>
+    </div>
+{% endif %}

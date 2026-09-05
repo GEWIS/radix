@@ -6,7 +6,6 @@ namespace App\Controller\Activity;
 
 use App\Controller\Application\AbstractRevisionReviewController;
 use App\Entity\Activity\ActivityRevision;
-use App\Entity\Activity\SignupList;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
@@ -215,10 +214,6 @@ class AdminApprovalController extends AbstractRevisionReviewController
             'migrationBlocked' => $migrationBlocked,
             'activityPassed' => $liveEnded || $debutMissed,
             'debutMissed' => $debutMissed,
-            'signupListDiff' => $this->buildSignupListDiff(
-                $revision,
-                $revision->getPreviousRevision(),
-            ),
             'unfinishedSignupList' => null === $unfinished ? null : [
                 'name' => SignupListRule::label(
                     $unfinished['list'],
@@ -237,74 +232,5 @@ class AdminApprovalController extends AbstractRevisionReviewController
             'admin/activities/approvals/review',
             ['revision' => $revision->getId()],
         );
-    }
-
-    /**
-     * Match the revision's sign-up lists to the previous revision's by lineage, so the review screen can pair each
-     * list with its counterpart (for a field-by-field diff) and flag the ones that are new or were removed. Each
-     * present entry also carries `liveAdmitted`: how many sign-ups are already admitted (drawn) on the live revision's
-     * counterpart, so the screen can warn when a lowered capacity would sit below the people already let in.
-     *
-     * @return array{
-     *     present: list<array{list: SignupList, previous: SignupList|null, liveAdmitted: int}>,
-     *     removed: list<SignupList>,
-     * }
-     */
-    private function buildSignupListDiff(
-        ActivityRevision $revision,
-        ?ActivityRevision $previous,
-    ): array {
-        $previousByLineage = [];
-        foreach ($previous?->getSignupLists() ?? [] as $list) {
-            $previousByLineage[$list->getLineageId()->toRfc4122()] = $list;
-        }
-
-        // How many are already admitted on each live list (by lineage), so a capacity drop below it can be flagged.
-        // Only meaningful for a live list that was itself limited: on an unlimited list every sign-up is drawn by
-        // default (no draw ever ran), so counting it would raise a bogus "capacity below admitted" warning.
-        $liveAdmittedByLineage = [];
-        foreach ($revision->getActivity()->getLiveRevision()?->getSignupLists() ?? [] as $liveList) {
-            if (!$liveList->getLimitedCapacity()) {
-                continue;
-            }
-
-            $admitted = 0;
-            foreach ($liveList->getSignUps() as $signup) {
-                if (!$signup->isDrawn()) {
-                    continue;
-                }
-
-                ++$admitted;
-            }
-
-            $liveAdmittedByLineage[$liveList->getLineageId()->toRfc4122()] = $admitted;
-        }
-
-        $present = [];
-        $seen = [];
-        foreach ($revision->getSignupLists() as $list) {
-            $key = $list->getLineageId()->toRfc4122();
-            $seen[$key] = true;
-            $counterpart = $previousByLineage[$key] ?? null;
-            $present[] = [
-                'list' => $list,
-                'previous' => $counterpart,
-                'liveAdmitted' => $liveAdmittedByLineage[$key] ?? 0,
-            ];
-        }
-
-        $removed = [];
-        foreach ($previousByLineage as $key => $list) {
-            if (isset($seen[$key])) {
-                continue;
-            }
-
-            $removed[] = $list;
-        }
-
-        return [
-            'present' => $present,
-            'removed' => $removed,
-        ];
     }
 }

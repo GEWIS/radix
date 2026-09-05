@@ -43,6 +43,7 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
 
         return [
             new RevisionSection(
+                'general',
                 t('General information'),
                 [
                     $this->field(
@@ -90,6 +91,7 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'details',
                 t('Details'),
                 [
                     $this->localisedField(
@@ -126,6 +128,7 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'contact',
                 t('Contact details'),
                 [
                     $this->field(

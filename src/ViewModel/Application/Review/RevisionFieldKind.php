@@ -31,6 +31,8 @@ enum RevisionFieldKind: string
     /** A start and an end, either of which may be open. */
     case DateRange = 'date-range';
 
+    case Moment = 'moment';
+
     /** A stored image path, shown beside the one it replaces. */
     case Image = 'image';
 }

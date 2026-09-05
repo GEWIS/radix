@@ -1,0 +1,59 @@
+{% import 'partials/application/review-pane.html.twig' as panemacro %}
+
+{% if entries is empty %}
+    <p class="text-muted small mb-0">{{ 'No questions are asked on this list.'|trans }}</p>
+{% else %}
+    <div class="review-entries">
+        {% for entry in entries %}
+            {% set id = 'review-entry-' ~ loop.index %}
+            {% set entryWholesale = wholesale|default(false) or entry.kind.value in ['added', 'removed'] %}
+            <div class="review-entry review-entry--{{ entry.kind.value }}">
+                <button type="button"
+                        class="panel-collapse-toggle{{ entry.openByDefault ? '' : ' collapsed' }} review-entry__head d-flex align-items-center gap-2 w-100 border-0 bg-transparent text-start"
+                        data-bs-toggle="collapse" data-bs-target="#{{ id }}"
+                        aria-expanded="{{ entry.openByDefault ? 'true' : 'false' }}" aria-controls="{{ id }}">
+                    {% if entry.position is not null %}
+                        <span class="signup-list-badge">{{ entry.position }}</span>
+                    {% endif %}
+                    {% if not wholesale|default(false) %}
+                        <span class="badge {{ entry.kind.badgeClass }}">{{ entry.kind|trans }}</span>
+                    {% endif %}
+                    <span class="review-entry__naming">
+                        <span class="review-entry__title">{{ entry.title }}</span>
+                        {% if entry.note is not null %}
+                            <span class="review-entry__note">{{ entry.note|trans }}</span>
+                        {% endif %}
+                    </span>
+                    {% if entry.type is not null %}
+                        <span class="badge badge-tag">{{ entry.type|trans }}</span>
+                    {% endif %}
+                    <span class="fas fa-chevron-down panel-collapse-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="collapse{{ entry.openByDefault ? ' show' }}" id="{{ id }}">
+                    <div class="review-entry__body">
+                        {{ panemacro.rows(entry.fields, entryWholesale) }}
+                        {% if entry.options is not empty %}
+                            <div class="review-options">
+                                <h6 class="review-options__heading">{{ 'Answers'|trans }}</h6>
+                                {% for option in entry.options %}
+                                    <div class="review-option review-option--{{ option.kind.value }}">
+                                        {% if not entryWholesale %}
+                                            <span class="badge {{ option.kind.badgeClass }} align-self-start">
+                                                {{ option.kind|trans }}
+                                            </span>
+                                        {% endif %}
+                                        <div class="review-row__cells review-row__cells--pair">
+                                            {% for value in option.value.values %}
+                                                {{ panemacro.cell(option.value, value) }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

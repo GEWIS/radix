@@ -47,7 +47,7 @@ final readonly class SignupListMigrator
         ActivityRevision $outgoing,
         ActivityRevision $incoming,
     ): void {
-        $byLineage = $this->lineageMap($incoming);
+        $byLineage = $incoming->getSignupListsByLineage();
         $blocker = $this->firstBlocker(
             $outgoing,
             $incoming,
@@ -96,7 +96,7 @@ final readonly class SignupListMigrator
         ActivityRevision $incoming,
         ?array $byLineage = null,
     ): ?string {
-        $byLineage ??= $this->lineageMap($incoming);
+        $byLineage ??= $incoming->getSignupListsByLineage();
         foreach ($outgoing->getSignupLists() as $oldList) {
             if ($oldList->getSignUps()->isEmpty()) {
                 continue;
@@ -127,19 +127,6 @@ final readonly class SignupListMigrator
         }
 
         return null;
-    }
-
-    /**
-     * @return array<string, SignupList>
-     */
-    private function lineageMap(ActivityRevision $revision): array
-    {
-        $map = [];
-        foreach ($revision->getSignupLists() as $list) {
-            $map[$list->getLineageId()->toRfc4122()] = $list;
-        }
-
-        return $map;
     }
 
     private function structureMatches(

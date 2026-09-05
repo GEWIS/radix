@@ -14,16 +14,20 @@ use App\Form\Activity\ActivityFlow\ActivityData;
 use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityDraftFactory;
+use App\Service\Application\RevisionDescriberRegistry;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Support\AnswersActivityForm;
+use App\ViewModel\Application\Review\ReviewOutline;
+use App\ViewModel\Application\Review\RevisionAudience;
+use App\ViewModel\Application\Review\RevisionSection;
 use DateTime;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-use function str_contains;
 use function strpos;
 use function substr_count;
 
@@ -356,32 +360,23 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         );
     }
 
-    public function testTheReviewDiffShowsTheAllocationSettingsAndWhatTheyWere(): void
+    public function testTheReviewShowsTheAllocationSettingsAndWhatTheyWere(): void
     {
-        $previous = $this->list();
-        $previous->setOrganisingCommitteeSeats(1);
+        $previous = $this->revisionWithList();
+        $previousList = $previous->getSignupLists()->getValues()[0];
+        $previousList->setOrganisingCommitteeSeats(1);
 
-        $current = $this->list();
-        $current->setOrganisingCommitteeSeats(4);
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+        $list->setLineageId($previousList->getLineageId());
+        $list->setOrganisingCommitteeSeats(4);
 
-        $html = $this->twig()->render(
-            'partials/activity/signup-list-diff.html.twig',
-            [
-                'signupListDiff' => [
-                    'present' => [
-                        [
-                            'list' => $current,
-                            'previous' => $previous,
-                            'liveAdmitted' => 0,
-                        ],
-                    ],
-                    'removed' => [],
-                ],
-            ],
+        $html = $this->renderPane(
+            $revision,
+            $previous,
+            SignupListSection::Allocation->keyFor($list),
         );
 
-        // The board sees the capacity and the method, which the review never showed before, and the modifiers with
-        // them.
         self::assertStringContainsString(
             'Capacity',
             $html,
@@ -394,11 +389,101 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             'Driver (2)',
             $html,
         );
-        // A changed setting carries what it was.
-        self::assertTrue(str_contains(
+        self::assertStringContainsString(
+            '<del>1</del><ins>4</ins>',
             $html,
-            '<del class="text-danger">1</del>',
-        ));
+        );
+    }
+
+    public function testTheReviewOutlineStepsThroughEachSignupList(): void
+    {
+        $revision = $this->revisionWithList();
+        $list = $revision->getSignupLists()->getValues()[0];
+
+        $html = $this->renderOutline(
+            $revision,
+            null,
+            SignupListSection::Basics->keyFor($list),
+        );
+
+        self::assertStringContainsString(
+            'Participants',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Basics',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Allocation',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Questions',
+            $html,
+        );
+    }
+
+    private function renderPane(
+        ActivityRevision $revision,
+        ?ActivityRevision $previous,
+        string $key,
+    ): string {
+        $sections = $this->sections(
+            $revision,
+            $previous,
+        );
+        $section = ReviewOutline::sectionFor(
+            $sections,
+            $key,
+        );
+        self::assertNotNull($section);
+
+        $this->pushRequest();
+
+        return $this->twig()->render(
+            'partials/application/review-pane.html.twig',
+            ['section' => $section],
+        );
+    }
+
+    private function renderOutline(
+        ActivityRevision $revision,
+        ?ActivityRevision $previous,
+        string $key,
+    ): string {
+        $sections = $this->sections(
+            $revision,
+            $previous,
+        );
+
+        $this->pushRequest();
+
+        return $this->twig()->render(
+            'partials/application/review-outline.html.twig',
+            [
+                'outline' => ReviewOutline::of(
+                    $sections,
+                    $key,
+                    self::getContainer()->get(TranslatorInterface::class),
+                ),
+            ],
+        );
+    }
+
+    /**
+     * @return list<RevisionSection>
+     */
+    private function sections(
+        ActivityRevision $revision,
+        ?ActivityRevision $previous,
+    ): array {
+        return self::getContainer()->get(RevisionDescriberRegistry::class)
+            ->describe(
+                $revision,
+                $previous,
+            )
+            ->sectionsFor(RevisionAudience::ReviewerOnly);
     }
 
     private function list(): SignupList

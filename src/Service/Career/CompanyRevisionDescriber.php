@@ -39,6 +39,7 @@ final class CompanyRevisionDescriber extends AbstractRevisionDescriber
 
         return [
             new RevisionSection(
+                'profile',
                 t('Profile'),
                 [
                     $this->localisedField(
@@ -63,6 +64,7 @@ final class CompanyRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'contact',
                 t('Contact details'),
                 [
                     $this->field(
@@ -96,6 +98,7 @@ final class CompanyRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'social',
                 t('Social media'),
                 $this->socialFields(
                     $previous?->getSocialLinks(),
@@ -104,6 +107,7 @@ final class CompanyRevisionDescriber extends AbstractRevisionDescriber
                 ),
             ),
             new RevisionSection(
+                'logos',
                 t('Logos'),
                 [
                     $this->field(
