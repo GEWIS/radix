@@ -605,6 +605,10 @@
         <source>A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.</source>
         <target state="translated">A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.</target>
       </trans-unit>
+      <trans-unit id="P4fTk.T" resname="A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.">
+        <source>A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.</source>
+        <target state="translated">A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.</target>
+      </trans-unit>
       <trans-unit id="sjNzVF_" resname="A mailing list sync is running">
         <source>A mailing list sync is running</source>
         <target state="translated">A mailing list sync is running</target>
@@ -3493,6 +3497,10 @@
         <source>Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.</source>
         <target state="translated">Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.</target>
       </trans-unit>
+      <trans-unit id="b4smB2G" resname="Everybody who signed up before %date% is in the draw.">
+        <source>Everybody who signed up before %date% is in the draw.</source>
+        <target state="translated">Everybody who signed up before %date% is in the draw.</target>
+      </trans-unit>
       <trans-unit id="gGWFXbX" resname="Everyone">
         <source>Everyone</source>
         <target state="translated">Everyone</target>
@@ -4128,6 +4136,10 @@
       <trans-unit id="HBZe6l1" resname="Hand it in">
         <source>Hand it in</source>
         <target state="translated">Hand it in</target>
+      </trans-unit>
+      <trans-unit id="AuCiE0p" resname="Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.">
+        <source>Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.</source>
+        <target state="translated">Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.</target>
       </trans-unit>
       <trans-unit id="Vr8hJW8" resname="Handed in">
         <source>Handed in</source>
@@ -6824,6 +6836,10 @@
       <trans-unit id="gX0CV88" resname="Placed on the photo">
         <source>Placed on the photo</source>
         <target>Placed on the photo</target>
+      </trans-unit>
+      <trans-unit id="5qY3Fqv" resname="Places are allocated by a draw among everybody who signed up before %date%.">
+        <source>Places are allocated by a draw among everybody who signed up before %date%.</source>
+        <target state="translated">Places are allocated by a draw among everybody who signed up before %date%.</target>
       </trans-unit>
       <trans-unit id="wo9xY6x" resname="Places are allocated by a draw on %date%.">
         <source>Places are allocated by a draw on %date%.</source>
@@ -9728,6 +9744,10 @@
       <trans-unit id="zRRdI4A" resname="This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.">
         <source>This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.</source>
         <target>This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.</target>
+      </trans-unit>
+      <trans-unit id="NdjoFzM" resname="This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.">
+        <source>This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.</source>
+        <target state="translated">This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.</target>
       </trans-unit>
       <trans-unit id="SyPSgf9" resname="This meeting has no decisions (yet).">
         <source>This meeting has no decisions (yet).</source>

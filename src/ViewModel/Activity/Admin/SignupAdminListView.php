@@ -62,6 +62,7 @@ final readonly class SignupAdminListView
         public ?string $drawnByName,
         public ?DateTime $autoDrawAt,
         public bool $autoDrawDue,
+        public bool $drawnByHand,
         public bool $isOpen,
         public bool $isClosed,
         // The activity is cancelled or unpublished: all sign-up interaction (draws included) is frozen.
@@ -259,6 +260,7 @@ final readonly class SignupAdminListView
             drawnByName: $signupList->getDrawnBy()?->getFullName(),
             autoDrawAt: $signupList->getAutoDrawAt(),
             autoDrawDue: $signupList->isAutoDrawDue(),
+            drawnByHand: $signupList->isDrawnByHand(),
             isOpen: $signupList->isOpen(),
             isClosed: $signupList->isClosed(),
             frozen: $signupList->getActivity()->isFrozen(),

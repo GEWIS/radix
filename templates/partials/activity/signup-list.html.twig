@@ -42,9 +42,15 @@
                 </small>
                 {% if list.drawAt is not null %}
                     <small class="text-muted d-block">
-                        {{ 'Places are allocated by a draw on %date%.'|trans({
-                            '%date%': list.drawAt|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
-                        }) }}
+                        {% if list.drawnByHand %}
+                            {{ 'Places are allocated by a draw among everybody who signed up before %date%.'|trans({
+                                '%date%': list.drawAt|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                            }) }}
+                        {% else %}
+                            {{ 'Places are allocated by a draw on %date%.'|trans({
+                                '%date%': list.drawAt|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                            }) }}
+                        {% endif %}
                     </small>
                 {% endif %}
                 {% for order in list.priority %}

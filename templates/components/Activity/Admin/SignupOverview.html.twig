@@ -146,7 +146,7 @@
                     {% set drawAction = isFcfs ? 'drawFirstCome' : 'drawLottery' %}
                     {% set drawIcon = isFcfs ? 'fa-list-ol' : 'fa-dice' %}
                     {% set drawLabel = isFcfs ? 'First-come-first-served'|trans : 'Random draw'|trans %}
-                    {% set drawReady = (list.isClosed or list.autoDrawDue) and admissionOpen and list.capacity is not null and not list.frozen %}
+                    {% set drawReady = (list.isClosed or (list.autoDrawDue and not list.drawnByHand)) and admissionOpen and list.capacity is not null and not list.frozen %}
                     {% set drawConfirm = 'Run the draw now? This admits people up to capacity and it cannot be undone.'|trans %}
                     <div class="panel-body border-bottom">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -213,6 +213,17 @@
                                 {{ admissionOpen ? 'You can still admit from the waiting list or remove a no-show until shortly after the activity.'|trans : 'Admission is closed.'|trans }}
                             {% elseif not admissionOpen %}
                                 {{ 'Admission is closed.'|trans }}
+                            {% elseif list.drawnByHand %}
+                                {% if list.autoDrawAt is not null %}
+                                    {{ 'Everybody who signed up before %date% is in the draw.'|trans({
+                                        '%date%': list.autoDrawAt|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
+                                    }) }}
+                                {% endif %}
+                                {% if list.isClosed %}
+                                    {{ 'Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.'|trans }}
+                                {% else %}
+                                    {{ 'This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.'|trans }}
+                                {% endif %}
                             {% elseif list.autoDrawDue %}
                                 {{ 'The draw will be performed automatically within a few minutes.'|trans }}
                                 {% if isBoard %}

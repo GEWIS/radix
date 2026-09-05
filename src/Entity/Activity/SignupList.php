@@ -719,6 +719,15 @@ class SignupList
     }
 
     /**
+     * A role is handed out once sign-up has closed, so a draw at the list's own moment would run before anybody held
+     * one and would make up no shortfall at all. That moment still fixes who is in the draw, only the running waits.
+     */
+    public function isDrawnByHand(): bool
+    {
+        return !$this->roles->isEmpty();
+    }
+
+    /**
      * The moment the automated draw is due for this list, or `null` when it is never drawn automatically.
      *
      * Lists with unlimited capacity, manual allocation methods, or a conditional draw without a cutoff rule (only for

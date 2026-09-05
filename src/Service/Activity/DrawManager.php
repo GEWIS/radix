@@ -62,13 +62,17 @@ final readonly class DrawManager
      * Scheduled draw at the list's own automated draw moment ({@see SignupList::getAutoDrawAt()}); the list need not
      * have closed, because {@see \App\Entity\Activity\Enums\DrawCutoffRule::IfFullBefore} and
      * {@see \App\Entity\Activity\Enums\DrawCutoffRule::AfterDurationOpen} legitimately fire while sign-up is still
-     * open. A null drawnBy marks the draw as automated.
+     * open. A null drawnBy marks the draw as automated. A list that guarantees roles is never drawn here: the roles
+     * are handed out once sign-up has closed, so its own moment only fixes who is in the draw.
      *
      * Returns whether a draw was actually performed.
      */
     public function drawAutomatically(SignupList $list): bool
     {
-        if ($list->getAllocationMethod()->isManual()) {
+        if (
+            $list->getAllocationMethod()->isManual()
+            || $list->isDrawnByHand()
+        ) {
             return false;
         }
 
@@ -135,8 +139,9 @@ final readonly class DrawManager
      * Whether the given draw may be run on a list now: it is limited with a real capacity, uses that draw method, has
      * not been drawn yet, and we are within the admission window. An automated draw additionally requires the list's
      * own draw moment to have passed; a manual draw requires the list to have closed or that same moment to have
-     * passed (the fallback for a missed automated draw). The capacity guard is essential: without it a capacity-less
-     * limited list would admit zero and lock irreversibly.
+     * passed (the fallback for a missed automated draw), except on a list that guarantees roles, which is only ever
+     * drawn once it has closed. The capacity guard is essential: without it a capacity-less limited list would admit
+     * zero and lock irreversibly.
      */
     private function canDraw(
         SignupList $list,
@@ -155,8 +160,12 @@ final readonly class DrawManager
             return false;
         }
 
-        return $requireDue
-            ? $list->isAutoDrawDue()
+        if ($requireDue) {
+            return $list->isAutoDrawDue();
+        }
+
+        return $list->isDrawnByHand()
+            ? $list->isClosed()
             : ($list->isClosed() || $list->isAutoDrawDue());
     }
 

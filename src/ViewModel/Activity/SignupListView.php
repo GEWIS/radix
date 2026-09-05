@@ -23,13 +23,14 @@ use function count;
 final readonly class SignupListView
 {
     /**
-     * @param ?DateTime   $drawAt     the announced moment of the upcoming lottery draw; only set for a conditional
-     *                                draw that has not been performed yet (first-come-first-served needs no
-     *                                member-facing announcement)
-     * @param string[]    $fieldNames column headers (localised), one per sign-up field
-     * @param SignupRow[] $rows       populated only when $canViewDetails
-     * @param string[]    $priority   the orders this list serves its places in, best first, one sentence each; these
-     *                                are part of the deal somebody signs up under, so they are said before they do
+     * @param ?DateTime   $drawAt      the announced moment of the upcoming lottery draw; only set for a conditional
+     *                                 draw that has not been performed yet. On a list drawn by hand it is the moment
+     *                                 that decides who is in the draw rather than the moment places are handed out
+     * @param bool        $drawnByHand whether that draw is made by hand after sign-up closes
+     * @param string[]    $fieldNames  column headers (localised), one per sign-up field
+     * @param SignupRow[] $rows        populated only when $canViewDetails
+     * @param string[]    $priority    the orders this list serves its places in, best first, one sentence each; these
+     *                                 are part of the deal somebody signs up under, so they are said before they do
      */
     public function __construct(
         public int $listId,
@@ -40,6 +41,7 @@ final readonly class SignupListView
         public bool $limitedCapacity,
         public ?int $capacity,
         public ?DateTime $drawAt,
+        public bool $drawnByHand,
         public bool $onlyGEWIS,
         public bool $displaySubscribedNumber,
         public bool $promoted,
@@ -141,6 +143,7 @@ final readonly class SignupListView
                 && !$signupList->isDrawLocked()
                     ? $signupList->getAutoDrawAt()
                     : null,
+            drawnByHand: $signupList->isDrawnByHand(),
             onlyGEWIS: $signupList->getOnlyGEWIS(),
             displaySubscribedNumber: $signupList->getDisplaySubscribedNumber(),
             promoted: $signupList->isPromoted(),

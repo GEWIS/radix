@@ -554,14 +554,6 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         'capacity' => 2,
                         'allocationMethod' => AllocationMethod::ConditionalDraw,
                         'drawCutoffRule' => DrawCutoffRule::OnClose,
-                        // Closed but not yet drawn, so the organiser can still hand the role out on the sign-ups
-                        // page and see the draw make up the shortfall.
-                        'roles' => [
-                            [
-                                'name' => 'Driver',
-                                'minimum' => 1,
-                            ],
-                        ],
                         'subscribers' => [
                             8005,
                             8006,
@@ -896,6 +888,61 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         'limitedCapacity' => false,
                         'subscribers' => [
                             8007,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'creator' => 8025,
+                'status' => RevisionStatus::Approved,
+                'beginTime' => '+12 days 09:00',
+                'endTime' => '+12 days 18:00',
+                'category' => ActivityCategories::Recreational,
+                'requireGEFLITST' => false,
+                'requireZettle' => false,
+                'name' => [
+                    'en' => 'Karting trip',
+                    'nl' => 'Kartuitje',
+                ],
+                'location' => [
+                    'en' => 'Karting Track',
+                    'nl' => 'Kartbaan',
+                ],
+                'costs' => [
+                    'en' => '20 euro',
+                    'nl' => '20 euro',
+                ],
+                'description' => [
+                    'en' => 'An afternoon of karting. We drive there together, so at least one of the places goes to '
+                        . 'somebody who can drive.',
+                    'nl' => 'Een middag karten. We rijden er samen heen, dus minstens een van de plaatsen gaat naar '
+                        . 'iemand die kan rijden.',
+                ],
+                'signupLists' => [
+                    [
+                        'name' => [
+                            'en' => 'Attendance',
+                            'nl' => 'Aanwezigheid',
+                        ],
+                        'openDate' => '-2 weeks 12:00',
+                        'closeDate' => '-2 hours',
+                        'onlyGEWIS' => true,
+                        'displaySubscribedNumber' => true,
+                        'limitedCapacity' => true,
+                        'capacity' => 2,
+                        'allocationMethod' => AllocationMethod::ConditionalDraw,
+                        'drawCutoffRule' => DrawCutoffRule::OnClose,
+                        'roles' => [
+                            [
+                                'name' => 'Driver',
+                                'minimum' => 1,
+                            ],
+                        ],
+                        'subscribers' => [
+                            8005,
+                            8006,
+                            8007,
+                            8008,
                         ],
                     ],
                 ],

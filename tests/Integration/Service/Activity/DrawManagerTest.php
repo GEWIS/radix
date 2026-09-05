@@ -352,6 +352,51 @@ final class DrawManagerTest extends DatabaseTestCase
         );
     }
 
+    public function testAListGuaranteeingARoleIsNeverDrawnAutomatically(): void
+    {
+        $this->addRole(
+            6,
+            'Driver',
+            1,
+        );
+        $this->pinDates(
+            6,
+            closeDate: '+1 week',
+            endTime: '+8 days',
+            rule: DrawCutoffRule::IfFullBefore,
+            cutoffAt: '-1 hour',
+        );
+        $list = $this->list(6);
+
+        self::assertTrue($list->isAutoDrawDue());
+        self::assertFalse($this->drawManager()->drawAutomatically($list));
+        self::assertNull($list->getDrawnAt());
+    }
+
+    public function testAListGuaranteeingARoleIsNotDrawnByHandBeforeItCloses(): void
+    {
+        $this->addRole(
+            6,
+            'Driver',
+            1,
+        );
+        $this->pinDates(
+            6,
+            closeDate: '+1 week',
+            endTime: '+8 days',
+            rule: DrawCutoffRule::IfFullBefore,
+            cutoffAt: '-1 hour',
+        );
+        $list = $this->list(6);
+
+        self::assertFalse($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+        self::assertNull($list->getDrawnAt());
+    }
+
     public function testTheDrawMakesUpAShortfallInAGuaranteedRole(): void
     {
         $ids = $this->signupIds(11);

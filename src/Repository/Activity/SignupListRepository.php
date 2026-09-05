@@ -69,7 +69,8 @@ class SignupListRepository extends ServiceEntityRepository
     /**
      * The live-revision sign-up lists whose automated draw moment ({@see SignupList::getAutoDrawAt()}) has passed but
      * that have not been drawn yet, still inside the admission window (until a day after the activity ends, mirroring
-     * {@see \App\Util\Activity\SignupAdminWindow::canChangeAdmission()}). A coarse SQL pre-filter only:
+     * {@see \App\Util\Activity\SignupAdminWindow::canChangeAdmission()}). A list that guarantees roles is left out:
+     * it is drawn by hand once it has closed. A coarse SQL pre-filter only:
      * {@see \App\Service\Activity\DrawManager::drawAutomatically()} re-checks every guard under a row lock.
      *
      * @return SignupList[]
@@ -93,6 +94,7 @@ class SignupListRepository extends ServiceEntityRepository
             ->andWhere('a.unpublishedAt IS NULL')
             ->andWhere('sl.limitedCapacity = true')
             ->andWhere('sl.capacity >= 1')
+            ->andWhere('SIZE(sl.roles) = 0')
             ->andWhere('sl.openDate <= :now')
             ->andWhere('r.endTime IS NOT NULL')
             ->andWhere('r.endTime >= :admissionBound')
