@@ -351,11 +351,11 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             $html,
         );
         self::assertStringContainsString(
-            'Jump to sign-up list',
+            'dropdown-header">Sign-up lists',
             $html,
         );
         self::assertStringContainsString(
-            'All sign-up lists',
+            'form-stepper-badge',
             $html,
         );
     }

@@ -1221,10 +1221,6 @@
         <source>All sessions except this one will be signed out immediately.</source>
         <target state="translated">Alle sessies, behalve deze, worden onmiddellijk beëindigd.</target>
       </trans-unit>
-      <trans-unit id="PowDAK." resname="All sign-up lists">
-        <source>All sign-up lists</source>
-        <target>Alle inschrijflijsten</target>
-      </trans-unit>
       <trans-unit id="nA25Dva" resname="All subscribers">
         <source>All subscribers</source>
         <target>Alle inschrijvers</target>
@@ -4729,10 +4725,6 @@
         <source>Jobs</source>
         <target>Vacatures</target>
       </trans-unit>
-      <trans-unit id="mWdoT4O" resname="Jump to sign-up list">
-        <source>Jump to sign-up list</source>
-        <target>Ga naar inschrijflijst</target>
-      </trans-unit>
       <trans-unit id="DGalwXb" resname="KCC">
         <source>KCC</source>
         <target state="translated">KCC</target>
@@ -5732,10 +5724,6 @@
       <trans-unit id="VHgrstm" resname="Next change">
         <source>Next change</source>
         <target state="translated">Volgende wijziging</target>
-      </trans-unit>
-      <trans-unit id="CmMUgVt" resname="Next list">
-        <source>Next list</source>
-        <target>Volgende lijst</target>
       </trans-unit>
       <trans-unit id="O3MH35V" resname="Next month">
         <source>Next month</source>
@@ -7036,10 +7024,6 @@
       <trans-unit id="ouNrIYq" resname="Previous">
         <source>Previous</source>
         <target state="translated">Vorige</target>
-      </trans-unit>
-      <trans-unit id="8AKfOKm" resname="Previous list">
-        <source>Previous list</source>
-        <target>Vorige lijst</target>
       </trans-unit>
       <trans-unit id="oiwk.U9" resname="Previous month">
         <source>Previous month</source>

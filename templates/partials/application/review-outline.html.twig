@@ -36,7 +36,7 @@
         <div class="dropdown">
             <button type="button" class="form-stepper-group__current dropdown-toggle" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                <span class="signup-list-badge">{{ bar.position }}</span>
+                <span class="form-stepper-badge">{{ bar.position }}</span>
                 <span class="form-stepper-group__naming">
                     <span class="form-stepper-group__name">{{ bar.group.label }}</span>
                     <span class="form-stepper-group__position">
@@ -50,7 +50,7 @@
                     <li>
                         <a class="dropdown-item d-flex align-items-center gap-2{{ sibling.current ? ' active' }}"
                            href="{{ outlinemacro.section_url(sibling.key) }}">
-                            <span class="signup-list-badge signup-list-badge--muted">{{ sibling.position }}</span>
+                            <span class="form-stepper-badge form-stepper-badge--muted">{{ sibling.position }}</span>
                             <span class="flex-grow-1 text-truncate">{{ sibling.label }}</span>
                             <span class="text-body-secondary small">
                                 {{ sibling.changeCount > 0

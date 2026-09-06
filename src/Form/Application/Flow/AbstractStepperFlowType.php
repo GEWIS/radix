@@ -479,6 +479,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
 
         return [
             'label' => $groups[$current]['label'],
+            'collection' => $groups[$current]['collection'] ?? null,
             'number' => $groups[$current]['number'] ?? null,
             'state' => $this->progress($steps),
             'overview' => $groups[$current]['under'],

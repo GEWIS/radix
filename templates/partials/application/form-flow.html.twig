@@ -54,7 +54,7 @@
             <button type="button" class="form-stepper-group__current dropdown-toggle" data-bs-toggle="dropdown"
                     aria-expanded="false">
                 {% if group.number is not null %}
-                    <span class="signup-list-badge">{{ group.number }}</span>
+                    <span class="form-stepper-badge">{{ group.number }}</span>
                 {% endif %}
                 <span class="form-stepper-group__naming">
                     <span class="form-stepper-group__name">{{ group.label }}</span>
@@ -64,12 +64,14 @@
                 </span>
             </button>
             <ul class="dropdown-menu">
-                <li><h6 class="dropdown-header">{{ 'Jump to sign-up list'|trans }}</h6></li>
+                {% if group.collection is not null %}
+                    <li><h6 class="dropdown-header">{{ group.collection|trans }}</h6></li>
+                {% endif %}
                 {% for sibling in group.siblings %}
                     <li>
                         {% set naming %}
                             {% if sibling.number is not null %}
-                                <span class="signup-list-badge signup-list-badge--muted">{{ sibling.number }}</span>
+                                <span class="form-stepper-badge form-stepper-badge--muted">{{ sibling.number }}</span>
                             {% endif %}
                             <span class="flex-grow-1 text-truncate">{{ sibling.label }}</span>
                             {% if sibling.state is not null %}
@@ -82,7 +84,7 @@
                     </li>
                 {% endfor %}
                 <li><hr class="dropdown-divider"></li>
-                <li>{{ self.goto(form, group.overview, 'All sign-up lists'|trans, {'class': 'dropdown-item text-gewis-primary'}) }}</li>
+                <li>{{ self.goto(form, group.overview, (form.vars.step_labels[group.overview]|default(group.overview))|trans, {'class': 'dropdown-item text-gewis-primary'}) }}</li>
             </ul>
         </div>
 
@@ -107,10 +109,10 @@
 
         <span class="form-stepper-group__nav">
             {% if group.previous is not null %}
-                {{ self.goto(form, group.previous, 'Previous list'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
+                {{ self.goto(form, group.previous, 'Previous'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
             {% endif %}
             {% if group.next is not null %}
-                {{ self.goto(form, group.next, 'Next list'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
+                {{ self.goto(form, group.next, 'Next'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
             {% endif %}
         </span>
     </div>

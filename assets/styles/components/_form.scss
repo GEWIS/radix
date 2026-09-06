@@ -130,6 +130,29 @@ $form-switch-bg-image-night: url("data:image/svg+xml,<svg xmlns='http://www.w3.o
     }
 }
 
+.form-stepper-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 0.45rem;
+    background-color: var(--#{$prefix}form-stepper-accent-subtle, #{rgba($gewis-red, 0.12)});
+    color: $gewis-red;
+    font-size: 0.7rem;
+    font-weight: 800;
+
+    &--muted {
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+        border-radius: 0.4rem;
+        background-color: var(--#{$prefix}secondary-bg);
+        color: var(--#{$prefix}secondary-color);
+        font-size: 0.65rem;
+    }
+}
+
 .form-stepper-group {
     display: flex;
     align-items: center;

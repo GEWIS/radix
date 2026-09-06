@@ -13,7 +13,7 @@
                         data-bs-toggle="collapse" data-bs-target="#{{ id }}"
                         aria-expanded="{{ entry.openByDefault ? 'true' : 'false' }}" aria-controls="{{ id }}">
                     {% if entry.position is not null %}
-                        <span class="signup-list-badge">{{ entry.position }}</span>
+                        <span class="form-stepper-badge">{{ entry.position }}</span>
                     {% endif %}
                     {% if not wholesale|default(false) %}
                         <span class="badge {{ entry.kind.badgeClass }}">{{ entry.kind|trans }}</span>

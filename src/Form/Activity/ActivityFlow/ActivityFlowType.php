@@ -170,6 +170,7 @@ class ActivityFlowType extends AbstractStepperFlowType
                             $section,
                         )] = [
                             'under' => ActivityData::STEP_SIGNUP_LISTS,
+                            'collection' => t('Sign-up lists'),
                             'group' => self::listGroup($list),
                             'label' => SignupListRule::label(
                                 $list,
