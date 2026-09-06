@@ -636,6 +636,27 @@
                             </thead>
                             <tbody>
                                 {% set dividerDrawn = false %}
+                                {% if list.limitedCapacity and not settled and list.rows is not empty %}
+                                    {# Nothing has been decided yet, which the table says rather than leaving everybody
+                                       looking admitted. #}
+                                    <tr class="table-light">
+                                        <td colspan="{{ columnCount }}" class="stat-label py-1">{{ 'Admitted'|trans }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="{{ columnCount }}" class="text-muted small">
+                                            {% if list.frozen %}
+                                                {{ 'Nobody has been admitted: this activity is cancelled or unpublished.'|trans }}
+                                            {% elseif list.drawnByHand %}
+                                                {{ 'Nobody has been admitted yet: the draw is run by hand once sign-up has closed and the roles are handed out.'|trans }}
+                                            {% else %}
+                                                {{ 'Nobody has been admitted yet: the draw still has to be run.'|trans }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td colspan="{{ columnCount }}" class="stat-label py-1">{{ 'Signed up'|trans }}</td>
+                                    </tr>
+                                {% endif %}
                                 {% for row in list.rows %}
                                     {% if list.limitedCapacity and settled and not row.drawn and not dividerDrawn %}
                                         {% set dividerDrawn = true %}

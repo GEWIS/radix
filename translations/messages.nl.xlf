@@ -4265,10 +4265,6 @@
         <source>Grantee</source>
         <target state="translated">Verkrijger</target>
       </trans-unit>
-      <trans-unit id="McP3HRK" resname="Guaranteed">
-        <source>Guaranteed</source>
-        <target>Gegarandeerd</target>
-      </trans-unit>
       <trans-unit id="SSsvGvC" resname="Guaranteed roles">
         <source>Guaranteed roles</source>
         <target>Gegarandeerde rollen</target>
@@ -6200,6 +6196,18 @@
       <trans-unit id="WHq2evG" resname="Nobody has asked for a change to their data.">
         <source>Nobody has asked for a change to their data.</source>
         <target state="translated">Niemand heeft een wijziging van gegevens aangevraagd.</target>
+      </trans-unit>
+      <trans-unit id="gEswUK." resname="Nobody has been admitted yet: the draw is run by hand once sign-up has closed and the roles are handed out.">
+        <source>Nobody has been admitted yet: the draw is run by hand once sign-up has closed and the roles are handed out.</source>
+        <target>Er is nog niemand toegelaten: de loting wordt handmatig gedaan zodra de inschrijving is gesloten en de rollen zijn uitgedeeld.</target>
+      </trans-unit>
+      <trans-unit id="1UPuVk0" resname="Nobody has been admitted yet: the draw still has to be run.">
+        <source>Nobody has been admitted yet: the draw still has to be run.</source>
+        <target>Er is nog niemand toegelaten: de loting moet nog worden gedaan.</target>
+      </trans-unit>
+      <trans-unit id="M87T8NQ" resname="Nobody has been admitted: this activity is cancelled or unpublished.">
+        <source>Nobody has been admitted: this activity is cancelled or unpublished.</source>
+        <target>Er is niemand toegelaten: deze activiteit is geannuleerd of niet gepubliceerd.</target>
       </trans-unit>
       <trans-unit id="2eSNipe" resname="Nobody has said anything yet.">
         <source>Nobody has said anything yet.</source>
