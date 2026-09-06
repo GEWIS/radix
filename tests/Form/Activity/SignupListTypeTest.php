@@ -554,6 +554,38 @@ final class SignupListTypeTest extends TypeTestCase
         ));
     }
 
+    public function testAFreshOrderAdmitsOrdinaryExternalAndHonoraryTogether(): void
+    {
+        $form = $this->section(
+            SignupListSection::Allocation,
+            $this->list(),
+        );
+
+        self::assertSame(
+            MembershipTier::defaultRanks(),
+            $form->createView()->vars['membershipTierOrderTiers'],
+        );
+
+        $membersOnly = $this->list();
+        $membersOnly->setOnlyGEWIS(true);
+        $form = $this->section(
+            SignupListSection::Allocation,
+            $membersOnly,
+        );
+
+        self::assertSame(
+            [
+                [
+                    MembershipTier::Ordinary,
+                    MembershipTier::External,
+                    MembershipTier::Honorary,
+                ],
+                [MembershipTier::Graduate],
+            ],
+            $form->createView()->vars['membershipTierOrderTiers'],
+        );
+    }
+
     public function testAMembersOnlyListDoesNotOfferTheNonMemberTier(): void
     {
         $list = $this->list();

@@ -833,26 +833,13 @@ class SignupListType extends AbstractType
         return [
             'membershipTierOrderTiers' => null === $list
                 ? MembershipTier::defaultRanks()
-                : $list->getMembershipTierOrder() ?? self::ranksOf($list->membershipTiers()),
+                : $list->getMembershipTierOrder() ?? $list->membershipRanks(),
             'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
             'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
             'onlyGEWIS' => $list?->getOnlyGEWIS() ?? true,
             // The places held for each rank of the membership order, which the control asks for on the rank itself.
             'membershipPlaces' => $list?->getHeldMembershipPlaces() ?? [],
         ];
-    }
-
-    /**
-     * @param list<PriorityTierInterface> $tiers
-     *
-     * @return list<list<PriorityTierInterface>>
-     */
-    private static function ranksOf(array $tiers): array
-    {
-        return array_map(
-            static fn (PriorityTierInterface $tier): array => [$tier],
-            $tiers,
-        );
     }
 
     /**

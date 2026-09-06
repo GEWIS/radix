@@ -901,6 +901,36 @@ class SignupList
     }
 
     /**
+     * The order a list starts from before anybody arranges it: the association's own, with the tiers admitted
+     * together on one rank, less the rank a members-only list has nobody for.
+     *
+     * @return list<list<MembershipTier>>
+     */
+    public function membershipRanks(): array
+    {
+        $tiers = $this->membershipTiers();
+        $ranks = [];
+        foreach (MembershipTier::defaultRanks() as $rank) {
+            $rank = array_values(array_filter(
+                $rank,
+                static fn (MembershipTier $tier): bool => in_array(
+                    $tier,
+                    $tiers,
+                    true,
+                ),
+            ));
+
+            if ([] === $rank) {
+                continue;
+            }
+
+            $ranks[] = $rank;
+        }
+
+        return $ranks;
+    }
+
+    /**
      * @return list<MembershipTier>
      */
     public function membershipTiers(): array
