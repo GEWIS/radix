@@ -320,7 +320,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
         $html = $this->renderForm(SignupListSection::Allocation);
 
         self::assertStringContainsString(
-            'form-stepper-group',
+            'dropdown-toggle',
             $html,
         );
         self::assertStringContainsString(

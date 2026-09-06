@@ -75,9 +75,9 @@ class SignupListType extends AbstractType
     /**
      * The allocation method and its per-method settings, frozen once the list has sign-ups: changing how places are
      * allocated after people have committed would rewrite the deal they signed up under. `capacity` is deliberately
-     * excluded — it is not per-method and may still need adjusting (e.g. adding places) while the list is open; it is
-     * frozen separately once the draw has been performed (see {@see self::freezeWhenDrawn()}, which locks the draw's
-     * exact settings so the carried draw lock cannot go stale).
+     * excluded, since it is not per-method and may still need adjusting (e.g. adding places) while the list is open;
+     * it is frozen separately once the draw has been performed (see {@see self::freezeWhenDrawn()}, which locks the
+     * draw's exact settings so the carried draw lock cannot go stale).
      */
     private const array METHOD_FIELDS = [
         'allocationMethod',

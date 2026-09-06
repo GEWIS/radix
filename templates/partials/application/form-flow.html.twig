@@ -49,16 +49,16 @@
 
 {% macro group_bar(form, group) %}
     {% import _self as self %}
-    <div class="form-stepper-group">
+    <div class="d-flex align-items-center gap-3 flex-wrap mb-4 pt-3 border-top">
         <div class="dropdown">
-            <button type="button" class="form-stepper-group__current dropdown-toggle" data-bs-toggle="dropdown"
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 text-start" data-bs-toggle="dropdown"
                     aria-expanded="false">
                 {% if group.number is not null %}
                     <span class="form-stepper-badge">{{ group.number }}</span>
                 {% endif %}
-                <span class="form-stepper-group__naming">
-                    <span class="form-stepper-group__name">{{ group.label }}</span>
-                    <span class="form-stepper-group__position">
+                <span class="d-flex flex-column overflow-hidden lh-sm">
+                    <span class="small fw-bold text-truncate">{{ group.label }}</span>
+                    <span class="small text-muted">
                         {{ '%position% of %total%'|trans({'%position%': group.position, '%total%': group.total}) }}
                     </span>
                 </span>
@@ -107,7 +107,7 @@
             {% endfor %}
         </ul>
 
-        <span class="form-stepper-group__nav">
+        <span class="ms-auto d-flex gap-2">
             {% if group.previous is not null %}
                 {{ self.goto(form, group.previous, 'Previous'|trans, {'class': 'btn btn-sm btn-outline-secondary'}) }}
             {% endif %}

@@ -83,13 +83,14 @@ export default class extends DragReorder {
             if (null !== tie) {
                 tie.hidden = 0 === index;
                 tie.setAttribute('aria-pressed', tied ? 'true' : 'false');
+                tie.classList.toggle('active', tied);
             }
 
             // The places are held for the rank, so only the row it starts on asks for them.
             const box = entry.querySelector<HTMLElement>('[data-tier-order-target="placesBox"]');
             const places = entry.querySelector<HTMLInputElement>('[data-tier-order-target="places"]');
             if (null !== box && null !== places) {
-                box.classList.toggle('is-tied', tied);
+                box.classList.toggle('invisible', tied);
                 places.disabled = tied;
                 if (tied) {
                     places.value = '';

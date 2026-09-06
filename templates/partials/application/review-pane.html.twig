@@ -12,8 +12,8 @@
     <div class="review-row review-row--head">
         <div class="review-row__label"></div>
         <div class="review-row__cells review-row__cells--pair">
-            <div class="review-cell__lang"><span class="flag-icon flag-icon-nl"></span> {{ 'Dutch'|trans }}</div>
-            <div class="review-cell__lang"><span class="flag-icon flag-icon-en"></span> {{ 'English'|trans }}</div>
+            <div class="stat-label mb-1"><span class="flag-icon flag-icon-nl"></span> {{ 'Dutch'|trans }}</div>
+            <div class="stat-label mb-1"><span class="flag-icon flag-icon-en"></span> {{ 'English'|trans }}</div>
         </div>
     </div>
 {% endmacro %}
@@ -21,7 +21,7 @@
 {% macro row(field, wholesale) %}
     {% import _self as self %}
     {% set kind = field.changeKind %}
-    <div class="review-row{{ 'same' == kind.value ? ' is-unchanged' }}">
+    <div class="review-row{{ 'same' == kind.value ? ' opacity-75' }}">
         <div class="review-row__label">
             <span>{{ field.label|trans }}</span>
             {% if 'same' != kind.value and not wholesale|default(false) %}
@@ -53,9 +53,9 @@
 {% set changed = section.changeCount %}
 {% set wholesale = section.group is not null and section.group.kind.value in ['added', 'removed'] %}
 <div class="panel review-pane{{ wholesale ? ' review-pane--' ~ section.group.kind.value }}">
-    <div class="panel-heading review-pane__heading">
+    <div class="panel-heading d-flex flex-wrap align-items-start gap-3">
         <div>
-            <h3>{{ section.heading|trans }}</h3>
+            <h3 class="mb-1">{{ section.heading|trans }}</h3>
             <p class="text-muted small mb-0">
                 {% if section.description is not null %}{{ section.description }}{% endif %}
                 {% if changed > 0 %}
@@ -68,12 +68,12 @@
                 {% endif %}
             </p>
         </div>
-        <span class="review-legend">
+        <span class="ms-auto d-inline-flex align-items-center gap-2">
             <span class="badge badge-danger"><s>{{ 'removed'|trans }}</s></span>
             <span class="badge badge-success">{{ 'added'|trans }}</span>
         </span>
     </div>
-    <div class="panel-body review-pane__body">
+    <div class="panel-body">
         {% if section.entries is not empty %}
             {% include 'partials/application/review-entries.html.twig' with {
                 'entries': section.entries,

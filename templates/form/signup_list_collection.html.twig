@@ -24,7 +24,7 @@
                             data-tier-order-tied-param="{{ not loop.first ? '1' : '0' }}"
                             {% if not field.vars.disabled %}draggable="true"
                             data-action="dragstart->tier-order#dragStart dragend->tier-order#dragEnd"{% endif %}>
-                            <span class="tier-order-rank" data-tier-order-target="rank" aria-hidden="true"></span>
+                            <span class="form-stepper-badge" data-tier-order-target="rank" aria-hidden="true"></span>
                             {% if not field.vars.disabled %}
                                 <span class="sortable-handle" role="button" aria-label="{{ 'Reorder tier'|trans }}">
                                     <span class="fas fa-arrows-up-down"></span>
@@ -34,7 +34,7 @@
                             {% if places is not null %}
                                 {# The places are held for the rank rather than for one tier, so the number sits on
                                    the row the rank starts on and the tiers tied to it share what it says. #}
-                                <span class="tier-order-places" data-tier-order-target="placesBox"
+                                <span class="flex-shrink-0" style="width: 4.5rem" data-tier-order-target="placesBox"
                                       data-signup-list-target="membershipPlaces">
                                     <input type="number" min="0" class="form-control form-control-sm"
                                            aria-label="{{ 'Places held for this rank'|trans }}"
@@ -45,7 +45,7 @@
                                 </span>
                             {% endif %}
                             {% if not field.vars.disabled %}
-                                <button type="button" class="tier-order-tie" data-tier-order-target="tie"
+                                <button type="button" class="btn btn-sm btn-outline-secondary border-0" data-tier-order-target="tie"
                                         data-action="tier-order#tie"
                                         title="{{ 'Admit this tier together with the one above it'|trans }}"
                                         aria-label="{{ 'Admit this tier together with the one above it'|trans }}">

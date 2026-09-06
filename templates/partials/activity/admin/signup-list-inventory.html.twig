@@ -11,11 +11,12 @@
     <div class="panel-body">
         <div class="d-flex flex-column gap-3">
             {% for list in step.vars.lists %}
-                <div class="signup-list-row">
-                    <div class="flex-grow-1 d-flex flex-column gap-2" style="min-width:0">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center gap-3 flex-wrap">
+                    <div class="flex-grow-1 d-flex flex-column gap-2 overflow-hidden">
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="form-stepper-badge">{{ list.position }}</span>
-                            <span class="signup-list-row__name">{{ list.name }}</span>
+                            <span class="fw-bold">{{ list.name }}</span>
                             {% if list.locked %}
                                 <span class="badge badge-tag">
                                     <span class="fas fa-lock" aria-hidden="true"></span>
@@ -33,7 +34,7 @@
                         <div class="d-flex align-items-center gap-3 flex-wrap">
                             {% for section in list.steps %}
                                 {{ flow.goto(form, section.step, section.label, {
-                                    'class': 'signup-list-row__part' ~ (section.done ? ' is-done' : ''),
+                                    'class': 'signup-list-step' ~ (section.done ? ' is-done' : ''),
                                 }) }}
                             {% endfor %}
                         </div>
@@ -41,7 +42,7 @@
                     <div class="d-flex align-items-center gap-2">
                         {{ flow.goto(form, list.steps|first.step, 'Open'|trans, {'class': 'btn btn-sm btn-gewis-primary'}) }}
                         {% if not list.locked %}
-                            <button type="submit" class="signup-list-row__remove"
+                            <button type="submit" class="btn btn-sm btn-outline-gewis-primary"
                                     formnovalidate formmethod="post"
                                     formaction="{{ path('admin/activities/signup_list_remove', {
                                         'activity': activity.id,
@@ -54,9 +55,10 @@
                             </button>
                         {% endif %}
                     </div>
+                    </div>
                 </div>
             {% else %}
-                <div class="signup-list-empty">
+                <div class="panel panel-dashed text-center p-4 mb-0">
                     <div class="fw-semibold">{{ 'No sign-up lists'|trans }}</div>
                     <div class="small text-body-secondary">
                         {{ 'People will simply see the activity in the calendar. Add a list if you need registrations.'|trans }}
@@ -65,7 +67,7 @@
             {% endfor %}
         </div>
 
-        <button type="submit" class="signup-list-add mt-3"
+        <button type="submit" class="btn btn-outline-gewis-primary mt-3"
                 formnovalidate formmethod="post"
                 formaction="{{ path('admin/activities/signup_list_add', {
                     'activity': activity.id,

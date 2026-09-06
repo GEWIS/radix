@@ -7,7 +7,7 @@
 {% if field.kind.value in ['text', 'long-text'] %}
     {% set rendered = diff(value.old, value.new, 'long-text' == field.kind.value ? 'Inline' : 'Combined') %}
     {% if rendered|trim is empty %}
-        <span class="review-cell__empty">{{ empty }}</span>
+        <span class="text-muted fst-italic">{{ empty }}</span>
     {% else %}
         {{ rendered }}
     {% endif %}
@@ -29,22 +29,22 @@
                      src="{{ image_url(value.new, field.option('variant')) }}" alt="">
             </div>
         {% else %}
-            <span class="review-cell__empty">{{ empty }}</span>
+            <span class="text-muted fst-italic">{{ empty }}</span>
         {% endif %}
     </div>
 {% elseif 'reference' == field.kind.value %}
     {{ value.new is empty ? empty : value.new }}
     {% if field.comparable and value.isChanged and value.old is not empty %}
-        <del class="review-cell__was">{{ value.old }}</del>
+        <del class="small text-danger-emphasis ms-2">{{ value.old }}</del>
     {% endif %}
 {% elseif 'badge' == field.kind.value %}
     {% if value.new is null %}
-        <span class="review-cell__empty">{{ empty }}</span>
+        <span class="text-muted fst-italic">{{ empty }}</span>
     {% else %}
         <span class="badge {{ field.option('badgeClass')|default('badge-tag') }}">{{ value.new|trans }}</span>
     {% endif %}
     {% if field.comparable and value.isChanged and value.old is not null %}
-        <del class="review-cell__was">{{ value.old|trans }}</del>
+        <del class="small text-danger-emphasis ms-2">{{ value.old|trans }}</del>
     {% endif %}
 {% elseif 'tags' == field.kind.value %}
     {% set oldIds = value.old|default([])|map(tag => tag.id) %}
@@ -55,7 +55,7 @@
         </span>
     {% else %}
         {% if value.old|default([]) is empty %}
-            <span class="review-cell__empty">{{ empty }}</span>
+            <span class="text-muted fst-italic">{{ empty }}</span>
         {% endif %}
     {% endfor %}
     {% if field.comparable %}
@@ -70,18 +70,18 @@
         {% endfor %}
     {% endset %}
     {% if flags|trim is empty %}
-        <span class="review-cell__empty">{{ empty }}</span>
+        <span class="text-muted fst-italic">{{ empty }}</span>
     {% else %}
         {{ flags }}
     {% endif %}
 {% elseif 'moment' == field.kind.value %}
     {% if value.new is null %}
-        <span class="review-cell__empty">{{ empty }}</span>
+        <span class="text-muted fst-italic">{{ empty }}</span>
     {% else %}
         {{ value.new|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
     {% endif %}
     {% if field.comparable and value.isChanged and value.old is not null %}
-        <del class="review-cell__was">
+        <del class="small text-danger-emphasis ms-2">
             {{ value.old|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
         </del>
     {% endif %}
@@ -94,7 +94,7 @@
         {{ value.new.end is not null ? value.new.end|date('j M Y') : '-' }}
     {% endif %}
     {% if field.comparable and value.old is not null and value.isChanged %}
-        <del class="review-cell__was">
+        <del class="small text-danger-emphasis ms-2">
             {% if 'activity' == field.option('format') %}
                 {{ activity_date_range(value.old.start, value.old.end) }}
             {% else %}
