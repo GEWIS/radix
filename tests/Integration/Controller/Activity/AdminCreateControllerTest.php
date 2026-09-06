@@ -103,7 +103,7 @@ final class AdminCreateControllerTest extends DatabaseTestCase
         );
 
         $response = $this->controller()->create(
-            $this->post(
+            $this->finish(
                 ActivityData::STEP_DETAILS,
                 $this->details(),
                 $session,
@@ -269,7 +269,7 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             $this->user(),
         );
         $this->controller()->create(
-            $this->post(
+            $this->finish(
                 ActivityData::STEP_DETAILS,
                 $this->details(),
                 $session,
@@ -333,6 +333,23 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             [
                 $step => $fields,
                 'next' => '',
+            ],
+            $session,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     */
+    private function finish(
+        string $step,
+        array $fields,
+        SessionInterface $session,
+    ): Request {
+        return $this->submit(
+            [
+                $step => $fields,
+                'finish' => '',
             ],
             $session,
         );

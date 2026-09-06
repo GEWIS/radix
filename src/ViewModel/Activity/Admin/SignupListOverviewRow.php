@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ViewModel\Activity\Admin;
 
 use App\Entity\Activity\SignupList;
+use App\Entity\Application\Enums\Languages;
 use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Util\Activity\SignupListRule;
@@ -30,10 +31,14 @@ final readonly class SignupListOverviewRow
     ) {
     }
 
+    /**
+     * @param list<Languages> $languages the languages the activity is written in, which a list is named in
+     */
     public static function fromSignupList(
         SignupList $list,
         int $position,
         bool $locked,
+        array $languages,
         TranslatorInterface $translator,
     ): self {
         $steps = [];
@@ -46,7 +51,10 @@ final readonly class SignupListOverviewRow
             $steps[] = [
                 'step' => $step,
                 'label' => $section->trans($translator),
-                'done' => $section->isFilledIn($list),
+                'done' => $section->isFilledIn(
+                    $list,
+                    $languages,
+                ),
             ];
         }
 

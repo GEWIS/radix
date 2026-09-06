@@ -7,12 +7,14 @@ namespace App\Form\Activity\ActivityFlow;
 use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\Enums\ActivityCategories;
+use App\Entity\Application\Enums\Languages;
 use App\Form\Application\Flow\HasFlowStep;
 use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function array_map;
+use function in_array;
 use function Symfony\Component\Translation\t;
 use function trim;
 
@@ -136,11 +138,39 @@ final class ActivityData
         $data->descriptionNL = $revision->getDescription()->getValueNL();
         $data->descriptionEN = $revision->getDescription()->getValueEN();
 
-        // A brand-new activity defaults to English enabled, so the form is immediately usable.
-        $data->languageDutch = $data->hasContent(true);
-        $data->languageEnglish = $data->hasContent(false) || !$data->languageDutch;
+        $languages = $revision->languages();
+        $data->languageDutch = in_array(
+            Languages::Dutch,
+            $languages,
+            true,
+        );
+        $data->languageEnglish = in_array(
+            Languages::English,
+            $languages,
+            true,
+        );
 
         return $data;
+    }
+
+    /**
+     * The languages the activity is written in, which is what every text on it and on its sign-up lists is asked in.
+     *
+     * @return list<Languages>
+     */
+    public function languages(): array
+    {
+        $languages = [];
+
+        if ($this->languageDutch) {
+            $languages[] = Languages::Dutch;
+        }
+
+        if ($this->languageEnglish) {
+            $languages[] = Languages::English;
+        }
+
+        return $languages;
     }
 
     private static function identifier(?int $id): string
@@ -282,27 +312,5 @@ final class ActivityData
                     ->addViolation();
             }
         }
-    }
-
-    private function hasContent(bool $dutch): bool
-    {
-        $suffix = $dutch
-            ? 'NL'
-            : 'EN';
-
-        foreach (
-            [
-                'name',
-                'location',
-                'costs',
-                'description',
-            ] as $field
-        ) {
-            if ('' !== trim((string) $this->{$field . $suffix})) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

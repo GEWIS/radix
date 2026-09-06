@@ -15,6 +15,7 @@ use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Database\Enums\ProgramType;
 use App\Form\Activity\Enums\SignupListSection;
@@ -532,7 +533,10 @@ final class SignupListTypeTest extends TypeTestCase
         self::assertNull($list->getCloseDate());
         self::assertFalse($list->isOpen());
         self::assertFalse($list->isClosed());
-        self::assertFalse(SignupListSection::Basics->isFilledIn($list));
+        self::assertFalse(SignupListSection::Basics->isFilledIn(
+            $list,
+            [Languages::English],
+        ));
     }
 
     public function testAListWithANameAndAWindowIsFilledIn(): void
@@ -541,7 +545,13 @@ final class SignupListTypeTest extends TypeTestCase
         $list->setOpenDate(new DateTime('2030-01-01 12:00'));
         $list->setCloseDate(new DateTime('2030-02-01 12:00'));
 
-        self::assertTrue(SignupListSection::Basics->isFilledIn($list));
+        self::assertTrue(SignupListSection::Basics->isFilledIn(
+            $list,
+            [
+                Languages::Dutch,
+                Languages::English,
+            ],
+        ));
     }
 
     public function testAMembersOnlyListDoesNotOfferTheNonMemberTier(): void

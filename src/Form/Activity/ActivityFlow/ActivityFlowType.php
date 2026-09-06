@@ -10,10 +10,10 @@ use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\Flow\AbstractStepperFlowType;
 use App\Util\Activity\SignupListRule;
 use Override;
+use Symfony\Component\Form\Flow\ButtonFlowInterface;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Flow\FormFlowInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Flow\Type\FinishFlowType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -66,17 +66,42 @@ class ActivityFlowType extends AbstractStepperFlowType
             ->addStep(
                 ActivityData::STEP_DETAILS,
                 DetailsStepType::class,
-            )
-            ->addStep(
-                ActivityData::STEP_SIGNUP_LISTS,
-                SignupListInventoryStepType::class,
+            );
+
+        if (true !== $options['lists']) {
+            // Finishing a run without the lists leaves it standing on them, so the editor that picks it up opens there.
+            $builder->add(
+                'finish',
+                FinishFlowType::class,
                 [
-                    'mapped' => false,
-                    'data' => $options['revision'],
+                    'label' => $options['finish_label'],
+                    'handler' => static function (
+                        mixed $data,
+                        ButtonFlowInterface $button,
+                        FormFlowInterface $flow,
+                    ): void {
+                        $flow->getConfig()->getStepAccessor()->setStep(
+                            $data,
+                            ActivityData::STEP_SIGNUP_LISTS,
+                        );
+                        $flow->getConfig()->getDataStorage()->save($data);
+                    },
                 ],
             );
 
-        foreach (self::listsOf($options['revision']) as $list) {
+            return;
+        }
+
+        $builder->addStep(
+            ActivityData::STEP_SIGNUP_LISTS,
+            SignupListInventoryStepType::class,
+            [
+                'mapped' => false,
+                'data' => $options['revision'],
+            ],
+        );
+
+        foreach (self::listsOf($options) as $list) {
             foreach (SignupListSection::order() as $section) {
                 $builder->addStep(
                     self::listStep(
@@ -92,53 +117,6 @@ class ActivityFlowType extends AbstractStepperFlowType
                 );
             }
         }
-
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            fn (FormEvent $event) => $this->refuseAnUnfinishedList(
-                $event,
-                $options['revision'],
-            ),
-        );
-    }
-
-    private function refuseAnUnfinishedList(
-        FormEvent $event,
-        mixed $revision,
-    ): void {
-        $flow = $event->getForm();
-
-        if (
-            !$flow instanceof FormFlowInterface
-            || !$this->isFinishing($flow)
-        ) {
-            return;
-        }
-
-        if (!$revision instanceof ActivityRevision) {
-            return;
-        }
-
-        $unfinished = SignupListRule::firstUnfinished($revision);
-
-        if (null === $unfinished) {
-            return;
-        }
-
-        $this->refuse(
-            $flow,
-            $this->translator->trans(
-                'This cannot be saved yet: the %part% of %list% is not filled in.',
-                [
-                    '%part%' => $unfinished['section']->trans($this->translator),
-                    '%list%' => SignupListRule::label(
-                        $unfinished['list'],
-                        $unfinished['position'],
-                        $this->translator,
-                    ),
-                ],
-            ),
-        );
     }
 
     #[Override]
@@ -154,6 +132,7 @@ class ActivityFlowType extends AbstractStepperFlowType
             'company_editable' => true,
             'bound_organ_id' => null,
             'revision' => null,
+            'lists' => true,
         ]);
 
         $resolver->setDefault(
@@ -165,7 +144,7 @@ class ActivityFlowType extends AbstractStepperFlowType
                     ActivityData::STEP_SIGNUP_LISTS => t('Sign-up lists'),
                 ];
 
-                foreach (self::listsOf($options['revision']) as $list) {
+                foreach (self::listsOf($options) as $list) {
                     foreach (SignupListSection::order() as $section) {
                         $labels[self::listStep(
                             $list,
@@ -183,7 +162,7 @@ class ActivityFlowType extends AbstractStepperFlowType
             function (Options $options): array {
                 $groups = [];
                 $position = 0;
-                foreach (self::listsOf($options['revision']) as $list) {
+                foreach (self::listsOf($options) as $list) {
                     ++$position;
                     foreach (SignupListSection::order() as $section) {
                         $groups[self::listStep(
@@ -198,7 +177,11 @@ class ActivityFlowType extends AbstractStepperFlowType
                                 $this->translator,
                             ),
                             'number' => $position,
-                            'done' => $section->isFilledIn($list),
+                            // Named in every language the activity is written in, which the form still holds here.
+                            'complete' => static fn (mixed $data): bool => $section->isFilledIn(
+                                $list,
+                                $data instanceof ActivityData ? $data->languages() : [],
+                            ),
                         ];
                     }
                 }
@@ -214,6 +197,10 @@ class ActivityFlowType extends AbstractStepperFlowType
 
         $resolver->setAllowedTypes(
             'company_editable',
+            'bool',
+        );
+        $resolver->setAllowedTypes(
+            'lists',
             'bool',
         );
         $resolver->setAllowedTypes(
@@ -233,11 +220,20 @@ class ActivityFlowType extends AbstractStepperFlowType
     }
 
     /**
+     * The lists the run builds its steps from, which a run without the lists has none of.
+     *
+     * @param array<string, mixed>|Options<array<string, mixed>> $options
+     *
      * @return list<SignupList>
      */
-    private static function listsOf(mixed $revision): array
+    private static function listsOf(array|Options $options): array
     {
-        if (!$revision instanceof ActivityRevision) {
+        $revision = $options['revision'];
+
+        if (
+            true !== $options['lists']
+            || !$revision instanceof ActivityRevision
+        ) {
             return [];
         }
 

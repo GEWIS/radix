@@ -81,10 +81,7 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
 
     public function testAllowsARevisionWithNoSignupListsAtAll(): void
     {
-        $revision = new ActivityRevision();
-        new Activity()->addRevision($revision);
-
-        $event = $this->guardEvent($revision);
+        $event = $this->guardEvent($this->revision());
         ($this->listener)($event);
 
         self::assertFalse($event->isBlocked());
@@ -98,10 +95,24 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
         self::assertFalse($event->isBlocked());
     }
 
-    private function revisionWith(SignupList $list): ActivityRevision
+    /**
+     * Written in English alone, so a list is asked for an English name and nothing else.
+     */
+    private function revision(): ActivityRevision
     {
         $revision = new ActivityRevision();
         new Activity()->addRevision($revision);
+        $revision->setName(new ActivityLocalisedText('Test activity'));
+        $revision->setLocation(new ActivityLocalisedText());
+        $revision->setCosts(new ActivityLocalisedText());
+        $revision->setDescription(new ActivityLocalisedText());
+
+        return $revision;
+    }
+
+    private function revisionWith(SignupList $list): ActivityRevision
+    {
+        $revision = $this->revision();
         $revision->addSignupList($list);
 
         return $revision;

@@ -116,14 +116,17 @@ class AdminController extends AbstractController
                 'flow_key' => $run,
                 'revision' => $revision,
                 'company_editable' => $companyEditable,
+                // The lists are built from saved records, so a run that starts from nothing ends before them.
+                'lists' => false,
             ],
         );
         $flow->handleRequest($request);
 
-        // The clicked button is handled here, which is what moves the flow on, so the step is only known afterwards.
+        // The clicked button is handled here, which moves the flow on and, on finishing, leaves the run standing on
+        // the lists, so the step is only known afterwards.
         $form = $flow->getStepForm();
 
-        if (ActivityData::STEP_SIGNUP_LISTS === $flow->getCursor()->getCurrentStep()) {
+        if ($flow->isFinished()) {
             $collected = $flow->getData();
             assert($collected instanceof ActivityData);
             $this->activityFormMapper->apply(

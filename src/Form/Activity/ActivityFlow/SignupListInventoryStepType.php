@@ -55,6 +55,12 @@ class SignupListInventoryStepType extends AbstractType
         $rows = [];
 
         if ($revision instanceof ActivityRevision) {
+            // A list is named in the languages the activity is being written in, which the form still holds.
+            $activity = $form->getRoot()->getData();
+            $languages = $activity instanceof ActivityData
+                ? $activity->languages()
+                : $revision->languages();
+
             $position = 0;
             foreach ($revision->getSignupLists() as $list) {
                 ++$position;
@@ -62,6 +68,7 @@ class SignupListInventoryStepType extends AbstractType
                     $list,
                     $position,
                     $list->hasLineageSignUps(),
+                    $languages,
                     $this->translator,
                 );
             }

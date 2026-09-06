@@ -20,15 +20,29 @@ use function trim;
 final class SignupListRule
 {
     /**
+     * The first section of a list that has not been answered, judged in the languages the revision is written in
+     * unless the form that is still collecting them says which.
+     *
+     * @param ?list<Languages> $languages
+     *
      * @return array{list: SignupList, position: int, section: SignupListSection}|null
      */
-    public static function firstUnfinished(ActivityRevision $revision): ?array
-    {
+    public static function firstUnfinished(
+        ActivityRevision $revision,
+        ?array $languages = null,
+    ): ?array {
+        $languages ??= $revision->languages();
+
         $position = 0;
         foreach ($revision->getSignupLists() as $list) {
             ++$position;
             foreach (SignupListSection::order() as $section) {
-                if ($section->isFilledIn($list)) {
+                if (
+                    $section->isFilledIn(
+                        $list,
+                        $languages,
+                    )
+                ) {
                     continue;
                 }
 

@@ -30,6 +30,7 @@ use function array_keys;
 use function array_search;
 use function array_values;
 use function count;
+use function is_callable;
 use function is_object;
 use function sprintf;
 use function Symfony\Component\Translation\t;
@@ -121,6 +122,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
             fn (FormEvent $event) => $this->refuseAnUnfinishedForm(
                 $event,
                 $options['step_labels'],
+                $options['step_groups'],
             ),
         );
     }
@@ -130,11 +132,13 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
      * one moment the whole thing has to be true at once, and the step that is wanting is named, because it is not the
      * step on screen and there is nothing on screen for the message to point at.
      *
-     * @param array<string, mixed> $labels
+     * @param array<string, mixed>                $labels
+     * @param array<string, array<string, mixed>> $groups
      */
     private function refuseAnUnfinishedForm(
         FormEvent $event,
         array $labels,
+        array $groups,
     ): void {
         $flow = $event->getForm();
         $data = $event->getData();
@@ -152,30 +156,64 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
 
         foreach ($flow->getCursor()->getSteps() as $step) {
             if (
-                0 === count($this->validator->validate(
+                $this->holds(
+                    $step,
                     $data,
-                    null,
-                    [$step],
-                ))
+                    $groups,
+                )
             ) {
                 continue;
             }
 
+            $label = $this->label(
+                $labels,
+                $step,
+            );
+            $group = $groups[$step]['label'] ?? null;
+
             $this->refuse(
                 $flow,
-                $this->translator->trans(
-                    'This cannot be saved yet: %step% is not filled in.',
-                    [
-                        '%step%' => $this->label(
-                            $labels,
-                            $step,
-                        ),
-                    ],
-                ),
+                null === $group
+                    ? $this->translator->trans(
+                        'This cannot be saved yet: %step% is not filled in.',
+                        ['%step%' => $label],
+                    )
+                    : $this->translator->trans(
+                        'This cannot be saved yet: the %step% of %group% is not filled in.',
+                        [
+                            '%step%' => $label,
+                            '%group%' => $group,
+                        ],
+                    ),
             );
 
             return;
         }
+    }
+
+    /**
+     * Whether a step holds together: by the rules in the group named after it, or, for a step built from a record
+     * the data object does not hold, by what the step says itself. One answer for the tick, the jump and the finish.
+     *
+     * @param array<string, array<string, mixed>> $groups
+     */
+    private function holds(
+        string $name,
+        mixed $data,
+        array $groups,
+    ): bool {
+        $complete = $groups[$name]['complete'] ?? null;
+
+        if (is_callable($complete)) {
+            return (bool) $complete($data);
+        }
+
+        return !is_object($data)
+            || 0 === count($this->validator->validate(
+                $data,
+                null,
+                [$name],
+            ));
     }
 
     /**
@@ -252,6 +290,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
             $visible,
             $data,
             $currentIndex = $form->getCursor()->getStepIndex(),
+            $groups,
         );
         $cursor = $form->getCursor();
         $current = $cursor->getCurrentStep();
@@ -293,16 +332,16 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                     $groups,
                     $current,
                     $currentIndex,
+                    $data,
                 ),
         ];
     }
 
     /**
      * Which steps may be moved to straight away: a step is offered as soon as every step before it holds together.
-     * Judged by the very rules the flow judges a step by when it is handed in, the group named after it, so this
-     * cannot drift from what the form itself would accept.
      *
-     * @param array<string, array{index: int}> $visible
+     * @param array<string, array{index: int}>    $visible
+     * @param array<string, array<string, mixed>> $groups
      *
      * @return array<string, bool>
      */
@@ -310,6 +349,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
         array $visible,
         mixed $data,
         int $currentIndex,
+        array $groups,
     ): array {
         $reachable = [];
         $behind = true;
@@ -321,12 +361,11 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                 continue;
             }
 
-            $behind = !is_object($data)
-                || 0 === count($this->validator->validate(
-                    $data,
-                    null,
-                    [$name],
-                ));
+            $behind = $this->holds(
+                $name,
+                $data,
+                $groups,
+            );
         }
 
         return $reachable;
@@ -382,6 +421,7 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
         array $groups,
         string $current,
         int $currentIndex,
+        mixed $data,
     ): array {
         $key = $groups[$current]['group'];
 
@@ -412,7 +452,11 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                 'name' => $name,
                 'label' => $view->vars['step_labels'][$name] ?? $name,
                 'position' => count($byGroup[$group['group']]) + 1,
-                'done' => (bool) ($group['done'] ?? false),
+                'done' => $this->holds(
+                    $name,
+                    $data,
+                    $groups,
+                ),
                 'state' => $this->state(
                     false,
                     $step['index'],

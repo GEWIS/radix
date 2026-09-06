@@ -168,6 +168,42 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
         );
     }
 
+    public function testAListNamedInOneLanguageIsUnfinishedWhileTheActivityIsWrittenInTwo(): void
+    {
+        $revision = $this->revisionWithLists('Dinner');
+        $revision->getSignupLists()->getValues()[0]->setName(new ActivityLocalisedText('Dinner'));
+        $data = $this->answered(ActivityData::STEP_SIGNUP_LISTS);
+        $data->languageDutch = true;
+        $data->nameNL = 'Testactiviteit';
+        $data->locationNL = 'Aula';
+        $data->costsNL = 'Gratis';
+        $data->descriptionNL = 'Een praatje.';
+
+        $flow = $this->build(
+            $revision,
+            $data,
+        );
+        $flow->submit(['finish' => '']);
+
+        self::assertFalse($flow->isFinished());
+        self::assertStringContainsString(
+            'Basics',
+            (string) $flow->getErrors(),
+        );
+
+        $data->languageDutch = false;
+        $flow = $this->build(
+            $revision,
+            $data,
+        );
+        $flow->submit(['finish' => '']);
+
+        self::assertTrue(
+            $flow->isFinished(),
+            (string) $flow->getErrors(),
+        );
+    }
+
     public function testFinishingIsAllowedWhenEveryStepHoldsTogether(): void
     {
         $flow = $this->build(

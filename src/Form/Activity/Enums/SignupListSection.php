@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Activity\Enums;
 
 use App\Entity\Activity\SignupList;
+use App\Entity\Application\Enums\Languages;
 use Override;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -42,12 +43,20 @@ enum SignupListSection: string implements TranslatableInterface
         );
     }
 
-    public function isFilledIn(SignupList $list): bool
-    {
+    /**
+     * Whether the section has been answered, which is the same question the form asks when the section is handed
+     * in: a name in every language the activity is written in, and a window.
+     *
+     * @param list<Languages> $languages
+     */
+    public function isFilledIn(
+        SignupList $list,
+        array $languages,
+    ): bool {
         return match ($this) {
-            self::Basics => (
-                '' !== trim($list->getName()->getValueEN() ?? '')
-                || '' !== trim($list->getName()->getValueNL() ?? '')
+            self::Basics => self::named(
+                $list,
+                $languages,
             )
                 && null !== $list->getOpenDate()
                 && null !== $list->getCloseDate(),
@@ -55,6 +64,22 @@ enum SignupListSection: string implements TranslatableInterface
                 || ($list->getCapacity() ?? 0) >= 1,
             self::Questions => true,
         };
+    }
+
+    /**
+     * @param list<Languages> $languages
+     */
+    private static function named(
+        SignupList $list,
+        array $languages,
+    ): bool {
+        foreach ($languages as $language) {
+            if ('' === trim($list->getName()->getExactText($language) ?? '')) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function description(TranslatorInterface $translator): string
