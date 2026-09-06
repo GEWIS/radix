@@ -45,6 +45,12 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
         'organ-keur' => 'KEUR',
     ];
 
+    // Members whose number the ledger draws from a sequence, so the web seeds name them by what stays the same.
+    private const array MEMBERS = [
+        'member-spring-master' => 'springmaster@example.com',
+        'member-autumn-external' => 'autumnexternal@example.com',
+    ];
+
     #[Override]
     public function load(ObjectManager $manager): void
     {
@@ -55,12 +61,31 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
 
     private function members(ObjectManager $manager): void
     {
-        foreach ($manager->getRepository(Member::class)->findAll() as $member) {
+        $repository = $manager->getRepository(Member::class);
+
+        foreach ($repository->findAll() as $member) {
             $this->addReference(
                 sprintf(
                     'member-%d',
                     $member->getLidnr(),
                 ),
+                $member,
+            );
+        }
+
+        foreach (self::MEMBERS as $reference => $email) {
+            $member = $repository->findOneBy(['email' => $email]);
+
+            if (null === $member) {
+                throw new LogicException(sprintf(
+                    'The replay produced no member with the address "%s", which the web fixtures call "%s".',
+                    $email,
+                    $reference,
+                ));
+            }
+
+            $this->addReference(
+                $reference,
                 $member,
             );
         }

@@ -77,7 +77,7 @@ use function sprintf;
  *     promoted?: bool,
  *     presenceTaken?: bool,
  *     fields?: list<array<string, mixed>>,
- *     subscribers?: list<int|array<string, mixed>>,
+ *     subscribers?: list<int|string|array<string, mixed>>,
  *     externals?: list<array<string, mixed>>,
  * }
  * @phpstan-type ActivitySeedType = array{
@@ -1213,15 +1213,17 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
     {
         // Enough of a cast that a ranking shows: ordinary members of four generations, an external member, an
         // honorary member, a graduate, a master student and somebody doing a doctorate.
+        // The master student and the doctoral candidate are attention members whose number the ledger hands out,
+        // so they go by the name the projection references them under.
         $cast = [
             8005,
             8010,
             8006,
             8100,
             8115,
-            21,
+            'spring-master',
             8155,
-            22,
+            'autumn-external',
             8007,
         ];
         $guests = [
@@ -1609,10 +1611,10 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                             ] : [],
                             ...$config['perState'][$number] ?? [],
                             'subscribers' => array_map(
-                                static fn (int $lidnr): array => [
-                                    'member' => $lidnr,
+                                static fn (int|string $member): array => [
+                                    'member' => $member,
                                     ...in_array(
-                                        $lidnr,
+                                        $member,
                                         $holders,
                                         true,
                                     ) ? ['role' => 'Driver'] : [],
