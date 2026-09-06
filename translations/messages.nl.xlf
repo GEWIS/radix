@@ -1089,7 +1089,7 @@
         <source>Admit the tiers in order</source>
         <target state="translated">De groepen op volgorde toelaten</target>
       </trans-unit>
-      <trans-unit id="phJn6n2" resname="Admit this tier together with the one above it">
+      <trans-unit id="ilhY8CD" resname="Admit this tier together with the one above it">
         <source>Admit this tier together with the one above it</source>
         <target state="translated">Deze groep tegelijk toelaten met de groep erboven</target>
       </trans-unit>
@@ -2185,6 +2185,10 @@
         <source>Cohort priority</source>
         <target>Voorrang op generatie</target>
       </trans-unit>
+      <trans-unit id="95XUNeo" resname="Collects the payment">
+        <source>Collects the payment</source>
+        <target>Int de betaling</target>
+      </trans-unit>
       <trans-unit id="5THj8oK" resname="Columns">
         <source>Columns</source>
         <target>Kolommen</target>
@@ -2912,6 +2916,10 @@
       <trans-unit id="JTnK8N0" resname="Diagnose">
         <source>Diagnose</source>
         <target state="translated">Onderzoeken</target>
+      </trans-unit>
+      <trans-unit id="xCxoEo7" resname="Dictates the order of admissions">
+        <source>Dictates the order of admissions</source>
+        <target>Bepaalt de volgorde van toelating</target>
       </trans-unit>
       <trans-unit id="s.f1kym" resname="Did not receive the confirmation email? Resend it.">
         <source>Did not receive the confirmation email? Resend it.</source>
@@ -5633,6 +5641,10 @@
         <source>Needs your attention</source>
         <target state="translated">Vraagt om je aandacht</target>
       </trans-unit>
+      <trans-unit id="3O9qm56" resname="Neither">
+        <source>Neither</source>
+        <target>Geen van beide</target>
+      </trans-unit>
       <trans-unit id="pK.xkHw" resname="Never">
         <source>Never</source>
         <target state="translated">Nooit</target>
@@ -6353,10 +6365,6 @@
         <source>Oldest first</source>
         <target state="translated">Oudste eerst</target>
       </trans-unit>
-      <trans-unit id="vriUPQt" resname="On">
-        <source>On</source>
-        <target state="translated">Aan</target>
-      </trans-unit>
       <trans-unit id="U05.DlE" resname="On Form">
         <source>On Form</source>
         <target state="translated">Op inschrijfformulier</target>
@@ -6404,6 +6412,10 @@
       <trans-unit id="aGilLiW" resname="Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.">
         <source>Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.</source>
         <target>Alleen gebruikt door het HS512-profiel met gedeeld geheim. Deel het alleen met de applicatie en vervang het jaarlijks.</target>
+      </trans-unit>
+      <trans-unit id="uCU5_Lp" resname="Only visible to the board and organiser">
+        <source>Only visible to the board and organiser</source>
+        <target>Alleen zichtbaar voor het bestuur en de organisator</target>
       </trans-unit>
       <trans-unit id="bnfrTZj" resname="Only with open sign-up">
         <source>Only with open sign-up</source>
@@ -8053,7 +8065,7 @@
         <source>Seats guaranteed</source>
         <target>Gegarandeerde plaatsen</target>
       </trans-unit>
-      <trans-unit id="uK3niMi" resname="Seats held for %tier%">
+      <trans-unit id="eA9sNNr" resname="Seats held for %tier%">
         <source>Seats held for %tier%</source>
         <target state="translated">Plaatsen gereserveerd voor %tier%</target>
       </trans-unit>
@@ -8061,7 +8073,7 @@
         <source>Seats held for the organising body</source>
         <target>Plaatsen gereserveerd voor het organiserende orgaan</target>
       </trans-unit>
-      <trans-unit id="ZX5SGcA" resname="Seats held for this rank">
+      <trans-unit id="gZeH2cF" resname="Seats held for this rank">
         <source>Seats held for this rank</source>
         <target state="translated">Plaatsen gereserveerd voor deze groep</target>
       </trans-unit>
@@ -8176,10 +8188,6 @@
       <trans-unit id="g8FZmwT" resname="Send your summary or old exam for %code% to the education officer and it is added here.">
         <source>Send your summary or old exam for %code% to the education officer and it is added here.</source>
         <target state="translated">Stuur je samenvatting of oude tentamen voor %code% naar de onderwijscommissaris en het wordt hier toegevoegd.</target>
-      </trans-unit>
-      <trans-unit id="8YIUjez" resname="Sensitive">
-        <source>Sensitive</source>
-        <target state="translated">Gevoelig</target>
       </trans-unit>
       <trans-unit id="94BV7cN" resname="Sensitive (only visible to the board and organiser)">
         <source>Sensitive (only visible to the board and organiser)</source>
@@ -9133,6 +9141,10 @@
         <source>The external application has been updated.</source>
         <target>De externe applicatie is bijgewerkt.</target>
       </trans-unit>
+      <trans-unit id="SeMiDgq" resname="The external party">
+        <source>The external party</source>
+        <target>De externe partij</target>
+      </trans-unit>
       <trans-unit id="juj8ffI" resname="The external party dictates the order of admissions">
         <source>The external party dictates the order of admissions</source>
         <target>De externe partij bepaalt de volgorde van toelating</target>
@@ -9973,7 +9985,7 @@
         <source>This window overlaps an existing maintenance window.</source>
         <target>Dit venster overlapt een bestaand onderhoudsvenster.</target>
       </trans-unit>
-      <trans-unit id="kmUAkyC" resname="Tiers on the same number are admitted together.">
+      <trans-unit id="T3weQko" resname="Tiers on the same number are admitted together.">
         <source>Tiers on the same number are admitted together.</source>
         <target state="translated">Groepen met hetzelfde nummer worden tegelijk toegelaten.</target>
       </trans-unit>
@@ -10176,6 +10188,10 @@
       <trans-unit id="sdih8bl" resname="Unknown reason">
         <source>Unknown reason</source>
         <target state="translated">Reden onbekend</target>
+      </trans-unit>
+      <trans-unit id="W8BQW1b" resname="Unlimited">
+        <source>Unlimited</source>
+        <target>Onbeperkt</target>
       </trans-unit>
       <trans-unit id="_c9YbkL" resname="Unlink">
         <source>Unlink</source>
@@ -10480,6 +10496,10 @@
       <trans-unit id="zND6L.F" resname="Visible to whoever asked and to the board. Use it to explain a decision.">
         <source>Visible to whoever asked and to the board. Use it to explain a decision.</source>
         <target state="translated">Zichtbaar voor de aanvrager en het bestuur. Gebruik dit om een besluit toe te lichten.</target>
+      </trans-unit>
+      <trans-unit id="cmDrSH2" resname="Visible to whoever may see the sign-ups">
+        <source>Visible to whoever may see the sign-ups</source>
+        <target>Zichtbaar voor wie de inschrijvingen mag zien</target>
       </trans-unit>
       <trans-unit id="VcuSKVC" resname="Visible to you and your contact at GEWIS.">
         <source>Visible to you and your contact at GEWIS.</source>

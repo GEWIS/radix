@@ -23,6 +23,7 @@ use App\ViewModel\Application\Review\RevisionEntry;
 use App\ViewModel\Application\Review\RevisionEntryOption;
 use App\ViewModel\Application\Review\RevisionField;
 use App\ViewModel\Application\Review\RevisionFieldKind;
+use App\ViewModel\Application\Review\RevisionFlag;
 use App\ViewModel\Application\Review\RevisionSection;
 use App\ViewModel\Application\Review\RevisionSectionGroup;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -245,23 +246,27 @@ final readonly class SignupListSections
                 $new?->getCloseDate(),
                 $comparable,
             ),
-            $this->onOff(
-                t('Members only'),
-                $old?->getOnlyGEWIS(),
-                $new?->getOnlyGEWIS(),
+            $this->flags(
+                t('Settings'),
+                [
+                    [
+                        t('Members only'),
+                        $old?->getOnlyGEWIS(),
+                        $new?->getOnlyGEWIS(),
+                    ],
+                    [
+                        t('Show the number of sign-ups to logged-out visitors'),
+                        $old?->getDisplaySubscribedNumber(),
+                        $new?->getDisplaySubscribedNumber(),
+                    ],
+                    [
+                        t('Promoted'),
+                        $old?->isPromoted(),
+                        $new?->isPromoted(),
+                    ],
+                ],
                 $comparable,
-            ),
-            $this->onOff(
-                t('Show the number of sign-ups to logged-out visitors'),
-                $old?->getDisplaySubscribedNumber(),
-                $new?->getDisplaySubscribedNumber(),
-                $comparable,
-            ),
-            $this->onOff(
-                t('Promoted'),
-                $old?->isPromoted(),
-                $new?->isPromoted(),
-                $comparable,
+                t('None'),
             ),
         ];
     }
@@ -275,10 +280,11 @@ final readonly class SignupListSections
         bool $comparable,
     ): array {
         $fields = [
-            $this->onOff(
-                t('Limited capacity'),
-                $old?->getLimitedCapacity(),
-                $new?->getLimitedCapacity(),
+            $this->field(
+                t('Capacity'),
+                RevisionFieldKind::Text,
+                $this->capacity($old),
+                $this->capacity($new),
                 $comparable,
             ),
         ];
@@ -290,13 +296,6 @@ final readonly class SignupListSections
             return $fields;
         }
 
-        $fields[] = $this->field(
-            t('Capacity'),
-            RevisionFieldKind::Text,
-            $this->number($old?->getCapacity()),
-            $this->number($new?->getCapacity()),
-            $comparable,
-        );
         $fields[] = $this->field(
             t('Allocation method'),
             RevisionFieldKind::Badge,
@@ -369,17 +368,22 @@ final readonly class SignupListSections
                 $new?->getExternalPolicyUrl(),
                 $comparable,
             );
-            $fields[] = $this->onOff(
-                t('The external party dictates the order of admissions'),
-                $old?->getExternalForceOrdering(),
-                $new?->getExternalForceOrdering(),
+            $fields[] = $this->flags(
+                t('The external party'),
+                [
+                    [
+                        t('Dictates the order of admissions'),
+                        $old?->getExternalForceOrdering(),
+                        $new?->getExternalForceOrdering(),
+                    ],
+                    [
+                        t('Collects the payment'),
+                        $old?->getExternalPaymentByExternal(),
+                        $new?->getExternalPaymentByExternal(),
+                    ],
+                ],
                 $comparable,
-            );
-            $fields[] = $this->onOff(
-                t('Payment is collected by the external party'),
-                $old?->getExternalPaymentByExternal(),
-                $new?->getExternalPaymentByExternal(),
-                $comparable,
+                t('Neither'),
             );
         }
 
@@ -730,11 +734,17 @@ final readonly class SignupListSections
                 $new?->getType(),
                 $comparable,
             ),
-            $this->onOff(
-                t('Sensitive'),
-                $old?->isSensitive(),
-                $new?->isSensitive(),
+            $this->flags(
+                t('Answers'),
+                [
+                    [
+                        t('Only visible to the board and organiser'),
+                        $old?->isSensitive(),
+                        $new?->isSensitive(),
+                    ],
+                ],
                 $comparable,
+                t('Visible to whoever may see the sign-ups'),
             ),
         ];
 
@@ -1012,18 +1022,50 @@ final readonly class SignupListSections
             || (null !== $new && $uses($new));
     }
 
-    private function onOff(
+    /**
+     * Toggles read best as the things that are on, so a set of them is one field of flags: a flag that went on is
+     * drawn as new, one that went off as removed, and a list that is gone has every one of them off.
+     *
+     * @param list<array{TranslatableInterface, ?bool, ?bool}> $toggles the label, the old and the new state
+     */
+    private function flags(
         TranslatableInterface $label,
-        ?bool $old,
-        ?bool $new,
+        array $toggles,
         bool $comparable,
+        TranslatableInterface $emptyLabel,
     ): RevisionField {
+        $flags = [];
+        foreach ($toggles as [$name, $old, $new]) {
+            $flags[] = new RevisionFlag(
+                $name,
+                $old,
+                true === $new,
+            );
+        }
+
         return $this->field(
             $label,
-            RevisionFieldKind::Badge,
-            null === $old ? null : ($old ? t('On') : t('Off')),
-            null === $new ? null : ($new ? t('On') : t('Off')),
+            RevisionFieldKind::Flag,
+            null,
+            $flags,
             $comparable,
+            emptyLabel: $emptyLabel,
         );
+    }
+
+    /**
+     * What a list can take, which is a number only once it is limited.
+     */
+    private function capacity(?SignupList $list): ?string
+    {
+        if (null === $list) {
+            return null;
+        }
+
+        if (!$list->getLimitedCapacity()) {
+            return $this->translator->trans('Unlimited');
+        }
+
+        return $this->number($list->getCapacity());
     }
 }

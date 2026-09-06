@@ -1089,7 +1089,7 @@
         <source>Admit the tiers in order</source>
         <target state="translated">Admit the tiers in order</target>
       </trans-unit>
-      <trans-unit id="phJn6n2" resname="Admit this tier together with the one above it">
+      <trans-unit id="ilhY8CD" resname="Admit this tier together with the one above it">
         <source>Admit this tier together with the one above it</source>
         <target>Admit this tier together with the one above it</target>
       </trans-unit>
@@ -2185,6 +2185,10 @@
         <source>Cohort priority</source>
         <target>Cohort priority</target>
       </trans-unit>
+      <trans-unit id="95XUNeo" resname="Collects the payment">
+        <source>Collects the payment</source>
+        <target>Collects the payment</target>
+      </trans-unit>
       <trans-unit id="5THj8oK" resname="Columns">
         <source>Columns</source>
         <target>Columns</target>
@@ -2912,6 +2916,10 @@
       <trans-unit id="JTnK8N0" resname="Diagnose">
         <source>Diagnose</source>
         <target state="translated">Diagnose</target>
+      </trans-unit>
+      <trans-unit id="xCxoEo7" resname="Dictates the order of admissions">
+        <source>Dictates the order of admissions</source>
+        <target>Dictates the order of admissions</target>
       </trans-unit>
       <trans-unit id="s.f1kym" resname="Did not receive the confirmation email? Resend it.">
         <source>Did not receive the confirmation email? Resend it.</source>
@@ -5633,6 +5641,10 @@
         <source>Needs your attention</source>
         <target state="translated">Needs your attention</target>
       </trans-unit>
+      <trans-unit id="3O9qm56" resname="Neither">
+        <source>Neither</source>
+        <target>Neither</target>
+      </trans-unit>
       <trans-unit id="pK.xkHw" resname="Never">
         <source>Never</source>
         <target state="translated">Never</target>
@@ -6353,10 +6365,6 @@
         <source>Oldest first</source>
         <target state="translated">Oldest first</target>
       </trans-unit>
-      <trans-unit id="vriUPQt" resname="On">
-        <source>On</source>
-        <target state="translated">On</target>
-      </trans-unit>
       <trans-unit id="U05.DlE" resname="On Form">
         <source>On Form</source>
         <target state="translated">On Form</target>
@@ -6404,6 +6412,10 @@
       <trans-unit id="aGilLiW" resname="Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.">
         <source>Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.</source>
         <target>Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.</target>
+      </trans-unit>
+      <trans-unit id="uCU5_Lp" resname="Only visible to the board and organiser">
+        <source>Only visible to the board and organiser</source>
+        <target>Only visible to the board and organiser</target>
       </trans-unit>
       <trans-unit id="bnfrTZj" resname="Only with open sign-up">
         <source>Only with open sign-up</source>
@@ -8053,7 +8065,7 @@
         <source>Seats guaranteed</source>
         <target>Seats guaranteed</target>
       </trans-unit>
-      <trans-unit id="uK3niMi" resname="Seats held for %tier%">
+      <trans-unit id="eA9sNNr" resname="Seats held for %tier%">
         <source>Seats held for %tier%</source>
         <target>Seats held for %tier%</target>
       </trans-unit>
@@ -8061,7 +8073,7 @@
         <source>Seats held for the organising body</source>
         <target>Seats held for the organising body</target>
       </trans-unit>
-      <trans-unit id="ZX5SGcA" resname="Seats held for this rank">
+      <trans-unit id="gZeH2cF" resname="Seats held for this rank">
         <source>Seats held for this rank</source>
         <target>Seats held for this rank</target>
       </trans-unit>
@@ -8176,10 +8188,6 @@
       <trans-unit id="g8FZmwT" resname="Send your summary or old exam for %code% to the education officer and it is added here.">
         <source>Send your summary or old exam for %code% to the education officer and it is added here.</source>
         <target state="translated">Send your summary or old exam for %code% to the education officer and it is added here.</target>
-      </trans-unit>
-      <trans-unit id="8YIUjez" resname="Sensitive">
-        <source>Sensitive</source>
-        <target state="translated">Sensitive</target>
       </trans-unit>
       <trans-unit id="94BV7cN" resname="Sensitive (only visible to the board and organiser)">
         <source>Sensitive (only visible to the board and organiser)</source>
@@ -9133,6 +9141,10 @@
         <source>The external application has been updated.</source>
         <target>The external application has been updated.</target>
       </trans-unit>
+      <trans-unit id="SeMiDgq" resname="The external party">
+        <source>The external party</source>
+        <target>The external party</target>
+      </trans-unit>
       <trans-unit id="juj8ffI" resname="The external party dictates the order of admissions">
         <source>The external party dictates the order of admissions</source>
         <target>The external party dictates the order of admissions</target>
@@ -9973,7 +9985,7 @@
         <source>This window overlaps an existing maintenance window.</source>
         <target>This window overlaps an existing maintenance window.</target>
       </trans-unit>
-      <trans-unit id="kmUAkyC" resname="Tiers on the same number are admitted together.">
+      <trans-unit id="T3weQko" resname="Tiers on the same number are admitted together.">
         <source>Tiers on the same number are admitted together.</source>
         <target>Tiers on the same number are admitted together.</target>
       </trans-unit>
@@ -10176,6 +10188,10 @@
       <trans-unit id="sdih8bl" resname="Unknown reason">
         <source>Unknown reason</source>
         <target state="translated">Unknown reason</target>
+      </trans-unit>
+      <trans-unit id="W8BQW1b" resname="Unlimited">
+        <source>Unlimited</source>
+        <target>Unlimited</target>
       </trans-unit>
       <trans-unit id="_c9YbkL" resname="Unlink">
         <source>Unlink</source>
@@ -10480,6 +10496,10 @@
       <trans-unit id="zND6L.F" resname="Visible to whoever asked and to the board. Use it to explain a decision.">
         <source>Visible to whoever asked and to the board. Use it to explain a decision.</source>
         <target state="translated">Visible to whoever asked and to the board. Use it to explain a decision.</target>
+      </trans-unit>
+      <trans-unit id="cmDrSH2" resname="Visible to whoever may see the sign-ups">
+        <source>Visible to whoever may see the sign-ups</source>
+        <target>Visible to whoever may see the sign-ups</target>
       </trans-unit>
       <trans-unit id="VcuSKVC" resname="Visible to you and your contact at GEWIS.">
         <source>Visible to you and your contact at GEWIS.</source>
