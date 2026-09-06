@@ -50,11 +50,11 @@
     font-weight: 800;
 }
 
-.tier-order-seats {
+.tier-order-places {
     inline-size: 4.5rem;
     flex: none;
 
-    // A tier tied to the one above shares its seats, so it asks for none of its own.
+    // A tier tied to the one above shares its places, so it asks for none of its own.
     &.is-tied {
         visibility: hidden;
     }

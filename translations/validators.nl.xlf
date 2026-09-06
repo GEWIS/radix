@@ -265,8 +265,8 @@
         <source>Enter when proposing closes.</source>
         <target state="translated">Vul in wanneer voorstellen indienen sluit.</target>
       </trans-unit>
-      <trans-unit id="vhbzV_h" resname="Enter zero or more seats.">
-        <source>Enter zero or more seats.</source>
+      <trans-unit id="jenoGET" resname="Enter zero or more places.">
+        <source>Enter zero or more places.</source>
         <target>Vul nul of meer plaatsen in.</target>
       </trans-unit>
       <trans-unit id="B9r0Hn5" resname="Error">
@@ -301,8 +301,8 @@
         <source>Give this round a name.</source>
         <target state="translated">Geef deze ronde een naam.</target>
       </trans-unit>
-      <trans-unit id="Hmh0Dzs" resname="Hold at least one seat for the organising body, or hold none at all.">
-        <source>Hold at least one seat for the organising body, or hold none at all.</source>
+      <trans-unit id="8MskUlR" resname="Hold at least one place for the organising body, or hold none at all.">
+        <source>Hold at least one place for the organising body, or hold none at all.</source>
         <target>Reserveer minstens één plaats voor het organiserende orgaan, of reserveer er geen.</target>
       </trans-unit>
       <trans-unit id="WLxP5.7" resname="Key code cannot be granted in the past.">
@@ -321,8 +321,8 @@
         <source>Mailman and Listmonk mailing lists cannot both be set at the same time</source>
         <target state="translated">Een Mailman- en een Listmonk-mailinglijst kunnen niet allebei tegelijk worden ingesteld</target>
       </trans-unit>
-      <trans-unit id="flUO1Ky" resname="More seats are held than the list has to give out.">
-        <source>More seats are held than the list has to give out.</source>
+      <trans-unit id="oVoJQRc" resname="More places are held than the list has to give out.">
+        <source>More places are held than the list has to give out.</source>
         <target>Er zijn meer plaatsen gereserveerd dan de lijst te vergeven heeft.</target>
       </trans-unit>
       <trans-unit id="Yg_k.o3" resname="Name the role.">
@@ -441,8 +441,8 @@
         <source>The name should be at most {{ limit }} characters.</source>
         <target state="translated">De naam mag hoogstens {{ limit }} tekens lang zijn.</target>
       </trans-unit>
-      <trans-unit id="Tx6GC3B" resname="The roles together guarantee more seats than the list has.">
-        <source>The roles together guarantee more seats than the list has.</source>
+      <trans-unit id="wGAWxEw" resname="The roles together guarantee more places than the list has.">
+        <source>The roles together guarantee more places than the list has.</source>
         <target>De rollen garanderen samen meer plaatsen dan de lijst heeft.</target>
       </trans-unit>
       <trans-unit id="k8QayhA" resname="The sign-up list must close before the activity starts.">

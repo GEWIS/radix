@@ -125,7 +125,7 @@
                             fields.vars.membershipTierOrderTiers,
                             'Admit some members before others'|trans,
                             membership_settings,
-                            fields.vars.membershipSeats,
+                            fields.vars.membershipPlaces,
                         ) }}
                         {% if fields.vars.onlyGEWIS %}
                             {{ helper.tier_modifier(fields.programTypeOrder, fields.vars.programTypeOrderTiers, 'Admit some study phases before others'|trans) }}
@@ -136,12 +136,12 @@
                             {% do fields.cohortTierOrder.setRendered %}
                         {% endif %}
                         <hr>
-                        <h6>{{ 'Reserved seats'|trans }}</h6>
+                        <h6>{{ 'Reserved places'|trans }}</h6>
                         <p class="form-text mt-0">
-                            {{ 'Seats taken out of the draw before anything else is allocated.'|trans }}
+                            {{ 'Places taken out of the draw before anything else is allocated.'|trans }}
                         </p>
                         <div class="row">
-                            <div class="col-md-4">{{ form_row(fields.organisingCommitteeSeats) }}</div>
+                            <div class="col-md-4">{{ form_row(fields.organisingCommitteePlaces) }}</div>
                         </div>
                         <label class="form-label">{{ 'Guaranteed roles'|trans }}</label>
                         <p class="form-text mt-0">

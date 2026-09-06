@@ -42,8 +42,8 @@ class SignupRoleType extends AbstractType
                 'minimum',
                 IntegerType::class,
                 [
-                    'label' => t('Seats guaranteed'),
-                    'constraints' => [new Positive(message: 'Guarantee the role at least one seat.')],
+                    'label' => t('Places guaranteed'),
+                    'constraints' => [new Positive(message: 'Guarantee the role at least one place.')],
                 ],
             );
 

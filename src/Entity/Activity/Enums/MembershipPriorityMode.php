@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 enum MembershipPriorityMode: string implements TranslatableInterface
 {
     case Ordering = 'ordering';
-    case ReservedSeats = 'reserved-seats';
+    case ReservedPlaces = 'reserved-places';
 
     #[Override]
     public function trans(
@@ -23,8 +23,8 @@ enum MembershipPriorityMode: string implements TranslatableInterface
                 'Admit the tiers in order',
                 locale: $locale,
             ),
-            self::ReservedSeats => $translator->trans(
-                'Reserve a number of seats per tier',
+            self::ReservedPlaces => $translator->trans(
+                'Reserve a number of places per tier',
                 locale: $locale,
             ),
         };

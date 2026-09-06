@@ -78,9 +78,9 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             'data-tier-order-value-param="non-member"',
             $html,
         );
-        // The seats are asked for on the rank they are held for, inside the order itself.
+        // The places are asked for on the rank they are held for, inside the order itself.
         self::assertStringContainsString(
-            'data-tier-order-target="seats"',
+            'data-tier-order-target="places"',
             $html,
         );
         self::assertStringContainsString(
@@ -364,12 +364,12 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     {
         $previous = $this->revisionWithList();
         $previousList = $previous->getSignupLists()->getValues()[0];
-        $previousList->setOrganisingCommitteeSeats(1);
+        $previousList->setOrganisingCommitteePlaces(1);
 
         $revision = $this->revisionWithList();
         $list = $revision->getSignupLists()->getValues()[0];
         $list->setLineageId($previousList->getLineageId());
-        $list->setOrganisingCommitteeSeats(4);
+        $list->setOrganisingCommitteePlaces(4);
 
         $html = $this->renderPane(
             $revision,
@@ -502,8 +502,8 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             [MembershipTier::Graduate],
             [MembershipTier::Ordinary],
         ]);
-        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedSeats);
-        $list->setHeldMembershipSeats([MembershipTier::Ordinary->value => 2]);
+        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedPlaces);
+        $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 2]);
 
         $role = new SignupRole();
         $role->setName('Driver');

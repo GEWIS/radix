@@ -39,7 +39,7 @@ use function sprintf;
 /**
  * Once a sign-up list has sign-ups the way places are allocated must not change under the people who already committed:
  * the allocation method and its per-method settings are frozen (rendered read-only, ignored on submit). The capacity is
- * deliberately left editable so seats can still be adjusted while the list is open. These tests pin both.
+ * deliberately left editable so places can still be adjusted while the list is open. These tests pin both.
  */
 // TypeTestCase creates an unconfigured EventDispatcher mock internally; opt out of the no-expectations notice.
 #[AllowMockObjectsWithoutExpectations]
@@ -439,13 +439,13 @@ final class SignupListTypeTest extends TypeTestCase
         );
     }
 
-    public function testNoMoreSeatsMayBeHeldThanTheListHasToGiveOut(): void
+    public function testNoMorePlacesMayBeHeldThanTheListHasToGiveOut(): void
     {
         $form = $this->submitList([
             'capacity' => '10',
             'membershipTierOrder' => 'ordinary:8,graduate:2,non-member:0',
-            'membershipPriorityMode' => MembershipPriorityMode::ReservedSeats->value,
-            'organisingCommitteeSeats' => '3',
+            'membershipPriorityMode' => MembershipPriorityMode::ReservedPlaces->value,
+            'organisingCommitteePlaces' => '3',
         ]);
 
         self::assertFalse($form->isValid());
@@ -455,7 +455,7 @@ final class SignupListTypeTest extends TypeTestCase
         );
     }
 
-    public function testHeldSeatsAreDroppedWhenTheOrderIsNotAppliedByHoldingThem(): void
+    public function testHeldPlacesAreDroppedWhenTheOrderIsNotAppliedByHoldingThem(): void
     {
         $list = $this->list();
         $this->submitList(
@@ -466,10 +466,10 @@ final class SignupListTypeTest extends TypeTestCase
             $list,
         );
 
-        self::assertNull($list->getHeldMembershipSeats());
+        self::assertNull($list->getHeldMembershipPlaces());
         self::assertSame(
             [],
-            $list->getMembershipSeats(),
+            $list->getMembershipPlaces(),
         );
     }
 
@@ -483,7 +483,7 @@ final class SignupListTypeTest extends TypeTestCase
                 'membershipTierOrder' => 'member,graduate,non-member',
                 'membershipPriorityMode' => MembershipPriorityMode::Ordering->value,
                 'cohortTierOrder' => 'first-year,second-year,third-year-and-above,unknown',
-                'organisingCommitteeSeats' => '2',
+                'organisingCommitteePlaces' => '2',
             ],
             $list,
         );
@@ -491,7 +491,7 @@ final class SignupListTypeTest extends TypeTestCase
         self::assertNull($list->getMembershipTierOrder());
         self::assertNull($list->getMembershipPriorityMode());
         self::assertNull($list->getCohortTierOrder());
-        self::assertNull($list->getOrganisingCommitteeSeats());
+        self::assertNull($list->getOrganisingCommitteePlaces());
         self::assertFalse($list->hasPriorityModifiers());
     }
 
@@ -508,7 +508,7 @@ final class SignupListTypeTest extends TypeTestCase
                 'membershipPriorityMode',
                 'cohortTierOrder',
                 'programTypeOrder',
-                'organisingCommitteeSeats',
+                'organisingCommitteePlaces',
                 'roles',
             ] as $name
         ) {
@@ -589,7 +589,7 @@ final class SignupListTypeTest extends TypeTestCase
         );
     }
 
-    public function testSeatsAreNotHeldForNonMembersOnAMembersOnlyList(): void
+    public function testPlacesAreNotHeldForNonMembersOnAMembersOnlyList(): void
     {
         $list = $this->list();
         $list->setOnlyGEWIS(true);
@@ -597,15 +597,15 @@ final class SignupListTypeTest extends TypeTestCase
         $this->submitList(
             [
                 'membershipTierOrder' => 'ordinary:4,graduate,non-member:2',
-                'membershipPriorityMode' => MembershipPriorityMode::ReservedSeats->value,
+                'membershipPriorityMode' => MembershipPriorityMode::ReservedPlaces->value,
             ],
             $list,
         );
 
-        // The list is members-only, so the rank the non-members stood on is gone and the seats held for it with it.
+        // The list is members-only, so the rank the non-members stood on is gone and the places held for it with it.
         self::assertSame(
             [MembershipTier::Ordinary->value => 4],
-            $list->getHeldMembershipSeats(),
+            $list->getHeldMembershipPlaces(),
         );
         // The tiers the order left out are appended as the one rank the association would rank them on, and that
         // rank holds nothing until somebody says otherwise.
@@ -615,7 +615,7 @@ final class SignupListTypeTest extends TypeTestCase
                 MembershipTier::Graduate->value => 0,
                 MembershipTier::External->value . '+' . MembershipTier::Honorary->value => 0,
             ],
-            $list->getMembershipSeats(),
+            $list->getMembershipPlaces(),
         );
     }
 

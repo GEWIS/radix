@@ -1,7 +1,7 @@
 import DragReorder from '../application/drag_reorder.ts';
 
 export default class extends DragReorder {
-    static targets = ['toggle', 'panel', 'value', 'entries', 'rank', 'tie', 'seats', 'seatsBox'];
+    static targets = ['toggle', 'panel', 'value', 'entries', 'rank', 'tie', 'places', 'placesBox'];
 
     declare readonly hasToggleTarget: boolean;
     declare readonly toggleTarget: HTMLInputElement;
@@ -85,14 +85,14 @@ export default class extends DragReorder {
                 tie.setAttribute('aria-pressed', tied ? 'true' : 'false');
             }
 
-            // The seats are held for the rank, so only the row it starts on asks for them.
-            const box = entry.querySelector<HTMLElement>('[data-tier-order-target="seatsBox"]');
-            const seats = entry.querySelector<HTMLInputElement>('[data-tier-order-target="seats"]');
-            if (null !== box && null !== seats) {
+            // The places are held for the rank, so only the row it starts on asks for them.
+            const box = entry.querySelector<HTMLElement>('[data-tier-order-target="placesBox"]');
+            const places = entry.querySelector<HTMLInputElement>('[data-tier-order-target="places"]');
+            if (null !== box && null !== places) {
                 box.classList.toggle('is-tied', tied);
-                seats.disabled = tied;
+                places.disabled = tied;
                 if (tied) {
-                    seats.value = '';
+                    places.value = '';
                 }
             }
         });
@@ -105,7 +105,7 @@ export default class extends DragReorder {
             return;
         }
 
-        const ranks: { tiers: string[]; seats: string }[] = [];
+        const ranks: { tiers: string[]; places: string }[] = [];
         this.directEntries().forEach((entry, index) => {
             const value = entry.dataset.tierOrderValueParam ?? '';
             if ('' === value) {
@@ -118,13 +118,13 @@ export default class extends DragReorder {
                 return;
             }
 
-            const seats = entry.querySelector<HTMLInputElement>('[data-tier-order-target="seats"]');
+            const places = entry.querySelector<HTMLInputElement>('[data-tier-order-target="places"]');
 
-            ranks.push({tiers: [value], seats: seats?.value.trim() ?? ''});
+            ranks.push({tiers: [value], places: places?.value.trim() ?? ''});
         });
 
         this.valueTarget.value = ranks
-            .map((rank) => rank.tiers.join('+') + ('' === rank.seats ? '' : ':' + rank.seats))
+            .map((rank) => rank.tiers.join('+') + ('' === rank.places ? '' : ':' + rank.places))
             .join(',');
     }
 }

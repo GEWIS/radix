@@ -16,7 +16,7 @@ final class Version20260904093855 extends AbstractMigration
     public function getDescription(): string
     {
         return 'Give a sign-up list the priority modifiers the board asked for: an order to serve its membership'
-            . ' tiers, study phases and cohorts in, seats held for those tiers or for the organising body, and the'
+            . ' tiers, study phases and cohorts in, places held for those tiers or for the organising body, and the'
             . ' roles an activity cannot go ahead without together with the role each subscriber was handed. Every'
             . ' one of them is off until an organiser turns it on, so existing lists allocate their places exactly'
             . ' as they did.';
@@ -29,7 +29,7 @@ final class Version20260904093855 extends AbstractMigration
         $this->addSql('ALTER TABLE Signup ADD role_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE Signup ADD CONSTRAINT FK_490F1BD9D60322AC FOREIGN KEY (role_id) REFERENCES SignupRole (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX IDX_490F1BD9D60322AC ON Signup (role_id)');
-        $this->addSql('ALTER TABLE SignupList ADD membershipTierOrder JSON DEFAULT NULL, ADD membershipPriorityMode VARCHAR(255) DEFAULT NULL, ADD membershipSeats JSON DEFAULT NULL, ADD cohortTierOrder JSON DEFAULT NULL, ADD programTypeOrder JSON DEFAULT NULL, ADD organisingCommitteeSeats INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE SignupList ADD membershipTierOrder JSON DEFAULT NULL, ADD membershipPriorityMode VARCHAR(255) DEFAULT NULL, ADD membershipPlaces JSON DEFAULT NULL, ADD cohortTierOrder JSON DEFAULT NULL, ADD programTypeOrder JSON DEFAULT NULL, ADD organisingCommitteePlaces INT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
@@ -39,6 +39,6 @@ final class Version20260904093855 extends AbstractMigration
         $this->addSql('ALTER TABLE Signup DROP FOREIGN KEY FK_490F1BD9D60322AC');
         $this->addSql('DROP INDEX IDX_490F1BD9D60322AC ON Signup');
         $this->addSql('ALTER TABLE Signup DROP role_id');
-        $this->addSql('ALTER TABLE SignupList DROP membershipTierOrder, DROP membershipPriorityMode, DROP membershipSeats, DROP cohortTierOrder, DROP programTypeOrder, DROP organisingCommitteeSeats');
+        $this->addSql('ALTER TABLE SignupList DROP membershipTierOrder, DROP membershipPriorityMode, DROP membershipPlaces, DROP cohortTierOrder, DROP programTypeOrder, DROP organisingCommitteePlaces');
     }
 }

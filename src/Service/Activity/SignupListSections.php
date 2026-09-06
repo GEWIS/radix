@@ -449,11 +449,11 @@ final readonly class SignupListSections
             $this->uses(
                 $old,
                 $new,
-                static fn (SignupList $list): bool => MembershipPriorityMode::ReservedSeats
+                static fn (SignupList $list): bool => MembershipPriorityMode::ReservedPlaces
                 === $list->getMembershipPriorityMode(),
             )
         ) {
-            // The seats are held for a rank of the order, so they are read back against the tiers that share them.
+            // The places are held for a rank of the order, so they are read back against the tiers that share them.
             $ranks = [];
             foreach (
                 [
@@ -468,8 +468,8 @@ final readonly class SignupListSections
 
             foreach ($ranks as $rank) {
                 $held = [
-                    $this->number($old?->getMembershipSeatsForRank($rank)),
-                    $this->number($new?->getMembershipSeatsForRank($rank)),
+                    $this->number($old?->getMembershipPlacesForRank($rank)),
+                    $this->number($new?->getMembershipPlacesForRank($rank)),
                 ];
 
                 if (!$this->said($held)) {
@@ -478,7 +478,7 @@ final readonly class SignupListSections
 
                 $fields[] = $this->field(
                     t(
-                        'Seats held for %tier%',
+                        'Places held for %tier%',
                         [
                             '%tier%' => SignupTiers::orderText(
                                 [$rank],
@@ -524,17 +524,17 @@ final readonly class SignupListSections
             );
         }
 
-        $seats = [
-            $this->number($old?->getOrganisingCommitteeSeats()),
-            $this->number($new?->getOrganisingCommitteeSeats()),
+        $places = [
+            $this->number($old?->getOrganisingCommitteePlaces()),
+            $this->number($new?->getOrganisingCommitteePlaces()),
         ];
 
-        if ($this->said($seats)) {
+        if ($this->said($places)) {
             $fields[] = $this->field(
-                t('Seats held for the organising body'),
+                t('Places held for the organising body'),
                 RevisionFieldKind::Text,
-                $seats[0],
-                $seats[1],
+                $places[0],
+                $places[1],
                 $comparable,
             );
         }

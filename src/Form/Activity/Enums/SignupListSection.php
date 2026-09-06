@@ -88,7 +88,7 @@ enum SignupListSection: string implements TranslatableInterface
             self::Basics => $translator->trans(
                 'Name the list and say when it is open. Everything else about this list comes later.',
             ),
-            self::Allocation => $translator->trans('Who gets a place when there are more sign-ups than seats.'),
+            self::Allocation => $translator->trans('Who gets a place when there are more sign-ups than places.'),
             self::Questions => $translator->trans('What people are asked when they sign up for this list.'),
         };
     }

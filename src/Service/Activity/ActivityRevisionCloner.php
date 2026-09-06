@@ -118,10 +118,10 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
         $list->setCustomMethodDescription($source->getCustomMethodDescription());
         $list->setMembershipTierOrder($source->getMembershipTierOrder());
         $list->setMembershipPriorityMode($source->getMembershipPriorityMode());
-        $list->setHeldMembershipSeats($source->getHeldMembershipSeats());
+        $list->setHeldMembershipPlaces($source->getHeldMembershipPlaces());
         $list->setCohortTierOrder($source->getCohortTierOrder());
         $list->setProgramTypeOrder($source->getProgramTypeOrder());
-        $list->setOrganisingCommitteeSeats($source->getOrganisingCommitteeSeats());
+        $list->setOrganisingCommitteePlaces($source->getOrganisingCommitteePlaces());
         $list->setPresenceTaken($source->isPresenceTaken());
         $list->setPromoted($source->isPromoted());
         // Carry the lineage forward so approval can migrate the live sign-ups onto this clone.

@@ -180,12 +180,12 @@ final class AdmissionOrderTest extends TestCase
         );
     }
 
-    public function testHeldSeatsMoveOnlyTheirOwnTierForwardAndLeaveTheRestAlone(): void
+    public function testHeldPlacesMoveOnlyTheirOwnTierForwardAndLeaveTheRestAlone(): void
     {
         $list = $this->list();
         $list->setMembershipTierOrder(self::ranks(MembershipTier::defaultOrder()));
-        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedSeats);
-        $list->setHeldMembershipSeats([MembershipTier::Ordinary->value => 1]);
+        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedPlaces);
+        $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 1]);
 
         $pool = [
             $this->external('external-first'),

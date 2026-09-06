@@ -69,10 +69,10 @@ use function sprintf;
  *     drawnBy?: int,
  *     membershipTierOrder?: list<list<MembershipTier>>,
  *     membershipPriorityMode?: MembershipPriorityMode,
- *     membershipSeats?: array<string, int>,
+ *     membershipPlaces?: array<string, int>,
  *     cohortTierOrder?: list<list<CohortTier>>,
  *     programTypeOrder?: list<list<ProgramType>>,
- *     organisingCommitteeSeats?: int,
+ *     organisingCommitteePlaces?: int,
  *     roles?: list<array{name: string, minimum: int}>,
  *     promoted?: bool,
  *     presenceTaken?: bool,
@@ -205,7 +205,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     'nl' => 'Gratis',
                 ],
                 'description' => [
-                    'en' => "Grab a seat and a blanket for a cosy **movie night** at the association.\n\n"
+                    'en' => "Grab a place and a blanket for a cosy **movie night** at the association.\n\n"
                         . 'We screen two films back to back, with a short break for free popcorn and drinks in '
                         . "between. The theme changes every month and is decided by a poll among members.\n\n"
                         . 'No sign-up needed for the second film — just show up. Expect the evening to run until '
@@ -636,7 +636,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         'displaySubscribedNumber' => false,
                         'limitedCapacity' => true,
                         'capacity' => 40,
-                        // An external party (the venue) allocates the seats; admission is recorded by hand.
+                        // An external party (the venue) allocates the places; admission is recorded by hand.
                         'allocationMethod' => AllocationMethod::ExternalParty,
                         'externalPolicyUrl' => 'https://example.org/venue-policy',
                     ],
@@ -974,7 +974,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 $revision->addLabel($this->getReference($labelReference, ActivityLabel::class));
             }
 
-            // The organ behind the activity, which is what the seats held for the organising body are read against.
+            // The organ behind the activity, which is what the places held for the organising body are read against.
             if (isset($data['organ'])) {
                 $revision->setOrgan(
                     $this->getReference(
@@ -1276,11 +1276,11 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             ],
             'B' => [
                 'does' => [
-                    'en' => 'Seats held back',
+                    'en' => 'Places held back',
                     'nl' => 'Gereserveerde plaatsen',
                 ],
                 'says' => [
-                    'en' => 'Seats are held for the organising body and for each rank of the membership order; what '
+                    'en' => 'Places are held for the organising body and for each rank of the membership order; what '
                         . 'is left over is open to everybody.',
                     'nl' => 'Er zijn plaatsen gereserveerd voor het organiserende orgaan en voor elke groep van de '
                         . 'ledenvolgorde; wat overblijft is voor iedereen.',
@@ -1292,13 +1292,13 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 // at. The modifiers act on either method the same way.
                 'method' => AllocationMethod::FirstComeFirstServed,
                 'settings' => $membership + [
-                    'membershipPriorityMode' => MembershipPriorityMode::ReservedSeats,
-                    'membershipSeats' => [
+                    'membershipPriorityMode' => MembershipPriorityMode::ReservedPlaces,
+                    'membershipPlaces' => [
                         'ordinary+external+honorary' => 3,
                         'graduate' => 1,
                         'non-member' => 1,
                     ],
-                    'organisingCommitteeSeats' => 2,
+                    'organisingCommitteePlaces' => 2,
                 ],
                 'subscribers' => [
                     8025,
@@ -1384,7 +1384,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     'nl' => 'Alles tegelijk',
                 ],
                 'says' => [
-                    'en' => 'An order, seats held for the organising body, and a role the activity cannot go ahead '
+                    'en' => 'An order, places held for the organising body, and a role the activity cannot go ahead '
                         . 'without, all on the one list. The draw runs at the moment the organiser named.',
                     'nl' => 'Een volgorde, plaatsen voor het organiserende orgaan en een rol waar de activiteit niet '
                         . 'zonder kan, allemaal op dezelfde lijst. Er wordt geloot op het moment dat de organisator '
@@ -1395,7 +1395,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 'method' => AllocationMethod::ConditionalDraw,
                 'settings' => $membership + $roles + [
                     'membershipPriorityMode' => MembershipPriorityMode::Ordering,
-                    'organisingCommitteeSeats' => 1,
+                    'organisingCommitteePlaces' => 1,
                     'cohortTierOrder' => [
                         [CohortTier::FirstYear],
                         [CohortTier::SecondYear],
@@ -1918,10 +1918,10 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         $signupList->setPresenceTaken($data['presenceTaken'] ?? false);
         $signupList->setMembershipTierOrder($data['membershipTierOrder'] ?? null);
         $signupList->setMembershipPriorityMode($data['membershipPriorityMode'] ?? null);
-        $signupList->setHeldMembershipSeats($data['membershipSeats'] ?? null);
+        $signupList->setHeldMembershipPlaces($data['membershipPlaces'] ?? null);
         $signupList->setCohortTierOrder($data['cohortTierOrder'] ?? null);
         $signupList->setProgramTypeOrder($data['programTypeOrder'] ?? null);
-        $signupList->setOrganisingCommitteeSeats($data['organisingCommitteeSeats'] ?? null);
+        $signupList->setOrganisingCommitteePlaces($data['organisingCommitteePlaces'] ?? null);
 
         $position = 0;
         foreach ($data['roles'] ?? [] as $role) {

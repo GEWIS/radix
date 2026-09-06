@@ -294,16 +294,16 @@ final class ActivityRevisionClonerTest extends TestCase
             $draftList->getMembershipTierOrder(),
         );
         self::assertSame(
-            MembershipPriorityMode::ReservedSeats,
+            MembershipPriorityMode::ReservedPlaces,
             $draftList->getMembershipPriorityMode(),
         );
         self::assertSame(
             [MembershipTier::Ordinary->value => 3],
-            $draftList->getHeldMembershipSeats(),
+            $draftList->getHeldMembershipPlaces(),
         );
         self::assertSame(
             2,
-            $draftList->getOrganisingCommitteeSeats(),
+            $draftList->getOrganisingCommitteePlaces(),
         );
 
         $sourceRole = $sourceList->getRoles()->getValues()[0];
@@ -435,9 +435,9 @@ final class ActivityRevisionClonerTest extends TestCase
             [MembershipTier::Ordinary],
             [MembershipTier::Graduate],
         ]);
-        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedSeats);
-        $list->setHeldMembershipSeats([MembershipTier::Ordinary->value => 3]);
-        $list->setOrganisingCommitteeSeats(2);
+        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedPlaces);
+        $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 3]);
+        $list->setOrganisingCommitteePlaces(2);
 
         $signup = new ExternalSignup();
         $signup->setSignupList($list);

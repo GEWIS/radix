@@ -31,6 +31,12 @@ enum RecipientScope: string implements TranslatableInterface
     /** The attendees: those marked present. */
     case Present = 'present';
 
+    /** Externals and non-members. */
+    case External = 'external';
+
+    /** People signed up for more than one list of the activity. */
+    case Multi = 'multi';
+
     #[Override]
     public function trans(
         TranslatorInterface $translator,
@@ -55,6 +61,14 @@ enum RecipientScope: string implements TranslatableInterface
             ),
             self::Present => $translator->trans(
                 'Attendees (present)',
+                locale: $locale,
+            ),
+            self::External => $translator->trans(
+                'Externals',
+                locale: $locale,
+            ),
+            self::Multi => $translator->trans(
+                'In several lists',
                 locale: $locale,
             ),
         };

@@ -75,7 +75,7 @@ class SignupListType extends AbstractType
     /**
      * The allocation method and its per-method settings, frozen once the list has sign-ups: changing how places are
      * allocated after people have committed would rewrite the deal they signed up under. `capacity` is deliberately
-     * excluded — it is not per-method and may still need adjusting (e.g. adding seats) while the list is open; it is
+     * excluded — it is not per-method and may still need adjusting (e.g. adding places) while the list is open; it is
      * frozen separately once the draw has been performed (see {@see self::freezeWhenDrawn()}, which locks the draw's
      * exact settings so the carried draw lock cannot go stale).
      */
@@ -92,7 +92,7 @@ class SignupListType extends AbstractType
         'membershipPriorityMode',
         'cohortTierOrder',
         'programTypeOrder',
-        'organisingCommitteeSeats',
+        'organisingCommitteePlaces',
         'roles',
     ];
 
@@ -378,10 +378,10 @@ class SignupListType extends AbstractType
                 ],
             )
             ->add(
-                'organisingCommitteeSeats',
+                'organisingCommitteePlaces',
                 IntegerType::class,
                 [
-                    'label' => t('Seats held for the organising body'),
+                    'label' => t('Places held for the organising body'),
                     'required' => false,
                 ],
             )
@@ -510,16 +510,16 @@ class SignupListType extends AbstractType
         }
 
         $reserved = 0;
-        if (MembershipPriorityMode::ReservedSeats === $list->getMembershipPriorityMode()) {
-            foreach ($list->getMembershipSeats() as $seats) {
-                if ($seats >= 0) {
-                    $reserved += $seats;
+        if (MembershipPriorityMode::ReservedPlaces === $list->getMembershipPriorityMode()) {
+            foreach ($list->getMembershipPlaces() as $places) {
+                if ($places >= 0) {
+                    $reserved += $places;
 
                     continue;
                 }
 
                 $context->buildViolation(t(
-                    'Enter zero or more seats.',
+                    'Enter zero or more places.',
                     [],
                     'validators',
                 )->getMessage())
@@ -528,15 +528,15 @@ class SignupListType extends AbstractType
             }
         }
 
-        $committee = $list->getOrganisingCommitteeSeats();
+        $committee = $list->getOrganisingCommitteePlaces();
         if (null !== $committee) {
             if ($committee < 1) {
                 $context->buildViolation(t(
-                    'Hold at least one seat for the organising body, or hold none at all.',
+                    'Hold at least one place for the organising body, or hold none at all.',
                     [],
                     'validators',
                 )->getMessage())
-                    ->atPath('organisingCommitteeSeats')
+                    ->atPath('organisingCommitteePlaces')
                     ->addViolation();
             } else {
                 $reserved += $committee;
@@ -548,7 +548,7 @@ class SignupListType extends AbstractType
             && $reserved > $capacity
         ) {
             $context->buildViolation(t(
-                'More seats are held than the list has to give out.',
+                'More places are held than the list has to give out.',
                 [],
                 'validators',
             )->getMessage())
@@ -568,7 +568,7 @@ class SignupListType extends AbstractType
         }
 
         $context->buildViolation(t(
-            'The roles together guarantee more seats than the list has.',
+            'The roles together guarantee more places than the list has.',
             [],
             'validators',
         )->getMessage())
@@ -577,8 +577,8 @@ class SignupListType extends AbstractType
     }
 
     /**
-     * The membership order as the control holds it: the ranks in turn, the tiers of a rank joined, and the seats
-     * held for a rank written behind it. The seats belong to the rank rather than to a tier, because the tiers of a
+     * The membership order as the control holds it: the ranks in turn, the tiers of a rank joined, and the places
+     * held for a rank written behind it. The places belong to the rank rather than to a tier, because the tiers of a
      * rank are admitted together and share what is held for them.
      */
     private static function membershipAsString(SignupList $list): string
@@ -586,11 +586,11 @@ class SignupListType extends AbstractType
         $ranks = [];
         foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
             $tiers = self::orderAsString([$rank]);
-            $seats = $list->getMembershipSeatsForRank($rank);
+            $places = $list->getMembershipPlacesForRank($rank);
 
-            $ranks[] = null === $seats
+            $ranks[] = null === $places
                 ? $tiers
-                : $tiers . ':' . $seats;
+                : $tiers . ':' . $places;
         }
 
         return implode(
@@ -604,7 +604,7 @@ class SignupListType extends AbstractType
         ?string $value,
     ): void {
         $order = [];
-        $seats = [];
+        $places = [];
 
         foreach (
             explode(
@@ -643,11 +643,11 @@ class SignupListType extends AbstractType
                 continue;
             }
 
-            $seats[SignupList::rankKey($rank[0])] = (int) trim($held);
+            $places[SignupList::rankKey($rank[0])] = (int) trim($held);
         }
 
         $list->setMembershipTierOrder([] === $order ? null : $order);
-        $list->setHeldMembershipSeats([] === $seats ? null : $seats);
+        $list->setHeldMembershipPlaces([] === $places ? null : $places);
     }
 
     /**
@@ -837,8 +837,8 @@ class SignupListType extends AbstractType
             'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
             'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
             'onlyGEWIS' => $list?->getOnlyGEWIS() ?? true,
-            // The seats held for each rank of the membership order, which the control asks for on the rank itself.
-            'membershipSeats' => $list?->getHeldMembershipSeats() ?? [],
+            // The places held for each rank of the membership order, which the control asks for on the rank itself.
+            'membershipPlaces' => $list?->getHeldMembershipPlaces() ?? [],
         ];
     }
 
@@ -906,8 +906,8 @@ class SignupListType extends AbstractType
 
     /**
      * Re-add the structural fields and the allocation method (with its per-method settings) as `disabled` for a list
-     * that already has sign-ups, so they render read-only and are ignored on submit. `capacity` stays editable so seats
-     * can still be adjusted; {@see self::freezeWhenDrawn()} locks it too once the draw has run.
+     * that already has sign-ups, so they render read-only and are ignored on submit. `capacity` stays editable so
+     * places can still be adjusted; {@see self::freezeWhenDrawn()} locks it too once the draw has run.
      */
     private function freezeWhenSubscribed(FormEvent $event): void
     {
@@ -1047,7 +1047,7 @@ class SignupListType extends AbstractType
 
     /**
      * Drop the priority modifiers a list cannot act on: all of them where admission is not decided here, the held
-     * seats where the membership order is not applied by holding them, and the study phase and the cohort on a list
+     * places where the membership order is not applied by holding them, and the study phase and the cohort on a list
      * anybody may sign up for.
      */
     private function clearInapplicablePriority(SignupList $list): void
@@ -1059,7 +1059,7 @@ class SignupListType extends AbstractType
             $list->setMembershipTierOrder(null);
             $list->setCohortTierOrder(null);
             $list->setProgramTypeOrder(null);
-            $list->setOrganisingCommitteeSeats(null);
+            $list->setOrganisingCommitteePlaces(null);
 
             foreach ($list->getRoles()->toArray() as $role) {
                 $list->removeRole($role);
@@ -1075,8 +1075,8 @@ class SignupListType extends AbstractType
             $list->setMembershipPriorityMode(null);
         }
 
-        if (MembershipPriorityMode::ReservedSeats !== $list->getMembershipPriorityMode()) {
-            $list->setHeldMembershipSeats(null);
+        if (MembershipPriorityMode::ReservedPlaces !== $list->getMembershipPriorityMode()) {
+            $list->setHeldMembershipPlaces(null);
 
             return;
         }
@@ -1085,15 +1085,15 @@ class SignupListType extends AbstractType
         // it into every future revision.
         $held = [];
         foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
-            $seats = $list->getMembershipSeatsForRank($rank);
-            if (null === $seats) {
+            $places = $list->getMembershipPlacesForRank($rank);
+            if (null === $places) {
                 continue;
             }
 
-            $held[SignupList::rankKey($rank)] = $seats;
+            $held[SignupList::rankKey($rank)] = $places;
         }
 
-        $list->setHeldMembershipSeats([] === $held ? null : $held);
+        $list->setHeldMembershipPlaces([] === $held ? null : $held);
     }
 
     private function disableOpenDateWhenOpened(FormEvent $event): void

@@ -3,7 +3,7 @@
    adding an entry clones it with its placeholder (`__list__` / `__field__`) replaced by a fresh index,
    keeping the collapse target ids unique. #}
 
-{% macro tier_modifier(field, ranks, label, settings, seats = null) %}
+{% macro tier_modifier(field, ranks, label, settings, places = null) %}
     {% set on = field.vars.value is not empty %}
     <div class="mb-3" data-controller="tier-order">
         <div class="form-check">
@@ -31,16 +31,16 @@
                                 </span>
                             {% endif %}
                             <span class="flex-grow-1">{{ tier|trans }}</span>
-                            {% if seats is not null %}
-                                {# The seats are held for the rank rather than for one tier, so the number sits on
+                            {% if places is not null %}
+                                {# The places are held for the rank rather than for one tier, so the number sits on
                                    the row the rank starts on and the tiers tied to it share what it says. #}
-                                <span class="tier-order-seats" data-tier-order-target="seatsBox"
-                                      data-signup-list-target="membershipSeats">
+                                <span class="tier-order-places" data-tier-order-target="placesBox"
+                                      data-signup-list-target="membershipPlaces">
                                     <input type="number" min="0" class="form-control form-control-sm"
-                                           aria-label="{{ 'Seats held for this rank'|trans }}"
-                                           data-tier-order-target="seats"
+                                           aria-label="{{ 'Places held for this rank'|trans }}"
+                                           data-tier-order-target="places"
                                            data-action="input->tier-order#write"
-                                           value="{{ loop.first ? seats[rankKey]|default('') }}"
+                                           value="{{ loop.first ? places[rankKey]|default('') }}"
                                            {% if field.vars.disabled %}disabled{% endif %}>
                                 </span>
                             {% endif %}

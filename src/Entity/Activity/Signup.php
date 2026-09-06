@@ -258,6 +258,12 @@ abstract class Signup
     abstract public function getEmail(): ?string;
 
     /**
+     * Who this sign-up is, the same across every list they are in: a member by their number, an external by the
+     * address they typed, so one person's sign-ups on one activity can be read side by side.
+     */
+    abstract public function personKey(): string;
+
+    /**
      * @return SignupGdprArrayType
      */
     public function toGdprArray(): array

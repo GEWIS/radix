@@ -68,10 +68,10 @@ use const PHP_INT_MAX;
  *     customMethodDescription: ?string,
  *     membershipTierOrder: ?list<list<string>>,
  *     membershipPriorityMode: ?string,
- *     membershipSeats: ?array<string, int>,
+ *     membershipPlaces: ?array<string, int>,
  *     cohortTierOrder: ?list<list<string>>,
  *     programTypeOrder: ?list<list<string>>,
- *     organisingCommitteeSeats: ?int,
+ *     organisingCommitteePlaces: ?int,
  *     roles: array<array-key, array{name: string, minimum: int}>,
  *     fields: ImportedSignupFieldArrayType[],
  *     presenceTaken: bool,
@@ -98,10 +98,10 @@ use const PHP_INT_MAX;
  *     customMethodDescription: ?string,
  *     membershipTierOrder: ?list<list<string>>,
  *     membershipPriorityMode: ?string,
- *     membershipSeats: ?array<string, int>,
+ *     membershipPlaces: ?array<string, int>,
  *     cohortTierOrder: ?list<list<string>>,
  *     programTypeOrder: ?list<list<string>>,
- *     organisingCommitteeSeats: ?int,
+ *     organisingCommitteePlaces: ?int,
  *     roles: array<array-key, array{name: string, minimum: int}>,
  *     fields: ImportedSignupFieldGdprArrayType[],
  *     presenceTaken: bool,
@@ -322,7 +322,7 @@ class SignupList
         type: Types::JSON,
         nullable: true,
     )]
-    private ?array $membershipSeats = null;
+    private ?array $membershipPlaces = null;
 
     /** @var ?list<list<string>> */
     #[Column(
@@ -342,7 +342,7 @@ class SignupList
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $organisingCommitteeSeats = null;
+    private ?int $organisingCommitteePlaces = null;
 
     /** @var Collection<array-key, SignupRole> */
     #[OneToMany(
@@ -936,18 +936,18 @@ class SignupList
     }
 
     /**
-     * The seats held for one rank of the membership order. Tiers admitted together share the seats held for them:
+     * The places held for one rank of the membership order. Tiers admitted together share the places held for them:
      * the rank is the pool, not the tier.
      *
      * @param list<MembershipTier> $rank
      */
-    public function getMembershipSeatsForRank(array $rank): ?int
+    public function getMembershipPlacesForRank(array $rank): ?int
     {
-        return $this->membershipSeats[self::rankKey($rank)] ?? null;
+        return $this->membershipPlaces[self::rankKey($rank)] ?? null;
     }
 
     /**
-     * The tiers of a rank as the seats held for it are keyed, in the association's own order so that dragging two
+     * The tiers of a rank as the places held for it are keyed, in the association's own order so that dragging two
      * tiers past one another within a rank does not lose the number held for them.
      *
      * @param list<MembershipTier> $rank
@@ -978,37 +978,37 @@ class SignupList
     /**
      * @return ?array<string, int>
      */
-    public function getHeldMembershipSeats(): ?array
+    public function getHeldMembershipPlaces(): ?array
     {
-        return $this->membershipSeats;
+        return $this->membershipPlaces;
     }
 
     /**
-     * @param ?array<string, int> $seats
+     * @param ?array<string, int> $places
      */
-    public function setHeldMembershipSeats(?array $seats): void
+    public function setHeldMembershipPlaces(?array $places): void
     {
-        $this->membershipSeats = [] === $seats
+        $this->membershipPlaces = [] === $places
             ? null
-            : $seats;
+            : $places;
     }
 
     /**
      * @return array<string, int>
      */
-    public function getMembershipSeats(): array
+    public function getMembershipPlaces(): array
     {
-        if (MembershipPriorityMode::ReservedSeats !== $this->membershipPriorityMode) {
+        if (MembershipPriorityMode::ReservedPlaces !== $this->membershipPriorityMode) {
             return [];
         }
 
-        $seats = [];
+        $places = [];
         foreach ($this->getMembershipTierOrder() ?? [] as $rank) {
             $key = self::rankKey($rank);
-            $seats[$key] = $this->membershipSeats[$key] ?? 0;
+            $places[$key] = $this->membershipPlaces[$key] ?? 0;
         }
 
-        return $seats;
+        return $places;
     }
 
     /**
@@ -1057,14 +1057,14 @@ class SignupList
         $this->programTypeOrder = self::tierValues($order);
     }
 
-    public function getOrganisingCommitteeSeats(): ?int
+    public function getOrganisingCommitteePlaces(): ?int
     {
-        return $this->organisingCommitteeSeats;
+        return $this->organisingCommitteePlaces;
     }
 
-    public function setOrganisingCommitteeSeats(?int $seats): void
+    public function setOrganisingCommitteePlaces(?int $places): void
     {
-        $this->organisingCommitteeSeats = $seats;
+        $this->organisingCommitteePlaces = $places;
     }
 
     /**
@@ -1096,7 +1096,7 @@ class SignupList
         return null !== $this->getMembershipTierOrder()
             || null !== $this->getCohortTierOrder()
             || null !== $this->getProgramTypeOrder()
-            || null !== $this->organisingCommitteeSeats
+            || null !== $this->organisingCommitteePlaces
             || !$this->roles->isEmpty();
     }
 
@@ -1325,10 +1325,10 @@ class SignupList
             'customMethodDescription' => $this->getCustomMethodDescription(),
             'membershipTierOrder' => self::tierValues($this->getMembershipTierOrder()),
             'membershipPriorityMode' => $this->getMembershipPriorityMode()?->value,
-            'membershipSeats' => $this->membershipSeats,
+            'membershipPlaces' => $this->membershipPlaces,
             'cohortTierOrder' => self::tierValues($this->getCohortTierOrder()),
             'programTypeOrder' => self::tierValues($this->getProgramTypeOrder()),
-            'organisingCommitteeSeats' => $this->getOrganisingCommitteeSeats(),
+            'organisingCommitteePlaces' => $this->getOrganisingCommitteePlaces(),
             'roles' => $rolesArrays,
             'presenceTaken' => $this->isPresenceTaken(),
             'promoted' => $this->isPromoted(),
@@ -1368,10 +1368,10 @@ class SignupList
             'customMethodDescription' => $this->getCustomMethodDescription(),
             'membershipTierOrder' => self::tierValues($this->getMembershipTierOrder()),
             'membershipPriorityMode' => $this->getMembershipPriorityMode()?->value,
-            'membershipSeats' => $this->membershipSeats,
+            'membershipPlaces' => $this->membershipPlaces,
             'cohortTierOrder' => self::tierValues($this->getCohortTierOrder()),
             'programTypeOrder' => self::tierValues($this->getProgramTypeOrder()),
-            'organisingCommitteeSeats' => $this->getOrganisingCommitteeSeats(),
+            'organisingCommitteePlaces' => $this->getOrganisingCommitteePlaces(),
             'roles' => $rolesArrays,
             'presenceTaken' => $this->isPresenceTaken(),
             'promoted' => $this->isPromoted(),

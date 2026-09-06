@@ -240,14 +240,14 @@ final readonly class ReviewOutline
         }
 
         $siblings = [];
-        $seat = 0;
+        $place = 0;
         foreach ($families as $id => $family) {
-            ++$seat;
+            ++$place;
 
             $siblings[] = new ReviewGroupLink(
                 ($family['sections'][($part ?? 1) - 1] ?? $family['sections'][0])->key,
                 $family['group']->label,
-                $seat,
+                $place,
                 self::countIn($family['sections']),
                 $id === $current->id,
             );

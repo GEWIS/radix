@@ -23,7 +23,7 @@ export default class extends Controller {
     static targets = [
         'limited', 'capacity', 'methodBlock', 'method',
         'conditional', 'rule', 'cutoffAt', 'durationHours', 'external', 'custom',
-        'priority', 'mode', 'membershipSeats', 'required',
+        'priority', 'mode', 'membershipPlaces', 'required',
     ];
 
     declare readonly hasLimitedTarget: boolean;
@@ -56,13 +56,13 @@ export default class extends Controller {
         this.setHidden('cutoffAt', !(conditional && 'if-full-before' === rule));
         this.setHidden('durationHours', !(conditional && 'after-duration-open' === rule));
         this.setHidden('priority', !allocates);
-        this.setHidden('membershipSeats', 'reserved-seats' !== mode);
+        this.setHidden('membershipPlaces', 'reserved-places' !== mode);
 
         this.markRequired();
     }
 
     setHidden(name: string, hidden: boolean): void {
-        // Every one of them: the seats held per rank are one target per row of the membership order.
+        // Every one of them: the places held per rank are one target per row of the membership order.
         this.targets.findAll(name).forEach((target) => {
             if (!(target instanceof HTMLElement)) {
                 return;

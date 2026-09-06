@@ -23,7 +23,7 @@ use function usort;
  * Applies a sign-up list's priority modifiers to the pool the draw is about to admit from, as a change to the order
  * the draw admits in, so there is one place where admission is decided.
  *
- * Ranking first, where the coarsest configured order wins and the sort is stable; then the seats held back, the
+ * Ranking first, where the coarsest configured order wins and the sort is stable; then the places held back, the
  * organising committee before the membership tiers; then the role minimums, only to make up a shortfall. All of it
  * acts on the pool that existed at the announced draw moment, never on the latecomers the draw appends afterwards.
  */
@@ -187,11 +187,11 @@ final readonly class AdmissionOrder
         SignupList $list,
         array $ordered,
     ): array {
-        $seats = $list->getMembershipSeats();
-        $committeeSeats = $list->getOrganisingCommitteeSeats();
+        $places = $list->getMembershipPlaces();
+        $committeePlaces = $list->getOrganisingCommitteePlaces();
         if (
-            [] === $seats
-            && null === $committeeSeats
+            [] === $places
+            && null === $committeePlaces
         ) {
             return $ordered;
         }
@@ -199,13 +199,13 @@ final readonly class AdmissionOrder
         $front = [];
         $taken = [];
 
-        if (null !== $committeeSeats) {
+        if (null !== $committeePlaces) {
             $committee = SignupTiers::organisingCommittee($list);
             $this->take(
                 $ordered,
                 $front,
                 $taken,
-                $committeeSeats,
+                $committeePlaces,
                 static function (Signup $signup) use ($committee): bool {
                     return $signup instanceof UserSignup
                         && array_key_exists(
@@ -216,13 +216,13 @@ final readonly class AdmissionOrder
             );
         }
 
-        // Tiers admitted together share the seats held for them: one pool per rank rather than one per tier.
+        // Tiers admitted together share the places held for them: one pool per rank rather than one per tier.
         foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
             $this->take(
                 $ordered,
                 $front,
                 $taken,
-                $seats[SignupList::rankKey($rank)] ?? 0,
+                $places[SignupList::rankKey($rank)] ?? 0,
                 static fn (Signup $signup): bool => in_array(
                     SignupTiers::membership($signup),
                     $rank,
@@ -265,10 +265,10 @@ final readonly class AdmissionOrder
         array $ordered,
         array &$front,
         array &$taken,
-        int $seats,
+        int $places,
         callable $matches,
     ): void {
-        $remaining = $seats;
+        $remaining = $places;
         foreach ($ordered as $index => $signup) {
             if ($remaining < 1) {
                 return;
