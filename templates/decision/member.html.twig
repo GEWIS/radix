@@ -11,7 +11,7 @@
 
 {% set isSelf = is_granted(member.getSelfRole) %}
 {% set isBoard = is_granted('ROLE_BOARD') %}
-{% set showMembership = isSelf or isBoard %}
+{% set showPrivateDetails = isSelf or isBoard %}
 
 {% block sidebar_label %}{{ member.getFullName }}{% endblock %}
 {% block sidebar %}
@@ -30,7 +30,7 @@
                 <span class="badge {{ member.getType.badgeClass }}">{{ member.getType.getName|trans }}</span>
                 <span class="badge badge-tag">{{ 'Member'|trans }} #{{ member.getLidnr }}</span>
                 <span class="badge badge-tag">{{ 'Generation'|trans }} {{ member.getGeneration }}</span>
-                {% if showMembership %}
+                {% if showPrivateDetails %}
                     {% if member.getType.isFormalMember %}
                         <span class="badge badge-tag">{{ 'Member until %date%'|trans({'%date%': (member.getMembershipEndsOn ?? member.getExpiration)|date('j F Y')}) }}</span>
                     {% else %}
@@ -47,7 +47,7 @@
 
         <div class="row g-4">
             <div class="col-lg-8">
-                {% if isSelf %}
+                {% if showPrivateDetails %}
                     <div class="panel">
                         <div class="panel-heading">
                             <h3>{{ 'Personal information'|trans }}</h3>
@@ -69,10 +69,12 @@
                                 </div>
                                 {{ _self.detail('Birth date'|trans, member.getBirth|date('l j F Y')) }}
                             </dl>
-                            {% set secretary %}<a href="mailto:secretary@gewis.nl">{{ 'the secretary of GEWIS'|trans }}</a>{% endset %}
-                            <p class="profile-note">
-                                {{ 'If your information is no longer up to date, contact %secretary% to change it. The same contact also handles data removal requests.'|trans({'%secretary%': secretary})|raw }}
-                            </p>
+                            {% if isSelf %}
+                                {% set secretary %}<a href="mailto:secretary@gewis.nl">{{ 'the secretary of GEWIS'|trans }}</a>{% endset %}
+                                <p class="profile-note">
+                                    {{ 'If your information is no longer up to date, contact %secretary% to change it. The same contact also handles data removal requests.'|trans({'%secretary%': secretary})|raw }}
+                                </p>
+                            {% endif %}
                         </div>
                     </div>
                 {% endif %}
