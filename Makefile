@@ -49,7 +49,7 @@ seed: ## Reset both development databases: drop the schemas, migrate them back u
 	@# Dropped rather than only purged, so migrations a branch of its own added leave nothing behind.
 	@$(SYMFONY) doctrine:schema:drop --force --full-database
 	@$(SYMFONY) doctrine:schema:drop --force --full-database --em=web
-	@$(MAKE) migrate
+	@$(MAKE) migrate MIGRATE_FLAGS=--no-interaction
 	@# One command for all of it: the ledger, then the replay into the projection, then the web database whose
 	@# fixtures hang off what that replay produced. The projection is never seeded directly, so there is nothing to
 	@# regenerate afterwards.
@@ -203,9 +203,13 @@ cc: sf
 DEFAULT_MIGRATIONS := --configuration=config/packages/migrations/default.yaml
 WEB_MIGRATIONS     := --configuration=config/packages/migrations/web.yaml
 
+# MIGRATE_FLAGS is what `seed` passes --no-interaction through; on its own this target still asks before it changes
+# a schema that is still there.
+MIGRATE_FLAGS ?=
+
 migrate: ## Run the migrations on both entity managers
-	@$(SYMFONY) doctrine:migrations:migrate $(DEFAULT_MIGRATIONS)
-	@$(SYMFONY) doctrine:migrations:migrate $(WEB_MIGRATIONS)
+	@$(SYMFONY) doctrine:migrations:migrate $(DEFAULT_MIGRATIONS) $(MIGRATE_FLAGS)
+	@$(SYMFONY) doctrine:migrations:migrate $(WEB_MIGRATIONS) $(MIGRATE_FLAGS)
 
 migrate-to: ## Migrate one entity manager to a given version
 	@$(DOCKER_COMP) exec -T app sh -c '. ./scripts/migrate-version.sh && bin/console doctrine:migrations:migrate $$migrations $$configuration'
