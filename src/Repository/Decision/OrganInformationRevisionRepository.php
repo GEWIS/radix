@@ -9,8 +9,6 @@ use App\Repository\Application\FindsRevisionsForReviewTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-use function addcslashes;
-
 /**
  * @extends ServiceEntityRepository<OrganInformationRevision>
  */
@@ -63,31 +61,5 @@ class OrganInformationRevisionRepository extends ServiceEntityRepository
 
         return $builder->getQuery()
             ->getResult();
-    }
-
-    /**
-     * The revision holding an image whose stored path ends with the given filename, used to resolve a legacy
-     * `/data/{2ch}/{file}` URL onto the migrated organ image (organ images re-root that same filename). Any revision
-     * counts: an old bookmark points at whatever was live when it was made.
-     */
-    public function findOneByImageBasename(string $basename): ?OrganInformationRevision
-    {
-        $suffix = '%/' . addcslashes(
-            $basename,
-            '%_',
-        );
-
-        return $this->createQueryBuilder('r')
-            ->where('r.bannerPath LIKE :suffix')
-            ->orWhere('r.logoPath LIKE :suffix')
-            ->orWhere('r.bannerSource LIKE :suffix')
-            ->orWhere('r.logoSource LIKE :suffix')
-            ->setParameter(
-                'suffix',
-                $suffix,
-            )
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
     }
 }

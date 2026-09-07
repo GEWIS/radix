@@ -26,8 +26,6 @@
         <exclude-pattern>src/Entity/Database/MailingList.php</exclude-pattern>
         <exclude-pattern>src/Entity/Database/SubDecision.php</exclude-pattern>
         <exclude-pattern>src/Entity/Decision/Decision.php</exclude-pattern>
-        <exclude-pattern>src/Entity/Decision/LegacyMeetingDocument.php</exclude-pattern>
-        <exclude-pattern>src/Entity/Decision/LegacyMeetingMinutes.php</exclude-pattern>
         <exclude-pattern>src/Entity/Decision/MailingList.php</exclude-pattern>
         <exclude-pattern>src/Entity/Decision/MeetingLocalDetails.php</exclude-pattern>
         <exclude-pattern>src/Entity/Decision/MeetingMinutes.php</exclude-pattern>

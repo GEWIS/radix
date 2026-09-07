@@ -141,11 +141,11 @@ The application is bilingual (`en`, `nl`) and most controller routes are prefixe
   defined in `config/routes.yaml` rather than as attributes — **order matters**. Attribute scanning that ran before the
   explicit YAML routes used to steal traffic; that bug bit voting committees. Don't reorder this file lightly.
 - **Every page a person reads carries its language in its own address.** What is left without one is either not a page
-  (`image_serve` and `legacy_data`, assets and old bookmarks whose slash-bearing `{path}` must be matched before
-  `page_route` could grab it; the public JWKS document; the Stripe webhook; `/health`) or an address we do not get to
-  move, which answers through `App\Controller\Application\LocaleRedirectController` and forwards to the page proper.
-  Those are the sign-up and renewal links that sit in mailboxes and on posters, the checkout return addresses that
-  travel with a session already open, and `/user/token/{app}`, which external applications are configured with. The
+  (`image_serve`, whose slash-bearing `{path}` must be matched before `page_route` could grab it; the public JWKS
+  document; the Stripe webhook; `/health`) or an address we do not get to move, which answers through
+  `App\Controller\Application\LocaleRedirectController` and forwards to the page proper. Those are the sign-up and
+  renewal links that sit in mailboxes and on posters, the checkout return addresses that travel with a session already
+  open, and `/user/token/{app}`, which external applications are configured with. The
   redirect is a 302, not a 301: where it lands depends on `Accept-Language`, so it must not be remembered.
 - A locale-prefixed route has to be declared **above `page_route`** in `config/routes.yaml`, whose
   `/{_locale}/{category}/{subCategory}/{name}` otherwise reads three segments of it as a page that does not exist.
@@ -496,20 +496,6 @@ marker) and answers 503 with `Retry-After` (`ImageVariantResponder`). The varian
 workers rather than by whichever container the command was run from, and `IMAGE_WORKER_REPLICAS` is what paces it.
 Run it after clearing the variant cache, and with `--force` after changing the variant set or the encoding.
 Synchronous encode-on-miss is what once saturated the production host; do not reintroduce it.
-
-The application inherits one legacy pool: the flat content-addressed tree GEWISWEB wrote at `public/data`, holding
-every photo, company and organ image, course document, page-embedded image and meeting document. `app:storage:migrate`
-migrates all of it in one run — there is no second source, and GEWISDB never stored files. The run is journalled per
-item and so is resumable, and `--source-dir` names the pool for the production layout, where it arrives as a populated
-volume rather than at `public/data`. See the command's `--help`.
-
-Its `--meetings` phase is the odd one out and the one to be careful with. Everything else is hardlinked into place by
-`--files` and switched over by `--paths`, so those files survive the pool being removed; the flat meeting documents and
-minutes are touched by neither, and are carried over only by `--meetings`, which rebuilds them into the
-agenda-point/version model and *copies* their files. Until it has run, the pool is the only copy of every set of
-minutes on the site. It skips per row what the new model already has — an earlier run's work, or the board's own — so
-it can be run again at any time, and every run of the command ends by saying how many legacy rows still have no
-counterpart.
 
 ## Doctrine caching
 
