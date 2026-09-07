@@ -108,6 +108,21 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     /** Large enough to read on a fixture photo without the caption running off a narrow one. */
     private const int CAPTION_SIZE = 28;
 
+    /**
+     * How many distinct placeholders the demo albums draw between them.
+     *
+     * Drawing one image per photo is what the seed used to spend nearly all of its time on: close to a thousand demo
+     * photos, at some seventy milliseconds each to rasterise and encode, and none of it interesting -- they are flat
+     * colour, a band and a caption. So the demo albums cycle through a fixed set instead, drawn once and reused,
+     * which is a few seconds of the minute and a half `make seed` took. A multiple of the number of {@see SHAPES},
+     * so every shape comes round as often as it did when each photo was drawn for itself, and enough of them that
+     * the whole of {@see PALETTE} is reached and an album is not visibly the same picture twice over.
+     *
+     * Photos outside the demo albums -- the tree the integration tests assert against, and all there is under `test`
+     * -- keep an image of their own, so what the tests see is unchanged.
+     */
+    private const int DEMO_PLACEHOLDERS = 48;
+
     /** Distinct background colours so generated thumbnails are told apart at a glance. */
     private const array PALETTE = [
         [
@@ -153,6 +168,13 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     ];
 
     private int $photoCounter = 0;
+
+    /**
+     * The encoded bytes of each demo placeholder, keyed by its number, drawn the first time one is asked for.
+     *
+     * @var array<int, string>
+     */
+    private array $demoImages = [];
 
     public function __construct(
         private readonly FileStorage $fileStorage,
@@ -398,7 +420,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             $manager->flush();
 
             for ($i = 0; $i < $count; ++$i) {
-                $manager->persist($this->makePhoto(
+                $manager->persist($this->makeDemoPhoto(
                     $album,
                     sprintf(
                         '-%d days +%d minutes',
@@ -433,7 +455,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             $manager->flush();
 
             for ($i = 0; $i < 20; ++$i) {
-                $manager->persist($this->makePhoto(
+                $manager->persist($this->makeDemoPhoto(
                     $subAlbum,
                     sprintf(
                         '-70 days +%d hours +%d minutes',
@@ -469,14 +491,77 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         string $dateTime,
     ): Photo {
         ++$this->photoCounter;
+        $shape = $this->photoCounter % count(self::SHAPES);
+
+        return $this->storePhoto(
+            $album,
+            $dateTime,
+            $shape,
+            $this->drawImage(
+                $shape,
+                'Photo ' . $this->photoCounter,
+            ),
+        );
+    }
+
+    /**
+     * A photo for a demo album, drawn from the fixed set of placeholders rather than given an image of its own; see
+     * {@see DEMO_PLACEHOLDERS} for why.
+     *
+     * The photos of one album that land on the same placeholder store as one file, since what is stored is
+     * content-addressed and scoped to the album. That is the point rather than a side effect: they are the same
+     * picture, and a seed has no reason to keep a thousand copies of fifty images.
+     */
+    private function makeDemoPhoto(
+        Album $album,
+        string $dateTime,
+    ): Photo {
+        ++$this->photoCounter;
+        // The set is a multiple of the number of shapes, so this leaves the shape a photo is given exactly where
+        // numbering every photo did.
+        $placeholder = $this->photoCounter % self::DEMO_PLACEHOLDERS;
+        $shape = $placeholder % count(self::SHAPES);
+
+        return $this->storePhoto(
+            $album,
+            $dateTime,
+            $shape,
+            $this->demoImages[$placeholder] ??= $this->drawImage(
+                $shape,
+                sprintf(
+                    'Photo %d of %d',
+                    $placeholder + 1,
+                    self::DEMO_PLACEHOLDERS,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Stores encoded image bytes the way an upload would and hangs a photo off the album they belong to, which is
+     * what scopes the stored path, so the album must already have an id by the time this is called.
+     */
+    private function storePhoto(
+        Album $album,
+        string $dateTime,
+        int $shape,
+        string $image,
+    ): Photo {
         [
             $width, $height
-        ] = self::SHAPES[abs($this->photoCounter) % count(self::SHAPES)];
+        ] = self::SHAPES[$shape];
 
-        $temporaryFile = $this->generateImage(
-            $width,
-            $height,
-            'Photo ' . $this->photoCounter,
+        $temporaryFile = tempnam(
+            sys_get_temp_dir(),
+            'gewisweb-fixture-photo',
+        );
+        if (false === $temporaryFile) {
+            throw new RuntimeException('Cannot create a temporary file for a fixture image.');
+        }
+
+        file_put_contents(
+            $temporaryFile,
+            $image,
         );
 
         try {
@@ -500,17 +585,18 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     }
 
     /**
-     * Draws a coloured placeholder image (a background band with a caption) to a temporary file and returns its path.
-     * The caption makes every photo's bytes unique, so content-addressed storage does not collapse them into one file.
-     *
-     * @param positive-int $width
-     * @param positive-int $height
+     * Draws a coloured placeholder image (a background band with a caption) in one of the {@see SHAPES} and returns
+     * the encoded bytes. The caption is what makes an image's bytes unique, so content-addressed storage collapses
+     * two of them into one file only where they are meant to be the same picture.
      */
-    private function generateImage(
-        int $width,
-        int $height,
+    private function drawImage(
+        int $shape,
         string $caption,
     ): string {
+        [
+            $width, $height
+        ] = self::SHAPES[$shape];
+
         [
             $red,
             $green,
@@ -571,20 +657,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             },
         );
 
-        $temporaryFile = tempnam(
-            sys_get_temp_dir(),
-            'gewisweb-fixture-photo',
-        );
-        if (false === $temporaryFile) {
-            throw new RuntimeException('Cannot create a temporary file for a fixture image.');
-        }
-
-        file_put_contents(
-            $temporaryFile,
-            $image->encode(new JpegEncoder(quality: 82))->toString(),
-        );
-
-        return $temporaryFile;
+        return $image->encode(new JpegEncoder(quality: 82))->toString();
     }
 
     private function color(
