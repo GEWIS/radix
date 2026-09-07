@@ -8,6 +8,38 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.4.0](https://github.com/GEWIS/radix/tree/v5.4.0) (2026-09-07)
+
+* Added priority modifiers to a sign-up list, so an activity with fewer places than sign-ups can admit the members it is meant for before everyone else. A list can order by membership type, study phase, or cohort, or reserve seats for the members installed in the organising body. The membership types that are admitted together share a rank, so a list that sets no order behaves as it did before.
+* Added roles that an activity cannot go ahead without, each with a guaranteed number of seats. The organiser assigns them after sign-up has closed, and the draw then fills only the shortfall that is left. Such a list is drawn by hand, because two of the three cutoff rules trigger before the list closes.
+* Added storage of the position the draw assigned to every sign-up, admitted or not, so the waiting list keeps that order instead of being recalculated later against a pool that has changed since.
+* Added a separate step for each part of a sign-up list: an overview, followed by the basics, the allocation, and the questions of each list. Submitting and approving are blocked while a part is incomplete, so a list without a name or a window can no longer reach the board.
+* Added the study a member follows to the projection, which previously recorded it in the ledger only. Existing rows read `Unknown` until the ledger next writes the member, or immediately if the projection is rebuilt with `app:decision:generate`.
+* Added the initials, name, e-mail address, and date of birth of a member to the profile as the board sees it, which the board may be asked by the member to look up or to pass on to a third party. Addresses remain visible to the member alone.
+* Added `--force` to `app:application:delete-stale-revisions`, which also removes abandoned activities that have sign-ups on their lists. These activities were never approved, so neither they nor their sign-ups can be reached from the site, and they were skipped by every nightly run. Votes, comments, sold packages, and representative accounts are still never removed.
+* Improved the review of a revision, which was a single long page of panels, by splitting it into the steps the author filled in, one at a time, each with a count of how much changed. Every domain that revises something now uses the same outline.
+* Improved the sign-ups page of an activity, which showed a separate panel per list and nothing that compared them. It now shows one list at a time, selected from a set of cards, or everyone on the activity side by side with one row per person and one column per list. The selected list, view, and filter are kept in the address.
+* Improved the stepper of every multi-step form, which only offered the steps already completed, so returning to a form meant walking through it from the start. A step is now offered as soon as every step before it is valid, and finishing the form reports which step is incomplete.
+* Improved the loading of localised texts, which were lazy and cost a query per name; the review screen made twenty round trips before rendering anything. They are now loaded together with the record they belong to.
+* Improved the speed of seeding, which generated around a thousand photos where fifty in each size and colour are enough for the albums to reuse.
+* Changed the review of a revision to compare against the live revision rather than against the one it was created from, which after a round of changes is a draft that was never published. The revision it was created from is offered alongside, for checking whether the author did what was asked.
+* Changed the development ports of the application and Matomo to be configurable, as a rootless Docker daemon cannot bind the ports below 1024 that both used. The addresses pointing at the stack are derived from `APP_URL`.
+* Changed the development Mailman to run on MariaDB, which is what it uses in production and the only one of the two databases it supports.
+* Removed the legacy storage migrators now that the migration is complete: `app:storage:migrate` and `app:page:migrate-images`, the journal that made them resumable, the `/data/{path}` route that caught old bookmarks, and the two tables holding the flat meeting documents and minutes from GEWISWEB.
+* Fixed an issue where the sign-up lists of an activity were emptied by leaving their step and returning, as they were edited on the revision, which is rebuilt on every request, instead of on the data object that is carried between the steps.
+* Fixed an issue where the sign-up lists showed the Dutch and English fields side by side regardless of the language the activity was written in, and where a language that is switched off had its text cleared instead of kept.
+* Fixed an issue where the settings required by an allocation method were validated on the server but not marked as required, and where a number question was not validated against its bounds at all.
+* Fixed an issue where discarding a draft with sign-up lists failed on a foreign key, because the audit trail added an entry to the revision that the same flush was deleting.
+* Fixed an issue where generating the address of a member's profile threw an error on PCRE versions older than 10.43, which read the `{,4}` in the member number requirement literally instead of as `{0,4}`.
+
+### [v5.3.2](https://github.com/GEWIS/radix/tree/v5.3.2) (2026-09-02)
+
+* Fixed an issue where the link to the books in the welcome e-mail for new members was missing the language prefix, which every page on the website requires.
+
+### [v5.3.1](https://github.com/GEWIS/radix/tree/v5.3.1) (2026-09-02)
+
+* Fixed an issue where the IP databases included in the image could not be read by the user the application runs as, so device recognition and the location in a security notice had no data until the twice-weekly refresh had written its own copy.
+
 ### [v5.3.0](https://github.com/GEWIS/radix/tree/v5.3.0) (2026-09-02)
 
 * Added recognition of the devices an account has signed in from, so coming back on one of them no longer sends a security notice. A device is known by a long-lived cookie, and where that is refused or cleared by the browser family, the operating system family and the languages the request asks for, with the network taken separately and at the level of the autonomous system. Every address in `TUE_IP_RANGES` reduces to one campus network first, because the internal side of the university's NAT reaches us on shared space that no database names and whose prefixes rotate.
