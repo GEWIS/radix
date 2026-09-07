@@ -34,11 +34,11 @@ final class Version20260904093855 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE SignupRole DROP FOREIGN KEY FK_34EC7A2DBDD669D6');
-        $this->addSql('DROP TABLE SignupRole');
         $this->addSql('ALTER TABLE Signup DROP FOREIGN KEY FK_490F1BD9D60322AC');
         $this->addSql('DROP INDEX IDX_490F1BD9D60322AC ON Signup');
         $this->addSql('ALTER TABLE Signup DROP role_id');
+        $this->addSql('ALTER TABLE SignupRole DROP FOREIGN KEY FK_34EC7A2DBDD669D6');
+        $this->addSql('DROP TABLE SignupRole');
         $this->addSql('ALTER TABLE SignupList DROP membershipTierOrder, DROP membershipPriorityMode, DROP membershipPlaces, DROP cohortTierOrder, DROP programTypeOrder, DROP organisingCommitteePlaces');
     }
 }
