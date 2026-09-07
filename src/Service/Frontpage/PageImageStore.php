@@ -19,29 +19,23 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 use function array_pop;
 use function array_unique;
-use function array_values;
 use function basename;
 use function explode;
 use function hash;
 use function implode;
 use function preg_match;
-use function preg_match_all;
-use function preg_quote;
 use function sprintf;
 use function str_contains;
-use function str_ends_with;
 use function str_replace;
 use function str_starts_with;
 use function strlen;
 use function strval;
 use function substr;
-use function substr_count;
 use function usort;
 
 /**
  * The directory a page's images live in is the whole record of them; there is no table, which is what lets the
- * browser still offer an image the HTML no longer shows. The files the old website left lie flat in `pages/images`
- * and are not filed under any page.
+ * browser still offer an image the HTML no longer shows.
  */
 final readonly class PageImageStore
 {
@@ -52,8 +46,6 @@ final readonly class PageImageStore
     private const int PENDING_TTL = 900;
 
     private const string RUN_PATTERN = '/\A[0-9a-f]{16}\z/';
-
-    private const string PATH_IN_CONTENT = '#/img/[a-z0-9]+/(%s/[^"\'\s?\#]+)#';
 
     public function __construct(
         private FileStorage $fileStorage,
@@ -313,125 +305,6 @@ final readonly class PageImageStore
         }
 
         return $pruned;
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function legacyPaths(?string $content): array
-    {
-        if (null === $content) {
-            return [];
-        }
-
-        $pattern = sprintf(
-            self::PATH_IN_CONTENT,
-            preg_quote(
-                $this->root(),
-                '#',
-            ),
-        );
-
-        if (
-            1 > preg_match_all(
-                $pattern,
-                $content,
-                $matches,
-            )
-        ) {
-            return [];
-        }
-
-        $paths = [];
-        foreach ($matches[1] as $path) {
-            if (!$this->isLegacy($path)) {
-                continue;
-            }
-
-            $paths[] = $path;
-        }
-
-        return array_values(array_unique($paths));
-    }
-
-    /** Copied rather than moved: another page may still be pointing at the same file. Null when it is gone. */
-    public function adopt(
-        Page $page,
-        string $legacyPath,
-    ): ?string {
-        $scope = $this->scope(
-            $page,
-            null,
-        );
-
-        if (
-            null === $scope
-            || !$this->fileStorage->exists($legacyPath)
-        ) {
-            return null;
-        }
-
-        $destination = sprintf(
-            '%s/%s',
-            $this->directory($scope),
-            basename($legacyPath),
-        );
-
-        if (!$this->fileStorage->exists($destination)) {
-            $this->fileStorage->copy(
-                $legacyPath,
-                $destination,
-            );
-        }
-
-        $this->process(
-            $destination,
-            $scope,
-        );
-
-        return $destination;
-    }
-
-    /** Refuses anything filed under a page, so this cannot reach a page's own directory. */
-    public function discardLegacy(string $path): bool
-    {
-        if (!$this->isLegacy($path)) {
-            return false;
-        }
-
-        if (!$this->fileStorage->remove($path)) {
-            return false;
-        }
-
-        $this->variantGenerator->purge($path);
-
-        return true;
-    }
-
-    private function isLegacy(string $path): bool
-    {
-        $root = $this->root();
-
-        return str_starts_with(
-            $path,
-            $root . '/',
-        )
-            && substr_count(
-                $path,
-                '/',
-            ) === substr_count(
-                $root . '/',
-                '/',
-            )
-            && !str_ends_with(
-                $path,
-                '/',
-            );
-    }
-
-    private function root(): string
-    {
-        return StorageNamespace::PageImage->directory();
     }
 
     /** The marker is raised first, or a transport that handles the message inline would settle it before it exists. */

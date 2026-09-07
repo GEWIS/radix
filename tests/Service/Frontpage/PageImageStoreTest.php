@@ -353,62 +353,6 @@ final class PageImageStoreTest extends TestCase
         self::assertFalse($storage->exists($path));
     }
 
-    public function testTheImagesOfAnOldPageAreRecognisedAndFiledUnderIt(): void
-    {
-        [
-            $store,
-            $storage,
-        ] = $this->store();
-
-        $legacy = 'pages/images/deadbeef.png';
-        $storage->write(
-            $legacy,
-            $this->pngBytes(),
-        );
-
-        $content = '<p><img src="/img/w1280/' . $legacy . '">'
-            . '<img src="/img/w640/pages/images/5/already-filed.png"></p>';
-
-        self::assertSame(
-            [$legacy],
-            $store->legacyPaths($content),
-        );
-
-        $filed = $store->adopt(
-            $this->page(5),
-            $legacy,
-        );
-
-        self::assertSame(
-            'pages/images/5/deadbeef.png',
-            $filed,
-        );
-        self::assertTrue($storage->exists($filed));
-        self::assertTrue($storage->exists($legacy));
-
-        self::assertTrue($store->discardLegacy($legacy));
-        self::assertFalse($storage->exists($legacy));
-    }
-
-    public function testWhatIsAlreadyFiledUnderAPageIsNeverDiscardedAsLegacy(): void
-    {
-        [
-            $store,
-            $storage,
-        ] = $this->store();
-
-        $path = $store->store(
-            $this->png(),
-            $this->scopeOf(
-                $store,
-                5,
-            ),
-        )->path;
-
-        self::assertFalse($store->discardLegacy($path));
-        self::assertTrue($storage->exists($path));
-    }
-
     /**
      * @return array{PageImageStore, FileStorage, VariantGenerator}
      */
