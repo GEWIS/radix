@@ -11,9 +11,11 @@ use App\Entity\User\User;
 use App\Message\Activity\OrganiserAnnouncementEmail;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Twig\Components\Activity\Admin\SignupOverview;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Twig\Environment;
 
 /**
  * The sign-up admin component is the first live component that writes to the database and dispatches mail, so it
@@ -136,6 +138,105 @@ final class SignupOverviewTest extends DatabaseTestCase
         self::assertNotNull($list->getDrawnBy());
     }
 
+    public function testTheListReadingDrawsTheRailAndTheTable(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+
+        $html = $this->render(9);
+
+        self::assertStringContainsString(
+            'One list at a time',
+            $html,
+        );
+        self::assertStringContainsString(
+            'card h-100 w-100 text-start border-gewis-primary',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Select all shown',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Everyone',
+            $html,
+        );
+    }
+
+    public function testThePeopleReadingHasOneRowPerPersonAndAColumnPerList(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(9);
+
+        $component->setMode(SignupOverview::MODE_PEOPLE);
+        $people = $component->getPeopleView();
+
+        self::assertCount(
+            1,
+            $people->lists,
+        );
+        self::assertSame(
+            4,
+            $people->peopleCount,
+        );
+        self::assertSame(
+            0,
+            $people->multiCount,
+        );
+
+        $html = $this->render(
+            9,
+            ['mode' => SignupOverview::MODE_PEOPLE],
+        );
+        self::assertStringContainsString(
+            'Everyone, side by side',
+            $html,
+        );
+        self::assertStringContainsString(
+            '1 / 1',
+            $html,
+        );
+    }
+
+    public function testAQuickFilterNarrowsTheRowsButNotTheCounts(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(9);
+
+        $component->setQuickFilter('external');
+        $list = $component->getActiveList();
+
+        self::assertNotNull($list);
+        self::assertSame(
+            4,
+            $list->subscriberCount,
+        );
+        self::assertSame(
+            $list->externalCount,
+            $list->shownCount,
+        );
+    }
+
+    public function testSendingToEveryoneReachesEachPersonOnce(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(9);
+        $component->setMode(SignupOverview::MODE_PEOPLE);
+        $component->emailSubject = 'See you at the Gala';
+        $component->emailBody = 'Doors open at 17:00.';
+
+        $component->sendToPeople();
+
+        $sent = $this->bulkMessages();
+        self::assertCount(
+            1,
+            $sent,
+        );
+        self::assertCount(
+            4,
+            $sent[0]->getRecipients(),
+        );
+    }
+
     public function testAnActionIsDeniedForANonOwnerNonBoardMember(): void
     {
         // 8005 is an active member but does not organise activity #9 and is not on the board, so the per-action access
@@ -182,6 +283,31 @@ final class SignupOverviewTest extends DatabaseTestCase
         $component->activity = $activity;
 
         return $component;
+    }
+
+    /**
+     * The component as the page draws it, so the template runs against the real read-models without the HTTP layer
+     * the class comment rules out.
+     *
+     * @param array<string, mixed> $props
+     */
+    private function render(
+        int $activityId,
+        array $props = [],
+    ): string {
+        $activity = $this->entityManager->getRepository(Activity::class)->find($activityId);
+        self::assertInstanceOf(
+            Activity::class,
+            $activity,
+        );
+
+        // The dates are written in the request's locale, so there has to be a request.
+        self::getContainer()->get('request_stack')->push(new Request());
+
+        // Through a template rather than the renderer, which wants a Twig template on the stack for the live id.
+        return self::getContainer()->get(Environment::class)
+            ->createTemplate('{{ component(\'Activity:Admin:SignupOverview\', props) }}')
+            ->render(['props' => ['activity' => $activity] + $props]);
     }
 
     /**

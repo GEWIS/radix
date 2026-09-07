@@ -16,6 +16,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 
+use function array_key_exists;
 use function array_keys;
 use function in_array;
 use function spl_object_id;
@@ -128,7 +129,28 @@ final readonly class RevisionAuditListener
             $record($owner, 'labels');
         }
 
-        foreach ($perRevision as ['revision' => $revision, 'fields' => $fields]) {
+        // A revision going away in this same flush takes its trail with it, and a row inserted against one about
+        // to be deleted is refused outright. Discarding a draft schedules its lists for deletion, which reads here
+        // as a change to them.
+        $leaving = [];
+        foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
+            if (!$entity instanceof ActivityRevision) {
+                continue;
+            }
+
+            $leaving[spl_object_id($entity)] = true;
+        }
+
+        foreach ($perRevision as $key => ['revision' => $revision, 'fields' => $fields]) {
+            if (
+                array_key_exists(
+                    $key,
+                    $leaving,
+                )
+            ) {
+                continue;
+            }
+
             $editor = $revision->getLastEditedBy();
             if (null === $editor) {
                 // Not a member-driven in-place edit (a fixture, the stale-revision cron or an approval): nothing to

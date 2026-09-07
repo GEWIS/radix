@@ -6,11 +6,18 @@ namespace App\Tests\Integration\Service\Activity;
 
 use App\Entity\Activity\Enums\AllocationMethod;
 use App\Entity\Activity\Enums\DrawCutoffRule;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
+use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
 use App\Entity\Decision\Member;
 use App\Service\Activity\DrawManager;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTime;
+
+use function array_map;
+use function count;
+use function json_encode;
 
 /**
  * The shared draw runner behind both the board's manual draw and the automated deadline draw. Pinned here: the guard
@@ -227,6 +234,397 @@ final class DrawManagerTest extends DatabaseTestCase
             ],
             $this->drawnIds($list),
         );
+    }
+
+    public function testAMembershipOrderDecidesWhoGetsThePlaces(): void
+    {
+        $this->clearDraw(3);
+        $this->pinSubscribedAt(
+            3,
+            '-2 hours',
+        );
+        $this->pinDates(
+            3,
+            closeDate: '-1 hour',
+            endTime: '+2 days',
+        );
+        $this->pinMembershipOrder(
+            3,
+            MembershipTier::defaultOrder(),
+        );
+        $list = $this->list(3);
+        $external = $this->externalSignupId(3);
+
+        self::assertTrue($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+
+        self::assertNotContains(
+            $external,
+            $this->drawnIds($list),
+        );
+    }
+
+    public function testTheWaitingListKeepsTheOrderTheDrawGaveIt(): void
+    {
+        $this->clearDraw(3);
+        $this->pinSubscribedAt(
+            3,
+            '-2 hours',
+        );
+        $this->pinDates(
+            3,
+            closeDate: '-1 hour',
+            endTime: '+2 days',
+        );
+        $this->pinMembershipOrder(
+            3,
+            MembershipTier::defaultOrder(),
+        );
+        $list = $this->list(3);
+        $external = $this->externalSignupId(3);
+
+        self::assertTrue($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+
+        $ranked = [];
+        foreach ($this->list(3)->getSignUpsInAdmissionOrder() as $signup) {
+            if (null === $signup->getDrawPosition()) {
+                continue;
+            }
+
+            $ranked[] = $signup;
+        }
+
+        // Everybody the draw looked at holds the place it gave them, in that order.
+        foreach ($ranked as $place => $signup) {
+            self::assertSame(
+                $place + 1,
+                $signup->getDrawPosition(),
+            );
+        }
+
+        // The external ranks below every member, so they are last on the waiting list rather than first.
+        self::assertSame(
+            $external,
+            (int) $ranked[count($ranked) - 1]->getId(),
+        );
+        self::assertFalse($ranked[count($ranked) - 1]->isDrawn());
+    }
+
+    public function testTurningTheMembershipOrderAroundServesNonMembersFirst(): void
+    {
+        $this->clearDraw(3);
+        $this->pinSubscribedAt(
+            3,
+            '-2 hours',
+        );
+        $this->pinDates(
+            3,
+            closeDate: '-1 hour',
+            endTime: '+2 days',
+        );
+        $this->pinMembershipOrder(
+            3,
+            [
+                MembershipTier::NonMember,
+                MembershipTier::Ordinary,
+                MembershipTier::Graduate,
+            ],
+        );
+        $list = $this->list(3);
+        $external = $this->externalSignupId(3);
+
+        self::assertTrue($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+
+        self::assertContains(
+            $external,
+            $this->drawnIds($list),
+        );
+    }
+
+    public function testAListGuaranteeingARoleIsNeverDrawnAutomatically(): void
+    {
+        $this->addRole(
+            6,
+            'Driver',
+            1,
+        );
+        $this->pinDates(
+            6,
+            closeDate: '+1 week',
+            endTime: '+8 days',
+            rule: DrawCutoffRule::IfFullBefore,
+            cutoffAt: '-1 hour',
+        );
+        $list = $this->list(6);
+
+        self::assertTrue($list->isAutoDrawDue());
+        self::assertFalse($this->drawManager()->drawAutomatically($list));
+        self::assertNull($list->getDrawnAt());
+    }
+
+    public function testAListGuaranteeingARoleIsNotDrawnByHandBeforeItCloses(): void
+    {
+        $this->addRole(
+            6,
+            'Driver',
+            1,
+        );
+        $this->pinDates(
+            6,
+            closeDate: '+1 week',
+            endTime: '+8 days',
+            rule: DrawCutoffRule::IfFullBefore,
+            cutoffAt: '-1 hour',
+        );
+        $list = $this->list(6);
+
+        self::assertFalse($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+        self::assertNull($list->getDrawnAt());
+    }
+
+    public function testTheDrawMakesUpAShortfallInAGuaranteedRole(): void
+    {
+        $ids = $this->signupIds(11);
+        $roleId = $this->addRole(
+            11,
+            'Driver',
+            1,
+        );
+        $this->assignRole(
+            $ids[3],
+            $roleId,
+        );
+        $this->pinSubscribedAt(
+            11,
+            '-2 hours',
+        );
+        $this->pinDates(
+            11,
+            closeDate: '-1 hour',
+            endTime: '+2 days',
+        );
+        $list = $this->list(11);
+
+        self::assertTrue($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+
+        self::assertContains(
+            $ids[3],
+            $this->drawnIds($list),
+        );
+        self::assertSame(
+            2,
+            $this->drawnCount($list),
+        );
+    }
+
+    public function testTheSeededListWithEverythingAtOnceAdmitsBothDrivers(): void
+    {
+        // ÅLLOC-F2: closed, two drivers handed out, one place for the organising body, an order and a cohort order.
+        $list = $this->list(31);
+
+        self::assertTrue($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+
+        $drivers = 0;
+        foreach ($list->getSignUps() as $signup) {
+            if (
+                null === $signup->getRole()
+                || !$signup->isDrawn()
+            ) {
+                continue;
+            }
+
+            ++$drivers;
+        }
+
+        self::assertSame(
+            2,
+            $drivers,
+        );
+        self::assertSame(
+            6,
+            $this->drawnCount($list),
+        );
+    }
+
+    public function testARoleHolderWhoSignedUpAfterTheDrawMomentStillGetsAPlace(): void
+    {
+        $ids = $this->signupIds(11);
+        $roleId = $this->addRole(
+            11,
+            'Driver',
+            1,
+        );
+        $this->pinSubscribedAt(
+            11,
+            '-3 hours',
+        );
+        $this->pinDates(
+            11,
+            closeDate: '-1 hour',
+            endTime: '+2 days',
+        );
+        // The last to sign up did so after the list had closed, which puts them behind the on-time pool; the role
+        // is handed out afterwards, to anybody on the list.
+        $this->entityManager->getConnection()->update(
+            'Signup',
+            ['createdAt' => $this->sqlDateTime('-30 minutes')],
+            ['id' => $ids[3]],
+        );
+        $this->entityManager->clear();
+        $this->assignRole(
+            $ids[3],
+            $roleId,
+        );
+        $list = $this->list(11);
+
+        self::assertTrue($this->drawManager()->drawManually(
+            $list,
+            AllocationMethod::ConditionalDraw,
+            $this->member(8025),
+        ));
+
+        self::assertContains(
+            $ids[3],
+            $this->drawnIds($list),
+        );
+        self::assertSame(
+            2,
+            $this->drawnCount($list),
+        );
+    }
+
+    private function pinSubscribedAt(
+        int $listId,
+        string $modifier,
+    ): void {
+        $at = $this->sqlDateTime($modifier);
+        $connection = $this->entityManager->getConnection();
+        $connection->update(
+            'Signup',
+            ['createdAt' => $at],
+            ['signuplist_id' => $listId],
+        );
+        $connection->executeStatement(
+            'UPDATE Signup SET verifiedAt = ? WHERE signuplist_id = ? AND verifiedAt IS NOT NULL',
+            [
+                $at,
+                $listId,
+            ],
+        );
+
+        $this->entityManager->clear();
+    }
+
+    private function clearDraw(int $listId): void
+    {
+        $connection = $this->entityManager->getConnection();
+        $connection->update(
+            'SignupList',
+            [
+                'drawnAt' => null,
+                'drawnBy_id' => null,
+            ],
+            ['id' => $listId],
+        );
+        $connection->update(
+            'Signup',
+            ['drawn' => 0],
+            ['signuplist_id' => $listId],
+        );
+
+        $this->entityManager->clear();
+    }
+
+    /**
+     * @param list<MembershipTier> $order
+     */
+    private function pinMembershipOrder(
+        int $listId,
+        array $order,
+    ): void {
+        $this->entityManager->getConnection()->update(
+            'SignupList',
+            [
+                'membershipTierOrder' => json_encode(array_map(
+                    static fn (MembershipTier $tier): string => $tier->value,
+                    $order,
+                )),
+                'membershipPriorityMode' => MembershipPriorityMode::Ordering->value,
+            ],
+            ['id' => $listId],
+        );
+
+        $this->entityManager->clear();
+    }
+
+    private function addRole(
+        int $listId,
+        string $name,
+        int $minimum,
+    ): int {
+        $connection = $this->entityManager->getConnection();
+        $connection->insert(
+            'SignupRole',
+            [
+                'signuplist_id' => $listId,
+                'name' => $name,
+                'minimum' => $minimum,
+                'position' => 0,
+            ],
+        );
+
+        $this->entityManager->clear();
+
+        return (int) $connection->lastInsertId();
+    }
+
+    private function assignRole(
+        int $signupId,
+        int $roleId,
+    ): void {
+        $this->entityManager->getConnection()->update(
+            'Signup',
+            ['role_id' => $roleId],
+            ['id' => $signupId],
+        );
+
+        $this->entityManager->clear();
+    }
+
+    private function externalSignupId(int $listId): int
+    {
+        foreach ($this->list($listId)->getSignUps() as $signup) {
+            if (!$signup instanceof ExternalSignup) {
+                continue;
+            }
+
+            return (int) $signup->getId();
+        }
+
+        self::fail('The seed is expected to contain a confirmed external sign-up on this list.');
     }
 
     private function drawManager(): DrawManager

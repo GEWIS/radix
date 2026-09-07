@@ -1,4 +1,4 @@
-import { Controller } from '@hotwired/stimulus';
+import DragReorder from './drag_reorder.ts';
 
 /**
  * On drop the dragged entry is moved in the DOM and every entry's position input is rewritten to its new index. A
@@ -18,13 +18,11 @@ import { Controller } from '@hotwired/stimulus';
  * </div>
  * ```
  */
-export default class extends Controller {
+export default class extends DragReorder {
     static targets = ['entries', 'position'];
 
-    declare readonly entriesTarget: HTMLElement;
     declare readonly positionTargets: HTMLInputElement[];
 
-    private dragging: HTMLElement | null = null;
     private form: HTMLFormElement | null = null;
     private readonly reindexOnSubmit = (): void => this.reindex();
 
@@ -38,82 +36,12 @@ export default class extends Controller {
         this.form?.removeEventListener('submit', this.reindexOnSubmit, true);
     }
 
-    dragStart(event: DragEvent): void {
-        const handle = event.currentTarget as HTMLElement;
-        const entry = handle.closest<HTMLElement>('[data-form-collection-target="entry"]');
-        // Only reorder entries that belong directly to this collection, never a nested one.
-        if (null === entry || entry.parentElement !== this.entriesTarget) {
-            return;
-        }
-
-        this.dragging = entry;
-        entry.classList.add('dragging');
-
-        if (null !== event.dataTransfer) {
-            event.dataTransfer.effectAllowed = 'move';
-            // Firefox only starts a drag once some data is set; the value itself is unused.
-            event.dataTransfer.setData('text/plain', '');
-            event.dataTransfer.setDragImage(entry, 0, 0);
-        }
+    protected entrySelector(): string {
+        return '[data-form-collection-target="entry"]';
     }
 
-    dragEnd(): void {
-        if (null !== this.dragging) {
-            this.dragging.classList.remove('dragging');
-            this.dragging = null;
-        }
-
+    protected reordered(): void {
         this.reindex();
-    }
-
-    dragOver(event: DragEvent): void {
-        if (null === this.dragging) {
-            return;
-        }
-
-        // Allow dropping here and live-preview the move by slotting the dragged entry before the entry under the cursor.
-        event.preventDefault();
-
-        const after = this.entryAfter(event.clientY);
-        if (null === after) {
-            this.entriesTarget.appendChild(this.dragging);
-        } else if (after !== this.dragging) {
-            this.entriesTarget.insertBefore(this.dragging, after);
-        }
-    }
-
-    drop(event: DragEvent): void {
-        event.preventDefault();
-        this.reindex();
-    }
-
-    /**
-     * The first direct entry whose vertical midpoint is below the cursor, or null to append at the end.
-     */
-    private entryAfter(y: number): HTMLElement | null {
-        let closestOffset = Number.NEGATIVE_INFINITY;
-        let closest: HTMLElement | null = null;
-
-        for (const entry of this.directEntries()) {
-            if (entry === this.dragging) {
-                continue;
-            }
-
-            const box = entry.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closestOffset) {
-                closestOffset = offset;
-                closest = entry;
-            }
-        }
-
-        return closest;
-    }
-
-    private directEntries(): HTMLElement[] {
-        return Array.from(
-            this.entriesTarget.querySelectorAll<HTMLElement>(':scope > [data-form-collection-target="entry"]'),
-        );
     }
 
     private reindex(): void {

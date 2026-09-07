@@ -129,6 +129,16 @@ enum Studies: string implements TranslatableInterface
         );
     }
 
+    public function getProgramType(): ProgramType
+    {
+        return match (true) {
+            $this->isBachelor() => ProgramType::Bachelor,
+            $this->isPreMaster(), $this->isGraduate() => ProgramType::Master,
+            $this->isEngDPhD() => ProgramType::Doctorate,
+            default => ProgramType::Other,
+        };
+    }
+
     public function isMcsStudy(): bool
     {
         return !$this->isSpecial() && !$this->isEngDPhD();

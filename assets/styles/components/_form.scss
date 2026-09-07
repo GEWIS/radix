@@ -4,6 +4,7 @@
     --#{$prefix}form-stepper-accent: #{$gewis-red};
     --#{$prefix}form-stepper-on-accent: #{$white};
     --#{$prefix}form-stepper-accent-subtle: #{rgba($gewis-red, 0.12)};
+    --#{$prefix}form-stepper-num-size: 2rem;
 
     display: flex;
     margin: 0 0 1.5rem;
@@ -20,7 +21,7 @@
     &__step:not(:first-child)::before {
         content: '';
         position: absolute;
-        inset-block-start: 1rem;
+        inset-block-start: calc(var(--#{$prefix}form-stepper-num-size) / 2);
         inset-inline-end: 50%;
         inline-size: 100%;
         block-size: 2px;
@@ -53,8 +54,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        inline-size: 2rem;
-        block-size: 2rem;
+        inline-size: var(--#{$prefix}form-stepper-num-size);
+        block-size: var(--#{$prefix}form-stepper-num-size);
         border: 2px solid var(--#{$prefix}border-color);
         border-radius: 50%;
         background-color: var(--#{$prefix}body-bg);
@@ -128,3 +129,27 @@ $form-switch-bg-image-night: url("data:image/svg+xml,<svg xmlns='http://www.w3.o
         --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image-night)};
     }
 }
+
+.form-stepper-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 0.45rem;
+    background-color: var(--#{$prefix}form-stepper-accent-subtle, #{rgba($gewis-red, 0.12)});
+    color: $gewis-red;
+    font-size: 0.7rem;
+    font-weight: 800;
+
+    &--muted {
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+        border-radius: 0.4rem;
+        background-color: var(--#{$prefix}secondary-bg);
+        color: var(--#{$prefix}secondary-color);
+        font-size: 0.65rem;
+    }
+}
+

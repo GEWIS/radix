@@ -1,13 +1,16 @@
 {#
-    Called by revision-comparison.html.twig once per value: a localised field comes past twice, once for each
-    language column.
 
-    {% include 'partials/application/revision-field.html.twig' with {'field': field, 'value': field.value} only %}
 #}
 {% import 'partials/application/revision-diff.html.twig' as diffmacro %}
+{% set empty = field.emptyLabel is not null ? field.emptyLabel|trans : 'Not filled in'|trans %}
 
 {% if field.kind.value in ['text', 'long-text'] %}
-    {{ diffmacro.field_diff(field.label|trans, value.old, value.new, 'long-text' == field.kind.value ? 'Inline' : 'Combined') }}
+    {% set rendered = diff(value.old, value.new, 'long-text' == field.kind.value ? 'Inline' : 'Combined') %}
+    {% if rendered|trim is empty %}
+        <span class="text-muted fst-italic">{{ empty }}</span>
+    {% else %}
+        {{ rendered }}
+    {% endif %}
 {% elseif 'image' == field.kind.value %}
     <div class="d-flex flex-wrap gap-4">
         {% if field.comparable and value.old is not null and value.isChanged %}
@@ -19,89 +22,86 @@
         {% endif %}
         {% if value.new is not null %}
             <div>
-                <h6 class="text-muted small mb-1">{{ 'Now'|trans }}</h6>
+                {% if field.comparable and value.old is not null and value.isChanged %}
+                    <h6 class="text-muted small mb-1">{{ 'Now'|trans }}</h6>
+                {% endif %}
                 <img class="{{ field.option('class') }}" style="object-fit: cover;"
                      src="{{ image_url(value.new, field.option('variant')) }}" alt="">
             </div>
-        {% elseif field.emptyLabel is not null %}
-            <span class="text-muted small">{{ field.emptyLabel|trans }}</span>
+        {% else %}
+            <span class="text-muted fst-italic">{{ empty }}</span>
         {% endif %}
     </div>
-{% else %}
-    <div class="mb-2">
-        <h6 class="text-muted small mb-1">{{ field.label|trans }}</h6>
-        {% if 'reference' == field.kind.value %}
-            <div>
-                {{ value.new is empty ? (field.emptyLabel is not null ? field.emptyLabel|trans : '') : value.new }}
-                {% if field.comparable and value.isChanged %}
-                    <span class="text-muted small">
-                        ({{ 'was'|trans }} {{ value.old is empty ? (field.emptyLabel is not null ? field.emptyLabel|trans|lower : '') : value.old }})
-                    </span>
-                {% endif %}
-            </div>
-        {% elseif 'badge' == field.kind.value %}
-            <div>
-                <span class="badge {{ field.option('badgeClass')|default('badge-secondary') }}">{{ value.new|trans }}</span>
-                {% if field.comparable and value.isChanged and value.old is not null %}
-                    <span class="text-muted small">({{ 'was'|trans }} {{ value.old|trans }})</span>
-                {% endif %}
-            </div>
-        {% elseif 'tags' == field.kind.value %}
-            {% set oldIds = value.old|map(tag => tag.id) %}
-            {% set newIds = value.new|map(tag => tag.id) %}
-            <div>
-                {% for tag in value.new %}
-                    <span class="badge {{ field.comparable and tag.id not in oldIds ? 'badge-success' : 'badge-tag' }}">
-                        {{ tag.label|localise_text }}
-                    </span>
-                {% else %}
-                    {% if field.emptyLabel is not null %}
-                        <span class="text-muted small">{{ field.emptyLabel|trans }}</span>
-                    {% endif %}
-                {% endfor %}
-                {% if field.comparable %}
-                    {% for tag in value.old|filter(tag => tag.id not in newIds) %}
-                        <span class="badge badge-danger"><s>{{ tag.label|localise_text }}</s></span>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% elseif 'flag' == field.kind.value %}
-            {% set flags %}
-                {% for flag in value.new %}
-                    {{ diffmacro.flag(flag.label|trans, field.comparable ? flag.old : null, flag.new) }}
-                {% endfor %}
-            {% endset %}
-            <div>
-                {% if flags|trim is empty %}
-                    {% if field.emptyLabel is not null %}
-                        <span class="text-muted small">{{ field.emptyLabel|trans }}</span>
-                    {% endif %}
-                {% else %}
-                    {{ flags }}
-                {% endif %}
-            </div>
-        {% elseif 'date-range' == field.kind.value %}
-            <div>
-                {% if 'activity' == field.option('format') %}
-                    {{ activity_date_range(value.new.start, value.new.end) }}
-                {% else %}
-                    {{ value.new.start is not null ? value.new.start|date('j M Y') : 'on approval'|trans }}
-                    &ndash;
-                    {{ value.new.end is not null ? value.new.end|date('j M Y') : '-' }}
-                {% endif %}
-            </div>
-            {% if field.comparable and value.old is not null and value.isChanged %}
-                <div class="text-muted small">
-                    {{ 'Was:'|trans }}
-                    {% if 'activity' == field.option('format') %}
-                        {{ activity_date_range(value.old.start, value.old.end) }}
-                    {% else %}
-                        {{ value.old.start is not null ? value.old.start|date('j M Y') : 'on approval'|trans }}
-                        &ndash;
-                        {{ value.old.end is not null ? value.old.end|date('j M Y') : '-' }}
-                    {% endif %}
-                </div>
+{% elseif 'reference' == field.kind.value %}
+    {{ value.new is empty ? empty : value.new }}
+    {% if field.comparable and value.isChanged and value.old is not empty %}
+        <del class="small text-danger-emphasis ms-2">{{ value.old }}</del>
+    {% endif %}
+{% elseif 'badge' == field.kind.value %}
+    {% if value.new is null %}
+        <span class="text-muted fst-italic">{{ empty }}</span>
+    {% else %}
+        <span class="badge {{ field.option('badgeClass')|default('badge-tag') }}">{{ value.new|trans }}</span>
+    {% endif %}
+    {% if field.comparable and value.isChanged and value.old is not null %}
+        <del class="small text-danger-emphasis ms-2">{{ value.old|trans }}</del>
+    {% endif %}
+{% elseif 'tags' == field.kind.value %}
+    {% set oldIds = value.old|default([])|map(tag => tag.id) %}
+    {% set newIds = value.new|default([])|map(tag => tag.id) %}
+    {% for tag in value.new|default([]) %}
+        <span class="badge {{ field.comparable and tag.id not in oldIds ? 'badge-success' : 'badge-tag' }}">
+            {{ tag.label|localise_text }}
+        </span>
+    {% else %}
+        {% if value.old|default([]) is empty %}
+            <span class="text-muted fst-italic">{{ empty }}</span>
+        {% endif %}
+    {% endfor %}
+    {% if field.comparable %}
+        {% for tag in value.old|default([])|filter(tag => tag.id not in newIds) %}
+            <span class="badge badge-danger"><s>{{ tag.label|localise_text }}</s></span>
+        {% endfor %}
+    {% endif %}
+{% elseif 'flag' == field.kind.value %}
+    {% set flags %}
+        {% for flag in value.new|default([]) %}
+            {{ diffmacro.flag(flag.label|trans, field.comparable ? flag.old : null, flag.new) }}
+        {% endfor %}
+    {% endset %}
+    {% if flags|trim is empty %}
+        <span class="text-muted fst-italic">{{ empty }}</span>
+    {% else %}
+        {{ flags }}
+    {% endif %}
+{% elseif 'moment' == field.kind.value %}
+    {% if value.new is null %}
+        <span class="text-muted fst-italic">{{ empty }}</span>
+    {% else %}
+        {{ value.new|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
+    {% endif %}
+    {% if field.comparable and value.isChanged and value.old is not null %}
+        <del class="small text-danger-emphasis ms-2">
+            {{ value.old|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
+        </del>
+    {% endif %}
+{% elseif 'date-range' == field.kind.value %}
+    {% if 'activity' == field.option('format') %}
+        {{ activity_date_range(value.new.start, value.new.end) }}
+    {% else %}
+        {{ value.new.start is not null ? value.new.start|date('j M Y') : 'on approval'|trans }}
+        &ndash;
+        {{ value.new.end is not null ? value.new.end|date('j M Y') : '-' }}
+    {% endif %}
+    {% if field.comparable and value.old is not null and value.isChanged %}
+        <del class="small text-danger-emphasis ms-2">
+            {% if 'activity' == field.option('format') %}
+                {{ activity_date_range(value.old.start, value.old.end) }}
+            {% else %}
+                {{ value.old.start is not null ? value.old.start|date('j M Y') : 'on approval'|trans }}
+                &ndash;
+                {{ value.old.end is not null ? value.old.end|date('j M Y') : '-' }}
             {% endif %}
-        {% endif %}
-    </div>
+        </del>
+    {% endif %}
 {% endif %}

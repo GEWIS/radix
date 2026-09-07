@@ -34,6 +34,7 @@ final readonly class DrawManager
     public function __construct(
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
+        private AdmissionOrder $admissionOrder,
     ) {
     }
 
@@ -61,13 +62,17 @@ final readonly class DrawManager
      * Scheduled draw at the list's own automated draw moment ({@see SignupList::getAutoDrawAt()}); the list need not
      * have closed, because {@see \App\Entity\Activity\Enums\DrawCutoffRule::IfFullBefore} and
      * {@see \App\Entity\Activity\Enums\DrawCutoffRule::AfterDurationOpen} legitimately fire while sign-up is still
-     * open. A null drawnBy marks the draw as automated.
+     * open. A null drawnBy marks the draw as automated. A list that guarantees roles is never drawn here: the roles
+     * are handed out once sign-up has closed, so its own moment only fixes who is in the draw.
      *
      * Returns whether a draw was actually performed.
      */
     public function drawAutomatically(SignupList $list): bool
     {
-        if ($list->getAllocationMethod()->isManual()) {
+        if (
+            $list->getAllocationMethod()->isManual()
+            || $list->isDrawnByHand()
+        ) {
             return false;
         }
 
@@ -134,8 +139,9 @@ final readonly class DrawManager
      * Whether the given draw may be run on a list now: it is limited with a real capacity, uses that draw method, has
      * not been drawn yet, and we are within the admission window. An automated draw additionally requires the list's
      * own draw moment to have passed; a manual draw requires the list to have closed or that same moment to have
-     * passed (the fallback for a missed automated draw). The capacity guard is essential: without it a capacity-less
-     * limited list would admit zero and lock irreversibly.
+     * passed (the fallback for a missed automated draw), except on a list that guarantees roles, which is only ever
+     * drawn once it has closed. The capacity guard is essential: without it a capacity-less limited list would admit
+     * zero and lock irreversibly.
      */
     private function canDraw(
         SignupList $list,
@@ -154,14 +160,19 @@ final readonly class DrawManager
             return false;
         }
 
-        return $requireDue
-            ? $list->isAutoDrawDue()
+        if ($requireDue) {
+            return $list->isAutoDrawDue();
+        }
+
+        return $list->isDrawnByHand()
+            ? $list->isClosed()
             : ($list->isClosed() || $list->isAutoDrawDue());
     }
 
     /**
      * Admit the first capacity of the (pre-ordered) sign-ups, waitlist the rest (clearing their attendance), then
-     * lock the draw with an audit stamp. The draw is a one-shot event and cannot be re-run; later adjustments are
+     * lock the draw with an audit stamp. Everybody keeps the place the draw gave them, so the waiting list stays in
+     * the order it was ranked in. The draw is a one-shot event and cannot be re-run; later adjustments are
      * manual ({@see \App\Twig\Components\Activity\Admin\SignupOverview::toggleAdmission()}).
      *
      * @param Signup[] $orderedSignups the cutoff pool (shuffled for a lottery) followed by the latecomers in
@@ -177,6 +188,7 @@ final readonly class DrawManager
         foreach ($orderedSignups as $signup) {
             $admitted = $position < $capacity;
             $signup->setDrawn($admitted);
+            $signup->setDrawPosition($position + 1);
             if (!$admitted) {
                 $signup->setPresent(false);
             }
@@ -217,7 +229,10 @@ final readonly class DrawManager
                 continue;
             }
 
-            if ($subscribedAt <= $cutoff) {
+            if (
+                null !== $cutoff
+                && $subscribedAt <= $cutoff
+            ) {
                 $pool[] = $signup;
                 continue;
             }
@@ -231,6 +246,11 @@ final readonly class DrawManager
         if (AllocationMethod::ConditionalDraw === $method) {
             $pool = array_values(new Randomizer()->shuffleArray($pool));
         }
+
+        $pool = $this->admissionOrder->arrange(
+            $list,
+            $pool,
+        );
 
         usort(
             $late,
@@ -247,7 +267,10 @@ final readonly class DrawManager
             $pool[] = $entry[1];
         }
 
-        return $pool;
+        return $this->admissionOrder->guaranteeRoles(
+            $list,
+            $pool,
+        );
     }
 
     /**

@@ -7,6 +7,8 @@
     {% set canMark = this.canMarkPresence %}
     {% set isBoard = this.isBoard %}
     {% set admissionOpen = this.admissionOpen %}
+    {% set people = this.peopleMode %}
+    {% set dateFormat = 'EEE d MMM. yyyy HH:mm' %}
 
     {% if attendanceListId is not null %}
         {% set list = listViews|filter(l => l.listId == attendanceListId)|first %}
@@ -57,280 +59,484 @@
                 </div>
             </div>
         {% endif %}
-    {% else %}
+    {% elseif listViews is empty %}
         <div class="panel mb-3">
-            <div class="panel-body">
-                <label class="form-label" for="signup-filter">{{ 'Filter by name or email'|trans }}</label>
-                <input type="search" class="form-control" id="signup-filter"
-                       placeholder="{{ 'Filter by name or email'|trans }}"
-                       data-model="debounce(300)|filter" value="{{ filter }}">
-                {% if not canMark %}
-                    <small class="text-muted d-block mt-2">
-                        <span class="fas fa-info-circle"></span>
-                        {{ 'Attendance can only be marked from 30 minutes before the activity until a day after it ends.'|trans }}
-                    </small>
-                {% endif %}
+            <div class="panel-body text-center text-muted py-4">
+                {{ 'This activity has no sign-up lists.'|trans }}
             </div>
         </div>
+    {% else %}
+        {% set list = this.activeList %}
+        {% set filters = this.filters %}
+        {% set current = this.quickFilterValue %}
 
-        {% for list in listViews %}
-            {% set isManual = list.allocationMethod.isManual %}
-            {% set collapseId = 'signup-list-' ~ list.listId %}
-            <div class="panel mb-3">
-                {# Client-side Bootstrap collapse; the open state survives live re-renders because ExternalMutationTracker re-applies the show/collapsed classes across the DOM morph. #}
-                <button type="button"
-                        class="panel-heading panel-collapse-toggle d-flex justify-content-between align-items-start gap-2 w-100 border-0 bg-transparent text-start collapsed"
-                        data-bs-toggle="collapse" data-bs-target="#{{ collapseId }}"
-                        aria-expanded="false" aria-controls="{{ collapseId }}">
-                    <span>
-                        <span class="d-flex flex-wrap align-items-center gap-1 mb-1">
-                            <span class="h5 mb-0">{{ list.name }}</span>
-                            {% if list.promoted %}
-                                <span class="fas fa-star text-warning" title="{{ 'Promoted'|trans }}"></span>
-                            {% endif %}
-                        </span>
-                        <span class="d-flex flex-wrap align-items-center gap-1 ">
-                            {% if list.isOpen %}
-                                <span class="badge badge-success">{{ 'Open'|trans }}</span>
-                            {% elseif list.isClosed %}
-                                <span class="badge badge-danger">{{ 'Closed'|trans }}</span>
-                            {% else %}
-                                <span class="badge badge-info">{{ 'Not yet open'|trans }}</span>
-                            {% endif %}
-                            {% if list.limitedCapacity %}
-                                <span class="badge badge-warning">
-                                    {%- if list.capacity is not null -%}
-                                        {{ 'Limited capacity (%capacity%)'|trans({'%capacity%': list.capacity}) }}
-                                    {%- else -%}
-                                        {{ 'Limited capacity'|trans }}
-                                    {%- endif -%}
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+            <ul class="nav nav-pills nav-pills-compact" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link{{ not people ? ' active' }}" role="tab"
+                            aria-selected="{{ not people ? 'true' : 'false' }}"
+                            data-action="live#action" data-live-action-param="setMode" data-live-mode-param="list">
+                        {{ 'One list at a time'|trans }}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link{{ people ? ' active' }}" role="tab"
+                            aria-selected="{{ people ? 'true' : 'false' }}"
+                            data-action="live#action" data-live-action-param="setMode" data-live-mode-param="people">
+                        {{ 'Everyone, side by side'|trans }}
+                    </button>
+                </li>
+            </ul>
+            <span class="small text-muted">
+                {% if people %}
+                    {{ 'One row per person, one column per list: the quickest way to see who is in two lists, who is stuck on a waiting list and who only joined one part.'|trans }}
+                {% elseif list %}
+                    {{ 'Work one list at a time: admit, mark presence and read the answers for %list%.'|trans({'%list%': list.name}) }}
+                {% endif %}
+            </span>
+        </div>
+
+        {% if not people %}
+            <div class="row g-3 mb-3">
+                {% for view in listViews %}
+                    {% set placesLeft = view.placesLeft %}
+                    {% set active = list and view.listId == list.listId %}
+                    <div class="col-sm-6 col-lg-4">
+                        <button type="button" class="card h-100 w-100 text-start{{ active ? ' border-gewis-primary' }}"
+                                data-action="live#action" data-live-action-param="showList" data-live-list-id-param="{{ view.listId }}"
+                                aria-pressed="{{ active ? 'true' : 'false' }}">
+                            <div class="card-body d-flex flex-column gap-2 py-3">
+                                <span class="d-flex align-items-center gap-2">
+                                    <span class="form-stepper-badge">{{ loop.index }}</span>
+                                    <span class="fw-bold text-truncate">{{ view.name }}</span>
+                                    <span class="ms-auto">
+                                        {% if view.isOpen %}
+                                            <span class="badge badge-success">{{ 'Open'|trans }}</span>
+                                        {% elseif view.isClosed %}
+                                            <span class="badge badge-danger">{{ 'Closed'|trans }}</span>
+                                        {% else %}
+                                            <span class="badge badge-info">{{ 'Not yet open'|trans }}</span>
+                                        {% endif %}
+                                    </span>
                                 </span>
-                            {% endif %}
-                            <span class="badge badge-secondary">
-                                {{ 'Sign-ups: %count%'|trans({'%count%': list.subscriberCount}) }}
-                            </span>
-                            {% if list.limitedCapacity and list.drawLocked %}
-                                <span class="badge {{ list.capacity is not null and list.admittedCount > list.capacity ? 'badge-danger' : 'badge-info' }}">
-                                    {{ 'Admitted: %admitted% / %capacity%'|trans({'%admitted%': list.admittedCount, '%capacity%': list.capacity ?? '?'}) }}
+                                <span class="d-flex align-items-baseline gap-2">
+                                    {% if view.limitedCapacity %}
+                                        <span class="fs-5 fw-bold">{{ view.admittedCount }} / {{ view.capacity ?? '?' }}</span>
+                                        <span class="stat-note">{{ 'admitted of %count% sign-ups'|trans({'%count%': view.subscriberCount}) }}</span>
+                                    {% else %}
+                                        <span class="fs-5 fw-bold">{{ view.subscriberCount }}</span>
+                                        <span class="stat-note">{{ 'sign-ups'|trans }}</span>
+                                    {% endif %}
                                 </span>
-                            {% endif %}
-                            {% if list.presenceTaken %}
-                                <span class="badge badge-success">
-                                    {{ 'Present: %count%'|trans({'%count%': list.presentCount}) }}
+                                <div class="progress" role="progressbar" style="height: 0.3rem"
+                                     aria-valuenow="{{ view.admittedShare }}" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar{{ view.limitedCapacity ? '' : ' bg-success' }}" style="width: {{ view.admittedShare }}%"></div>
+                                    <div class="progress-bar bg-warning" style="width: {{ view.waitingShare }}%"></div>
+                                </div>
+                                <span class="stat-note{{ view.limitedCapacity and placesLeft > 0 and view.waitingCount > 0 ? ' text-gewis-primary' }}">
+                                    {% if not view.limitedCapacity %}
+                                        {{ 'Unlimited, everybody is in'|trans }}
+                                    {% elseif not view.drawLocked and not view.allocationMethod.isManual %}
+                                        {{ 'Not drawn yet'|trans }}
+                                    {% elseif placesLeft > 0 and view.waitingCount > 0 %}
+                                        {{ '%places% places left, %waiting% waiting'|trans({'%places%': placesLeft, '%waiting%': view.waitingCount}) }}
+                                    {% elseif view.waitingCount > 0 %}
+                                        {{ 'Full, %count% on the waiting list'|trans({'%count%': view.waitingCount}) }}
+                                    {% elseif placesLeft < 0 %}
+                                        {{ 'Overbooked by %count%'|trans({'%count%': -placesLeft}) }}
+                                    {% else %}
+                                        {{ '%count% places left'|trans({'%count%': placesLeft}) }}
+                                    {% endif %}
                                 </span>
-                            {% endif %}
-                            {% if list.onlyGEWIS %}
-                                <span class="badge badge-tag">{{ 'GEWIS members only'|trans }}</span>
-                            {% endif %}
-                        </span>
-                    </span>
-                    <span class="fas fa-chevron-down panel-collapse-chevron"></span>
-                </button>
-                <div class="collapse" id="{{ collapseId }}">
-                    <div class="panel-body border-bottom">
-                        <dl class="row mb-0 small">
-                            <dt class="col-sm-4 col-lg-3">{{ 'Sign-up window'|trans }}</dt>
-                            <dd class="col-sm-8 col-lg-9 mb-2">
-                                {{ 'Open from %open% until %close%.'|trans({
-                                    '%open%': list.openDate|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
-                                    '%close%': list.closeDate|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
-                                }) }}
-                            </dd>
-                            <dt class="col-sm-4 col-lg-3">{{ 'Subscriber count shown publicly'|trans }}</dt>
-                            <dd class="col-sm-8 col-lg-9 mb-2">{{ list.displaySubscribedNumber ? 'Yes'|trans : 'No'|trans }}</dd>
-                        </dl>
+                            </div>
+                        </button>
                     </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-                {% if list.limitedCapacity %}
-                    {% set isFcfs = list.allocationMethod.value == 'first-come-first-served' %}
-                    {% set drawAction = isFcfs ? 'drawFirstCome' : 'drawLottery' %}
-                    {% set drawIcon = isFcfs ? 'fa-list-ol' : 'fa-dice' %}
-                    {% set drawLabel = isFcfs ? 'First-come-first-served'|trans : 'Random draw'|trans %}
-                    {% set drawReady = (list.isClosed or list.autoDrawDue) and admissionOpen and list.capacity is not null and not list.frozen %}
-                    {% set drawConfirm = 'Run the draw now? This admits people up to capacity and it cannot be undone.'|trans %}
-                    <div class="panel-body border-bottom">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                            <span class="d-flex flex-wrap align-items-center gap-2">
-                                <strong>{{ 'Admission'|trans }}</strong>
-                                <span class="badge badge-tag">{{ list.allocationMethod|trans }}</span>
-                                <span class="badge {{ list.capacity is not null and list.admittedCount > list.capacity ? 'badge-danger' : 'badge-secondary' }}">
-                                    {{ 'Admitted: %admitted% / %capacity%'|trans({'%admitted%': list.admittedCount, '%capacity%': list.capacity ?? '∞'}) }}
-                                </span>
+        <div class="panel mb-3">
+            {% if not people and list %}
+                {% set isManual = list.allocationMethod.isManual %}
+                {% set isFcfs = list.allocationMethod.value == 'first-come-first-served' %}
+                {% set drawAction = isFcfs ? 'drawFirstCome' : 'drawLottery' %}
+                {% set drawReady = (list.isClosed or (list.autoDrawDue and not list.drawnByHand)) and admissionOpen and list.capacity is not null and not list.frozen %}
+                {% set settled = list.drawLocked or isManual %}
+
+                <div class="panel-body border-bottom d-flex flex-column gap-3">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="h5 mb-0 d-flex align-items-center gap-2">
+                            {{ list.name }}
+                            {% if list.promoted %}
+                                <span class="fas fa-star text-warning small" title="{{ 'Promoted'|trans }}"></span>
+                            {% endif %}
+                        </span>
+                        {% if list.isOpen %}
+                            <span class="badge badge-success">{{ 'Open'|trans }}</span>
+                        {% elseif list.isClosed %}
+                            <span class="badge badge-danger">{{ 'Closed'|trans }}</span>
+                        {% else %}
+                            <span class="badge badge-info">{{ 'Not yet open'|trans }}</span>
+                        {% endif %}
+                        {% if list.limitedCapacity %}
+                            <span class="badge badge-warning">
+                                {%- if list.capacity is not null -%}
+                                    {{ 'Limited capacity (%capacity%)'|trans({'%capacity%': list.capacity}) }}
+                                {%- else -%}
+                                    {{ 'Limited capacity'|trans }}
+                                {%- endif -%}
                             </span>
-                            {% if list.drawLocked or isManual %}
-                                <span class="d-flex flex-wrap gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-gewis-primary"
-                                            data-action="live#action" data-live-action-param="openComposer"
-                                            data-live-list-id-param="{{ list.listId }}" data-live-scope-param="admitted">
-                                        <span class="fas fa-envelope"></span> {{ 'Email admittees'|trans }}
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                                            data-action="live#action" data-live-action-param="openComposer"
-                                            data-live-list-id-param="{{ list.listId }}" data-live-scope-param="waitlisted">
-                                        <span class="fas fa-envelope"></span> {{ 'Email the waiting list'|trans }}
-                                    </button>
-                                </span>
-                            {% elseif isBoard %}
+                        {% else %}
+                            <span class="badge badge-tag">{{ 'Unlimited'|trans }}</span>
+                        {% endif %}
+                        <span class="badge badge-secondary">{{ 'Sign-ups: %count%'|trans({'%count%': list.subscriberCount}) }}</span>
+                        {% if list.limitedCapacity and settled %}
+                            <span class="badge {{ list.capacity is not null and list.admittedCount > list.capacity ? 'badge-danger' : 'badge-info' }}">
+                                {{ 'Admitted: %admitted% / %capacity%'|trans({'%admitted%': list.admittedCount, '%capacity%': list.capacity ?? '?'}) }}
+                            </span>
+                        {% elseif not list.limitedCapacity %}
+                            <span class="badge badge-success">{{ 'Everybody admitted'|trans }}</span>
+                        {% endif %}
+                        {% if list.presenceTaken %}
+                            <span class="badge badge-success">{{ 'Present: %count%'|trans({'%count%': list.presentCount}) }}</span>
+                        {% endif %}
+                        <span class="ms-auto d-flex flex-wrap gap-2">
+                            {% if canMark %}
+                                <button type="button" class="btn btn-sm btn-success"
+                                        data-action="live#action" data-live-action-param="enterAttendance"
+                                        data-live-list-id-param="{{ list.listId }}">
+                                    <span class="fas fa-clipboard-check"></span> {{ 'Take attendance'|trans }}
+                                </button>
+                            {% endif %}
+                            {% if list.limitedCapacity and settled %}
+                                <button type="button" class="btn btn-sm btn-outline-gewis-primary"
+                                        data-action="live#action" data-live-action-param="openComposer"
+                                        data-live-scope-param="admitted">
+                                    <span class="fas fa-envelope"></span> {{ 'Email admittees'|trans }}
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        data-action="live#action" data-live-action-param="openComposer"
+                                        data-live-scope-param="waitlisted">
+                                    <span class="fas fa-envelope"></span> {{ 'Email the waiting list'|trans }}
+                                </button>
+                            {% elseif list.limitedCapacity and isBoard %}
                                 <button type="button" class="btn btn-sm btn-outline-gewis-primary" {{ drawReady ? '' : 'disabled' }}
                                         data-bs-toggle="modal" data-bs-target="#confirm-modal"
                                         data-confirm-title="{{ 'Run the draw?'|trans }}"
-                                        data-confirm-message="{{ drawConfirm }}"
+                                        data-confirm-message="{{ 'Run the draw now? This admits people up to capacity and it cannot be undone.'|trans }}"
                                         data-confirm-label="{{ 'Run the draw'|trans }}"
                                         data-confirm-live-action="{{ drawAction }}"
                                         data-confirm-live-args='{"listId": {{ list.listId }}}'>
-                                    <span class="fas {{ drawIcon }}"></span> {{ drawLabel }}
+                                    <span class="fas {{ isFcfs ? 'fa-list-ol' : 'fa-dice' }}"></span>
+                                    {{ isFcfs ? 'First-come-first-served'|trans : 'Random draw'|trans }}
                                 </button>
                             {% endif %}
-                        </div>
-                        <small class="text-muted d-block mt-2">
-                            {% if list.frozen %}
-                                {{ 'This activity is cancelled or unpublished, so sign-up actions are frozen.'|trans }}
-                            {% elseif isManual %}
-                                {{ admissionOpen ? 'Admit people by hand with the toggles below.'|trans : 'Admission is closed.'|trans }}
-                            {% elseif list.drawLocked %}
-                                {% if list.drawnByName is null %}
-                                    {{ 'Drawn automatically on %date%.'|trans({
-                                        '%date%': list.drawnAt ? list.drawnAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) : '',
+                            {% if list.isOpen and not list.frozen %}
+                                <a class="btn btn-sm btn-outline-success"
+                                   href="{{ path('admin/activities/add_external_signup', {'activity': this.activity.getId, 'signupList': list.listId}) }}">
+                                    <span class="fas fa-user-plus"></span> {{ 'Add external subscriber'|trans }}
+                                </a>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-4 col-lg-3">{{ 'Sign-up window'|trans }}</dt>
+                        <dd class="col-sm-8 col-lg-9 mb-1">
+                            {{ list.openDate|format_datetime(pattern: dateFormat, locale: app.request.locale) }}
+                            &ndash;
+                            {{ list.closeDate|format_datetime(pattern: dateFormat, locale: app.request.locale) }}
+                        </dd>
+                        <dt class="col-sm-4 col-lg-3">{{ 'Who may sign up'|trans }}</dt>
+                        <dd class="col-sm-8 col-lg-9 mb-1">{{ list.onlyGEWIS ? 'GEWIS members only'|trans : 'Everybody, members and externals'|trans }}</dd>
+                        <dt class="col-sm-4 col-lg-3">{{ 'Count shown publicly'|trans }}</dt>
+                        <dd class="col-sm-8 col-lg-9 mb-1">{{ list.displaySubscribedNumber ? 'Yes'|trans : 'No'|trans }}</dd>
+                        {% for order in list.priorityOrders %}
+                            <dt class="col-sm-4 col-lg-3">{{ 'Priority order'|trans }}</dt>
+                            <dd class="col-sm-8 col-lg-9 mb-1">{{ order }}</dd>
+                        {% endfor %}
+                    </dl>
+
+                    {% if list.limitedCapacity %}
+                        <div class="alert alert-secondary d-flex flex-wrap align-items-center gap-2 py-2 small mb-0">
+                            <span class="stat-label">{{ 'Admission'|trans }}</span>
+                            <span class="fw-semibold">
+                                {{ list.allocationMethod|trans }}
+                                {%- if list.drawLocked %} &middot; {{ 'drawn'|trans }}{% elseif isManual %} &middot; {{ 'by hand'|trans }}{% endif -%}
+                            </span>
+                            <span class="text-muted">
+                                {% if list.frozen %}
+                                    {{ 'This activity is cancelled or unpublished, so sign-up actions are frozen.'|trans }}
+                                {% elseif isManual %}
+                                    {{ admissionOpen ? 'Admit people by hand with the toggles below.'|trans : 'Admission is closed.'|trans }}
+                                {% elseif list.drawLocked %}
+                                    {% if list.drawnByName is null %}
+                                        {{ 'Drawn automatically on %date%.'|trans({
+                                            '%date%': list.drawnAt ? list.drawnAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) : '',
+                                        }) }}
+                                    {% else %}
+                                        {{ 'Drawn by %name% on %date%.'|trans({
+                                            '%name%': list.drawnByName,
+                                            '%date%': list.drawnAt ? list.drawnAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) : '',
+                                        }) }}
+                                    {% endif %}
+                                    {{ admissionOpen ? 'You can still admit from the waiting list or remove a no-show until shortly after the activity.'|trans : 'Admission is closed.'|trans }}
+                                {% elseif not admissionOpen %}
+                                    {{ 'Admission is closed.'|trans }}
+                                {% elseif list.drawnByHand %}
+                                    {% if list.autoDrawAt is not null %}
+                                        {{ 'Everybody who signed up before %date% is in the draw.'|trans({
+                                            '%date%': list.autoDrawAt|format_datetime(pattern: dateFormat, locale: app.request.locale),
+                                        }) }}
+                                    {% endif %}
+                                    {% if list.isClosed %}
+                                        {{ 'Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.'|trans }}
+                                    {% else %}
+                                        {{ 'This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.'|trans }}
+                                    {% endif %}
+                                {% elseif list.autoDrawDue %}
+                                    {{ 'The draw will be performed automatically within a few minutes.'|trans }}
+                                    {% if isBoard %}
+                                        {{ 'You can also run it now.'|trans }}
+                                    {% endif %}
+                                {% elseif list.autoDrawAt is not null %}
+                                    {{ 'The draw will be performed automatically on %date%.'|trans({
+                                        '%date%': list.autoDrawAt|format_datetime(pattern: dateFormat, locale: app.request.locale),
                                     }) }}
+                                {% elseif not isBoard %}
+                                    {{ 'Waiting for the board to perform the draw.'|trans }}
+                                {% elseif not list.isClosed %}
+                                    {{ 'The draw can be run once sign-up has closed.'|trans }}
                                 {% else %}
-                                    {{ 'Drawn by %name% on %date%.'|trans({
-                                        '%name%': list.drawnByName,
-                                        '%date%': list.drawnAt ? list.drawnAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) : '',
-                                    }) }}
+                                    {{ 'Running the draw admits people up to capacity and locks it; you can adjust individuals afterwards.'|trans }}
                                 {% endif %}
-                                {{ admissionOpen ? 'You can still admit from the waiting list or remove a no-show until shortly after the activity.'|trans : 'Admission is closed.'|trans }}
-                            {% elseif not admissionOpen %}
-                                {{ 'Admission is closed.'|trans }}
-                            {% elseif list.autoDrawDue %}
-                                {{ 'The draw will be performed automatically within a few minutes.'|trans }}
-                                {% if isBoard %}
-                                    {{ 'You can also run it now.'|trans }}
-                                {% endif %}
-                            {% elseif list.autoDrawAt is not null %}
-                                {{ 'The draw will be performed automatically on %date%.'|trans({
-                                    '%date%': list.autoDrawAt|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale),
-                                }) }}
-                            {% elseif not isBoard %}
-                                {{ 'Waiting for the board to perform the draw.'|trans }}
-                            {% elseif not list.isClosed %}
-                                {{ 'The draw can be run once sign-up has closed.'|trans }}
-                            {% else %}
-                                {{ 'Running the draw admits people up to capacity and locks it; you can adjust individuals afterwards.'|trans }}
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary d-flex flex-wrap align-items-center gap-2 py-2 small mb-0">
+                            <span class="stat-label">{{ 'Admission'|trans }}</span>
+                            <span class="fw-semibold">{{ 'No admission needed'|trans }}</span>
+                            <span class="text-muted">{{ 'Unlimited capacity, so everybody who signs up is in.'|trans }}</span>
+                        </div>
+                    {% endif %}
+
+                    {% if list.roles is not empty or list.reservedPlaces is not empty %}
+                        <div class="alert alert-warning d-flex flex-column gap-2 py-2 small mb-0">
+                            <span class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="stat-label">{{ 'Reserved places'|trans }}</span>
+                                {% for role in list.roles %}
+                                    <span class="badge {{ role.taken >= role.minimum ? 'badge-success' : 'badge-warning badge-outlined' }}">
+                                        {{ role.name }} <strong>{{ role.taken }} / {{ role.minimum }}</strong>
+                                    </span>
+                                {% endfor %}
+                                {% for held in list.reservedPlaces %}
+                                    <span class="badge badge-warning">
+                                        <span class="fas fa-bookmark" aria-hidden="true"></span> {{ held }}
+                                    </span>
+                                {% endfor %}
+                            </span>
+                            {% if list.roles is not empty %}
+                                <span class="text-muted">
+                                    {{ 'A reserved place is handed out by you: pick a person in the Reserved place column and they keep it whatever the draw does.'|trans }}
+                                    {% if list.canAssignRoles %}
+                                        {{ 'Places you leave empty go back to the draw.'|trans }}
+                                    {% elseif not list.isClosed %}
+                                        {{ 'Places are handed out once sign-up has closed.'|trans }}
+                                    {% endif %}
+                                </span>
                             {% endif %}
-                        </small>
-                    </div>
-                {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
 
-                    <div class="panel-body border-bottom d-flex flex-wrap align-items-center gap-2">
-                        {% if canMark %}
-                            <button type="button" class="btn btn-sm btn-success"
-                                    data-action="live#action" data-live-action-param="enterAttendance"
-                                    data-live-list-id-param="{{ list.listId }}">
-                                <span class="fas fa-clipboard-check"></span> {{ 'Take attendance'|trans }}
+            <div class="panel-body border-bottom d-flex flex-wrap align-items-center gap-2">
+                <input type="search" class="form-control form-control-sm w-auto flex-grow-1" style="max-inline-size: 20rem"
+                       aria-label="{{ 'Search'|trans }}"
+                       placeholder="{{ people ? 'Search everyone by name, type or answer'|trans : 'Search by name, type or answer'|trans }}"
+                       data-model="debounce(300)|filter" value="{{ filter }}">
+                <ul class="nav nav-pills nav-pills-compact" role="tablist" aria-label="{{ 'Filter'|trans }}">
+                    {% for option in filters %}
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link{{ option == current ? ' active' }}" role="tab"
+                                    aria-selected="{{ option == current ? 'true' : 'false' }}"
+                                    data-action="live#action" data-live-action-param="setQuickFilter"
+                                    data-live-filter-param="{{ option.value }}">
+                                {{ option|trans }}
                             </button>
-                        {% endif %}
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                data-action="live#action" data-live-action-param="selectAll"
-                                data-live-list-id-param="{{ list.listId }}">
-                            {{ 'Select all'|trans }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <span class="ms-auto small text-muted">
+                    {% if people %}
+                        {{ '%shown% of %total% people shown'|trans({'%shown%': this.peopleView.rows|length, '%total%': this.peopleView.peopleCount}) }}
+                    {% elseif list %}
+                        {{ '%shown% of %total% sign-ups shown'|trans({'%shown%': list.shownCount, '%total%': list.subscriberCount}) }}
+                    {% endif %}
+                </span>
+                {# data-bs-auto-close="outside" plus ExternalMutationTracker keep this dropdown open across the re-render a toggle triggers. #}
+                <div class="dropdown">
+                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="fas fa-table-columns"></span> {{ 'Columns'|trans }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end p-2">
+                        <li><h6 class="dropdown-header">{{ 'Show columns'|trans }}</h6></li>
+                        {% set optional = people ? {'generation': 'Generation'|trans} : {'otherLists': 'Other lists this person is in'|trans, 'generation': 'Generation'|trans, 'signedUpAt': 'Signed up at'|trans} %}
+                        {% for column, label in optional %}
+                            <li>
+                                <label class="dropdown-item d-flex align-items-center gap-2 mb-0">
+                                    <input type="checkbox" class="form-check-input mt-0" {{ this.columnShown(column) ? 'checked' }}
+                                           data-action="live#action" data-live-action-param="toggleColumn"
+                                           data-live-column-param="{{ column }}">
+                                    {{ label }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                        {% set fieldColumns = people ? this.peopleView.answerColumns : (list ? list.fieldColumns : []) %}
+                        {% for field in fieldColumns %}
+                            <li>
+                                <label class="dropdown-item d-flex align-items-center gap-2 mb-0">
+                                    <input type="checkbox" class="form-check-input mt-0" {{ field.hidden ? '' : 'checked' }}
+                                           data-action="live#action" data-live-action-param="toggleFieldColumn"
+                                           data-live-field-id-param="{{ field.fieldId|default(field.id) }}">
+                                    {{ field.label|default(field.name) }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            {% set selectedCount = people ? this.peopleView.selectedCount : (list ? list.selectedCount : 0) %}
+            <div class="panel-body border-bottom d-flex flex-wrap align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-action="live#action" data-live-action-param="selectShown">
+                    {{ 'Select all shown'|trans }}
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-action="live#action" data-live-action-param="clearAll">
+                    {{ 'Clear'|trans }}
+                </button>
+                <button type="button" class="btn btn-sm btn-gewis-primary"
+                        data-action="live#action" data-live-action-param="openComposer">
+                    <span class="fas fa-envelope"></span>
+                    {% if selectedCount > 0 %}
+                        {{ 'Email %count% selected'|trans({'%count%': selectedCount}) }}
+                    {% elseif people %}
+                        {{ 'Email everyone'|trans }}
+                    {% else %}
+                        {{ 'Email sign-ups'|trans }}
+                    {% endif %}
+                </button>
+                <span class="ms-auto small text-muted">
+                    {{ selectedCount > 0 ? '%count% selected'|trans({'%count%': selectedCount}) : 'Nothing selected'|trans }}
+                </span>
+            </div>
+
+            {% if composerOpen %}
+                {% set audiences = this.audiences %}
+                {% set recipients = this.recipients %}
+                {% set externals = this.externalRecipientCount %}
+                <div class="panel-body border-bottom d-flex flex-column gap-3">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="h6 mb-0">{{ 'New message'|trans }}</span>
+                        <span class="badge badge-info">{{ '%count% recipient|%count% recipients'|trans({'%count%': recipients|length}) }}</span>
+                        <button type="button" class="btn btn-sm btn-link ms-auto text-muted"
+                                data-action="live#action" data-live-action-param="closeComposer">
+                            {{ 'Discard'|trans }}
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                data-action="live#action" data-live-action-param="clearSelection"
-                                data-live-list-id-param="{{ list.listId }}">
-                            {{ 'Clear selection'|trans }}
-                        </button>
-                        <button type="button" class="btn btn-sm btn-gewis-primary"
-                                data-action="live#action" data-live-action-param="openComposer"
-                                data-live-list-id-param="{{ list.listId }}">
-                            <span class="fas fa-envelope"></span> {{ 'Email sign-ups'|trans }}
-                        </button>
-                        {% if list.isOpen and not list.frozen %}
-                            <a class="btn btn-sm btn-outline-success"
-                               href="{{ path('admin/activities/add_external_signup', {'activity': this.activity.getId, 'signupList': list.listId}) }}">
-                                <span class="fas fa-user-plus"></span> {{ 'Add external subscriber'|trans }}
-                            </a>
-                        {% endif %}
-                        {% if list.fieldColumns is not empty %}
-                            {# data-bs-auto-close="outside" plus ExternalMutationTracker keep this dropdown open across the re-render a toggle triggers. #}
-                            <div class="dropdown ms-auto">
-                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                    <span class="fas fa-table-columns"></span> {{ 'Columns'|trans }}
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end p-2">
-                                    {% for field in list.fieldColumns %}
-                                        <li>
-                                            <label class="dropdown-item d-flex align-items-center gap-2 mb-0">
-                                                <input type="checkbox" class="form-check-input mt-0"
-                                                       {{ field.hidden ? '' : 'checked' }}
-                                                       data-action="live#action" data-live-action-param="toggleFieldColumn"
-                                                       data-live-field-id-param="{{ field.id }}">
-                                                {{ field.name }}
-                                            </label>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <span class="stat-label">{{ 'Who gets this'|trans }}</span>
+                        <ul class="nav nav-pills nav-pills-compact flex-wrap" role="tablist">
+                            {% for audience in audiences %}
+                                <li class="nav-item" role="presentation">
+                                    <button type="button" class="nav-link{{ audience.scope.value == this.scope ? ' active' }}" role="tab"
+                                            aria-selected="{{ audience.scope.value == this.scope ? 'true' : 'false' }}"
+                                            data-action="live#action" data-live-action-param="setScope"
+                                            data-live-scope-param="{{ audience.scope.value }}">
+                                        {{ audience.scope|trans }} <span class="badge">{{ audience.count }}</span>
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% for audience in audiences|filter(a => a.scope.value == this.scope) %}
+                            <div class="alert alert-secondary py-2 small mb-0">{{ audience.explain }}</div>
+                        {% endfor %}
+                        {% if externals > 0 %}
+                            <div class="alert alert-warning py-2 small mb-0">
+                                <span>
+                                    {{ '%count% recipient is an external or a non-member: they read this at the address they typed in themselves, and they cannot open member-only links.|%count% recipients are externals or non-members: they read this at the address they typed in themselves, and they cannot open member-only links.'|trans({'%count%': externals}) }}
+                                </span>
                             </div>
                         {% endif %}
                     </div>
 
-                {% if composingListId == list.listId %}
-                    <div class="panel-body border-bottom">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <select class="form-select" id="email-scope-{{ list.listId }}" data-model="norender|scope">
-                                        {% for option in this.getRecipientScopes(list.limitedCapacity) %}
-                                            <option value="{{ option.value }}" {% if this.scope == option.value %}selected{% endif %}>
-                                                {{ option|trans }}{% if option.value == 'selected' %} ({{ list.selectedCount }}){% endif %}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                    <label for="email-scope-{{ list.listId }}">{{ 'Recipients'|trans }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="email-subject-{{ list.listId }}" required
-                                           placeholder="{{ 'Subject'|trans }}"
-                                           data-model="norender|emailSubject" value="{{ emailSubject }}">
-                                    <label class="required" for="email-subject-{{ list.listId }}">{{ 'Subject'|trans }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                {# data-live-ignore: the markdown-editor injects its own DOM here; keep the re-render from destroying it. #}
-                                <div class="form-floating" data-live-ignore>
-                                    {# Floating-label textareas need an explicit height (rows is ignored). #}
-                                    <textarea class="form-control" id="email-body-{{ list.listId }}" required
-                                              placeholder="{{ 'Message'|trans }}" style="height: 160px;"
-                                              data-controller="markdown-editor"
-                                              data-markdown-editor-toolbar-value="minimal"
-                                              data-markdown-editor-language-value="{{ app.request.locale }}"
-                                              data-model="norender|emailBody">{{ emailBody }}</textarea>
-                                    <label class="required" for="email-body-{{ list.listId }}">{{ 'Message'|trans }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-12 d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-outline-secondary"
-                                        data-action="live#action" data-live-action-param="closeComposer">
-                                    {{ 'Cancel'|trans }}
-                                </button>
-                                <button type="button" class="btn btn-gewis-primary"
-                                        data-bs-toggle="modal" data-bs-target="#confirm-modal"
-                                        data-confirm-title="{{ 'Send this email?'|trans }}"
-                                        data-confirm-message="{{ 'The selected recipients will receive this email immediately. This cannot be undone.'|trans }}"
-                                        data-confirm-label="{{ 'Send'|trans }}"
-                                        data-confirm-live-action="sendEmail"
-                                        data-confirm-live-args='{"listId": {{ list.listId }}}'>
-                                    <span class="fas fa-paper-plane"></span> {{ 'Send'|trans }}
-                                </button>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="email-subject" required
+                                       placeholder="{{ 'Subject'|trans }}"
+                                       data-model="norender|emailSubject" value="{{ emailSubject }}">
+                                <label class="required" for="email-subject">{{ 'Subject'|trans }}</label>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            {# data-live-ignore: the markdown-editor injects its own DOM here; keep the re-render from destroying it. #}
+                            <div class="form-floating" data-live-ignore>
+                                {# Floating-label textareas need an explicit height (rows is ignored). #}
+                                <textarea class="form-control" id="email-body" required
+                                          placeholder="{{ 'Message'|trans }}" style="height: 160px;"
+                                          data-controller="markdown-editor"
+                                          data-markdown-editor-toolbar-value="minimal"
+                                          data-markdown-editor-language-value="{{ app.request.locale }}"
+                                          data-model="norender|emailBody">{{ emailBody }}</textarea>
+                                <label class="required" for="email-body">{{ 'Message'|trans }}</label>
+                            </div>
+                            <small class="text-muted">{{ 'Everybody gets their own copy, so nobody sees who else received it.'|trans }}</small>
+                        </div>
                     </div>
-                {% endif %}
 
-                <div class="panel-body">
-                    <div class="table-responsive">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="small text-muted">
+                            {% if recipients is empty %}
+                                {{ 'Nobody is in this group yet.'|trans }}
+                            {% else %}
+                                {{ 'Sending to %count% person|Sending to %count% people'|trans({'%count%': recipients|length}) }}
+                            {% endif %}
+                        </span>
+                        <span class="ms-auto d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    data-action="live#action" data-live-action-param="closeComposer">
+                                {{ 'Cancel'|trans }}
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary"
+                                    data-action="live#action" data-live-action-param="sendTest">
+                                {{ 'Send a test to me'|trans }}
+                            </button>
+                            <button type="button" class="btn btn-gewis-primary" {{ recipients is empty ? 'disabled' }}
+                                    data-bs-toggle="modal" data-bs-target="#confirm-modal"
+                                    data-confirm-title="{{ 'Send this email?'|trans }}"
+                                    data-confirm-message="{{ 'The selected recipients will receive this email immediately. This cannot be undone.'|trans }}"
+                                    data-confirm-label="{{ 'Send'|trans }}"
+                                    data-confirm-live-action="{{ people ? 'sendToPeople' : 'sendEmail' }}"
+                                    data-confirm-live-args='{{ people ? '{}' : '{"listId": ' ~ list.listId ~ '}' }}'>
+                                <span class="fas fa-paper-plane"></span>
+                                {{ recipients is empty ? 'Send'|trans : 'Send to %count%'|trans({'%count%': recipients|length}) }}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="panel-body">
+                <div class="table-responsive">
+                    {% if people %}
+                        {% set view = this.peopleView %}
+                        {% set showGeneration = this.columnShown('generation') %}
+                        {% set columnCount = 4 + (showGeneration ? 1 : 0) + view.lists|length + view.visibleAnswerCount %}
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
@@ -338,53 +544,222 @@
                                     <th>#</th>
                                     <th>{{ 'Name'|trans }}</th>
                                     <th>{{ 'Type'|trans }}</th>
-                                    <th>{{ 'Generation'|trans }}</th>
-                                    <th>{{ 'Signed up at'|trans }}</th>
-                                    {% for field in list.fieldColumns %}
-                                        {% if not field.hidden %}
-                                            <th>{{ field.name }}</th>
-                                        {% endif %}
+                                    {% if showGeneration %}<th>{{ 'Generation'|trans }}</th>{% endif %}
+                                    {% for each in view.lists %}
+                                        <th class="text-center">{{ each.name }}</th>
                                     {% endfor %}
-                                    {% if list.limitedCapacity %}
-                                        <th class="text-center">{{ 'Admitted'|trans }}</th>
-                                    {% endif %}
-                                    <th class="text-center">{{ 'Present'|trans }}</th>
+                                    <th class="text-center">{{ 'Lists'|trans }}</th>
+                                    {% for column in view.answerColumns %}
+                                        {% if not column.hidden %}<th>{{ column.label }}</th>{% endif %}
+                                    {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for row in list.rows %}
+                                {% for row in view.rows %}
                                     <tr>
                                         <td>
                                             <input type="checkbox" class="form-check-input" data-model="selected"
-                                                   value="{{ row.signupId }}" {{ row.signupId in selected ? 'checked' }}>
+                                                   value="{{ row.signupIds|first }}" {{ row.selected ? 'checked' }}
+                                                   aria-label="{{ 'Select %name%'|trans({'%name%': row.fullName}) }}">
                                         </td>
-                                        <td>{{ row.position }}</td>
+                                        <td class="text-muted">{{ row.position }}</td>
                                         <td>
-                                            {{ row.fullName }}
-                                            {% if list.limitedCapacity and not row.drawn %}
-                                                <span class="badge badge-secondary">{{ 'Waiting list'|trans }}</span>
+                                            <span class="fw-semibold">{{ row.fullName }}</span>
+                                            {% if row.organisingBody %}
+                                                <span class="badge badge-gewis-primary">{{ 'Organising body'|trans }}</span>
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            {{ row.membershipTypeLabel }}
                                             {% if row.external %}
                                                 <span class="badge badge-tag">{{ 'Non-member'|trans }}</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ row.generation ?? ('N/A'|trans) }}</td>
-                                        <td class="text-muted small">
-                                            {{ row.signedUpAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) }}
-                                        </td>
-                                        {% for field in list.fieldColumns %}
-                                            {% if not field.hidden %}
-                                                <td>{{ row.cells[loop.index0].value }}</td>
+                                        <td class="text-muted">{{ row.membershipTypeLabel }}</td>
+                                        {% if showGeneration %}<td class="text-muted">{{ row.generation ?? ('N/A'|trans) }}</td>{% endif %}
+                                        {% for each in view.lists %}
+                                            {% set status = row.statuses[each.listId]|default(null) %}
+                                            <td class="text-center">
+                                                {% if status == 'admitted' %}
+                                                    <span class="badge badge-success">{{ 'Admitted'|trans }}</span>
+                                                {% elseif status == 'waiting' %}
+                                                    <span class="badge badge-warning">{{ 'Waiting'|trans }}</span>
+                                                {% elseif status == 'signed' %}
+                                                    <span class="badge badge-success">{{ 'Signed up'|trans }}</span>
+                                                {% else %}
+                                                    <span class="badge badge-tag">{{ 'Not signed up'|trans }}</span>
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                        <td class="text-center fw-semibold">{{ row.listCount }} / {{ view.lists|length }}</td>
+                                        {% for column in view.answerColumns %}
+                                            {% if not column.hidden %}
+                                                {% set answer = row.answers[column.key]|default(null) %}
+                                                <td class="{{ answer is null or answer == '' ? 'text-muted' }}">{{ answer is null ? '' : (answer == '' ? '-' : answer) }}</td>
                                             {% endif %}
                                         {% endfor %}
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="{{ columnCount }}" class="py-4">
+                                            <div class="text-center">
+                                                <div class="fw-semibold">{{ view.peopleCount > 0 ? 'Nobody matches this filter'|trans : 'No sign-ups yet.'|trans }}</div>
+                                                {% if view.peopleCount > 0 %}
+                                                    <div class="small text-muted">{{ 'Clear the search or pick another filter above.'|trans }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% elseif list %}
+                        {% set showOther = this.columnShown('otherLists') and listViews|length > 1 %}
+                        {% set showGeneration = this.columnShown('generation') %}
+                        {% set showSignedUp = this.columnShown('signedUpAt') %}
+                        {% set columnCount = 5 + (showGeneration ? 1 : 0) + (showSignedUp ? 1 : 0) + list.visibleFieldCount + (list.hasPriority ? 1 : 0) + (list.roles is not empty ? 1 : 0) + (showOther ? 1 : 0) + (list.limitedCapacity ? 1 : 0) %}
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>#</th>
+                                    <th>{{ 'Name'|trans }}</th>
+                                    <th>{{ 'Type'|trans }}</th>
+                                    {% if showGeneration %}<th>{{ 'Generation'|trans }}</th>{% endif %}
+                                    {% if showSignedUp %}<th>{{ 'Signed up at'|trans }}</th>{% endif %}
+                                    {% for field in list.fieldColumns %}
+                                        {% if not field.hidden %}<th>{{ field.name }}</th>{% endif %}
+                                    {% endfor %}
+                                    {% if list.hasPriority %}<th>{{ 'Priority'|trans }}</th>{% endif %}
+                                    {% if list.roles is not empty %}<th>{{ 'Reserved place'|trans }}</th>{% endif %}
+                                    {% if showOther %}<th>{{ 'Other lists'|trans }}</th>{% endif %}
+                                    {% if list.limitedCapacity %}<th class="text-center">{{ 'Admitted'|trans }}</th>{% endif %}
+                                    <th class="text-center">{{ 'Present'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set dividerDrawn = false %}
+                                {% if list.limitedCapacity and not settled and list.rows is not empty %}
+                                    {# Nothing has been decided yet, which the table says rather than leaving everybody
+                                       looking admitted. #}
+                                    <tr class="table-light">
+                                        <td colspan="{{ columnCount }}" class="stat-label py-1">{{ 'Admitted'|trans }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="{{ columnCount }}" class="text-muted small">
+                                            {% if list.frozen %}
+                                                {{ 'Nobody has been admitted: this activity is cancelled or unpublished.'|trans }}
+                                            {% elseif list.drawnByHand %}
+                                                {{ 'Nobody has been admitted yet: the draw is run by hand once sign-up has closed and the roles are handed out.'|trans }}
+                                            {% else %}
+                                                {{ 'Nobody has been admitted yet: the draw still has to be run.'|trans }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td colspan="{{ columnCount }}" class="stat-label py-1">{{ 'Signed up'|trans }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% for row in list.rows %}
+                                    {% if list.limitedCapacity and settled and not row.drawn and not dividerDrawn %}
+                                        {% set dividerDrawn = true %}
+                                        <tr class="table-light">
+                                            <td colspan="{{ columnCount }}" class="stat-label py-1">{{ 'Waiting list'|trans }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr class="{{ list.limitedCapacity and settled and not row.drawn ? 'table-light' }}">
+                                        <td>
+                                            <input type="checkbox" class="form-check-input" data-model="selected"
+                                                   value="{{ row.signupId }}" {{ row.selected ? 'checked' }}
+                                                   aria-label="{{ 'Select %name%'|trans({'%name%': row.fullName}) }}">
+                                        </td>
+                                        <td class="text-muted">{{ row.position }}</td>
+                                        <td>
+                                            <span class="fw-semibold">{{ row.fullName }}</span>
+                                            {% if row.organisingBody %}
+                                                <span class="badge badge-gewis-primary">{{ 'Organising body'|trans }}</span>
+                                            {% endif %}
+                                            {% if row.external %}
+                                                <span class="badge badge-tag">{{ 'Non-member'|trans }}</span>
+                                            {% endif %}
+                                            {% if list.limitedCapacity and settled and not row.drawn %}
+                                                <span class="badge badge-secondary">{{ 'Waiting list'|trans }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">{{ row.membershipTypeLabel }}</td>
+                                        {% if showGeneration %}<td class="text-muted">{{ row.generation ?? ('N/A'|trans) }}</td>{% endif %}
+                                        {% if showSignedUp %}
+                                            <td class="text-muted small">{{ row.signedUpAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) }}</td>
+                                        {% endif %}
+                                        {% for field in list.fieldColumns %}
+                                            {% if not field.hidden %}
+                                                {% set answer = row.cells[loop.index0].value %}
+                                                <td class="{{ answer == '' ? 'text-muted' }}">{{ answer == '' ? '-' : answer }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if list.hasPriority %}
+                                            <td class="small">
+                                                {% for label in row.priority %}
+                                                    <span class="badge badge-secondary">{{ label }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">{{ 'N/A'|trans }}</span>
+                                                {% endfor %}
+                                            </td>
+                                        {% endif %}
+                                        {% if list.roles is not empty %}
+                                            <td>
+                                                {% if list.canAssignRoles %}
+                                                    <div class="dropdown">
+                                                        <button type="button" class="btn btn-sm dropdown-toggle {{ row.roleName ? 'btn-outline-gewis-primary' : 'btn-outline-secondary' }}"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                            {{ row.roleName ?? 'Assign'|trans }}
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><h6 class="dropdown-header">{{ 'Reserved place'|trans }}</h6></li>
+                                                            {% for role in list.roles %}
+                                                                {% set mine = role.id == row.roleId %}
+                                                                {% set full = role.taken >= role.minimum and not mine %}
+                                                                <li>
+                                                                    <button type="button" class="dropdown-item d-flex align-items-center gap-3{{ mine ? ' active' }}" {{ full ? 'disabled' }}
+                                                                            data-action="live#action" data-live-action-param="assignRole"
+                                                                            data-live-signup-id-param="{{ row.signupId }}" data-live-role-id-param="{{ role.id }}">
+                                                                        <span class="flex-grow-1">{{ role.name }}</span>
+                                                                        <span class="small text-muted">{{ role.taken }} / {{ role.minimum }}{{ full ? ' · ' ~ 'full'|trans }}</span>
+                                                                    </button>
+                                                                </li>
+                                                            {% endfor %}
+                                                            {% if row.roleId is not null %}
+                                                                <li><hr class="dropdown-divider"></li>
+                                                                <li>
+                                                                    <button type="button" class="dropdown-item"
+                                                                            data-action="live#action" data-live-action-param="assignRole"
+                                                                            data-live-signup-id-param="{{ row.signupId }}" data-live-role-id-param="{{ row.roleId }}">
+                                                                        {{ 'No reserved place'|trans }}
+                                                                    </button>
+                                                                </li>
+                                                            {% endif %}
+                                                        </ul>
+                                                    </div>
+                                                {% elseif row.roleName %}
+                                                    <span class="badge badge-warning">{{ row.roleName }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                        {% if showOther %}
+                                            <td>
+                                                {% for other in row.otherLists %}
+                                                    <span class="badge {{ other.waiting ? 'badge-warning' : 'badge-info' }}">
+                                                        {{ other.name }}{% if other.waiting %} &middot; {{ 'waiting'|trans }}{% endif %}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge badge-tag">{{ 'This list only'|trans }}</span>
+                                                {% endfor %}
+                                            </td>
+                                        {% endif %}
                                         {% if list.limitedCapacity %}
                                             <td class="text-center">
                                                 <div class="form-check form-switch d-inline-block mb-0">
                                                     <input class="form-check-input" type="checkbox"
-                                                           {{ row.drawn ? 'checked' }} {{ ((list.drawLocked or isManual) and admissionOpen) ? '' : 'disabled' }}
+                                                           {{ row.drawn ? 'checked' }} {{ (settled and admissionOpen) ? '' : 'disabled' }}
                                                            aria-label="{{ 'Admitted'|trans }}"
                                                            data-action="live#action"
                                                            data-live-action-param="toggleAdmission"
@@ -405,23 +780,37 @@
                                     </tr>
                                 {% else %}
                                     <tr>
-                                        <td colspan="{{ (list.limitedCapacity ? 8 : 7) + list.visibleFieldCount }}" class="text-center text-muted py-3">
-                                            {{ 'No sign-ups yet.'|trans }}
+                                        <td colspan="{{ columnCount }}" class="py-4">
+                                            <div class="text-center">
+                                                <div class="fw-semibold">{{ list.subscriberCount > 0 ? 'Nobody matches this filter'|trans : 'No sign-ups yet.'|trans }}</div>
+                                                {% if list.subscriberCount > 0 %}
+                                                    <div class="small text-muted">{{ 'Clear the search or pick another filter above.'|trans }}</div>
+                                                {% endif %}
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                    </div>
+                    {% endif %}
                 </div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-3 small text-muted">
+                    {% if people %}
+                        {% set view = this.peopleView %}
+                        {{ '%people% people · %signups% sign-ups · %multi% in more than one list'|trans({'%people%': view.peopleCount, '%signups%': view.signupCount, '%multi%': view.multiCount}) }}
+                    {% elseif list and list.limitedCapacity %}
+                        {{ '%admitted% admitted · %waiting% waiting · capacity %capacity%'|trans({'%admitted%': list.admittedCount, '%waiting%': list.waitingCount, '%capacity%': list.capacity ?? '?'}) }}
+                    {% elseif list %}
+                        {{ '%count% sign-ups · no capacity limit'|trans({'%count%': list.subscriberCount}) }}
+                    {% endif %}
+                    {% if not canMark %}
+                        <span class="ms-auto">
+                            <span class="fas fa-info-circle"></span>
+                            {{ 'Attendance can only be marked from 30 minutes before the activity until a day after it ends.'|trans }}
+                        </span>
+                    {% endif %}
                 </div>
             </div>
-        {% else %}
-            <div class="panel mb-3">
-                <div class="panel-body text-center text-muted py-4">
-                    {{ 'This activity has no sign-up lists.'|trans }}
-                </div>
-            </div>
-        {% endfor %}
+        </div>
     {% endif %}
 </div>

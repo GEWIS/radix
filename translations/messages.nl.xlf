@@ -221,6 +221,10 @@
         <source>%actor% withdrew the invitation for %detail%</source>
         <target state="translated">%actor% heeft de uitnodiging voor %detail% ingetrokken</target>
       </trans-unit>
+      <trans-unit id="mAOga75" resname="%admitted% admitted · %waiting% waiting · capacity %capacity%">
+        <source>%admitted% admitted · %waiting% waiting · capacity %capacity%</source>
+        <target>%admitted% toegelaten · %waiting% wachtend · capaciteit %capacity%</target>
+      </trans-unit>
       <trans-unit id="3UU4Fuo" resname="%at% of %of%">
         <source>%at% of %of%</source>
         <target state="translated">%at% van %of%</target>
@@ -228,6 +232,10 @@
       <trans-unit id="Rq5XstT" resname="%browser% on %system%">
         <source>%browser% on %system%</source>
         <target state="translated">%browser% op %system%</target>
+      </trans-unit>
+      <trans-unit id="vVZuA_L" resname="%changed% of %total% changed in this revision; the rest is left as it was.">
+        <source>%changed% of %total% changed in this revision; the rest is left as it was.</source>
+        <target state="translated">%changed% van %total% zijn in deze revisie gewijzigd; de rest is gebleven zoals het was.</target>
       </trans-unit>
       <trans-unit id="_6RHR9L" resname="%code% - %name%">
         <source>%code% - %name%</source>
@@ -256,6 +264,10 @@
       <trans-unit id="2jo5BH5" resname="%count% bodies have submitted their page for review.">
         <source>%count% bodies have submitted their page for review.</source>
         <target state="translated">%count% organen hebben hun pagina ter beoordeling ingediend.</target>
+      </trans-unit>
+      <trans-unit id="TF4s6hD" resname="%count% changed">
+        <source>%count% changed</source>
+        <target state="translated">%count% gewijzigd</target>
       </trans-unit>
       <trans-unit id="p5ZiG8E" resname="%count% company profiles have been submitted for review.">
         <source>%count% company profiles have been submitted for review.</source>
@@ -329,6 +341,10 @@
         <source>%count% of the days you were holding have been released.</source>
         <target state="translated">%count% van de dagen die je vasthield zijn vrijgegeven.</target>
       </trans-unit>
+      <trans-unit id="fjgw1sP" resname="%count% of them">
+        <source>%count% of them</source>
+        <target state="translated">%count% stuks</target>
+      </trans-unit>
       <trans-unit id="2M6JhH2" resname="%count% of your proposals have been given a day.">
         <source>%count% of your proposals have been given a day.</source>
         <target state="translated">%count% van je voorstellen hebben een dag gekregen.</target>
@@ -349,9 +365,25 @@
         <source>%count% person can act for your company.|%count% people can act for your company.</source>
         <target state="translated">%count% persoon kan namens je bedrijf handelen.|%count% personen kunnen namens je bedrijf handelen.</target>
       </trans-unit>
+      <trans-unit id="YEE0fRC" resname="%count% places left">
+        <source>%count% places left</source>
+        <target>Nog %count% plaatsen</target>
+      </trans-unit>
       <trans-unit id="prT919M" resname="%count% polls have been requested.">
         <source>%count% polls have been requested.</source>
         <target state="translated">Er zijn %count% polls aangevraagd.</target>
+      </trans-unit>
+      <trans-unit id="HXC9ItS" resname="%count% question|%count% questions">
+        <source>%count% question|%count% questions</source>
+        <target>%count% vraag|%count% vragen</target>
+      </trans-unit>
+      <trans-unit id="9a5vASq" resname="%count% recipient is an external or a non-member: they read this at the address they typed in themselves, and they cannot open member-only links.|%count% recipients are externals or non-members: they read this at the address they typed in themselves, and they cannot open member-only links.">
+        <source>%count% recipient is an external or a non-member: they read this at the address they typed in themselves, and they cannot open member-only links.|%count% recipients are externals or non-members: they read this at the address they typed in themselves, and they cannot open member-only links.</source>
+        <target>%count% ontvanger is extern of geen lid: die leest dit op het adres dat hij zelf heeft ingevuld en kan geen links openen die alleen voor leden zijn.|%count% ontvangers zijn extern of geen lid: zij lezen dit op het adres dat ze zelf hebben ingevuld en kunnen geen links openen die alleen voor leden zijn.</target>
+      </trans-unit>
+      <trans-unit id="y8CDRtW" resname="%count% recipient|%count% recipients">
+        <source>%count% recipient|%count% recipients</source>
+        <target>%count% ontvanger|%count% ontvangers</target>
       </trans-unit>
       <trans-unit id="JaLYS7G" resname="%count% reference document selected|%count% reference documents selected">
         <source>%count% reference document selected|%count% reference documents selected</source>
@@ -361,13 +393,25 @@
         <source>%count% reply|%count% replies</source>
         <target state="translated">%count% reactie|%count% reacties</target>
       </trans-unit>
+      <trans-unit id="QJEwzrr" resname="%count% selected">
+        <source>%count% selected</source>
+        <target>%count% geselecteerd</target>
+      </trans-unit>
       <trans-unit id="Bp.9tYU" resname="%count% session(s) terminated.">
         <source>%count% session(s) terminated.</source>
         <target state="translated">%count% sessie(s) beëindigd.</target>
       </trans-unit>
+      <trans-unit id="sSNJzsg" resname="%count% sign-up list|%count% sign-up lists">
+        <source>%count% sign-up list|%count% sign-up lists</source>
+        <target>%count% inschrijflijst|%count% inschrijflijsten</target>
+      </trans-unit>
       <trans-unit id="j2HLdTO" resname="%count% sign-ups you are on are closing soon.">
         <source>%count% sign-ups you are on are closing soon.</source>
         <target state="translated">Er sluiten binnenkort %count% inschrijvingen waarop je staat.</target>
+      </trans-unit>
+      <trans-unit id="LQ9fTI9" resname="%count% sign-ups · no capacity limit">
+        <source>%count% sign-ups · no capacity limit</source>
+        <target>%count% inschrijvingen · geen capaciteitslimiet</target>
       </trans-unit>
       <trans-unit id="trAQw1q" resname="%count% summary|%count% summaries">
         <source>%count% summary|%count% summaries</source>
@@ -501,6 +545,18 @@
         <source>%package% runs out on %date%</source>
         <target state="translated">%package% verloopt op %date%</target>
       </trans-unit>
+      <trans-unit id="Qdw9b05" resname="%people% people · %signups% sign-ups · %multi% in more than one list">
+        <source>%people% people · %signups% sign-ups · %multi% in more than one list</source>
+        <target>%people% personen · %signups% inschrijvingen · %multi% op meer dan één lijst</target>
+      </trans-unit>
+      <trans-unit id="xm2aR.9" resname="%places% places left, %waiting% waiting">
+        <source>%places% places left, %waiting% waiting</source>
+        <target>Nog %places% plaatsen, %waiting% wachtend</target>
+      </trans-unit>
+      <trans-unit id="fXgCut0" resname="%position% of %total%">
+        <source>%position% of %total%</source>
+        <target>%position% van %total%</target>
+      </trans-unit>
       <trans-unit id="HJnAXpg" resname="%remaining% of %maximum%">
         <source>%remaining% of %maximum%</source>
         <target state="translated">%remaining% van %maximum%</target>
@@ -525,6 +581,14 @@
         <source>%service% lists have not been fetched recently. The mailing list server may be down, or fetching may be failing.</source>
         <target state="translated">%service%-lijsten zijn recent niet opgehaald. Mogelijk is de mailinglijstserver onbereikbaar of gaat het ophalen mis.</target>
       </trans-unit>
+      <trans-unit id="pKjqxtZ" resname="%shown% of %total% people shown">
+        <source>%shown% of %total% people shown</source>
+        <target>%shown% van %total% personen getoond</target>
+      </trans-unit>
+      <trans-unit id="_BeEzW0" resname="%shown% of %total% sign-ups shown">
+        <source>%shown% of %total% sign-ups shown</source>
+        <target>%shown% van %total% inschrijvingen getoond</target>
+      </trans-unit>
       <trans-unit id="ACC_oMp" resname="%study%¹">
         <source>%study%¹</source>
         <target state="translated">%study%¹</target>
@@ -536,6 +600,10 @@
       <trans-unit id="s4eJWBv" resname="%valid% changes, %issues% issues">
         <source>%valid% changes, %issues% issues</source>
         <target state="translated">%valid% wijzigingen, %issues% problemen</target>
+      </trans-unit>
+      <trans-unit id="MU12HOL" resname="(Pre-)master">
+        <source>(Pre-)master</source>
+        <target>(Pre-)master</target>
       </trans-unit>
       <trans-unit id="r0_Bmcr" resname="(bulk) renew as ordinary OR convert to graduate">
         <source>(bulk) renew as ordinary OR convert to graduate</source>
@@ -593,6 +661,10 @@
         <source>A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.</source>
         <target state="translated">Een uitlichting zet een van je vacatures bovenaan de carrièrepagina, boven alle andere plaatsingen. Vraag je contactpersoon bij GEWIS wat een uitlichtpakket je zou kosten.</target>
       </trans-unit>
+      <trans-unit id="P4fTk.T" resname="A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.">
+        <source>A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.</source>
+        <target state="translated">Een lijst die een rol garandeert wordt daarom nooit automatisch geloot: het moment hierboven bepaalt alleen wie er meeloot, en de loting zelf wordt daarna met de hand gedaan.</target>
+      </trans-unit>
       <trans-unit id="sjNzVF_" resname="A mailing list sync is running">
         <source>A mailing list sync is running</source>
         <target state="translated">Er loopt een mailinglijstsynchronisatie</target>
@@ -645,9 +717,21 @@
         <source>A question cannot be changed once it has been sent, so read it over first.</source>
         <target state="translated">Een vraag kan na het versturen niet meer worden aangepast, dus lees hem eerst nog eens door.</target>
       </trans-unit>
+      <trans-unit id="UBTQNXo" resname="A reserved place is handed out by you: pick a person in the Reserved place column and they keep it whatever the draw does.">
+        <source>A reserved place is handed out by you: pick a person in the Reserved place column and they keep it whatever the draw does.</source>
+        <target>Een gereserveerde plaats geef jij uit: kies iemand in de kolom Gereserveerde plaats en die houdt hem, wat de loting ook doet.</target>
+      </trans-unit>
+      <trans-unit id="GbwbQPn" resname="A role is handed out on the sign-ups page once sign-up has closed, and the draw makes up whatever is short.">
+        <source>A role is handed out on the sign-ups page once sign-up has closed, and the draw makes up whatever is short.</source>
+        <target>Een rol wordt op de inschrijvingenpagina toegekend zodra de inschrijving gesloten is; de loting vult aan wat tekortkomt.</target>
+      </trans-unit>
       <trans-unit id="G9Mw23h" resname="A sign-up list with existing sign-ups was changed in this revision, so the live sign-ups cannot be carried over and it can no longer be submitted or approved.">
         <source>A sign-up list with existing sign-ups was changed in this revision, so the live sign-ups cannot be carried over and it can no longer be submitted or approved.</source>
         <target state="translated">Een inschrijflijst met bestaande inschrijvingen is in deze revisie gewijzigd, waardoor de bestaande inschrijvingen niet kunnen worden meegenomen en deze niet meer kan worden ingediend of goedgekeurd.</target>
+      </trans-unit>
+      <trans-unit id="qhmiyL6" resname="A test of your message is on its way to you.">
+        <source>A test of your message is on its way to you.</source>
+        <target>Een test van je bericht is naar je onderweg.</target>
       </trans-unit>
       <trans-unit id="9NmRvbs" resname="A vacancy that closes, or that you take down, drops off the career page on its own.">
         <source>A vacancy that closes, or that you take down, drops off the career page on its own.</source>
@@ -837,10 +921,6 @@
         <source>Activity is being edited</source>
         <target state="translated">Activiteit wordt bewerkt</target>
       </trans-unit>
-      <trans-unit id="T8fAn0A" resname="Activity saved as a draft. Submit it for review when you are ready.">
-        <source>Activity saved as a draft. Submit it for review when you are ready.</source>
-        <target state="translated">Activiteit opgeslagen als concept. Dien het ter beoordeling in wanneer je er klaar voor bent.</target>
-      </trans-unit>
       <trans-unit id="5rGNJkS" resname="Activity submitted for review.">
         <source>Activity submitted for review.</source>
         <target state="translated">Activiteit ingediend ter beoordeling.</target>
@@ -924,6 +1004,10 @@
       <trans-unit id="Cvlsb4D" resname="Add a question">
         <source>Add a question</source>
         <target state="translated">Vraag toevoegen</target>
+      </trans-unit>
+      <trans-unit id="ur_JgMD" resname="Add a role">
+        <source>Add a role</source>
+        <target>Rol toevoegen</target>
       </trans-unit>
       <trans-unit id="MCEV14g" resname="Add a sign-up list">
         <source>Add a sign-up list</source>
@@ -1040,6 +1124,26 @@
       <trans-unit id="xtD.6cM" resname="Admit people by hand with the toggles below.">
         <source>Admit people by hand with the toggles below.</source>
         <target>Laat mensen handmatig toe met de schakelaars hieronder.</target>
+      </trans-unit>
+      <trans-unit id="w5kXrky" resname="Admit some cohorts before others">
+        <source>Admit some cohorts before others</source>
+        <target state="translated">Sommige generaties eerder toelaten dan andere</target>
+      </trans-unit>
+      <trans-unit id="vk4PXFr" resname="Admit some members before others">
+        <source>Admit some members before others</source>
+        <target state="translated">Sommige leden eerder toelaten dan andere</target>
+      </trans-unit>
+      <trans-unit id="ZzobUA3" resname="Admit some study phases before others">
+        <source>Admit some study phases before others</source>
+        <target state="translated">Sommige studiefasen eerder toelaten dan andere</target>
+      </trans-unit>
+      <trans-unit id="rZCri9_" resname="Admit the tiers in order">
+        <source>Admit the tiers in order</source>
+        <target state="translated">De groepen op volgorde toelaten</target>
+      </trans-unit>
+      <trans-unit id="ilhY8CD" resname="Admit this tier together with the one above it">
+        <source>Admit this tier together with the one above it</source>
+        <target state="translated">Deze groep tegelijk toelaten met de groep erboven</target>
       </trans-unit>
       <trans-unit id="_Evwb08" resname="Admitted">
         <source>Admitted</source>
@@ -1181,9 +1285,17 @@
         <source>All years</source>
         <target state="translated">Alle jaren</target>
       </trans-unit>
+      <trans-unit id="wt2iCCE" resname="Allocation">
+        <source>Allocation</source>
+        <target>Toewijzing</target>
+      </trans-unit>
       <trans-unit id="_jGMIZg" resname="Allocation method">
         <source>Allocation method</source>
         <target>Toewijzingsmethode</target>
+      </trans-unit>
+      <trans-unit id="OwaWu5N" resname="Allowed range">
+        <source>Allowed range</source>
+        <target state="translated">Toegestaan bereik</target>
       </trans-unit>
       <trans-unit id="q6XvAor" resname="Almost there! Check your email to confirm your sign-up.">
         <source>Almost there! Check your email to confirm your sign-up.</source>
@@ -1196,6 +1308,10 @@
       <trans-unit id="CrcKB8q" resname="Already in the agenda">
         <source>Already in the agenda</source>
         <target state="translated">Staat al in de agenda</target>
+      </trans-unit>
+      <trans-unit id="RqIy6Dg" resname="Also in another list">
+        <source>Also in another list</source>
+        <target>Ook op een andere lijst</target>
       </trans-unit>
       <trans-unit id="E1I5elk" resname="Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings">
         <source>Also recorded in %count% virtual meeting|Also recorded in %count% virtual meetings</source>
@@ -1284,6 +1400,10 @@
       <trans-unit id="JJkKJth" resname="Answer %number%">
         <source>Answer %number%</source>
         <target state="translated">Antwoord %number%</target>
+      </trans-unit>
+      <trans-unit id="ftE024L" resname="Answer type">
+        <source>Answer type</source>
+        <target state="translated">Soort antwoord</target>
       </trans-unit>
       <trans-unit id="NEnOMrB" resname="Answered by me">
         <source>Answered by me</source>
@@ -1465,6 +1585,10 @@
         <source>Ask your contact at GEWIS to add somebody or to shut somebody out.</source>
         <target state="translated">Vraag je contactpersoon bij GEWIS om iemand toe te voegen of iemand de toegang te ontnemen.</target>
       </trans-unit>
+      <trans-unit id="4bcq6sL" resname="Assign">
+        <source>Assign</source>
+        <target>Toewijzen</target>
+      </trans-unit>
       <trans-unit id="FzJGBxU" resname="Association">
         <source>Association</source>
         <target>Vereniging</target>
@@ -1557,6 +1681,10 @@
         <source>BV</source>
         <target state="translated">BV</target>
       </trans-unit>
+      <trans-unit id="lc_zq_h" resname="Bachelor">
+        <source>Bachelor</source>
+        <target>Bachelor</target>
+      </trans-unit>
       <trans-unit id="Xk0PmZy" resname="Bachelor Applied Mathematics">
         <source>Bachelor Applied Mathematics</source>
         <target state="translated">Bachelor Applied Mathematics</target>
@@ -1643,6 +1771,10 @@
       </trans-unit>
       <trans-unit id="rWM97hF" resname="Basic">
         <source>Basic</source>
+        <target>Basis</target>
+      </trans-unit>
+      <trans-unit id="VOhwkJI" resname="Basics">
+        <source>Basics</source>
         <target>Basis</target>
       </trans-unit>
       <trans-unit id="6lQYTVL" resname="Be the first to upload">
@@ -1997,6 +2129,10 @@
         <source>Choose an option</source>
         <target>Kies een optie</target>
       </trans-unit>
+      <trans-unit id="dL0l59Z" resname="Choose how the tiers are admitted">
+        <source>Choose how the tiers are admitted</source>
+        <target state="translated">Kies hoe de groepen worden toegelaten</target>
+      </trans-unit>
       <trans-unit id="vZloDGs" resname="Choose when the draw happens">
         <source>Choose when the draw happens</source>
         <target>Kies wanneer de loting plaatsvindt</target>
@@ -2041,9 +2177,9 @@
         <source>Clear</source>
         <target state="translated">Wissen</target>
       </trans-unit>
-      <trans-unit id="4XOnmWM" resname="Clear selection">
-        <source>Clear selection</source>
-        <target>Selectie wissen</target>
+      <trans-unit id="_6w36F_" resname="Clear the search or pick another filter above.">
+        <source>Clear the search or pick another filter above.</source>
+        <target>Wis de zoekopdracht of kies hierboven een ander filter.</target>
       </trans-unit>
       <trans-unit id="gEz_C4l" resname="Click here for approval if membership fee paid with cash.">
         <source>Click here for approval if membership fee paid with cash.</source>
@@ -2100,6 +2236,14 @@
       <trans-unit id="Tbcnsfe" resname="Code">
         <source>Code</source>
         <target state="translated">Code</target>
+      </trans-unit>
+      <trans-unit id="_7LTeGa" resname="Cohort priority">
+        <source>Cohort priority</source>
+        <target>Voorrang op generatie</target>
+      </trans-unit>
+      <trans-unit id="95XUNeo" resname="Collects the payment">
+        <source>Collects the payment</source>
+        <target>Int de betaling</target>
       </trans-unit>
       <trans-unit id="5THj8oK" resname="Columns">
         <source>Columns</source>
@@ -2212,6 +2356,10 @@
       <trans-unit id="k.dn_DH" resname="Company profiles">
         <source>Company profiles</source>
         <target state="translated">Bedrijfsprofielen</target>
+      </trans-unit>
+      <trans-unit id="_hOvrYb" resname="Compared with">
+        <source>Compared with</source>
+        <target state="translated">Vergeleken met</target>
       </trans-unit>
       <trans-unit id="HqZJjC4" resname="Compared with revision #%number%.">
         <source>Compared with revision #%number%.</source>
@@ -2404,6 +2552,10 @@
       <trans-unit id="kDhOoV8" resname="Could not save change(s) of %entity%!">
         <source>Could not save change(s) of %entity%!</source>
         <target state="translated">Kon wijziging(en) van %entity% niet opslaan!</target>
+      </trans-unit>
+      <trans-unit id="YES3Pwq" resname="Count shown publicly">
+        <source>Count shown publicly</source>
+        <target>Aantal openbaar getoond</target>
       </trans-unit>
       <trans-unit id="dA6J4om" resname="Counterpart of %type% %number%.%point%.%decision%">
         <source>Counterpart of %type% %number%.%point%.%decision%</source>
@@ -2825,6 +2977,10 @@
         <source>Diagnose</source>
         <target state="translated">Onderzoeken</target>
       </trans-unit>
+      <trans-unit id="xCxoEo7" resname="Dictates the order of admissions">
+        <source>Dictates the order of admissions</source>
+        <target>Bepaalt de volgorde van toelating</target>
+      </trans-unit>
       <trans-unit id="s.f1kym" resname="Did not receive the confirmation email? Resend it.">
         <source>Did not receive the confirmation email? Resend it.</source>
         <target state="translated">Heb je de bevestigingsmail niet ontvangen? Verstuur hem opnieuw.</target>
@@ -3165,6 +3321,10 @@
         <source>Edit the %type% package</source>
         <target state="translated">%type%-pakket bewerken</target>
       </trans-unit>
+      <trans-unit id="DOJ2A06" resname="Edit the activity to finish the list, or remove it.">
+        <source>Edit the activity to finish the list, or remove it.</source>
+        <target state="translated">Bewerk de activiteit om de lijst af te maken, of verwijder de lijst.</target>
+      </trans-unit>
       <trans-unit id="Lb8PGCv" resname="Edit the draft">
         <source>Edit the draft</source>
         <target state="translated">Concept bewerken</target>
@@ -3184,6 +3344,10 @@
       <trans-unit id="AXw4Ns4" resname="Edit your vacancy">
         <source>Edit your vacancy</source>
         <target state="translated">Je vacature bewerken</target>
+      </trans-unit>
+      <trans-unit id="zNQA7.2" resname="Edited">
+        <source>Edited</source>
+        <target state="translated">Bewerkt</target>
       </trans-unit>
       <trans-unit id="aCXq5RB" resname="Editor">
         <source>Editor</source>
@@ -3205,6 +3369,10 @@
         <source>Email</source>
         <target state="translated">E-mail</target>
       </trans-unit>
+      <trans-unit id="E7P6HyH" resname="Email %count% selected">
+        <source>Email %count% selected</source>
+        <target>E-mail %count% geselecteerden</target>
+      </trans-unit>
       <trans-unit id="3PkXx5O" resname="Email address">
         <source>Email address</source>
         <target state="translated">E-mailadres</target>
@@ -3216,6 +3384,10 @@
       <trans-unit id="g4xpNdE" resname="Email admittees">
         <source>Email admittees</source>
         <target>Toegelatenen e-mailen</target>
+      </trans-unit>
+      <trans-unit id="5mcpRVo" resname="Email everyone">
+        <source>Email everyone</source>
+        <target>E-mail iedereen</target>
       </trans-unit>
       <trans-unit id="EiKzvgW" resname="Email me about %topic%">
         <source>Email me about %topic%</source>
@@ -3308,6 +3480,10 @@
       <trans-unit id="AhAbUC5" resname="EngD Software Technology">
         <source>EngD Software Technology</source>
         <target state="translated">EngD Software Technology</target>
+      </trans-unit>
+      <trans-unit id="5qTB7nO" resname="EngD or PhD">
+        <source>EngD or PhD</source>
+        <target>EngD of PhD</target>
       </trans-unit>
       <trans-unit id="NR2RdXC" resname="English">
         <source>English</source>
@@ -3421,17 +3597,49 @@
         <source>Every question the association has been asked, and how it answered.</source>
         <target state="translated">Elke vraag die aan de vereniging is gesteld, en hoe zij die beantwoordde.</target>
       </trans-unit>
-      <trans-unit id="4ADZXUU" resname="When your account is signed in from an unrecognised device or location">
-        <source>When your account is signed in from an unrecognised device or location</source>
-        <target state="translated">Wanneer er op je account wordt ingelogd vanaf een onbekend apparaat of onbekende locatie</target>
+      <trans-unit id="f7vALKX" resname="Everybody admitted">
+        <source>Everybody admitted</source>
+        <target>Iedereen toegelaten</target>
+      </trans-unit>
+      <trans-unit id="MmxQYez" resname="Everybody gets their own copy, so nobody sees who else received it.">
+        <source>Everybody gets their own copy, so nobody sees who else received it.</source>
+        <target>Iedereen krijgt een eigen exemplaar, dus niemand ziet wie het nog meer heeft ontvangen.</target>
+      </trans-unit>
+      <trans-unit id="GdLzG75" resname="Everybody marked present on any list.">
+        <source>Everybody marked present on any list.</source>
+        <target>Iedereen die op een lijst als aanwezig is gemarkeerd.</target>
+      </trans-unit>
+      <trans-unit id="90pcLHf" resname="Everybody on %list%, the waiting list included.">
+        <source>Everybody on %list%, the waiting list included.</source>
+        <target>Iedereen op %list%, de wachtlijst inbegrepen.</target>
+      </trans-unit>
+      <trans-unit id="xqKtqkX" resname="Everybody on this activity, whichever list they are in.">
+        <source>Everybody on this activity, whichever list they are in.</source>
+        <target>Iedereen bij deze activiteit, op welke lijst ze ook staan.</target>
+      </trans-unit>
+      <trans-unit id="fvtLNjX" resname="Everybody still waiting for a place on at least one list.">
+        <source>Everybody still waiting for a place on at least one list.</source>
+        <target>Iedereen die op minstens één lijst nog op een plaats wacht.</target>
       </trans-unit>
       <trans-unit id="xMd0Hq2" resname="Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.">
         <source>Everybody who can act for %company% here. To add somebody, or to remove one of them, ask your contact at GEWIS.</source>
         <target state="translated">Iedereen die hier namens %company% kan handelen. Neem contact op met je contactpersoon bij GEWIS om iemand toe te voegen of te verwijderen.</target>
       </trans-unit>
+      <trans-unit id="b4smB2G" resname="Everybody who signed up before %date% is in the draw.">
+        <source>Everybody who signed up before %date% is in the draw.</source>
+        <target state="translated">Iedereen die zich voor %date% heeft ingeschreven, loot mee.</target>
+      </trans-unit>
+      <trans-unit id="kSy79yZ" resname="Everybody, members and externals">
+        <source>Everybody, members and externals</source>
+        <target>Iedereen, leden en externen</target>
+      </trans-unit>
       <trans-unit id="gGWFXbX" resname="Everyone">
         <source>Everyone</source>
         <target state="translated">Iedereen</target>
+      </trans-unit>
+      <trans-unit id="ctxbcB." resname="Everyone else">
+        <source>Everyone else</source>
+        <target>Iedereen anders</target>
       </trans-unit>
       <trans-unit id="ibvUgTf" resname="Everyone on the register, and what needs doing about them.">
         <source>Everyone on the register, and what needs doing about them.</source>
@@ -3444,6 +3652,10 @@
       <trans-unit id="LdakJY6" resname="Everyone who has registered but is not a member yet. A registration expires 14 days after its checkout is created.">
         <source>Everyone who has registered but is not a member yet. A registration expires 14 days after its checkout is created.</source>
         <target state="translated">Iedereen die zich heeft ingeschreven maar nog geen lid is. Een inschrijving verloopt 14 dagen nadat de betaling is aangemaakt.</target>
+      </trans-unit>
+      <trans-unit id="a6oeqTQ" resname="Everyone, side by side">
+        <source>Everyone, side by side</source>
+        <target>Iedereen, naast elkaar</target>
       </trans-unit>
       <trans-unit id="4iH0elm" resname="Everything">
         <source>Everything</source>
@@ -3617,6 +3829,18 @@
         <source>External party policy URL</source>
         <target>URL van het beleid van de externe partij</target>
       </trans-unit>
+      <trans-unit id="Jr_6QfW" resname="Externals">
+        <source>Externals</source>
+        <target>Externen</target>
+      </trans-unit>
+      <trans-unit id="qcORQD4" resname="Externals and non-members involved in this activity.">
+        <source>Externals and non-members involved in this activity.</source>
+        <target>Externen en niet-leden die bij deze activiteit betrokken zijn.</target>
+      </trans-unit>
+      <trans-unit id="yfNKgtw" resname="Externals and non-members on %list%, for the practical details members already know.">
+        <source>Externals and non-members on %list%, for the practical details members already know.</source>
+        <target>Externen en niet-leden op %list%, voor de praktische details die leden al kennen.</target>
+      </trans-unit>
       <trans-unit id="Lln6wAG" resname="FAQ">
         <source>FAQ</source>
         <target state="translated">FAQ</target>
@@ -3673,9 +3897,9 @@
         <source>Fill in the username, not the whole link. Pasting a link works too, everything after the username is thrown away.</source>
         <target state="translated">Vul de gebruikersnaam in, niet de hele link. Een link plakken werkt ook, alles na de gebruikersnaam wordt weggelaten.</target>
       </trans-unit>
-      <trans-unit id="WhpqrmK" resname="Filter by name or email">
-        <source>Filter by name or email</source>
-        <target>Filter op naam of e-mail</target>
+      <trans-unit id="o7tHpZ5" resname="Filter">
+        <source>Filter</source>
+        <target>Filter</target>
       </trans-unit>
       <trans-unit id="_Bu6g7f" resname="Filter entities">
         <source>Filter entities</source>
@@ -3745,6 +3969,10 @@
         <source>First-come-first-served</source>
         <target>Wie het eerst komt, het eerst maalt</target>
       </trans-unit>
+      <trans-unit id="NaImQvS" resname="First-year members">
+        <source>First-year members</source>
+        <target>Eerstejaarsleden</target>
+      </trans-unit>
       <trans-unit id="c0uwrTM" resname="Flash">
         <source>Flash</source>
         <target>Flits</target>
@@ -3812,6 +4040,10 @@
       <trans-unit id="i9.ArB8" resname="Full name">
         <source>Full name</source>
         <target>Volledige naam</target>
+      </trans-unit>
+      <trans-unit id="hf_R1Df" resname="Full, %count% on the waiting list">
+        <source>Full, %count% on the waiting list</source>
+        <target>Vol, %count% op de wachtlijst</target>
       </trans-unit>
       <trans-unit id="7Ig99MO" resname="Fun">
         <source>Fun</source>
@@ -4033,6 +4265,10 @@
         <source>Grantee</source>
         <target state="translated">Verkrijger</target>
       </trans-unit>
+      <trans-unit id="SSsvGvC" resname="Guaranteed roles">
+        <source>Guaranteed roles</source>
+        <target>Gegarandeerde rollen</target>
+      </trans-unit>
       <trans-unit id="p.fuLaB" resname="Guest">
         <source>Guest</source>
         <target state="translated">Gast</target>
@@ -4053,6 +4289,10 @@
         <source>Hand it in</source>
         <target state="translated">Indienen</target>
       </trans-unit>
+      <trans-unit id="AuCiE0p" resname="Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.">
+        <source>Hand out the roles below, then run the draw yourself: it makes up whatever the roles are short.</source>
+        <target state="translated">Deel hieronder de rollen uit en loot daarna zelf: de loting vult aan wat er aan rollen tekortkomt.</target>
+      </trans-unit>
       <trans-unit id="Vr8hJW8" resname="Handed in">
         <source>Handed in</source>
         <target state="translated">Ingediend</target>
@@ -4064,6 +4304,10 @@
       <trans-unit id="PQ40PF0" resname="Has not said whether they want the Supremum.">
         <source>Has not said whether they want the Supremum.</source>
         <target state="translated">Heeft niet aangegeven of ze de Supremum willen ontvangen.</target>
+      </trans-unit>
+      <trans-unit id="q2JnEC6" resname="Has subscribers">
+        <source>Has subscribers</source>
+        <target>Heeft inschrijvingen</target>
       </trans-unit>
       <trans-unit id="yTvE6dJ" resname="Have a GEWIS account? Log in to sign up.">
         <source>Have a GEWIS account? Log in to sign up.</source>
@@ -4213,6 +4457,10 @@
         <source>How the change date works</source>
         <target state="translated">Hoe de wijzigingsdatum werkt</target>
       </trans-unit>
+      <trans-unit id="w0KU.9j" resname="How the membership order is applied">
+        <source>How the membership order is applied</source>
+        <target>Hoe de volgorde op lidmaatschap wordt toegepast</target>
+      </trans-unit>
       <trans-unit id="oSU4QwX" resname="How this works">
         <source>How this works</source>
         <target state="translated">Hoe dit werkt</target>
@@ -4260,6 +4508,14 @@
       <trans-unit id="37wivZ3" resname="ID">
         <source>ID</source>
         <target state="translated">ID</target>
+      </trans-unit>
+      <trans-unit id="Q4mlqev" resname="IP address data by">
+        <source>IP address data by</source>
+        <target state="translated">IP-adresgegevens door</target>
+      </trans-unit>
+      <trans-unit id="OuTMKSi" resname="IP databases">
+        <source>IP databases</source>
+        <target state="translated">IP-databases</target>
       </trans-unit>
       <trans-unit id="z_EeVDq" resname="ISO">
         <source>ISO</source>
@@ -4349,9 +4605,17 @@
         <source>In line</source>
         <target state="translated">In de rij</target>
       </trans-unit>
+      <trans-unit id="RS4Rxkj" resname="In one list only">
+        <source>In one list only</source>
+        <target>Op maar één lijst</target>
+      </trans-unit>
       <trans-unit id="2XmzEnB" resname="In review">
         <source>In review</source>
         <target state="translated">In beoordeling</target>
+      </trans-unit>
+      <trans-unit id="JKRrHZs" resname="In several lists">
+        <source>In several lists</source>
+        <target>Op meerdere lijsten</target>
       </trans-unit>
       <trans-unit id="81oq4ve" resname="In the order they asked. Whoever asked first has first dibs, but you decide, and you may always make an exception.">
         <source>In the order they asked. Whoever asked first has first dibs, but you decide, and you may always make an exception.</source>
@@ -4588,6 +4852,10 @@
       <trans-unit id="FPIW94w" resname="Jobs">
         <source>Jobs</source>
         <target>Vacatures</target>
+      </trans-unit>
+      <trans-unit id="v4b7b2a" resname="Just the rows you ticked.">
+        <source>Just the rows you ticked.</source>
+        <target>Alleen de rijen die je hebt aangevinkt.</target>
       </trans-unit>
       <trans-unit id="DGalwXb" resname="KCC">
         <source>KCC</source>
@@ -5233,6 +5501,10 @@
         <source>Membership of Committees and Fraternities</source>
         <target state="translated">Lidmaatschap van commissies en disputen</target>
       </trans-unit>
+      <trans-unit id="7zFN335" resname="Membership priority">
+        <source>Membership priority</source>
+        <target>Voorrang op lidmaatschap</target>
+      </trans-unit>
       <trans-unit id="3MPObnt" resname="Membership type">
         <source>Membership type</source>
         <target state="translated">Type lidmaatschap</target>
@@ -5381,6 +5653,10 @@
         <source>Move selected to…</source>
         <target state="translated">Selectie verplaatsen naar…</target>
       </trans-unit>
+      <trans-unit id="f6_I9TD" resname="Moved">
+        <source>Moved</source>
+        <target state="translated">Verplaatst</target>
+      </trans-unit>
       <trans-unit id="2khgmbM" resname="Multi-factor authentication">
         <source>Multi-factor authentication</source>
         <target state="translated">Multi-factor authenticatie</target>
@@ -5461,6 +5737,10 @@
         <source>Name (Sync)</source>
         <target state="translated">Naam (Sync)</target>
       </trans-unit>
+      <trans-unit id="z3HIGz0" resname="Name the list and say when it is open. Everything else about this list comes later.">
+        <source>Name the list and say when it is open. Everything else about this list comes later.</source>
+        <target>Geef de lijst een naam en zeg wanneer die open is. De rest van deze lijst komt later.</target>
+      </trans-unit>
       <trans-unit id="fPcPc7X" resname="Name this query">
         <source>Name this query</source>
         <target state="translated">Geef deze query een naam</target>
@@ -5484,6 +5764,10 @@
       <trans-unit id="ZSvN7dh" resname="Needs your attention">
         <source>Needs your attention</source>
         <target state="translated">Vraagt om je aandacht</target>
+      </trans-unit>
+      <trans-unit id="3O9qm56" resname="Neither">
+        <source>Neither</source>
+        <target>Geen van beide</target>
       </trans-unit>
       <trans-unit id="pK.xkHw" resname="Never">
         <source>Never</source>
@@ -5521,17 +5805,13 @@
         <source>New expiration</source>
         <target state="translated">Nieuwe afloopdatum</target>
       </trans-unit>
-      <trans-unit id="pSP333t" resname="New field">
-        <source>New field</source>
-        <target state="translated">Nieuw veld</target>
-      </trans-unit>
-      <trans-unit id="ek_tIy_" resname="New list">
-        <source>New list</source>
-        <target state="translated">Nieuwe lijst</target>
-      </trans-unit>
       <trans-unit id="FzacjvZ" resname="New meeting">
         <source>New meeting</source>
         <target state="translated">Nieuwe vergadering</target>
+      </trans-unit>
+      <trans-unit id="RfpNc3o" resname="New message">
+        <source>New message</source>
+        <target>Nieuw bericht</target>
       </trans-unit>
       <trans-unit id="eKO.JM8" resname="New page">
         <source>New page</source>
@@ -5577,6 +5857,10 @@
         <source>Next</source>
         <target state="translated">Volgende</target>
       </trans-unit>
+      <trans-unit id="VHgrstm" resname="Next change">
+        <source>Next change</source>
+        <target state="translated">Volgende wijziging</target>
+      </trans-unit>
       <trans-unit id="O3MH35V" resname="Next month">
         <source>Next month</source>
         <target state="translated">Volgende maand</target>
@@ -5616,6 +5900,10 @@
       <trans-unit id="rPEmEb5" resname="No addresses on record.">
         <source>No addresses on record.</source>
         <target state="translated">Geen adressen geregistreerd.</target>
+      </trans-unit>
+      <trans-unit id="LDZurTW" resname="No admission needed">
+        <source>No admission needed</source>
+        <target>Geen toelating nodig</target>
       </trans-unit>
       <trans-unit id="GnSjgKv" resname="No announcements are pinned. A one-off announcement is only a toast and is not kept here.">
         <source>No announcements are pinned. A one-off announcement is only a toast and is not kept here.</source>
@@ -5668,10 +5956,6 @@
       <trans-unit id="bGLrVwk" resname="No course matches your search">
         <source>No course matches your search</source>
         <target state="translated">Geen enkel vak voldoet aan je zoekopdracht</target>
-      </trans-unit>
-      <trans-unit id="k9navuj" resname="No custom fields.">
-        <source>No custom fields.</source>
-        <target state="translated">Geen aangepaste velden.</target>
       </trans-unit>
       <trans-unit id="aOdgmpu" resname="No decisions have been published for this meeting. They may still be processed from the minutes, or this meeting simply took none.">
         <source>No decisions have been published for this meeting. They may still be processed from the minutes, or this meeting simply took none.</source>
@@ -5845,6 +6129,10 @@
         <source>No poll matches what you are looking for.</source>
         <target state="translated">Geen enkele poll komt overeen met waar je naar zoekt.</target>
       </trans-unit>
+      <trans-unit id="bW9Fmj6" resname="No questions are asked on this list.">
+        <source>No questions are asked on this list.</source>
+        <target state="translated">Op deze lijst worden geen vragen gesteld.</target>
+      </trans-unit>
       <trans-unit id="zduI6pP" resname="No registrations are in this state.">
         <source>No registrations are in this state.</source>
         <target state="translated">Er zijn geen inschrijvingen in deze staat.</target>
@@ -5852,6 +6140,10 @@
       <trans-unit id="drcu0.A" resname="No requests">
         <source>No requests</source>
         <target state="translated">Geen verzoeken</target>
+      </trans-unit>
+      <trans-unit id="9vM4Ufq" resname="No reserved place">
+        <source>No reserved place</source>
+        <target>Geen gereserveerde plaats</target>
       </trans-unit>
       <trans-unit id="pW4SVZG" resname="No round is taking proposals at the moment. The board opens one before each quartile.">
         <source>No round is taking proposals at the moment. The board opens one before each quartile.</source>
@@ -5864,6 +6156,10 @@
       <trans-unit id="aQlndVq" resname="No rows">
         <source>No rows</source>
         <target state="translated">Geen rijen</target>
+      </trans-unit>
+      <trans-unit id="4DqZPti" resname="No sign-up lists">
+        <source>No sign-up lists</source>
+        <target>Geen inschrijflijsten</target>
       </trans-unit>
       <trans-unit id="oY5RMDD" resname="No sign-ups found.">
         <source>No sign-ups found.</source>
@@ -5901,6 +6197,18 @@
         <source>Nobody has asked for a change to their data.</source>
         <target state="translated">Niemand heeft een wijziging van gegevens aangevraagd.</target>
       </trans-unit>
+      <trans-unit id="gEswUK." resname="Nobody has been admitted yet: the draw is run by hand once sign-up has closed and the roles are handed out.">
+        <source>Nobody has been admitted yet: the draw is run by hand once sign-up has closed and the roles are handed out.</source>
+        <target>Er is nog niemand toegelaten: de loting wordt handmatig gedaan zodra de inschrijving is gesloten en de rollen zijn uitgedeeld.</target>
+      </trans-unit>
+      <trans-unit id="1UPuVk0" resname="Nobody has been admitted yet: the draw still has to be run.">
+        <source>Nobody has been admitted yet: the draw still has to be run.</source>
+        <target>Er is nog niemand toegelaten: de loting moet nog worden gedaan.</target>
+      </trans-unit>
+      <trans-unit id="M87T8NQ" resname="Nobody has been admitted: this activity is cancelled or unpublished.">
+        <source>Nobody has been admitted: this activity is cancelled or unpublished.</source>
+        <target>Er is niemand toegelaten: deze activiteit is geannuleerd of niet gepubliceerd.</target>
+      </trans-unit>
       <trans-unit id="2eSNipe" resname="Nobody has said anything yet.">
         <source>Nobody has said anything yet.</source>
         <target state="translated">Nog niemand heeft iets gezegd.</target>
@@ -5909,6 +6217,10 @@
         <source>Nobody is competing for a day at the moment.</source>
         <target state="translated">Op dit moment strijdt niemand om een dag.</target>
       </trans-unit>
+      <trans-unit id="KfQXuDn" resname="Nobody is in this group yet.">
+        <source>Nobody is in this group yet.</source>
+        <target>Er zit nog niemand in deze groep.</target>
+      </trans-unit>
       <trans-unit id="fPDHDLX" resname="Nobody is installed in this body.">
         <source>Nobody is installed in this body.</source>
         <target state="translated">Niemand is in dit orgaan geïnstalleerd.</target>
@@ -5916,6 +6228,10 @@
       <trans-unit id="C_YTExT" resname="Nobody is installed right now.">
         <source>Nobody is installed right now.</source>
         <target state="translated">Er is op dit moment niemand geïnstalleerd.</target>
+      </trans-unit>
+      <trans-unit id="l4ODkdd" resname="Nobody matches this filter">
+        <source>Nobody matches this filter</source>
+        <target>Niemand voldoet aan dit filter</target>
       </trans-unit>
       <trans-unit id="kicT4e0" resname="Nobody needs attention">
         <source>Nobody needs attention</source>
@@ -5928,6 +6244,10 @@
       <trans-unit id="nUNPJ8C" resname="Non-member">
         <source>Non-member</source>
         <target>Niet-lid</target>
+      </trans-unit>
+      <trans-unit id="rOqxk3Z" resname="Non-members">
+        <source>Non-members</source>
+        <target>Niet-leden</target>
       </trans-unit>
       <trans-unit id="35SQQqs" resname="None">
         <source>None</source>
@@ -5949,6 +6269,10 @@
         <source>Not downloadable yet</source>
         <target state="translated">Nog niet te downloaden</target>
       </trans-unit>
+      <trans-unit id="LLeg5Rx" resname="Not drawn yet">
+        <source>Not drawn yet</source>
+        <target>Nog niet geloot</target>
+      </trans-unit>
       <trans-unit id="RsA0_Lz" resname="Not filled in">
         <source>Not filled in</source>
         <target state="translated">Niet ingevuld</target>
@@ -5965,6 +6289,10 @@
         <source>Not picked</source>
         <target state="translated">Niet gekozen</target>
       </trans-unit>
+      <trans-unit id="a52vJdQ" resname="Not refreshed since %date%.">
+        <source>Not refreshed since %date%.</source>
+        <target state="translated">Niet ververst sinds %date%.</target>
+      </trans-unit>
       <trans-unit id="V69AV1f" resname="Not run">
         <source>Not run</source>
         <target state="translated">Niet uitgevoerd</target>
@@ -5977,6 +6305,10 @@
         <source>Not signed in</source>
         <target state="translated">Niet ingelogd</target>
       </trans-unit>
+      <trans-unit id="31UDukz" resname="Not signed up">
+        <source>Not signed up</source>
+        <target>Niet ingeschreven</target>
+      </trans-unit>
       <trans-unit id="G_bzmc9" resname="Not started">
         <source>Not started</source>
         <target state="translated">Nog niet begonnen</target>
@@ -5988,10 +6320,6 @@
       <trans-unit id="H4tw96s" resname="Not tied to an agenda point; these apply to the meeting as a whole.">
         <source>Not tied to an agenda point; these apply to the meeting as a whole.</source>
         <target state="translated">Niet gekoppeld aan een agendapunt; deze gelden voor de vergadering als geheel.</target>
-      </trans-unit>
-      <trans-unit id="TylM_JW" resname="Not used in this revision.">
-        <source>Not used in this revision.</source>
-        <target state="translated">Niet gebruikt in deze revisie.</target>
       </trans-unit>
       <trans-unit id="Z458ldp" resname="Not used yet">
         <source>Not used yet</source>
@@ -6061,6 +6389,10 @@
         <source>Nothing here</source>
         <target state="translated">Hier is niets</target>
       </trans-unit>
+      <trans-unit id="i1hZIm8" resname="Nothing here changed in this revision.">
+        <source>Nothing here changed in this revision.</source>
+        <target state="translated">Hier is in deze revisie niets gewijzigd.</target>
+      </trans-unit>
       <trans-unit id="TnkjRq8" resname="Nothing in the next two months.">
         <source>Nothing in the next two months.</source>
         <target state="translated">Niets in de komende twee maanden.</target>
@@ -6072,6 +6404,10 @@
       <trans-unit id="uyXddNC" resname="Nothing is being announced at the moment.">
         <source>Nothing is being announced at the moment.</source>
         <target state="translated">Er wordt op dit moment niets aangekondigd.</target>
+      </trans-unit>
+      <trans-unit id="He_LyWu" resname="Nothing is filled in here.">
+        <source>Nothing is filled in here.</source>
+        <target state="translated">Hier is niets ingevuld.</target>
       </trans-unit>
       <trans-unit id="Lq2OJnZ" resname="Nothing is highlighted right now.">
         <source>Nothing is highlighted right now.</source>
@@ -6116,6 +6452,10 @@
       <trans-unit id="3KfzYKC" resname="Nothing runs out in the next three months.">
         <source>Nothing runs out in the next three months.</source>
         <target state="translated">Er verloopt niets in de komende drie maanden.</target>
+      </trans-unit>
+      <trans-unit id="3yi6JPy" resname="Nothing selected">
+        <source>Nothing selected</source>
+        <target>Niets geselecteerd</target>
       </trans-unit>
       <trans-unit id=".nH048f" resname="Nothing to claim right now.">
         <source>Nothing to claim right now.</source>
@@ -6209,9 +6549,17 @@
         <source>One answer per member. Your answer cannot be changed once it is in, and the results are shown either way.</source>
         <target state="translated">Eén antwoord per lid. Je antwoord kan niet meer worden gewijzigd zodra het binnen is, en de uitslag wordt hoe dan ook getoond.</target>
       </trans-unit>
+      <trans-unit id="OrVBeMB" resname="One list at a time">
+        <source>One list at a time</source>
+        <target>Eén lijst tegelijk</target>
+      </trans-unit>
       <trans-unit id="GBKGR5p" resname="One membership number per line, or separated by spaces or commas">
         <source>One membership number per line, or separated by spaces or commas</source>
         <target state="translated">Eén lidmaatschapsnummer per regel, of gescheiden middels spaties of kommas</target>
+      </trans-unit>
+      <trans-unit id="a1Ptqm6" resname="One row per person, one column per list: the quickest way to see who is in two lists, who is stuck on a waiting list and who only joined one part.">
+        <source>One row per person, one column per list: the quickest way to see who is in two lists, who is stuck on a waiting list and who only joined one part.</source>
+        <target>Eén rij per persoon, één kolom per lijst: de snelste manier om te zien wie op twee lijsten staat, wie op een wachtlijst vastzit en wie maar aan één onderdeel meedoet.</target>
       </trans-unit>
       <trans-unit id="dH8Yn7H" resname="Only a hash of the token is stored, so only its last characters can be shown. It cannot be read back or changed; revoke this principal and create another to replace it.">
         <source>Only a hash of the token is stored, so only its last characters can be shown. It cannot be read back or changed; revoke this principal and create another to replace it.</source>
@@ -6229,6 +6577,14 @@
         <source>Only the first %limit% matches are shown; refine your search to narrow them down.</source>
         <target state="translated">Alleen de eerste %limit% resultaten worden getoond; verfijn je zoekopdracht.</target>
       </trans-unit>
+      <trans-unit id="1xxNK2x" resname="Only the people still waiting for a place on %list%.">
+        <source>Only the people still waiting for a place on %list%.</source>
+        <target>Alleen de mensen die nog op een plaats op %list% wachten.</target>
+      </trans-unit>
+      <trans-unit id="zDbM8e6" resname="Only the people with a place on %list%.">
+        <source>Only the people with a place on %list%.</source>
+        <target>Alleen de mensen met een plaats op %list%.</target>
+      </trans-unit>
       <trans-unit id="jWCEU.u" resname="Only their name is kept, so that the decisions mentioning them stay correct. There is nothing here to edit.">
         <source>Only their name is kept, so that the decisions mentioning them stay correct. There is nothing here to edit.</source>
         <target state="translated">Alleen de naam wordt bewaard, zodat de besluiten waarin deze persoon genoemd wordt blijven kloppen. Er valt hier niets te bewerken.</target>
@@ -6236,6 +6592,10 @@
       <trans-unit id="aGilLiW" resname="Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.">
         <source>Only used by the HS512 shared-secret profile. Share it only with the application, and rotate it yearly.</source>
         <target>Alleen gebruikt door het HS512-profiel met gedeeld geheim. Deel het alleen met de applicatie en vervang het jaarlijks.</target>
+      </trans-unit>
+      <trans-unit id="uCU5_Lp" resname="Only visible to the board and organiser">
+        <source>Only visible to the board and organiser</source>
+        <target>Alleen zichtbaar voor het bestuur en de organisator</target>
       </trans-unit>
       <trans-unit id="bnfrTZj" resname="Only with open sign-up">
         <source>Only with open sign-up</source>
@@ -6321,9 +6681,9 @@
         <source>Option calendar</source>
         <target state="translated">Optiekalender</target>
       </trans-unit>
-      <trans-unit id="bVgiLEK" resname="Optional. A sign-up list with subscribers can no longer be changed structurally.">
-        <source>Optional. A sign-up list with subscribers can no longer be changed structurally.</source>
-        <target state="translated">Optioneel. Een inschrijflijst met inschrijvingen kan niet meer structureel worden gewijzigd.</target>
+      <trans-unit id="hK6n_7V" resname="Optional. Add the lists you need here; each one then gets its own steps for the basics, the allocation and the questions. A list with subscribers can no longer be changed structurally.">
+        <source>Optional. Add the lists you need here; each one then gets its own steps for the basics, the allocation and the questions. A list with subscribers can no longer be changed structurally.</source>
+        <target>Optioneel. Voeg hier de lijsten toe die je nodig hebt; elke lijst krijgt daarna eigen stappen voor de basis, de toewijzing en de vragen. Een lijst met inschrijvingen kan niet meer structureel worden gewijzigd.</target>
       </trans-unit>
       <trans-unit id="PK.ZLoC" resname="Or enter this secret in your app manually:">
         <source>Or enter this secret in your app manually:</source>
@@ -6413,6 +6773,14 @@
         <source>Other documents</source>
         <target state="translated">Overige documenten</target>
       </trans-unit>
+      <trans-unit id="cp7coh5" resname="Other lists">
+        <source>Other lists</source>
+        <target>Andere lijsten</target>
+      </trans-unit>
+      <trans-unit id="LB09AKf" resname="Other lists this person is in">
+        <source>Other lists this person is in</source>
+        <target>Andere lijsten waar deze persoon op staat</target>
+      </trans-unit>
       <trans-unit id="6TQwpIX" resname="Other meetings">
         <source>Other meetings</source>
         <target state="translated">Andere vergaderingen</target>
@@ -6424,6 +6792,10 @@
       <trans-unit id=".5bLoYJ" resname="Others only; hidden photos still show in their own album.">
         <source>Others only; hidden photos still show in their own album.</source>
         <target>Alleen voor anderen; verborgen foto's blijven zichtbaar in hun eigen album.</target>
+      </trans-unit>
+      <trans-unit id="upQTUGl" resname="Overbooked by %count%">
+        <source>Overbooked by %count%</source>
+        <target>%count% overboekt</target>
       </trans-unit>
       <trans-unit id="HmgPmMV" resname="Overview">
         <source>Overview</source>
@@ -6540,6 +6912,18 @@
       <trans-unit id="CJZXCgf" resname="Penningmeester">
         <source>Penningmeester</source>
         <target state="translated">Penningmeester</target>
+      </trans-unit>
+      <trans-unit id="yP0YJYC" resname="People have signed up for this list, so it can no longer be removed.">
+        <source>People have signed up for this list, so it can no longer be removed.</source>
+        <target>Er hebben zich mensen ingeschreven voor deze lijst, dus die kan niet meer worden verwijderd.</target>
+      </trans-unit>
+      <trans-unit id="u5ocEVM" resname="People in more than one part of the activity: the group that needs a combined timetable.">
+        <source>People in more than one part of the activity: the group that needs a combined timetable.</source>
+        <target>Mensen die aan meer dan één onderdeel van de activiteit meedoen: de groep die een gecombineerd tijdschema nodig heeft.</target>
+      </trans-unit>
+      <trans-unit id="hsPgdUT" resname="People will simply see the activity in the calendar. Add a list if you need registrations.">
+        <source>People will simply see the activity in the calendar. Add a list if you need registrations.</source>
+        <target>Mensen zien de activiteit gewoon in de agenda. Voeg een lijst toe als je inschrijvingen nodig hebt.</target>
       </trans-unit>
       <trans-unit id="hPqPyLn" resname="Per page">
         <source>Per page</source>
@@ -6693,9 +7077,45 @@
         <source>Placed on the photo</source>
         <target>Op de foto geplaatst</target>
       </trans-unit>
+      <trans-unit id="5qY3Fqv" resname="Places are allocated by a draw among everybody who signed up before %date%.">
+        <source>Places are allocated by a draw among everybody who signed up before %date%.</source>
+        <target state="translated">Plaatsen worden verloot onder iedereen die zich voor %date% heeft ingeschreven.</target>
+      </trans-unit>
       <trans-unit id="wo9xY6x" resname="Places are allocated by a draw on %date%.">
         <source>Places are allocated by a draw on %date%.</source>
         <target>Plekken worden verdeeld via een loting op %date%.</target>
+      </trans-unit>
+      <trans-unit id="B_duGCf" resname="Places are given out in this order: %order%.">
+        <source>Places are given out in this order: %order%.</source>
+        <target>Plaatsen worden in deze volgorde vergeven: %order%.</target>
+      </trans-unit>
+      <trans-unit id="TZUTRr8" resname="Places are handed out once sign-up has closed.">
+        <source>Places are handed out once sign-up has closed.</source>
+        <target>Plaatsen worden uitgegeven zodra de inschrijving is gesloten.</target>
+      </trans-unit>
+      <trans-unit id="9qPaAGY" resname="Places guaranteed">
+        <source>Places guaranteed</source>
+        <target>Gegarandeerde plaatsen</target>
+      </trans-unit>
+      <trans-unit id="2eycBq6" resname="Places held for %tier%">
+        <source>Places held for %tier%</source>
+        <target>Plaatsen gereserveerd voor %tier%</target>
+      </trans-unit>
+      <trans-unit id="ALbSfsn" resname="Places held for the organising body">
+        <source>Places held for the organising body</source>
+        <target>Plaatsen gereserveerd voor het organiserende orgaan</target>
+      </trans-unit>
+      <trans-unit id="GvcPheV" resname="Places held for this rank">
+        <source>Places held for this rank</source>
+        <target>Plaatsen gereserveerd voor deze groep</target>
+      </trans-unit>
+      <trans-unit id="5RiIxVb" resname="Places taken out of the draw before anything else is allocated.">
+        <source>Places taken out of the draw before anything else is allocated.</source>
+        <target>Plaatsen die uit de loting worden gehaald voordat er iets anders wordt toegewezen.</target>
+      </trans-unit>
+      <trans-unit id="LFe9QhU" resname="Places you leave empty go back to the draw.">
+        <source>Places you leave empty go back to the draw.</source>
+        <target>Plaatsen die je leeg laat gaan terug naar de loting.</target>
       </trans-unit>
       <trans-unit id="HEW6n8h" resname="Please complete the verification again and resubmit.">
         <source>Please complete the verification again and resubmit.</source>
@@ -6869,6 +7289,14 @@
         <source>Print</source>
         <target state="translated">Afdrukken</target>
       </trans-unit>
+      <trans-unit id="YU48PYC" resname="Priority">
+        <source>Priority</source>
+        <target>Voorrang</target>
+      </trans-unit>
+      <trans-unit id="Md6sGQq" resname="Priority order">
+        <source>Priority order</source>
+        <target>Voorrangsvolgorde</target>
+      </trans-unit>
       <trans-unit id="baOJdYt" resname="Privacy">
         <source>Privacy</source>
         <target>Privacy</target>
@@ -7021,6 +7449,10 @@
         <source>Question</source>
         <target state="translated">Vraag</target>
       </trans-unit>
+      <trans-unit id="Rx5irUP" resname="Questions">
+        <source>Questions</source>
+        <target>Vragen</target>
+      </trans-unit>
       <trans-unit id="kkOf_T8" resname="Questions about your profile, vacancies, banner or package all go here.">
         <source>Questions about your profile, vacancies, banner or package all go here.</source>
         <target state="translated">Vragen over je profiel, vacatures, banner of pakket gaan allemaal hierheen.</target>
@@ -7125,10 +7557,6 @@
         <source>Recipient</source>
         <target state="translated">Gemachtigde</target>
       </trans-unit>
-      <trans-unit id="u7Ln3jf" resname="Recipients">
-        <source>Recipients</source>
-        <target>Ontvangers</target>
-      </trans-unit>
       <trans-unit id="krgQCqo" resname="Recorded">
         <source>Recorded</source>
         <target state="translated">Vastgelegd</target>
@@ -7152,6 +7580,10 @@
       <trans-unit id="Y2Swv4b" resname="Reference selection">
         <source>Reference selection</source>
         <target state="translated">Referentieselectie</target>
+      </trans-unit>
+      <trans-unit id="hgDcLbp" resname="Refreshed %date%.">
+        <source>Refreshed %date%.</source>
+        <target state="translated">Ververst op %date%.</target>
       </trans-unit>
       <trans-unit id="wtanMIv" resname="Regenerate backup codes">
         <source>Regenerate backup codes</source>
@@ -7289,6 +7721,10 @@
         <source>Remove question</source>
         <target state="translated">Verwijder vraag</target>
       </trans-unit>
+      <trans-unit id="XUtaS0J" resname="Remove role">
+        <source>Remove role</source>
+        <target>Rol verwijderen</target>
+      </trans-unit>
       <trans-unit id="NmDF5_O" resname="Remove sign-up list">
         <source>Remove sign-up list</source>
         <target state="translated">Verwijder inschrijflijst</target>
@@ -7344,14 +7780,6 @@
       <trans-unit id="5yBqYN5" resname="Removed account">
         <source>Removed account</source>
         <target state="translated">Verwijderd account</target>
-      </trans-unit>
-      <trans-unit id="Sg9.yIf" resname="Removed field">
-        <source>Removed field</source>
-        <target state="translated">Verwijderd veld</target>
-      </trans-unit>
-      <trans-unit id="QNufj8x" resname="Removed list">
-        <source>Removed list</source>
-        <target state="translated">Verwijderde lijst</target>
       </trans-unit>
       <trans-unit id="Q9rF..c" resname="Removes the application and everything the applicant entered.">
         <source>Removes the application and everything the applicant entered.</source>
@@ -7409,6 +7837,14 @@
         <source>Reorder question</source>
         <target state="translated">Vraag verplaatsen</target>
       </trans-unit>
+      <trans-unit id="T31WAFa" resname="Reorder role">
+        <source>Reorder role</source>
+        <target>Rol verplaatsen</target>
+      </trans-unit>
+      <trans-unit id="4cNT18W" resname="Reorder tier">
+        <source>Reorder tier</source>
+        <target>Groep verplaatsen</target>
+      </trans-unit>
       <trans-unit id="0GpRD.b" resname="Repeat password">
         <source>Repeat password</source>
         <target state="translated">Wachtwoord herhalen</target>
@@ -7465,9 +7901,21 @@
         <source>Reserve a date</source>
         <target state="translated">Reserveer een datum</target>
       </trans-unit>
+      <trans-unit id="I0WvNOL" resname="Reserve a number of places per tier">
+        <source>Reserve a number of places per tier</source>
+        <target>Een aantal plaatsen per groep reserveren</target>
+      </trans-unit>
       <trans-unit id="NS2db7A" resname="Reserved">
         <source>Reserved</source>
         <target state="translated">Gereserveerd</target>
+      </trans-unit>
+      <trans-unit id="NLNCsNB" resname="Reserved place">
+        <source>Reserved place</source>
+        <target>Gereserveerde plaats</target>
+      </trans-unit>
+      <trans-unit id="3rhD7Xj" resname="Reserved places">
+        <source>Reserved places</source>
+        <target>Gereserveerde plaatsen</target>
       </trans-unit>
       <trans-unit id="gHvOyV9" resname="Reset MFA">
         <source>Reset MFA</source>
@@ -7576,6 +8024,10 @@
       <trans-unit id="ZaB0t0a" resname="Revoked">
         <source>Revoked</source>
         <target state="translated">Ingetrokken</target>
+      </trans-unit>
+      <trans-unit id="wVFHuss" resname="Role">
+        <source>Role</source>
+        <target>Rol</target>
       </trans-unit>
       <trans-unit id="aq2eM8Q" resname="Roles">
         <source>Roles</source>
@@ -7765,6 +8217,10 @@
         <source>Search by name or slug</source>
         <target state="translated">Zoek op naam of slug</target>
       </trans-unit>
+      <trans-unit id="pee5zaI" resname="Search by name, type or answer">
+        <source>Search by name, type or answer</source>
+        <target>Zoek op naam, type of antwoord</target>
+      </trans-unit>
       <trans-unit id="xdmKe6X" resname="Search by title or slug">
         <source>Search by title or slug</source>
         <target state="translated">Zoek op titel of slug</target>
@@ -7784,6 +8240,10 @@
       <trans-unit id="FvmJd5H" resname="Search decisions">
         <source>Search decisions</source>
         <target state="translated">Besluiten zoeken</target>
+      </trans-unit>
+      <trans-unit id="JAm2N0U" resname="Search everyone by name, type or answer">
+        <source>Search everyone by name, type or answer</source>
+        <target>Zoek iedereen op naam, type of antwoord</target>
       </trans-unit>
       <trans-unit id="xnFK3hj" resname="Search for a name or email">
         <source>Search for a name or email</source>
@@ -7833,6 +8293,10 @@
         <source>Searches the decision texts and understands meeting references such as “GMM 214” or “BM 1805.3.1”.</source>
         <target state="translated">Doorzoekt de besluitteksten en begrijpt vergaderreferenties zoals “ALV 214” of “BV 1805.3.1”.</target>
       </trans-unit>
+      <trans-unit id="mlixqLr" resname="Second-year members">
+        <source>Second-year members</source>
+        <target>Tweedejaarsleden</target>
+      </trans-unit>
       <trans-unit id="yLOgULN" resname="Secret">
         <source>Secret</source>
         <target>Geheim</target>
@@ -7856,6 +8320,10 @@
       <trans-unit id="l_d5jYJ" resname="Select">
         <source>Select</source>
         <target>Selecteren</target>
+      </trans-unit>
+      <trans-unit id="dY1QZ54" resname="Select %name%">
+        <source>Select %name%</source>
+        <target>Selecteer %name%</target>
       </trans-unit>
       <trans-unit id="XDeiLNk" resname="Select API permissions">
         <source>Select API permissions</source>
@@ -7885,9 +8353,9 @@
         <source>Select a study</source>
         <target state="translated">Selecteer een studie</target>
       </trans-unit>
-      <trans-unit id="Hu8.1pz" resname="Select all">
-        <source>Select all</source>
-        <target>Alles selecteren</target>
+      <trans-unit id="eGWbrcA" resname="Select all shown">
+        <source>Select all shown</source>
+        <target>Selecteer alles wat getoond wordt</target>
       </trans-unit>
       <trans-unit id="qgAT_FC" resname="Select photos and a destination album to move them.">
         <source>Select photos and a destination album to move them.</source>
@@ -7900,6 +8368,10 @@
       <trans-unit id="6fhrjug" resname="Send">
         <source>Send</source>
         <target>Verzenden</target>
+      </trans-unit>
+      <trans-unit id="qW8YddE" resname="Send a test to me">
+        <source>Send a test to me</source>
+        <target>Stuur mij een test</target>
       </trans-unit>
       <trans-unit id="IfR2MG4" resname="Send again">
         <source>Send again</source>
@@ -7929,6 +8401,10 @@
         <source>Send this email?</source>
         <target>Deze e-mail versturen?</target>
       </trans-unit>
+      <trans-unit id="TLm.DCc" resname="Send to %count%">
+        <source>Send to %count%</source>
+        <target>Verstuur naar %count%</target>
+      </trans-unit>
       <trans-unit id="RkdDo_y" resname="Send to the board">
         <source>Send to the board</source>
         <target state="translated">Naar het bestuur sturen</target>
@@ -7937,9 +8413,9 @@
         <source>Send your summary or old exam for %code% to the education officer and it is added here.</source>
         <target state="translated">Stuur je samenvatting of oude tentamen voor %code% naar de onderwijscommissaris en het wordt hier toegevoegd.</target>
       </trans-unit>
-      <trans-unit id="8YIUjez" resname="Sensitive">
-        <source>Sensitive</source>
-        <target state="translated">Gevoelig</target>
+      <trans-unit id="vzKQUZm" resname="Sending to %count% person|Sending to %count% people">
+        <source>Sending to %count% person|Sending to %count% people</source>
+        <target>Wordt verstuurd naar %count% persoon|Wordt verstuurd naar %count% personen</target>
       </trans-unit>
       <trans-unit id="94BV7cN" resname="Sensitive (only visible to the board and organiser)">
         <source>Sensitive (only visible to the board and organiser)</source>
@@ -7993,6 +8469,10 @@
         <source>Show all activities</source>
         <target state="translated">Alle activiteiten tonen</target>
       </trans-unit>
+      <trans-unit id="n7OlzSR" resname="Show columns">
+        <source>Show columns</source>
+        <target>Toon kolommen</target>
+      </trans-unit>
       <trans-unit id="WDBuc7a" resname="Show less">
         <source>Show less</source>
         <target>Toon minder</target>
@@ -8000,10 +8480,6 @@
       <trans-unit id="Vlj9mPs" resname="Show more">
         <source>Show more</source>
         <target>Toon meer</target>
-      </trans-unit>
-      <trans-unit id="3_iF3Y0" resname="Show sign-up count">
-        <source>Show sign-up count</source>
-        <target state="translated">Aantal inschrijvingen tonen</target>
       </trans-unit>
       <trans-unit id="_Aj9SKA" resname="Show the number of sign-ups to logged-out visitors">
         <source>Show the number of sign-ups to logged-out visitors</source>
@@ -8105,9 +8581,9 @@
         <source>Sign-up closes:</source>
         <target>Inschrijving sluit:</target>
       </trans-unit>
-      <trans-unit id="MUlHXYF" resname="Sign-up list">
-        <source>Sign-up list</source>
-        <target state="translated">Inschrijflijst</target>
+      <trans-unit id="6MX7525" resname="Sign-up list %position%">
+        <source>Sign-up list %position%</source>
+        <target>Inschrijflijst %position%</target>
       </trans-unit>
       <trans-unit id="JiavS3V" resname="Sign-up lists">
         <source>Sign-up lists</source>
@@ -8156,6 +8632,10 @@
       <trans-unit id="lIY1Kot" resname="Signed in %date%">
         <source>Signed in %date%</source>
         <target state="translated">Ingelogd op %date%</target>
+      </trans-unit>
+      <trans-unit id="UdiKxgu" resname="Signed up">
+        <source>Signed up</source>
+        <target>Ingeschreven</target>
       </trans-unit>
       <trans-unit id="aKsBUgl" resname="Signed up at">
         <source>Signed up at</source>
@@ -8361,6 +8841,10 @@
         <source>Study Association GEWIS</source>
         <target>Studievereniging GEWIS</target>
       </trans-unit>
+      <trans-unit id="q9UA9iV" resname="Study phase priority">
+        <source>Study phase priority</source>
+        <target>Voorrang op studiefase</target>
+      </trans-unit>
       <trans-unit id=".ElBgaP" resname="Study trips">
         <source>Study trips</source>
         <target state="translated">Studiereizen</target>
@@ -8400,10 +8884,6 @@
       <trans-unit id="2lJhxzM" resname="Subscribe">
         <source>Subscribe</source>
         <target state="translated">Inschrijven</target>
-      </trans-unit>
-      <trans-unit id="2915U_G" resname="Subscriber count shown publicly">
-        <source>Subscriber count shown publicly</source>
-        <target>Aantal inschrijvingen openbaar getoond</target>
       </trans-unit>
       <trans-unit id="etRjvgO" resname="Subscriptions cannot be changed safely while it runs. Try again in a few minutes.">
         <source>Subscriptions cannot be changed safely while it runs. Try again in a few minutes.</source>
@@ -8545,6 +9025,10 @@
         <source>Terminate session?</source>
         <target state="translated">Sessie beëindigen?</target>
       </trans-unit>
+      <trans-unit id="ORyDBcS" resname="Test">
+        <source>Test</source>
+        <target>Test</target>
+      </trans-unit>
       <trans-unit id="cnzcOY5" resname="Text">
         <source>Text</source>
         <target state="translated">Tekst</target>
@@ -8593,6 +9077,10 @@
         <source>That upload could not be published; check what it says.</source>
         <target state="translated">Die upload kon niet worden gepubliceerd; controleer wat erbij staat.</target>
       </trans-unit>
+      <trans-unit id="esnqMPj" resname="The %part% of %list% has not been filled in, so this activity cannot be submitted or approved yet.">
+        <source>The %part% of %list% has not been filled in, so this activity cannot be submitted or approved yet.</source>
+        <target state="translated">De %part% van %list% is niet ingevuld, dus deze activiteit kan nog niet worden ingediend of goedgekeurd.</target>
+      </trans-unit>
       <trans-unit id="s5IkPEB" resname="The GEWIS website is open-source! Check out the repository on &lt;a href=&quot;https://github.com/GEWIS/radix&quot; target=&quot;_blank&quot;&gt;&lt;span class=&quot;fab fa-github&quot;&gt;&lt;/span&gt;&amp;nbsp;GitHub&lt;/a&gt;%build%. Or visit our &lt;a href=&quot;https://github.com/GEWIS&quot; target=&quot;_blank&quot;&gt;organisation&lt;/a&gt; for more of our awesome open-source projects.">
         <source>The GEWIS website is open-source! Check out the repository on &lt;a href="https://github.com/GEWIS/radix" target="_blank"&gt;&lt;span class="fab fa-github"&gt;&lt;/span&gt;&amp;nbsp;GitHub&lt;/a&gt;%build%. Or visit our &lt;a href="https://github.com/GEWIS" target="_blank"&gt;organisation&lt;/a&gt; for more of our awesome open-source projects.</source>
         <target state="translated"><![CDATA[De GEWIS-website is open-source! Bekijk de repository op <a href="https://github.com/GEWIS/radix" target="_blank"><span class="fab fa-github"></span>&nbsp;GitHub</a>%build%. Of bezoek onze <a href="https://github.com/GEWIS" target="_blank">organisatie</a> voor meer van onze geweldige open-sourceprojecten.]]></target>
@@ -8628,6 +9116,10 @@
       <trans-unit id="Poo2BZL" resname="The activity revision was updated.">
         <source>The activity revision was updated.</source>
         <target state="translated">De activiteitsrevisie is bijgewerkt.</target>
+      </trans-unit>
+      <trans-unit id="_JiwvKL" resname="The activity starts on %date%.">
+        <source>The activity starts on %date%.</source>
+        <target>De activiteit begint op %date%.</target>
       </trans-unit>
       <trans-unit id="Zd0APHr" resname="The address">
         <source>The address</source>
@@ -8773,6 +9265,10 @@
         <source>The data export you asked for is ready.</source>
         <target state="translated">De gegevensexport die je hebt aangevraagd staat klaar.</target>
       </trans-unit>
+      <trans-unit id="2BkvMfm" resname="The databases are missing.">
+        <source>The databases are missing.</source>
+        <target state="translated">De databases ontbreken.</target>
+      </trans-unit>
       <trans-unit id="0zEevCa" resname="The day is reserved and the activity has been started for them.">
         <source>The day is reserved and the activity has been started for them.</source>
         <target state="translated">De dag is gereserveerd en de activiteit is voor ze aangemaakt.</target>
@@ -8880,6 +9376,10 @@
       <trans-unit id="VjGu0lN" resname="The external application has been updated.">
         <source>The external application has been updated.</source>
         <target>De externe applicatie is bijgewerkt.</target>
+      </trans-unit>
+      <trans-unit id="SeMiDgq" resname="The external party">
+        <source>The external party</source>
+        <target>De externe partij</target>
       </trans-unit>
       <trans-unit id="juj8ffI" resname="The external party dictates the order of admissions">
         <source>The external party dictates the order of admissions</source>
@@ -9012,6 +9512,10 @@
       <trans-unit id="4Op3lcu" resname="The page was updated.">
         <source>The page was updated.</source>
         <target state="translated">De pagina is bijgewerkt.</target>
+      </trans-unit>
+      <trans-unit id="dHbvW.F" resname="The people marked present on %list%.">
+        <source>The people marked present on %list%.</source>
+        <target>De mensen die op %list% als aanwezig zijn gemarkeerd.</target>
       </trans-unit>
       <trans-unit id="sbbDOd." resname="The photo of the week can only be hidden on Monday morning, before noon.">
         <source>The photo of the week can only be hidden on Monday morning, before noon.</source>
@@ -9249,6 +9753,10 @@
         <source>There is already a draft to work on.</source>
         <target state="translated">Er is al een concept om aan te werken.</target>
       </trans-unit>
+      <trans-unit id="_65X5iD" resname="There is more this revision changed further on.">
+        <source>There is more this revision changed further on.</source>
+        <target state="translated">Verderop is in deze revisie meer gewijzigd.</target>
+      </trans-unit>
       <trans-unit id="mftjN3u" resname="There is no banner on the website yet.">
         <source>There is no banner on the website yet.</source>
         <target state="translated">Er staat nog geen banner op de website.</target>
@@ -9308,6 +9816,10 @@
       <trans-unit id="GoS4ssK" resname="Thesis projects at companies">
         <source>Thesis projects at companies</source>
         <target state="translated">Afstudeerprojecten bij bedrijven</target>
+      </trans-unit>
+      <trans-unit id="e0iS7FK" resname="Third-year members and above">
+        <source>Third-year members and above</source>
+        <target>Derdejaarsleden en ouder</target>
       </trans-unit>
       <trans-unit id="ecpVw4m" resname="This activity cannot be cancelled.">
         <source>This activity cannot be cancelled.</source>
@@ -9396,6 +9908,14 @@
       <trans-unit id="iqd9dpA" resname="This body no longer organises activities.">
         <source>This body no longer organises activities.</source>
         <target state="translated">Dit orgaan organiseert geen activiteiten meer.</target>
+      </trans-unit>
+      <trans-unit id="XPTtXP1" resname="This cannot be saved yet: %step% is not filled in.">
+        <source>This cannot be saved yet: %step% is not filled in.</source>
+        <target>Dit kan nog niet worden opgeslagen: %step% is niet ingevuld.</target>
+      </trans-unit>
+      <trans-unit id="BhXT7SO" resname="This cannot be saved yet: the %step% of %group% is not filled in.">
+        <source>This cannot be saved yet: the %step% of %group% is not filled in.</source>
+        <target>Dit kan nog niet worden opgeslagen: de %step% van %group% is niet ingevuld.</target>
       </trans-unit>
       <trans-unit id="qITaaEH" resname="This company has no packages.">
         <source>This company has no packages.</source>
@@ -9496,6 +10016,18 @@
       <trans-unit id="VUwNvf3" resname="This label is still used by a vacancy, so it cannot be removed.">
         <source>This label is still used by a vacancy, so it cannot be removed.</source>
         <target state="translated">Dit label wordt nog door een vacature gebruikt en kan daarom niet verwijderd worden.</target>
+      </trans-unit>
+      <trans-unit id="zRRdI4A" resname="This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.">
+        <source>This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.</source>
+        <target>Deze lijst heeft al inschrijvingen, dus de structuur ligt vast. Het sluitmoment en de teksten kunnen nog worden gewijzigd.</target>
+      </trans-unit>
+      <trans-unit id="NdjoFzM" resname="This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.">
+        <source>This list guarantees a role, which is handed out once sign-up has closed, so the draw waits until then and is run by hand.</source>
+        <target state="translated">Deze lijst garandeert een rol, die pas wordt uitgedeeld nadat de inschrijving is gesloten, dus de loting wacht daarop en wordt met de hand gedaan.</target>
+      </trans-unit>
+      <trans-unit id="VeD2wCo" resname="This list only">
+        <source>This list only</source>
+        <target>Alleen deze lijst</target>
       </trans-unit>
       <trans-unit id="SyPSgf9" resname="This meeting has no decisions (yet).">
         <source>This meeting has no decisions (yet).</source>
@@ -9697,6 +10229,14 @@
         <source>This window overlaps an existing maintenance window.</source>
         <target>Dit venster overlapt een bestaand onderhoudsvenster.</target>
       </trans-unit>
+      <trans-unit id="f4iXsj2" resname="Tick rows in the table to mail a hand-picked group.">
+        <source>Tick rows in the table to mail a hand-picked group.</source>
+        <target>Vink rijen in de tabel aan om een zelfgekozen groep te mailen.</target>
+      </trans-unit>
+      <trans-unit id="T3weQko" resname="Tiers on the same number are admitted together.">
+        <source>Tiers on the same number are admitted together.</source>
+        <target state="translated">Groepen met hetzelfde nummer worden tegelijk toegelaten.</target>
+      </trans-unit>
       <trans-unit id="OmjSafb" resname="Time &amp; place">
         <source>Time &amp; place</source>
         <target state="translated"><![CDATA[Tijd & locatie]]></target>
@@ -9813,6 +10353,10 @@
         <source>Turn off the balloons, snow, and fireworks across the website.</source>
         <target>Schakel de ballonnen, sneeuw en het vuurwerk op de hele website uit.</target>
       </trans-unit>
+      <trans-unit id="Yv_VVml" resname="Turn on only the orders you need. Where several are on, the coarser one decides first.">
+        <source>Turn on only the orders you need. Where several are on, the coarser one decides first.</source>
+        <target>Zet alleen de volgordes aan die je nodig hebt. Staan er meerdere aan, dan beslist de grofste eerst.</target>
+      </trans-unit>
       <trans-unit id="DaAfpuA" resname="Turn this proposal down?">
         <source>Turn this proposal down?</source>
         <target state="translated">Dit voorstel afwijzen?</target>
@@ -9869,6 +10413,10 @@
         <source>Uncategorised</source>
         <target>Niet gecategoriseerd</target>
       </trans-unit>
+      <trans-unit id="a6da7Vp" resname="Unchanged">
+        <source>Unchanged</source>
+        <target state="translated">Ongewijzigd</target>
+      </trans-unit>
       <trans-unit id="SsE5mLL" resname="Undated">
         <source>Undated</source>
         <target>Zonder datum</target>
@@ -9889,6 +10437,18 @@
         <source>Unknown reason</source>
         <target state="translated">Reden onbekend</target>
       </trans-unit>
+      <trans-unit id="W8BQW1b" resname="Unlimited">
+        <source>Unlimited</source>
+        <target>Onbeperkt</target>
+      </trans-unit>
+      <trans-unit id="C3ZbjIm" resname="Unlimited capacity, so everybody who signs up is in.">
+        <source>Unlimited capacity, so everybody who signs up is in.</source>
+        <target>Onbeperkte capaciteit, dus iedereen die zich inschrijft is erbij.</target>
+      </trans-unit>
+      <trans-unit id="UNyOaSk" resname="Unlimited, everybody is in">
+        <source>Unlimited, everybody is in</source>
+        <target>Onbeperkt, iedereen is erbij</target>
+      </trans-unit>
       <trans-unit id="_c9YbkL" resname="Unlink">
         <source>Unlink</source>
         <target state="translated">Ontkoppelen</target>
@@ -9896,6 +10456,10 @@
       <trans-unit id="hGeuCbc" resname="Unlink this counterpart?">
         <source>Unlink this counterpart?</source>
         <target state="translated">Deze tegenhanger ontkoppelen?</target>
+      </trans-unit>
+      <trans-unit id="LU0x91C" resname="Unnamed question">
+        <source>Unnamed question</source>
+        <target state="translated">Naamloze vraag</target>
       </trans-unit>
       <trans-unit id="tTYXtrf" resname="Unpublish">
         <source>Unpublish</source>
@@ -10189,6 +10753,10 @@
         <source>Visible to whoever asked and to the board. Use it to explain a decision.</source>
         <target state="translated">Zichtbaar voor de aanvrager en het bestuur. Gebruik dit om een besluit toe te lichten.</target>
       </trans-unit>
+      <trans-unit id="cmDrSH2" resname="Visible to whoever may see the sign-ups">
+        <source>Visible to whoever may see the sign-ups</source>
+        <target>Zichtbaar voor wie de inschrijvingen mag zien</target>
+      </trans-unit>
       <trans-unit id="VcuSKVC" resname="Visible to you and your contact at GEWIS.">
         <source>Visible to you and your contact at GEWIS.</source>
         <target state="translated">Zichtbaar voor jou en je contactpersoon bij GEWIS.</target>
@@ -10285,9 +10853,9 @@
         <source>Was it not your intention to close the payment page? Then do not worry, we have sent you an e-mail containing a link that allows you to go to the payment page again. Do you not want to become a member of GEWIS after all? Let us know and we will delete your details.</source>
         <target state="translated">Was het niet je bedoeling om de betaalpagina te sluiten? Geen zorgen, we hebben je een e-mail gestuurd met een link waarmee je opnieuw naar de betaalpagina kunt gaan. Wil je toch geen lid worden van GEWIS? Laat het ons weten en we verwijderen jouw gegevens.</target>
       </trans-unit>
-      <trans-unit id="yLrgGa8" resname="Was:">
-        <source>Was:</source>
-        <target state="translated">Was:</target>
+      <trans-unit id="Sz1D.Uy" resname="Was question %number%.">
+        <source>Was question %number%.</source>
+        <target state="translated">Was vraag %number%.</target>
       </trans-unit>
       <trans-unit id="SnmiFq3" resname="We are preparing your data export. You will receive an email with a download link when it is ready.">
         <source>We are preparing your data export. You will receive an email with a download link when it is ready.</source>
@@ -10397,6 +10965,10 @@
         <source>What it is</source>
         <target state="translated">Wat het is</target>
       </trans-unit>
+      <trans-unit id="5FHRi2t" resname="What people are asked when they sign up for this list.">
+        <source>What people are asked when they sign up for this list.</source>
+        <target>Wat mensen wordt gevraagd als ze zich inschrijven voor deze lijst.</target>
+      </trans-unit>
       <trans-unit id="o2OJeNf" resname="What runs out or starts before %date%.">
         <source>What runs out or starts before %date%.</source>
         <target state="translated">Wat afloopt of begint voor %date%.</target>
@@ -10473,6 +11045,10 @@
         <source>When an activity is waiting to be reviewed</source>
         <target state="translated">Wanneer een activiteit wacht op beoordeling</target>
       </trans-unit>
+      <trans-unit id="WkPK0Y9" resname="When people can sign up. It has to close before the activity starts.">
+        <source>When people can sign up. It has to close before the activity starts.</source>
+        <target>Wanneer mensen zich kunnen inschrijven. De lijst moet sluiten voordat de activiteit begint.</target>
+      </trans-unit>
       <trans-unit id="AS1e.sj" resname="When photos of an event are published">
         <source>When photos of an event are published</source>
         <target>Wanneer foto's van een activiteit worden gepubliceerd</target>
@@ -10496,6 +11072,10 @@
       <trans-unit id="Pw06KjY" resname="When to use which type">
         <source>When to use which type</source>
         <target state="translated">Wanneer welk type</target>
+      </trans-unit>
+      <trans-unit id="g6ZKs3S" resname="When your account is signed in from an unrecognised device or location">
+        <source>When your account is signed in from an unrecognised device or location</source>
+        <target state="translated">Wanneer er op je account wordt ingelogd vanaf een onbekend apparaat of onbekende locatie</target>
       </trans-unit>
       <trans-unit id="TbjdPnE" resname="Where the member is sent when they decline.">
         <source>Where the member is sent when they decline.</source>
@@ -10529,6 +11109,14 @@
         <source>Who do you want to authorize?</source>
         <target state="translated">Wie wil je machtigen?</target>
       </trans-unit>
+      <trans-unit id="9gB5xEw" resname="Who gets a place when there are more sign-ups than places.">
+        <source>Who gets a place when there are more sign-ups than places.</source>
+        <target>Wie een plaats krijgt als er meer inschrijvingen dan plaatsen zijn.</target>
+      </trans-unit>
+      <trans-unit id="KqkwnyG" resname="Who gets this">
+        <source>Who gets this</source>
+        <target>Wie krijgt dit</target>
+      </trans-unit>
       <trans-unit id="JqvdByI" resname="Who may read it">
         <source>Who may read it</source>
         <target state="translated">Wie het mag lezen</target>
@@ -10540,6 +11128,14 @@
       <trans-unit id="mfe.B6z" resname="Who may read this page">
         <source>Who may read this page</source>
         <target state="translated">Wie deze pagina mag lezen</target>
+      </trans-unit>
+      <trans-unit id="6lHHAxq" resname="Who may sign up">
+        <source>Who may sign up</source>
+        <target>Wie mag zich inschrijven</target>
+      </trans-unit>
+      <trans-unit id="Cfuvr45" resname="Who may sign up, and what other people are shown about the list.">
+        <source>Who may sign up, and what other people are shown about the list.</source>
+        <target>Wie zich mag inschrijven, en wat anderen over de lijst te zien krijgen.</target>
       </trans-unit>
       <trans-unit id="OyOkpbP" resname="Who to renew">
         <source>Who to renew</source>
@@ -10588,6 +11184,10 @@
       <trans-unit id="i1Pbibt" resname="Without Modifications">
         <source>Without Modifications</source>
         <target state="translated">Zonder wijzigingen</target>
+      </trans-unit>
+      <trans-unit id="YX39UIV" resname="Work one list at a time: admit, mark presence and read the answers for %list%.">
+        <source>Work one list at a time: admit, mark presence and read the answers for %list%.</source>
+        <target>Werk één lijst tegelijk af: laat toe, markeer aanwezigheid en lees de antwoorden voor %list%.</target>
       </trans-unit>
       <trans-unit id="lszYawJ" resname="Working title">
         <source>Working title</source>
@@ -10749,6 +11349,10 @@
         <source>You have been unsubscribed.</source>
         <target>Je bent uitgeschreven.</target>
       </trans-unit>
+      <trans-unit id="jDNC1VA" resname="You have no email address to send a test to.">
+        <source>You have no email address to send a test to.</source>
+        <target>Je hebt geen e-mailadres om een test naartoe te sturen.</target>
+      </trans-unit>
       <trans-unit id="F07ab4W" resname="You have not been a member of a committee or fraternity.">
         <source>You have not been a member of a committee or fraternity.</source>
         <target>Je bent nooit lid geweest van een commissie of dispuut.</target>
@@ -10801,11 +11405,11 @@
         <source>Your account is ready, but your company has no running contract with GEWIS. You can sign in once the board has entered it.</source>
         <target state="translated">Je account is klaar, maar je bedrijf heeft geen lopend contract met GEWIS. Je kunt inloggen zodra het bestuur dit heeft ingevoerd.</target>
       </trans-unit>
-      <trans-unit id="FSsHSES" resname="Your account was signed in %count% times from an unrecognised device or location.">
+      <trans-unit id="5k7XFx6" resname="Your account was signed in %count% times from an unrecognised device or location.">
         <source>Your account was signed in %count% times from an unrecognised device or location.</source>
         <target state="translated">Er is %count% keer op je account ingelogd vanaf een onbekend apparaat of onbekende locatie.</target>
       </trans-unit>
-      <trans-unit id="1rTGsTd" resname="Your account was signed in from an unrecognised device: %name%.">
+      <trans-unit id="1hYTW0B" resname="Your account was signed in from an unrecognised device: %name%.">
         <source>Your account was signed in from an unrecognised device: %name%.</source>
         <target state="translated">Er is op je account ingelogd vanaf een onbekend apparaat: %name%.</target>
       </trans-unit>
@@ -11089,6 +11693,14 @@
         <source>active/inactive</source>
         <target state="translated">actief/inactief</target>
       </trans-unit>
+      <trans-unit id="3i6bs7i" resname="added">
+        <source>added</source>
+        <target state="translated">toegevoegd</target>
+      </trans-unit>
+      <trans-unit id="vMsdiHs" resname="admitted of %count% sign-ups">
+        <source>admitted of %count% sign-ups</source>
+        <target>toegelaten van %count% inschrijvingen</target>
+      </trans-unit>
       <trans-unit id="zxPuD2." resname="afgekeurd">
         <source>afgekeurd</source>
         <target state="translated">afgekeurd</target>
@@ -11121,9 +11733,21 @@
         <source>by %name%</source>
         <target state="translated">door %name%</target>
       </trans-unit>
+      <trans-unit id="Bd7fLO4" resname="by hand">
+        <source>by hand</source>
+        <target>handmatig</target>
+      </trans-unit>
       <trans-unit id="gpwpUUb" resname="category">
         <source>category</source>
         <target state="translated">categorie</target>
+      </trans-unit>
+      <trans-unit id="ZcQYxFR" resname="change to review">
+        <source>change to review</source>
+        <target state="translated">wijziging om te beoordelen</target>
+      </trans-unit>
+      <trans-unit id="SkrZEAd" resname="changes to review">
+        <source>changes to review</source>
+        <target state="translated">wijzigingen om te beoordelen</target>
       </trans-unit>
       <trans-unit id="RjhTtRC" resname="commissiereglement">
         <source>commissiereglement</source>
@@ -11145,6 +11769,10 @@
         <source>dispuutsreglement</source>
         <target state="translated">dispuutsreglement</target>
       </trans-unit>
+      <trans-unit id="JAet1gU" resname="drawn">
+        <source>drawn</source>
+        <target>geloot</target>
+      </trans-unit>
       <trans-unit id="lqnZTLi" resname="email address change pending">
         <source>email address change pending</source>
         <target state="translated">e-mailadreswijziging gepland</target>
@@ -11156,6 +11784,10 @@
       <trans-unit id="9BZOqKp" resname="first in line">
         <source>first in line</source>
         <target state="translated">eerste in de rij</target>
+      </trans-unit>
+      <trans-unit id="hU8PAYC" resname="full">
+        <source>full</source>
+        <target>vol</target>
       </trans-unit>
       <trans-unit id="OgZ0qFO" resname="goedgekeurd">
         <source>goedgekeurd</source>
@@ -11216,6 +11848,10 @@
       <trans-unit id="NoLyHVo" resname="listmonk sync">
         <source>listmonk sync</source>
         <target state="translated">listmonk-synchronisatie</target>
+      </trans-unit>
+      <trans-unit id="nDxG2oM" resname="live">
+        <source>live</source>
+        <target state="translated">live</target>
       </trans-unit>
       <trans-unit id="je93_Nv" resname="live %number%">
         <source>live %number%</source>
@@ -11309,13 +11945,25 @@
         <source>photos</source>
         <target>foto's</target>
       </trans-unit>
+      <trans-unit id="ubsu.0t" resname="removed">
+        <source>removed</source>
+        <target state="translated">verwijderd</target>
+      </trans-unit>
       <trans-unit id="iP7D8YD" resname="rev. #%n%">
         <source>rev. #%n%</source>
         <target state="translated">rev. #%n%</target>
       </trans-unit>
+      <trans-unit id="M6lahGB" resname="revision #%number%">
+        <source>revision #%number%</source>
+        <target state="translated">revisie #%number%</target>
+      </trans-unit>
       <trans-unit id="NdlEWZ3" resname="selected">
         <source>selected</source>
         <target>geselecteerd</target>
+      </trans-unit>
+      <trans-unit id="fPwCil1" resname="sign-ups">
+        <source>sign-ups</source>
+        <target>inschrijvingen</target>
       </trans-unit>
       <trans-unit id="pxtmiM0" resname="similar to">
         <source>similar to</source>
@@ -11461,9 +12109,9 @@
         <source>used by %count% revisions</source>
         <target state="translated">gebruikt door %count% versies</target>
       </trans-unit>
-      <trans-unit id="A0Prwbn" resname="was">
-        <source>was</source>
-        <target state="translated">was</target>
+      <trans-unit id="yqfaihZ" resname="waiting">
+        <source>waiting</source>
+        <target>wachtend</target>
       </trans-unit>
       <trans-unit id="LK8qg03" resname="you">
         <source>you</source>
@@ -11484,26 +12132,6 @@
       <trans-unit id="dch67pJ" resname="¹ This permission will add more properties to existing entities that can already be requested.">
         <source>¹ This permission will add more properties to existing entities that can already be requested.</source>
         <target state="translated">¹ Deze permissie voegt meer eigenschappen toe aan bestaande entiteiten die al opgevraagd kunnen worden.</target>
-      </trans-unit>
-      <trans-unit id="dyTVOrJ" resname="IP databases">
-        <source>IP databases</source>
-        <target state="translated">IP-databases</target>
-      </trans-unit>
-      <trans-unit id="D63Kb1y" resname="The databases are missing.">
-        <source>The databases are missing.</source>
-        <target state="translated">De databases ontbreken.</target>
-      </trans-unit>
-      <trans-unit id="wxO6sHk" resname="Not refreshed since %date%.">
-        <source>Not refreshed since %date%.</source>
-        <target state="translated">Niet ververst sinds %date%.</target>
-      </trans-unit>
-      <trans-unit id="zdCHZef" resname="Refreshed %date%.">
-        <source>Refreshed %date%.</source>
-        <target state="translated">Ververst op %date%.</target>
-      </trans-unit>
-      <trans-unit id="3Gewnwz" resname="IP address data by">
-        <source>IP address data by</source>
-        <target state="translated">IP-adresgegevens door</target>
       </trans-unit>
     </body>
   </file>

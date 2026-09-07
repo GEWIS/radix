@@ -13,6 +13,7 @@ use App\ViewModel\Application\RevisionActions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -38,6 +39,8 @@ abstract class AbstractRevisionController extends AbstractController
 
     protected TranslatorInterface $translator;
 
+    protected RequestStack $requestStack;
+
     /**
      * Injected through a setter rather than a constructor so a concrete controller keeps its own constructor and its
      * own dependency list, exactly as {@see AbstractController} takes its container.
@@ -48,11 +51,13 @@ abstract class AbstractRevisionController extends AbstractController
         RevisionDescriberRegistry $revisionDescribers,
         RevisionReviewService $revisionReviewService,
         TranslatorInterface $translator,
+        RequestStack $requestStack,
     ): void {
         $this->revisionActionResolver = $revisionActionResolver;
         $this->revisionDescribers = $revisionDescribers;
         $this->revisionReviewService = $revisionReviewService;
         $this->translator = $translator;
+        $this->requestStack = $requestStack;
     }
 
     protected function revisionActions(RevisionInterface $revision): RevisionActions

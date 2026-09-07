@@ -3,7 +3,7 @@
 {% set step = form_flow_current_step(form) %}
 
 {{ form_start(form) }}
-{{ form_errors(form) }}
+
 
 {{ flow.stepper(form) }}
 
@@ -115,25 +115,16 @@
             </div>
         </div>
     </div>
+{% elseif 'signupLists' == step %}
+    {% include 'partials/activity/admin/signup-list-inventory.html.twig' with {
+        'form': form,
+        'activity': activity,
+    } only %}
 {% else %}
-    {# The language checkboxes live on the previous step, so the controller is handed their answer instead. #}
-    <div class="row" data-controller="localised-fields"
-         data-localised-fields-dutch-value="{{ form.signupLists.vars.language_dutch ? 'true' : 'false' }}"
-         data-localised-fields-english-value="{{ form.signupLists.vars.language_english ? 'true' : 'false' }}">
-        <div class="col-md-12">
-            <div class="panel">
-                <div class="panel-heading">
-                    <h3>{{ 'Sign-up lists'|trans }}</h3>
-                    <p class="text-muted small mb-0">
-                        {{ 'Optional. A sign-up list with subscribers can no longer be changed structurally.'|trans }}
-                    </p>
-                </div>
-                <div class="panel-body">
-                    {{ form_widget(form.signupLists.signupLists) }}
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'partials/activity/admin/signup-list-section.html.twig' with {
+        'form': form,
+        'step': step,
+    } only %}
 {% endif %}
 
 {{ flow.navigation(form, path('admin/activities/index')) }}

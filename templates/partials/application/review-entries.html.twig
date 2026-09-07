@@ -1,0 +1,60 @@
+{% import 'partials/application/review-pane.html.twig' as panemacro %}
+
+{% if entries is empty %}
+    <p class="text-muted small mb-0">{{ 'No questions are asked on this list.'|trans }}</p>
+{% else %}
+    <div class="d-flex flex-column gap-2">
+        {% for entry in entries %}
+            {% set id = 'review-entry-' ~ loop.index %}
+            {% set entryWholesale = wholesale|default(false) or entry.kind.value in ['added', 'removed'] %}
+            {% set removed = 'removed' == entry.kind.value %}
+            <div class="panel mb-0{{ removed ? ' review-pane--removed' }}{{ 'same' == entry.kind.value ? ' opacity-75' }}">
+                <button type="button"
+                        class="panel-heading panel-collapse-toggle{{ entry.openByDefault ? '' : ' collapsed' }} d-flex align-items-center gap-2 w-100 border-0 bg-transparent text-start"
+                        data-bs-toggle="collapse" data-bs-target="#{{ id }}"
+                        aria-expanded="{{ entry.openByDefault ? 'true' : 'false' }}" aria-controls="{{ id }}">
+                    {% if entry.position is not null %}
+                        <span class="form-stepper-badge">{{ entry.position }}</span>
+                    {% endif %}
+                    {% if not wholesale|default(false) %}
+                        <span class="badge {{ entry.kind.badgeClass }}">{{ entry.kind|trans }}</span>
+                    {% endif %}
+                    <span class="d-flex flex-column flex-grow-1 overflow-hidden">
+                        <span class="fw-semibold text-truncate{{ removed ? ' text-muted text-decoration-line-through' }}">{{ entry.title }}</span>
+                        {% if entry.note is not null %}
+                            <span class="small text-muted">{{ entry.note|trans }}</span>
+                        {% endif %}
+                    </span>
+                    {% if entry.type is not null %}
+                        <span class="badge badge-tag">{{ entry.type|trans }}</span>
+                    {% endif %}
+                    <span class="fas fa-chevron-down panel-collapse-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="collapse{{ entry.openByDefault ? ' show' }}" id="{{ id }}">
+                    <div class="panel-body">
+                        {{ panemacro.rows(entry.fields, entryWholesale) }}
+                        {% if entry.options is not empty %}
+                            <div class="border rounded p-3 mt-3 bg-body-tertiary">
+                                <h6 class="small text-muted mb-2">{{ 'Answers'|trans }}</h6>
+                                {% for option in entry.options %}
+                                    <div class="d-flex flex-wrap align-items-start gap-3 py-1{{ 'same' == option.kind.value ? ' opacity-75' }}">
+                                        {% if not entryWholesale %}
+                                            <span class="badge {{ option.kind.badgeClass }} align-self-start">
+                                                {{ option.kind|trans }}
+                                            </span>
+                                        {% endif %}
+                                        <div class="review-row__cells review-row__cells--pair flex-grow-1">
+                                            {% for value in option.value.values %}
+                                                {{ panemacro.cell(option.value, value) }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

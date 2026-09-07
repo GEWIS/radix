@@ -9,6 +9,30 @@
     }
 }
 
-[data-form-collection-target="entry"].dragging {
+[data-form-collection-target="entry"].dragging,
+[data-tier-order-target="entry"].dragging {
     opacity: 0.5;
 }
+
+.tier-order-entry {
+    cursor: grab;
+    background-color: var(--#{$prefix}tertiary-bg);
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    // A tier admitted together with the one above sits against it, so a rank reads as one block rather than as two
+    // rows that happen to carry the same number.
+    &--tied {
+        margin-block-start: -0.35rem;
+        border-start-start-radius: 0;
+        border-start-end-radius: 0;
+    }
+
+    &:has(+ &--tied) {
+        border-end-start-radius: 0;
+        border-end-end-radius: 0;
+    }
+}
+

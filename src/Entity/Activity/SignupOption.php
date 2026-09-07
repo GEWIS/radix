@@ -53,6 +53,7 @@ class SignupOption
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(

@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
 
+use function mb_strtolower;
+
 /**
  * ExternalSignup model.
  */
@@ -75,6 +77,12 @@ class ExternalSignup extends Signup
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    #[Override]
+    public function personKey(): string
+    {
+        return 'email:' . mb_strtolower($this->email);
     }
 
     /**

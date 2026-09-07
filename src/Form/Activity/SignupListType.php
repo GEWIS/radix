@@ -5,8 +5,15 @@ declare(strict_types=1);
 namespace App\Form\Activity;
 
 use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\SignupList;
+use App\Entity\Activity\SignupRole;
+use App\Entity\Application\PriorityTierInterface;
+use App\Entity\Database\Enums\ProgramType;
+use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\LocalisedTextType;
 use App\Form\DisablesFieldsTrait;
 use DateTime;
@@ -16,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -24,6 +32,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,6 +40,12 @@ use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use function array_keys;
+use function array_map;
+use function array_pad;
+use function array_sum;
+use function assert;
+use function explode;
+use function implode;
 use function strval;
 use function Symfony\Component\Translation\t;
 use function trim;
@@ -60,9 +75,9 @@ class SignupListType extends AbstractType
     /**
      * The allocation method and its per-method settings, frozen once the list has sign-ups: changing how places are
      * allocated after people have committed would rewrite the deal they signed up under. `capacity` is deliberately
-     * excluded — it is not per-method and may still need adjusting (e.g. adding seats) while the list is open; it is
-     * frozen separately once the draw has been performed (see {@see self::freezeWhenDrawn()}, which locks the draw's
-     * exact settings so the carried draw lock cannot go stale).
+     * excluded, since it is not per-method and may still need adjusting (e.g. adding places) while the list is open;
+     * it is frozen separately once the draw has been performed (see {@see self::freezeWhenDrawn()}, which locks the
+     * draw's exact settings so the carried draw lock cannot go stale).
      */
     private const array METHOD_FIELDS = [
         'allocationMethod',
@@ -73,6 +88,12 @@ class SignupListType extends AbstractType
         'externalForceOrdering',
         'externalPaymentByExternal',
         'customMethodDescription',
+        'membershipTierOrder',
+        'membershipPriorityMode',
+        'cohortTierOrder',
+        'programTypeOrder',
+        'organisingCommitteePlaces',
+        'roles',
     ];
 
     #[Override]
@@ -80,6 +101,56 @@ class SignupListType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
+        $section = $options['section'];
+        assert($section instanceof SignupListSection);
+
+        match ($section) {
+            SignupListSection::Basics => $this->addBasics($builder),
+            SignupListSection::Allocation => $this->addAllocation($builder),
+            SignupListSection::Questions => $this->addQuestions($builder),
+        };
+
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            $this->freezeWhenActivityStarted(...),
+        );
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            $this->freezeWhenSubscribed(...),
+        );
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            $this->freezeWhenDrawn(...),
+        );
+
+        if (SignupListSection::Basics === $options['section']) {
+            $builder->addEventListener(
+                FormEvents::POST_SET_DATA,
+                $this->disableOpenDateWhenOpened(...),
+            );
+            $builder->addEventListener(
+                FormEvents::POST_SET_DATA,
+                $this->disableCloseDateWhenClosed(...),
+            );
+        }
+
+        if (SignupListSection::Allocation !== $options['section']) {
+            return;
+        }
+
+        // Only the section that renders these may clear them, and a hidden input must not keep settings the cloner
+        // would carry into every future revision.
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            $this->clearInapplicableAllocation(...),
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface<?SignupList> $builder
+     */
+    private function addBasics(FormBuilderInterface $builder): void
+    {
         $builder
             ->add(
                 'name',
@@ -93,15 +164,6 @@ class SignupListType extends AbstractType
                     'label' => t('Opens'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter an opening date and time.')],
-                    // The entity setter is non-nullable; an empty submission maps to null and would TypeError during
-                    // data mapping (before NotBlank runs). Skip the write when empty so NotBlank reports it instead.
-                    'setter' => static function (SignupList $list, ?DateTime $value): void {
-                        if (null === $value) {
-                            return;
-                        }
-
-                        $list->setOpenDate($value);
-                    },
                 ],
             )
             ->add(
@@ -111,13 +173,6 @@ class SignupListType extends AbstractType
                     'label' => t('Closes'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter a closing date and time.')],
-                    'setter' => static function (SignupList $list, ?DateTime $value): void {
-                        if (null === $value) {
-                            return;
-                        }
-
-                        $list->setCloseDate($value);
-                    },
                 ],
             )
             ->add(
@@ -136,6 +191,22 @@ class SignupListType extends AbstractType
                     'required' => false,
                 ],
             )
+            ->add(
+                'promoted',
+                CheckboxType::class,
+                [
+                    'label' => t('Promoted'),
+                    'required' => false,
+                ],
+            );
+    }
+
+    /**
+     * @param FormBuilderInterface<?SignupList> $builder
+     */
+    private function addAllocation(FormBuilderInterface $builder): void
+    {
+        $builder
             ->add(
                 'limitedCapacity',
                 CheckboxType::class,
@@ -235,13 +306,108 @@ class SignupListType extends AbstractType
                 ],
             )
             ->add(
-                'promoted',
-                CheckboxType::class,
+                'membershipTierOrder',
+                HiddenType::class,
                 [
-                    'label' => t('Promoted'),
+                    'label' => false,
+                    'required' => false,
+                    'getter' => static fn (SignupList $list): string => self::membershipAsString($list),
+                    'setter' => static function (
+                        SignupList $list,
+                        ?string $value,
+                    ): void {
+                        self::membershipFromString(
+                            $list,
+                            $value,
+                        );
+                    },
+                ],
+            )
+            ->add(
+                'membershipPriorityMode',
+                EnumType::class,
+                [
+                    'label' => t('How the membership order is applied'),
+                    'class' => MembershipPriorityMode::class,
+                    'required' => false,
+                    'placeholder' => t('Choose how the tiers are admitted'),
+                ],
+            )
+            ->add(
+                'cohortTierOrder',
+                HiddenType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'getter' => static fn (SignupList $list): string => self::orderAsString(
+                        $list->getCohortTierOrder(),
+                    ),
+                    'setter' => static function (
+                        SignupList $list,
+                        ?string $value,
+                    ): void {
+                        /** @var ?list<list<CohortTier>> $order */
+                        $order = self::orderFromString(
+                            $value,
+                            CohortTier::class,
+                        );
+                        $list->setCohortTierOrder($order);
+                    },
+                ],
+            )
+            ->add(
+                'programTypeOrder',
+                HiddenType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'getter' => static fn (SignupList $list): string => self::orderAsString(
+                        $list->getProgramTypeOrder(),
+                    ),
+                    'setter' => static function (
+                        SignupList $list,
+                        ?string $value,
+                    ): void {
+                        /** @var ?list<list<ProgramType>> $order */
+                        $order = self::orderFromString(
+                            $value,
+                            ProgramType::class,
+                        );
+                        $list->setProgramTypeOrder($order);
+                    },
+                ],
+            )
+            ->add(
+                'organisingCommitteePlaces',
+                IntegerType::class,
+                [
+                    'label' => t('Places held for the organising body'),
                     'required' => false,
                 ],
             )
+            ->add(
+                'roles',
+                CollectionType::class,
+                [
+                    'label' => false,
+                    'entry_type' => SignupRoleType::class,
+                    'entry_options' => ['label' => false],
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'by_reference' => false,
+                    'prototype' => true,
+                    'prototype_name' => '__role__',
+                    'block_prefix' => 'signup_role_collection',
+                ],
+            );
+    }
+
+    /**
+     * @param FormBuilderInterface<?SignupList> $builder
+     */
+    private function addQuestions(FormBuilderInterface $builder): void
+    {
+        $builder
             ->add(
                 'fields',
                 CollectionType::class,
@@ -258,44 +424,31 @@ class SignupListType extends AbstractType
                     'block_prefix' => 'signup_field_collection',
                 ],
             );
-
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->freezeWhenActivityStarted(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->freezeWhenSubscribed(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->freezeWhenDrawn(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->disableOpenDateWhenOpened(...),
-        );
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            $this->disableCloseDateWhenClosed(...),
-        );
-        // After binding, drop any per-method settings that do not apply to the chosen method (or to an unlimited
-        // list), so hidden inputs cannot persist stale config that the cloner would carry into future revisions.
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            $this->clearInapplicableAllocation(...),
-        );
     }
 
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => SignupList::class,
-            // A limited-capacity list must carry a positive capacity; validated at the object level so the rule can
-            // depend on the limitedCapacity flag.
-            'constraints' => [new Callback($this->validateCapacity(...))],
-        ]);
+        $resolver->setDefaults(['data_class' => SignupList::class]);
+
+        $resolver->setRequired('section');
+        $resolver->setAllowedTypes(
+            'section',
+            SignupListSection::class,
+        );
+
+        // Only the section that renders a field may report an error against it: an error whose path names a field
+        // that is not on screen is mapped onto the form itself, which leaves the organiser nothing to correct.
+        $resolver->setDefault(
+            'constraints',
+            function (Options $options): array {
+                if (SignupListSection::Allocation !== $options['section']) {
+                    return [];
+                }
+
+                return [new Callback($this->validateCapacity(...))];
+            },
+        );
     }
 
     public function validateCapacity(
@@ -327,6 +480,241 @@ class SignupListType extends AbstractType
             $list,
             $context,
         );
+        $this->validatePriorityModifiers(
+            $list,
+            $context,
+        );
+    }
+
+    private function validatePriorityModifiers(
+        SignupList $list,
+        ExecutionContextInterface $context,
+    ): void {
+        if ($list->getAllocationMethod()->isManual()) {
+            return;
+        }
+
+        $capacity = $list->getCapacity() ?? 0;
+
+        if (
+            null !== $list->getMembershipTierOrder()
+            && null === $list->getMembershipPriorityMode()
+        ) {
+            $context->buildViolation(t(
+                'Choose how the membership tiers are admitted.',
+                [],
+                'validators',
+            )->getMessage())
+                ->atPath('membershipPriorityMode')
+                ->addViolation();
+        }
+
+        $reserved = 0;
+        if (MembershipPriorityMode::ReservedPlaces === $list->getMembershipPriorityMode()) {
+            foreach ($list->getMembershipPlaces() as $places) {
+                if ($places >= 0) {
+                    $reserved += $places;
+
+                    continue;
+                }
+
+                $context->buildViolation(t(
+                    'Enter zero or more places.',
+                    [],
+                    'validators',
+                )->getMessage())
+                    ->atPath('membershipTierOrder')
+                    ->addViolation();
+            }
+        }
+
+        $committee = $list->getOrganisingCommitteePlaces();
+        if (null !== $committee) {
+            if ($committee < 1) {
+                $context->buildViolation(t(
+                    'Hold at least one place for the organising body, or hold none at all.',
+                    [],
+                    'validators',
+                )->getMessage())
+                    ->atPath('organisingCommitteePlaces')
+                    ->addViolation();
+            } else {
+                $reserved += $committee;
+            }
+        }
+
+        if (
+            $capacity >= 1
+            && $reserved > $capacity
+        ) {
+            $context->buildViolation(t(
+                'More places are held than the list has to give out.',
+                [],
+                'validators',
+            )->getMessage())
+                ->atPath('capacity')
+                ->addViolation();
+        }
+
+        $guaranteed = array_sum(array_map(
+            static fn (SignupRole $role): int => $role->getMinimum(),
+            $list->getRoles()->toArray(),
+        ));
+        if (
+            $capacity < 1
+            || $guaranteed <= $capacity
+        ) {
+            return;
+        }
+
+        $context->buildViolation(t(
+            'The roles together guarantee more places than the list has.',
+            [],
+            'validators',
+        )->getMessage())
+            ->atPath('roles')
+            ->addViolation();
+    }
+
+    /**
+     * The membership order as the control holds it: the ranks in turn, the tiers of a rank joined, and the places
+     * held for a rank written behind it. The places belong to the rank rather than to a tier, because the tiers of a
+     * rank are admitted together and share what is held for them.
+     */
+    private static function membershipAsString(SignupList $list): string
+    {
+        $ranks = [];
+        foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
+            $tiers = self::orderAsString([$rank]);
+            $places = $list->getMembershipPlacesForRank($rank);
+
+            $ranks[] = null === $places
+                ? $tiers
+                : $tiers . ':' . $places;
+        }
+
+        return implode(
+            ',',
+            $ranks,
+        );
+    }
+
+    private static function membershipFromString(
+        SignupList $list,
+        ?string $value,
+    ): void {
+        $order = [];
+        $places = [];
+
+        foreach (
+            explode(
+                ',',
+                $value ?? '',
+            ) as $part
+        ) {
+            [
+                $names, $held
+            ] = array_pad(
+                explode(
+                    ':',
+                    $part,
+                    2,
+                ),
+                2,
+                null,
+            );
+
+            /** @var ?list<list<MembershipTier>> $rank */
+            $rank = self::orderFromString(
+                $names,
+                MembershipTier::class,
+            );
+
+            if (null === $rank) {
+                continue;
+            }
+
+            $order[] = $rank[0];
+
+            if (
+                null === $held
+                || '' === trim($held)
+            ) {
+                continue;
+            }
+
+            $places[SignupList::rankKey($rank[0])] = (int) trim($held);
+        }
+
+        $list->setMembershipTierOrder([] === $order ? null : $order);
+        $list->setHeldMembershipPlaces([] === $places ? null : $places);
+    }
+
+    /**
+     * @param ?list<list<PriorityTierInterface>> $order
+     */
+    private static function orderAsString(?array $order): string
+    {
+        if (null === $order) {
+            return '';
+        }
+
+        return implode(
+            ',',
+            array_map(
+                static fn (array $rank): string => implode(
+                    '+',
+                    array_map(
+                        static fn (PriorityTierInterface $tier): string => strval($tier->value),
+                        $rank,
+                    ),
+                ),
+                $order,
+            ),
+        );
+    }
+
+    /**
+     * @param class-string<PriorityTierInterface> $tier
+     *
+     * @return ?list<list<PriorityTierInterface>>
+     */
+    private static function orderFromString(
+        ?string $value,
+        string $tier,
+    ): ?array {
+        $order = [];
+        foreach (
+            explode(
+                ',',
+                $value ?? '',
+            ) as $rank
+        ) {
+            $tiers = [];
+            foreach (
+                explode(
+                    '+',
+                    $rank,
+                ) as $name
+            ) {
+                $case = $tier::tryFrom(trim($name));
+                if (null === $case) {
+                    continue;
+                }
+
+                $tiers[] = $case;
+            }
+
+            if ([] === $tiers) {
+                continue;
+            }
+
+            $order[] = $tiers;
+        }
+
+        return [] === $order
+            ? null
+            : $order;
     }
 
     /**
@@ -425,6 +813,33 @@ class SignupListType extends AbstractType
         $list = $form->getData();
         $view->vars['frozen'] = $this->hasLiveSignUps($list)
             || $this->activityStarted($list);
+
+        if (SignupListSection::Allocation !== $options['section']) {
+            return;
+        }
+
+        foreach (self::allocationVars($list) as $name => $value) {
+            $view->vars[$name] = $value;
+        }
+    }
+
+    /**
+     * What the allocation section shows for a list, or for the collection prototype, which has no bound list.
+     *
+     * @return array<string, mixed>
+     */
+    private static function allocationVars(?SignupList $list): array
+    {
+        return [
+            'membershipTierOrderTiers' => null === $list
+                ? MembershipTier::defaultRanks()
+                : $list->getMembershipTierOrder() ?? $list->membershipRanks(),
+            'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
+            'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
+            'onlyGEWIS' => $list?->getOnlyGEWIS() ?? true,
+            // The places held for each rank of the membership order, which the control asks for on the rank itself.
+            'membershipPlaces' => $list?->getHeldMembershipPlaces() ?? [],
+        ];
     }
 
     /**
@@ -478,8 +893,8 @@ class SignupListType extends AbstractType
 
     /**
      * Re-add the structural fields and the allocation method (with its per-method settings) as `disabled` for a list
-     * that already has sign-ups, so they render read-only and are ignored on submit. `capacity` stays editable so seats
-     * can still be adjusted; {@see self::freezeWhenDrawn()} locks it too once the draw has run.
+     * that already has sign-ups, so they render read-only and are ignored on submit. `capacity` stays editable so
+     * places can still be adjusted; {@see self::freezeWhenDrawn()} locks it too once the draw has run.
      */
     private function freezeWhenSubscribed(FormEvent $event): void
     {
@@ -491,8 +906,28 @@ class SignupListType extends AbstractType
             return;
         }
 
-        $form = $event->getForm();
-        foreach ([...self::FROZEN_FIELDS, ...self::METHOD_FIELDS] as $name) {
+        $this->disableFields(
+            $event->getForm(),
+            [
+                ...self::FROZEN_FIELDS,
+                ...self::METHOD_FIELDS,
+            ],
+        );
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     * @param list<string>         $names
+     */
+    private function disableFields(
+        FormInterface $form,
+        array $names,
+    ): void {
+        foreach ($names as $name) {
+            if (!$form->has($name)) {
+                continue;
+            }
+
             $this->disableField(
                 $form,
                 $name,
@@ -508,51 +943,7 @@ class SignupListType extends AbstractType
      */
     private function hasLiveSignUps(?SignupList $list): bool
     {
-        return $this->holdsForLiveLineage(
-            $list,
-            static fn (SignupList $candidate): bool => $candidate->hasSignUps(),
-        );
-    }
-
-    /**
-     * The shared lineage walk behind {@see self::hasLiveSignUps()} and {@see self::isLiveDrawn()}: whether a predicate
-     * holds for this list, or (when it is a draft clone whose own state is still empty because sign-ups/draws live
-     * on the live revision until approval) for the live revision's list it descends from (matched by
-     * {@see SignupList::getLineageId()}). The collection prototype has no bound list (`null`), for which this is false.
-     *
-     * @param callable(SignupList): bool $predicate
-     */
-    private function holdsForLiveLineage(
-        ?SignupList $list,
-        callable $predicate,
-    ): bool {
-        if (!$list instanceof SignupList) {
-            return false;
-        }
-
-        if ($predicate($list)) {
-            return true;
-        }
-
-        if (!$list->hasRevision()) {
-            return false;
-        }
-
-        $live = $list->getRevision()->getActivity()->getLiveRevision();
-        if (null === $live) {
-            return false;
-        }
-
-        foreach ($live->getSignupLists() as $liveList) {
-            if (
-                $liveList->getLineageId()->equals($list->getLineageId())
-                && $predicate($liveList)
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return (bool) $list?->hasLineageSignUps();
     }
 
     /**
@@ -569,25 +960,23 @@ class SignupListType extends AbstractType
             return;
         }
 
-        $form = $event->getForm();
-        foreach ([...self::METHOD_FIELDS, 'capacity'] as $name) {
-            $this->disableField(
-                $form,
-                $name,
-            );
-        }
+        $this->disableFields(
+            $event->getForm(),
+            [
+                ...self::METHOD_FIELDS,
+                'capacity',
+            ],
+        );
     }
 
     /**
      * Whether this list, or its live lineage counterpart, has had its draw performed (and locked). Like
-     * {@see self::hasLiveSignUps()} a draft clone carries the lock forward, so the same lineage walk is used.
+     * {@see self::hasLiveSignUps()} a draft clone carries the lock forward.
      */
     private function isLiveDrawn(?SignupList $list): bool
     {
-        return $this->holdsForLiveLineage(
-            $list,
-            static fn (SignupList $candidate): bool => $candidate->isDrawLocked(),
-        );
+        return (bool) $list?->isDrawLocked()
+            || (bool) $list?->liveCounterpart()?->isDrawLocked();
     }
 
     /**
@@ -636,25 +1025,75 @@ class SignupListType extends AbstractType
             $list->setExternalPaymentByExternal(false);
         }
 
-        if (AllocationMethod::Custom === $method) {
-            return;
+        if (AllocationMethod::Custom !== $method) {
+            $list->setCustomMethodDescription(null);
         }
 
-        $list->setCustomMethodDescription(null);
+        $this->clearInapplicablePriority($list);
     }
 
     /**
-     * Re-add `openDate` as `disabled` once a (persisted) sign-up list has opened, so a passed opening date can no
-     * longer be moved; only a newly-set opening date must be in the future. A brand-new list (no id yet) is always
-     * editable.
+     * Drop the priority modifiers a list cannot act on: all of them where admission is not decided here, the held
+     * places where the membership order is not applied by holding them, and the study phase and the cohort on a list
+     * anybody may sign up for.
      */
+    private function clearInapplicablePriority(SignupList $list): void
+    {
+        if (
+            !$list->getLimitedCapacity()
+            || $list->getAllocationMethod()->isManual()
+        ) {
+            $list->setMembershipTierOrder(null);
+            $list->setCohortTierOrder(null);
+            $list->setProgramTypeOrder(null);
+            $list->setOrganisingCommitteePlaces(null);
+
+            foreach ($list->getRoles()->toArray() as $role) {
+                $list->removeRole($role);
+            }
+        }
+
+        if (!$list->getOnlyGEWIS()) {
+            $list->setCohortTierOrder(null);
+            $list->setProgramTypeOrder(null);
+        }
+
+        if (null === $list->getMembershipTierOrder()) {
+            $list->setMembershipPriorityMode(null);
+        }
+
+        if (MembershipPriorityMode::ReservedPlaces !== $list->getMembershipPriorityMode()) {
+            $list->setHeldMembershipPlaces(null);
+
+            return;
+        }
+
+        // A number held for a rank the order no longer has is a guarantee nothing shows, and the cloner would carry
+        // it into every future revision.
+        $held = [];
+        foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
+            $places = $list->getMembershipPlacesForRank($rank);
+            if (null === $places) {
+                continue;
+            }
+
+            $held[SignupList::rankKey($rank)] = $places;
+        }
+
+        $list->setHeldMembershipPlaces([] === $held ? null : $held);
+    }
+
     private function disableOpenDateWhenOpened(FormEvent $event): void
     {
         $list = $event->getData();
+        $live = $list instanceof SignupList
+            ? $list->liveCounterpart()
+            : null;
         if (
-            !$list instanceof SignupList
-            || !$list->hasRevision()
-            || $list->getOpenDate() > new DateTime()
+            null === $live
+            || !$event->getForm()->has('openDate')
+            || null === $live->getOpenDate()
+            || $live->getOpenDate() > new DateTime()
         ) {
             return;
         }
@@ -665,18 +1104,17 @@ class SignupListType extends AbstractType
         );
     }
 
-    /**
-     * Re-add `closeDate` as `disabled` once a (persisted) sign-up list has closed, so a passed closing date can no
-     * longer be moved. While the list is still open or upcoming the closing date stays editable, so it can be
-     * extended; a brand-new list (no id yet) is always editable.
-     */
     private function disableCloseDateWhenClosed(FormEvent $event): void
     {
         $list = $event->getData();
+        $live = $list instanceof SignupList
+            ? $list->liveCounterpart()
+            : null;
         if (
-            !$list instanceof SignupList
-            || !$list->hasRevision()
-            || $list->getCloseDate() > new DateTime()
+            null === $live
+            || !$event->getForm()->has('closeDate')
+            || null === $live->getCloseDate()
+            || $live->getCloseDate() > new DateTime()
         ) {
             return;
         }

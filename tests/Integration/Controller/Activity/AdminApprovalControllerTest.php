@@ -6,20 +6,27 @@ namespace App\Tests\Integration\Controller\Activity;
 
 use App\Controller\Activity\AdminApprovalController;
 use App\Entity\Activity\Activity;
+use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityRevision;
+use App\Entity\Activity\ActivityRevisionEdit;
+use App\Entity\Activity\SignupList;
 use App\Entity\Application\EditLock;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\User\User;
 use App\Repository\Application\EditLockRepository;
+use App\Security\User\SudoMode;
 use App\Service\Activity\ActivityRevisionCloner;
 use App\Service\Application\EditLockService;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTime;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use function str_contains;
 
 /**
  * The review controller is thin glue over already-tested pieces (the workflow, {@see RevisionDiscarder},
@@ -120,6 +127,146 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         $this->controller()->discard($draft);
     }
 
+    public function testDiscardTakesTheEditTrailWithIt(): void
+    {
+        $activity = $this->anApprovedActivityWithoutSignupLists();
+        $live = $activity->getLiveRevision();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $live,
+        );
+
+        $draft = $this->cloner()->cloneAsDraft($live);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $draft,
+        );
+        $this->entityManager->persist($draft);
+
+        $draft->setLastEditedBy($this->user(8025));
+        $list = new SignupList();
+        $list->setName(new ActivityLocalisedText(
+            'Deelnemers',
+            'Participants',
+        ));
+        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
+        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+        $draft->addSignupList($list);
+
+        $edit = new ActivityRevisionEdit();
+        $edit->setRevision($draft);
+        $edit->setEditor($this->user(8025));
+        $edit->setEditedAt(new DateTime());
+        $edit->setChangedFields(['name']);
+        $this->entityManager->persist($edit);
+        $this->entityManager->flush();
+
+        $draftId = (int) $draft->getId();
+        $this->entityManager->clear();
+        $draft = $this->entityManager->getRepository(ActivityRevision::class)->find($draftId);
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $draft,
+        );
+
+        $this->authenticate(['ROLE_BOARD']);
+        $this->pushRequestWithSession();
+
+        $this->controller()->discard($draft);
+
+        self::assertNull(
+            $this->entityManager->getRepository(ActivityRevision::class)->find($draftId),
+        );
+        self::assertSame(
+            [],
+            $this->entityManager->createQueryBuilder()
+                ->select('e')
+                ->from(
+                    ActivityRevisionEdit::class,
+                    'e',
+                )
+                ->where('IDENTITY(e.revision) = :revision')
+                ->setParameter(
+                    'revision',
+                    $draftId,
+                )
+                ->getQuery()
+                ->getResult(),
+        );
+    }
+
+    public function testTheReviewScreenSaysWhichListWasLeftUnfinished(): void
+    {
+        $draft = $this->aNeverApprovedDraft();
+        $list = new SignupList();
+        $list->setName(new ActivityLocalisedText());
+        $draft->addSignupList($list);
+
+        $this->authenticateAsBoardWithSudo();
+
+        $html = (string) $this->controller()->review($draft)->getContent();
+
+        self::assertStringContainsString(
+            'Sign-up list 1',
+            $html,
+        );
+        self::assertStringContainsString(
+            'cannot be submitted or approved yet',
+            $html,
+        );
+    }
+
+    public function testTheReviewScreenReadsNoLocalisedTextOnItsOwn(): void
+    {
+        $revision = $this->aRevisionWithSignupLists();
+
+        $this->authenticateAsBoardWithSudo();
+        $holder = self::getContainer()->get('doctrine.debug_data_holder');
+        $holder->reset();
+
+        $this->controller()->review($revision);
+
+        $texts = 0;
+        foreach ($holder->getData() as $queries) {
+            foreach ($queries as $query) {
+                if (
+                    !str_contains(
+                        $query['sql'],
+                        'FROM ActivityLocalisedText',
+                    )
+                ) {
+                    continue;
+                }
+
+                ++$texts;
+            }
+        }
+
+        self::assertSame(
+            0,
+            $texts,
+        );
+    }
+
+    private function authenticateAsBoardWithSudo(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+
+        $session = $this->pushRequestWithSession();
+        $request = self::getContainer()->get('request_stack')->getCurrentRequest();
+        self::assertInstanceOf(
+            Request::class,
+            $request,
+        );
+        // A sudo grant is only read back off a session the request already carried, so the cookie has to be there.
+        $request->cookies->set(
+            $session->getName(),
+            'test',
+        );
+
+        self::getContainer()->get(SudoMode::class)->grant();
+    }
+
     private function controller(): AdminApprovalController
     {
         return self::getContainer()->get(AdminApprovalController::class);
@@ -207,6 +354,31 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         );
 
         return $activity;
+    }
+
+    private function aRevisionWithSignupLists(): ActivityRevision
+    {
+        $revision = $this->entityManager->createQueryBuilder()
+            ->select('r')
+            ->from(
+                ActivityRevision::class,
+                'r',
+            )
+            ->where('SIZE(r.signupLists) > 0')
+            ->orderBy(
+                'SIZE(r.signupLists)',
+                'DESC',
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $revision,
+            'The seed is expected to contain a revision with sign-up lists.',
+        );
+
+        return $revision;
     }
 
     private function aNeverApprovedDraft(): ActivityRevision

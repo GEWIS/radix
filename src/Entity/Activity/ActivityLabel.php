@@ -54,6 +54,7 @@ class ActivityLabel
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(

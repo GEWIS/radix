@@ -1,0 +1,38 @@
+// A list's steps on the inventory: a small link per step, with a dot that fills once the step is filled in.
+.signup-list-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--#{$prefix}secondary-color);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+        color: $gewis-red;
+        text-decoration: none;
+    }
+
+    &::before {
+        content: '';
+        inline-size: 0.55rem;
+        block-size: 0.55rem;
+        border: 1px solid currentcolor;
+        border-radius: 50%;
+    }
+
+    &.is-done::before {
+        border-color: #{$nav-pills-badge-done-bg};
+        background-color: #{$nav-pills-badge-done-bg};
+    }
+}
+
+@include color-mode(gewis-night) {
+    .signup-list-step.is-done::before {
+        border-color: #{$nav-pills-badge-done-bg-dark};
+        background-color: #{$nav-pills-badge-done-bg-dark};
+    }
+}

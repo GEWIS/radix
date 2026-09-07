@@ -41,6 +41,7 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
 
         return [
             new RevisionSection(
+                'page',
                 t('Page'),
                 [
                     $this->localisedField(
@@ -59,6 +60,7 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'contact',
                 t('Contact details'),
                 [
                     $this->field(
@@ -80,6 +82,7 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
             new RevisionSection(
+                'social',
                 t('Social media'),
                 $this->socialFields(
                     $previous?->getSocialLinks(),
@@ -88,6 +91,7 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                 ),
             ),
             new RevisionSection(
+                'images',
                 t('Images'),
                 [
                     $this->field(

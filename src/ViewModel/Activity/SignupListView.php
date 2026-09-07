@@ -9,6 +9,7 @@ use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\Languages;
+use App\Util\Activity\SignupTiers;
 use DateTime;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -22,21 +23,25 @@ use function count;
 final readonly class SignupListView
 {
     /**
-     * @param ?DateTime   $drawAt     the announced moment of the upcoming lottery draw; only set for a conditional
-     *                                draw that has not been performed yet (first-come-first-served needs no
-     *                                member-facing announcement)
-     * @param string[]    $fieldNames column headers (localised), one per sign-up field
-     * @param SignupRow[] $rows       populated only when $canViewDetails
+     * @param ?DateTime   $drawAt      the announced moment of the upcoming lottery draw; only set for a conditional
+     *                                 draw that has not been performed yet. On a list drawn by hand it is the moment
+     *                                 that decides who is in the draw rather than the moment places are handed out
+     * @param bool        $drawnByHand whether that draw is made by hand after sign-up closes
+     * @param string[]    $fieldNames  column headers (localised), one per sign-up field
+     * @param SignupRow[] $rows        populated only when $canViewDetails
+     * @param string[]    $priority    the orders this list serves its places in, best first, one sentence each; these
+     *                                 are part of the deal somebody signs up under, so they are said before they do
      */
     public function __construct(
         public int $listId,
         public int $activityId,
         public string $name,
-        public DateTime $openDate,
-        public DateTime $closeDate,
+        public ?DateTime $openDate,
+        public ?DateTime $closeDate,
         public bool $limitedCapacity,
         public ?int $capacity,
         public ?DateTime $drawAt,
+        public bool $drawnByHand,
         public bool $onlyGEWIS,
         public bool $displaySubscribedNumber,
         public bool $promoted,
@@ -49,6 +54,7 @@ final readonly class SignupListView
         public bool $hasSensitiveField,
         public array $fieldNames,
         public array $rows,
+        public array $priority = [],
     ) {
     }
 
@@ -69,7 +75,7 @@ final readonly class SignupListView
         // Hide externals that have not confirmed their email yet from both the count and the rows. A confirmed sign-up
         // is exactly one whose verification moment is set (manually-added externals have it set immediately).
         $visibleSignups = [];
-        foreach ($signupList->getSignUps() as $signup) {
+        foreach ($signupList->getSignUpsInAdmissionOrder() as $signup) {
             if (
                 $signup instanceof ExternalSignup
                 && null === $signup->getVerifiedAt()
@@ -137,6 +143,7 @@ final readonly class SignupListView
                 && !$signupList->isDrawLocked()
                     ? $signupList->getAutoDrawAt()
                     : null,
+            drawnByHand: $signupList->isDrawnByHand(),
             onlyGEWIS: $signupList->getOnlyGEWIS(),
             displaySubscribedNumber: $signupList->getDisplaySubscribedNumber(),
             promoted: $signupList->isPromoted(),
@@ -149,6 +156,10 @@ final readonly class SignupListView
             hasSensitiveField: $signupList->hasSensitiveField(),
             fieldNames: $fieldNames,
             rows: $rows,
+            priority: SignupTiers::orderTexts(
+                $signupList,
+                $translator,
+            ),
         );
     }
 }

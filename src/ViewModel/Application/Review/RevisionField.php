@@ -7,6 +7,9 @@ namespace App\ViewModel\Application\Review;
 use App\Entity\Application\Enums\Languages;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+use function count;
+use function reset;
+
 /**
  * One thing a revision says about itself: what it is called, how it should be read, and what it holds now against what
  * it held before.
@@ -31,6 +34,26 @@ final readonly class RevisionField
         public RevisionAudience $audience = RevisionAudience::Everyone,
         public ?TranslatableInterface $emptyLabel = null,
     ) {
+    }
+
+    public function changeKind(): RevisionChangeKind
+    {
+        $kinds = [];
+        foreach ($this->values as $value) {
+            $kind = $value->changeKind($this->comparable);
+
+            if (RevisionChangeKind::Same === $kind) {
+                continue;
+            }
+
+            $kinds[$kind->value] = $kind;
+        }
+
+        return match (count($kinds)) {
+            0 => RevisionChangeKind::Same,
+            1 => reset($kinds),
+            default => RevisionChangeKind::Changed,
+        };
     }
 
     /**

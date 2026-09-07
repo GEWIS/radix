@@ -74,6 +74,7 @@ class SignupField
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(

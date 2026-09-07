@@ -7,6 +7,7 @@ namespace App\Entity\Activity;
 use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\Application\AbstractRevision;
 use App\Entity\Application\AbstractRevisionComment;
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\RevisableInterface;
 use App\Entity\Career\Company as CompanyModel;
 use App\Entity\Decision\Organ as OrganModel;
@@ -26,6 +27,8 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
+
+use function trim;
 
 /**
  * An immutable snapshot of an {@see Activity}'s revisable content for one point in its revision chain.
@@ -61,6 +64,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -76,6 +80,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -91,6 +96,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -106,6 +112,7 @@ class ActivityRevision extends AbstractRevision
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -247,6 +254,21 @@ class ActivityRevision extends AbstractRevision
         return $this->signupLists;
     }
 
+    /**
+     * The lists by the lineage they carry, which is how a list is told apart across revisions.
+     *
+     * @return array<string, SignupList>
+     */
+    public function getSignupListsByLineage(): array
+    {
+        $byLineage = [];
+        foreach ($this->signupLists as $list) {
+            $byLineage[$list->getLineageId()->toRfc4122()] = $list;
+        }
+
+        return $byLineage;
+    }
+
     public function addSignupList(SignupList $signupList): void
     {
         if ($this->signupLists->contains($signupList)) {
@@ -287,6 +309,49 @@ class ActivityRevision extends AbstractRevision
     public function detachPreviousRevision(): void
     {
         $this->previousRevision = null;
+    }
+
+    /**
+     * The languages this revision is written in, read off its texts: Dutch when any of them says something in Dutch,
+     * English when any says something in English or none says anything in Dutch, so a revision with nothing in it
+     * yet is written in English.
+     *
+     * @return list<Languages>
+     */
+    public function languages(): array
+    {
+        $dutch = $this->saysSomethingIn(Languages::Dutch);
+        $english = $this->saysSomethingIn(Languages::English) || !$dutch;
+
+        $languages = [];
+
+        if ($dutch) {
+            $languages[] = Languages::Dutch;
+        }
+
+        if ($english) {
+            $languages[] = Languages::English;
+        }
+
+        return $languages;
+    }
+
+    private function saysSomethingIn(Languages $language): bool
+    {
+        foreach (
+            [
+                $this->name,
+                $this->location,
+                $this->costs,
+                $this->description,
+            ] as $text
+        ) {
+            if ('' !== trim($text->getExactText($language) ?? '')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getName(): ActivityLocalisedText

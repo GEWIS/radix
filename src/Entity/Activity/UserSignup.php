@@ -64,4 +64,10 @@ class UserSignup extends Signup
     {
         return $this->getUser()->getEmail();
     }
+
+    #[Override]
+    public function personKey(): string
+    {
+        return 'member:' . $this->getUser()->getLidnr();
+    }
 }

@@ -39,6 +39,7 @@ use function intval;
  *     signupList_id: ?int,
  *     fieldValues: ImportedSignupFieldValueGdprArrayType[],
  *     present: bool,
+ *     role: ?string,
  * }
  */
 #[Entity(repositoryClass: SignupRepository::class)]
@@ -120,6 +121,26 @@ abstract class Signup
      */
     #[Column(type: Types::BOOLEAN)]
     private bool $drawn = false;
+
+    /**
+     * Where the draw ranked this sign-up, admitted or not, so the waiting list keeps the order the draw gave it: who
+     * moves up when somebody drops out is a question about that moment, and re-deriving it later would answer it
+     * against a pool that has since changed. Null until a draw has run, and on a list that never has one.
+     */
+    #[Column(
+        type: Types::INTEGER,
+        nullable: true,
+    )]
+    private ?int $drawPosition = null;
+
+    #[ManyToOne(targetEntity: SignupRole::class)]
+    #[JoinColumn(
+        name: 'role_id',
+        referencedColumnName: 'id',
+        nullable: true,
+        onDelete: 'SET NULL',
+    )]
+    private ?SignupRole $role = null;
 
     public function __construct()
     {
@@ -206,6 +227,26 @@ abstract class Signup
         $this->drawn = $drawn;
     }
 
+    public function getDrawPosition(): ?int
+    {
+        return $this->drawPosition;
+    }
+
+    public function setDrawPosition(?int $position): void
+    {
+        $this->drawPosition = $position;
+    }
+
+    public function getRole(): ?SignupRole
+    {
+        return $this->role;
+    }
+
+    public function setRole(?SignupRole $role): void
+    {
+        $this->role = $role;
+    }
+
     /**
      * Get the full name of the user whom signed up for the SignupList.
      */
@@ -215,6 +256,12 @@ abstract class Signup
      * Get the email address of the user whom signed up for the SignupList.
      */
     abstract public function getEmail(): ?string;
+
+    /**
+     * Who this sign-up is, the same across every list they are in: a member by their number, an external by the
+     * address they typed, so one person's sign-ups on one activity can be read side by side.
+     */
+    abstract public function personKey(): string;
 
     /**
      * @return SignupGdprArrayType
@@ -234,6 +281,7 @@ abstract class Signup
             'activity_id' => $this->getSignupList()->getActivity()->getId(),
             'signupList_id' => $this->getSignupList()->getId(),
             'present' => $this->isPresent(),
+            'role' => $this->getRole()?->getName(),
             'fieldValues' => $fieldValues,
         ];
     }

@@ -411,6 +411,46 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         );
     }
 
+    public function testLeavesAListThatGuaranteesARole(): void
+    {
+        $list = $this->listWithARole();
+
+        self::assertTrue($list->isClosed());
+        self::assertTrue($list->isAutoDrawDue());
+
+        $this->executeCommand();
+
+        $this->entityManager->clear();
+        self::assertNull($this->list((int) $list->getId())->getDrawnAt());
+    }
+
+    private function listWithARole(): SignupList
+    {
+        $list = $this->entityManager->createQueryBuilder()
+            ->select('sl')
+            ->from(
+                SignupList::class,
+                'sl',
+            )
+            ->where('SIZE(sl.roles) > 0')
+            ->andWhere('sl.closeDate < :now')
+            ->andWhere('sl.drawnAt IS NULL')
+            ->setParameter(
+                'now',
+                new DateTime(),
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+        self::assertInstanceOf(
+            SignupList::class,
+            $list,
+            'The seed is expected to contain a sign-up list that guarantees a role.',
+        );
+
+        return $list;
+    }
+
     private function executeCommand(): void
     {
         $this->assertCommandIsSuccessful(static::runCommand('app:activity:run-due-draws'));

@@ -13,26 +13,28 @@ use App\ViewModel\Application\Review\RevisionDateRange;
 use App\ViewModel\Application\Review\RevisionField;
 use App\ViewModel\Application\Review\RevisionFieldKind;
 use App\ViewModel\Application\Review\RevisionFieldValue;
-use App\ViewModel\Application\Review\RevisionFlag;
-use App\ViewModel\Application\Review\RevisionTag;
+use DateTimeInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * The two shapes every describer needs: a field written once per language, and one written once. Kept together so a
  * describer reads as the list of fields it is.
+ *
+ * @phpstan-import-type RevisionValueSet from RevisionFieldValue
  */
 trait BuildsRevisionFieldsTrait
 {
     /**
-     * A field the author fills in per language, laid out in the language columns.
+     * A field the author fills in per language, laid out in the language columns. A null `new` is the thing the
+     * field belongs to having been taken away, not the author having emptied it.
      *
      * @param array<string, string> $options
      */
     protected function localisedField(
         TranslatableInterface $label,
         ?LocalisedText $old,
-        LocalisedText $new,
+        ?LocalisedText $new,
         bool $comparable,
         RevisionFieldKind $kind = RevisionFieldKind::Text,
         array $options = [],
@@ -43,7 +45,7 @@ trait BuildsRevisionFieldsTrait
         foreach ([Languages::Dutch, Languages::English] as $language) {
             $values[] = new RevisionFieldValue(
                 $old?->getExactText($language),
-                $new->getExactText($language),
+                $new?->getExactText($language),
                 $language,
             );
         }
@@ -119,15 +121,15 @@ trait BuildsRevisionFieldsTrait
     /**
      * A field the revision holds once, laid out in a row of its own.
      *
-     * @param string|bool|TranslatableInterface|RevisionDateRange|list<RevisionTag>|list<RevisionFlag>|null $old
-     * @param string|bool|TranslatableInterface|RevisionDateRange|list<RevisionTag>|list<RevisionFlag>|null $new
-     * @param array<string, string>                                                                         $options
+     * @param string|bool|TranslatableInterface|RevisionDateRange|DateTimeInterface|RevisionValueSet|null $old
+     * @param string|bool|TranslatableInterface|RevisionDateRange|DateTimeInterface|RevisionValueSet|null $new
+     * @param array<string, string>                                                                       $options
      */
     protected function field(
         TranslatableInterface $label,
         RevisionFieldKind $kind,
-        string|bool|TranslatableInterface|RevisionDateRange|array|null $old,
-        string|bool|TranslatableInterface|RevisionDateRange|array|null $new,
+        string|bool|TranslatableInterface|RevisionDateRange|DateTimeInterface|array|null $old,
+        string|bool|TranslatableInterface|RevisionDateRange|DateTimeInterface|array|null $new,
         bool $comparable,
         array $options = [],
         RevisionAudience $audience = RevisionAudience::Everyone,

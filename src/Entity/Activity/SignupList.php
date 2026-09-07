@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace App\Entity\Activity;
 
 use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
+use App\Entity\Activity\Enums\MembershipPriorityMode;
+use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Application\LocalisedText as LocalisedTextModel;
+use App\Entity\Application\PriorityTierInterface;
 use App\Entity\Application\Traits\IdentifiableTrait;
+use App\Entity\Database\Enums\ProgramType;
 use App\Entity\Decision\Member as MemberModel;
 use App\Repository\Activity\SignupListRepository;
 use DateTime;
@@ -27,7 +32,17 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
+use function array_filter;
+use function array_map;
+use function array_values;
+use function implode;
+use function in_array;
+use function is_array;
 use function sprintf;
+use function strval;
+use function usort;
+
+use const PHP_INT_MAX;
 
 /**
  * SignupList model.
@@ -37,8 +52,8 @@ use function sprintf;
  *     id: ?int,
  *     name: ?string,
  *     nameEn: ?string,
- *     openDate: DateTime,
- *     closeDate: DateTime,
+ *     openDate: ?DateTime,
+ *     closeDate: ?DateTime,
  *     onlyGEWIS: bool,
  *     displaySubscribedNumber: bool,
  *     limitedCapacity: bool,
@@ -51,6 +66,13 @@ use function sprintf;
  *     externalForceOrdering: bool,
  *     externalPaymentByExternal: bool,
  *     customMethodDescription: ?string,
+ *     membershipTierOrder: ?list<list<string>>,
+ *     membershipPriorityMode: ?string,
+ *     membershipPlaces: ?array<string, int>,
+ *     cohortTierOrder: ?list<list<string>>,
+ *     programTypeOrder: ?list<list<string>>,
+ *     organisingCommitteePlaces: ?int,
+ *     roles: array<array-key, array{name: string, minimum: int}>,
  *     fields: ImportedSignupFieldArrayType[],
  *     presenceTaken: bool,
  *     promoted: bool,
@@ -60,8 +82,8 @@ use function sprintf;
  * @phpstan-type SignupListGdprArrayType = array{
  *     id: ?int,
  *     name: ImportedLocalisedTextGdprArrayType,
- *     openDate: string,
- *     closeDate: string,
+ *     openDate: ?string,
+ *     closeDate: ?string,
  *     onlyGEWIS: bool,
  *     displaySubscribedNumber: bool,
  *     limitedCapacity: bool,
@@ -74,6 +96,13 @@ use function sprintf;
  *     externalForceOrdering: bool,
  *     externalPaymentByExternal: bool,
  *     customMethodDescription: ?string,
+ *     membershipTierOrder: ?list<list<string>>,
+ *     membershipPriorityMode: ?string,
+ *     membershipPlaces: ?array<string, int>,
+ *     cohortTierOrder: ?list<list<string>>,
+ *     programTypeOrder: ?list<list<string>>,
+ *     organisingCommitteePlaces: ?int,
+ *     roles: array<array-key, array{name: string, minimum: int}>,
  *     fields: ImportedSignupFieldGdprArrayType[],
  *     presenceTaken: bool,
  *     promoted: bool
@@ -123,6 +152,7 @@ class SignupList
             'persist',
             'remove',
         ],
+        fetch: 'EAGER',
         orphanRemoval: true,
     )]
     #[JoinColumn(
@@ -132,17 +162,17 @@ class SignupList
     )]
     private ActivityLocalisedText $name;
 
-    /**
-     * The date and time the SignupList is open for signups.
-     */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $openDate;
+    #[Column(
+        type: Types::DATETIME_MUTABLE,
+        nullable: true,
+    )]
+    private ?DateTime $openDate = null;
 
-    /**
-     * The date and time after which the SignupList is no longer open.
-     */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $closeDate;
+    #[Column(
+        type: Types::DATETIME_MUTABLE,
+        nullable: true,
+    )]
+    private ?DateTime $closeDate = null;
 
     /**
      * When subscribers were told this was about to close, so they are told once rather than every time the reminder
@@ -273,6 +303,63 @@ class SignupList
     )]
     private ?string $customMethodDescription = null;
 
+    /** @var ?list<list<string>> */
+    #[Column(
+        type: Types::JSON,
+        nullable: true,
+    )]
+    private ?array $membershipTierOrder = null;
+
+    #[Column(
+        type: Types::STRING,
+        nullable: true,
+        enumType: MembershipPriorityMode::class,
+    )]
+    private ?MembershipPriorityMode $membershipPriorityMode = null;
+
+    /** @var ?array<string, int> */
+    #[Column(
+        type: Types::JSON,
+        nullable: true,
+    )]
+    private ?array $membershipPlaces = null;
+
+    /** @var ?list<list<string>> */
+    #[Column(
+        type: Types::JSON,
+        nullable: true,
+    )]
+    private ?array $cohortTierOrder = null;
+
+    /** @var ?list<list<string>> */
+    #[Column(
+        type: Types::JSON,
+        nullable: true,
+    )]
+    private ?array $programTypeOrder = null;
+
+    #[Column(
+        type: Types::INTEGER,
+        nullable: true,
+    )]
+    private ?int $organisingCommitteePlaces = null;
+
+    /** @var Collection<array-key, SignupRole> */
+    #[OneToMany(
+        mappedBy: 'signupList',
+        targetEntity: SignupRole::class,
+        cascade: [
+            'persist',
+            'remove',
+        ],
+        orphanRemoval: true,
+    )]
+    #[OrderBy([
+        'position' => 'ASC',
+        'id' => 'ASC',
+    ])]
+    private Collection $roles;
+
     /**
      * All additional fields belonging to the activity.
      *
@@ -302,6 +389,7 @@ class SignupList
         mappedBy: 'signupList',
         targetEntity: Signup::class,
         orphanRemoval: true,
+        fetch: 'EXTRA_LAZY',
     )]
     #[OrderBy(value: ['id' => 'ASC'])]
     private Collection $signUps;
@@ -322,11 +410,10 @@ class SignupList
     {
         $this->signUps = new ArrayCollection();
         $this->fields = new ArrayCollection();
+        $this->roles = new ArrayCollection();
         // Initialise the required scalars/relations so a freshly-formed (not-yet-hydrated) list is form-ready;
         // Doctrine bypasses the constructor when hydrating, so existing rows keep their persisted values.
         $this->name = new ActivityLocalisedText();
-        $this->openDate = new DateTime();
-        $this->closeDate = new DateTime();
         // A brand-new list starts its own lineage; the cloner copies this id onto each clone.
         $this->lineageId = Uuid::v4();
     }
@@ -356,11 +443,74 @@ class SignupList
     }
 
     /**
+     * A draft clone's own sign-ups stay on the live revision until approval migrates them, so anything that must not
+     * disturb people who have already committed looks through the lineage rather than at this copy.
+     */
+    public function hasLineageSignUps(): bool
+    {
+        return $this->hasSignUps()
+            || (bool) $this->liveCounterpart()?->hasSignUps();
+    }
+
+    /**
+     * The live revision's list this one descends from (matched by lineage), or null when there is none. A draft's
+     * own sign-ups and draw state stay empty until approval, so anything about people or windows already shown to
+     * members is answered by the counterpart.
+     */
+    public function liveCounterpart(): ?SignupList
+    {
+        if (!$this->hasRevision()) {
+            return null;
+        }
+
+        $live = $this->revision->getActivity()->getLiveRevision();
+        if (null === $live) {
+            return null;
+        }
+
+        foreach ($live->getSignupLists() as $liveList) {
+            if ($liveList->getLineageId()->equals($this->lineageId)) {
+                return $liveList;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return Collection<array-key, Signup>
      */
     public function getSignUps(): Collection
     {
         return $this->signUps;
+    }
+
+    /**
+     * The sign-ups in the order the draw left them, admitted first and the waiting list behind them in the order it
+     * was ranked in. Sign-up order until a draw has run, and on a list that never has one.
+     *
+     * @return list<Signup>
+     */
+    public function getSignUpsInAdmissionOrder(): array
+    {
+        $signUps = $this->signUps->getValues();
+
+        if (!$this->isDrawLocked()) {
+            return $signUps;
+        }
+
+        usort(
+            $signUps,
+            static fn (Signup $a, Signup $b): int => [
+                $a->getDrawPosition() ?? PHP_INT_MAX,
+                $a->getId() ?? 0,
+            ] <=> [
+                $b->getDrawPosition() ?? PHP_INT_MAX,
+                $b->getId() ?? 0,
+            ],
+        );
+
+        return $signUps;
     }
 
     /**
@@ -415,7 +565,7 @@ class SignupList
     /**
      * Returns the opening DateTime of this SignupList.
      */
-    public function getOpenDate(): DateTime
+    public function getOpenDate(): ?DateTime
     {
         return $this->openDate;
     }
@@ -423,7 +573,7 @@ class SignupList
     /**
      * Sets the opening DateTime of this SignupList.
      */
-    public function setOpenDate(DateTime $openDate): void
+    public function setOpenDate(?DateTime $openDate): void
     {
         $this->openDate = $openDate;
     }
@@ -441,7 +591,7 @@ class SignupList
         $this->remindedAt = $remindedAt;
     }
 
-    public function getCloseDate(): DateTime
+    public function getCloseDate(): ?DateTime
     {
         return $this->closeDate;
     }
@@ -449,7 +599,7 @@ class SignupList
     /**
      * Sets the closing DateTime of this SignupList.
      */
-    public function setCloseDate(DateTime $closeDate): void
+    public function setCloseDate(?DateTime $closeDate): void
     {
         $this->closeDate = $closeDate;
     }
@@ -462,9 +612,16 @@ class SignupList
      */
     public function isOpen(): bool
     {
+        if (
+            null === $this->openDate
+            || null === $this->closeDate
+        ) {
+            return false;
+        }
+
         $now = new DateTime('now');
 
-        return $now >= $this->getOpenDate() && $now < $this->getCloseDate();
+        return $now >= $this->openDate && $now < $this->closeDate;
     }
 
     /**
@@ -474,7 +631,8 @@ class SignupList
      */
     public function isClosed(): bool
     {
-        return new DateTime('now') >= $this->getCloseDate();
+        return null !== $this->closeDate
+            && new DateTime('now') >= $this->closeDate;
     }
 
     /**
@@ -562,6 +720,15 @@ class SignupList
     }
 
     /**
+     * A role is handed out once sign-up has closed, so a draw at the list's own moment would run before anybody held
+     * one and would make up no shortfall at all. That moment still fixes who is in the draw, only the running waits.
+     */
+    public function isDrawnByHand(): bool
+    {
+        return !$this->roles->isEmpty();
+    }
+
+    /**
      * The moment the automated draw is due for this list, or `null` when it is never drawn automatically.
      *
      * Lists with unlimited capacity, manual allocation methods, or a conditional draw without a cutoff rule (only for
@@ -586,11 +753,12 @@ class SignupList
             DrawCutoffRule::OnClose => $this->closeDate,
             DrawCutoffRule::IfFullBefore => $this->drawCutoffAt,
             DrawCutoffRule::AfterDurationOpen => null === $this->drawAfterDurationHours
-                ? null
-                : (clone $this->openDate)->modify(sprintf(
-                    '+%d hours',
-                    $this->drawAfterDurationHours,
-                )),
+                || null === $this->openDate
+                    ? null
+                    : (clone $this->openDate)->modify(sprintf(
+                        '+%d hours',
+                        $this->drawAfterDurationHours,
+                    )),
             null => null,
         };
     }
@@ -697,6 +865,371 @@ class SignupList
     }
 
     /**
+     * @return ?list<list<MembershipTier>>
+     */
+    public function getMembershipTierOrder(): ?array
+    {
+        $order = self::tierOrder(
+            $this->membershipTierOrder,
+            MembershipTier::class,
+        );
+
+        if (null === $order) {
+            return null;
+        }
+
+        $tiers = $this->membershipTiers();
+        $ranks = [];
+        foreach ($order as $rank) {
+            $rank = array_values(array_filter(
+                $rank,
+                static fn (MembershipTier $tier): bool => in_array(
+                    $tier,
+                    $tiers,
+                    true,
+                ),
+            ));
+
+            if ([] === $rank) {
+                continue;
+            }
+
+            $ranks[] = $rank;
+        }
+
+        return $ranks;
+    }
+
+    /**
+     * The order a list starts from before anybody arranges it: the association's own, with the tiers admitted
+     * together on one rank, less the rank a members-only list has nobody for.
+     *
+     * @return list<list<MembershipTier>>
+     */
+    public function membershipRanks(): array
+    {
+        $tiers = $this->membershipTiers();
+        $ranks = [];
+        foreach (MembershipTier::defaultRanks() as $rank) {
+            $rank = array_values(array_filter(
+                $rank,
+                static fn (MembershipTier $tier): bool => in_array(
+                    $tier,
+                    $tiers,
+                    true,
+                ),
+            ));
+
+            if ([] === $rank) {
+                continue;
+            }
+
+            $ranks[] = $rank;
+        }
+
+        return $ranks;
+    }
+
+    /**
+     * @return list<MembershipTier>
+     */
+    public function membershipTiers(): array
+    {
+        $tiers = MembershipTier::defaultOrder();
+
+        if (!$this->onlyGEWIS) {
+            return $tiers;
+        }
+
+        return array_values(array_filter(
+            $tiers,
+            static fn (MembershipTier $tier): bool => MembershipTier::NonMember !== $tier,
+        ));
+    }
+
+    /**
+     * @param ?list<list<MembershipTier>> $order
+     */
+    public function setMembershipTierOrder(?array $order): void
+    {
+        $this->membershipTierOrder = self::tierValues($order);
+    }
+
+    public function getMembershipPriorityMode(): ?MembershipPriorityMode
+    {
+        return $this->membershipPriorityMode;
+    }
+
+    public function setMembershipPriorityMode(?MembershipPriorityMode $mode): void
+    {
+        $this->membershipPriorityMode = $mode;
+    }
+
+    /**
+     * The places held for one rank of the membership order. Tiers admitted together share the places held for them:
+     * the rank is the pool, not the tier.
+     *
+     * @param list<MembershipTier> $rank
+     */
+    public function getMembershipPlacesForRank(array $rank): ?int
+    {
+        return $this->membershipPlaces[self::rankKey($rank)] ?? null;
+    }
+
+    /**
+     * The tiers of a rank as the places held for it are keyed, in the association's own order so that dragging two
+     * tiers past one another within a rank does not lose the number held for them.
+     *
+     * @param list<MembershipTier> $rank
+     */
+    public static function rankKey(array $rank): string
+    {
+        $tiers = [];
+        foreach (MembershipTier::defaultOrder() as $tier) {
+            if (
+                !in_array(
+                    $tier,
+                    $rank,
+                    true,
+                )
+            ) {
+                continue;
+            }
+
+            $tiers[] = $tier->value;
+        }
+
+        return implode(
+            '+',
+            $tiers,
+        );
+    }
+
+    /**
+     * @return ?array<string, int>
+     */
+    public function getHeldMembershipPlaces(): ?array
+    {
+        return $this->membershipPlaces;
+    }
+
+    /**
+     * @param ?array<string, int> $places
+     */
+    public function setHeldMembershipPlaces(?array $places): void
+    {
+        $this->membershipPlaces = [] === $places
+            ? null
+            : $places;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function getMembershipPlaces(): array
+    {
+        if (MembershipPriorityMode::ReservedPlaces !== $this->membershipPriorityMode) {
+            return [];
+        }
+
+        $places = [];
+        foreach ($this->getMembershipTierOrder() ?? [] as $rank) {
+            $key = self::rankKey($rank);
+            $places[$key] = $this->membershipPlaces[$key] ?? 0;
+        }
+
+        return $places;
+    }
+
+    /**
+     * @return ?list<list<CohortTier>>
+     */
+    public function getCohortTierOrder(): ?array
+    {
+        if (!$this->onlyGEWIS) {
+            return null;
+        }
+
+        return self::tierOrder(
+            $this->cohortTierOrder,
+            CohortTier::class,
+        );
+    }
+
+    /**
+     * @param ?list<list<CohortTier>> $order
+     */
+    public function setCohortTierOrder(?array $order): void
+    {
+        $this->cohortTierOrder = self::tierValues($order);
+    }
+
+    /**
+     * @return ?list<list<ProgramType>>
+     */
+    public function getProgramTypeOrder(): ?array
+    {
+        if (!$this->onlyGEWIS) {
+            return null;
+        }
+
+        return self::tierOrder(
+            $this->programTypeOrder,
+            ProgramType::class,
+        );
+    }
+
+    /**
+     * @param ?list<list<ProgramType>> $order
+     */
+    public function setProgramTypeOrder(?array $order): void
+    {
+        $this->programTypeOrder = self::tierValues($order);
+    }
+
+    public function getOrganisingCommitteePlaces(): ?int
+    {
+        return $this->organisingCommitteePlaces;
+    }
+
+    public function setOrganisingCommitteePlaces(?int $places): void
+    {
+        $this->organisingCommitteePlaces = $places;
+    }
+
+    /**
+     * @return Collection<array-key, SignupRole>
+     */
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    public function addRole(SignupRole $role): void
+    {
+        if ($this->roles->contains($role)) {
+            return;
+        }
+
+        $this->roles->add($role);
+        $role->setSignupList($this);
+    }
+
+    public function removeRole(SignupRole $role): void
+    {
+        $this->roles->removeElement($role);
+    }
+
+    public function hasPriorityModifiers(): bool
+    {
+        // Through the getters: an order the list can no longer act on is stored but not held.
+        return null !== $this->getMembershipTierOrder()
+            || null !== $this->getCohortTierOrder()
+            || null !== $this->getProgramTypeOrder()
+            || null !== $this->organisingCommitteePlaces
+            || !$this->roles->isEmpty();
+    }
+
+    /**
+     * @template T of PriorityTierInterface
+     *
+     * @param ?list<list<string>|string> $stored
+     * @param class-string<T>            $tier
+     *
+     * @return ?list<list<T>>
+     */
+    private static function tierOrder(
+        ?array $stored,
+        string $tier,
+    ): ?array {
+        if (null === $stored) {
+            return null;
+        }
+
+        $order = [];
+        $seen = [];
+        foreach ($stored as $rank) {
+            $tiers = [];
+            foreach (is_array($rank) ? $rank : [$rank] as $value) {
+                $case = $tier::tryFrom($value);
+                if (
+                    null === $case
+                    || in_array(
+                        $case,
+                        $seen,
+                        true,
+                    )
+                ) {
+                    continue;
+                }
+
+                $seen[] = $case;
+                $tiers[] = $case;
+            }
+
+            if ([] === $tiers) {
+                continue;
+            }
+
+            $order[] = $tiers;
+        }
+
+        if ([] === $order) {
+            return null;
+        }
+
+        // What the stored order left out is appended the way the association would rank it, ties and all, so a tier
+        // added to the enum lands beside the ones it belongs with rather than alone at the end.
+        foreach ($tier::defaultRanks() as $rank) {
+            $missing = [];
+            foreach ($rank as $case) {
+                if (
+                    in_array(
+                        $case,
+                        $seen,
+                        true,
+                    )
+                ) {
+                    continue;
+                }
+
+                $missing[] = $case;
+            }
+
+            if ([] === $missing) {
+                continue;
+            }
+
+            $order[] = $missing;
+        }
+
+        return $order;
+    }
+
+    /**
+     * @param ?list<list<PriorityTierInterface>> $order
+     *
+     * @return ?list<list<string>>
+     */
+    private static function tierValues(?array $order): ?array
+    {
+        if (
+            null === $order
+            || [] === $order
+        ) {
+            return null;
+        }
+
+        return array_values(array_map(
+            static fn (array $rank): array => array_values(array_map(
+                static fn (PriorityTierInterface $tier): string => strval($tier->value),
+                $rank,
+            )),
+            $order,
+        ));
+    }
+
+    /**
      * Whether this list has been attached to a revision yet. A brand-new list added through the form has none until
      * it is bound; a cloned draft list already does (so its date/freeze rules look through its lineage).
      */
@@ -773,6 +1306,22 @@ class SignupList
     }
 
     /**
+     * @return array<array-key, array{name: string, minimum: int}>
+     */
+    private function rolesToArray(): array
+    {
+        $roles = [];
+        foreach ($this->getRoles() as $role) {
+            $roles[] = [
+                'name' => $role->getName(),
+                'minimum' => $role->getMinimum(),
+            ];
+        }
+
+        return $roles;
+    }
+
+    /**
      * Returns an associative array representation of this object.
      *
      * @return SignupListArrayType
@@ -783,6 +1332,8 @@ class SignupList
         foreach ($this->getFields() as $field) {
             $fieldsArrays[] = $field->toArray();
         }
+
+        $rolesArrays = $this->rolesToArray();
 
         return [
             'id' => $this->getId(),
@@ -802,6 +1353,13 @@ class SignupList
             'externalForceOrdering' => $this->getExternalForceOrdering(),
             'externalPaymentByExternal' => $this->getExternalPaymentByExternal(),
             'customMethodDescription' => $this->getCustomMethodDescription(),
+            'membershipTierOrder' => self::tierValues($this->getMembershipTierOrder()),
+            'membershipPriorityMode' => $this->getMembershipPriorityMode()?->value,
+            'membershipPlaces' => $this->membershipPlaces,
+            'cohortTierOrder' => self::tierValues($this->getCohortTierOrder()),
+            'programTypeOrder' => self::tierValues($this->getProgramTypeOrder()),
+            'organisingCommitteePlaces' => $this->getOrganisingCommitteePlaces(),
+            'roles' => $rolesArrays,
             'presenceTaken' => $this->isPresenceTaken(),
             'promoted' => $this->isPromoted(),
             'fields' => $fieldsArrays,
@@ -819,11 +1377,13 @@ class SignupList
             $fieldsArrays[] = $field->toGdprArray();
         }
 
+        $rolesArrays = $this->rolesToArray();
+
         return [
             'id' => $this->getId(),
             'name' => $this->getName()->toGdprArray(),
-            'openDate' => $this->getOpenDate()->format(DateTimeInterface::ATOM),
-            'closeDate' => $this->getCloseDate()->format(DateTimeInterface::ATOM),
+            'openDate' => $this->getOpenDate()?->format(DateTimeInterface::ATOM),
+            'closeDate' => $this->getCloseDate()?->format(DateTimeInterface::ATOM),
             'onlyGEWIS' => $this->getOnlyGEWIS(),
             'displaySubscribedNumber' => $this->getDisplaySubscribedNumber(),
             'limitedCapacity' => $this->getLimitedCapacity(),
@@ -836,6 +1396,13 @@ class SignupList
             'externalForceOrdering' => $this->getExternalForceOrdering(),
             'externalPaymentByExternal' => $this->getExternalPaymentByExternal(),
             'customMethodDescription' => $this->getCustomMethodDescription(),
+            'membershipTierOrder' => self::tierValues($this->getMembershipTierOrder()),
+            'membershipPriorityMode' => $this->getMembershipPriorityMode()?->value,
+            'membershipPlaces' => $this->membershipPlaces,
+            'cohortTierOrder' => self::tierValues($this->getCohortTierOrder()),
+            'programTypeOrder' => self::tierValues($this->getProgramTypeOrder()),
+            'organisingCommitteePlaces' => $this->getOrganisingCommitteePlaces(),
+            'roles' => $rolesArrays,
             'presenceTaken' => $this->isPresenceTaken(),
             'promoted' => $this->isPromoted(),
             'fields' => $fieldsArrays,

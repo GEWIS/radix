@@ -70,9 +70,6 @@ trait HandlesFormFlowTrait
         return $flow;
     }
 
-    /**
-     * What is wrong is named on the fields themselves; this is only the nudge to look at them.
-     */
     private function flashRejectedStep(
         FormFlowInterface $flow,
         TranslatorInterface $translator,
@@ -81,6 +78,19 @@ trait HandlesFormFlowTrait
             !$flow->isSubmitted()
             || $flow->isValid()
         ) {
+            return;
+        }
+
+        $said = false;
+        foreach ($flow->getErrors() as $error) {
+            $said = true;
+            $this->addFlash(
+                AlertTypes::Danger->value,
+                $error->getMessage(),
+            );
+        }
+
+        if ($said) {
             return;
         }
 
