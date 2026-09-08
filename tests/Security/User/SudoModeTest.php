@@ -4,23 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Security\User;
 
-use App\Security\User\SudoMode;
+use App\Tests\Support\BuildsSudoMode;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 final class SudoModeTest extends TestCase
 {
+    use BuildsSudoMode;
+
     public function testAPasswordJustTypedUnlocksTheFirewallItWasTypedOn(): void
     {
         $session = $this->session();
@@ -40,18 +33,56 @@ final class SudoModeTest extends TestCase
     {
         $session = $this->session();
         $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
 
         $this->sudoMode(
             $session,
             $tokenStorage,
             'company',
+            valkey: $valkey,
         )->grant();
 
         self::assertFalse($this->sudoMode(
             $session,
             $tokenStorage,
             'main',
+            valkey: $valkey,
         )->isActive());
+    }
+
+    public function testAGrantOnOneSessionIsNotAGrantOnAnother(): void
+    {
+        $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
+
+        $this->sudoMode(
+            $this->session('the-session-it-was-typed-on'),
+            $tokenStorage,
+            'main',
+            valkey: $valkey,
+        )->grant();
+
+        self::assertFalse($this->sudoMode(
+            $this->session('a-session-it-was-not'),
+            $tokenStorage,
+            'main',
+            valkey: $valkey,
+        )->isActive());
+    }
+
+    public function testAStatelessFirewallHoldsNoGrant(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
+
+        $sudo = $this->sudoMode(
+            $session,
+            $tokenStorage,
+            'api',
+        );
+        $sudo->grant();
+
+        self::assertFalse($sudo->isActive());
     }
 
     public function testAGrantDoesNotSurviveTheSessionBecomingSomebodyElses(): void
@@ -100,16 +131,19 @@ final class SudoModeTest extends TestCase
     {
         $session = $this->session();
         $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
 
         $main = $this->sudoMode(
             $session,
             $tokenStorage,
             'main',
+            valkey: $valkey,
         );
         $company = $this->sudoMode(
             $session,
             $tokenStorage,
             'company',
+            valkey: $valkey,
         );
 
         $main->grant();
@@ -120,49 +154,24 @@ final class SudoModeTest extends TestCase
         self::assertFalse($company->isActive());
     }
 
-    private function sudoMode(
-        SessionInterface $session,
-        TokenStorageInterface $tokenStorage,
-        string $firewall,
-        ?MockClock $clock = null,
-    ): SudoMode {
-        // A grant is only read back off a session the request already carried, so the cookie has to be there.
-        $request = new Request(cookies: [$session->getName() => 'a-session-id']);
-        $request->setSession($session);
+    /** A second tab used to overwrite the session it had read, dropping a grant written in the meantime. */
+    public function testAConcurrentSessionWriteDoesNotDropAGrant(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
 
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-
-        $firewallMap = self::createStub(FirewallMap::class);
-        $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig(
-            $firewall,
-            'security.user_checker',
-        ));
-
-        return new SudoMode(
-            $requestStack,
-            $clock ?? new MockClock(),
-            $firewallMap,
+        $sudo = $this->sudoMode(
+            $session,
             $tokenStorage,
-        );
-    }
-
-    private function session(): SessionInterface
-    {
-        return new Session(new MockArraySessionStorage());
-    }
-
-    private function tokenStorage(string $userIdentifier): TokenStorageInterface
-    {
-        $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken(
-            new InMemoryUser(
-                $userIdentifier,
-                null,
-            ),
             'main',
-        ));
+        );
 
-        return $tokenStorage;
+        $readByTheOtherTab = $session->all();
+
+        $sudo->grant();
+
+        $session->replace($readByTheOtherTab);
+
+        self::assertTrue($sudo->isActive());
     }
 }

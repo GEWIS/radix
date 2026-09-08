@@ -23,6 +23,10 @@ framework:
         cookie_samesite: strict
         name: GWS_SESSION
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+        # The last-used stamp otherwise changes every second, so a request that read the session still rewrites all
+        # of it and can overwrite what another request wrote in the meantime. Nothing reads the stamp, and the TTL
+        # is refreshed either way.
+        metadata_update_threshold: '%app.session_last_used_threshold%'
 
     http_client:
         scoped_clients:

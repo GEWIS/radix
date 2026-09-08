@@ -48,11 +48,6 @@ use function assert;
 #[AsEventListener(event: RequestEvent::class)]
 final class StaleSessionGuardListener
 {
-    /**
-     * Do not write lastUsedAt more than once per this many seconds to spare the DB.
-     */
-    private const int LAST_USED_THROTTLE_SECONDS = 180;
-
     public function __construct(
         private readonly SessionRepository $repository,
         private readonly HandlerRegistry $registry,
@@ -68,6 +63,8 @@ final class StaleSessionGuardListener
         private readonly KnownDeviceRegistry $knownDevices,
         private readonly CredentialsSignature $credentials,
         private readonly RealtimeAuthorization $realtime,
+        #[Autowire(param: 'app.session_last_used_threshold')]
+        private readonly int $lastUsedThreshold,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -219,7 +216,7 @@ final class StaleSessionGuardListener
         // Throttled lastUsedAt bump so the security UI's "Last seen" reflects real activity rather than only the
         // moments of token rotation.
         $now = new DateTimeImmutable();
-        $staleAfter = $now->modify('-' . self::LAST_USED_THROTTLE_SECONDS . ' seconds');
+        $staleAfter = $now->modify('-' . $this->lastUsedThreshold . ' seconds');
         $inUse = $managedSession->getLastUsedAt() < $staleAfter;
         if ($inUse) {
             $managedSession->setLastUsedAt($now);
@@ -236,7 +233,7 @@ final class StaleSessionGuardListener
 
         // Somebody working in a device they signed in from months ago is the same reason to keep it recognised as
         // signing in from it again would be, and this is the only place that sees them do it. Behind the same throttle
-        // as the bump above, so it costs one lookup per three minutes of activity.
+        // as the bump above, so it costs one lookup per window of activity.
         $this->knownDevices->refresh(
             $managedSession->getUserIdentifier(),
             $firewall,
