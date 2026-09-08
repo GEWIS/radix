@@ -61,6 +61,20 @@ class AdminController extends AbstractController
         return $this->render('user/admin/company-users.html.twig');
     }
 
+    /**
+     * Both firewalls' events in one list. It is not per account on purpose: the questions this answers -- where a
+     * burst of failed sign-ins is coming from, whether a torn-down session happened to one member or to fifty -- are
+     * the ones a per-account page cannot be asked.
+     */
+    #[Route(
+        path: '/security-log',
+        name: 'security-log',
+    )]
+    public function securityLog(): Response
+    {
+        return $this->render('user/admin/security-log.html.twig');
+    }
+
     #[Route(
         path: '/{lidnr}/sessions',
         name: 'sessions',

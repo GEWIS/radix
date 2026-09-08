@@ -7,6 +7,7 @@ namespace App\Controller\User;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\NotificationType;
 use App\Entity\User\CompanyUser;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\Enums\UserTypes;
 use App\Entity\User\PasswordReset;
 use App\Entity\User\User;
@@ -29,6 +30,7 @@ use App\Service\User\AccountPasswordService;
 use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
 use App\Service\User\PasswordResetService;
+use App\Service\User\SecurityEventLogger;
 use App\Service\User\SecurityNotifier;
 use App\Service\User\SessionManager;
 use App\Util\Application\SplitToken;
@@ -77,6 +79,7 @@ abstract class AbstractSecurityController extends AbstractController
         protected readonly PasswordResetService $passwordResetService,
         protected readonly KnownDeviceRegistry $knownDevices,
         protected readonly RealtimeAuthorization $realtime,
+        protected readonly SecurityEventLogger $securityEvents,
         protected readonly string $routePrefix,
         protected readonly UserTypes $userType,
     ) {
@@ -160,6 +163,13 @@ abstract class AbstractSecurityController extends AbstractController
             false === $ipLimit->isAccepted()
             || false === $credLimit->isAccepted()
         ) {
+            $this->securityEvents->record(
+                SecurityEventType::PasswordResetRejected,
+                null,
+                null,
+                ['reason' => 'rate_limited'],
+            );
+
             $this->addFlash(
                 AlertTypes::Danger->value,
                 $this->translator->trans(
@@ -218,6 +228,13 @@ abstract class AbstractSecurityController extends AbstractController
                 PasswordReset::HASH_ALGO,
             )
         ) {
+            $this->securityEvents->record(
+                SecurityEventType::PasswordResetRejected,
+                null,
+                null,
+                ['reason' => 'invalid_or_expired_token'],
+            );
+
             throw new NotFoundHttpException();
         }
 
@@ -328,6 +345,14 @@ abstract class AbstractSecurityController extends AbstractController
             $target,
         );
 
+        $this->securityEvents->record(
+            SecurityEventType::PasswordResetCompleted,
+            $target->getUserIdentifier(),
+            $this->firewall($request),
+            [],
+            $request,
+        );
+
         // A reset is what somebody reaches for when they think their account has been reached, so anything signed in
         // on the old password goes, recognised devices included.
         $this->sessionManager->terminateAll(
@@ -395,6 +420,7 @@ abstract class AbstractSecurityController extends AbstractController
                     $securityNotifier,
                     $user,
                     NotificationType::PasswordChanged,
+                    SecurityEventType::PasswordChanged,
                     $request,
                 );
 
@@ -606,6 +632,14 @@ abstract class AbstractSecurityController extends AbstractController
             false === $ipLimit->isAccepted()
             || false === $credLimit->isAccepted()
         ) {
+            $this->securityEvents->record(
+                SecurityEventType::SudoRefused,
+                $user->getUserIdentifier(),
+                $this->firewall($request),
+                ['reason' => 'rate_limited'],
+                $request,
+            );
+
             $form->addError(new FormError(
                 $this->translator->trans(
                     'You have sent too many requests in a short period of time. Please wait a few minutes before trying again.', // phpcs:ignore Generic.Files.LineLength.TooLong -- user-visible strings should not be split
@@ -646,6 +680,17 @@ abstract class AbstractSecurityController extends AbstractController
         ) {
             // Attach the same generic error to every credential field so the response body never reveals which factor
             // was wrong. Pairs with the always-run-every-check block above (which closes the timing side-channel).
+            $this->securityEvents->record(
+                SecurityEventType::SudoRefused,
+                $user->getUserIdentifier(),
+                $this->firewall($request),
+                [
+                    'reason' => 'incorrect_credentials',
+                    'secondFactorRequired' => $mfaRequired,
+                ],
+                $request,
+            );
+
             $errorMessage = $this->translator->trans('Incorrect credentials.');
             $form->get('password')->addError(new FormError($errorMessage));
             if ($form->has('mfaCode')) {
@@ -666,9 +711,25 @@ abstract class AbstractSecurityController extends AbstractController
                 $user,
                 $mfaCode,
             );
+
+            $this->securityEvents->record(
+                SecurityEventType::BackupCodeUsed,
+                $user->getUserIdentifier(),
+                $this->firewall($request),
+                ['context' => 'sudo'],
+                $request,
+            );
         }
 
         $sudoMode->grant();
+
+        $this->securityEvents->record(
+            SecurityEventType::SudoGranted,
+            $user->getUserIdentifier(),
+            $this->firewall($request),
+            ['secondFactorRequired' => $mfaRequired],
+            $request,
+        );
 
         return new RedirectResponse($next);
     }
@@ -745,6 +806,7 @@ abstract class AbstractSecurityController extends AbstractController
                     $securityNotifier,
                     $user,
                     NotificationType::MfaEnabled,
+                    SecurityEventType::MfaEnabled,
                     $request,
                 );
 
@@ -848,6 +910,7 @@ abstract class AbstractSecurityController extends AbstractController
             $securityNotifier,
             $user,
             NotificationType::BackupCodesRegenerated,
+            SecurityEventType::BackupCodesRegenerated,
             $request,
         );
 
@@ -895,6 +958,7 @@ abstract class AbstractSecurityController extends AbstractController
             $securityNotifier,
             $user,
             NotificationType::MfaDisabled,
+            SecurityEventType::MfaDisabled,
             $request,
         );
 
@@ -966,6 +1030,15 @@ abstract class AbstractSecurityController extends AbstractController
 
     private function staleLinkRedirect(): RedirectResponse
     {
+        // No account is named: every path here is one where the link could not be tied to one, which is the whole
+        // reason the response is the same in each case.
+        $this->securityEvents->record(
+            SecurityEventType::PasswordResetRejected,
+            null,
+            null,
+            ['reason' => 'stale_or_used_link'],
+        );
+
         $this->addFlash(
             AlertTypes::Warning->value,
             $this->translator->trans(
@@ -1047,6 +1120,7 @@ abstract class AbstractSecurityController extends AbstractController
         SecurityNotifier $securityNotifier,
         User|CompanyUser $user,
         NotificationType $type,
+        SecurityEventType $event,
         Request $request,
     ): void {
         $firewall = Firewall::tryFrom($this->firewall($request));
@@ -1077,6 +1151,14 @@ abstract class AbstractSecurityController extends AbstractController
             $firewall,
             $user->getUserIdentifier(),
             $type,
+            $request,
+        );
+
+        $this->securityEvents->record(
+            $event,
+            $user->getUserIdentifier(),
+            $firewall->value,
+            [],
             $request,
         );
     }

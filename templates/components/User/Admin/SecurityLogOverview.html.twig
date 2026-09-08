@@ -1,0 +1,134 @@
+<div {{ attributes }}>
+    <div class="panel mb-3">
+        <div class="panel-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label" for="security-log-search">{{ 'Search'|trans }}</label>
+                    <input type="search" class="form-control" id="security-log-search"
+                           placeholder="{{ 'Membership number, email address or IP address'|trans }}"
+                           data-model="debounce(300)|search"
+                           value="{{ this.search }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="security-log-category">{{ 'Kind of event'|trans }}</label>
+                    <select class="form-select" id="security-log-category" data-model="category">
+                        <option value="">{{ 'Any'|trans }}</option>
+                        {% for category in this.categories %}
+                            <option value="{{ category.value }}" {% if this.category == category.value %}selected{% endif %}>
+                                {{ category.label|trans }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="security-log-days">{{ 'Period'|trans }}</label>
+                    <select class="form-select" id="security-log-days" data-model="days">
+                        {% for window in this.windows %}
+                            <option value="{{ window }}" {% if this.days == window %}selected{% endif %}>
+                                {% if window == 0 %}
+                                    {{ 'Everything kept'|trans }}
+                                {% else %}
+                                    {{ 'Last %count% day(s)'|trans({'%count%': window}) }}
+                                {% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{ 'When'|trans }}</th>
+                            <th>{{ 'Event'|trans }}</th>
+                            <th>{{ 'Account'|trans }}</th>
+                            <th>{{ 'Origin'|trans }}</th>
+                            <th>{{ 'Details'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in this.entries %}
+                            <tr>
+                                <td class="text-nowrap">
+                                    {{ entry.occurredAt|date('Y-m-d H:i:s') }}
+                                </td>
+                                <td>
+                                    {{ entry.event.label|trans }}
+                                    <div class="text-muted small">{{ entry.event.category.label|trans }}</div>
+                                </td>
+                                <td>
+                                    {% if entry.userIdentifier %}
+                                        <code>{{ entry.userIdentifier }}</code>
+                                    {% else %}
+                                        <span class="text-muted small">&ndash;</span>
+                                    {% endif %}
+                                    {% if entry.actorIdentifier %}
+                                        <div class="text-muted small">
+                                            {{ 'By %actor%'|trans({'%actor%': entry.actorIdentifier}) }}
+                                        </div>
+                                    {% endif %}
+                                    {% if entry.firewallName %}
+                                        <div class="text-muted small">{{ entry.firewallName }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if entry.ipAddress %}
+                                        <code>{{ entry.ipAddress }}</code>
+                                    {% else %}
+                                        <span class="text-muted small">&ndash;</span>
+                                    {% endif %}
+                                    {% if entry.browser or entry.operatingSystem %}
+                                        <div class="text-muted small">
+                                            {{ device_description(entry.browser, entry.operatingSystem) }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if entry.detail is not empty %}
+                                        <dl class="row mb-0 small">
+                                            {% for key, value in entry.detail %}
+                                                <dt class="col-5 text-truncate fw-normal text-muted">{{ key }}</dt>
+                                                <dd class="col-7 mb-0 text-break">
+                                                    {% if value is null %}
+                                                        &ndash;
+                                                    {% elseif value is same as(true) %}
+                                                        {{ 'Yes'|trans }}
+                                                    {% elseif value is same as(false) %}
+                                                        {{ 'No'|trans }}
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                </dd>
+                                            {% endfor %}
+                                        </dl>
+                                    {% else %}
+                                        <span class="text-muted small">&ndash;</span>
+                                    {% endif %}
+                                    {% if entry.requestId %}
+                                        <div class="text-muted small font-monospace">{{ entry.requestId }}</div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-muted">{{ 'Nothing was recorded in this period.'|trans }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% include 'partials/application/pagination.html.twig' with {
+                'page': this.page,
+                'totalPages': this.totalPages,
+                'totalCount': this.totalCount,
+                'pageSize': this.pageSize,
+            } only %}
+        </div>
+    </div>
+</div>

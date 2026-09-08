@@ -2,6 +2,52 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        # Anything that decides whether somebody is who they say they are, or may do what they are asking to do.
+        # Kept apart from the application's own noise because it is read for a different reason: not to find out why
+        # a page broke, but to answer what happened to an account. In production it is written unconditionally and
+        # kept far longer than the rest; see the handlers below.
+        - security
+
+services:
+    # The context every security record carries, gathered once here rather than spelled out at each call site. Without
+    # these a line saying a session was torn down would not say whose, from where, or on which request.
+    #
+    # All of them are stateless or reset per request, which is what FrankenPHP's worker mode requires: a processor
+    # that remembered the previous request would attribute one member's event to the next visitor.
+    Symfony\Bridge\Monolog\Processor\WebProcessor:
+        tags:
+            - { name: monolog.processor }
+            - { name: kernel.event_subscriber }
+
+    Symfony\Bridge\Monolog\Processor\RouteProcessor:
+        tags:
+            - { name: monolog.processor }
+            - { name: kernel.event_subscriber }
+            - { name: kernel.reset, method: reset }
+
+    # Who was signed in when the record was written. `SwitchUserTokenProcessor` adds the administrator behind an
+    # impersonation, which `TokenProcessor` alone would report as the member being impersonated.
+    Symfony\Bridge\Monolog\Processor\TokenProcessor:
+        arguments:
+            $tokenStorage: '@security.token_storage'
+        tags:
+            - { name: monolog.processor }
+
+    Symfony\Bridge\Monolog\Processor\SwitchUserTokenProcessor:
+        arguments:
+            $tokenStorage: '@security.token_storage'
+        tags:
+            - { name: monolog.processor }
+
+    # Which command produced the record, for everything written by a worker, the scheduler or a hand-run command.
+    # Without the arguments: a command line is the one place a secret is routinely typed out in full.
+    Symfony\Bridge\Monolog\Processor\ConsoleCommandProcessor:
+        arguments:
+            $includeArguments: false
+            $includeOptions: false
+        tags:
+            - { name: monolog.processor }
+            - { name: kernel.event_subscriber }
 
 when@dev:
     monolog:
@@ -22,6 +68,9 @@ when@test:
             main:
                 type: fingers_crossed
                 action_level: error
+                # As in production: a test asserting that something was logged must not depend on the same request
+                # also having failed.
+                passthru_level: warning
                 handler: nested
                 excluded_http_codes: [404, 405]
                 channels: ["!event"]
@@ -33,12 +82,39 @@ when@test:
 when@prod:
     monolog:
         handlers:
+            # First in the stack and `bubble: false`, so a security record is written by this handler and no other:
+            # `main` below would otherwise buffer it and, most of the time, throw it away.
+            security:
+                type: whatfailuregroup
+                channels: [security]
+                members: [security_nested, security_stderr]
+                bubble: false
+            # Half a year and a bit of daily files, outliving the retention on the `SecurityLog` rows the same events
+            # are written to, so the file still answers for a period the table has already forgotten. Deliberately not
+            # `%env(LOG_NAME)%`-free: a worker signing somebody out must not rotate the web container's file.
+            security_nested:
+                type: rotating_file
+                max_files: 200
+                path: "%kernel.project_dir%/data/logs/security-%env(LOG_NAME)%.log"
+                level: info
+                formatter: monolog.formatter.json
+            security_stderr:
+                type: stream
+                path: php://stderr
+                level: info
+                formatter: monolog.formatter.json
             main:
                 type: fingers_crossed
                 action_level: error
+                # Without this, everything below `error` is buffered and then dropped unless the same request also
+                # failed -- which is how every warning this application raised about a torn-down session went
+                # unrecorded. A warning is something we decided was worth saying; it is now always written, and the
+                # buffer only adds the debug and info records leading up to a failure.
+                passthru_level: warning
                 handler: grouped
                 excluded_http_codes: [404, 405]
                 buffer_size: 50 # How many messages should be saved? Prevent memory leaks
+                channels: ["!security"]
             # `whatfailuregroup` rather than `group`: an unwritable volume must not also cost the copy on stderr.
             grouped:
                 type: whatfailuregroup

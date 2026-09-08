@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\EventListener\Api;
 
+use App\Entity\User\Enums\SecurityEventType;
 use App\Security\Api\ApiToken;
+use App\Service\User\SecurityEventLogger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -27,6 +29,7 @@ final readonly class RateLimitListener
 
     public function __construct(
         private TokenStorageInterface $tokenStorage,
+        private SecurityEventLogger $securityEvents,
         #[Autowire(service: 'limiter.api_principal')]
         private RateLimiterFactoryInterface $limiter,
     ) {
@@ -57,6 +60,14 @@ final readonly class RateLimitListener
         if ($limit->isAccepted()) {
             return;
         }
+
+        $this->securityEvents->record(
+            SecurityEventType::ApiRateLimitExceeded,
+            $token->getUserIdentifier(),
+            'api',
+            ['path' => $event->getRequest()->getPathInfo()],
+            $event->getRequest(),
+        );
 
         throw new TooManyRequestsHttpException(
             max(

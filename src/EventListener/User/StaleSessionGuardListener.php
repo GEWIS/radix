@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener\User;
 
+use App\Entity\User\Enums\SecurityEventType;
 use App\Repository\User\SessionRepository;
 use App\Security\User\CredentialsSignature;
 use App\Security\User\Firewall;
@@ -12,9 +13,9 @@ use App\Security\User\SudoMode;
 use App\Security\User\UserAgentParser;
 use App\Service\Application\RealtimeAuthorization;
 use App\Service\User\KnownDeviceRegistry;
+use App\Service\User\SecurityEventLogger;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -47,6 +48,10 @@ use function assert;
  * The lookup pivot here is the cookie's **series**, not the PHP session ID. Series is the authoritative identifier (it
  * does not change across token rotations or session migrations), whereas `phpSessionId` is just the pointer we keep so
  * "log out this device" can destroy the matching Valkey entry directly.
+ *
+ * Every way out of here that ends a session is recorded through {@see \App\Service\User\SecurityEventLogger},
+ * including the two that used to say nothing at all. A member asking why they were signed out is asking about one of
+ * these five, and the answer has to be findable without them having noticed the minute it happened.
  */
 #[AsEventListener(event: RequestEvent::class)]
 final class StaleSessionGuardListener
@@ -67,9 +72,9 @@ final class StaleSessionGuardListener
         private readonly CredentialsSignature $credentials,
         private readonly RealtimeAuthorization $realtime,
         private readonly SudoMode $sudoMode,
+        private readonly SecurityEventLogger $securityEvents,
         #[Autowire(param: 'app.session_last_used_threshold')]
         private readonly int $lastUsedThreshold,
-        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -113,6 +118,14 @@ final class StaleSessionGuardListener
                 $this->entityManager->flush();
             }
 
+            $this->securityEvents->record(
+                SecurityEventType::SessionEndedWithoutCookie,
+                $orphan?->getUserIdentifier() ?? $this->signedInUser()?->getUserIdentifier(),
+                $firewall,
+                ['managedSessionFound' => null !== $orphan],
+                $request,
+            );
+
             $this->forceLogout(
                 $firewall,
                 $event,
@@ -126,6 +139,14 @@ final class StaleSessionGuardListener
 
         // Cookie references a series with no row -> also anomalous, tear down.
         if (null === $managedSession) {
+            $this->securityEvents->record(
+                SecurityEventType::SessionEndedUnknownSeries,
+                $this->signedInUser()?->getUserIdentifier(),
+                $firewall,
+                ['series' => $series],
+                $request,
+            );
+
             $this->forceLogout(
                 $firewall,
                 $event,
@@ -137,6 +158,17 @@ final class StaleSessionGuardListener
         // Cross-firewall token replay attempt (a cookie from one firewall on another firewall's URL). Refuse -> leave
         // the data alone and let the request fall through unauthenticated.
         if ($managedSession->getFirewallName() !== $firewall) {
+            $this->securityEvents->record(
+                SecurityEventType::CrossFirewallTokenRejected,
+                $managedSession->getUserIdentifier(),
+                $firewall,
+                [
+                    'series' => $series,
+                    'storedFirewall' => $managedSession->getFirewallName(),
+                ],
+                $request,
+            );
+
             return;
         }
 
@@ -151,13 +183,12 @@ final class StaleSessionGuardListener
                 $user,
             )
         ) {
-            $this->logger?->info(
-                'Account credentials changed since this session was opened -> tearing down session.',
-                [
-                    'series' => $series,
-                    'user' => $managedSession->getUserIdentifier(),
-                    'firewall' => $firewall,
-                ],
+            $this->securityEvents->record(
+                SecurityEventType::SessionEndedCredentialsChanged,
+                $managedSession->getUserIdentifier(),
+                $firewall,
+                ['series' => $series],
+                $request,
             );
             $this->entityManager->remove($managedSession);
             $this->entityManager->flush();
@@ -186,17 +217,18 @@ final class StaleSessionGuardListener
             $browserMismatch
             || $osMismatch
         ) {
-            $this->logger?->warning(
-                'User-agent family mismatch -> tearing down session.',
+            $this->securityEvents->record(
+                SecurityEventType::SessionEndedDeviceChanged,
+                $managedSession->getUserIdentifier(),
+                $firewall,
                 [
                     'series' => $series,
-                    'user' => $managedSession->getUserIdentifier(),
-                    'firewall' => $firewall,
-                    'stored_browser' => $managedSession->getBrowser(),
-                    'current_browser' => $currentMeta['browser'],
-                    'stored_os' => $managedSession->getOperatingSystem(),
-                    'current_os' => $currentMeta['operatingSystem'],
+                    'storedBrowser' => $managedSession->getBrowser(),
+                    'currentBrowser' => $currentMeta['browser'],
+                    'storedOperatingSystem' => $managedSession->getOperatingSystem(),
+                    'currentOperatingSystem' => $currentMeta['operatingSystem'],
                 ],
+                $request,
             );
             $this->entityManager->remove($managedSession);
             $this->entityManager->flush();

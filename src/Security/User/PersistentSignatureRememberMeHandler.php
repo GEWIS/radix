@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Security\User;
 
 use App\Entity\Application\Enums\NotificationType;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\Session;
 use App\Repository\User\SessionRepository;
 use App\Service\User\KnownDeviceRegistry;
+use App\Service\User\SecurityEventLogger;
 use App\Service\User\SecurityNotifier;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -62,6 +64,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         private readonly SessionRepository $repository,
         private readonly UserAgentParser $userAgentParser,
         private readonly SecurityNotifier $securityNotifier,
+        private readonly SecurityEventLogger $securityEvents,
         private readonly KnownDeviceRegistry $knownDevices,
         private readonly ClockInterface $clock,
         private readonly CredentialsSignature $credentials,
@@ -157,12 +160,13 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 
         // Ensure we only process remember-me requests for the correct firewall.
         if ($session->getFirewallName() !== $this->firewallName) {
-            $this->logger?->warning(
-                'Cross-firewall token replay attempt rejected.',
+            $this->securityEvents->record(
+                SecurityEventType::CrossFirewallTokenRejected,
+                $session->getUserIdentifier(),
+                $this->firewallName,
                 [
                     'series' => $series,
-                    'token_firewall' => $session->getFirewallName(),
-                    'request_firewall' => $this->firewallName,
+                    'storedFirewall' => $session->getFirewallName(),
                 ],
             );
 
@@ -171,6 +175,12 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 
         // The remember-me token must not be expired.
         if ($session->isExpired()) {
+            $this->securityEvents->record(
+                SecurityEventType::SessionExpired,
+                $session->getUserIdentifier(),
+                $this->firewallName,
+                ['series' => $series],
+            );
             $this->entityManager->remove($session);
             $this->entityManager->flush();
 
@@ -179,13 +189,11 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 
         // Ensure integrity of the remember-me token.
         if (!$this->rowSignature->verify($session)) {
-            $this->logger?->warning(
-                'HMAC mismatch; possible DB tampering or kernel.secret rotation.',
-                [
-                    'series' => $series,
-                    'user' => $session->getUserIdentifier(),
-                    'firewall' => $this->firewallName,
-                ],
+            $this->securityEvents->record(
+                SecurityEventType::SessionSignatureRejected,
+                $session->getUserIdentifier(),
+                $this->firewallName,
+                ['series' => $series],
             );
             $this->entityManager->remove($session);
             $this->entityManager->flush();
@@ -212,6 +220,13 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                     $presentedToken,
                 )
             ) {
+                $this->securityEvents->record(
+                    SecurityEventType::RememberMeTokenUnrecognised,
+                    $session->getUserIdentifier(),
+                    $this->firewallName,
+                    ['series' => $series],
+                );
+
                 throw new AuthenticationException('Remember-me token is not recognised.');
             }
 
@@ -228,14 +243,11 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                 $user,
             )
         ) {
-            $this->logger?->info(
-                'User properties fingerprint changed – session invalidated.',
-                [
-                    'series' => $series,
-                    'user' => $session->getUserIdentifier(),
-                    'firewall' => $this->firewallName,
-                    'properties' => CredentialsSignature::PROPERTIES,
-                ],
+            $this->securityEvents->record(
+                SecurityEventType::SessionEndedCredentialsChanged,
+                $session->getUserIdentifier(),
+                $this->firewallName,
+                ['series' => $series],
             );
             $this->entityManager->remove($session);
             $this->entityManager->flush();
@@ -301,6 +313,13 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             return;
         }
 
+        $this->securityEvents->record(
+            SecurityEventType::SessionResumed,
+            $session->getUserIdentifier(),
+            $this->firewallName,
+            ['series' => $series],
+        );
+
         $this->createCookie(new RememberMeDetails(
             $user->getUserIdentifier(),
             $session->getExpiresAt()->getTimestamp(),
@@ -317,12 +336,13 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
     /** @throws CookieTheftException Always. */
     private function reportTheft(Session $session): never
     {
-        $this->logger?->emergency(
-            'Cookie theft detected! Invalidating ALL sessions for this user on this firewall.',
+        $this->securityEvents->record(
+            SecurityEventType::RememberMeTokenReplayed,
+            $session->getUserIdentifier(),
+            $this->firewallName,
             [
                 'series' => $session->getSeries(),
-                'user' => $session->getUserIdentifier(),
-                'firewall' => $this->firewallName,
+                'consequence' => 'all_sessions_invalidated',
             ],
         );
         $this->repository->deleteAllForUserOnFirewall(

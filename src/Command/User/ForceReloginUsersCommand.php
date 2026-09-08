@@ -7,7 +7,9 @@ namespace App\Command\User;
 use App\Command\HoldsRunLockTrait;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\User\CompanyUser;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\User;
+use App\Service\User\SecurityEventLogger;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,6 +45,7 @@ final class ForceReloginUsersCommand extends Command
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
+        private readonly SecurityEventLogger $securityEvents,
     ) {
         parent::__construct();
     }
@@ -118,6 +121,18 @@ final class ForceReloginUsersCommand extends Command
         $updated = $this->runUpdate(
             $entityClass,
             $forceReloginAt,
+        );
+
+        // One row for the run rather than one per account: this is a single administrative act, and a row per member
+        // would put tens of thousands of them in the table for something none of them did.
+        $this->securityEvents->record(
+            SecurityEventType::ReloginForced,
+            null,
+            $isCompany ? 'company' : 'main',
+            [
+                'accounts' => $updated,
+                'forceReloginAt' => $forceReloginAt->format(DateTime::ATOM),
+            ],
         );
 
         $message = sprintf(

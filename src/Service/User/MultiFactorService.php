@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\User;
 
 use App\Entity\User\CompanyUser;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +24,7 @@ final readonly class MultiFactorService
     public function __construct(
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
+        private SecurityEventLogger $securityEvents,
     ) {
     }
 
@@ -69,5 +71,15 @@ final readonly class MultiFactorService
         $account->setForceReloginAt(new DateTime());
 
         $this->entityManager->flush();
+
+        // Only the board reaches this, on behalf of somebody who cannot get in; taking one's own second factor off is
+        // {@see self::disable()} and is recorded by the controller that offers it. The administrator who did this is
+        // filled in as the actor.
+        $this->securityEvents->record(
+            SecurityEventType::MfaDisabled,
+            $account->getUserIdentifier(),
+            $account instanceof CompanyUser ? 'company' : 'main',
+            ['by' => 'administrator'],
+        );
     }
 }

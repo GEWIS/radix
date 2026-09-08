@@ -20,6 +20,7 @@ use App\Repository\User\ExternalAppAuthenticationRepository;
 use App\Repository\User\KnownDeviceRepository;
 use App\Repository\User\KnownDeviceTokenRepository;
 use App\Repository\User\KnownNetworkRepository;
+use App\Repository\User\SecurityLogRepository;
 use App\Repository\User\SessionRepository;
 use App\Repository\User\UserRepository;
 
@@ -40,6 +41,7 @@ class GdprService
         private readonly KnownDeviceRepository $knownDeviceRepository,
         private readonly KnownNetworkRepository $knownNetworkRepository,
         private readonly KnownDeviceTokenRepository $knownDeviceTokenRepository,
+        private readonly SecurityLogRepository $securityLogRepository,
         private readonly ExternalAppAuthenticationRepository $externalAppAuthenticationRepository,
         private readonly UserSignupRepository $signupRepository,
         private readonly AuthorizationRepository $authorizationRepository,
@@ -91,6 +93,13 @@ class GdprService
                 'known_device_cookies' => array_map(
                     static fn ($token) => $token->toGdprArray(),
                     $this->knownDeviceTokenRepository->findAllByUser(strval($lidnr)),
+                ),
+                // Everything still recorded about them, which is everything inside the retention period
+                // `app:user:prune-security-log` enforces. The rows naming them as the actor rather than the subject
+                // belong to the accounts they acted on and are not included.
+                'security_log' => array_map(
+                    static fn ($entry) => $entry->toGdprArray(),
+                    $this->securityLogRepository->findAllByUser(strval($lidnr)),
                 ),
                 'external_applications' => array_map(
                     static fn ($authentication) => $authentication->toGdprArray(),

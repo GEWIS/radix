@@ -1,0 +1,25 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ 'Security log'|trans|page_title }}{{ 'Users'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item active" aria-current="page">
+        <a href="{{ path('admin/users/index') }}">
+            {{ 'Users'|trans }}
+        </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+        {{ 'Security log'|trans }}
+    </li>
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-md-12">
+            <p class="text-muted">
+                {{ 'What happened to accounts: who signed in, who could not, whose session was ended and why. Kept for half a year, after which entries are removed. The application\'s own log files keep the same events for a little longer.'|trans }}
+            </p>
+            {{ component('User:Admin:SecurityLogOverview') }}
+        </div>
+    </div>
+{% endblock %}
