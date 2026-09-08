@@ -8,6 +8,7 @@ use App\Security\User\Firewall;
 use App\Tests\Support\BuildsSudoMode;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -174,6 +175,63 @@ final class SudoModeTest extends TestCase
         $session->replace($readByTheOtherTab);
 
         self::assertTrue($sudo->isActive());
+    }
+
+    /**
+     * The account on the token while impersonating is the one being looked at, but the grant belongs to the
+     * administrator who typed a password to get there.
+     */
+    public function testAnImpersonatorKeepsTheGrantTheyConfirmedThemselves(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
+
+        $sudo = $this->sudoMode(
+            $session,
+            $tokenStorage,
+        );
+        $sudo->grant();
+
+        $administrator = $tokenStorage->getToken();
+        self::assertNotNull($administrator);
+
+        $tokenStorage->setToken(new SwitchUserToken(
+            new InMemoryUser(
+                '8001',
+                null,
+            ),
+            'main',
+            ['ROLE_USER'],
+            $administrator,
+        ));
+
+        self::assertTrue($sudo->isActive());
+    }
+
+    public function testAnImpersonationOnASessionThatNeverConfirmedHoldsNoGrant(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
+
+        $sudo = $this->sudoMode(
+            $session,
+            $tokenStorage,
+        );
+
+        $administrator = $tokenStorage->getToken();
+        self::assertNotNull($administrator);
+
+        $tokenStorage->setToken(new SwitchUserToken(
+            new InMemoryUser(
+                '8001',
+                null,
+            ),
+            'main',
+            ['ROLE_USER'],
+            $administrator,
+        ));
+
+        self::assertFalse($sudo->isActive());
     }
 
     /** Signing another device out has to take its grant with it; the session it belongs to is not this one. */

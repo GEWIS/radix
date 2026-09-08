@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
@@ -141,7 +143,7 @@ final class StaleSessionGuardListener
         // The remember-me handler makes the same comparison, but only on a request that hands it the cookie, which a
         // device with a live PHP session never makes: Valkey pushes that session's expiry forward on every request,
         // so without this a password reset would leave whoever it was meant to shut out signed in.
-        $user = $this->security->getUser();
+        $user = $this->signedInUser();
         if (
             null !== $user
             && !$this->credentials->matches(
@@ -241,6 +243,22 @@ final class StaleSessionGuardListener
             $firewall,
             $request,
         );
+    }
+
+    /**
+     * The account the row was stamped for, which while impersonating is the administrator rather than the member they
+     * are looking at. Comparing the member's credentials against the administrator's row is a mismatch every time, and
+     * tore the session down the moment an impersonated request got this far.
+     */
+    private function signedInUser(): ?UserInterface
+    {
+        $token = $this->tokenStorage->getToken();
+
+        while ($token instanceof SwitchUserToken) {
+            $token = $token->getOriginalToken();
+        }
+
+        return $token?->getUser();
     }
 
     private function forceLogout(

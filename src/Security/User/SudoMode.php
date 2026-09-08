@@ -10,6 +10,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 
 use function count;
 use function ctype_digit;
@@ -202,7 +203,16 @@ final class SudoMode
 
     private function userIdentifier(): ?string
     {
-        $identifier = $this->tokenStorage->getToken()?->getUserIdentifier();
+        $token = $this->tokenStorage->getToken();
+
+        // While impersonating, the account on the token is the one being looked at rather than the one that proved
+        // itself. The grant belongs to the administrator behind the switch, who is the only party that typed a
+        // password, so read through to them.
+        while ($token instanceof SwitchUserToken) {
+            $token = $token->getOriginalToken();
+        }
+
+        $identifier = $token?->getUserIdentifier();
 
         if (
             null === $identifier
