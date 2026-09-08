@@ -231,6 +231,17 @@ services:
               event: Symfony\Component\Security\Http\Event\LogoutEvent
               dispatcher: security.event_dispatcher.company
 
+    App\EventListener\User\ClearSudoGrantListener:
+        tags:
+            - name: kernel.event_listener
+              event: Symfony\Component\Security\Http\Event\LogoutEvent
+              dispatcher: security.event_dispatcher.main
+              priority: 10
+            - name: kernel.event_listener
+              event: Symfony\Component\Security\Http\Event\LogoutEvent
+              dispatcher: security.event_dispatcher.company
+              priority: 10
+
     # The external-application signing service uses the bundle-managed JWS builder and the association's key set. Both
     # are referenced by their bundle service id because several of each exist and autowiring cannot pick by type.
     App\Service\User\ExternalAppService:

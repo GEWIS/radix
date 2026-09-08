@@ -8,6 +8,7 @@ use App\Repository\User\SessionRepository;
 use App\Security\User\CredentialsSignature;
 use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
+use App\Security\User\SudoMode;
 use App\Security\User\UserAgentParser;
 use App\Service\Application\RealtimeAuthorization;
 use App\Service\User\KnownDeviceRegistry;
@@ -63,6 +64,7 @@ final class StaleSessionGuardListener
         private readonly KnownDeviceRegistry $knownDevices,
         private readonly CredentialsSignature $credentials,
         private readonly RealtimeAuthorization $realtime,
+        private readonly SudoMode $sudoMode,
         #[Autowire(param: 'app.session_last_used_threshold')]
         private readonly int $lastUsedThreshold,
         private readonly ?LoggerInterface $logger = null,
@@ -249,6 +251,8 @@ final class StaleSessionGuardListener
         // ContextListener writes the still-active token back to the freshly-created PHP session on kernel.response, and
         // the next request is silently re-authenticated -> this listener fires again -> infinite redirect loop.
         $this->tokenStorage->setToken(null);
+        // Before the invalidation, which replaces the session ID the grant is keyed by.
+        $this->sudoMode->revoke();
         $event->getRequest()->getSession()->invalidate();
 
         $this->realtime->revoke();

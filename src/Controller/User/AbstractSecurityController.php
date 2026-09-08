@@ -443,6 +443,7 @@ abstract class AbstractSecurityController extends AbstractController
     public function sessionTerminate(
         string $series,
         Request $request,
+        SudoMode $sudoMode,
         #[CurrentUser]
         User|CompanyUser $user,
     ): Response {
@@ -473,6 +474,8 @@ abstract class AbstractSecurityController extends AbstractController
 
         if ($currentSeries === $series) {
             $handler->clearRememberMeCookie();
+            // Before the invalidation, which replaces the session ID the grant is keyed by.
+            $sudoMode->revoke();
             $request->getSession()->invalidate();
             $this->realtime->revoke();
 

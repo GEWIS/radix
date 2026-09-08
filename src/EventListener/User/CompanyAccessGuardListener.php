@@ -7,6 +7,7 @@ namespace App\EventListener\User;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\CompanyUser;
 use App\Security\User\Firewall;
+use App\Security\User\SudoMode;
 use App\Security\User\UserChecker;
 use App\Service\User\CompanyUserAccessPolicy;
 use DateTimeImmutable;
@@ -37,6 +38,7 @@ final readonly class CompanyAccessGuardListener
         private TranslatorInterface $translator,
         #[Autowire(service: 'security.firewall.map')]
         private FirewallMap $firewallMap,
+        private SudoMode $sudoMode,
     ) {
     }
 
@@ -68,6 +70,9 @@ final readonly class CompanyAccessGuardListener
         // Clear the token before invalidating the session, so the context listener cannot write it back on
         // kernel.response and re-authenticate the next request into the same dead end.
         $this->tokenStorage->setToken(null);
+
+        // Before the invalidation, which replaces the session ID the grant is keyed by.
+        $this->sudoMode->revoke();
 
         $session = $request->getSession();
         $session->invalidate();

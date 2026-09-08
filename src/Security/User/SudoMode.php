@@ -91,6 +91,26 @@ final class SudoMode
         $this->redis->del($key);
     }
 
+    /**
+     * Drops the grant of a session other than the one making this request, which is what signing another device out
+     * has to do. Without it the grant would outlive the session it was given on by up to its own expiry.
+     */
+    public function revokeSession(
+        Firewall $firewall,
+        string $phpSessionId,
+    ): void {
+        if ('' === $phpSessionId) {
+            return;
+        }
+
+        $this->redis->del(
+            $this->keyFor(
+                $firewall->value,
+                $phpSessionId,
+            ),
+        );
+    }
+
     public function remainingSeconds(): int
     {
         $identifier = $this->userIdentifier();
@@ -167,7 +187,17 @@ final class SudoMode
             return null;
         }
 
-        return self::KEY_PREFIX . $firewall . '_' . $sessionId;
+        return $this->keyFor(
+            $firewall,
+            $sessionId,
+        );
+    }
+
+    private function keyFor(
+        string $firewall,
+        string $phpSessionId,
+    ): string {
+        return self::KEY_PREFIX . $firewall . '_' . $phpSessionId;
     }
 
     private function userIdentifier(): ?string

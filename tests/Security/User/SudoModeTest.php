@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Security\User;
 
+use App\Security\User\Firewall;
 use App\Tests\Support\BuildsSudoMode;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
@@ -173,5 +174,34 @@ final class SudoModeTest extends TestCase
         $session->replace($readByTheOtherTab);
 
         self::assertTrue($sudo->isActive());
+    }
+
+    /** Signing another device out has to take its grant with it; the session it belongs to is not this one. */
+    public function testRevokingAnotherSessionDropsItsGrant(): void
+    {
+        $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
+
+        $other = $this->session('the-other-device');
+        $this->sudoMode(
+            $other,
+            $tokenStorage,
+            valkey: $valkey,
+        )->grant();
+
+        $this->sudoMode(
+            $this->session(),
+            $tokenStorage,
+            valkey: $valkey,
+        )->revokeSession(
+            Firewall::Main,
+            'the-other-device',
+        );
+
+        self::assertFalse($this->sudoMode(
+            $other,
+            $tokenStorage,
+            valkey: $valkey,
+        )->isActive());
     }
 }
