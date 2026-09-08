@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace App\Tests\Security\User;
 
-use App\Security\User\SudoMode;
+use App\Security\User\Firewall;
+use App\Tests\Support\BuildsSudoMode;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 final class SudoModeTest extends TestCase
 {
+    use BuildsSudoMode;
+
     public function testAPasswordJustTypedUnlocksTheFirewallItWasTypedOn(): void
     {
         $session = $this->session();
@@ -40,18 +35,56 @@ final class SudoModeTest extends TestCase
     {
         $session = $this->session();
         $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
 
         $this->sudoMode(
             $session,
             $tokenStorage,
             'company',
+            valkey: $valkey,
         )->grant();
 
         self::assertFalse($this->sudoMode(
             $session,
             $tokenStorage,
             'main',
+            valkey: $valkey,
         )->isActive());
+    }
+
+    public function testAGrantOnOneSessionIsNotAGrantOnAnother(): void
+    {
+        $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
+
+        $this->sudoMode(
+            $this->session('the-session-it-was-typed-on'),
+            $tokenStorage,
+            'main',
+            valkey: $valkey,
+        )->grant();
+
+        self::assertFalse($this->sudoMode(
+            $this->session('a-session-it-was-not'),
+            $tokenStorage,
+            'main',
+            valkey: $valkey,
+        )->isActive());
+    }
+
+    public function testAStatelessFirewallHoldsNoGrant(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
+
+        $sudo = $this->sudoMode(
+            $session,
+            $tokenStorage,
+            'api',
+        );
+        $sudo->grant();
+
+        self::assertFalse($sudo->isActive());
     }
 
     public function testAGrantDoesNotSurviveTheSessionBecomingSomebodyElses(): void
@@ -100,16 +133,19 @@ final class SudoModeTest extends TestCase
     {
         $session = $this->session();
         $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
 
         $main = $this->sudoMode(
             $session,
             $tokenStorage,
             'main',
+            valkey: $valkey,
         );
         $company = $this->sudoMode(
             $session,
             $tokenStorage,
             'company',
+            valkey: $valkey,
         );
 
         $main->grant();
@@ -120,49 +156,110 @@ final class SudoModeTest extends TestCase
         self::assertFalse($company->isActive());
     }
 
-    private function sudoMode(
-        SessionInterface $session,
-        TokenStorageInterface $tokenStorage,
-        string $firewall,
-        ?MockClock $clock = null,
-    ): SudoMode {
-        // A grant is only read back off a session the request already carried, so the cookie has to be there.
-        $request = new Request(cookies: [$session->getName() => 'a-session-id']);
-        $request->setSession($session);
+    /** A second tab used to overwrite the session it had read, dropping a grant written in the meantime. */
+    public function testAConcurrentSessionWriteDoesNotDropAGrant(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
 
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
+        $sudo = $this->sudoMode(
+            $session,
+            $tokenStorage,
+            'main',
+        );
 
-        $firewallMap = self::createStub(FirewallMap::class);
-        $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig(
-            $firewall,
-            'security.user_checker',
-        ));
+        $readByTheOtherTab = $session->all();
 
-        return new SudoMode(
-            $requestStack,
-            $clock ?? new MockClock(),
-            $firewallMap,
+        $sudo->grant();
+
+        $session->replace($readByTheOtherTab);
+
+        self::assertTrue($sudo->isActive());
+    }
+
+    /**
+     * The account on the token while impersonating is the one being looked at, but the grant belongs to the
+     * administrator who typed a password to get there.
+     */
+    public function testAnImpersonatorKeepsTheGrantTheyConfirmedThemselves(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
+
+        $sudo = $this->sudoMode(
+            $session,
             $tokenStorage,
         );
-    }
+        $sudo->grant();
 
-    private function session(): SessionInterface
-    {
-        return new Session(new MockArraySessionStorage());
-    }
+        $administrator = $tokenStorage->getToken();
+        self::assertNotNull($administrator);
 
-    private function tokenStorage(string $userIdentifier): TokenStorageInterface
-    {
-        $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken(
+        $tokenStorage->setToken(new SwitchUserToken(
             new InMemoryUser(
-                $userIdentifier,
+                '8001',
                 null,
             ),
             'main',
+            ['ROLE_USER'],
+            $administrator,
         ));
 
-        return $tokenStorage;
+        self::assertTrue($sudo->isActive());
+    }
+
+    public function testAnImpersonationOnASessionThatNeverConfirmedHoldsNoGrant(): void
+    {
+        $session = $this->session();
+        $tokenStorage = $this->tokenStorage('8025');
+
+        $sudo = $this->sudoMode(
+            $session,
+            $tokenStorage,
+        );
+
+        $administrator = $tokenStorage->getToken();
+        self::assertNotNull($administrator);
+
+        $tokenStorage->setToken(new SwitchUserToken(
+            new InMemoryUser(
+                '8001',
+                null,
+            ),
+            'main',
+            ['ROLE_USER'],
+            $administrator,
+        ));
+
+        self::assertFalse($sudo->isActive());
+    }
+
+    /** Signing another device out has to take its grant with it; the session it belongs to is not this one. */
+    public function testRevokingAnotherSessionDropsItsGrant(): void
+    {
+        $tokenStorage = $this->tokenStorage('8025');
+        $valkey = $this->valkey();
+
+        $other = $this->session('the-other-device');
+        $this->sudoMode(
+            $other,
+            $tokenStorage,
+            valkey: $valkey,
+        )->grant();
+
+        $this->sudoMode(
+            $this->session(),
+            $tokenStorage,
+            valkey: $valkey,
+        )->revokeSession(
+            Firewall::Main,
+            'the-other-device',
+        );
+
+        self::assertFalse($this->sudoMode(
+            $other,
+            $tokenStorage,
+            valkey: $valkey,
+        )->isActive());
     }
 }

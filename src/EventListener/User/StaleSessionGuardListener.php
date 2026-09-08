@@ -8,6 +8,7 @@ use App\Repository\User\SessionRepository;
 use App\Security\User\CredentialsSignature;
 use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
+use App\Security\User\SudoMode;
 use App\Security\User\UserAgentParser;
 use App\Service\Application\RealtimeAuthorization;
 use App\Service\User\KnownDeviceRegistry;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
@@ -48,11 +51,6 @@ use function assert;
 #[AsEventListener(event: RequestEvent::class)]
 final class StaleSessionGuardListener
 {
-    /**
-     * Do not write lastUsedAt more than once per this many seconds to spare the DB.
-     */
-    private const int LAST_USED_THROTTLE_SECONDS = 180;
-
     public function __construct(
         private readonly SessionRepository $repository,
         private readonly HandlerRegistry $registry,
@@ -68,6 +66,9 @@ final class StaleSessionGuardListener
         private readonly KnownDeviceRegistry $knownDevices,
         private readonly CredentialsSignature $credentials,
         private readonly RealtimeAuthorization $realtime,
+        private readonly SudoMode $sudoMode,
+        #[Autowire(param: 'app.session_last_used_threshold')]
+        private readonly int $lastUsedThreshold,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -142,7 +143,7 @@ final class StaleSessionGuardListener
         // The remember-me handler makes the same comparison, but only on a request that hands it the cookie, which a
         // device with a live PHP session never makes: Valkey pushes that session's expiry forward on every request,
         // so without this a password reset would leave whoever it was meant to shut out signed in.
-        $user = $this->security->getUser();
+        $user = $this->signedInUser();
         if (
             null !== $user
             && !$this->credentials->matches(
@@ -219,7 +220,7 @@ final class StaleSessionGuardListener
         // Throttled lastUsedAt bump so the security UI's "Last seen" reflects real activity rather than only the
         // moments of token rotation.
         $now = new DateTimeImmutable();
-        $staleAfter = $now->modify('-' . self::LAST_USED_THROTTLE_SECONDS . ' seconds');
+        $staleAfter = $now->modify('-' . $this->lastUsedThreshold . ' seconds');
         $inUse = $managedSession->getLastUsedAt() < $staleAfter;
         if ($inUse) {
             $managedSession->setLastUsedAt($now);
@@ -236,12 +237,28 @@ final class StaleSessionGuardListener
 
         // Somebody working in a device they signed in from months ago is the same reason to keep it recognised as
         // signing in from it again would be, and this is the only place that sees them do it. Behind the same throttle
-        // as the bump above, so it costs one lookup per three minutes of activity.
+        // as the bump above, so it costs one lookup per window of activity.
         $this->knownDevices->refresh(
             $managedSession->getUserIdentifier(),
             $firewall,
             $request,
         );
+    }
+
+    /**
+     * The account the row was stamped for, which while impersonating is the administrator rather than the member they
+     * are looking at. Comparing the member's credentials against the administrator's row is a mismatch every time, and
+     * tore the session down the moment an impersonated request got this far.
+     */
+    private function signedInUser(): ?UserInterface
+    {
+        $token = $this->tokenStorage->getToken();
+
+        while ($token instanceof SwitchUserToken) {
+            $token = $token->getOriginalToken();
+        }
+
+        return $token?->getUser();
     }
 
     private function forceLogout(
@@ -252,6 +269,8 @@ final class StaleSessionGuardListener
         // ContextListener writes the still-active token back to the freshly-created PHP session on kernel.response, and
         // the next request is silently re-authenticated -> this listener fires again -> infinite redirect loop.
         $this->tokenStorage->setToken(null);
+        // Before the invalidation, which replaces the session ID the grant is keyed by.
+        $this->sudoMode->revoke();
         $event->getRequest()->getSession()->invalidate();
 
         $this->realtime->revoke();

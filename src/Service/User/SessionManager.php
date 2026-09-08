@@ -8,8 +8,10 @@ use App\Entity\User\Session;
 use App\Message\User\RevokeSessionsRealtimeMessage;
 use App\Repository\User\SessionRepository;
 use App\Security\User\CredentialsSignature;
+use App\Security\User\Firewall;
 use App\Security\User\HandlerRegistry;
 use App\Security\User\SessionRowSignature;
+use App\Security\User\SudoMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Redis;
@@ -42,6 +44,7 @@ final class SessionManager
         private readonly MessageBusInterface $messageBus,
         private readonly CredentialsSignature $credentials,
         private readonly SessionRowSignature $rowSignature,
+        private readonly SudoMode $sudoMode,
         private readonly LoggerInterface $logger,
         #[Autowire(service: 'Redis')]
         private readonly Redis $redis,
@@ -112,9 +115,9 @@ final class SessionManager
 
         // Same guard as terminateAllExceptCurrent(): if a zombie row points at the live PHP session ID, destroying it
         // would wipe the caller's session in Valkey and silently log them out (and, via remember-me, drop them back at
-        // the sudo-confirm prompt because the sudo grant lived on the wiped session). So, we must drop the DB row but
-        // skip the destroy(). No real-time revocation either: this is the caller's own device and the controller
-        // already logs it out.
+        // the sudo-confirm prompt because the sudo grant is held against the wiped session). So, we must drop the DB
+        // row but skip the destroy(). No real-time revocation either: this is the caller's own device and the
+        // controller already logs it out.
         if ($session->getPhpSessionId() === $request->getSession()->getId()) {
             $this->em->remove($session);
             $this->em->flush();
@@ -270,6 +273,16 @@ final class SessionManager
 
         if ('' !== $phpSessionId) {
             $this->redis->del($this->sessionPrefix . $phpSessionId);
+
+            // The grant is keyed by session ID rather than held on the session, so destroying the session no longer
+            // takes it with it.
+            $firewall = Firewall::tryFrom($session->getFirewallName());
+            if (null !== $firewall) {
+                $this->sudoMode->revokeSession(
+                    $firewall,
+                    $phpSessionId,
+                );
+            }
         }
 
         $this->em->remove($session);

@@ -4,6 +4,11 @@ parameters:
     # Named rather than left to `session.gc_maxlifetime`, whose twenty-four minutes had an ordinary break ending in
     # a remember-me re-authentication, and a token rotation with it.
     app.session_ttl: 28800
+    # How stale a "last used" stamp may get before it is written again. Shared by the two that keep one: the session
+    # metadata in Valkey (`framework.session.metadata_update_threshold`) and the `lastUsedAt` of a managed session row
+    # (StaleSessionGuardListener). Both write on a request that otherwise changes nothing, and both are read only to
+    # report when a session was last seen.
+    app.session_last_used_threshold: 180
 
 services:
     app.security.remember_me.main:
