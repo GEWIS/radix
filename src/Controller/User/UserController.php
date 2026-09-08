@@ -22,6 +22,7 @@ use App\Service\User\ExternalAppService;
 use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
 use App\Service\User\PasswordResetService;
+use App\Service\User\SecurityEventLogger;
 use App\Service\User\SessionManager;
 use DateTimeImmutable;
 use Override;
@@ -57,6 +58,7 @@ class UserController extends AbstractSecurityController
         PasswordResetService $passwordResetService,
         KnownDeviceRegistry $knownDevices,
         RealtimeAuthorization $realtime,
+        SecurityEventLogger $securityEvents,
         private readonly UserRepository $userRepository,
         private readonly ExternalAppRepository $externalAppRepository,
         private readonly ExternalAppAuthenticationRepository $externalAppAuthenticationRepository,
@@ -72,6 +74,7 @@ class UserController extends AbstractSecurityController
             $passwordResetService,
             $knownDevices,
             $realtime,
+            $securityEvents,
             routePrefix: 'user_',
             userType: UserTypes::User,
         );

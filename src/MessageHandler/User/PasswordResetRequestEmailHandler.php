@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\MessageHandler\User;
 
 use App\Entity\Decision\Member;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\Enums\UserTypes;
 use App\Entity\User\PasswordReset;
 use App\Message\User\PasswordResetRequestEmail;
 use App\Repository\Decision\MemberRepository;
 use App\Repository\User\CompanyUserRepository;
 use App\Repository\User\PasswordResetRepository;
+use App\Service\User\SecurityEventLogger;
 use App\Util\Application\SplitToken;
 use DateInterval;
 use DateTimeImmutable;
@@ -42,6 +44,7 @@ class PasswordResetRequestEmailHandler
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly SecurityEventLogger $securityEvents,
     ) {
     }
 
@@ -96,6 +99,18 @@ class PasswordResetRequestEmailHandler
             // controller already shows the generic "if there is an account..." message.
             return;
         }
+
+        // Recorded here rather than in the controller that asked for it, because this is the first point at which the
+        // account is known: the request itself is answered identically whether one exists or not, and recording what
+        // was typed would mean keeping addresses belonging to people who are not members. The cost is that the row
+        // carries no address of its own -- a worker is answering nobody's request.
+        $this->securityEvents->record(
+            SecurityEventType::PasswordResetRequested,
+            $member instanceof Member
+                ? (string) $member->getLidnr()
+                : $companyUser->getUserIdentifier(),
+            $member instanceof Member ? 'main' : 'company',
+        );
 
         $split = SplitToken::generate(
             self::SELECTOR_BYTES,

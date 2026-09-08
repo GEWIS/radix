@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\EventListener\Database;
 
 use App\Entity\Application\Enums\AlertTypes;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Security\Database\RegisterNetworkChecker;
+use App\Service\User\SecurityEventLogger;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -45,6 +47,7 @@ final readonly class RegisterNetworkAccessDeniedListener
 
     public function __construct(
         private RegisterNetworkChecker $networkChecker,
+        private SecurityEventLogger $securityEvents,
         private TokenStorageInterface $tokenStorage,
         private UrlGeneratorInterface $urlGenerator,
         private TranslatorInterface $translator,
@@ -87,6 +90,17 @@ final readonly class RegisterNetworkAccessDeniedListener
         }
 
         $request = $event->getRequest();
+
+        // Recorded before the response is decided, so that a denial still shows up for somebody who has no session
+        // to be told in.
+        $this->securityEvents->record(
+            SecurityEventType::RegisterAccessRefused,
+            $user->getUserIdentifier(),
+            null,
+            ['route' => $request->attributes->getString('_route')],
+            $request,
+        );
+
         if (!$request->hasSession()) {
             return;
         }

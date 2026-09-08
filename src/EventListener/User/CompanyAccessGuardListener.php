@@ -6,10 +6,12 @@ namespace App\EventListener\User;
 
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\CompanyUser;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Security\User\Firewall;
 use App\Security\User\SudoMode;
 use App\Security\User\UserChecker;
 use App\Service\User\CompanyUserAccessPolicy;
+use App\Service\User\SecurityEventLogger;
 use DateTimeImmutable;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
@@ -39,6 +41,7 @@ final readonly class CompanyAccessGuardListener
         #[Autowire(service: 'security.firewall.map')]
         private FirewallMap $firewallMap,
         private SudoMode $sudoMode,
+        private SecurityEventLogger $securityEvents,
     ) {
     }
 
@@ -66,6 +69,14 @@ final readonly class CompanyAccessGuardListener
         ) {
             return;
         }
+
+        $this->securityEvents->record(
+            SecurityEventType::CompanyAccessRevoked,
+            $companyUser->getUserIdentifier(),
+            Firewall::Company->value,
+            [],
+            $request,
+        );
 
         // Clear the token before invalidating the session, so the context listener cannot write it back on
         // kernel.response and re-authenticate the next request into the same dead end.

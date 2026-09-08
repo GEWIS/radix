@@ -757,6 +757,10 @@
         <source>ALV-Werkgroep</source>
         <target state="translated">ALV-Werkgroep</target>
       </trans-unit>
+      <trans-unit id="6e8o.wA" resname="API">
+        <source>API</source>
+        <target state="translated">API</target>
+      </trans-unit>
       <trans-unit id="gDAicwp" resname="API User">
         <source>API User</source>
         <target state="translated">API-gebruiker</target>
@@ -768,6 +772,14 @@
       <trans-unit id="dPK53_T" resname="API principals">
         <source>API principals</source>
         <target state="translated">API-gebruikers</target>
+      </trans-unit>
+      <trans-unit id="_6bZfh4" resname="API rate limit exceeded">
+        <source>API rate limit exceeded</source>
+        <target state="translated">API-limiet overschreden</target>
+      </trans-unit>
+      <trans-unit id="nMcaoXH" resname="API token refused">
+        <source>API token refused</source>
+        <target state="translated">API-token geweigerd</target>
       </trans-unit>
       <trans-unit id="KNRiz0N" resname="Abbreviation">
         <source>Abbreviation</source>
@@ -1613,6 +1625,10 @@
         <source>Attention needed</source>
         <target state="translated">Aandacht nodig</target>
       </trans-unit>
+      <trans-unit id="D.UbKe4" resname="Authentication">
+        <source>Authentication</source>
+        <target state="translated">Authenticatie</target>
+      </trans-unit>
       <trans-unit id="devFmcu" resname="Author">
         <source>Author</source>
         <target state="translated">Auteur</target>
@@ -1733,6 +1749,10 @@
         <source>Back to the company</source>
         <target state="translated">Terug naar het bedrijf</target>
       </trans-unit>
+      <trans-unit id="u2nYDaz" resname="Backup code used">
+        <source>Backup code used</source>
+        <target state="translated">Back-upcode gebruikt</target>
+      </trans-unit>
       <trans-unit id="9PmFUn6" resname="Backup codes">
         <source>Backup codes</source>
         <target state="translated">Back-upcodes</target>
@@ -1744,6 +1764,10 @@
       <trans-unit id="xpQOd56" resname="Backup codes have already been shown. Regenerate to get a new set.">
         <source>Backup codes have already been shown. Regenerate to get a new set.</source>
         <target state="translated">De back-upcodes zijn al weergegeven. Genereer nieuwe back-upcodes om een nieuwe set te krijgen.</target>
+      </trans-unit>
+      <trans-unit id="cToohtZ" resname="Backup codes regenerated">
+        <source>Backup codes regenerated</source>
+        <target state="translated">Back-upcodes opnieuw gegenereerd</target>
       </trans-unit>
       <trans-unit id="aUj7.8J" resname="Backup codes regenerated. The previous codes are no longer valid.">
         <source>Backup codes regenerated. The previous codes are no longer valid.</source>
@@ -1952,6 +1976,10 @@
       <trans-unit id="c4Zkzxq" resname="By">
         <source>By</source>
         <target state="translated">Door</target>
+      </trans-unit>
+      <trans-unit id="2jJAPJf" resname="By %actor%">
+        <source>By %actor%</source>
+        <target state="translated">Door %actor%</target>
       </trans-unit>
       <trans-unit id="MbZy9Nf" resname="By type">
         <source>By type</source>
@@ -2333,6 +2361,10 @@
         <source>Company Users</source>
         <target state="translated">Bedrijfsgebruikers</target>
       </trans-unit>
+      <trans-unit id="qc1Bs7a" resname="Company access withdrawn">
+        <source>Company access withdrawn</source>
+        <target state="translated">Bedrijfstoegang ingetrokken</target>
+      </trans-unit>
       <trans-unit id="DifjhI6" resname="Company accounts">
         <source>Company accounts</source>
         <target state="translated">Bedrijfsaccounts</target>
@@ -2424,6 +2456,10 @@
       <trans-unit id="cb4I4C3" resname="Confirm your sign-up">
         <source>Confirm your sign-up</source>
         <target state="translated">Bevestig je inschrijving</target>
+      </trans-unit>
+      <trans-unit id="8FFY_6b" resname="Confirmation">
+        <source>Confirmation</source>
+        <target state="translated">Bevestiging</target>
       </trans-unit>
       <trans-unit id="4NzFMHh" resname="Confirmed %count% membership renewal(s).">
         <source>Confirmed %count% membership renewal(s).</source>
@@ -2729,6 +2765,14 @@
         <source>Data export</source>
         <target>Gegevensexport</target>
       </trans-unit>
+      <trans-unit id="nv9VXZx" resname="Data export downloaded">
+        <source>Data export downloaded</source>
+        <target state="translated">Gegevensexport gedownload</target>
+      </trans-unit>
+      <trans-unit id="K_E_Csz" resname="Data export requested">
+        <source>Data export requested</source>
+        <target state="translated">Gegevensexport aangevraagd</target>
+      </trans-unit>
       <trans-unit id="_0b32_R" resname="Data exports">
         <source>Data exports</source>
         <target state="translated">Gegevensexports</target>
@@ -2968,6 +3012,10 @@
       <trans-unit id="lh.oZIZ" resname="Details and committees">
         <source>Details and committees</source>
         <target state="translated">Gegevens en commissies</target>
+      </trans-unit>
+      <trans-unit id="ESIszjr" resname="Device presented on the wrong firewall">
+        <source>Device presented on the wrong firewall</source>
+        <target state="translated">Apparaat aangeboden op de verkeerde firewall</target>
       </trans-unit>
       <trans-unit id="7chmnoI" resname="Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.">
         <source>Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.</source>
@@ -3545,6 +3593,10 @@
         <source>Evening</source>
         <target state="translated">Avond</target>
       </trans-unit>
+      <trans-unit id="Fjwtl6P" resname="Event">
+        <source>Event</source>
+        <target state="translated">Gebeurtenis</target>
+      </trans-unit>
       <trans-unit id="U3hnjYE" resname="Every active session for this user will be terminated immediately.">
         <source>Every active session for this user will be terminated immediately.</source>
         <target state="translated">Alle actieve sessies van deze gebruiker worden direct beëindigd.</target>
@@ -3685,6 +3737,10 @@
         <source>Everything is clear</source>
         <target state="translated">Alles is afgehandeld</target>
       </trans-unit>
+      <trans-unit id="A4I0oqr" resname="Everything kept">
+        <source>Everything kept</source>
+        <target state="translated">Alles wat bewaard is</target>
+      </trans-unit>
       <trans-unit id="09wa3mW" resname="Everything shows up on the website. Pick which topics you also want by email, and how often they should reach you. Notices about your own account and your privacy are always sent and cannot be turned off.">
         <source>Everything shows up on the website. Pick which topics you also want by email, and how often they should reach you. Notices about your own account and your privacy are always sent and cannot be turned off.</source>
         <target state="translated">Alles verschijnt op de website. Kies over welke onderwerpen je ook e-mail wilt en hoe vaak. Meldingen over je eigen account en je privacy worden altijd verstuurd en kunnen niet worden uitgezet.</target>
@@ -3812,6 +3868,10 @@
       <trans-unit id="6esltbj" resname="External - Admitted by the board">
         <source>External - Admitted by the board</source>
         <target state="translated">Extern - Toegelaten door het bestuur</target>
+      </trans-unit>
+      <trans-unit id="EnC4OGI" resname="External application authorised">
+        <source>External application authorised</source>
+        <target state="translated">Externe applicatie geautoriseerd</target>
       </trans-unit>
       <trans-unit id="SkqnrJk" resname="External applications">
         <source>External applications</source>
@@ -4533,6 +4593,14 @@
         <source>Identity</source>
         <target state="translated">Identiteit</target>
       </trans-unit>
+      <trans-unit id="yvBWDji" resname="Identity confirmation failed">
+        <source>Identity confirmation failed</source>
+        <target state="translated">Bevestigen van identiteit mislukt</target>
+      </trans-unit>
+      <trans-unit id="V1iqbnQ" resname="Identity confirmed">
+        <source>Identity confirmed</source>
+        <target state="translated">Identiteit bevestigd</target>
+      </trans-unit>
       <trans-unit id="jFs7gBY" resname="If a pending sign-up exists for this email address, we have sent a new confirmation link.">
         <source>If a pending sign-up exists for this email address, we have sent a new confirmation link.</source>
         <target state="translated">Als er een aanmelding in behandeling is voor dit e-mailadres, hebben we een nieuwe bevestigingslink gestuurd.</target>
@@ -4596,6 +4664,18 @@
       <trans-unit id="0QlUu9B" resname="Immediately">
         <source>Immediately</source>
         <target>Direct</target>
+      </trans-unit>
+      <trans-unit id="ThV9CKS" resname="Impersonation">
+        <source>Impersonation</source>
+        <target state="translated">Overnemen van een account</target>
+      </trans-unit>
+      <trans-unit id="5c9IvL4" resname="Impersonation started">
+        <source>Impersonation started</source>
+        <target state="translated">Overnemen van account gestart</target>
+      </trans-unit>
+      <trans-unit id="UanxVkI" resname="Impersonation stopped">
+        <source>Impersonation stopped</source>
+        <target state="translated">Overnemen van account gestopt</target>
       </trans-unit>
       <trans-unit id="AZfPAZa" resname="Improve security by signing out of other devices.">
         <source>Improve security by signing out of other devices.</source>
@@ -4909,6 +4989,10 @@
         <source>Kind of decision</source>
         <target state="translated">Soort besluit</target>
       </trans-unit>
+      <trans-unit id="wKGasLQ" resname="Kind of event">
+        <source>Kind of event</source>
+        <target state="translated">Soort gebeurtenis</target>
+      </trans-unit>
       <trans-unit id="FHllCNm" resname="LEGACY Onderwijscommissaris">
         <source>LEGACY Onderwijscommissaris</source>
         <target state="translated">Onderwijscommissaris</target>
@@ -4928,6 +5012,10 @@
       <trans-unit id="xkMjr4i" resname="Lapsed">
         <source>Lapsed</source>
         <target state="translated">Vervallen</target>
+      </trans-unit>
+      <trans-unit id="Znf63bo" resname="Last %count% day(s)">
+        <source>Last %count% day(s)</source>
+        <target state="translated">Afgelopen %count% dag(en)</target>
       </trans-unit>
       <trans-unit id="kMjMOLe" resname="Last Day">
         <source>Last Day</source>
@@ -5493,6 +5581,10 @@
         <source>Membership number</source>
         <target state="translated">Lidmaatschapsnummer</target>
       </trans-unit>
+      <trans-unit id="_iGmiqI" resname="Membership number, email address or IP address">
+        <source>Membership number, email address or IP address</source>
+        <target state="translated">Lidnummer, e-mailadres of IP-adres</target>
+      </trans-unit>
       <trans-unit id="HrlCGQS" resname="Membership numbers">
         <source>Membership numbers</source>
         <target state="translated">Lidmaatschapsnummers</target>
@@ -5621,6 +5713,10 @@
         <source>Modifications</source>
         <target state="translated">Wijzigingen</target>
       </trans-unit>
+      <trans-unit id="7hw57N3" resname="Monitoring">
+        <source>Monitoring</source>
+        <target state="translated">Monitoring</target>
+      </trans-unit>
       <trans-unit id="wHBscUb" resname="More of my photos">
         <source>More of my photos</source>
         <target>Meer van mijn foto's</target>
@@ -5668,6 +5764,14 @@
       <trans-unit id="kJyiVGV" resname="Multi-factor authentication cannot be disabled while it is required for your role.">
         <source>Multi-factor authentication cannot be disabled while it is required for your role.</source>
         <target state="translated">Tweestapsverificatie kan niet worden uitgeschakeld zolang deze voor jouw rol verplicht is.</target>
+      </trans-unit>
+      <trans-unit id="ersBnK4" resname="Multi-factor authentication disabled">
+        <source>Multi-factor authentication disabled</source>
+        <target state="translated">Multi-factor authenticatie uitgeschakeld</target>
+      </trans-unit>
+      <trans-unit id="6P7zCMb" resname="Multi-factor authentication enabled">
+        <source>Multi-factor authentication enabled</source>
+        <target state="translated">Multi-factor authenticatie ingeschakeld</target>
       </trans-unit>
       <trans-unit id="ssXNW8n" resname="Multi-factor authentication is not enabled for this user.">
         <source>Multi-factor authentication is not enabled for this user.</source>
@@ -5768,6 +5872,10 @@
       <trans-unit id="3O9qm56" resname="Neither">
         <source>Neither</source>
         <target>Geen van beide</target>
+      </trans-unit>
+      <trans-unit id="Q8e1h.i" resname="Networks">
+        <source>Networks</source>
+        <target state="translated">Netwerken</target>
       </trans-unit>
       <trans-unit id="pK.xkHw" resname="Never">
         <source>Never</source>
@@ -6465,6 +6573,10 @@
         <source>Nothing waiting here</source>
         <target state="translated">Hier wacht niets</target>
       </trans-unit>
+      <trans-unit id="RlPqtUC" resname="Nothing was recorded in this period.">
+        <source>Nothing was recorded in this period.</source>
+        <target state="translated">In deze periode is niets vastgelegd.</target>
+      </trans-unit>
       <trans-unit id="Pgw1rmH" resname="Nothing yet">
         <source>Nothing yet</source>
         <target state="translated">Nog niets</target>
@@ -6757,6 +6869,10 @@
         <source>Organising party</source>
         <target>Organiserende partij</target>
       </trans-unit>
+      <trans-unit id="k6riWiF" resname="Origin">
+        <source>Origin</source>
+        <target state="translated">Herkomst</target>
+      </trans-unit>
       <trans-unit id="aiFSOsy" resname="Other">
         <source>Other</source>
         <target state="translated">Overig</target>
@@ -6865,13 +6981,33 @@
         <source>Password and sessions</source>
         <target state="translated">Wachtwoord en sessies</target>
       </trans-unit>
+      <trans-unit id="uX0X7tx" resname="Password changed">
+        <source>Password changed</source>
+        <target state="translated">Wachtwoord gewijzigd</target>
+      </trans-unit>
       <trans-unit id=".Gj312w" resname="Password requirements">
         <source>Password requirements</source>
         <target state="translated">Wachtwoordeisen</target>
       </trans-unit>
+      <trans-unit id="o9XeFFI" resname="Password reset completed">
+        <source>Password reset completed</source>
+        <target state="translated">Wachtwoordherstel voltooid</target>
+      </trans-unit>
+      <trans-unit id="X.UKwB_" resname="Password reset link refused">
+        <source>Password reset link refused</source>
+        <target state="translated">Wachtwoordherstellink geweigerd</target>
+      </trans-unit>
+      <trans-unit id="2TUj.v8" resname="Password reset requested">
+        <source>Password reset requested</source>
+        <target state="translated">Wachtwoordherstel aangevraagd</target>
+      </trans-unit>
       <trans-unit id="LTQgZqV" resname="Password updated successfully.">
         <source>Password updated successfully.</source>
         <target state="translated">Het wachtwoord is succesvol bijgewerkt.</target>
+      </trans-unit>
+      <trans-unit id="VTgKlwx" resname="Passwords">
+        <source>Passwords</source>
+        <target state="translated">Wachtwoorden</target>
       </trans-unit>
       <trans-unit id="KuOux_1" resname="Paste this into a LaTeX editor to produce the document.">
         <source>Paste this into a LaTeX editor to produce the document.</source>
@@ -6928,6 +7064,10 @@
       <trans-unit id="hPqPyLn" resname="Per page">
         <source>Per page</source>
         <target state="translated">Per pagina</target>
+      </trans-unit>
+      <trans-unit id=".JfJF1w" resname="Period">
+        <source>Period</source>
+        <target state="translated">Periode</target>
       </trans-unit>
       <trans-unit id="Pb977EF" resname="Permissions">
         <source>Permissions</source>
@@ -7613,6 +7753,10 @@
         <source>Register member</source>
         <target state="translated">Lid inschrijven</target>
       </trans-unit>
+      <trans-unit id="3Gl7d2r" resname="Register refused from this network">
+        <source>Register refused from this network</source>
+        <target state="translated">Register geweigerd vanaf dit netwerk</target>
+      </trans-unit>
       <trans-unit id="W_u56BZ" resname="Registered">
         <source>Registered</source>
         <target state="translated">Ingeschreven</target>
@@ -7656,6 +7800,10 @@
       <trans-unit id="W4eVxqW" resname="Relieve a board member of their function.">
         <source>Relieve a board member of their function.</source>
         <target state="translated">Onthef een bestuurslid uit zijn of haar functie.</target>
+      </trans-unit>
+      <trans-unit id="9Lallty" resname="Remembered device presented twice">
+        <source>Remembered device presented twice</source>
+        <target state="translated">Onthouden apparaat tweemaal aangeboden</target>
       </trans-unit>
       <trans-unit id="fEeElvJ" resname="Remove">
         <source>Remove</source>
@@ -8293,6 +8441,14 @@
         <source>Searches the decision texts and understands meeting references such as “GMM 214” or “BM 1805.3.1”.</source>
         <target state="translated">Doorzoekt de besluitteksten en begrijpt vergaderreferenties zoals “ALV 214” of “BV 1805.3.1”.</target>
       </trans-unit>
+      <trans-unit id="J2xyH_G" resname="Second factor accepted">
+        <source>Second factor accepted</source>
+        <target state="translated">Tweede factor geaccepteerd</target>
+      </trans-unit>
+      <trans-unit id="hujmPld" resname="Second factor rejected">
+        <source>Second factor rejected</source>
+        <target state="translated">Tweede factor geweigerd</target>
+      </trans-unit>
       <trans-unit id="mlixqLr" resname="Second-year members">
         <source>Second-year members</source>
         <target>Tweedejaarsleden</target>
@@ -8308,6 +8464,10 @@
       <trans-unit id="8dn7uBl" resname="Security">
         <source>Security</source>
         <target state="translated">Beveiliging</target>
+      </trans-unit>
+      <trans-unit id="gdkabQl" resname="Security log">
+        <source>Security log</source>
+        <target state="translated">Beveiligingslogboek</target>
       </trans-unit>
       <trans-unit id="SQkSbRN" resname="See all">
         <source>See all</source>
@@ -8421,6 +8581,38 @@
         <source>Sensitive (only visible to the board and organiser)</source>
         <target state="translated">Gevoelig (alleen zichtbaar voor het bestuur en de organisator)</target>
       </trans-unit>
+      <trans-unit id="WW4P12M" resname="Session ended: browser or system changed">
+        <source>Session ended: browser or system changed</source>
+        <target state="translated">Sessie beëindigd: browser of systeem gewijzigd</target>
+      </trans-unit>
+      <trans-unit id="JFcstUT" resname="Session ended: credentials changed">
+        <source>Session ended: credentials changed</source>
+        <target state="translated">Sessie beëindigd: inloggegevens gewijzigd</target>
+      </trans-unit>
+      <trans-unit id="ZprXeFt" resname="Session ended: no remembered device">
+        <source>Session ended: no remembered device</source>
+        <target state="translated">Sessie beëindigd: geen onthouden apparaat</target>
+      </trans-unit>
+      <trans-unit id="hWxC12q" resname="Session ended: record could not be trusted">
+        <source>Session ended: record could not be trusted</source>
+        <target state="translated">Sessie beëindigd: registratie was niet te vertrouwen</target>
+      </trans-unit>
+      <trans-unit id="ctZ7A0a" resname="Session ended: unknown device">
+        <source>Session ended: unknown device</source>
+        <target state="translated">Sessie beëindigd: onbekend apparaat</target>
+      </trans-unit>
+      <trans-unit id="g8RV4Uj" resname="Session expired">
+        <source>Session expired</source>
+        <target state="translated">Sessie verlopen</target>
+      </trans-unit>
+      <trans-unit id="RFBMnb7" resname="Session resumed from a remembered device">
+        <source>Session resumed from a remembered device</source>
+        <target state="translated">Sessie hervat vanaf een onthouden apparaat</target>
+      </trans-unit>
+      <trans-unit id="BEy8HxS" resname="Session terminated">
+        <source>Session terminated</source>
+        <target state="translated">Sessie beëindigd</target>
+      </trans-unit>
       <trans-unit id="K84Ihek" resname="Sessions">
         <source>Sessions</source>
         <target state="translated">Sessies</target>
@@ -8428,6 +8620,10 @@
       <trans-unit id="R9ar2ea" resname="Sessions for %name%">
         <source>Sessions for %name%</source>
         <target state="translated">Sessies voor %name%</target>
+      </trans-unit>
+      <trans-unit id="6p6iXd7" resname="Sessions terminated">
+        <source>Sessions terminated</source>
+        <target state="translated">Sessies beëindigd</target>
       </trans-unit>
       <trans-unit id="mRFBZ2C" resname="Set as profile photo">
         <source>Set as profile photo</source>
@@ -8573,6 +8769,22 @@
         <source>Sign up for '%name%'</source>
         <target>Inschrijven voor '%name%'</target>
       </trans-unit>
+      <trans-unit id="9UI1IPw" resname="Sign-in failed">
+        <source>Sign-in failed</source>
+        <target state="translated">Aanmelden mislukt</target>
+      </trans-unit>
+      <trans-unit id="DOOVbUf" resname="Sign-in refused for this account">
+        <source>Sign-in refused for this account</source>
+        <target state="translated">Aanmelden geweigerd voor dit account</target>
+      </trans-unit>
+      <trans-unit id="GTuYf7a" resname="Sign-in required again">
+        <source>Sign-in required again</source>
+        <target state="translated">Opnieuw aanmelden vereist</target>
+      </trans-unit>
+      <trans-unit id="OFvFcow" resname="Sign-in throttled">
+        <source>Sign-in throttled</source>
+        <target state="translated">Aanmelden geblokkeerd na te veel pogingen</target>
+      </trans-unit>
       <trans-unit id="HYxhyIL" resname="Sign-ins">
         <source>Sign-ins</source>
         <target state="translated">Inloggen</target>
@@ -8629,9 +8841,17 @@
         <source>Sign-ups: %count%</source>
         <target state="translated">Inschrijvingen: %count%</target>
       </trans-unit>
+      <trans-unit id="OuDpD6H" resname="Signed in">
+        <source>Signed in</source>
+        <target state="translated">Aangemeld</target>
+      </trans-unit>
       <trans-unit id="lIY1Kot" resname="Signed in %date%">
         <source>Signed in %date%</source>
         <target state="translated">Ingelogd op %date%</target>
+      </trans-unit>
+      <trans-unit id="Zif_Cgh" resname="Signed out">
+        <source>Signed out</source>
+        <target state="translated">Afgemeld</target>
       </trans-unit>
       <trans-unit id="UdiKxgu" resname="Signed up">
         <source>Signed up</source>
@@ -10477,6 +10697,10 @@
         <source>Unpublished albums are only visible to the board.</source>
         <target state="translated">Niet-gepubliceerde albums zijn alleen zichtbaar voor het bestuur.</target>
       </trans-unit>
+      <trans-unit id="dm9mKBr" resname="Unrecognised remembered device presented">
+        <source>Unrecognised remembered device presented</source>
+        <target state="translated">Onbekend onthouden apparaat aangeboden</target>
+      </trans-unit>
       <trans-unit id="TeuL_GQ" resname="Unsubscribe">
         <source>Unsubscribe</source>
         <target>Uitschrijven</target>
@@ -10957,6 +11181,10 @@
         <source>What each transport is holding right now. A count that keeps climbing means the consumers of that transport are not keeping up.</source>
         <target state="translated">Wat elk transport op dit moment vasthoudt. Een aantal dat blijft oplopen betekent dat de consumers van dat transport het niet bijhouden.</target>
       </trans-unit>
+      <trans-unit id="OQoAQUB" resname="What happened to accounts: who signed in, who could not, whose session was ended and why. Kept for half a year, after which entries are removed. The application's own log files keep the same events for a little longer.">
+        <source>What happened to accounts: who signed in, who could not, whose session was ended and why. Kept for half a year, after which entries are removed. The application's own log files keep the same events for a little longer.</source>
+        <target state="translated">Wat er met accounts is gebeurd: wie zich heeft aangemeld, bij wie dat niet lukte, wiens sessie is beëindigd en waarom. Een half jaar bewaard, daarna worden vermeldingen verwijderd. De logbestanden van de applicatie bewaren dezelfde gebeurtenissen iets langer.</target>
+      </trans-unit>
       <trans-unit id="Plh8MiX" resname="What has happened">
         <source>What has happened</source>
         <target state="translated">Wat er gebeurd is</target>
@@ -11024,6 +11252,10 @@
       <trans-unit id="EYgzCv_" resname="What your body is recognised by on an overview card.">
         <source>What your body is recognised by on an overview card.</source>
         <target state="translated">Waaraan je orgaan wordt herkend op een overzichtskaart.</target>
+      </trans-unit>
+      <trans-unit id="5boi_9J" resname="When">
+        <source>When</source>
+        <target state="translated">Wanneer</target>
       </trans-unit>
       <trans-unit id="TDgj7w9" resname="When a body has changed its page and is waiting to be reviewed">
         <source>When a body has changed its page and is waiting to be reviewed</source>

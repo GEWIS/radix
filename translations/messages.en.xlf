@@ -757,6 +757,10 @@
         <source>ALV-Werkgroep</source>
         <target state="translated">GMM Taskforce</target>
       </trans-unit>
+      <trans-unit id="6e8o.wA" resname="API">
+        <source>API</source>
+        <target state="translated">API</target>
+      </trans-unit>
       <trans-unit id="gDAicwp" resname="API User">
         <source>API User</source>
         <target state="translated">API User</target>
@@ -768,6 +772,14 @@
       <trans-unit id="dPK53_T" resname="API principals">
         <source>API principals</source>
         <target state="translated">API principals</target>
+      </trans-unit>
+      <trans-unit id="_6bZfh4" resname="API rate limit exceeded">
+        <source>API rate limit exceeded</source>
+        <target state="translated">API rate limit exceeded</target>
+      </trans-unit>
+      <trans-unit id="nMcaoXH" resname="API token refused">
+        <source>API token refused</source>
+        <target state="translated">API token refused</target>
       </trans-unit>
       <trans-unit id="KNRiz0N" resname="Abbreviation">
         <source>Abbreviation</source>
@@ -1613,6 +1625,10 @@
         <source>Attention needed</source>
         <target state="translated">Attention needed</target>
       </trans-unit>
+      <trans-unit id="D.UbKe4" resname="Authentication">
+        <source>Authentication</source>
+        <target state="translated">Authentication</target>
+      </trans-unit>
       <trans-unit id="devFmcu" resname="Author">
         <source>Author</source>
         <target state="translated">Author</target>
@@ -1733,6 +1749,10 @@
         <source>Back to the company</source>
         <target state="translated">Back to the company</target>
       </trans-unit>
+      <trans-unit id="u2nYDaz" resname="Backup code used">
+        <source>Backup code used</source>
+        <target state="translated">Backup code used</target>
+      </trans-unit>
       <trans-unit id="9PmFUn6" resname="Backup codes">
         <source>Backup codes</source>
         <target state="translated">Backup codes</target>
@@ -1744,6 +1764,10 @@
       <trans-unit id="xpQOd56" resname="Backup codes have already been shown. Regenerate to get a new set.">
         <source>Backup codes have already been shown. Regenerate to get a new set.</source>
         <target state="translated">Backup codes have already been shown. Regenerate to get a new set.</target>
+      </trans-unit>
+      <trans-unit id="cToohtZ" resname="Backup codes regenerated">
+        <source>Backup codes regenerated</source>
+        <target state="translated">Backup codes regenerated</target>
       </trans-unit>
       <trans-unit id="aUj7.8J" resname="Backup codes regenerated. The previous codes are no longer valid.">
         <source>Backup codes regenerated. The previous codes are no longer valid.</source>
@@ -1952,6 +1976,10 @@
       <trans-unit id="c4Zkzxq" resname="By">
         <source>By</source>
         <target state="translated">By</target>
+      </trans-unit>
+      <trans-unit id="2jJAPJf" resname="By %actor%">
+        <source>By %actor%</source>
+        <target state="translated">By %actor%</target>
       </trans-unit>
       <trans-unit id="MbZy9Nf" resname="By type">
         <source>By type</source>
@@ -2333,6 +2361,10 @@
         <source>Company Users</source>
         <target state="translated">Company Users</target>
       </trans-unit>
+      <trans-unit id="qc1Bs7a" resname="Company access withdrawn">
+        <source>Company access withdrawn</source>
+        <target state="translated">Company access withdrawn</target>
+      </trans-unit>
       <trans-unit id="DifjhI6" resname="Company accounts">
         <source>Company accounts</source>
         <target state="translated">Company accounts</target>
@@ -2424,6 +2456,10 @@
       <trans-unit id="cb4I4C3" resname="Confirm your sign-up">
         <source>Confirm your sign-up</source>
         <target>Confirm your sign-up</target>
+      </trans-unit>
+      <trans-unit id="8FFY_6b" resname="Confirmation">
+        <source>Confirmation</source>
+        <target state="translated">Confirmation</target>
       </trans-unit>
       <trans-unit id="4NzFMHh" resname="Confirmed %count% membership renewal(s).">
         <source>Confirmed %count% membership renewal(s).</source>
@@ -2729,6 +2765,14 @@
         <source>Data export</source>
         <target>Data export</target>
       </trans-unit>
+      <trans-unit id="nv9VXZx" resname="Data export downloaded">
+        <source>Data export downloaded</source>
+        <target state="translated">Data export downloaded</target>
+      </trans-unit>
+      <trans-unit id="K_E_Csz" resname="Data export requested">
+        <source>Data export requested</source>
+        <target state="translated">Data export requested</target>
+      </trans-unit>
       <trans-unit id="_0b32_R" resname="Data exports">
         <source>Data exports</source>
         <target state="translated">Data exports</target>
@@ -2968,6 +3012,10 @@
       <trans-unit id="lh.oZIZ" resname="Details and committees">
         <source>Details and committees</source>
         <target state="translated">Details and committees</target>
+      </trans-unit>
+      <trans-unit id="ESIszjr" resname="Device presented on the wrong firewall">
+        <source>Device presented on the wrong firewall</source>
+        <target state="translated">Device presented on the wrong firewall</target>
       </trans-unit>
       <trans-unit id="7chmnoI" resname="Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.">
         <source>Devices where your account is currently signed in. If you notice an unrecognised device or location, terminate that session immediately and consider changing your password.</source>
@@ -3545,6 +3593,10 @@
         <source>Evening</source>
         <target state="translated">Evening</target>
       </trans-unit>
+      <trans-unit id="Fjwtl6P" resname="Event">
+        <source>Event</source>
+        <target state="translated">Event</target>
+      </trans-unit>
       <trans-unit id="U3hnjYE" resname="Every active session for this user will be terminated immediately.">
         <source>Every active session for this user will be terminated immediately.</source>
         <target state="translated">Every active session for this user will be terminated immediately.</target>
@@ -3685,6 +3737,10 @@
         <source>Everything is clear</source>
         <target state="translated">Everything is clear</target>
       </trans-unit>
+      <trans-unit id="A4I0oqr" resname="Everything kept">
+        <source>Everything kept</source>
+        <target state="translated">Everything kept</target>
+      </trans-unit>
       <trans-unit id="09wa3mW" resname="Everything shows up on the website. Pick which topics you also want by email, and how often they should reach you. Notices about your own account and your privacy are always sent and cannot be turned off.">
         <source>Everything shows up on the website. Pick which topics you also want by email, and how often they should reach you. Notices about your own account and your privacy are always sent and cannot be turned off.</source>
         <target state="translated">Everything shows up on the website. Pick which topics you also want by email, and how often they should reach you. Notices about your own account and your privacy are always sent and cannot be turned off.</target>
@@ -3812,6 +3868,10 @@
       <trans-unit id="6esltbj" resname="External - Admitted by the board">
         <source>External - Admitted by the board</source>
         <target state="translated">External - Admitted by the board</target>
+      </trans-unit>
+      <trans-unit id="EnC4OGI" resname="External application authorised">
+        <source>External application authorised</source>
+        <target state="translated">External application authorised</target>
       </trans-unit>
       <trans-unit id="SkqnrJk" resname="External applications">
         <source>External applications</source>
@@ -4533,6 +4593,14 @@
         <source>Identity</source>
         <target state="translated">Identity</target>
       </trans-unit>
+      <trans-unit id="yvBWDji" resname="Identity confirmation failed">
+        <source>Identity confirmation failed</source>
+        <target state="translated">Identity confirmation failed</target>
+      </trans-unit>
+      <trans-unit id="V1iqbnQ" resname="Identity confirmed">
+        <source>Identity confirmed</source>
+        <target state="translated">Identity confirmed</target>
+      </trans-unit>
       <trans-unit id="jFs7gBY" resname="If a pending sign-up exists for this email address, we have sent a new confirmation link.">
         <source>If a pending sign-up exists for this email address, we have sent a new confirmation link.</source>
         <target state="translated">If a pending sign-up exists for this email address, we have sent a new confirmation link.</target>
@@ -4596,6 +4664,18 @@
       <trans-unit id="0QlUu9B" resname="Immediately">
         <source>Immediately</source>
         <target>Immediately</target>
+      </trans-unit>
+      <trans-unit id="ThV9CKS" resname="Impersonation">
+        <source>Impersonation</source>
+        <target state="translated">Impersonation</target>
+      </trans-unit>
+      <trans-unit id="5c9IvL4" resname="Impersonation started">
+        <source>Impersonation started</source>
+        <target state="translated">Impersonation started</target>
+      </trans-unit>
+      <trans-unit id="UanxVkI" resname="Impersonation stopped">
+        <source>Impersonation stopped</source>
+        <target state="translated">Impersonation stopped</target>
       </trans-unit>
       <trans-unit id="AZfPAZa" resname="Improve security by signing out of other devices.">
         <source>Improve security by signing out of other devices.</source>
@@ -4909,6 +4989,10 @@
         <source>Kind of decision</source>
         <target state="translated">Kind of decision</target>
       </trans-unit>
+      <trans-unit id="wKGasLQ" resname="Kind of event">
+        <source>Kind of event</source>
+        <target state="translated">Kind of event</target>
+      </trans-unit>
       <trans-unit id="FHllCNm" resname="LEGACY Onderwijscommissaris">
         <source>LEGACY Onderwijscommissaris</source>
         <target state="translated">Education Officer</target>
@@ -4928,6 +5012,10 @@
       <trans-unit id="xkMjr4i" resname="Lapsed">
         <source>Lapsed</source>
         <target state="translated">Lapsed</target>
+      </trans-unit>
+      <trans-unit id="Znf63bo" resname="Last %count% day(s)">
+        <source>Last %count% day(s)</source>
+        <target state="translated">Last %count% day(s)</target>
       </trans-unit>
       <trans-unit id="kMjMOLe" resname="Last Day">
         <source>Last Day</source>
@@ -5493,6 +5581,10 @@
         <source>Membership number</source>
         <target state="translated">Membership number</target>
       </trans-unit>
+      <trans-unit id="_iGmiqI" resname="Membership number, email address or IP address">
+        <source>Membership number, email address or IP address</source>
+        <target state="translated">Membership number, email address or IP address</target>
+      </trans-unit>
       <trans-unit id="HrlCGQS" resname="Membership numbers">
         <source>Membership numbers</source>
         <target state="translated">Membership numbers</target>
@@ -5621,6 +5713,10 @@
         <source>Modifications</source>
         <target state="translated">Modifications</target>
       </trans-unit>
+      <trans-unit id="7hw57N3" resname="Monitoring">
+        <source>Monitoring</source>
+        <target state="translated">Monitoring</target>
+      </trans-unit>
       <trans-unit id="wHBscUb" resname="More of my photos">
         <source>More of my photos</source>
         <target>More of my photos</target>
@@ -5668,6 +5764,14 @@
       <trans-unit id="kJyiVGV" resname="Multi-factor authentication cannot be disabled while it is required for your role.">
         <source>Multi-factor authentication cannot be disabled while it is required for your role.</source>
         <target state="translated">Multi-factor authentication cannot be disabled while it is required for your role.</target>
+      </trans-unit>
+      <trans-unit id="ersBnK4" resname="Multi-factor authentication disabled">
+        <source>Multi-factor authentication disabled</source>
+        <target state="translated">Multi-factor authentication disabled</target>
+      </trans-unit>
+      <trans-unit id="6P7zCMb" resname="Multi-factor authentication enabled">
+        <source>Multi-factor authentication enabled</source>
+        <target state="translated">Multi-factor authentication enabled</target>
       </trans-unit>
       <trans-unit id="ssXNW8n" resname="Multi-factor authentication is not enabled for this user.">
         <source>Multi-factor authentication is not enabled for this user.</source>
@@ -5768,6 +5872,10 @@
       <trans-unit id="3O9qm56" resname="Neither">
         <source>Neither</source>
         <target>Neither</target>
+      </trans-unit>
+      <trans-unit id="Q8e1h.i" resname="Networks">
+        <source>Networks</source>
+        <target state="translated">Networks</target>
       </trans-unit>
       <trans-unit id="pK.xkHw" resname="Never">
         <source>Never</source>
@@ -6465,6 +6573,10 @@
         <source>Nothing waiting here</source>
         <target state="translated">Nothing waiting here</target>
       </trans-unit>
+      <trans-unit id="RlPqtUC" resname="Nothing was recorded in this period.">
+        <source>Nothing was recorded in this period.</source>
+        <target state="translated">Nothing was recorded in this period.</target>
+      </trans-unit>
       <trans-unit id="Pgw1rmH" resname="Nothing yet">
         <source>Nothing yet</source>
         <target state="translated">Nothing yet</target>
@@ -6757,6 +6869,10 @@
         <source>Organising party</source>
         <target>Organising party</target>
       </trans-unit>
+      <trans-unit id="k6riWiF" resname="Origin">
+        <source>Origin</source>
+        <target state="translated">Origin</target>
+      </trans-unit>
       <trans-unit id="aiFSOsy" resname="Other">
         <source>Other</source>
         <target state="translated">Other</target>
@@ -6865,13 +6981,33 @@
         <source>Password and sessions</source>
         <target state="translated">Password and sessions</target>
       </trans-unit>
+      <trans-unit id="uX0X7tx" resname="Password changed">
+        <source>Password changed</source>
+        <target state="translated">Password changed</target>
+      </trans-unit>
       <trans-unit id=".Gj312w" resname="Password requirements">
         <source>Password requirements</source>
         <target state="translated">Password requirements</target>
       </trans-unit>
+      <trans-unit id="o9XeFFI" resname="Password reset completed">
+        <source>Password reset completed</source>
+        <target state="translated">Password reset completed</target>
+      </trans-unit>
+      <trans-unit id="X.UKwB_" resname="Password reset link refused">
+        <source>Password reset link refused</source>
+        <target state="translated">Password reset link refused</target>
+      </trans-unit>
+      <trans-unit id="2TUj.v8" resname="Password reset requested">
+        <source>Password reset requested</source>
+        <target state="translated">Password reset requested</target>
+      </trans-unit>
       <trans-unit id="LTQgZqV" resname="Password updated successfully.">
         <source>Password updated successfully.</source>
         <target state="translated">Password updated successfully.</target>
+      </trans-unit>
+      <trans-unit id="VTgKlwx" resname="Passwords">
+        <source>Passwords</source>
+        <target state="translated">Passwords</target>
       </trans-unit>
       <trans-unit id="KuOux_1" resname="Paste this into a LaTeX editor to produce the document.">
         <source>Paste this into a LaTeX editor to produce the document.</source>
@@ -6928,6 +7064,10 @@
       <trans-unit id="hPqPyLn" resname="Per page">
         <source>Per page</source>
         <target state="translated">Per page</target>
+      </trans-unit>
+      <trans-unit id=".JfJF1w" resname="Period">
+        <source>Period</source>
+        <target state="translated">Period</target>
       </trans-unit>
       <trans-unit id="Pb977EF" resname="Permissions">
         <source>Permissions</source>
@@ -7613,6 +7753,10 @@
         <source>Register member</source>
         <target state="translated">Register member</target>
       </trans-unit>
+      <trans-unit id="3Gl7d2r" resname="Register refused from this network">
+        <source>Register refused from this network</source>
+        <target state="translated">Register refused from this network</target>
+      </trans-unit>
       <trans-unit id="W_u56BZ" resname="Registered">
         <source>Registered</source>
         <target state="translated">Registered</target>
@@ -7656,6 +7800,10 @@
       <trans-unit id="W4eVxqW" resname="Relieve a board member of their function.">
         <source>Relieve a board member of their function.</source>
         <target state="translated">Relieve a board member of their function.</target>
+      </trans-unit>
+      <trans-unit id="9Lallty" resname="Remembered device presented twice">
+        <source>Remembered device presented twice</source>
+        <target state="translated">Remembered device presented twice</target>
       </trans-unit>
       <trans-unit id="fEeElvJ" resname="Remove">
         <source>Remove</source>
@@ -8293,6 +8441,14 @@
         <source>Searches the decision texts and understands meeting references such as “GMM 214” or “BM 1805.3.1”.</source>
         <target state="translated">Searches the decision texts and understands meeting references such as “GMM 214” or “BM 1805.3.1”.</target>
       </trans-unit>
+      <trans-unit id="J2xyH_G" resname="Second factor accepted">
+        <source>Second factor accepted</source>
+        <target state="translated">Second factor accepted</target>
+      </trans-unit>
+      <trans-unit id="hujmPld" resname="Second factor rejected">
+        <source>Second factor rejected</source>
+        <target state="translated">Second factor rejected</target>
+      </trans-unit>
       <trans-unit id="mlixqLr" resname="Second-year members">
         <source>Second-year members</source>
         <target>Second-year members</target>
@@ -8308,6 +8464,10 @@
       <trans-unit id="8dn7uBl" resname="Security">
         <source>Security</source>
         <target state="translated">Security</target>
+      </trans-unit>
+      <trans-unit id="gdkabQl" resname="Security log">
+        <source>Security log</source>
+        <target state="translated">Security log</target>
       </trans-unit>
       <trans-unit id="SQkSbRN" resname="See all">
         <source>See all</source>
@@ -8421,6 +8581,38 @@
         <source>Sensitive (only visible to the board and organiser)</source>
         <target state="translated">Sensitive (only visible to the board and organiser)</target>
       </trans-unit>
+      <trans-unit id="WW4P12M" resname="Session ended: browser or system changed">
+        <source>Session ended: browser or system changed</source>
+        <target state="translated">Session ended: browser or system changed</target>
+      </trans-unit>
+      <trans-unit id="JFcstUT" resname="Session ended: credentials changed">
+        <source>Session ended: credentials changed</source>
+        <target state="translated">Session ended: credentials changed</target>
+      </trans-unit>
+      <trans-unit id="ZprXeFt" resname="Session ended: no remembered device">
+        <source>Session ended: no remembered device</source>
+        <target state="translated">Session ended: no remembered device</target>
+      </trans-unit>
+      <trans-unit id="hWxC12q" resname="Session ended: record could not be trusted">
+        <source>Session ended: record could not be trusted</source>
+        <target state="translated">Session ended: record could not be trusted</target>
+      </trans-unit>
+      <trans-unit id="ctZ7A0a" resname="Session ended: unknown device">
+        <source>Session ended: unknown device</source>
+        <target state="translated">Session ended: unknown device</target>
+      </trans-unit>
+      <trans-unit id="g8RV4Uj" resname="Session expired">
+        <source>Session expired</source>
+        <target state="translated">Session expired</target>
+      </trans-unit>
+      <trans-unit id="RFBMnb7" resname="Session resumed from a remembered device">
+        <source>Session resumed from a remembered device</source>
+        <target state="translated">Session resumed from a remembered device</target>
+      </trans-unit>
+      <trans-unit id="BEy8HxS" resname="Session terminated">
+        <source>Session terminated</source>
+        <target state="translated">Session terminated</target>
+      </trans-unit>
       <trans-unit id="K84Ihek" resname="Sessions">
         <source>Sessions</source>
         <target state="translated">Sessions</target>
@@ -8428,6 +8620,10 @@
       <trans-unit id="R9ar2ea" resname="Sessions for %name%">
         <source>Sessions for %name%</source>
         <target state="translated">Sessions for %name%</target>
+      </trans-unit>
+      <trans-unit id="6p6iXd7" resname="Sessions terminated">
+        <source>Sessions terminated</source>
+        <target state="translated">Sessions terminated</target>
       </trans-unit>
       <trans-unit id="mRFBZ2C" resname="Set as profile photo">
         <source>Set as profile photo</source>
@@ -8573,6 +8769,22 @@
         <source>Sign up for '%name%'</source>
         <target>Sign up for '%name%'</target>
       </trans-unit>
+      <trans-unit id="9UI1IPw" resname="Sign-in failed">
+        <source>Sign-in failed</source>
+        <target state="translated">Sign-in failed</target>
+      </trans-unit>
+      <trans-unit id="DOOVbUf" resname="Sign-in refused for this account">
+        <source>Sign-in refused for this account</source>
+        <target state="translated">Sign-in refused for this account</target>
+      </trans-unit>
+      <trans-unit id="GTuYf7a" resname="Sign-in required again">
+        <source>Sign-in required again</source>
+        <target state="translated">Sign-in required again</target>
+      </trans-unit>
+      <trans-unit id="OFvFcow" resname="Sign-in throttled">
+        <source>Sign-in throttled</source>
+        <target state="translated">Sign-in throttled</target>
+      </trans-unit>
       <trans-unit id="HYxhyIL" resname="Sign-ins">
         <source>Sign-ins</source>
         <target state="translated">Sign-ins</target>
@@ -8629,9 +8841,17 @@
         <source>Sign-ups: %count%</source>
         <target state="translated">Sign-ups: %count%</target>
       </trans-unit>
+      <trans-unit id="OuDpD6H" resname="Signed in">
+        <source>Signed in</source>
+        <target state="translated">Signed in</target>
+      </trans-unit>
       <trans-unit id="lIY1Kot" resname="Signed in %date%">
         <source>Signed in %date%</source>
         <target state="translated">Signed in %date%</target>
+      </trans-unit>
+      <trans-unit id="Zif_Cgh" resname="Signed out">
+        <source>Signed out</source>
+        <target state="translated">Signed out</target>
       </trans-unit>
       <trans-unit id="UdiKxgu" resname="Signed up">
         <source>Signed up</source>
@@ -10477,6 +10697,10 @@
         <source>Unpublished albums are only visible to the board.</source>
         <target state="translated">Unpublished albums are only visible to the board.</target>
       </trans-unit>
+      <trans-unit id="dm9mKBr" resname="Unrecognised remembered device presented">
+        <source>Unrecognised remembered device presented</source>
+        <target state="translated">Unrecognised remembered device presented</target>
+      </trans-unit>
       <trans-unit id="TeuL_GQ" resname="Unsubscribe">
         <source>Unsubscribe</source>
         <target>Unsubscribe</target>
@@ -10957,6 +11181,10 @@
         <source>What each transport is holding right now. A count that keeps climbing means the consumers of that transport are not keeping up.</source>
         <target state="translated">What each transport is holding right now. A count that keeps climbing means the consumers of that transport are not keeping up.</target>
       </trans-unit>
+      <trans-unit id="OQoAQUB" resname="What happened to accounts: who signed in, who could not, whose session was ended and why. Kept for half a year, after which entries are removed. The application's own log files keep the same events for a little longer.">
+        <source>What happened to accounts: who signed in, who could not, whose session was ended and why. Kept for half a year, after which entries are removed. The application's own log files keep the same events for a little longer.</source>
+        <target state="translated">What happened to accounts: who signed in, who could not, whose session was ended and why. Kept for half a year, after which entries are removed. The application's own log files keep the same events for a little longer.</target>
+      </trans-unit>
       <trans-unit id="Plh8MiX" resname="What has happened">
         <source>What has happened</source>
         <target state="translated">What has happened</target>
@@ -11024,6 +11252,10 @@
       <trans-unit id="EYgzCv_" resname="What your body is recognised by on an overview card.">
         <source>What your body is recognised by on an overview card.</source>
         <target state="translated">What your body is recognised by on an overview card.</target>
+      </trans-unit>
+      <trans-unit id="5boi_9J" resname="When">
+        <source>When</source>
+        <target state="translated">When</target>
       </trans-unit>
       <trans-unit id="TDgj7w9" resname="When a body has changed its page and is waiting to be reviewed">
         <source>When a body has changed its page and is waiting to be reviewed</source>

@@ -263,46 +263,76 @@
         <div>
             {{ sidebar.group('System'|trans) }}
             <ul class="sidebar-list">
-                {% set companyUsers = is_module_active(['user', 'admin', 'companyusersindex']) %}
+                {# Every row here matches the action it belongs to. Matching the controller alone and then excluding
+                   the other rows lit the wrong one as soon as a page was added, which is how a company account's
+                   sessions used to highlight the members' accounts. #}
+                {% set memberAccounts = is_module_active(['user', 'admin', 'index'])
+                    or is_module_active(['user', 'admin', 'usersessions']) %}
+                {% set companyAccounts = is_module_active(['user', 'admin', 'companyusersindex'])
+                    or is_module_active(['user', 'admin', 'companyusersessions']) %}
                 {{ sidebar.section('users', 'fa-user-shield', 'Users'|trans,
-                    is_module_active(['user']) or route starts with 'user_api_principal', [
+                    memberAccounts or companyAccounts, [
                     {
                         'href': path('admin/users/index'),
                         'label': "Members' accounts"|trans,
-                        'active': is_module_active(['user', 'admin']) and not companyUsers,
+                        'active': memberAccounts,
                     },
                     {
                         'href': path('admin/users/company-users/index'),
                         'label': 'Company accounts'|trans,
-                        'active': companyUsers,
+                        'active': companyAccounts,
                     },
+                ]) }}
+
+                {# What signs in against us without being a person. #}
+                {% set apiPrincipals = route starts with 'user_api_principal' %}
+                {% set externalApps = is_module_active(['user', 'adminexternalapp']) %}
+                {{ sidebar.section('integrations', 'fa-plug', 'Integrations'|trans,
+                    apiPrincipals or externalApps, [
                     {
                         'href': path('user_api_principal_index'),
                         'label': 'API principals'|trans,
-                        'active': route starts with 'user_api_principal',
+                        'active': apiPrincipals,
                     },
                     {
                         'href': path('admin/users/apps/index'),
                         'label': 'External apps'|trans,
-                        'active': is_module_active(['user', 'adminexternalapp']),
+                        'active': externalApps,
                     },
-                ]|filter(child => child is not null)) }}
+                ]) }}
 
-                {{ sidebar.section('application', 'fa-sliders', 'Application'|trans, is_module_active(['application', 'announcement']) or is_module_active(['application', 'maintenance']) or is_module_active(['application', 'queue']), [
+                {# What the application is doing, as opposed to what it is set to do. Both are read rather than
+                   changed, and both are read when something has gone wrong: what happened to accounts, and whether
+                   the workers are keeping up. Anything else that answers those questions belongs here too. #}
+                {% set securityLog = is_module_active(['user', 'admin', 'securitylog']) %}
+                {% set queues = is_module_active(['application', 'queue']) %}
+                {{ sidebar.section('monitoring', 'fa-heart-pulse', 'Monitoring'|trans,
+                    securityLog or queues, [
                     {
-                        'href': path('admin/announcement'),
-                        'label': 'Announcement'|trans,
-                        'active': is_module_active(['application', 'announcement']),
-                    },
-                    {
-                        'href': path('admin/maintenance'),
-                        'label': 'Maintenance'|trans,
-                        'active': is_module_active(['application', 'maintenance']),
+                        'href': path('admin/users/security-log'),
+                        'label': 'Security log'|trans,
+                        'active': securityLog,
                     },
                     {
                         'href': path('admin/queues'),
                         'label': 'Queues'|trans,
-                        'active': is_module_active(['application', 'queue']),
+                        'active': queues,
+                    },
+                ]) }}
+
+                {% set announcement = is_module_active(['application', 'announcement']) %}
+                {% set maintenance = is_module_active(['application', 'maintenance']) %}
+                {{ sidebar.section('application', 'fa-sliders', 'Application'|trans,
+                    announcement or maintenance, [
+                    {
+                        'href': path('admin/announcement'),
+                        'label': 'Announcement'|trans,
+                        'active': announcement,
+                    },
+                    {
+                        'href': path('admin/maintenance'),
+                        'label': 'Maintenance'|trans,
+                        'active': maintenance,
                     },
                 ]) }}
             </ul>

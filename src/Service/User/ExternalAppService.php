@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\User;
 
 use App\Entity\User\Enums\ExternalAppSignature;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\ExternalApp;
 use App\Entity\User\ExternalAppAuthentication;
 use App\Entity\User\User;
@@ -35,6 +36,7 @@ class ExternalAppService
         private readonly EntityManagerInterface $entityManager,
         private readonly JWSBuilder $jwsBuilder,
         private readonly JWKSet $signingKeySet,
+        private readonly SecurityEventLogger $securityEvents,
     ) {
     }
 
@@ -69,6 +71,13 @@ class ExternalAppService
         $this->logAuthentication(
             $app,
             $user,
+        );
+
+        $this->securityEvents->record(
+            SecurityEventType::ExternalAppAuthorised,
+            $user->getUserIdentifier(),
+            'main',
+            ['application' => $app->getAppId()],
         );
 
         return $app->getCallback() . $app->getTokenDelivery()->separator() . $this->sign(

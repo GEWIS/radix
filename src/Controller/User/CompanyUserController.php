@@ -15,6 +15,7 @@ use App\Service\User\AccountPasswordService;
 use App\Service\User\KnownDeviceRegistry;
 use App\Service\User\MultiFactorService;
 use App\Service\User\PasswordResetService;
+use App\Service\User\SecurityEventLogger;
 use App\Service\User\SessionManager;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
@@ -42,6 +43,7 @@ class CompanyUserController extends AbstractSecurityController
         PasswordResetService $passwordResetService,
         KnownDeviceRegistry $knownDevices,
         RealtimeAuthorization $realtime,
+        SecurityEventLogger $securityEvents,
     ) {
         parent::__construct(
             $translator,
@@ -53,6 +55,7 @@ class CompanyUserController extends AbstractSecurityController
             $passwordResetService,
             $knownDevices,
             $realtime,
+            $securityEvents,
             routePrefix: 'company_user_',
             userType: UserTypes::CompanyUser,
         );

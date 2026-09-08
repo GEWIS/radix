@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Security\Api;
 
+use App\Entity\User\Enums\SecurityEventType;
 use App\Repository\User\ApiPrincipalRepository;
+use App\Service\User\SecurityEventLogger;
 use LogicException;
 use Override;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,8 +39,10 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
     private const string HEADER = 'Authorization';
     private const string SCHEME = 'Bearer ';
 
-    public function __construct(private readonly ApiPrincipalRepository $apiPrincipalRepository)
-    {
+    public function __construct(
+        private readonly ApiPrincipalRepository $apiPrincipalRepository,
+        private readonly SecurityEventLogger $securityEvents,
+    ) {
     }
 
     #[Override]
@@ -62,6 +66,20 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
             null === $principal
             || !$principal->isUsable()
         ) {
+            // The token itself is never recorded, not even hashed: what is worth knowing is that an unusable one was
+            // presented, from where, and against which path. A principal that resolved but is switched off is named,
+            // because that one is somebody's own token still being used after it was withdrawn.
+            $this->securityEvents->record(
+                SecurityEventType::ApiTokenRejected,
+                null !== $principal ? 'api-principal-' . $principal->getId() : null,
+                'api',
+                [
+                    'reason' => null === $principal ? 'unknown_token' : 'token_not_usable',
+                    'path' => $request->getPathInfo(),
+                ],
+                $request,
+            );
+
             throw new BadCredentialsException('The provided bearer token is not known.');
         }
 

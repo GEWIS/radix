@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\User;
 
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\Session;
 use App\Message\User\RevokeSessionsRealtimeMessage;
 use App\Repository\User\SessionRepository;
@@ -45,6 +46,7 @@ final class SessionManager
         private readonly CredentialsSignature $credentials,
         private readonly SessionRowSignature $rowSignature,
         private readonly SudoMode $sudoMode,
+        private readonly SecurityEventLogger $securityEvents,
         private readonly LoggerInterface $logger,
         #[Autowire(service: 'Redis')]
         private readonly Redis $redis,
@@ -118,6 +120,17 @@ final class SessionManager
         // the sudo-confirm prompt because the sudo grant is held against the wiped session). So, we must drop the DB
         // row but skip the destroy(). No real-time revocation either: this is the caller's own device and the
         // controller already logs it out.
+        $this->securityEvents->record(
+            SecurityEventType::SessionTerminated,
+            $user->getUserIdentifier(),
+            $firewallName,
+            [
+                'series' => $series,
+                'own' => $session->getPhpSessionId() === $request->getSession()->getId(),
+            ],
+            $request,
+        );
+
         if ($session->getPhpSessionId() === $request->getSession()->getId()) {
             $this->em->remove($session);
             $this->em->flush();
@@ -187,6 +200,17 @@ final class SessionManager
             ),
         );
 
+        $this->securityEvents->record(
+            SecurityEventType::SessionsTerminated,
+            $user->getUserIdentifier(),
+            $firewallName,
+            [
+                'scope' => 'others',
+                'count' => count($sessions),
+            ],
+            $request,
+        );
+
         return count($sessions);
     }
 
@@ -215,6 +239,16 @@ final class SessionManager
                 static fn (Session $s): string => $s->getSeries(),
                 $sessions,
             ),
+        );
+
+        $this->securityEvents->record(
+            SecurityEventType::SessionsTerminated,
+            $user->getUserIdentifier(),
+            $firewallName,
+            [
+                'scope' => 'all',
+                'count' => count($sessions),
+            ],
         );
 
         return count($sessions);

@@ -99,6 +99,7 @@ src/
   Kernel.php
   Message/          Messenger message classes
   MessageHandler/   #[AsMessageHandler] handlers
+  Monolog/          Monolog infrastructure: processors adding context to every record
   OpenApi/          decorators completing the generated OpenAPI document
   Repository/       Doctrine repositories
   Scheduler/        Symfony Scheduler providers (flat)
@@ -251,6 +252,33 @@ putting a new `fetch` target inside one of these areas.
 Remember-me is a **custom** integration (`App\Security\User\PersistentSignatureRememberMeHandler`, persisted via the
 `Session` entity). The cookies, lifetimes and per-firewall handlers differ deliberately — read
 `config/packages/security.yaml` and `config/packages/session.yaml` before touching anything here.
+
+## Logging
+
+Two pipelines, and which one a message belongs in is decided by who reads it.
+
+**Ordinary logging** is `LoggerInterface` on the default channel, for whoever is working out why something broke. In
+production it goes through a `fingers_crossed` handler: `debug` and `info` are buffered and only written when the same
+request also fails, and **`warning` and above are always written** (`passthru_level`). Anything worth saying when
+nothing else went wrong therefore has to be at least a `warning`. Before that setting existed, every warning this
+application raised about a terminated session was buffered and dropped, which is why nobody could answer a member
+asking why they had been signed out.
+
+**Security logging** is `App\Service\User\SecurityEventLogger`, and it is the only way to record that something
+happened to an account: a sign-in, a session torn down, a second factor turned off, an administrator acting as
+somebody else. Call `record()` with a case of `App\Entity\User\Enums\SecurityEventType`. Everything else, meaning
+the address, the browser, who was signed in and which request it was, is gathered there, so two places reporting the
+same event cannot describe it differently. Do not reach for the plain logger for these, and do not write a sentence where a
+case belongs: the administration filters on the cases and a data export names them.
+
+It writes twice. The `security` monolog channel is never buffered and keeps half a year and a bit of daily files, so
+its copy survives a request that later failed and rolled back. `App\Entity\User\SecurityLog` is the copy that can be
+queried, is what `/admin/users/security-log` reads, and is included in a member's data export. Rows are personal data: keep the columns to what recognises an event, put nothing in `detail` that is not
+flat and scalar, and never a token, a cookie or a session identifier. `app:user:prune-security-log` enforces the
+retention period, which is what makes keeping any of it defensible.
+
+Every record carries the context the processors in `config/packages/monolog.yaml` add, `App\Monolog\Processor\RequestIdProcessor`
+among them, so the lines one visit produced can be read together and lined up against the row written beside them.
 
 ## API
 

@@ -9,6 +9,7 @@ use App\Entity\Application\Enums\NotificationAddressing;
 use App\Entity\Application\Enums\NotificationCategory;
 use App\Entity\Application\Enums\NotificationEmailFrequency;
 use App\Entity\Application\Enums\NotificationType;
+use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Form\User\GeneralSettingsType;
@@ -22,6 +23,7 @@ use App\Security\User\SudoMode;
 use App\Service\Application\FileDownloadHelper;
 use App\Service\Application\FileStorage;
 use App\Service\Photo\MemberTagPurgeService;
+use App\Service\User\SecurityEventLogger;
 use App\Service\User\UserSettingsService;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -62,6 +64,7 @@ class SettingsController extends AbstractController
         private readonly DataExportRequestRepository $dataExportRequestRepository,
         private readonly NotificationEmailSubscriptionRepository $notificationSubscriptions,
         private readonly UserSettingsService $userSettingsService,
+        private readonly SecurityEventLogger $securityEvents,
     ) {
     }
 
@@ -361,6 +364,12 @@ class SettingsController extends AbstractController
 
         $messageBus->dispatch(new ExportUserDataMessage($lidnr));
 
+        $this->securityEvents->record(
+            SecurityEventType::DataExportRequested,
+            $user->getUserIdentifier(),
+            'main',
+        );
+
         $this->addFlash(
             AlertTypes::Success->value,
             $this->translator->trans(
@@ -396,6 +405,14 @@ class SettingsController extends AbstractController
         ) {
             throw $this->createNotFoundException();
         }
+
+        // Everything the association records about somebody, in one file: worth a line of its own, and the one
+        // thing in this table a member would want to see if it happened without them.
+        $this->securityEvents->record(
+            SecurityEventType::DataExportDownloaded,
+            $user->getUserIdentifier(),
+            'main',
+        );
 
         return $fileDownloadHelper->download(
             ExportUserDataHandler::exportPath($lidnr),

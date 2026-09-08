@@ -11,6 +11,7 @@ use App\Security\User\PersistentSignatureRememberMeHandler;
 use App\Security\User\SessionRowSignature;
 use App\Security\User\UserAgentParser;
 use App\Service\User\KnownDeviceRegistry;
+use App\Service\User\SecurityEventLogger;
 use App\Service\User\SecurityNotifier;
 use App\Tests\Integration\DatabaseTestCase;
 use Override;
@@ -66,6 +67,7 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
             $this->repository(),
             $this->userAgentParser(),
             $this->securityNotifier(),
+            $this->securityEvents(),
             $this->knownDevices(),
             $this->clock,
             new CredentialsSignature(self::SECRET),
@@ -319,6 +321,17 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
         );
 
         return $notifier;
+    }
+
+    private function securityEvents(): SecurityEventLogger
+    {
+        $logger = self::getContainer()->get(SecurityEventLogger::class);
+        self::assertInstanceOf(
+            SecurityEventLogger::class,
+            $logger,
+        );
+
+        return $logger;
     }
 
     private function knownDevices(): KnownDeviceRegistry

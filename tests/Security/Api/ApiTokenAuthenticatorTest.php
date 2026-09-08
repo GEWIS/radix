@@ -5,16 +5,24 @@ declare(strict_types=1);
 namespace App\Tests\Security\Api;
 
 use App\Entity\Database\User\ApiPrincipal;
+use App\Monolog\Processor\RequestIdProcessor;
 use App\Repository\User\ApiPrincipalRepository;
+use App\Repository\User\SecurityLogRepository;
 use App\Security\Api\ApiPrincipalUser;
 use App\Security\Api\ApiToken;
 use App\Security\Api\ApiTokenAuthenticator;
+use App\Security\User\UserAgentParser;
+use App\Service\User\SecurityEventLogger;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -89,8 +97,10 @@ class ApiTokenAuthenticatorTest extends TestCase
             ->with('s3cr3t')
             ->willReturn($principal);
 
-        $passport = new ApiTokenAuthenticator($repository)
-            ->authenticate($this->request('Bearer s3cr3t'));
+        $passport = new ApiTokenAuthenticator(
+            $repository,
+            $this->securityEvents(),
+        )->authenticate($this->request('Bearer s3cr3t'));
 
         self::assertInstanceOf(
             SelfValidatingPassport::class,
@@ -200,7 +210,27 @@ class ApiTokenAuthenticatorTest extends TestCase
         $repository = self::createStub(ApiPrincipalRepository::class);
         $repository->method('findByToken')->willReturn(null);
 
-        return new ApiTokenAuthenticator($repository);
+        return new ApiTokenAuthenticator(
+            $repository,
+            $this->securityEvents(),
+        );
+    }
+
+    /**
+     * A real logger rather than a double: it is `final readonly`, and its collaborators are cheap enough that the
+     * rows it would write end up in a repository stub that discards them.
+     */
+    private function securityEvents(): SecurityEventLogger
+    {
+        return new SecurityEventLogger(
+            self::createStub(SecurityLogRepository::class),
+            new RequestStack(),
+            new UserAgentParser(),
+            self::createStub(TokenStorageInterface::class),
+            new RequestIdProcessor(),
+            new MockClock(),
+            new NullLogger(),
+        );
     }
 
     private function request(?string $authorization): Request
