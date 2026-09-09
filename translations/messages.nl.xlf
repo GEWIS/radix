@@ -705,6 +705,10 @@
         <source>A pinned announcement needs an end date.</source>
         <target state="translated">Een vastgezette aankondiging heeft een einddatum nodig.</target>
       </trans-unit>
+      <trans-unit id="pONeQk4" resname="A placeholder works in the subject as well, and is left empty for anybody who did not answer that question.">
+        <source>A placeholder works in the subject as well, and is left empty for anybody who did not answer that question.</source>
+        <target>Een placeholder werkt ook in het onderwerp en blijft leeg bij iedereen die die vraag niet heeft beantwoord.</target>
+      </trans-unit>
       <trans-unit id="3DNvGki" resname="A poll asking &quot;%name%&quot; has been requested.">
         <source>A poll asking "%name%" has been requested.</source>
         <target state="translated">Er is een poll aangevraagd met de vraag "%name%".</target>
@@ -712,6 +716,10 @@
       <trans-unit id="MONfFA1" resname="A poll cannot be sent back for changes. Turning it down lets the member rewrite the question and ask again.">
         <source>A poll cannot be sent back for changes. Turning it down lets the member rewrite the question and ask again.</source>
         <target state="translated">Een poll kan niet worden teruggestuurd voor wijzigingen. Door hem af te wijzen kan het lid de vraag herschrijven en opnieuw indienen.</target>
+      </trans-unit>
+      <trans-unit id="fkgBHTw" resname="A question belongs to one sign-up list, so write to a single list to fill in what people answered.">
+        <source>A question belongs to one sign-up list, so write to a single list to fill in what people answered.</source>
+        <target>Een vraag hoort bij één inschrijflijst, dus schrijf naar één lijst om in te vullen wat mensen hebben geantwoord.</target>
       </trans-unit>
       <trans-unit id="Y423HVo" resname="A question cannot be changed once it has been sent, so read it over first.">
         <source>A question cannot be changed once it has been sent, so read it over first.</source>
@@ -808,6 +816,10 @@
       <trans-unit id="Z7u9824" resname="About GEWIS">
         <source>About GEWIS</source>
         <target state="translated">Over GEWIS</target>
+      </trans-unit>
+      <trans-unit id="Qg2T8hx" resname="About the activity">
+        <source>About the activity</source>
+        <target>Over de activiteit</target>
       </trans-unit>
       <trans-unit id="8XjapXc" resname="About the days your body has asked for">
         <source>About the days your body has asked for</source>
@@ -1160,6 +1172,10 @@
       <trans-unit id="_Evwb08" resname="Admitted">
         <source>Admitted</source>
         <target>Toegelaten</target>
+      </trans-unit>
+      <trans-unit id="xwq2heb" resname="Admitted, not present">
+        <source>Admitted, not present</source>
+        <target>Toegelaten, niet aanwezig</target>
       </trans-unit>
       <trans-unit id="iwhMcTO" resname="Admitted: %admitted% / %capacity%">
         <source>Admitted: %admitted% / %capacity%</source>
@@ -6857,6 +6873,10 @@
         <source>Organising body</source>
         <target state="translated">Organiserend orgaan</target>
       </trans-unit>
+      <trans-unit id="eCqWztk" resname="Organising body, abbreviated">
+        <source>Organising body, abbreviated</source>
+        <target>Organiserend orgaan, afgekort</target>
+      </trans-unit>
       <trans-unit id="xer5g4K" resname="Organising company">
         <source>Organising company</source>
         <target state="translated">Organiserend bedrijf</target>
@@ -8793,6 +8813,10 @@
         <source>Sign-up closes:</source>
         <target>Inschrijving sluit:</target>
       </trans-unit>
+      <trans-unit id="MUlHXYF" resname="Sign-up list">
+        <source>Sign-up list</source>
+        <target>Inschrijflijst</target>
+      </trans-unit>
       <trans-unit id="6MX7525" resname="Sign-up list %position%">
         <source>Sign-up list %position%</source>
         <target>Inschrijflijst %position%</target>
@@ -9737,6 +9761,10 @@
         <source>The people marked present on %list%.</source>
         <target>De mensen die op %list% als aanwezig zijn gemarkeerd.</target>
       </trans-unit>
+      <trans-unit id="wmQ_rkl" resname="The people with a place on %list% who were not marked present.">
+        <source>The people with a place on %list% who were not marked present.</source>
+        <target>De mensen met een plek op %list% die niet als aanwezig zijn gemarkeerd.</target>
+      </trans-unit>
       <trans-unit id="sbbDOd." resname="The photo of the week can only be hidden on Monday morning, before noon.">
         <source>The photo of the week can only be hidden on Monday morning, before noon.</source>
         <target state="translated">De foto van de week kan alleen op maandagochtend, voor het middaguur, worden verborgen.</target>
@@ -10276,6 +10304,10 @@
       <trans-unit id="aWvFOrg" resname="This member is not installed in a body.">
         <source>This member is not installed in a body.</source>
         <target state="translated">Dit lid is niet lid van een orgaan.</target>
+      </trans-unit>
+      <trans-unit id="GsFYDiN" resname="This message uses a placeholder that is not available here: %placeholders%.">
+        <source>This message uses a placeholder that is not available here: %placeholders%.</source>
+        <target>Dit bericht gebruikt een placeholder die hier niet beschikbaar is: %placeholders%.</target>
       </trans-unit>
       <trans-unit id="gFodlnQ" resname="This package is a %format% banner.">
         <source>This package is a %format% banner.</source>
@@ -11205,6 +11237,10 @@
         <source>What the board calls this round, for example "Q1 2026-2027".</source>
         <target state="translated">Hoe het bestuur deze ronde noemt, bijvoorbeeld "Q1 2026-2027".</target>
       </trans-unit>
+      <trans-unit id="aSDDt0g" resname="What they answered">
+        <source>What they answered</source>
+        <target>Wat zij hebben geantwoord</target>
+      </trans-unit>
       <trans-unit id="eVvNiBE" resname="What this revision says">
         <source>What this revision says</source>
         <target state="translated">Wat deze revisie zegt</target>
@@ -11441,9 +11477,21 @@
         <source>Write a query or open a stored one, then execute it.</source>
         <target state="translated">Schrijf een query of open een opgeslagen query, en voer die uit.</target>
       </trans-unit>
+      <trans-unit id="Oj94ifp" resname="Write in English: the rest of the email is in English, and not everybody who signed up reads Dutch.">
+        <source>Write in English: the rest of the email is in English, and not everybody who signed up reads Dutch.</source>
+        <target>Schrijf in het Engels: de rest van de e-mail is in het Engels, en niet iedereen die zich heeft ingeschreven leest Nederlands.</target>
+      </trans-unit>
       <trans-unit id="YNeNcIg" resname="Write news">
         <source>Write news</source>
         <target state="translated">Nieuws schrijven</target>
+      </trans-unit>
+      <trans-unit id="oNYXZKG" resname="Writes %placeholder%, which is replaced with the answer each recipient gave.">
+        <source>Writes %placeholder%, which is replaced with the answer each recipient gave.</source>
+        <target>Schrijft %placeholder%, dat wordt vervangen door het antwoord dat elke ontvanger heeft gegeven.</target>
+      </trans-unit>
+      <trans-unit id="Qh.Jqp2" resname="Writes %placeholder%, which is replaced with the same value for everybody.">
+        <source>Writes %placeholder%, which is replaced with the same value for everybody.</source>
+        <target>Schrijft %placeholder%, dat voor iedereen door dezelfde waarde wordt vervangen.</target>
       </trans-unit>
       <trans-unit id="s999yGF" resname="Written by %author%">
         <source>Written by %author%</source>

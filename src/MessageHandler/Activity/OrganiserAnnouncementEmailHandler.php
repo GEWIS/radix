@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler\Activity;
 
 use App\Message\Activity\OrganiserAnnouncementEmail;
+use App\Util\Activity\AnnouncementPlaceholders;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -34,17 +35,29 @@ class OrganiserAnnouncementEmailHandler
                 // Build inside the try too: a malformed stored address makes `new Address()` throw an
                 // RfcComplianceException, which outside the try would abort the whole batch and (on Messenger retry)
                 // re-send to everyone already mailed. Skip just this recipient instead.
+                //
+                // The placeholders are replaced here rather than at dispatch, so the message stores one subject and
+                // one body, and only the replacements differ per recipient.
+                $subject = AnnouncementPlaceholders::apply(
+                    $message->getSubject(),
+                    $recipient['replacements'],
+                );
+                $body = AnnouncementPlaceholders::apply(
+                    $message->getBody(),
+                    $recipient['replacements'],
+                );
+
                 $email = new TemplatedEmail()
                     ->to(new Address(
                         $recipient['email'],
                         $recipient['name'],
                     ))
-                    ->subject($message->getSubject())
+                    ->subject($subject)
                     ->htmlTemplate('emails/activity/organiser-announcement.html.twig')
                     ->replyTo($replyTo)
                     ->context([
-                        'subject' => $message->getSubject(),
-                        'body' => $message->getBody(),
+                        'subject' => $subject,
+                        'body' => $body,
                         'activityName' => $message->getActivityName(),
                         'name' => $recipient['name'],
                         'organiserEmail' => $replyTo,

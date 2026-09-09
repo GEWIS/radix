@@ -14,6 +14,10 @@ import { flattenFloatingLabel } from '../../js/floating_label.ts';
  * textarea behind `data-live-ignore` cannot empty it through a re-render, so it says so with a browser event instead
  * (`data-action="poll-comment:posted@window->markdown-editor#clear"`).
  *
+ * `insertText()` inserts a string at the caret, for a controller that supplies text without writing it itself
+ * (`announcement-placeholder`). It is reached as a Stimulus outlet, as the page-image browser reaches the page
+ * editor, because the editor is inside `data-live-ignore` and cannot be re-rendered.
+ *
  * Coordinates with the `localised-fields` controller without coupling to it: when that disables the textarea, a
  * MutationObserver puts the editor into read-only mode; the disabled textarea is still omitted from the POST, so the
  * stored value is preserved.
@@ -77,6 +81,15 @@ export default class extends Controller {
     clear(): void {
         this.editor?.setData('');
         this.textarea.value = '';
+    }
+
+    insertText(text: string): void {
+        if (null === this.editor) {
+            return;
+        }
+
+        this.editor.execute('insertText', { text });
+        this.editor.focus();
     }
 
     private applyDisabledState(): void {
