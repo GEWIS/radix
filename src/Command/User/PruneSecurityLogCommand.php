@@ -23,7 +23,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '45 3 * * *',
-    jitter: 900,
     transports: 'gdpr',
 )]
 final class PruneSecurityLogCommand extends Command

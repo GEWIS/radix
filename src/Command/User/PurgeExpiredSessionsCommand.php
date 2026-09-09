@@ -29,7 +29,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '30 3 * * *',
-    jitter: 900,
     transports: 'gdpr',
 )]
 final class PurgeExpiredSessionsCommand extends Command

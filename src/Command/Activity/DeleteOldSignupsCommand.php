@@ -26,7 +26,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '0 4 * * *',
-    jitter: 900,
     transports: 'gdpr',
 )]
 final class DeleteOldSignupsCommand extends Command

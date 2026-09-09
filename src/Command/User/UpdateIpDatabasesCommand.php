@@ -46,7 +46,6 @@ use function unlink;
 )]
 #[AsCronTask(
     expression: '20 4 * * 1,4',
-    jitter: 900,
     transports: 'maintenance',
 )]
 final class UpdateIpDatabasesCommand extends Command

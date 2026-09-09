@@ -45,7 +45,6 @@ use function strval;
 )]
 #[AsCronTask(
     expression: '17 * * * *',
-    jitter: 300,
     transports: 'cron',
 )]
 final class RemindClosingSignupsCommand extends Command
