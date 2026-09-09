@@ -57,7 +57,10 @@ class WeeklyPhotoRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('w');
         // Both are read off the pick by the frontpage, and would otherwise be loaded as a query each while the
         // page is rendering.
-        $qb->addSelect('p', 'a')
+        $qb->addSelect(
+            'p',
+            'a',
+        )
             ->join(
                 'w.photo',
                 'p',

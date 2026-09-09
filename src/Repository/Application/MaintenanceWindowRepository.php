@@ -53,7 +53,10 @@ class MaintenanceWindowRepository extends ServiceEntityRepository
      */
     public function findRelevantOn(DateTimeImmutable $day): array
     {
-        $startOfDay = $day->setTime(0, 0);
+        $startOfDay = $day->setTime(
+            0,
+            0,
+        );
 
         return $this->createQueryBuilder('w')
             ->where('(w.endsAt IS NULL OR w.endsAt > :startOfDay)')
@@ -82,8 +85,14 @@ class MaintenanceWindowRepository extends ServiceEntityRepository
             $endsAt = $window->getEndsAt();
 
             if (
-                (null !== $startsAt && $startsAt > $now)
-                || (null !== $endsAt && $endsAt <= $now)
+                (
+                    null !== $startsAt
+                    && $startsAt > $now
+                )
+                || (
+                    null !== $endsAt
+                    && $endsAt <= $now
+                )
             ) {
                 continue;
             }

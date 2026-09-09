@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\EventListener\Application;
 
+use App\Entity\Application\Announcement;
 use App\Entity\Application\MaintenanceWindow;
+use App\Entity\Career\CompanyFeaturedPackage;
+use App\Repository\Application\AnnouncementRepository;
 use App\Repository\Application\MaintenanceWindowRepository;
+use App\Repository\Career\CompanyFeaturedPackageRepository;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
@@ -69,8 +73,19 @@ final readonly class LayoutCacheInvalidationListener
         object $entity,
         ObjectManager $manager,
     ): void {
+        $today = new DateTimeImmutable()->setTime(
+            0,
+            0,
+        );
+        $key = match (true) {
+            $entity instanceof MaintenanceWindow => MaintenanceWindowRepository::cacheKeyFor($today),
+            $entity instanceof Announcement => AnnouncementRepository::cacheKeyFor($today),
+            $entity instanceof CompanyFeaturedPackage => CompanyFeaturedPackageRepository::cacheKeyFor($today),
+            default => null,
+        };
+
         if (
-            !$entity instanceof MaintenanceWindow
+            null === $key
             || !$manager instanceof EntityManagerInterface
         ) {
             return;
@@ -82,8 +97,6 @@ final readonly class LayoutCacheInvalidationListener
         }
 
         // Only today's entry: a later day has not been asked about yet and so has nothing cached.
-        $resultCache->deleteItem(
-            MaintenanceWindowRepository::cacheKeyFor(new DateTimeImmutable()->setTime(0, 0)),
-        );
+        $resultCache->deleteItem($key);
     }
 }
