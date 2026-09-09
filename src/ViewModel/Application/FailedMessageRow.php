@@ -18,6 +18,11 @@ final readonly class FailedMessageRow
     public function __construct(
         public ?string $id,
         public string $class,
+        /**
+         * The command line, when the message runs one. Every scheduled job arrives here as the same
+         * `RunCommandMessage`, so the class alone does not say which of them failed.
+         */
+        public ?string $command,
         public ?string $originalTransport,
         public ?DateTimeImmutable $failedAt,
         public ?string $errorClass,
