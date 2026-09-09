@@ -11,8 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Which subscribers of a sign-up list a bulk email is addressed to. Mirrors the
  * Subscribee -> Admittee -> Attendee progression: {@see self::All} is every subscriber, {@see self::Admitted} and
- * {@see self::Waitlisted} the drawn / not-drawn halves of a limited-capacity list, and {@see self::Present} the
- * attendees. {@see self::Selected} cuts across all of these: the rows the organiser ticked by hand.
+ * {@see self::Waitlisted} the drawn / not-drawn halves of a limited-capacity list, {@see self::Present} the
+ * attendees and {@see self::NoShow} the admittees who were not marked present. {@see self::Selected} cuts across all
+ * of these: the rows the organiser ticked by hand.
  */
 enum RecipientScope: string implements TranslatableInterface
 {
@@ -30,6 +31,9 @@ enum RecipientScope: string implements TranslatableInterface
 
     /** The attendees: those marked present. */
     case Present = 'present';
+
+    /** The admittees who were not marked present. */
+    case NoShow = 'no-show';
 
     /** Externals and non-members. */
     case External = 'external';
@@ -61,6 +65,10 @@ enum RecipientScope: string implements TranslatableInterface
             ),
             self::Present => $translator->trans(
                 'Attendees (present)',
+                locale: $locale,
+            ),
+            self::NoShow => $translator->trans(
+                'Admitted, not present',
                 locale: $locale,
             ),
             self::External => $translator->trans(

@@ -495,7 +495,45 @@
                                           data-model="norender|emailBody">{{ emailBody }}</textarea>
                                 <label class="required" for="email-body">{{ 'Message'|trans }}</label>
                             </div>
-                            <small class="text-muted">{{ 'Everybody gets their own copy, so nobody sees who else received it.'|trans }}</small>
+                            <small class="d-block text-muted">{{ 'Everybody gets their own copy, so nobody sees who else received it.'|trans }}</small>
+                            <small class="d-block text-muted">{{ 'Write in English: the rest of the email is in English, and not everybody who signed up reads Dutch.'|trans }}</small>
+                            {# The buttons write into the editor through its Stimulus instance, because it is inside
+                               the `data-live-ignore` above and cannot be re-rendered. #}
+                            <div class="d-flex flex-column gap-1 mt-2"
+                                 data-controller="announcement-placeholder"
+                                 data-announcement-placeholder-markdown-editor-outlet="textarea#email-body">
+                                {# `own` says whether a placeholder is replaced per recipient. The two sentences are
+                                   written out rather than selected inside the `trans` call, which the extractor
+                                   cannot read into. #}
+                                {% for group in [
+                                    { label: 'About the activity'|trans, placeholders: this.aboutPlaceholders, own: false },
+                                    { label: 'What they answered'|trans, placeholders: this.questionPlaceholders, own: true },
+                                ] %}
+                                    {% if group.placeholders is not empty %}
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <span class="small text-muted">{{ group.label }}</span>
+                                            {% for token, stands_for in group.placeholders %}
+                                                {% set written = '{{' ~ token ~ '}}' %}
+                                                {% if group.own %}
+                                                    {% set title = 'Writes %placeholder%, which is replaced with the answer each recipient gave.'|trans({'%placeholder%': written}) %}
+                                                {% else %}
+                                                    {% set title = 'Writes %placeholder%, which is replaced with the same value for everybody.'|trans({'%placeholder%': written}) %}
+                                                {% endif %}
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        title="{{ title }}"
+                                                        data-action="announcement-placeholder#insert"
+                                                        data-announcement-placeholder-token-param="{{ written }}">
+                                                    {{ stands_for }}
+                                                </button>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <small class="d-block text-muted mt-1">
+                                {{ 'A placeholder works in the subject as well, and is left empty for anybody who did not answer that question.'|trans }}
+                                {% if people %}{{ 'A question belongs to one sign-up list, so write to a single list to fill in what people answered.'|trans }}{% endif %}
+                            </small>
                         </div>
                     </div>
 

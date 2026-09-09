@@ -47,6 +47,7 @@ loadControllers(
 
         // Activity-specific controllers.
         'activity-item': () => import('./controllers/activity/activity_item_controller.ts'),
+        'announcement-placeholder': () => import('./controllers/activity/announcement_placeholder_controller.ts'),
         'signup-field': () => import('./controllers/activity/signup_field_controller.ts'),
         'signup-list': () => import('./controllers/activity/signup_list_controller.ts'),
         'tier-order': () => import('./controllers/activity/tier_order_controller.ts'),

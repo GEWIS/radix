@@ -22,6 +22,7 @@ use App\Message\Activity\OrganiserAnnouncementEmail;
 use App\Security\Application\RevisionVoter;
 use App\Security\User\SudoVoter;
 use App\Service\Activity\DrawManager;
+use App\Util\Activity\AnnouncementPlaceholders;
 use App\Util\Activity\SignupAdminWindow;
 use App\ViewModel\Activity\Admin\SignupAdminListView;
 use App\ViewModel\Activity\Admin\SignupPeopleView;
@@ -43,6 +44,7 @@ use function array_key_exists;
 use function array_map;
 use function assert;
 use function count;
+use function implode;
 use function in_array;
 use function sprintf;
 use function trim;
@@ -489,6 +491,27 @@ final class SignupOverview
                     ['%list%' => $name],
                 ),
             ];
+
+            // Admission has to be settled before "admitted, not present" selects anybody: on a limited list whose
+            // draw is still open nobody is admitted, so the group is empty no matter how many people were absent.
+            // An unlimited list has no draw, and there the group is everybody who was absent.
+            if (
+                null !== $list
+                && (
+                    !$list->limitedCapacity
+                    || $list->drawLocked
+                    || $list->allocationMethod->isManual()
+                )
+            ) {
+                $scopes[] = [
+                    RecipientScope::NoShow,
+                    $this->translator->trans(
+                        'The people with a place on %list% who were not marked present.',
+                        ['%list%' => $name],
+                    ),
+                ];
+            }
+
             $scopes[] = [
                 RecipientScope::Selected,
                 $selected ? $ticked : $pick,
@@ -513,9 +536,88 @@ final class SignupOverview
     }
 
     /**
+     * The placeholders taken from the activity, and from the sign-up list when the message is addressed to one,
+     * against the label shown for each. Every recipient is sent the same value.
+     *
+     * @return array<string, string> token => the label shown in the composer
+     */
+    public function getAboutPlaceholders(): array
+    {
+        $this->assertAccess();
+
+        return AnnouncementPlaceholders::aboutFor(
+            $this->composingList(),
+            $this->translator,
+        );
+    }
+
+    /**
+     * The placeholders taken from the sign-up list's own questions, against the name of the question each one is
+     * derived from. Each is replaced per recipient with the answer that recipient gave, which lets one message
+     * include a value that differs for each of them.
+     *
+     * There are none in people mode: an activity may have several sign-up lists, two of them can ask a question of
+     * the same name and mean different things by it, and a message that covers all of them has no single sign-up
+     * list to read.
+     *
+     * @return array<string, string> token => the question's name
+     */
+    public function getQuestionPlaceholders(): array
+    {
+        $this->assertAccess();
+
+        return $this->questionsOf($this->composingList());
+    }
+
+    /**
+     * The sign-up list the composer is addressing, or null in people mode, where the message goes to everybody on
+     * the activity whichever sign-up list they are in.
+     */
+    private function composingList(): ?SignupList
+    {
+        if ($this->isPeopleMode()) {
+            return null;
+        }
+
+        $list = $this->getActiveList();
+        if (null === $list) {
+            return null;
+        }
+
+        return $this->findOwnedList($list->listId);
+    }
+
+    /**
+     * @return array<string, string> token => the question's name
+     */
+    private function questionsOf(?SignupList $signupList): array
+    {
+        return null === $signupList
+            ? []
+            : AnnouncementPlaceholders::questionsOf(
+                $signupList,
+                Languages::current(),
+            );
+    }
+
+    /**
+     * Every placeholder a message to this sign-up list may use, to check what was written against. Taken from the
+     * sign-up list being sent to rather than the one on screen, so what is checked is what will be replaced.
+     *
+     * @return array<string, string> token => the label shown in the composer
+     */
+    private function placeholders(?SignupList $signupList): array
+    {
+        return AnnouncementPlaceholders::aboutFor(
+            $signupList,
+            $this->translator,
+        ) + $this->questionsOf($signupList);
+    }
+
+    /**
      * Who the message on screen would go to.
      *
-     * @return list<array{email: string, name: string, external: bool}>
+     * @return list<array{email: string, name: string, external: bool, signup: Signup}>
      */
     public function getRecipients(): array
     {
@@ -549,7 +651,7 @@ final class SignupOverview
     }
 
     /**
-     * @return list<array{email: string, name: string, external: bool}>
+     * @return list<array{email: string, name: string, external: bool, signup: Signup}>
      */
     private function recipients(RecipientScope $scope): array
     {
@@ -577,7 +679,7 @@ final class SignupOverview
      * The recipients of a message to everybody on the activity: one address per person, whatever the number of
      * lists they are in, since the same practical mail twice reads as a mistake.
      *
-     * @return list<array{email: string, name: string, external: bool}>
+     * @return list<array{email: string, name: string, external: bool, signup: Signup}>
      */
     private function recipientsAcrossLists(RecipientScope $scope): array
     {
@@ -601,6 +703,7 @@ final class SignupOverview
                         true,
                     ),
                     RecipientScope::Admitted => $signup->isDrawn(),
+                    RecipientScope::NoShow => $signup->isDrawn() && !$signup->isPresent(),
                 };
 
                 if (
@@ -623,6 +726,7 @@ final class SignupOverview
                     'email' => $email,
                     'name' => $signup->getFullName(),
                     'external' => $external,
+                    'signup' => $signup,
                 ];
             }
         }
@@ -1160,17 +1264,39 @@ final class SignupOverview
     {
         $this->assertAccess();
 
-        if (!$this->composed()) {
-            return;
-        }
-
         $signupList = $this->findOwnedList($listId);
         if (null === $signupList) {
             return;
         }
 
+        if (!$this->composed($signupList)) {
+            return;
+        }
+
         $scope = $this->scopeValue();
-        if (RecipientScope::Multi === $scope) {
+
+        // Whether it is settled who has a place: a locked draw, or a manual allocation method where admission is set
+        // by hand. Until then every sign-up on a limited list is still not-yet-drawn.
+        $admissionSettled = $signupList->isDrawLocked()
+            || $signupList->getAllocationMethod()->isManual();
+
+        // Admitted/Waitlisted only distinguish recipients on a limited list whose admission is settled; anywhere else
+        // the two would silently resolve to "everyone" and "no one". Admitted-but-not-present needs the same, except
+        // on a list with no capacity to be admitted to, where every sign-up has a place from the start and the group
+        // is everybody who was absent. The composer offers each of them in exactly these circumstances, but $scope is
+        // a writable prop, so re-check it here.
+        $unavailable = match ($scope) {
+            RecipientScope::Multi => true,
+            RecipientScope::Admitted,
+            RecipientScope::Waitlisted => !$signupList->getLimitedCapacity() || !$admissionSettled,
+            RecipientScope::NoShow => $signupList->getLimitedCapacity() && !$admissionSettled,
+            RecipientScope::All,
+            RecipientScope::Selected,
+            RecipientScope::Present,
+            RecipientScope::External => false,
+        };
+
+        if ($unavailable) {
             $this->setFeedback(
                 AlertTypes::Warning,
                 $this->translator->trans('That recipient group is not available for this sign-up list.'),
@@ -1179,39 +1305,13 @@ final class SignupOverview
             return;
         }
 
-        // Admitted/Waitlisted only distinguish recipients once admission is settled: a locked draw, or a manual
-        // allocation method where admission is set by hand. On any other list every sign-up is not-yet-drawn, so the
-        // two scopes would silently resolve to "everyone"/"no one". The composer only offers them in the same
-        // circumstances, but $scope is a writable prop, so re-check it here.
-        if (
-            in_array(
+        $this->dispatchTo(
+            $this->recipientsFor(
+                $signupList,
                 $scope,
-                [
-                    RecipientScope::Admitted,
-                    RecipientScope::Waitlisted,
-                ],
-                true,
-            )
-            && !(
-                $signupList->getLimitedCapacity()
-                && (
-                    $signupList->isDrawLocked()
-                    || $signupList->getAllocationMethod()->isManual()
-                )
-            )
-        ) {
-            $this->setFeedback(
-                AlertTypes::Warning,
-                $this->translator->trans('That recipient group is not available for this sign-up list.'),
-            );
-
-            return;
-        }
-
-        $this->dispatchTo($this->recipientsFor(
+            ),
             $signupList,
-            $scope,
-        ));
+        );
     }
 
     /**
@@ -1222,12 +1322,26 @@ final class SignupOverview
     {
         $this->assertAccess();
 
-        if (!$this->composed()) {
+        // No sign-up list: the message covers every sign-up list of the activity, so nothing taken from one of them
+        // can be replaced.
+        if (!$this->composed(null)) {
             return;
         }
 
+        // Being admitted, and being admitted without attending, are both per sign-up list: a person can be admitted
+        // to one and waiting on another, so neither selects a person across all of them. The composer offers neither
+        // in people mode, but $scope is a writable prop, so re-check it here.
         $scope = $this->scopeValue();
-        if (RecipientScope::Admitted === $scope) {
+        if (
+            in_array(
+                $scope,
+                [
+                    RecipientScope::Admitted,
+                    RecipientScope::NoShow,
+                ],
+                true,
+            )
+        ) {
             $this->setFeedback(
                 AlertTypes::Warning,
                 $this->translator->trans('That recipient group is not available for this sign-up list.'),
@@ -1236,7 +1350,10 @@ final class SignupOverview
             return;
         }
 
-        $this->dispatchTo($this->recipientsAcrossLists($scope));
+        $this->dispatchTo(
+            $this->recipientsAcrossLists($scope),
+            null,
+        );
     }
 
     /**
@@ -1247,7 +1364,9 @@ final class SignupOverview
     {
         $this->assertAccess();
 
-        if (!$this->composed()) {
+        // A test uses what the composer is showing, which is what the message was written for.
+        $composing = $this->composingList();
+        if (!$this->composed($composing)) {
             return;
         }
 
@@ -1275,6 +1394,15 @@ final class SignupOverview
                 [
                     'email' => $email,
                     'name' => $member->getFullName(),
+                    // The activity and the sign-up list are known here, so their placeholders are replaced with
+                    // their real values. A test has no sign-up behind it: the organiser is checking their own
+                    // wording, not their own answers, and may not be signed up at all. A question is therefore
+                    // replaced with its own name, which shows where an answer appears.
+                    'replacements' => AnnouncementPlaceholders::aboutValuesFor(
+                        $this->activity,
+                        $composing,
+                        Languages::English,
+                    ) + $this->questionsOf($composing),
                 ],
             ],
         );
@@ -1286,30 +1414,61 @@ final class SignupOverview
     }
 
     /**
-     * Whether there is a message to send at all; says so when there is not.
+     * Whether there is a message to send at all, and whether every placeholder in it can be replaced for the sign-up
+     * list it is addressed to ($signupList is null for a message to everybody on the activity). Reports why not.
      */
-    private function composed(): bool
+    private function composed(?SignupList $signupList): bool
     {
         if (
-            '' !== trim($this->emailSubject)
-            && '' !== trim($this->emailBody)
+            '' === trim($this->emailSubject)
+            || '' === trim($this->emailBody)
         ) {
-            return true;
+            $this->setFeedback(
+                AlertTypes::Warning,
+                $this->translator->trans('Please provide both a subject and a message.'),
+            );
+
+            return false;
         }
 
-        $this->setFeedback(
-            AlertTypes::Warning,
-            $this->translator->trans('Please provide both a subject and a message.'),
+        // A placeholder that nothing available replaces would be sent with the value missing, so it is refused here
+        // instead: a mistyped name, or a message written for one sign-up list and then addressed to everybody on the
+        // activity, where a question of one sign-up list does not apply to the rest.
+        $unknown = AnnouncementPlaceholders::unknownIn(
+            trim($this->emailSubject) . "\n" . trim($this->emailBody),
+            $this->placeholders($signupList),
         );
 
-        return false;
+        if ([] !== $unknown) {
+            $this->setFeedback(
+                AlertTypes::Warning,
+                $this->translator->trans(
+                    'This message uses a placeholder that is not available here: %placeholders%.',
+                    [
+                        '%placeholders%' => implode(
+                            ', ',
+                            array_map(
+                                static fn (string $token): string => '{{' . $token . '}}',
+                                $unknown,
+                            ),
+                        ),
+                    ],
+                ),
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * @param list<array{email: string, name: string}> $recipients
+     * @param list<array{email: string, name: string, external: bool, signup: Signup}> $recipients
      */
-    private function dispatchTo(array $recipients): void
-    {
+    private function dispatchTo(
+        array $recipients,
+        ?SignupList $signupList,
+    ): void {
         if ([] === $recipients) {
             $this->setFeedback(
                 AlertTypes::Warning,
@@ -1319,9 +1478,33 @@ final class SignupOverview
             return;
         }
 
+        // Every placeholder is replaced here, and the result is stored with the address it was replaced for, for
+        // the same reason the address itself is snapshotted: an answer edited after the message is queued must not
+        // change what was composed. Everything is read in English, like the rest of the email. The activity and the
+        // sign-up list values are the same for every recipient, so they are read once and then copied per recipient,
+        // so that the handler works from a single map per email.
+        $about = AnnouncementPlaceholders::aboutValuesFor(
+            $this->activity,
+            $signupList,
+            Languages::English,
+        );
+
+        $payload = [];
+        foreach ($recipients as $recipient) {
+            $payload[] = [
+                'email' => $recipient['email'],
+                'name' => $recipient['name'],
+                'replacements' => $about + AnnouncementPlaceholders::answersOf(
+                    $recipient['signup'],
+                    $this->translator,
+                    Languages::English,
+                ),
+            ];
+        }
+
         $this->dispatch(
             trim($this->emailSubject),
-            $recipients,
+            $payload,
         );
 
         $this->setFeedback(
@@ -1339,7 +1522,7 @@ final class SignupOverview
     }
 
     /**
-     * @param list<array{email: string, name: string}> $recipients
+     * @param list<array{email: string, name: string, replacements: array<string, string>}> $recipients
      */
     private function dispatch(
         string $subject,
@@ -1353,14 +1536,6 @@ final class SignupOverview
             $activityName = '[CANCELLED] ' . $activityName;
         }
 
-        $plain = [];
-        foreach ($recipients as $recipient) {
-            $plain[] = [
-                'email' => $recipient['email'],
-                'name' => $recipient['name'],
-            ];
-        }
-
         // One message carrying every recipient: a single, atomic enqueue (never a half-enqueued per-recipient fan-out).
         // The handler sends one email per recipient and tolerates an individual failure, so there is no duplicate
         // re-send on retry either.
@@ -1370,7 +1545,7 @@ final class SignupOverview
                 trim($this->emailBody),
                 $activityName,
                 $this->replyTo(),
-                $plain,
+                $recipients,
             ),
         );
     }
@@ -1379,7 +1554,7 @@ final class SignupOverview
      * Resolve the concrete recipients of a bulk email for a list, by scope. External and member sign-ups alike carry
      * an email; any without one is skipped.
      *
-     * @return list<array{email: string, name: string, external: bool}>
+     * @return list<array{email: string, name: string, external: bool, signup: Signup}>
      */
     private function recipientsFor(
         SignupList $signupList,
@@ -1398,6 +1573,7 @@ final class SignupOverview
                     true,
                 ),
                 RecipientScope::Present => $signup->isPresent(),
+                RecipientScope::NoShow => $signup->isDrawn() && !$signup->isPresent(),
                 RecipientScope::Admitted => $signup->isDrawn(),
                 RecipientScope::Waitlisted => !$signup->isDrawn(),
                 RecipientScope::External => $external,
@@ -1417,6 +1593,7 @@ final class SignupOverview
                 'email' => $email,
                 'name' => $signup->getFullName(),
                 'external' => $external,
+                'signup' => $signup,
             ];
         }
 

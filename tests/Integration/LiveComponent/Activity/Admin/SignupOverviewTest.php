@@ -17,6 +17,10 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
 
+use function array_column;
+use function array_combine;
+use function array_keys;
+
 /**
  * The sign-up admin component is the first live component that writes to the database and dispatches mail, so it
  * re-asserts access on every action rather than trusting the page that embedded it. These exercise it as the framework
@@ -249,6 +253,184 @@ final class SignupOverviewTest extends DatabaseTestCase
 
         $this->expectException(AccessDeniedException::class);
         $component->selectAll(6);
+    }
+
+    public function testTheNoShowGroupReachesOnlyTheAdmitteesWhoDidNotTurnUp(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(4);
+        $component->setScope('no-show');
+        $component->emailSubject = 'We missed you';
+        $component->emailBody = 'You had a place but were not there.';
+
+        $component->sendEmail(3);
+
+        $sent = $this->bulkMessages();
+        self::assertCount(
+            1,
+            $sent,
+        );
+        // Two of the three admittees were marked present, so only 8015 remains.
+        self::assertSame(
+            ['8015@example.com'],
+            array_column(
+                $sent[0]->getRecipients(),
+                'email',
+            ),
+        );
+    }
+
+    public function testThePlaceholdersOfferedAreTheActivityAndTheQuestionsOfTheListOnScreen(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(4);
+
+        self::assertSame(
+            [
+                'ACTIVITY_NAME',
+                'SIGNUPLIST_NAME',
+                'ORGAN_NAME',
+                'ORGAN_ABBR',
+                'COMPANY_NAME',
+                'LOCATION',
+                'COSTS',
+                'BEGIN_TIME',
+                'END_TIME',
+            ],
+            array_keys($component->getAboutPlaceholders()),
+        );
+        self::assertSame(
+            [
+                'DIETARY_REQUIREMENTS' => 'Dietary requirements',
+                'T_SHIRT_SIZE' => 'T-shirt size',
+            ],
+            $component->getQuestionPlaceholders(),
+        );
+    }
+
+    public function testAcrossListsOnlyWhatTheActivityAnswersForIsOffered(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(4);
+        $component->setMode(SignupOverview::MODE_PEOPLE);
+
+        // The activity is the same whichever sign-up list a person is in; the sign-up lists and their questions
+        // are not.
+        self::assertArrayNotHasKey(
+            'SIGNUPLIST_NAME',
+            $component->getAboutPlaceholders(),
+        );
+        self::assertSame(
+            [],
+            $component->getQuestionPlaceholders(),
+        );
+    }
+
+    public function testEachRecipientCarriesTheirOwnAnswerToEveryPlaceholder(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(4);
+        $component->emailSubject = 'About {{ACTIVITY_NAME}}';
+        $component->emailBody = 'We are in {{LOCATION}}; we have you down for {{DIETARY_REQUIREMENTS}} '
+            . 'and a {{T_SHIRT_SIZE}}.';
+
+        $component->sendEmail(3);
+
+        $sent = $this->bulkMessages();
+        self::assertCount(
+            1,
+            $sent,
+        );
+
+        $replacements = array_combine(
+            array_column(
+                $sent[0]->getRecipients(),
+                'email',
+            ),
+            array_column(
+                $sent[0]->getRecipients(),
+                'replacements',
+            ),
+        );
+
+        // A chosen option is replaced with the chosen word, and an unanswered question with an empty string rather
+        // than a missing key, so the rest of the sentence is unaffected. The activity's own values are the same for
+        // everybody; only the answers differ.
+        self::assertSame(
+            [
+                'None',
+                'S',
+            ],
+            [
+                $replacements['8015@example.com']['DIETARY_REQUIREMENTS'],
+                $replacements['8015@example.com']['T_SHIRT_SIZE'],
+            ],
+        );
+        self::assertSame(
+            [
+                '',
+                'L',
+            ],
+            [
+                $replacements['8006@example.com']['DIETARY_REQUIREMENTS'],
+                $replacements['8006@example.com']['T_SHIRT_SIZE'],
+            ],
+        );
+        // This activity has no organising body, which makes it the board's, and no organising company.
+        self::assertSame(
+            [
+                'Workshop',
+                'Participants',
+                'the board',
+                '',
+                'Room 2',
+            ],
+            [
+                $replacements['8006@example.com']['ACTIVITY_NAME'],
+                $replacements['8006@example.com']['SIGNUPLIST_NAME'],
+                $replacements['8006@example.com']['ORGAN_NAME'],
+                $replacements['8006@example.com']['COMPANY_NAME'],
+                $replacements['8006@example.com']['LOCATION'],
+            ],
+        );
+    }
+
+    public function testTheComposerOffersThePlaceholdersOfTheListItIsWritingTo(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+
+        $html = $this->render(
+            4,
+            ['composerOpen' => true],
+        );
+
+        self::assertStringContainsString(
+            'data-announcement-placeholder-token-param="{{DIETARY_REQUIREMENTS}}"',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Write in English',
+            $html,
+        );
+    }
+
+    public function testAMessageWithAPlaceholderTheListDoesNotHaveIsNotSent(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(4);
+        $component->emailSubject = 'About the workshop';
+        $component->emailBody = 'We have you down for {{FAVOURITE_COLOUR}}.';
+
+        $component->sendEmail(3);
+
+        self::assertSame(
+            [],
+            $this->bulkMessages(),
+        );
+        self::assertSame(
+            AlertTypes::Warning->value,
+            $component->feedbackType,
+        );
     }
 
     /**
