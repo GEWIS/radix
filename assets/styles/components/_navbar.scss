@@ -13,6 +13,12 @@
     background-color: var(--#{$prefix}navbar-bg);
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(255, 255, 255, 0.15);
 
+    // Centred as a flex item, so the logo is not placed on the anchor's baseline with descender space under it.
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+    }
+
     // Disable box-shadow if special notice is present.
     //&:not(:has(+ .special-notice)) {
     //    box-shadow: none;
