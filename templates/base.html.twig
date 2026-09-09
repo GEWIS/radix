@@ -18,15 +18,15 @@
         {% endif %}
         {# Load CSS #}
         {% block stylesheets %}
-            {# Ahead of app.scss: components/_autocomplete.scss overrides this theme with selectors of equal
-               specificity, so it only wins on source order. #}
-            <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
             <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
-            <link rel="stylesheet" href="{{ asset('@symfony/ux-live-component/live.min.css') }}">
         {% endblock %}
         {# Load critical JS #}
         {% block javascripts %}
-            <script src="{{ asset('js/color-modes.js') }}" nonce="{{ csp_nonce('script') }}"></script>
+            {# Inlined so the theme is set before the first paint. #}
+            <script nonce="{{ csp_nonce('script') }}">{{ source('@js/color-modes.js') }}</script>
+            {# Before the importmap: deferred scripts and modules run in document order, and the controllers use
+               `window.bootstrap`. #}
+            <script src="{{ asset('js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce('script') }}" defer></script>
             {% block importmap %}{{ importmap('app', {'nonce': csp_nonce('script')}) }}{% endblock %}
         {% endblock %}
         {% if app.request.server.has('FRANKENPHP_HOT_RELOAD') %}
@@ -89,8 +89,7 @@
         {% include 'partials/application/privacy-widget.html.twig' %}
         {# Load non-critical JS #}
         {% block body_javascripts %}
-            <script src="{{ asset('js/privacy-widget.js') }}" nonce="{{ csp_nonce('script') }}"></script>
-            <script src="{{ asset('js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce('script') }}"></script>
+            <script src="{{ asset('js/privacy-widget.js') }}" nonce="{{ csp_nonce('script') }}" defer></script>
         {% endblock %}
         {% block gewis_festivities %}
             {# The container always renders so the cosmetics-toggle CSS ([data-cosmetics="off"]) has a stable node to

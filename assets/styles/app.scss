@@ -57,6 +57,11 @@ $enable-negative-margins: true;
 // Magic
 @import '../../vendor/twbs/bootstrap/scss/utilities/api';
 
+// Inlined rather than linked, so the head requests one stylesheet. tom-select stays ahead of
+// components/_autocomplete, which overrides it with selectors of equal specificity and so only wins on source order.
+@import '../vendor/tom-select/dist/css/tom-select.bootstrap5';
+@import '../../vendor/symfony/ux-live-component/assets/dist/live.min';
+
 // Custom styling
 // Components
 @import 'components/activity';
