@@ -44,7 +44,11 @@
                                         {# The class is what identifies the work; the namespace in front of it is noise in a table. #}
                                         <code>{{ message.class|split('\\')|last }}</code>
                                         <br>
-                                        <small class="text-muted">{{ message.class }}</small>
+                                        {% if message.command %}
+                                            <small class="text-muted"><code>{{ message.command }}</code></small>
+                                        {% else %}
+                                            <small class="text-muted">{{ message.class }}</small>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if message.originalTransport %}

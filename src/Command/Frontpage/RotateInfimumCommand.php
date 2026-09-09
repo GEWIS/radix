@@ -29,7 +29,6 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 )]
 #[AsCronTask(
     expression: '*/5 * * * *',
-    jitter: 60,
     transports: 'cron',
 )]
 final class RotateInfimumCommand extends Command

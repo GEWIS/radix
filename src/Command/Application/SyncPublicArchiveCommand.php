@@ -29,7 +29,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '7 * * * *',
-    jitter: 300,
     transports: 'cron',
 )]
 final class SyncPublicArchiveCommand extends Command

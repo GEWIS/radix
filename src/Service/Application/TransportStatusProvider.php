@@ -9,8 +9,10 @@ use App\ViewModel\Application\FailedMessageRow;
 use App\ViewModel\Application\TransportStatus;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -185,15 +187,39 @@ final readonly class TransportStatusProvider
             $failedAt = DateTimeImmutable::createFromInterface($lastRedelivery->getRedeliveredAt());
         }
 
+        $message = $envelope->getMessage();
+
         return new FailedMessageRow(
             is_scalar($id) ? (string) $id : null,
-            get_debug_type($envelope->getMessage()),
+            get_debug_type($message),
+            $this->command($message),
             $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName(),
             $failedAt,
             $error?->getExceptionClass(),
             $error?->getExceptionMessage(),
             count($redeliveries),
         );
+    }
+
+    /**
+     * The command line a failed message would have run, if it runs one.
+     *
+     * Every scheduled job reaches the failure transport as the same `RunCommandMessage`, so the class alone does
+     * not distinguish twenty-eight different jobs. A redispatch that failed before passing the command on is
+     * unwrapped for the same reason.
+     */
+    private function command(object $message): ?string
+    {
+        if ($message instanceof RedispatchMessage) {
+            $inner = $message->envelope;
+            $message = $inner instanceof Envelope
+                ? $inner->getMessage()
+                : $inner;
+        }
+
+        return $message instanceof RunCommandMessage
+            ? (string) $message
+            : null;
     }
 
     /**

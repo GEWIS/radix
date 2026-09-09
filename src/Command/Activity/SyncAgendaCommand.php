@@ -33,7 +33,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '*/15 * * * *',
-    jitter: 60,
     transports: 'cron',
 )]
 final class SyncAgendaCommand extends Command

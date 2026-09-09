@@ -32,16 +32,16 @@ use function sprintf;
  * frequency), mail those in one digest, drain the sent notifications and stamp the send time. Categories that are not
  * yet due keep their notifications queued for a later run; a member who paused all email keeps nothing queued.
  *
- * The five-minute tick is jittered so it does not land on the same second as the jobs scheduled on the hour; a digest
- * is due on the hour or the day, so a delay of up to a minute changes nothing about what gets sent.
+ * The five-minute tick is offset by three minutes so it does not land on the same minute as the jobs scheduled on
+ * the hour; a digest is due on the hour or the day, so running three minutes late changes nothing about what gets
+ * sent.
  */
 #[AsCommand(
     name: 'app:notification:run-digests',
     description: 'Mail a digest to every member whose queued notifications are due.',
 )]
 #[AsCronTask(
-    expression: '*/5 * * * *',
-    jitter: 60,
+    expression: '3-58/5 * * * *',
     transports: 'cron',
 )]
 final class RunNotificationDigestsCommand extends Command

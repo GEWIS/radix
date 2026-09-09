@@ -38,7 +38,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '30 4 * * *',
-    jitter: 900,
     transports: 'gdpr',
 )]
 final class AnonymisePollVotesCommand extends Command

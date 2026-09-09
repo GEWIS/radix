@@ -20,7 +20,6 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 // morning saying the same thing stops being read. Monday, so a week's decisions are checked before the next meeting.
 #[AsCronTask(
     expression: '47 6 * * 1',
-    jitter: 900,
     transports: 'maintenance',
 )]
 class CheckDatabaseCommand extends AbstractCheckerCommand

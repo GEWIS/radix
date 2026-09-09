@@ -31,7 +31,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '50 3 * * *',
-    jitter: 900,
     transports: 'gdpr',
 )]
 final class PruneUnverifiedSignupsCommand extends Command

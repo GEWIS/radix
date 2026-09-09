@@ -9,6 +9,7 @@ use App\Repository\Application\AnnouncementRepository;
 use App\Service\Application\MaintenanceStatusProvider;
 use App\Service\Application\RegisterStatusService;
 use App\Service\Application\ReviewQueueProviderInterface;
+use App\Service\Application\ScheduledTaskStatusProvider;
 use App\Service\User\IpDatabaseStatusProvider;
 use App\ViewModel\Application\Notification;
 use App\ViewModel\Application\ReviewQueueRow;
@@ -55,6 +56,7 @@ class AdminController extends AbstractController
         private readonly MaintenanceStatusProvider $maintenanceStatusProvider,
         private readonly RegisterStatusService $registerStatus,
         private readonly IpDatabaseStatusProvider $ipDatabaseStatus,
+        private readonly ScheduledTaskStatusProvider $scheduledTaskStatus,
     ) {
     }
 
@@ -109,6 +111,12 @@ class AdminController extends AbstractController
                 'ipDatabases' => $isAdmin
                     ? $this->ipDatabaseStatus->status()
                     : null,
+                // The whole schedule, so only for a reader who administers the whole application. What the register's
+                // own syncs are doing is told to a database administrator by the register notifications, off the
+                // fetch times rather than off the schedule.
+                'lateTasks' => $isAdmin
+                    ? $this->scheduledTaskStatus->late()
+                    : [],
                 'showsAdministration' => $isAdmin,
                 // Only assembled for a reader who administers the register: it is several queries, and the section
                 // it feeds is not rendered for anybody else.

@@ -45,7 +45,6 @@ use function strval;
 )]
 #[AsCronTask(
     expression: '25 8 * * *',
-    jitter: 600,
     transports: 'cron',
 )]
 final class RemindOptionBudgetCommand extends Command

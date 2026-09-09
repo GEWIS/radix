@@ -48,7 +48,6 @@ use function strval;
 )]
 #[AsCronTask(
     expression: '35 8 * * *',
-    jitter: 600,
     transports: 'cron',
 )]
 final class LapseOverdueOptionsCommand extends Command

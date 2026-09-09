@@ -28,7 +28,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '15 4 * * *',
-    jitter: 900,
     transports: 'maintenance',
 )]
 final class PruneUnclaimedPageImagesCommand extends Command

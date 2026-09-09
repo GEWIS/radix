@@ -149,6 +149,29 @@ class MainScheduleTest extends KernelTestCase
     }
 
     /**
+     * The generator builds its trigger heap once per process and rebuilds it from the checkpoint in the next one,
+     * and the workers restart every ten minutes. A trigger that returns a different date each time it is asked
+     * therefore loses due times: `JitterTrigger` reconstructs the base cron date by subtracting its maximum offset
+     * from the probe and then skips anything at or before it, so a rebuild between a due time and its jittered
+     * dispatch advances the task to the next date and the run never happens. That lost roughly two in three runs of
+     * every daily and weekly task.
+     */
+    public function testEveryTriggerAnswersTheSameThingTwice(): void
+    {
+        $probe = new DateTimeImmutable('2026-09-07 04:20:30');
+
+        foreach ($this->schedule()->getRecurringMessages() as $recurringMessage) {
+            $trigger = $recurringMessage->getTrigger();
+
+            self::assertEquals(
+                $trigger->getNextRunDate($probe),
+                $trigger->getNextRunDate($probe),
+                $trigger . ' does not answer the same thing twice, so a worker restart loses its due times.',
+            );
+        }
+    }
+
+    /**
      * What the generator hands a message provider when a run comes due.
      */
     private function context(RecurringMessage $recurringMessage): MessageContext

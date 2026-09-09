@@ -39,7 +39,6 @@ use function sprintf;
 )]
 #[AsCronTask(
     expression: '0 3 * * 1',
-    jitter: 900,
     transports: 'cron',
 )]
 final class GenerateWeeklyPhotoCommand extends Command
