@@ -200,7 +200,7 @@
                                 {{ 'Manage'|trans }}
                             </a>
                         </div>
-                        <div class="d-flex align-items-start gap-2 pt-2 border-top">
+                        <div class="d-flex align-items-start gap-2 py-2 border-top">
                             <span class="fas fa-map-location-dot text-muted mt-1" aria-hidden="true"></span>
                             <div class="flex-grow-1">
                                 <div class="fw-semibold">{{ 'IP databases'|trans }}</div>
@@ -214,6 +214,36 @@
                                     <span class="small text-muted">
                                         {{ 'Refreshed %date%.'|trans({'%date%': ipDatabases.updatedAt|date('M j, Y')}) }}
                                     </span>
+                                {% endif %}
+                            </div>
+                            <a href="{{ path('admin/queues') }}" class="small fw-semibold">
+                                {{ 'Queues'|trans }}
+                            </a>
+                        </div>
+                        {# A schedule that has stopped dispatching produces the same empty queues as one with nothing
+                           due, so the healthy case is stated rather than left blank. #}
+                        <div class="d-flex align-items-start gap-2 pt-2 border-top">
+                            <span class="fas fa-clock-rotate-left text-muted mt-1" aria-hidden="true"></span>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">{{ 'Scheduled tasks'|trans }}</div>
+                                {% if lateTasks is empty %}
+                                    <span class="small text-muted">{{ 'Every task is running to schedule.'|trans }}</span>
+                                {% else %}
+                                    <span class="small text-danger">
+                                        {{ '%count% tasks have not run when they should have.'|trans({'%count%': lateTasks|length}) }}
+                                    </span>
+                                    <ul class="small text-muted mb-0 ps-3">
+                                        {% for task in lateTasks|slice(0, 3) %}
+                                            <li>
+                                                <code>{{ task.command }}</code>
+                                                {% if task.lastRun is null %}
+                                                    {{ 'has not been seen at all.'|trans }}
+                                                {% else %}
+                                                    {{ 'last ran %date%.'|trans({'%date%': task.lastRun|date('M j, H:i')}) }}
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 {% endif %}
                             </div>
                             <a href="{{ path('admin/queues') }}" class="small fw-semibold">
