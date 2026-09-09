@@ -1,132 +1,90 @@
-import { startStimulusApp } from '@symfony/stimulus-bundle';
+import { loadControllers, startStimulusApp } from '@symfony/stimulus-bundle';
 
-// Application-wide, domain-agnostic controllers.
-import ConfirmModalController from './controllers/application/confirm_modal_controller.ts';
-import CopyController from './controllers/application/copy_controller.ts';
+// On every page, so loading these on demand would cost a round trip after the entrypoint has parsed.
 import CosmeticsToggleController from './controllers/application/cosmetics_toggle_controller.ts';
-import DescriptionToggleController from './controllers/application/description_toggle_controller.ts';
 import DismissibleController from './controllers/application/dismissible_controller.ts';
-import EditLockController from './controllers/application/edit_lock_controller.ts';
-import FormCollectionController from './controllers/application/form_collection_controller.ts';
-import ImageCropController from './controllers/application/image_crop_controller.ts';
-import InfiniteScrollController from './controllers/application/infinite_scroll_controller.ts';
-import LocalisedFieldsController from './controllers/application/localised_fields_controller.ts';
-import MarkdownEditorController from './controllers/application/markdown_editor_controller.ts';
-import ModalCloseController from './controllers/application/modal_close_controller.ts';
-import ModalFormTargetController from './controllers/application/modal_form_target_controller.ts';
 import NavDropdownController from './controllers/application/nav_dropdown_controller.ts';
-import NavigateSelectController from './controllers/application/navigate_select_controller.ts';
-import NotificationSettingsController from './controllers/application/notification_settings_controller.ts';
 import NotificationsController from './controllers/application/notifications_controller.ts';
-import PrintController from './controllers/application/print_controller.ts';
-import SortableController from './controllers/application/sortable_controller.ts';
-import SubmitOnceController from './controllers/application/submit_once_controller.ts';
-
-// User-specific controllers.
-import ExternalAppSigningController from './controllers/user/external_app_signing_controller.ts';
-
-// Activity-specific controllers.
-import ActivityItemController from './controllers/activity/activity_item_controller.ts';
-import SignupFieldController from './controllers/activity/signup_field_controller.ts';
-import SignupListController from './controllers/activity/signup_list_controller.ts';
-import TierOrderController from './controllers/activity/tier_order_controller.ts';
-
-// Frontpage-specific controllers.
-import BirthdayRotatorController from './controllers/frontpage/birthday_rotator_controller.ts';
-import InfimumController from './controllers/frontpage/infimum_controller.ts';
-import PageEditorController from './controllers/frontpage/page_editor_controller.ts';
-import PageImagesController from './controllers/frontpage/page_images_controller.ts';
-
-// Decision-specific controllers.
-import CounterpartModalController from './controllers/decision/counterpart_modal_controller.ts';
-import DecisionCounterpartController from './controllers/decision/decision_counterpart_controller.ts';
-import DecisionLookupController from './controllers/decision/decision_lookup_controller.ts';
-import DecisionNumberController from './controllers/decision/decision_number_controller.ts';
-import DocumentUploadController from './controllers/decision/document_upload_controller.ts';
-import FoundationFormController from './controllers/decision/foundation_form_controller.ts';
-import InstallEditorController from './controllers/decision/install_editor_controller.ts';
-import LiveSortableController from './controllers/decision/live_sortable_controller.ts';
-import MeetingLookupController from './controllers/decision/meeting_lookup_controller.ts';
-import MemberLookupController from './controllers/decision/member_lookup_controller.ts';
-import MemberSearchController from './controllers/decision/member_search_controller.ts';
-import OrganLookupController from './controllers/decision/organ_lookup_controller.ts';
-import OrganMembersController from './controllers/decision/organ_members_controller.ts';
-import RevisionFilterController from './controllers/decision/revision_filter_controller.ts';
-import SubDecisionChoiceController from './controllers/decision/subdecision_choice_controller.ts';
-
-// Join-specific controllers.
-import InitialsController from './controllers/join/initials_controller.ts';
-import StudyNoticeController from './controllers/join/study_notice_controller.ts';
-
-// Photo-specific controllers.
-import AlbumSearchController from './controllers/photo/album_search_controller.ts';
-import CoverController from './controllers/photo/cover_controller.ts';
-import GalleryController from './controllers/photo/gallery_controller.ts';
-import UploadController from './controllers/photo/upload_controller.ts';
-
-// Query-specific controllers.
-import QueryEditorController from './controllers/query/query_editor_controller.ts';
 
 const app = startStimulusApp();
 
 // Registered with flat identifiers so the templates keep using `data-controller="localised-fields"` etc. despite the
 // subdirectories -- the path-based autoload would otherwise namespace them (e.g. `application--localised-fields`). The
 // framework-scaffolded csrf_protection controller stays at the controllers/ root and autoloads as `csrf-protection`.
-app.register('confirm-modal', ConfirmModalController);
-app.register('copy', CopyController);
-app.register('cosmetics-toggle', CosmeticsToggleController);
-app.register('description-toggle', DescriptionToggleController);
-app.register('dismissible', DismissibleController);
-app.register('edit-lock', EditLockController);
-app.register('form-collection', FormCollectionController);
-app.register('image-crop', ImageCropController);
-app.register('infinite-scroll', InfiniteScrollController);
-app.register('localised-fields', LocalisedFieldsController);
-app.register('markdown-editor', MarkdownEditorController);
-app.register('modal-close', ModalCloseController);
-app.register('modal-form-target', ModalFormTargetController);
-app.register('nav-dropdown', NavDropdownController);
-app.register('navigate-select', NavigateSelectController);
-app.register('notification-settings', NotificationSettingsController);
-app.register('notifications', NotificationsController);
-app.register('print', PrintController);
-app.register('sortable', SortableController);
-app.register('submit-once', SubmitOnceController);
+//
+// The rest are imported dynamically: the asset mapper preloads whatever an entrypoint imports statically, so a static
+// import here would emit a `modulepreload` on every page. The `stimulusFetch` comment in each controller does the
+// same for its autoloaded alias.
+loadControllers(
+    app,
+    {
+        'cosmetics-toggle': CosmeticsToggleController,
+        'dismissible': DismissibleController,
+        'nav-dropdown': NavDropdownController,
+        'notifications': NotificationsController,
+    },
+    {
+        // Application-wide, domain-agnostic controllers.
+        'confirm-modal': () => import('./controllers/application/confirm_modal_controller.ts'),
+        'copy': () => import('./controllers/application/copy_controller.ts'),
+        'description-toggle': () => import('./controllers/application/description_toggle_controller.ts'),
+        'edit-lock': () => import('./controllers/application/edit_lock_controller.ts'),
+        'form-collection': () => import('./controllers/application/form_collection_controller.ts'),
+        'image-crop': () => import('./controllers/application/image_crop_controller.ts'),
+        'infinite-scroll': () => import('./controllers/application/infinite_scroll_controller.ts'),
+        'localised-fields': () => import('./controllers/application/localised_fields_controller.ts'),
+        'markdown-editor': () => import('./controllers/application/markdown_editor_controller.ts'),
+        'modal-close': () => import('./controllers/application/modal_close_controller.ts'),
+        'modal-form-target': () => import('./controllers/application/modal_form_target_controller.ts'),
+        'navigate-select': () => import('./controllers/application/navigate_select_controller.ts'),
+        'notification-settings': () => import('./controllers/application/notification_settings_controller.ts'),
+        'print': () => import('./controllers/application/print_controller.ts'),
+        'sortable': () => import('./controllers/application/sortable_controller.ts'),
+        'submit-once': () => import('./controllers/application/submit_once_controller.ts'),
 
-app.register('external-app-signing', ExternalAppSigningController);
+        // User-specific controllers.
+        'external-app-signing': () => import('./controllers/user/external_app_signing_controller.ts'),
 
-app.register('activity-item', ActivityItemController);
-app.register('signup-field', SignupFieldController);
-app.register('signup-list', SignupListController);
-app.register('tier-order', TierOrderController);
+        // Activity-specific controllers.
+        'activity-item': () => import('./controllers/activity/activity_item_controller.ts'),
+        'signup-field': () => import('./controllers/activity/signup_field_controller.ts'),
+        'signup-list': () => import('./controllers/activity/signup_list_controller.ts'),
+        'tier-order': () => import('./controllers/activity/tier_order_controller.ts'),
 
-app.register('birthday-rotator', BirthdayRotatorController);
-app.register('infimum', InfimumController);
-app.register('page-editor', PageEditorController);
-app.register('page-images', PageImagesController);
+        // Frontpage-specific controllers.
+        'birthday-rotator': () => import('./controllers/frontpage/birthday_rotator_controller.ts'),
+        'infimum': () => import('./controllers/frontpage/infimum_controller.ts'),
+        'page-editor': () => import('./controllers/frontpage/page_editor_controller.ts'),
+        'page-images': () => import('./controllers/frontpage/page_images_controller.ts'),
 
-app.register('counterpart-modal', CounterpartModalController);
-app.register('decision-counterpart', DecisionCounterpartController);
-app.register('decision-lookup', DecisionLookupController);
-app.register('decision-number', DecisionNumberController);
-app.register('document-upload', DocumentUploadController);
-app.register('foundation-form', FoundationFormController);
-app.register('install-editor', InstallEditorController);
-app.register('live-sortable', LiveSortableController);
-app.register('meeting-lookup', MeetingLookupController);
-app.register('member-lookup', MemberLookupController);
-app.register('member-search', MemberSearchController);
-app.register('organ-lookup', OrganLookupController);
-app.register('organ-members', OrganMembersController);
-app.register('revision-filter', RevisionFilterController);
-app.register('subdecision-choice', SubDecisionChoiceController);
+        // Decision-specific controllers.
+        'counterpart-modal': () => import('./controllers/decision/counterpart_modal_controller.ts'),
+        'decision-counterpart': () => import('./controllers/decision/decision_counterpart_controller.ts'),
+        'decision-lookup': () => import('./controllers/decision/decision_lookup_controller.ts'),
+        'decision-number': () => import('./controllers/decision/decision_number_controller.ts'),
+        'document-upload': () => import('./controllers/decision/document_upload_controller.ts'),
+        'foundation-form': () => import('./controllers/decision/foundation_form_controller.ts'),
+        'install-editor': () => import('./controllers/decision/install_editor_controller.ts'),
+        'live-sortable': () => import('./controllers/decision/live_sortable_controller.ts'),
+        'meeting-lookup': () => import('./controllers/decision/meeting_lookup_controller.ts'),
+        'member-lookup': () => import('./controllers/decision/member_lookup_controller.ts'),
+        'member-search': () => import('./controllers/decision/member_search_controller.ts'),
+        'organ-lookup': () => import('./controllers/decision/organ_lookup_controller.ts'),
+        'organ-members': () => import('./controllers/decision/organ_members_controller.ts'),
+        'revision-filter': () => import('./controllers/decision/revision_filter_controller.ts'),
+        'subdecision-choice': () => import('./controllers/decision/subdecision_choice_controller.ts'),
 
-app.register('initials', InitialsController);
-app.register('study-notice', StudyNoticeController);
+        // Join-specific controllers.
+        'initials': () => import('./controllers/join/initials_controller.ts'),
+        'study-notice': () => import('./controllers/join/study_notice_controller.ts'),
 
-app.register('album-search', AlbumSearchController);
-app.register('photo-cover', CoverController);
-app.register('gallery', GalleryController);
-app.register('photo-upload', UploadController);
+        // Photo-specific controllers.
+        'album-search': () => import('./controllers/photo/album_search_controller.ts'),
+        'photo-cover': () => import('./controllers/photo/cover_controller.ts'),
+        'gallery': () => import('./controllers/photo/gallery_controller.ts'),
+        'photo-upload': () => import('./controllers/photo/upload_controller.ts'),
 
-app.register('query-editor', QueryEditorController);
+        // Query-specific controllers.
+        'query-editor': () => import('./controllers/query/query_editor_controller.ts'),
+    },
+);

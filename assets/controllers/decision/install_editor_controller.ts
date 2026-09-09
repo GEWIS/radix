@@ -15,6 +15,7 @@ type Collection = 'installations' | 'reappointments' | 'discharges';
  * hidden fields, which are filled with the identifiers the form reads back. They are substituted separately, into
  * text nodes and into input values, so that a member's name is never treated as markup.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['panel', 'currentMembers', 'currentRowTemplate', 'result', 'resultRowTemplate',
         'installations', 'reappointments', 'discharges', 'memberInput', 'addMember', 'addInactiveMember',

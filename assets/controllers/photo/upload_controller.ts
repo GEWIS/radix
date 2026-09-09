@@ -11,6 +11,7 @@ import { Controller } from '@hotwired/stimulus';
  *       <ul data-photo-upload-target="list"></ul>
  *   </div>
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static values = {
         uploadUrl: String,

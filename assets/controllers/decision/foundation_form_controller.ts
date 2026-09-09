@@ -7,6 +7,7 @@ import { Controller } from '@hotwired/stimulus';
  * The membership starts with blank rows to fill in, and the ones that were left blank should not be submitted as
  * empty members, so they are dropped on the way out.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['name', 'nameLabel', 'abbr', 'abbrLabel', 'members'];
     static values = {

@@ -43,6 +43,7 @@ interface Slot {
  * screenful of the viewport are mounted; the rest are added and removed as the page scrolls, so an album of thousands
  * of photos stays light in both directions. Without JavaScript there is no grid (the viewer needs it regardless).
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static values = {
         manifestUrl: String,

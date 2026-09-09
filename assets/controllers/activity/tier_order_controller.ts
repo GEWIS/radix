@@ -1,5 +1,6 @@
 import DragReorder from '../application/drag_reorder.ts';
 
+/* stimulusFetch: 'lazy' */
 export default class extends DragReorder {
     static targets = ['toggle', 'panel', 'value', 'entries', 'rank', 'tie', 'places', 'placesBox'];
 

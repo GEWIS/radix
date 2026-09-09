@@ -4,6 +4,7 @@ import type { OrganInfo, OrganMember } from './organ_lookup_controller.ts';
 /**
  * Purely informative: nothing here is submitted.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['panel', 'list'];
     static values = {

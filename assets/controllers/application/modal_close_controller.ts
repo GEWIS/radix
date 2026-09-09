@@ -15,6 +15,7 @@ declare global {
  * lists on the page only the matching modal closes. The modal lives inside the live component, so on a re-render the
  * show class is preserved (ExternalMutationTracker) until this hides it.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static values = { listId: Number };
 

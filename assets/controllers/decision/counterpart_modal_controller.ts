@@ -9,6 +9,7 @@ import type { Component } from '@symfony/ux-live-component';
  * It lives OUTSIDE the live component, like the shared confirmation does, so the re-render that follows the action
  * never touches the modal or leaves an orphaned backdrop behind.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['meetingType', 'meetingNumber', 'point', 'number', 'input', 'preview', 'confirm'];
 

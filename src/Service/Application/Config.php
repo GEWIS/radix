@@ -8,11 +8,31 @@ use App\Entity\Database\ConfigItem;
 use App\Entity\Database\Enums\ConfigNamespaces;
 use App\Repository\Application\ConfigItemRepository;
 use DateTime;
+use Override;
+use Symfony\Contracts\Service\ResetInterface;
 
-class Config
+use function array_key_exists;
+
+/**
+ * Settings are read several times over a request, so the values are memoised for its length.
+ *
+ * Deliberately not shared between requests: one of these settings is the lock the mailing list synchronisation
+ * acquires, which has to be visible to the next request as soon as another process sets it. The memo is cleared
+ * through {@see ResetInterface}, which is required under FrankenPHP's worker mode.
+ */
+class Config implements ResetInterface
 {
+    /** @var array<string, bool|string|DateTime|null> */
+    private array $values = [];
+
     public function __construct(private readonly ConfigItemRepository $configItemRepository)
     {
+    }
+
+    #[Override]
+    public function reset(): void
+    {
+        $this->values = [];
     }
 
     /**
@@ -27,19 +47,21 @@ class Config
         string $key,
         bool|string|DateTime|null $default = null,
     ): bool|string|DateTime|null {
-        $configItem = $this->configItemRepository->findByKey(
-            $namespace,
-            $key,
-        );
+        $memoKey = $namespace->value . '.' . $key;
 
         if (
-            null === $configItem
-            || null === $configItem->getValue()
+            !array_key_exists(
+                $memoKey,
+                $this->values,
+            )
         ) {
-            return $default;
+            $this->values[$memoKey] = $this->configItemRepository->findByKey(
+                $namespace,
+                $key,
+            )?->getValue();
         }
 
-        return $configItem->getValue();
+        return $this->values[$memoKey] ?? $default;
     }
 
     public function setConfig(
@@ -62,6 +84,8 @@ class Config
 
         $configItem->setValue($value);
         $this->configItemRepository->persist($configItem);
+
+        unset($this->values[$namespace->value . '.' . $key]);
     }
 
     public function unsetConfig(
@@ -72,6 +96,8 @@ class Config
             $namespace,
             $key,
         );
+
+        unset($this->values[$namespace->value . '.' . $key]);
 
         if (null === $configItem) {
             return;

@@ -17,6 +17,7 @@ import type { ActionEvent } from '@hotwired/stimulus';
  * keyboard navigation, so Escape releases the field: the next Tab then moves focus as it normally would, and typing
  * anything puts indenting back.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['editor', 'submit', 'gutter', 'meta', 'entity', 'entityEmpty'];
 

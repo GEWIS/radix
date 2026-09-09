@@ -14,6 +14,7 @@ import { Controller } from '@hotwired/stimulus';
  * A field tagged `required` is one its block exists to ask for, so it is required exactly while that block is shown;
  * the server holds a question to the same rule (see SignupFieldType::validateBounds).
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['type', 'number', 'choice', 'defaultOption', 'required'];
 

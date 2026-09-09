@@ -1,0 +1,24 @@
+// Inlined as a mask rather than served as a font or an image: it is in the navigation on every page, so a request
+// of its own would delay it, and a mask takes its colour from `currentColor` as the glyph did.
+//
+// The source is the optimised black logo with its full-canvas clip path removed, which clipped nothing.
+$gewis-logo: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 372.9 750.4%22 fill-rule=%22evenodd%22%3E%3Cpath d=%22M179.2 631.7h30.1l65.2 44.1c.8-4.8 1.3-9.7 1.3-14.8 0-49.4-40-89.4-89.4-89.4-38.1 0-70.5 23.8-83.4 57.3l90.8 61.4h-30.1l-65.4-44.2c-.8 4.9-1.3 9.8-1.3 14.9 0 49.4 40 89.4 89.4 89.4 38.1 0 70.5-23.9 83.4-57.4zM201.1 558.2l54.3-176.3H117.5l54.2 176.3zM259.8 367.2l54.4-176.3h-69L215.8 279l-29.3-66-29.4 66-29.4-88.1H58.8l54.1 176.3h44.2l29.4-66.1 29.3 66.1z%22/%3E%3Cpath d=%22M201.1 367.2v-14.7h-29.4v14.7zM318.6 176.3l11.4-36.7h-77.5v-36.9h88.8l9-29.3h-97.8V36.7h109L372.9 0H193.8v176.3zM179.2 176.3V88.1h-58.9v36.7h22v14.8h-31.8L76.3 36.7h66V44h36.9V0H0l54.2 176.3z%22/%3E%3C/svg%3E");
+
+// 372.9 x 750.4 in the source.
+$gewis-logo-aspect: 0.497;
+
+.gi {
+    // Block, so no line box leaves descender space under the logo.
+    display: block;
+    background-color: currentColor;
+    -webkit-mask: $gewis-logo no-repeat center;
+    mask: $gewis-logo no-repeat center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+// Sized in `em` so the call sites keep driving it with `font-size`, as they did when it was a glyph.
+.gewis-base {
+    height: 1em;
+    width: $gewis-logo-aspect * 1em;
+}

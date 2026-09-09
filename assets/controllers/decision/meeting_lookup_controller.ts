@@ -8,6 +8,7 @@ interface MeetingMatch {
 /**
  * Picks the meeting a set of minutes belongs to, which is never the meeting the decision itself is taken in.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends LookupController<MeetingMatch> {
     static targets = ['meetingType', 'meetingNumber'];
 

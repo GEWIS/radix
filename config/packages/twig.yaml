@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 twig:
     file_name_pattern: '*.twig'
+    # Lets base.html.twig inline color-modes.js with `source()`, so the theme is set before the first paint.
+    paths:
+        '%kernel.project_dir%/assets/js': js
     form_themes:
         - 'bootstrap_5_layout.html.twig'
         - 'form/api_permissions.html.twig'

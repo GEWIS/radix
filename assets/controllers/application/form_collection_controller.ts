@@ -6,6 +6,7 @@ import { Controller } from '@hotwired/stimulus';
  * uses a distinct prototype placeholder (e.g. `__list__`, `__field__`, `__option__`): replacing the outer placeholder
  * leaves the inner ones intact, and Stimulus auto-connects the nested controllers when the new markup is inserted.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['entries', 'add'];
     static values = {

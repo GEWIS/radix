@@ -27,6 +27,7 @@ function fetchInfimum(url: string): Promise<unknown> {
  *   - the source:  data-infimum-url-value="<the infimum endpoint>"
  *   - the fallback: data-infimum-unavailable-value="<what to say when there is none>"
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['quote'];
     static values = {

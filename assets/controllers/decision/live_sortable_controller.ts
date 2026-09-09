@@ -14,6 +14,7 @@ import { getComponent } from '@symfony/ux-live-component';
  * </div>
  * ```
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['entry'];
     static values = {

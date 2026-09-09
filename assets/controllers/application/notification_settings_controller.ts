@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * Purely cosmetic: the server ignores a disabled topic's frequency and mutes all email while paused, so the form
  * still submits correctly without this controller.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['email', 'frequency', 'pause', 'dim'];
     static classes = ['paused'];

@@ -15,6 +15,7 @@ type LocalisedField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
  * Where the checkboxes are not on the page — a later step of a form flow answers them on an earlier one — the answer
  * is carried as data-localised-fields-dutch-value / -english-value instead. With neither, every language is on.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['dutchToggle', 'englishToggle', 'dutch', 'english'];
     static values = { dutch: Boolean, english: Boolean };

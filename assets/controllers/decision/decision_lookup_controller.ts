@@ -12,6 +12,7 @@ interface DecisionMatch {
  * The decision being recorded travels with the query, so the endpoint can leave out the decisions this one cannot
  * annul.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends LookupController<DecisionMatch> {
     static targets = ['meetingType', 'meetingNumber', 'point', 'number', 'preview', 'previewNumber',
         'previewContent', 'submit'];

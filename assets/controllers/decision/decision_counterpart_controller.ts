@@ -12,6 +12,7 @@ interface DecisionMatch {
  * Unlike the annulment lookup this gates nothing: the modal reads the hidden fields it fills in, and answers for
  * whether one was picked at all.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends LookupController<DecisionMatch> {
     static targets = ['meetingType', 'meetingNumber', 'point', 'number', 'preview', 'previewNumber',
         'previewContent'];

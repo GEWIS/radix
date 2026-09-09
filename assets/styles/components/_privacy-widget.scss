@@ -71,14 +71,14 @@
         bottom: 0;
         position: absolute;
         border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
+        // Sized by the button's font-size, as the glyph was. The box is the logo itself now, so the button centres
+        // it rather than the box being stretched to fill the button.
         > .gewis-base {
-            width: 3rem;
-            height: 3rem;
-            text-align: center;
             color: #FFFFFF;
-            display: inline-block;
-            line-height: inherit;
         }
     }
 }

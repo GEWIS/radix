@@ -6,14 +6,21 @@ namespace App\Repository\Career;
 
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyJobPackage;
+use App\Entity\Career\CompanyPackage;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
+use function array_filter;
 use function array_map;
+use function assert;
 use function intval;
+use function is_string;
 use function mb_strtolower;
+use function min;
 use function trim;
 
 /**
@@ -167,6 +174,57 @@ class CompanyRepository extends ServiceEntityRepository
         $source = self::PUBLIC_SOURCE;
 
         return intval($this->getEntityManager()->getConnection()->fetchOne('SELECT COUNT(*) ' . $source));
+    }
+
+    /**
+     * When {@see countPublic} next returns a different number through time passing alone, or null if no package is
+     * scheduled to start or expire. A company is public while it has a package that has started and not expired, so
+     * those are the only two moments the count changes without a write.
+     */
+    public function nextPublicBoundaryAfter(DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        $boundaries = array_filter([
+            $this->earliestPackageDate(
+                'p.starts',
+                $now,
+            ),
+            $this->earliestPackageDate(
+                'p.expires',
+                $now,
+            ),
+        ]);
+
+        return [] === $boundaries
+            ? null
+            : min($boundaries);
+    }
+
+    /**
+     * The earliest value of one package date column that is still in the future, or null when there is none.
+     */
+    private function earliestPackageDate(
+        string $column,
+        DateTimeImmutable $now,
+    ): ?DateTimeImmutable {
+        $value = $this->getEntityManager()->createQueryBuilder()
+            ->select('MIN(' . $column . ')')
+            ->from(
+                CompanyPackage::class,
+                'p',
+            )
+            ->where($column . ' > :now')
+            ->setParameter(
+                'now',
+                $now,
+                Types::DATETIME_IMMUTABLE,
+            )
+            ->getQuery()
+            ->getSingleScalarResult();
+        assert(is_string($value) || null === $value);
+
+        return null === $value
+            ? null
+            : new DateTimeImmutable($value);
     }
 
     /**

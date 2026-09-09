@@ -11,6 +11,7 @@ import { Controller } from '@hotwired/stimulus';
  *       <form data-action="photo-cover#regenerate"> ... </form>
  *   </div>
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static values = {
         hubUrl: String,

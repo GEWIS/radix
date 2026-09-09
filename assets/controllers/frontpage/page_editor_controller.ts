@@ -14,6 +14,7 @@ import { flattenFloatingLabel } from '../../js/floating_label.ts';
  * An image is picked out of the browser behind the toolbar's image button (page_images_controller.ts, which answers
  * the `page-editor:browse` this dispatches), never dropped into the text.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static values = {
         browseLabel: { type: String, default: 'Images' },

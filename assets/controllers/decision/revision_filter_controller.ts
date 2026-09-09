@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * Toggles a class on the wrapper that CSS uses to hide documents with a single version. Purely client-side; nothing
  * is persisted.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['all', 'revised'];
 
