@@ -11,11 +11,16 @@ use App\Entity\Career\CompanyBannerPackage;
 use App\Entity\Career\CompanyFeaturedPackage;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
+use App\Entity\Database\CheckoutSession;
+use App\Entity\Database\MemberUpdate;
+use App\Entity\Database\ProspectiveMember;
+use App\Entity\Database\SubDecision\Other;
 use App\Entity\Frontpage\NewsItem;
 use App\EventListener\Application\LayoutCacheInvalidationListener;
 use App\Repository\Application\AnnouncementRepository;
 use App\Repository\Application\MaintenanceWindowRepository;
 use App\Repository\Career\CompanyFeaturedPackageRepository;
+use App\Twig\Extensions\ApplicationExtension;
 use App\Twig\Extensions\CareerExtension;
 use DateTimeImmutable;
 use Doctrine\ORM\Configuration;
@@ -96,6 +101,53 @@ final class LayoutCacheInvalidationListenerTest extends TestCase
         $applicationCache->expects(self::once())
             ->method('deleteItem')
             ->with(CareerExtension::MENU_COUNTS_CACHE_KEY)
+            ->willReturn(true);
+
+        new LayoutCacheInvalidationListener($applicationCache)->postPersist(
+            new PostPersistEventArgs(
+                $entity,
+                $this->managerWith(self::createStub(CacheItemPoolInterface::class)),
+            ),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{object, string}>
+     */
+    public static function entitiesBehindTheAdministrationBadges(): iterable
+    {
+        yield 'prospective member' => [
+            new ProspectiveMember(),
+            ApplicationExtension::PROSPECTIVES_CACHE_KEY,
+        ];
+
+        // Whether an applicant has paid is read off their latest checkout session rather than off the applicant.
+        yield 'checkout session' => [
+            new CheckoutSession(),
+            ApplicationExtension::PROSPECTIVES_CACHE_KEY,
+        ];
+
+        yield 'member update' => [
+            new MemberUpdate(),
+            ApplicationExtension::MEMBER_UPDATES_CACHE_KEY,
+        ];
+
+        yield 'untranslated decision' => [
+            new Other(),
+            ApplicationExtension::UNTRANSLATED_CACHE_KEY,
+        ];
+    }
+
+    /** The administration's badges are cached without an expiry, so a write is the only chance to drop them. */
+    #[DataProvider('entitiesBehindTheAdministrationBadges')]
+    public function testStoringOneOfTheseDropsTheAdministrationBadge(
+        object $entity,
+        string $expectedKey,
+    ): void {
+        $applicationCache = $this->createMock(CacheItemPoolInterface::class);
+        $applicationCache->expects(self::once())
+            ->method('deleteItem')
+            ->with($expectedKey)
             ->willReturn(true);
 
         new LayoutCacheInvalidationListener($applicationCache)->postPersist(

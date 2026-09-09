@@ -7,14 +7,30 @@ namespace App\Twig\Extensions;
 use App\Service\Database\Meeting as MeetingService;
 use App\Service\Database\Member as MemberService;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+/**
+ * The badges on the administration's sidebar, which every administration page renders.
+ *
+ * Cached without an expiry, unlike the career badges beside them: none of these counts has a date predicate, so only
+ * a write changes them and the listener drops the entry when one happens.
+ */
 final class ApplicationExtension extends AbstractExtension
 {
+    public const string PROSPECTIVES_CACHE_KEY = 'layout.admin.prospectives_awaiting_approval';
+
+    public const string MEMBER_UPDATES_CACHE_KEY = 'layout.admin.member_updates_pending';
+
+    public const string UNTRANSLATED_CACHE_KEY = 'layout.admin.decisions_awaiting_translation';
+
     public function __construct(
         private readonly MemberService $memberService,
         private readonly MeetingService $meetingService,
+        #[Autowire(service: 'cache.app')]
+        private readonly CacheInterface $cache,
     ) {
     }
 
@@ -50,7 +66,10 @@ final class ApplicationExtension extends AbstractExtension
      */
     public function prospectiveAwaitingApproval(): int
     {
-        return $this->memberService->getPaidProspectivesCount();
+        return $this->cache->get(
+            self::PROSPECTIVES_CACHE_KEY,
+            fn (): int => $this->memberService->getPaidProspectivesCount(),
+        );
     }
 
     /**
@@ -58,11 +77,17 @@ final class ApplicationExtension extends AbstractExtension
      */
     public function memberUpdatesPending(): int
     {
-        return $this->memberService->getPendingUpdateCount();
+        return $this->cache->get(
+            self::MEMBER_UPDATES_CACHE_KEY,
+            fn (): int => $this->memberService->getPendingUpdateCount(),
+        );
     }
 
     public function decisionsAwaitingTranslation(): int
     {
-        return $this->meetingService->countUntranslatedDecisions();
+        return $this->cache->get(
+            self::UNTRANSLATED_CACHE_KEY,
+            fn (): int => $this->meetingService->countUntranslatedDecisions(),
+        );
     }
 }

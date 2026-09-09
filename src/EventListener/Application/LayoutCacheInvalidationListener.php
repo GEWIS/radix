@@ -11,9 +11,14 @@ use App\Entity\Career\CompanyFeaturedPackage;
 use App\Entity\Career\CompanyPackage;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyRevision;
+use App\Entity\Database\CheckoutSession;
+use App\Entity\Database\MemberUpdate;
+use App\Entity\Database\ProspectiveMember;
+use App\Entity\Database\SubDecision\Other;
 use App\Repository\Application\AnnouncementRepository;
 use App\Repository\Application\MaintenanceWindowRepository;
 use App\Repository\Career\CompanyFeaturedPackageRepository;
+use App\Twig\Extensions\ApplicationExtension;
 use App\Twig\Extensions\CareerExtension;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
@@ -47,6 +52,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsDoctrineListener(
     event: Events::postRemove,
     connection: 'web',
+)]
+#[AsDoctrineListener(
+    event: Events::postPersist,
+    connection: 'default',
+)]
+#[AsDoctrineListener(
+    event: Events::postUpdate,
+    connection: 'default',
+)]
+#[AsDoctrineListener(
+    event: Events::postRemove,
+    connection: 'default',
 )]
 final readonly class LayoutCacheInvalidationListener
 {
@@ -92,6 +109,19 @@ final readonly class LayoutCacheInvalidationListener
             || $entity instanceof VacancyRevision
         ) {
             $this->applicationCache->deleteItem(CareerExtension::MENU_COUNTS_CACHE_KEY);
+        }
+
+        // A checkout session counts because whether an applicant has paid is read off their latest one.
+        $badgeKey = match (true) {
+            $entity instanceof ProspectiveMember,
+            $entity instanceof CheckoutSession => ApplicationExtension::PROSPECTIVES_CACHE_KEY,
+            $entity instanceof MemberUpdate => ApplicationExtension::MEMBER_UPDATES_CACHE_KEY,
+            $entity instanceof Other => ApplicationExtension::UNTRANSLATED_CACHE_KEY,
+            default => null,
+        };
+
+        if (null !== $badgeKey) {
+            $this->applicationCache->deleteItem($badgeKey);
         }
 
         $today = new DateTimeImmutable()->setTime(
