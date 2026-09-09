@@ -19,6 +19,7 @@ use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
+use function array_map;
 use function ctype_digit;
 use function strtolower;
 use function trim;
@@ -633,5 +634,42 @@ class MemberRepository extends ServiceEntityRepository
             ->addSelect('s');
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Loads the organ and board installations of the given members, so that {@see Member::isActive()} and
+     * {@see Member::isBoardMember()} do not each trigger a lazy load per member.
+     *
+     * Two queries rather than one: both associations are to-many, and joining them together multiplies the rows by
+     * each other. The results are discarded; hydrating them populates the collections on the managed members.
+     *
+     * @param Member[] $members
+     */
+    public function warmInstallations(array $members): void
+    {
+        if ([] === $members) {
+            return;
+        }
+
+        $lidnrs = array_map(
+            static fn (Member $member): int => $member->getLidnr(),
+            $members,
+        );
+
+        foreach (['organInstallations', 'boardInstallations'] as $association) {
+            $this->createQueryBuilder('m')
+                ->addSelect('i')
+                ->leftJoin(
+                    'm.' . $association,
+                    'i',
+                )
+                ->where('m.lidnr IN (:lidnrs)')
+                ->setParameter(
+                    'lidnrs',
+                    $lidnrs,
+                )
+                ->getQuery()
+                ->getResult();
+        }
     }
 }

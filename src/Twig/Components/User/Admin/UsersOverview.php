@@ -117,6 +117,9 @@ final class UsersOverview extends AbstractDoctrinePaginatedOverview
             $members,
         );
 
+        // As above: every row reads the member's installations, which would otherwise be lazy-loaded per member.
+        $this->memberRepository->warmInstallations($members);
+
         $users = $this->userRepository->findByLidnrsWithRoles($lidnrs);
         /** @var array<int, User> $usersByLidnr */
         $usersByLidnr = [];
