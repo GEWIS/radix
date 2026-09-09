@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * One request per file, like the album upload, so a file the server rejects reports itself on its own row and the rest
  * of the batch carries on.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static values = {
         url: String,

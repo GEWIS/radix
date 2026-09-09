@@ -18,6 +18,7 @@ import DragReorder from './drag_reorder.ts';
  * </div>
  * ```
  */
+/* stimulusFetch: 'lazy' */
 export default class extends DragReorder {
     static targets = ['entries', 'position'];
 

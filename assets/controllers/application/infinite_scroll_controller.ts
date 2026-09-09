@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * Without `IntersectionObserver` the (always rendered) "Load more" button stays usable on its own. A short cooldown
  * prevents firing a burst of requests while the sentinel remains visible.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['sentinel', 'button'];
 

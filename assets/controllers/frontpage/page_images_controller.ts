@@ -23,6 +23,7 @@ declare global {
  * placed. This sits on the modal rather than in the live component, so a re-render neither closes the dialog nor
  * drops the connection.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static outlets = ['page-editor'];
     static targets = ['input', 'error'];

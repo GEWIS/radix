@@ -12,6 +12,7 @@ interface DirectoryResult {
  * input (the authorization form). A monotonic token guards against a slow response overwriting a newer one; rows are
  * built through DOM APIs because names are user data.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['input', 'results', 'hint', 'destination'];
     static values = {

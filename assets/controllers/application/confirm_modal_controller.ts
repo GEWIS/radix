@@ -15,6 +15,7 @@ import type { Component } from '@symfony/ux-live-component';
  *
  * The modal: <div id="confirm-modal" data-controller="confirm-modal"> with `title`, `message` and `confirm` targets.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['title', 'message', 'confirm'];
 

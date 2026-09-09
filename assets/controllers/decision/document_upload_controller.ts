@@ -6,6 +6,7 @@ import { Controller } from '@hotwired/stimulus';
  * The name input is optional: a new-document dropzone has one (pre-filled from the filename), a new-version flow does
  * not. Extra fixed fields (such as the agenda point id) come from the `extra` value.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['input', 'picker', 'form', 'filename', 'name', 'label', 'error'];
     static values = {

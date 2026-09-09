@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * Normalises the initials a prospective member types into dot-separated capitals. Anything of three letters or more
  * is taken to be a name rather than an initial and is reduced to its first letter, so "Thomas Jan" becomes "T.J.".
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLInputElement> {
     normalise(): void {
         this.element.value = normalise(this.element.value);

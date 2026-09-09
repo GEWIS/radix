@@ -5,6 +5,7 @@ import { Controller } from '@hotwired/stimulus';
  * still supported for applications that cannot verify anything stronger, but it should not be chosen for new ones, so
  * selecting it reveals a warning.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['signature', 'secret', 'secretField', 'warning'];
 

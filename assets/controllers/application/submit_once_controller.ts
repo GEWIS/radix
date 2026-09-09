@@ -14,6 +14,7 @@ import { Controller } from '@hotwired/stimulus';
  * </form>
  * ```
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['button'];
     static values = { label: String };

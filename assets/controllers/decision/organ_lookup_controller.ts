@@ -34,6 +34,7 @@ export interface OrganInfo extends OrganMatch {
  * who is currently installed in it, announced as `organ-lookup:selected` so the page around it can show the
  * consequences before the decision is taken.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends LookupController<OrganMatch> {
     static targets = ['meetingType', 'meetingNumber', 'decisionPoint', 'decisionNumber', 'sequence', 'submit'];
     static values = {

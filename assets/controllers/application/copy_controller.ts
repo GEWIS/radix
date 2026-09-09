@@ -9,6 +9,7 @@ import { Controller } from '@hotwired/stimulus';
  * icon needs the label target: assigning to the button's own `textContent` would replace its children with a single
  * text node and take the icon with it, for good.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['source', 'button', 'label'];
     static values = {

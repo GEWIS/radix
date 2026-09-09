@@ -19,6 +19,7 @@ import { Controller } from '@hotwired/stimulus';
  * A field tagged `required` is the one its block exists to ask for, so it is required exactly while that block is
  * shown; the server holds a list to the same rule (see SignupListType::validateAllocationMethod).
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = [
         'limited', 'capacity', 'methodBlock', 'method',

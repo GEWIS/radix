@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * Nothing is submitted: the point and the decision number are part of the decision's address, so they go into the
  * URL. The meeting already knows which number is next for each of its points.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLFormElement> {
     static targets = ['point', 'number'];
     static values = {

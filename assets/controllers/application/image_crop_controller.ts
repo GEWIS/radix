@@ -22,6 +22,7 @@ type Rectangle = { x: number; y: number; width: number; height: number };
  *
  * Everything here is a convenience: with no JavaScript at all the file still uploads and is stored whole.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['file', 'frame', 'image', 'message', 'preview', 'x', 'y', 'width', 'height'];
 

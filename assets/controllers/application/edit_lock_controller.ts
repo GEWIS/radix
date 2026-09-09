@@ -11,6 +11,7 @@ import { Controller } from '@hotwired/stimulus';
  * data-edit-lock-lost-message-value=...
  * ```
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static values = {
         pingUrl: String,

@@ -18,6 +18,7 @@ import { flattenFloatingLabel } from '../../js/floating_label.ts';
  * MutationObserver puts the editor into read-only mode; the disabled textarea is still omitted from the POST, so the
  * stored value is preserved.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static values = {
         toolbar: { type: String, default: 'full' },

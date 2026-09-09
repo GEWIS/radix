@@ -6,6 +6,7 @@ import { Controller } from '@hotwired/stimulus';
  *
  *   - the images: data-birthday-rotator-target="photo"
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['photo'];
     static values = {

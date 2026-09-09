@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLSelectElement> {
     public navigate(): void {
         const url = this.element.value;

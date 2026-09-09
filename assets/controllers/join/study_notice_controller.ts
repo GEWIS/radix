@@ -3,6 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 /**
  * The marker is put on the option label by `StudyChoices`, so the studies it applies to are not repeated here.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static targets = ['notice'];
 

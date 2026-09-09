@@ -4,6 +4,7 @@ import { Controller } from '@hotwired/stimulus';
  * The radios themselves are not form fields: which one is checked says nothing the server needs beyond the reference
  * they carry, and leaving them out of the form keeps that reference the single source of truth.
  */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
     static targets = ['meetingType', 'meetingNumber', 'decisionPoint', 'decisionNumber', 'sequence', 'until',
         'lidnr', 'submit'];
