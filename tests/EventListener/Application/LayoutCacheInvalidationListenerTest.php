@@ -6,12 +6,17 @@ namespace App\Tests\EventListener\Application;
 
 use App\Entity\Application\Announcement;
 use App\Entity\Application\MaintenanceWindow;
+use App\Entity\Career\Company;
+use App\Entity\Career\CompanyBannerPackage;
 use App\Entity\Career\CompanyFeaturedPackage;
+use App\Entity\Career\Vacancy;
+use App\Entity\Career\VacancyRevision;
 use App\Entity\Frontpage\NewsItem;
 use App\EventListener\Application\LayoutCacheInvalidationListener;
 use App\Repository\Application\AnnouncementRepository;
 use App\Repository\Application\MaintenanceWindowRepository;
 use App\Repository\Career\CompanyFeaturedPackageRepository;
+use App\Twig\Extensions\CareerExtension;
 use DateTimeImmutable;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,23 +64,61 @@ final class LayoutCacheInvalidationListenerTest extends TestCase
         object $entity,
         string $expectedKey,
     ): void {
-        $listener = new LayoutCacheInvalidationListener();
+        $listener = new LayoutCacheInvalidationListener(self::createStub(CacheItemPoolInterface::class));
 
         $listener->postPersist(new PostPersistEventArgs($entity, $this->manager($expectedKey)));
         $listener->postUpdate(new PostUpdateEventArgs($entity, $this->manager($expectedKey)));
         $listener->postRemove(new PostRemoveEventArgs($entity, $this->manager($expectedKey)));
     }
 
+    /**
+     * @return iterable<string, array{object}>
+     */
+    public static function entitiesBehindTheCareerBadges(): iterable
+    {
+        yield 'company' => [new Company()];
+
+        yield 'vacancy' => [new Vacancy()];
+
+        yield 'vacancy revision' => [new VacancyRevision()];
+
+        // Any package, not only the featured one: which packages are running decides both counts.
+        yield 'banner package' => [new CompanyBannerPackage()];
+
+        yield 'featured package' => [new CompanyFeaturedPackage()];
+    }
+
+    /** The career badges are counted rather than filtered, so whatever decides the count has to drop them. */
+    #[DataProvider('entitiesBehindTheCareerBadges')]
+    public function testStoringOneOfTheseDropsTheCareerBadges(object $entity): void
+    {
+        $applicationCache = $this->createMock(CacheItemPoolInterface::class);
+        $applicationCache->expects(self::once())
+            ->method('deleteItem')
+            ->with(CareerExtension::MENU_COUNTS_CACHE_KEY)
+            ->willReturn(true);
+
+        new LayoutCacheInvalidationListener($applicationCache)->postPersist(
+            new PostPersistEventArgs(
+                $entity,
+                $this->managerWith(self::createStub(CacheItemPoolInterface::class)),
+            ),
+        );
+    }
+
     /** An unrelated entity dropping these entries would turn the cache back into a query per page. */
     public function testStoringSomethingElseDropsNothing(): void
     {
-        $cache = $this->createMock(CacheItemPoolInterface::class);
-        $cache->expects(self::never())->method('deleteItem');
+        $resultCache = $this->createMock(CacheItemPoolInterface::class);
+        $resultCache->expects(self::never())->method('deleteItem');
 
-        new LayoutCacheInvalidationListener()->postPersist(
+        $applicationCache = $this->createMock(CacheItemPoolInterface::class);
+        $applicationCache->expects(self::never())->method('deleteItem');
+
+        new LayoutCacheInvalidationListener($applicationCache)->postPersist(
             new PostPersistEventArgs(
                 new NewsItem(),
-                $this->managerWith($cache),
+                $this->managerWith($resultCache),
             ),
         );
     }

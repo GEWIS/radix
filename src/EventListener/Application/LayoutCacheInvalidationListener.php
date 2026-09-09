@@ -6,10 +6,15 @@ namespace App\EventListener\Application;
 
 use App\Entity\Application\Announcement;
 use App\Entity\Application\MaintenanceWindow;
+use App\Entity\Career\Company;
 use App\Entity\Career\CompanyFeaturedPackage;
+use App\Entity\Career\CompanyPackage;
+use App\Entity\Career\Vacancy;
+use App\Entity\Career\VacancyRevision;
 use App\Repository\Application\AnnouncementRepository;
 use App\Repository\Application\MaintenanceWindowRepository;
 use App\Repository\Career\CompanyFeaturedPackageRepository;
+use App\Twig\Extensions\CareerExtension;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,18 +23,18 @@ use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Drops the cached answers the layout asks for on every page as soon as what they are about is written.
+ * Drops the cached answers the layout renders on every page when what they are about is written.
  *
- * The layout's queries are cached by the day rather than by the instant (see {@see MaintenanceWindowRepository}), so
- * that asking the same question on every page is one query a day rather than one per request. That trade only holds
- * while a write is reflected immediately: a maintenance window scheduled by the board has to reach the banner on the
- * next page load, not on the next rollover. Time passing is not a write and needs no invalidation, because the cached
- * set is a superset of what is in force at any instant within the day and the caller narrows it down itself.
+ * Both ways those answers are cached account for time passing on their own: the queries returning rows are cached by
+ * the day and narrowed to the instant by their caller, and the career badges expire when their count changes. Neither
+ * accounts for a write, which is what this listener is for.
  *
- * The pool is taken from the manager that raised the event rather than injected, so it is by construction the one
- * Doctrine wrote the entry with.
+ * The result cache is taken from the manager that raised the event rather than injected, so it is the one Doctrine
+ * wrote the entry with.
  */
 #[AsDoctrineListener(
     event: Events::postPersist,
@@ -45,6 +50,12 @@ use Doctrine\Persistence\ObjectManager;
 )]
 final readonly class LayoutCacheInvalidationListener
 {
+    public function __construct(
+        #[Autowire(service: 'cache.app')]
+        private CacheItemPoolInterface $applicationCache,
+    ) {
+    }
+
     public function postPersist(PostPersistEventArgs $args): void
     {
         $this->invalidateFor(
@@ -73,6 +84,16 @@ final readonly class LayoutCacheInvalidationListener
         object $entity,
         ObjectManager $manager,
     ): void {
+        // A package is both the featured pick and part of what decides the counts.
+        if (
+            $entity instanceof CompanyPackage
+            || $entity instanceof Company
+            || $entity instanceof Vacancy
+            || $entity instanceof VacancyRevision
+        ) {
+            $this->applicationCache->deleteItem(CareerExtension::MENU_COUNTS_CACHE_KEY);
+        }
+
         $today = new DateTimeImmutable()->setTime(
             0,
             0,

@@ -7,10 +7,13 @@ namespace App\Repository\Career;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyHighlightPackage;
+use App\Entity\Career\CompanyPackage;
 use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyLabel;
+use App\Entity\Career\VacancyRevision;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
@@ -18,10 +21,14 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function array_column;
+use function array_filter;
 use function array_map;
+use function assert;
 use function intval;
+use function is_string;
 use function iterator_to_array;
 use function mb_strtolower;
+use function min;
 use function trim;
 
 /**
@@ -552,6 +559,101 @@ class VacancyRepository extends ServiceEntityRepository
             ->andWhere('highlight.expires > :now');
 
         return $qb->andWhere($qb->expr()->exists($subQuery->getDQL()));
+    }
+
+    /**
+     * When {@see applyActivePredicate} next admits or excludes a vacancy through time passing alone, or null if
+     * nothing is scheduled to start or stop counting.
+     *
+     * The counts this bounds are aggregates the database computes, so they cannot be narrowed in PHP from a wider
+     * cached set the way the layout's other answers are. Their entry expires at this moment instead.
+     */
+    public function nextActiveBoundaryAfter(DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        $today = $now->setTime(
+            0,
+            0,
+        );
+
+        $boundaries = [
+            $this->earliest(
+                CompanyPackage::class,
+                'p.starts',
+                'p.starts > :bound',
+                $now,
+                Types::DATETIME_IMMUTABLE,
+            ),
+            $this->earliest(
+                CompanyPackage::class,
+                'p.expires',
+                'p.expires > :bound',
+                $now,
+                Types::DATETIME_IMMUTABLE,
+            ),
+            $this->earliest(
+                VacancyRevision::class,
+                'p.startDate',
+                'p.startDate > :bound',
+                $today,
+                Types::DATE_IMMUTABLE,
+            )?->setTime(
+                0,
+                0,
+            ),
+            // `endDate >= today` only turns false the day after the closing day.
+            $this->earliest(
+                VacancyRevision::class,
+                'p.endDate',
+                'p.endDate >= :bound',
+                $today,
+                Types::DATE_IMMUTABLE,
+            )?->setTime(
+                0,
+                0,
+            )?->modify('+1 day'),
+        ];
+
+        $future = array_filter(
+            $boundaries,
+            static fn (?DateTimeImmutable $boundary): bool => null !== $boundary && $boundary > $now,
+        );
+
+        return [] === $future
+            ? null
+            : min($future);
+    }
+
+    /**
+     * The earliest value of one date column among the rows matching one predicate, or null when none match.
+     *
+     * @param class-string $entity
+     */
+    private function earliest(
+        string $entity,
+        string $column,
+        string $predicate,
+        DateTimeImmutable $bound,
+        string $type,
+    ): ?DateTimeImmutable {
+        $value = $this->getEntityManager()->createQueryBuilder()
+            ->select('MIN(' . $column . ')')
+            ->from(
+                $entity,
+                'p',
+            )
+            ->where($predicate)
+            ->setParameter(
+                'bound',
+                $bound,
+                $type,
+            )
+            ->getQuery()
+            ->getSingleScalarResult();
+        assert(is_string($value) || null === $value);
+
+        return null === $value
+            ? null
+            : new DateTimeImmutable($value);
     }
 
     /**

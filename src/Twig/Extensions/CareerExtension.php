@@ -12,13 +12,19 @@ use App\Repository\Career\CompanyBannerPackageRepository;
 use App\Repository\Career\CompanyFeaturedPackageRepository;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Career\VacancyRepository;
+use DateTimeImmutable;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+use function array_filter;
 use function array_slice;
 use function array_sum;
+use function min;
 use function shuffle;
 
 /**
@@ -29,6 +35,8 @@ use function shuffle;
  */
 class CareerExtension extends AbstractExtension implements ResetInterface
 {
+    public const string MENU_COUNTS_CACHE_KEY = 'layout.career_menu_counts';
+
     /** @var array{categories: array<string, int>, vacancies: int, companies: int}|null */
     private ?array $menuCounts = null;
 
@@ -41,6 +49,8 @@ class CareerExtension extends AbstractExtension implements ResetInterface
         private readonly CompanyFeaturedPackageRepository $companyFeaturedPackageRepository,
         private readonly CompanyRepository $companyRepository,
         private readonly VacancyRepository $vacancyRepository,
+        #[Autowire(service: 'cache.app')]
+        private readonly CacheInterface $cache,
     ) {
     }
 
@@ -94,13 +104,34 @@ class CareerExtension extends AbstractExtension implements ResetInterface
             return $this->menuCounts;
         }
 
-        $categories = $this->vacancyRepository->countActiveByCategory();
+        /** @var array{categories: array<string, int>, vacancies: int, companies: int} $counts */
+        $counts = $this->cache->get(
+            self::MENU_COUNTS_CACHE_KEY,
+            function (ItemInterface $item): array {
+                $now = new DateTimeImmutable();
 
-        return $this->menuCounts = [
-            'categories' => $categories,
-            'vacancies' => array_sum($categories),
-            'companies' => $this->companyRepository->countPublic(),
-        ];
+                // Expires when a package or a vacancy next starts or ends, so the badge is never behind. A write
+                // invalidates it outright.
+                $boundaries = array_filter([
+                    $this->vacancyRepository->nextActiveBoundaryAfter($now),
+                    $this->companyRepository->nextPublicBoundaryAfter($now),
+                ]);
+
+                if ([] !== $boundaries) {
+                    $item->expiresAt(min($boundaries));
+                }
+
+                $categories = $this->vacancyRepository->countActiveByCategory();
+
+                return [
+                    'categories' => $categories,
+                    'vacancies' => array_sum($categories),
+                    'companies' => $this->companyRepository->countPublic(),
+                ];
+            },
+        );
+
+        return $this->menuCounts = $counts;
     }
 
     /**
