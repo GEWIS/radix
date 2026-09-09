@@ -55,7 +55,18 @@ class WeeklyPhotoRepository extends ServiceEntityRepository
     public function getCurrentPhotoOfTheWeek(): ?WeeklyPhoto
     {
         $qb = $this->createQueryBuilder('w');
-        $qb->setMaxResults(1)
+        // Both are read off the pick by the frontpage, and would otherwise be loaded as a query each while the
+        // page is rendering.
+        $qb->addSelect('p', 'a')
+            ->join(
+                'w.photo',
+                'p',
+            )
+            ->join(
+                'p.album',
+                'a',
+            )
+            ->setMaxResults(1)
             ->orderBy(
                 'w.week',
                 'DESC',
