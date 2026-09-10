@@ -173,7 +173,9 @@
                                                         'Un-cancel this activity? Sign-ups will reopen where the deadlines still allow.'|trans,
                                                         'btn-outline-success'
                                                     ) }}
-                                                {% else %}
+                                                {% elseif not row.passed %}
+                                                    {# Cancelling an activity that has taken place is refused by the
+                                                       action as well; un-cancelling one stays available. #}
                                                     {{ _self.confirm_form_modal(
                                                         'cancel-' ~ row.id,
                                                         path('admin/activities/cancel', {'activity': row.id}),
