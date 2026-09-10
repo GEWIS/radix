@@ -158,8 +158,8 @@ RUN <<-EOF
     php bin/console cache:clear --no-optional-warmers
     php bin/console assets:install public
     composer run-script --no-dev assets:update
-    php bin/console sass:build
     php bin/console importmap:install
+    php bin/console sass:build
     php bin/console asset-map:compile
     chmod +x bin/console
     chmod -R g=u var
