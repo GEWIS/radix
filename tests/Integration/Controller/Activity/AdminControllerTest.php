@@ -8,6 +8,7 @@ use App\Controller\Activity\AdminController;
 use App\Entity\Activity\Activity;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTime;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -23,7 +24,7 @@ final class AdminControllerTest extends DatabaseTestCase
 {
     public function testCancelAndUncancelAnApprovedActivity(): void
     {
-        $activity = $this->anApprovedActivity();
+        $activity = $this->anUpcomingApprovedActivity();
         self::assertFalse($activity->isCancelled());
 
         $this->authenticate();
@@ -89,6 +90,63 @@ final class AdminControllerTest extends DatabaseTestCase
         self::assertFalse($activity->isCancelled());
     }
 
+    /**
+     * An activity that has taken place cannot be called off. Un-cancelling one still can be, so an activity cancelled
+     * before it ended can still be reversed afterwards.
+     */
+    public function testCancelIsRefusedForAnActivityThatHasTakenPlace(): void
+    {
+        $activity = $this->anApprovedActivity();
+        $this->moveIntoThePast($activity);
+
+        $this->authenticate();
+        $this->pushRequestWithSession();
+
+        $this->controller()->cancel(
+            $this->user(8025),
+            $activity,
+        );
+
+        self::assertFalse($activity->isCancelled());
+    }
+
+    public function testUncancelIsStillAllowedForAnActivityThatHasTakenPlace(): void
+    {
+        $activity = $this->anUpcomingApprovedActivity();
+
+        $this->authenticate();
+        $this->pushRequestWithSession();
+
+        $this->controller()->cancel(
+            $this->user(8025),
+            $activity,
+        );
+        $this->moveIntoThePast($activity);
+
+        $this->controller()->uncancel($activity);
+
+        self::assertFalse($activity->isCancelled());
+    }
+
+    /**
+     * Unpublishing takes an activity out of public view, which is as meaningful once it has happened as before.
+     */
+    public function testUnpublishIsStillAllowedForAnActivityThatHasTakenPlace(): void
+    {
+        $activity = $this->anApprovedActivity();
+        $this->moveIntoThePast($activity);
+
+        $this->authenticate();
+        $this->pushRequestWithSession();
+
+        $this->controller()->unpublish(
+            $this->user(8025),
+            $activity,
+        );
+
+        self::assertTrue($activity->isUnpublished());
+    }
+
     public function testUncancelIsRefusedWhenNotCancelled(): void
     {
         $activity = $this->anApprovedActivity();
@@ -99,6 +157,21 @@ final class AdminControllerTest extends DatabaseTestCase
         $this->controller()->uncancel($activity);
 
         self::assertFalse($activity->isCancelled());
+    }
+
+    /**
+     * The live revision is dated back onto the transaction the test rolls back, so an activity that has taken place
+     * does not depend on which of the seeded ones is picked.
+     */
+    private function moveIntoThePast(Activity $activity): void
+    {
+        $revision = $activity->getLiveRevision();
+        self::assertNotNull($revision);
+
+        $revision->setBeginTime(new DateTime('-2 days'));
+        $revision->setEndTime(new DateTime('-1 day'));
+
+        self::assertTrue($activity->hasPassed());
     }
 
     private function controller(): AdminController
@@ -160,6 +233,40 @@ final class AdminControllerTest extends DatabaseTestCase
             Activity::class,
             $activity,
             'The seed is expected to contain an approved activity.',
+        );
+
+        return $activity;
+    }
+
+    /**
+     * An approved activity that has still to take place, which is what cancelling asks for.
+     */
+    private function anUpcomingApprovedActivity(): Activity
+    {
+        $activity = $this->entityManager->createQueryBuilder()
+            ->select('a')
+            ->from(
+                Activity::class,
+                'a',
+            )
+            ->join(
+                'a.liveRevision',
+                'lr',
+            )
+            ->where('a.cancelledAt IS NULL')
+            ->andWhere('a.unpublishedAt IS NULL')
+            ->andWhere('lr.endTime > :now')
+            ->setParameter(
+                'now',
+                new DateTime(),
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+        self::assertInstanceOf(
+            Activity::class,
+            $activity,
+            'The seed is expected to contain an approved activity that has still to take place.',
         );
 
         return $activity;

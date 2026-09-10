@@ -466,6 +466,18 @@ class Activity implements RevisableInterface
         return $endTime;
     }
 
+    /**
+     * Whether the activity has taken place, on the schedule the public is shown.
+     *
+     * {@see \App\ViewModel\Activity\Admin\ActivityAdminRow::$passed} answers the same question for the revision a
+     * row is built for, which is what decides whether that revision can still be revised. This one is about the
+     * activity itself, so it reads the displayed schedule.
+     */
+    public function hasPassed(): bool
+    {
+        return $this->getEndTime() < new DateTime();
+    }
+
     public function getCategory(): ActivityCategories
     {
         return $this->getDisplayRevision()->getCategory();

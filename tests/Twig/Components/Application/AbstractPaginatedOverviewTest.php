@@ -9,6 +9,7 @@ use App\Twig\Components\Application\AbstractPaginatedOverview;
 use App\Twig\Components\Concerns\PageSizeTrait;
 use ArrayIterator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -325,6 +326,161 @@ class AbstractPaginatedOverviewTest extends TestCase
         self::assertSame(
             1,
             $overview->queries,
+        );
+    }
+
+    /**
+     * A second table pages through the same action and the same clamping, and its totals are read before its page
+     * is: the pagination partial renders the page count, and the collapsed half of the activity overview renders the
+     * total in its heading. The table that ran its own action instead queried while the old page number still stood,
+     * and then rendered that page again for every request for a different one, which is why a page in the first
+     * table of that overview changed nothing until the page was reloaded.
+     */
+    public function testASecondTableServesThePageThatWasAskedFor(): void
+    {
+        $overview = $this->overview(45);
+        $overview->getTotalPages(PaginatedOverviewDouble::SECOND);
+
+        $overview->gotoPage(
+            3,
+            PaginatedOverviewDouble::SECOND,
+        );
+        $overview->getRows(PaginatedOverviewDouble::SECOND);
+
+        self::assertSame(
+            3,
+            $overview->getPageOf(PaginatedOverviewDouble::SECOND),
+        );
+        self::assertSame(
+            [
+                3,
+                10,
+            ],
+            $overview->secondAskedFor,
+        );
+    }
+
+    /**
+     * Each table pages on its own, so going to a page of one leaves the other where it was.
+     */
+    public function testPagingOneTableLeavesTheOtherWhereItWas(): void
+    {
+        $overview = $this->overview(45);
+
+        $overview->gotoPage(
+            3,
+            PaginatedOverviewDouble::SECOND,
+        );
+        $overview->getRows();
+        $overview->getRows(PaginatedOverviewDouble::SECOND);
+
+        self::assertSame(
+            1,
+            $overview->page,
+        );
+        self::assertSame(
+            [
+                1,
+                10,
+            ],
+            $overview->askedFor,
+        );
+        self::assertSame(
+            [
+                3,
+                10,
+            ],
+            $overview->secondAskedFor,
+        );
+    }
+
+    public function testASecondTablePastTheLastPageLandsOnIt(): void
+    {
+        $overview = $this->overview(45);
+        $overview->pages = [PaginatedOverviewDouble::SECOND => 999];
+
+        $overview->getRows(PaginatedOverviewDouble::SECOND);
+
+        self::assertSame(
+            5,
+            $overview->getPageOf(PaginatedOverviewDouble::SECOND),
+        );
+        self::assertSame(
+            [
+                5,
+                10,
+            ],
+            $overview->secondAskedFor,
+        );
+    }
+
+    /**
+     * The prop is written from the URL, which writes strings, and a query string is also where a page number that
+     * belongs to no table comes from.
+     */
+    public function testASecondTablePagesOnWhatAQueryStringCanPutInTheProp(): void
+    {
+        $overview = $this->overview(45);
+        $overview->pages = [PaginatedOverviewDouble::SECOND => '3'];
+
+        $overview->getRows(PaginatedOverviewDouble::SECOND);
+
+        self::assertSame(
+            [
+                3,
+                10,
+            ],
+            $overview->secondAskedFor,
+        );
+    }
+
+    public function testATableThatWasNeverDeclaredIsRejected(): void
+    {
+        $overview = $this->overview(45);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $overview->getRows('nothing');
+    }
+
+    /**
+     * One page size applies to every table of an overview, so all of them restart when it changes.
+     */
+    public function testEveryTableStartsOverWhenThePageSizeChanges(): void
+    {
+        $overview = $this->overview(500);
+        $overview->page = 4;
+        $overview->pages = [PaginatedOverviewDouble::SECOND => 7];
+        $overview->pageSize = 100;
+
+        $overview->onPageSizeUpdated();
+
+        self::assertSame(
+            1,
+            $overview->page,
+        );
+        self::assertSame(
+            1,
+            $overview->getPageOf(PaginatedOverviewDouble::SECOND),
+        );
+    }
+
+    public function testEachTableQueriesForItselfOnlyOnce(): void
+    {
+        $overview = $this->overview(45);
+
+        $overview->getRows();
+        $overview->getTotalPages();
+        $overview->getRows(PaginatedOverviewDouble::SECOND);
+        $overview->getTotalPages(PaginatedOverviewDouble::SECOND);
+
+        self::assertSame(
+            1,
+            $overview->queries,
+        );
+        self::assertSame(
+            1,
+            $overview->secondQueries,
         );
     }
 

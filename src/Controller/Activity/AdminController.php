@@ -728,6 +728,12 @@ class AdminController extends AbstractController
     /**
      * Cancel an approved activity (board only). It stays publicly visible with a notice and a [CANCELLED] title marker,
      * but all sign-up interaction is frozen. Reversible via {@see self::uncancel()}.
+     *
+     * Only while it has still to take place. An activity that has already happened cannot be called off, the notice
+     * would contradict what the public saw, and the freeze would close the draw and the role assignment that
+     * {@see \App\Util\Activity\SignupAdminWindow::canChangeAdmission()} deliberately keeps open until a day after
+     * the end, leaving a list with no admission and therefore no attendance. Un-cancelling stays available, so an
+     * activity cancelled before it ended can still be reversed afterwards.
      */
     #[Route(
         path: '/{activity}/cancel',
@@ -748,6 +754,7 @@ class AdminController extends AbstractController
         if (
             null === $activity->getLiveRevision()
             || $activity->isCancelled()
+            || $activity->hasPassed()
         ) {
             $this->addFlash(
                 AlertTypes::Warning->value,

@@ -12,6 +12,10 @@ use function in_array;
  * The page-size selection shared by the paginated overview components; the pagination partial renders the selector.
  * Read the size through {@see pageSize()} rather than the property: the prop is client-writable, so an arbitrary
  * value would otherwise reach the query and let one request ask for the whole table.
+ *
+ * One size applies to every table of a component, so the restart after a change goes through
+ * {@see resetToFirstPage()} rather than writing a page number here: a component with a second paginated table has a
+ * second page number that has to restart with it.
  */
 trait PageSizeTrait
 {
@@ -29,10 +33,12 @@ trait PageSizeTrait
     )]
     public int $pageSize = 10;
 
+    abstract protected function resetToFirstPage(): void;
+
     public function onPageSizeUpdated(): void
     {
         $this->pageSize = $this->pageSize();
-        $this->page = 1;
+        $this->resetToFirstPage();
     }
 
     /**

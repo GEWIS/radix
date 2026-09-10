@@ -276,6 +276,13 @@
                                 <li>
                                     <h6 class="dropdown-header">{{ 'Organise'|trans }}</h6>
                                 </li>
+                                {{ menu.item(
+                                    path('admin/activities/index'),
+                                    'fa-calendar-days',
+                                    'Overview'|trans,
+                                    null,
+                                    is_module_active(['activity', 'admin', 'index']),
+                                ) }}
                                 {{ menu.item(path('admin/activities/calendar/index'), 'fa-calendar-plus', 'Option Calendar'|trans) }}
                                 <li>
                                     <a href="{{ path('admin/activities/create') }}" class="dropdown-item nav-menu-action">
