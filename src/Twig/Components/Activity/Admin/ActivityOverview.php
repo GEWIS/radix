@@ -12,6 +12,7 @@ use App\Entity\User\User;
 use App\Repository\Activity\ActivityRepository;
 use App\Twig\Components\Application\AbstractDoctrinePaginatedOverview;
 use App\ViewModel\Activity\Admin\ActivityAdminRow;
+use Closure;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -19,15 +20,10 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
-use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
 use function array_map;
 use function assert;
-use function ceil;
-use function iterator_to_array;
-use function max;
-use function min;
 
 /**
  * Admin activity overview, split into a "pending" table (drafts/submitted/in-review/rejected/closed) and an
@@ -43,26 +39,16 @@ use function min;
 #[IsGranted(new Expression("is_granted('ROLE_ACTIVE_MEMBER') or is_granted('ROLE_BOARD')"))]
 final class ActivityOverview extends AbstractDoctrinePaginatedOverview
 {
+    /** The name the pending table pages under, which the template passes to the pagination partial as well. */
+    public const string PENDING = 'pending';
+
     #[LiveProp(writable: true)]
     public bool $showAll = false;
-
-    /**
-     * The pending table pages separately from the approved one, so its own page travels alongside the inherited
-     * `page` rather than sharing it. Both tables read the one page size.
-     */
-    #[LiveProp(
-        writable: true,
-        url: true,
-    )]
-    public int $pendingPage = 1;
 
     // The approved table can hold thousands of rows, so it is collapsed by default. Driven as a live prop (not a
     // client-side Bootstrap collapse) so the state survives the Ajax re-render that pagination triggers.
     #[LiveProp(writable: true)]
     public bool $expanded = false;
-
-    /** @var Paginator<Activity>|null */
-    private ?Paginator $pending = null;
 
     public function __construct(
         private readonly ActivityRepository $activityRepository,
@@ -82,34 +68,7 @@ final class ActivityOverview extends AbstractDoctrinePaginatedOverview
     {
         return array_map(
             static fn (Activity $activity): ActivityAdminRow => ActivityAdminRow::fromActivity($activity),
-            iterator_to_array($this->pendingPaginator()),
-        );
-    }
-
-    public function getPendingTotalCount(): int
-    {
-        return $this->pendingPaginator()->count();
-    }
-
-    public function getPendingTotalPages(): int
-    {
-        return max(
-            1,
-            (int) ceil($this->getPendingTotalCount() / $this->pageSize()),
-        );
-    }
-
-    #[LiveAction]
-    #[ReadOnlySafe]
-    public function gotoPendingPage(#[LiveArg]
-    int $page,): void
-    {
-        $this->pendingPage = max(
-            1,
-            min(
-                $page,
-                $this->getPendingTotalPages(),
-            ),
+            $this->getRows(self::PENDING),
         );
     }
 
@@ -122,16 +81,6 @@ final class ActivityOverview extends AbstractDoctrinePaginatedOverview
             static fn (Activity $activity): ActivityAdminRow => ActivityAdminRow::fromActivity($activity),
             $this->getRows(),
         );
-    }
-
-    public function getApprovedTotalCount(): int
-    {
-        return $this->getTotalCount();
-    }
-
-    public function getApprovedTotalPages(): int
-    {
-        return $this->getTotalPages();
     }
 
     #[LiveAction]
@@ -170,20 +119,23 @@ final class ActivityOverview extends AbstractDoctrinePaginatedOverview
     }
 
     /**
-     * @return Paginator<Activity>
+     * @return array<string, Closure(int, int): Paginator<Activity>>
      */
-    private function pendingPaginator(): Paginator
+    #[Override]
+    protected function otherPaginators(): array
     {
-        return $this->pending ??= $this->activityRepository->findPendingForAdmin(
-            $this->getMember(),
-            $this->getOrganIds(),
-            $this->showingAll(),
-            max(
-                1,
-                $this->pendingPage,
+        return [
+            self::PENDING => fn (
+                int $page,
+                int $pageSize,
+            ): Paginator => $this->activityRepository->findPendingForAdmin(
+                $this->getMember(),
+                $this->getOrganIds(),
+                $this->showingAll(),
+                $page,
+                $pageSize,
             ),
-            $this->pageSize(),
-        );
+        ];
     }
 
     private function showingAll(): bool

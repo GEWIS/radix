@@ -102,11 +102,11 @@
                 </div>
 
                 {% include 'partials/application/pagination.html.twig' with {
-                    'page': this.pendingPage,
-                    'totalPages': this.pendingTotalPages,
-                    'totalCount': this.pendingTotalCount,
+                    'page': this.pageOf('pending'),
+                    'totalPages': this.totalPages('pending'),
+                    'totalCount': this.totalCount('pending'),
                     'pageSize': this.pageSize,
-                    'action': 'gotoPendingPage',
+                    'table': 'pending',
                 } only %}
             {% endif %}
         </div>
@@ -120,7 +120,7 @@
                 aria-expanded="{{ expanded ? 'true' : 'false' }}">
             <h3 class="mb-0">
                 {{ 'Approved activities'|trans }}
-                <span class="badge badge-secondary ms-2">{{ this.approvedTotalCount }}</span>
+                <span class="badge badge-secondary ms-2">{{ this.totalCount }}</span>
             </h3>
             <span class="fas fa-chevron-down panel-collapse-chevron"></span>
         </button>
@@ -210,9 +210,9 @@
                         </table>
                     </div>
                     {% include 'partials/application/pagination.html.twig' with {
-                        'page': page,
-                        'totalPages': this.approvedTotalPages,
-                        'totalCount': this.approvedTotalCount,
+                        'page': this.page,
+                        'totalPages': this.totalPages,
+                        'totalCount': this.totalCount,
                         'pageSize': this.pageSize,
                     } only %}
                 {% endif %}

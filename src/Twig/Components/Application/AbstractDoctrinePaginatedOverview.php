@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Twig\Components\Application;
 
 use App\ViewModel\Application\ResultPage;
+use Closure;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
 
+use function array_map;
 use function iterator_to_array;
 
 /**
@@ -32,6 +34,35 @@ abstract class AbstractDoctrinePaginatedOverview extends AbstractPaginatedOvervi
     ): Paginator;
 
     /**
+     * The other tables of an overview that shows more than one, as a paginator per name; the same as
+     * {@see AbstractPaginatedOverview::otherTables()}, for a subclass that has a `Paginator` for those as well.
+     *
+     * @return array<string, Closure(int, int): Paginator<T>>
+     */
+    protected function otherPaginators(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return array<string, Closure(int, int): ResultPage<T>>
+     */
+    #[Override]
+    final protected function otherTables(): array
+    {
+        return array_map(
+            fn (Closure $createPaginator): Closure => fn (
+                int $page,
+                int $pageSize,
+            ): ResultPage => $this->resultPage($createPaginator(
+                $page,
+                $pageSize,
+            )),
+            $this->otherPaginators(),
+        );
+    }
+
+    /**
      * @return ResultPage<T>
      */
     #[Override]
@@ -39,11 +70,19 @@ abstract class AbstractDoctrinePaginatedOverview extends AbstractPaginatedOvervi
         int $page,
         int $pageSize,
     ): ResultPage {
-        $paginator = $this->createPaginator(
+        return $this->resultPage($this->createPaginator(
             $page,
             $pageSize,
-        );
+        ));
+    }
 
+    /**
+     * @param Paginator<T> $paginator
+     *
+     * @return ResultPage<T>
+     */
+    private function resultPage(Paginator $paginator): ResultPage
+    {
         return new ResultPage(
             iterator_to_array(
                 $paginator->getIterator(),
