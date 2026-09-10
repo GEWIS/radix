@@ -8,6 +8,32 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.5.0](https://github.com/GEWIS/radix/tree/v5.5.0) (2026-09-10)
+
+* Added a security log, which records sign-ins, terminated sessions, password changes and second-factor changes, since the application log discards everything below `warning` unless the request failed. It omits user agents, tokens and session identifiers, and an event is deleted after 180 days.
+* Added placeholders to the message an organiser sends to the sign-ups of an activity, which was one text for everybody. `{{PLACEHOLDER}}` takes its value from the activity, the organising body, the sign-up list, or a question on that list, which gives each recipient their own answer.
+* Added "Admitted, not present" as a group a message can be addressed to, offered once admission is settled, as a limited list whose draw is still open admits nobody.
+* Added a report of the scheduled tasks that are no longer running to the dashboard, as a schedule that stops dispatching produces the same empty queues as one with nothing due. It reads the compiled schedule, so a new `#[AsCronTask]` is covered without registering it.
+* Added a sudo grant that survives impersonation, resolved through `SwitchUserToken` to the administrator's own account, as an administrator does not know the password of the member they impersonate.
+* Added the administrative activity overview to the activities menu, which linked to the option calendar and the form to create an activity but not to the overview of the activities a member organises.
+* Improved the loading of the Stimulus controllers, which were all downloaded on every page and are now fetched when their `data-controller` first appears. Modulepreloads per page drop from 67 to 10.
+* Improved the fonts, four of the seven preloaded ahead of the stylesheet rendering nothing. Lato and Raleway are removed, and the icon font with them, as only the logo was used and it is inlined as a mask.
+* Improved the document head, which asked for three stylesheets and two blocking scripts, by compiling the styles into `app.scss`, dropping Font Awesome's v4 shims and inlining or deferring both scripts. The frontpage critical path goes from 80 requests and about 554 KB gzipped to 13 and about 121 KB.
+* Improved the queries the layout makes on every page by caching the maintenance window, the announcements and the featured company package by the day and narrowing them to the instant in PHP, which a query against the instant made impossible.
+* Improved the counts on the career menu and the badges on the administration sidebar, which were computed on every page and are now cached until a write or until the earliest package or vacancy date that changes them. The committee list goes from 7 queries to 2.
+* Improved the administration's user list, where each row read two collections that were not loaded, at two queries per member. Both are loaded for the whole page instead, which takes it from 38 queries to 20.
+* Improved the fetching of the photo of the week, which loaded the photo and its album as separate queries part-way through the frontpage render. Both are now joined.
+* Improved the reading of a setting, which was a query each time, by caching the answers for the request alone, since one of them is the lock the mailing-list synchronisation takes.
+* Changed the row of a failed message to show the command line rather than the class, which reported twenty-eight scheduled jobs as the same `RunCommandMessage`.
+* Fixed an issue where roughly two in three runs of every daily and weekly scheduled task never happened, as the scheduler worker rebuilds its triggers every ten minutes and a rebuild between the cron minute and the jittered dispatch advanced the task to its next cron date. The jitter is removed.
+* Fixed an issue where a second tab dropped the sudo grant, as a session is read at the start of a request and written back at the end, so a request that read it before the grant was recorded overwrote it. The grant is written to a key of its own instead.
+* Fixed an issue where a request that changed nothing rewrote the session every second to update the last-used timestamp, which `metadata_update_threshold` now prevents.
+* Fixed an issue where the sudo grant outlived the session it was granted in, once it was keyed separately. `SudoMode::revokeSession()` removes it when a session is terminated.
+* Fixed an issue where the altcha widget disappeared from the sign-up form, which re-renders on a change to any field. The form theme renders it in a container with the field's id instead.
+* Fixed an issue where paging the pending activities on the administrative overview moved the page number but not the rows, as that table wrote its own paging. `AbstractPaginatedOverview` pages any number of tables instead, which moves its page in the address from `pendingPage` to `pages[pending]`.
+* Fixed an issue where the approved activities table printed a page number above the last page, as it read the number off the raw prop rather than off the component.
+* Fixed an issue where an activity could be cancelled after it had taken place, which froze the draw and the role assignment that stay open until a day after the end and left a list that was never drawn without admission or attendance.
+
 ### [v5.4.0](https://github.com/GEWIS/radix/tree/v5.4.0) (2026-09-07)
 
 * Added priority modifiers to a sign-up list, so an activity with fewer places than sign-ups can admit the members it is meant for before everyone else. A list can order by membership type, study phase, or cohort, or reserve seats for the members installed in the organising body. The membership types that are admitted together share a rank, so a list that sets no order behaves as it did before.
