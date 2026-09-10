@@ -39,8 +39,9 @@ use function strval;
 /**
  * The guest (non-member) external sign-up form for one list. A live component so an invalid submit re-renders the form
  * inline (no full-page reload, no re-opening the modal), like the member flow. The Altcha widget can live here because
- * it carries `data-live-ignore`: the loading-directive scanner skips it (so it no longer throws on the widget's own
- * `data-loading`) and the solved proof-of-work survives re-renders untouched.
+ * `templates/form/altcha.html.twig` renders it in a container the live morph skips: the loading-directive
+ * scanner skips it (so it no longer throws on the widget's own `data-loading`) and the solved proof-of-work survives
+ * the re-render that every field change triggers.
  *
  * Window/GEWIS-only/members rules are re-asserted on submit (a live request bypasses any page-level gate). A successful
  * submit redirects to the activity (the verification email is the real next step), so the modal closes on reload;
