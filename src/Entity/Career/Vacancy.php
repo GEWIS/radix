@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
 use RuntimeException;
+use SortDirection;
 
 /**
  * Vacancy aggregate root.
@@ -81,7 +82,7 @@ class Vacancy implements RevisableInterface
         mappedBy: 'vacancy',
         cascade: ['persist'],
     )]
-    #[OrderBy(['revisionNumber' => 'DESC'])]
+    #[OrderBy(['revisionNumber' => SortDirection::Descending])]
     private Collection $revisions;
 
     /**

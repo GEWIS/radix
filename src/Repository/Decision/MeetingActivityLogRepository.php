@@ -9,6 +9,7 @@ use App\Entity\Decision\MeetingActivityLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<MeetingActivityLog>
@@ -83,11 +84,11 @@ class MeetingActivityLogRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'log.createdAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'log.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit);
     }

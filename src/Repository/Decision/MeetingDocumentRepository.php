@@ -8,6 +8,7 @@ use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingDocument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<MeetingDocument>
@@ -46,11 +47,11 @@ class MeetingDocumentRepository extends ServiceEntityRepository
             ->andWhere('m.number = :number')
             ->orderBy(
                 'document.displayPosition',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'document.id',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $qb->setParameter(

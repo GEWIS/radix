@@ -28,6 +28,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
+use SortDirection;
 
 use function addcslashes;
 use function filter_var;
@@ -95,7 +96,7 @@ class MemberRepository extends ServiceEntityRepository
             ->setMaxResults(32)
             ->orderBy(
                 'm.lidnr',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setFirstResult(0);
 
@@ -159,7 +160,7 @@ class MemberRepository extends ServiceEntityRepository
             ->andWhere('a.type = :type')
             ->orderBy(
                 'm.lidnr',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $qb->setParameter(
@@ -282,7 +283,7 @@ class MemberRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'm.lidnr',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $qb->setParameter(
@@ -794,7 +795,7 @@ class MemberRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'm.lidnr',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

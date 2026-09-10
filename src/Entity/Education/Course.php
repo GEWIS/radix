@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 use function array_values;
 use function implode;
@@ -59,7 +60,7 @@ class Course
         targetEntity: CourseDocument::class,
         mappedBy: 'course',
     )]
-    #[OrderBy(value: ['date' => 'ASC'])]
+    #[OrderBy(value: ['date' => SortDirection::Ascending])]
     private Collection $documents;
 
     /**

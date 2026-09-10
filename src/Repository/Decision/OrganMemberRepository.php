@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<OrganMember>
@@ -58,11 +59,11 @@ class OrganMemberRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'm.lidnr',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->addOrderBy(
                 'om.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -108,11 +109,11 @@ class OrganMemberRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'o.abbr',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->addOrderBy(
                 'om.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

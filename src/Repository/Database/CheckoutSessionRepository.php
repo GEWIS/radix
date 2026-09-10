@@ -8,6 +8,7 @@ use App\Entity\Database\CheckoutSession;
 use App\Entity\Database\ProspectiveMember;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<CheckoutSession>
@@ -42,7 +43,7 @@ class CheckoutSessionRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->orderBy(
                 'cs.id',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $qb->setParameter(

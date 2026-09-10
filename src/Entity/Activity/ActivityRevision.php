@@ -27,6 +27,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
+use SortDirection;
 
 use function trim;
 
@@ -159,8 +160,8 @@ class ActivityRevision extends AbstractRevision
         orphanRemoval: true,
     )]
     #[OrderBy([
-        'promoted' => 'DESC',
-        'id' => 'ASC',
+        'promoted' => SortDirection::Descending,
+        'id' => SortDirection::Ascending,
     ])]
     private Collection $signupLists;
 
@@ -213,7 +214,7 @@ class ActivityRevision extends AbstractRevision
         ],
         orphanRemoval: true,
     )]
-    #[OrderBy(['editedAt' => 'ASC'])]
+    #[OrderBy(['editedAt' => SortDirection::Ascending])]
     private Collection $editHistory;
 
     public function __construct()

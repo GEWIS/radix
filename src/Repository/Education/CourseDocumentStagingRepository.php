@@ -7,6 +7,7 @@ namespace App\Repository\Education;
 use App\Entity\Education\CourseDocumentStaging;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<CourseDocumentStaging>
@@ -31,11 +32,11 @@ class CourseDocumentStagingRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('s')
             ->orderBy(
                 's.uploadedAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 's.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

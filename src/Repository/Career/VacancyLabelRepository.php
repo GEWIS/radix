@@ -7,6 +7,7 @@ namespace App\Repository\Career;
 use App\Entity\Career\VacancyLabel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<VacancyLabel>
@@ -41,7 +42,7 @@ class VacancyLabelRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'l.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();
@@ -68,7 +69,7 @@ class VacancyLabelRepository extends ServiceEntityRepository
             ->groupBy('l.id')
             ->orderBy(
                 'l.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

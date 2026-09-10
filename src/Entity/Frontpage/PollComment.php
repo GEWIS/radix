@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * What a member wrote underneath a poll. Members sign their comment with a name of their own choosing, and only the
@@ -72,7 +73,7 @@ class PollComment
             'remove',
         ],
     )]
-    #[OrderBy(['createdOn' => 'ASC'])]
+    #[OrderBy(['createdOn' => SortDirection::Ascending])]
     private Collection $replies;
 
     /** @var Collection<array-key, PollCommentReaction> */

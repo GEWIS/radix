@@ -7,6 +7,7 @@ namespace App\Repository\Activity;
 use App\Entity\Activity\ActivityLabel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ActivityLabel>
@@ -40,7 +41,7 @@ class ActivityLabelRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'l.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

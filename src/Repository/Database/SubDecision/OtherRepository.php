@@ -9,6 +9,7 @@ use App\Entity\Database\SubDecision\Other;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Other>
@@ -34,19 +35,19 @@ class OtherRepository extends ServiceEntityRepository
         $items = $this->withoutEnglish()
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'd.point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'd.number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'o.sequence',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize)

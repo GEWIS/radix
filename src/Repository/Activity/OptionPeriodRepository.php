@@ -9,6 +9,7 @@ use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<OptionPeriod>
@@ -41,7 +42,7 @@ class OptionPeriodRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.startsAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();
@@ -63,7 +64,7 @@ class OptionPeriodRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.startsAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();
@@ -77,7 +78,7 @@ class OptionPeriodRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->orderBy(
                 'p.startsAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();

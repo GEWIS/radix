@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
+use SortDirection;
 
 /**
  * What a member asked the association at one point in the chain: the question and the options it can be answered with.
@@ -76,7 +77,7 @@ class PollRevision extends AbstractRevision
         ],
         orphanRemoval: true,
     )]
-    #[OrderBy(['id' => 'ASC'])]
+    #[OrderBy(['id' => SortDirection::Ascending])]
     private Collection $options;
 
     public function __construct()

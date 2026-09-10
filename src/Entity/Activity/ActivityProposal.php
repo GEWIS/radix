@@ -27,6 +27,7 @@ use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use Doctrine\ORM\Mapping\PrePersist;
 use LogicException;
+use SortDirection;
 
 use function count;
 use function sprintf;
@@ -129,7 +130,7 @@ class ActivityProposal
         ],
         orphanRemoval: true,
     )]
-    #[OrderBy(['position' => 'ASC'])]
+    #[OrderBy(['position' => SortDirection::Ascending])]
     private Collection $dateOptions;
 
     /**

@@ -8,6 +8,7 @@ use App\Entity\Activity\ProposalLimit;
 use App\Entity\Decision\Organ;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ProposalLimit>
@@ -83,7 +84,7 @@ class ProposalLimitRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'o.abbr',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

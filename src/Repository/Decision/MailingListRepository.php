@@ -8,6 +8,7 @@ use App\Entity\Decision\MailingList;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<MailingList>
@@ -33,7 +34,7 @@ class MailingListRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'ml.name',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

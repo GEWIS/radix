@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 use function sprintf;
 
@@ -62,8 +63,8 @@ class Meeting
         ],
     )]
     #[OrderBy(value: [
-        'point' => 'ASC',
-        'number' => 'ASC',
+        'point' => SortDirection::Ascending,
+        'number' => SortDirection::Ascending,
     ])]
     private Collection $decisions;
 
@@ -82,7 +83,7 @@ class Meeting
         targetEntity: MeetingPoint::class,
         mappedBy: 'meeting',
     )]
-    #[OrderBy(value: ['displayPosition' => 'ASC'])]
+    #[OrderBy(value: ['displayPosition' => SortDirection::Ascending])]
     private Collection $points;
 
     /**
@@ -94,7 +95,7 @@ class Meeting
         targetEntity: MeetingDocument::class,
         mappedBy: 'meeting',
     )]
-    #[OrderBy(value: ['displayPosition' => 'ASC'])]
+    #[OrderBy(value: ['displayPosition' => SortDirection::Ascending])]
     private Collection $documents;
 
     /**

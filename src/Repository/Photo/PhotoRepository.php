@@ -14,6 +14,7 @@ use App\Entity\Photo\Photo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 
@@ -70,7 +71,7 @@ class PhotoRepository extends ServiceEntityRepository
             $qb->setFirstResult($start)
                 ->orderBy(
                     'p.dateTime',
-                    'DESC',
+                    SortDirection::Descending,
                 );
         } elseif ($album instanceof OrganAlbum) {
             // Organ tags are their own subtype as well; join it so a body album is the photos that organ is tagged in.
@@ -87,7 +88,7 @@ class PhotoRepository extends ServiceEntityRepository
             $qb->setFirstResult($start)
                 ->orderBy(
                     'p.dateTime',
-                    'DESC',
+                    SortDirection::Descending,
                 );
         } else {
             $qb->where('p.album = :album')
@@ -98,7 +99,7 @@ class PhotoRepository extends ServiceEntityRepository
             $qb->setFirstResult($start)
                 ->orderBy(
                     'p.dateTime',
-                    'ASC',
+                    SortDirection::Ascending,
                 );
         }
 
@@ -250,11 +251,11 @@ class PhotoRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.dateTime',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'p.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

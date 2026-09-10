@@ -8,6 +8,7 @@ use App\Entity\Photo\Photo;
 use App\Entity\Photo\WeeklyPhoto;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<WeeklyPhoto>
@@ -46,7 +47,7 @@ class WeeklyPhotoRepository extends ServiceEntityRepository
             ->addSelect('photo')
             ->orderBy(
                 'w.week',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();
@@ -72,12 +73,12 @@ class WeeklyPhotoRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->orderBy(
                 'w.week',
-                'DESC',
+                SortDirection::Descending,
             )
             // Tiebreak so a regenerated pick for the same week (a later row) wins over the one it replaces.
             ->addOrderBy(
                 'w.id',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $res = $qb->getQuery()->getResult();

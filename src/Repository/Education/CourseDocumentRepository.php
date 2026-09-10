@@ -13,6 +13,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<CourseDocument>
@@ -68,11 +69,11 @@ class CourseDocumentRepository extends ServiceEntityRepository
             ->addSelect('c')
             ->orderBy(
                 'd.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'd.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit);
 
@@ -126,11 +127,11 @@ class CourseDocumentRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'd.flattenStatus',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'd.id',
-                'DESC',
+                SortDirection::Descending,
             );
     }
 
@@ -153,7 +154,7 @@ class CourseDocumentRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'd.id',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         if (null !== $limit) {

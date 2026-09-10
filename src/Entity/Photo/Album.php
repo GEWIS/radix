@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * Album.
@@ -101,7 +102,7 @@ class Album
         ],
         fetch: 'EXTRA_LAZY',
     )]
-    #[OrderBy(value: ['dateTime' => 'ASC'])]
+    #[OrderBy(value: ['dateTime' => SortDirection::Ascending])]
     protected Collection $photos;
 
     /**

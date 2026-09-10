@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<MailingListMember>
@@ -52,11 +53,11 @@ class MailingListMemberRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'm.lidnr',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->addOrderBy(
                 'mlm.email',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

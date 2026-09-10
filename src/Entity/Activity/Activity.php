@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
 use RuntimeException;
+use SortDirection;
 
 use function assert;
 
@@ -113,7 +114,7 @@ class Activity implements RevisableInterface
         mappedBy: 'activity',
         cascade: ['persist'],
     )]
-    #[OrderBy(['revisionNumber' => 'DESC'])]
+    #[OrderBy(['revisionNumber' => SortDirection::Descending])]
     private Collection $revisions;
 
     /**

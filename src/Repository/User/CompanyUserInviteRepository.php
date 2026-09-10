@@ -9,6 +9,7 @@ use App\Entity\User\CompanyUserInvite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function strtolower;
 
@@ -60,7 +61,7 @@ class CompanyUserInviteRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'i.createdAt',
-                'DESC',
+                SortDirection::Descending,
             );
 
         return $qb->getQuery()->getResult();

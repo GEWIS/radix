@@ -14,6 +14,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_map;
 use function mb_strtolower;
@@ -114,11 +115,11 @@ class OrganRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'o.abbr',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->addOrderBy(
                 'o.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -149,7 +150,7 @@ class OrganRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'o.abbr',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $now = new DateTime();
@@ -272,7 +273,7 @@ class OrganRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'o.foundationDate',
-                'DESC',
+                SortDirection::Descending,
             );
 
         if (null !== $type) {
@@ -390,7 +391,7 @@ class OrganRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'o.abrogationDate',
-                'DESC',
+                SortDirection::Descending,
             );
 
         if (null !== $type) {
@@ -475,7 +476,7 @@ class OrganRepository extends ServiceEntityRepository
         if ($latest) {
             $qb->orderBy(
                 'o.foundationDate',
-                'DESC',
+                SortDirection::Descending,
             );
             $queryResult = $qb->getQuery()->getResult();
 

@@ -10,6 +10,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 
@@ -54,7 +55,7 @@ class AlbumRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'a.startDateTime',
-                'DESC',
+                SortDirection::Descending,
             );
 
         if ($onlyPublished) {
@@ -90,7 +91,7 @@ class AlbumRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'a.startDateTime',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit)
             ->getQuery()
@@ -125,7 +126,7 @@ class AlbumRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'a.name',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults($limit)
             ->getQuery()
@@ -205,7 +206,7 @@ class AlbumRepository extends ServiceEntityRepository
             ->where('a.parent IS NULL')
             ->orderBy(
                 'a.startDateTime',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();
@@ -222,11 +223,11 @@ class AlbumRepository extends ServiceEntityRepository
             ->where('a.published = TRUE')
             ->orderBy(
                 'a.startDateTime',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'a.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -261,11 +262,11 @@ class AlbumRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'a.startDateTime',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'a.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();

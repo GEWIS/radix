@@ -8,6 +8,7 @@ use App\Entity\Database\SavedQuery;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<SavedQuery>
@@ -67,7 +68,7 @@ class SavedQueryRepository extends ServiceEntityRepository
         // orderBy()/addOrderBy() would add an explicit ASC to the first term.
         $qb->orderBy(
             'lower(q.category), lower(q.name)',
-            'ASC',
+            SortDirection::Ascending,
         );
 
         return $qb->getQuery()->getResult();

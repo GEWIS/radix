@@ -12,6 +12,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 use function intval;
@@ -43,11 +44,11 @@ class PollRepository extends ServiceEntityRepository
             ->andWhere('p.expiryDate > CURRENT_DATE()')
             ->orderBy(
                 'p.expiryDate',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'p.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();
@@ -65,11 +66,11 @@ class PollRepository extends ServiceEntityRepository
             ->andWhere('p.expiryDate <= CURRENT_DATE()')
             ->orderBy(
                 'p.expiryDate',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'p.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults(1)
             ->getQuery()
@@ -183,7 +184,7 @@ class PollRepository extends ServiceEntityRepository
             ->where('p.liveRevision IS NOT NULL')
             ->orderBy(
                 'p.expiryDate',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -220,8 +221,8 @@ class PollRepository extends ServiceEntityRepository
             ->orderBy(
                 'p.expiryDate',
                 $oldestFirst
-                    ? 'ASC'
-                    : 'DESC',
+                    ? SortDirection::Ascending
+                    : SortDirection::Descending,
             );
 
         $search = trim($search);
@@ -298,7 +299,7 @@ class PollRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.expiryDate',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit)
             ->getQuery()
@@ -327,7 +328,7 @@ class PollRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.expiryDate',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

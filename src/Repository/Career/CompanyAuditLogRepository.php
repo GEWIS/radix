@@ -9,6 +9,7 @@ use App\Entity\Career\CompanyAuditLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<CompanyAuditLog>
@@ -52,11 +53,11 @@ class CompanyAuditLogRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'log.createdAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'log.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit);
 

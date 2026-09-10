@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * A document from the association-wide reference library, e.g. "Scenarios and Procedures". Each meeting selects which
@@ -43,7 +44,7 @@ class ReferenceDocument
         targetEntity: ReferenceDocumentVersion::class,
         mappedBy: 'referenceDocument',
     )]
-    #[OrderBy(value: ['id' => 'ASC'])]
+    #[OrderBy(value: ['id' => SortDirection::Ascending])]
     private Collection $versions;
 
     public function __construct()

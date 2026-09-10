@@ -12,6 +12,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ActivityDateOption>
@@ -105,11 +106,11 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.createdAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'o.position',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         if (null !== $organ) {

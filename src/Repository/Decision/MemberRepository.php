@@ -18,6 +18,7 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_map;
 use function ctype_digit;
@@ -61,7 +62,7 @@ class MemberRepository extends ServiceEntityRepository
         $qb->where('m.lidnr = :lidnr')
             ->orderBy(
                 'm.lidnr',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $qb->setParameter(
@@ -424,7 +425,7 @@ class MemberRepository extends ServiceEntityRepository
             ->andWhere('m.deleted = false')
             ->orderBy(
                 'm.lidnr',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -466,7 +467,7 @@ class MemberRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'm.lidnr',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -591,7 +592,7 @@ class MemberRepository extends ServiceEntityRepository
         };
         $qb->orderBy(
             $orderField,
-            'desc' === strtolower($direction) ? 'DESC' : 'ASC',
+            'desc' === strtolower($direction) ? SortDirection::Descending : SortDirection::Ascending,
         );
 
         $qb->setFirstResult(($page - 1) * $pageSize)->setMaxResults($pageSize);

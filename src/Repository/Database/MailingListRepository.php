@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
+use SortDirection;
 
 use function mb_strtolower;
 use function trim;
@@ -71,7 +72,7 @@ class MailingListRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('l')
             ->orderBy(
                 'l.name',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

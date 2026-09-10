@@ -13,6 +13,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ActivityProposal>
@@ -141,7 +142,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.createdAt',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         if (null !== $period) {
@@ -191,7 +192,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'p.createdAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();
@@ -272,7 +273,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'c.beginsAt',
-                'ASC',
+                SortDirection::Ascending,
             );
     }
 

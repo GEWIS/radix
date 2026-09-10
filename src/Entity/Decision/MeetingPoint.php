@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * An agenda point of a meeting, under which documents are filed.
@@ -79,7 +80,7 @@ class MeetingPoint
         targetEntity: MeetingDocument::class,
         mappedBy: 'point',
     )]
-    #[OrderBy(value: ['displayPosition' => 'ASC'])]
+    #[OrderBy(value: ['displayPosition' => SortDirection::Ascending])]
     private Collection $documents;
 
     public function __construct()

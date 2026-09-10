@@ -9,6 +9,7 @@ use App\Entity\Activity\PeriodProposalLimit;
 use App\Entity\Decision\Organ;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<PeriodProposalLimit>
@@ -97,7 +98,7 @@ class PeriodProposalLimitRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'o.abbr',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

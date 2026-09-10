@@ -23,6 +23,7 @@ use Doctrine\ORM\Mapping\OrderBy;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Override;
 use RuntimeException;
+use SortDirection;
 
 /**
  * A body's page on the website, which is the one thing about a body that GEWIS itself writes: the organ and everything
@@ -64,7 +65,7 @@ class OrganInformation implements RevisableInterface
         mappedBy: 'organInformation',
         cascade: ['persist'],
     )]
-    #[OrderBy(['revisionNumber' => 'DESC'])]
+    #[OrderBy(['revisionNumber' => SortDirection::Descending])]
     private Collection $revisions;
 
     /**
