@@ -1,0 +1,19 @@
+{% use '@Altcha/fields.html.twig' %}
+
+{#
+    The captcha widget is a custom element that keeps the solved proof of work in a DOM of its own, and the bundle
+    gives it a fresh random id on every render, which makes the `data-live-ignore` the bundle puts on it
+    ineffective: the live component re-renders on every field change (`data-model="on(change)|*"`), and the morph
+    replaces the contents of an element whose id differs from the rendered one before it reads that attribute. The
+    widget was therefore emptied by the first change to another field, leaving nothing to solve and a sign-up that
+    could not be submitted.
+
+    A container with an id that does not change between renders is what the morph reads instead, so it skips the
+    container and everything in it, including the input the widget writes its payload into. The row's errors are
+    rendered outside this block and still re-render.
+#}
+{% block altcha_widget %}
+    <div id="{{ id }}_altcha" data-live-ignore>
+        {{ parent() }}
+    </div>
+{% endblock %}

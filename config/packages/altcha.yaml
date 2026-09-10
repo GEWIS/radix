@@ -9,5 +9,5 @@ altcha:
     expires: '+15 minutes'
     # Wire the widget via its Stimulus controller: on a solved challenge it writes the payload into the form input AND
     # fires a `change` event, which is what the live-component form binding needs to pick the value up (the widget lives
-    # inside a live component, behind `data-live-ignore`).
+    # inside a live component, in the container `templates/form/altcha.html.twig` puts it in).
     use_stimulus: true

@@ -6,6 +6,7 @@ twig:
         '%kernel.project_dir%/assets/js': js
     form_themes:
         - 'bootstrap_5_layout.html.twig'
+        - 'form/altcha.html.twig'
         - 'form/api_permissions.html.twig'
         - 'form/board_candidate_collection.html.twig'
         - 'form/bootstrap_floating.html.twig'

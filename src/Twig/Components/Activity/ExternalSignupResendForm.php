@@ -34,8 +34,8 @@ use function strval;
 /**
  * Recovery path for a lost/undelivered external-sign-up confirmation email: a small live form (email + Altcha) that
  * re-sends the verification link. A live component for the same reasons as {@see ExternalSignupForm}: inline
- * validation (incl. the captcha) without a full-page reload, and the Altcha widget can live here behind
- * `data-live-ignore`.
+ * validation (incl. the captcha) without a full-page reload, and the Altcha widget can live here behind the container
+ * `templates/form/altcha.html.twig` puts it in.
  *
  * Like the password-reset request, it dispatches {@see ExternalSignupResendVerificationEmail} unconditionally and the
  * existence check happens in the handler, off the request thread, so the response never reveals whether the address is
