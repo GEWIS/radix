@@ -87,7 +87,7 @@ class AnnouncementRepository extends ServiceEntityRepository
         return array_values(
             array_filter(
                 $this->findRelevantOn($now),
-                static fn (Announcement $announcement): bool => $announcement->getEndsAt() > $now,
+                static fn (Announcement $announcement): bool => $announcement->endsAt > $now,
             ),
         );
     }

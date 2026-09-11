@@ -59,12 +59,12 @@ final class AbstractRevisionInvariantsTest extends TestCase
         $revision->setLastEditedBy(self::createStub(User::class));
 
         $revision->assertSingleActor();
-        self::assertNull($revision->getLastEditedByCompanyUser());
+        self::assertNull($revision->lastEditedByCompanyUser);
 
         $revision->setLastEditedByCompanyUser(self::createStub(CompanyUser::class));
 
         $revision->assertSingleActor();
-        self::assertNull($revision->getLastEditedBy());
+        self::assertNull($revision->lastEditedBy);
     }
 
     /**

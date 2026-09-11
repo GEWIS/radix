@@ -183,8 +183,8 @@ final class RevisionDiscarderTest extends DatabaseTestCase
         $class = $revision->getCommentClass();
         $comment = new $class();
         $comment->attachTo($revision);
-        $comment->setAuthor($user);
-        $comment->setBody('Please reconsider this.');
+        $comment->author = $user;
+        $comment->body = 'Please reconsider this.';
         $this->entityManager->persist($comment);
 
         return $comment;

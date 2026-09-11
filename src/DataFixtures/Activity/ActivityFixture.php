@@ -1903,8 +1903,11 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         $comment->setRevision($revision);
         // The comment author is the member's user account (a CompanyUser would author careers comments); the board
         // members who comment all have a seeded user.
-        $comment->setAuthor($this->getReference('user-' . $author->lidnr, User::class));
-        $comment->setBody($body);
+        $comment->author = $this->getReference(
+            'user-' . $author->lidnr,
+            User::class,
+        );
+        $comment->body = $body;
         $manager->persist($comment);
     }
 

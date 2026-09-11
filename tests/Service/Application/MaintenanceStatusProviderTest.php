@@ -17,7 +17,7 @@ final class MaintenanceStatusProviderTest extends TestCase
     public function testTheActiveWindowIsQueriedOncePerRequest(): void
     {
         $window = new MaintenanceWindow();
-        $window->setStatus(MaintenanceStatus::Full);
+        $window->status = MaintenanceStatus::Full;
 
         $repository = $this->createMock(MaintenanceWindowRepository::class);
         $repository->expects(self::once())

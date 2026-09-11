@@ -151,7 +151,7 @@ final readonly class RevisionAuditListener
                 continue;
             }
 
-            $editor = $revision->getLastEditedBy();
+            $editor = $revision->lastEditedBy;
             if (null === $editor) {
                 // Not a member-driven in-place edit (a fixture, the stale-revision cron or an approval): nothing to
                 // log.

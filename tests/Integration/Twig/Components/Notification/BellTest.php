@@ -244,13 +244,13 @@ final class BellTest extends DatabaseTestCase
         ?DateTimeImmutable $at = null,
     ): Notification {
         $notification = new Notification();
-        $notification->setType(NotificationType::SignIn);
-        $notification->setContext(['browser' => $browser]);
+        $notification->type = NotificationType::SignIn;
+        $notification->context = ['browser' => $browser];
         $notification->setRecipient(
             $this->member(8025),
             null,
         );
-        $notification->setCreatedAt($at ?? new DateTimeImmutable());
+        $notification->createdAt = $at ?? new DateTimeImmutable();
         $this->entityManager->persist($notification);
 
         return $notification;
@@ -259,9 +259,9 @@ final class BellTest extends DatabaseTestCase
     private function broadcast(): Notification
     {
         $notification = new Notification();
-        $notification->setType(NotificationType::AlbumPublished);
-        $notification->setSubjectId(1);
-        $notification->setCreatedAt(new DateTimeImmutable());
+        $notification->type = NotificationType::AlbumPublished;
+        $notification->subjectId = 1;
+        $notification->createdAt = new DateTimeImmutable();
         $this->entityManager->persist($notification);
 
         return $notification;

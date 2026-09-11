@@ -88,9 +88,9 @@ final readonly class EditLockService
 
             if (null === $lock) {
                 $lock = new EditLock();
-                $lock->setResourceId($resource->getResourceId());
-                $lock->setResourceKey($this->key($resource));
-                $lock->setAcquiredAt(new DateTime());
+                $lock->resourceId = $resource->getResourceId();
+                $lock->resourceKey = $this->key($resource);
+                $lock->acquiredAt = new DateTime();
                 $this->entityManager->persist($lock);
             } elseif (
                 !$this->heldBy(
@@ -106,14 +106,14 @@ final readonly class EditLockService
                     return null;
                 }
 
-                $lock->setAcquiredAt(new DateTime());
+                $lock->acquiredAt = new DateTime();
             }
 
             $this->assign(
                 $lock,
                 $principal,
             );
-            $lock->setLastPingAt(new DateTime());
+            $lock->lastPingAt = new DateTime();
             $this->entityManager->flush();
 
             return $lock;
@@ -155,7 +155,7 @@ final readonly class EditLockService
             );
         }
 
-        $lock->setLastPingAt(new DateTime());
+        $lock->lastPingAt = new DateTime();
         $this->entityManager->flush();
 
         return true;
@@ -225,7 +225,7 @@ final readonly class EditLockService
 
     public function isAlive(EditLock $lock): bool
     {
-        return $lock->getLastPingAt() > new DateTime(sprintf('-%d seconds', self::TTL_SECONDS));
+        return $lock->lastPingAt > new DateTime(sprintf('-%d seconds', self::TTL_SECONDS));
     }
 
     private function find(RevisableInterface $resource): ?EditLock
@@ -254,13 +254,13 @@ final readonly class EditLockService
         User|CompanyUser $principal,
     ): bool {
         if ($principal instanceof User) {
-            $holder = $lock->getLockedBy();
+            $holder = $lock->lockedBy;
 
             return null !== $holder
                 && $holder->lidnr === $principal->lidnr;
         }
 
-        $holder = $lock->getLockedByCompanyUser();
+        $holder = $lock->lockedByCompanyUser;
 
         return null !== $holder
             && $holder->getId() === $principal->getId();
@@ -271,13 +271,13 @@ final readonly class EditLockService
         User|CompanyUser $principal,
     ): void {
         if ($principal instanceof User) {
-            $lock->setLockedBy($principal);
-            $lock->setLockedByCompanyUser(null);
+            $lock->lockedBy = $principal;
+            $lock->lockedByCompanyUser = null;
 
             return;
         }
 
-        $lock->setLockedByCompanyUser($principal);
-        $lock->setLockedBy(null);
+        $lock->lockedByCompanyUser = $principal;
+        $lock->lockedBy = null;
     }
 }

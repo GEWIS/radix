@@ -51,7 +51,7 @@ class CompanyUserInviteEmailHandler
                     'fullName' => $invite->name,
                     'companyName' => $invite->company->name,
                     'inviteUrl' => $url,
-                    'expiresAt' => $invite->getExpiresAt(),
+                    'expiresAt' => $invite->expiresAt,
                 ]),
         );
     }

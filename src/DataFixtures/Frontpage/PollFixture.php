@@ -330,11 +330,11 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
 
         $feedback = new PollRevisionComment();
         $feedback->attachTo($revision);
-        $feedback->setAuthor($this->getReference(
+        $feedback->author = $this->getReference(
             'user-8000',
             User::class,
-        ));
-        $feedback->setBody('We are not putting a question about named people to the whole association.');
+        );
+        $feedback->body = 'We are not putting a question about named people to the whole association.';
         $manager->persist($feedback);
     }
 

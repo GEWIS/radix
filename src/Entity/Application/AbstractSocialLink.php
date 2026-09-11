@@ -23,7 +23,7 @@ abstract class AbstractSocialLink
     use IdentifiableTrait;
 
     #[Column(type: Types::STRING)]
-    protected string $handle = '';
+    public protected(set) string $handle = '';
 
     /**
      * Final so every concrete subclass shares this exact signature, which lets {@see self::copy()} use `new static()`.
@@ -42,11 +42,6 @@ abstract class AbstractSocialLink
     public function getPlatform(): SocialPlatform
     {
         return $this->platform;
-    }
-
-    public function getHandle(): string
-    {
-        return $this->handle;
     }
 
     /**

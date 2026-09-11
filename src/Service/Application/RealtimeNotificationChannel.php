@@ -37,12 +37,12 @@ final readonly class RealtimeNotificationChannel implements NotificationChannelI
     #[Override]
     public function deliver(Notification $notification): void
     {
-        $type = $notification->getType();
-        $subjectId = $notification->getSubjectId();
+        $type = $notification->type;
+        $subjectId = $notification->subjectId;
         $name = $this->name(
             $type,
             $subjectId,
-            $notification->getContext(),
+            $notification->context,
         );
         if (null === $name) {
             return;
@@ -50,12 +50,12 @@ final readonly class RealtimeNotificationChannel implements NotificationChannelI
 
         // Topics are per account, so there is nowhere to push something addressed to a role. It waits in the
         // notification centre instead, which is where a queue of work belongs anyway.
-        if (null !== $notification->getRecipientRole()) {
+        if (null !== $notification->recipientRole) {
             return;
         }
 
-        $recipientUser = $notification->getRecipientUser();
-        $recipientCompanyUser = $notification->getRecipientCompanyUser();
+        $recipientUser = $notification->recipientUser;
+        $recipientCompanyUser = $notification->recipientCompanyUser;
 
         $recipient = match (true) {
             null !== $recipientUser => Firewall::Main,
@@ -64,7 +64,7 @@ final readonly class RealtimeNotificationChannel implements NotificationChannelI
         };
 
         $payload = new RealtimePayload(
-            $notification->getLevel(),
+            $notification->level,
             [
                 'en' => $this->translate(
                     $type->message($name['en']),
@@ -79,7 +79,7 @@ final readonly class RealtimeNotificationChannel implements NotificationChannelI
                 $type,
                 $subjectId,
                 $recipient,
-                $notification->getContext() ?? [],
+                $notification->context ?? [],
             ),
             notificationId: $notification->getId(),
         );

@@ -129,14 +129,12 @@ final class RealtimeNotificationChannelTest extends TestCase
     ): Notification {
         $notification = new Notification();
         // A context only means something to a kind that keeps one, so these are sign-ins rather than albums.
-        $notification->setType(
-            null === $origin
-                ? NotificationType::AlbumPublished
-                : NotificationType::SignIn,
-        );
-        $notification->setLevel(AlertTypes::Warning);
-        $notification->setSubjectId($subjectId);
-        $notification->setContext($origin);
+        $notification->type = null === $origin
+            ? NotificationType::AlbumPublished
+            : NotificationType::SignIn;
+        $notification->level = AlertTypes::Warning;
+        $notification->subjectId = $subjectId;
+        $notification->context = $origin;
 
         return $notification;
     }

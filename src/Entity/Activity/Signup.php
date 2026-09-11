@@ -209,7 +209,7 @@ abstract class Signup
         return [
             'id' => $this->getId(),
             'createdAt' => $this->getCreatedAt()->format(DateTimeInterface::ATOM),
-            'updatedAt' => $this->getUpdatedAt()->format(DateTimeInterface::ATOM),
+            'updatedAt' => $this->updatedAt->format(DateTimeInterface::ATOM),
             'activity_id' => $this->signupList->getActivity()->getId(),
             'signupList_id' => $this->signupList->getId(),
             'present' => $this->present,

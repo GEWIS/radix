@@ -168,11 +168,11 @@ class Bell
                 continue;
             }
 
-            $context = $notification->getContext();
+            $context = $notification->context;
             $name = null === $context
                 ? null
                 : $this->contextResolver->resolve(
-                    $notification->getType(),
+                    $notification->type,
                     $context,
                     $language,
                 );
@@ -188,9 +188,9 @@ class Bell
                 };
             }
 
-            $unread = (null === $readAt || $notification->getCreatedAt() > $readAt)
+            $unread = (null === $readAt || $notification->createdAt > $readAt)
                 && null === ($interactions[$id] ?? null)?->readAt;
-            $type = $notification->getType();
+            $type = $notification->type;
             $key = $type->groupsAcrossSubjects()
                 ? $type->value
                 : $type->value . "\0" . $name;
@@ -199,7 +199,7 @@ class Bell
                 null !== $current
                 && $key === $currentKey
                 && null !== $currentSince
-                && $notification->getCreatedAt() >= $currentSince
+                && $notification->createdAt >= $currentSince
             ) {
                 $current['ids'][] = $id;
                 $current['unread'] += $unread
@@ -214,14 +214,14 @@ class Bell
             }
 
             $currentKey = $key;
-            $currentSince = $notification->getCreatedAt()->sub(new DateInterval(self::GROUP_WINDOW));
+            $currentSince = $notification->createdAt->sub(new DateInterval(self::GROUP_WINDOW));
             $current = [
                 'notification' => $notification,
                 'name' => $name,
                 'href' => $this->urlGenerator->generate(
                     $type->route(Firewall::Main),
                     $type->routeParameters(
-                        $notification->getSubjectId(),
+                        $notification->subjectId,
                         $context ?? [],
                     ),
                 ),
@@ -277,7 +277,7 @@ class Bell
         foreach ($entries as $entry) {
             if (count($entry['ids']) > 1) {
                 $entry['href'] = $this->urlGenerator->generate(
-                    $entry['notification']->getType()->manyRoute(Firewall::Main),
+                    $entry['notification']->type->manyRoute(Firewall::Main),
                 );
             }
 

@@ -141,11 +141,9 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
 
         $comment = new CompanyRevisionComment();
         $comment->setRevision($draft);
-        $comment->setAuthor($reviewer);
-        $comment->setBody(
-            'The description reads as an advertisement rather than as a profile. Please tell our members what it is '
-            . 'like to work with you instead.',
-        );
+        $comment->author = $reviewer;
+        $comment->body = 'The description reads as an advertisement rather than as a profile. Please tell our '
+            . 'members what it is like to work with you instead.';
 
         $manager->persist($draft);
         $manager->persist($comment);
@@ -180,8 +178,8 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
 
         $feedback = new VacancyRevisionComment();
         $feedback->setRevision($reviewed);
-        $feedback->setAuthor($reviewer);
-        $feedback->setBody('Could you say something about the salary range? Our members ask us about it every year.');
+        $feedback->author = $reviewer;
+        $feedback->body = 'Could you say something about the salary range? Our members ask us about it every year.';
 
         $next = $this->cloneVacancyRevision(
             $vacancy,
@@ -193,8 +191,8 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
 
         $reply = new VacancyRevisionComment();
         $reply->setRevision($next);
-        $reply->setAuthorCompanyUser($author);
-        $reply->setBody('Added the range to the description. Let us know if it needs to be more specific.');
+        $reply->authorCompanyUser = $author;
+        $reply->body = 'Added the range to the description. Let us know if it needs to be more specific.';
 
         $manager->persist($reviewed);
         $manager->persist($feedback);

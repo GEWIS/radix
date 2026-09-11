@@ -230,11 +230,11 @@ final readonly class ActivityProposalManager
         }
 
         $notification = new Notification();
-        $notification->setType(NotificationType::ActivityProposalAwaitingDecision);
-        $notification->setContext([
+        $notification->type = NotificationType::ActivityProposalAwaitingDecision;
+        $notification->context = [
             'proposal' => strval($proposalId),
             'proposalName' => $proposal->name,
-        ]);
+        ];
         $notification->setRecipient(
             null,
             null,

@@ -19,28 +19,13 @@ trait SelectorTokenTrait
     public const string HASH_ALGO = 'sha256';
 
     #[Column(type: Types::STRING)]
-    private string $selector;
+    public private(set) string $selector;
 
     #[Column(type: Types::STRING)]
-    private string $hashedToken;
+    public private(set) string $hashedToken;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $expiresAt;
-
-    public function getSelector(): string
-    {
-        return $this->selector;
-    }
-
-    public function getHashedToken(): string
-    {
-        return $this->hashedToken;
-    }
-
-    public function getExpiresAt(): DateTimeImmutable
-    {
-        return $this->expiresAt;
-    }
+    public private(set) DateTimeImmutable $expiresAt;
 
     public function isExpired(): bool
     {

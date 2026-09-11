@@ -38,7 +38,7 @@ final readonly class NotificationEmailChannel implements NotificationChannelInte
         }
 
         $queued = false;
-        foreach ($this->subscriptions->findSubscribedUsers($notification->getType()) as $user) {
+        foreach ($this->subscriptions->findSubscribedUsers($notification->type) as $user) {
             $member = $user->member;
             if (
                 null === $member->email

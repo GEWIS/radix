@@ -81,8 +81,8 @@ final class NotificationEmailChannelTest extends TestCase
     private function notification(): Notification
     {
         $notification = new Notification();
-        $notification->setType(NotificationType::AlbumPublished);
-        $notification->setSubjectId(1);
+        $notification->type = NotificationType::AlbumPublished;
+        $notification->subjectId = 1;
 
         return $notification;
     }

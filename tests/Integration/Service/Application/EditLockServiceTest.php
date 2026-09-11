@@ -41,9 +41,9 @@ final class EditLockServiceTest extends DatabaseTestCase
         );
         self::assertSame(
             $holder->lidnr,
-            $lock->getLockedBy()?->lidnr,
+            $lock->lockedBy?->lidnr,
         );
-        self::assertNull($lock->getLockedByCompanyUser());
+        self::assertNull($lock->lockedByCompanyUser);
         self::assertTrue($this->service()->isAlive($lock));
         // It is persisted under the resource's key, so a later look-up finds the same row.
         self::assertNotNull($this->locks()->findOneByResource(
@@ -105,7 +105,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         );
         self::assertSame(
             $holder->lidnr,
-            $lock?->getLockedBy()?->lidnr,
+            $lock?->lockedBy?->lidnr,
         );
     }
 
@@ -129,7 +129,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         // The reviewer force-takes the still-alive lock from the original holder.
         self::assertSame(
             $reviewer->lidnr,
-            $taken?->getLockedBy()?->lidnr,
+            $taken?->lockedBy?->lidnr,
         );
     }
 
@@ -159,7 +159,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         // forced take-over.
         self::assertSame(
             $other->lidnr,
-            $taken?->getLockedBy()?->lidnr,
+            $taken?->lockedBy?->lidnr,
         );
     }
 
@@ -372,10 +372,10 @@ final class EditLockServiceTest extends DatabaseTestCase
      */
     private function makeStale(EditLock $lock): void
     {
-        $lock->setLastPingAt(new DateTime(sprintf(
+        $lock->lastPingAt = new DateTime(sprintf(
             '-%d seconds',
             EditLockService::TTL_SECONDS + 30,
-        )));
+        ));
         $this->entityManager->flush();
     }
 }

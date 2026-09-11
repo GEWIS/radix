@@ -102,12 +102,12 @@ class AnnouncementType extends AbstractType
         $form = $event->getForm();
         $this->requireEnglish(
             $form->get('title'),
-            $announcement->getTitle(),
+            $announcement->title,
             $this->translator->trans('Enter an English title.'),
         );
         $this->requireEnglish(
             $form->get('body'),
-            $announcement->getBody(),
+            $announcement->body,
             $this->translator->trans('Enter an English message.'),
         );
 

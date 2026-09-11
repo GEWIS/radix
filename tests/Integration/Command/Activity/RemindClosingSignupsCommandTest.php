@@ -89,7 +89,7 @@ final class RemindClosingSignupsCommandTest extends DatabaseTestCase
 
         self::assertSame(
             $expected,
-            $this->reminders()[0]->getType(),
+            $this->reminders()[0]->type,
         );
     }
 

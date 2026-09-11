@@ -42,7 +42,7 @@ final readonly class ExternalSignupTokenResolver
 
         if (
             !SplitToken::matches(
-                $verification->getHashedToken(),
+                $verification->hashedToken,
                 $split['verifier'],
                 ExternalSignupVerification::HASH_ALGO,
             )

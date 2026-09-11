@@ -27,49 +27,19 @@ class MaintenanceWindow
         length: 16,
         enumType: MaintenanceStatus::class,
     )]
-    private MaintenanceStatus $status = MaintenanceStatus::ReadOnly;
+    public MaintenanceStatus $status = MaintenanceStatus::ReadOnly;
 
     #[Column(
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $startsAt = null;
+    public ?DateTimeImmutable $startsAt = null;
 
     #[Column(
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $endsAt = null;
-
-    public function getStatus(): MaintenanceStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(MaintenanceStatus $status): void
-    {
-        $this->status = $status;
-    }
-
-    public function getStartsAt(): ?DateTimeImmutable
-    {
-        return $this->startsAt;
-    }
-
-    public function setStartsAt(?DateTimeImmutable $startsAt): void
-    {
-        $this->startsAt = $startsAt;
-    }
-
-    public function getEndsAt(): ?DateTimeImmutable
-    {
-        return $this->endsAt;
-    }
-
-    public function setEndsAt(?DateTimeImmutable $endsAt): void
-    {
-        $this->endsAt = $endsAt;
-    }
+    public ?DateTimeImmutable $endsAt = null;
 
     public function isActiveAt(DateTimeImmutable $now): bool
     {

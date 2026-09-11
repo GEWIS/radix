@@ -64,17 +64,17 @@ final class SecurityNotificationHandlerTest extends TestCase
         $notification = $this->published[0];
         self::assertSame(
             NotificationType::SignIn,
-            $notification->getType(),
+            $notification->type,
         );
         self::assertSame(
             AlertTypes::Warning,
-            $notification->getLevel(),
+            $notification->level,
         );
-        self::assertNotNull($notification->getRecipientUser());
-        self::assertNull($notification->getRecipientCompanyUser());
+        self::assertNotNull($notification->recipientUser);
+        self::assertNull($notification->recipientCompanyUser);
         self::assertSame(
             self::ORIGIN,
-            $notification->getContext(),
+            $notification->context,
         );
     }
 

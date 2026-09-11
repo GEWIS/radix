@@ -90,11 +90,11 @@ class BodyReviewFixture extends Fixture implements DependentFixtureInterface, Fi
 
         $comment = new OrganInformationRevisionComment();
         $comment->attachTo($draft);
-        $comment->setAuthor($this->getReference(
+        $comment->author = $this->getReference(
             'user-8001',
             User::class,
-        ));
-        $comment->setBody('We rewrote the description and moved from Discord to Instagram.');
+        );
+        $comment->body = 'We rewrote the description and moved from Discord to Instagram.';
         $manager->persist($comment);
 
         $manager->flush();

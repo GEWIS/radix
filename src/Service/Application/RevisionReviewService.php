@@ -134,12 +134,12 @@ final readonly class RevisionReviewService
 
         $comment = new $class();
         $comment->attachTo($revision);
-        $comment->setBody($body);
+        $comment->body = $body;
 
         if ($actor instanceof User) {
-            $comment->setAuthor($actor);
+            $comment->author = $actor;
         } else {
-            $comment->setAuthorCompanyUser($actor);
+            $comment->authorCompanyUser = $actor;
         }
 
         return $comment;

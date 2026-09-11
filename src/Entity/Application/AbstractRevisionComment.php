@@ -45,7 +45,7 @@ abstract class AbstractRevisionComment
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?UserModel $author = null;
+    public ?UserModel $author = null;
 
     /**
      * The company user who wrote this comment (careers portal). Mutually exclusive with {@see $author}.
@@ -56,30 +56,10 @@ abstract class AbstractRevisionComment
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?CompanyUserModel $authorCompanyUser = null;
+    public ?CompanyUserModel $authorCompanyUser = null;
 
     #[Column(type: Types::TEXT)]
-    private string $body;
-
-    public function getAuthor(): ?UserModel
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?UserModel $author): void
-    {
-        $this->author = $author;
-    }
-
-    public function getAuthorCompanyUser(): ?CompanyUserModel
-    {
-        return $this->authorCompanyUser;
-    }
-
-    public function setAuthorCompanyUser(?CompanyUserModel $authorCompanyUser): void
-    {
-        $this->authorCompanyUser = $authorCompanyUser;
-    }
+    public string $body;
 
     /**
      * A human-readable name for whoever wrote this comment, whether a member's account or a company user.
@@ -89,16 +69,6 @@ abstract class AbstractRevisionComment
         return $this->author?->getDisplayName()
             ?? $this->authorCompanyUser?->getDisplayName()
             ?? '';
-    }
-
-    public function getBody(): string
-    {
-        return $this->body;
-    }
-
-    public function setBody(string $body): void
-    {
-        $this->body = $body;
     }
 
     /**

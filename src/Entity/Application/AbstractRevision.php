@@ -114,7 +114,7 @@ abstract class AbstractRevision implements RevisionInterface
         type: Types::INTEGER,
         options: ['default' => 1],
     )]
-    private int $version = 1;
+    public private(set) int $version = 1;
 
     /**
      * The user (a member's account) who last saved an edit to this revision. Unlike {@see $author} (fixed when the
@@ -127,7 +127,7 @@ abstract class AbstractRevision implements RevisionInterface
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?UserModel $lastEditedBy = null;
+    public private(set) ?UserModel $lastEditedBy = null;
 
     /**
      * The company user who last saved an edit (careers portal). Mutually exclusive with {@see $lastEditedBy}.
@@ -138,7 +138,7 @@ abstract class AbstractRevision implements RevisionInterface
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?CompanyUserModel $lastEditedByCompanyUser = null;
+    public private(set) ?CompanyUserModel $lastEditedByCompanyUser = null;
 
     #[Override]
     public function getStatus(): RevisionStatus
@@ -257,16 +257,6 @@ abstract class AbstractRevision implements RevisionInterface
         $this->submittedAt = $submittedAt;
     }
 
-    public function getVersion(): int
-    {
-        return $this->version;
-    }
-
-    public function getLastEditedBy(): ?UserModel
-    {
-        return $this->lastEditedBy;
-    }
-
     public function setLastEditedBy(?UserModel $lastEditedBy): void
     {
         $this->lastEditedBy = $lastEditedBy;
@@ -276,11 +266,6 @@ abstract class AbstractRevision implements RevisionInterface
         }
 
         $this->lastEditedByCompanyUser = null;
-    }
-
-    public function getLastEditedByCompanyUser(): ?CompanyUserModel
-    {
-        return $this->lastEditedByCompanyUser;
     }
 
     public function setLastEditedByCompanyUser(?CompanyUserModel $lastEditedByCompanyUser): void

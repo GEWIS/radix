@@ -127,13 +127,13 @@ final class RunNotificationDigestsCommand extends Command
             $sentCategories = [];
             foreach ($this->pendingRepository->findForUser($user) as $queued) {
                 $notification = $queued->notification;
-                $category = $notification->getType()->value;
+                $category = $notification->type->value;
                 if (!isset($dueSubscriptions[$category])) {
                     continue;
                 }
 
-                $type = $notification->getType();
-                $subjectId = $notification->getSubjectId();
+                $type = $notification->type;
+                $subjectId = $notification->subjectId;
                 $name = null === $subjectId
                     ? null
                     : $this->subjectResolver->nameFor(

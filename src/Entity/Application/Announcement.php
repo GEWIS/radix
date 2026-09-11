@@ -28,7 +28,7 @@ class Announcement
         length: 16,
         enumType: AlertTypes::class,
     )]
-    private AlertTypes $level = AlertTypes::Info;
+    public AlertTypes $level = AlertTypes::Info;
 
     #[OneToOne(
         targetEntity: ApplicationLocalisedText::class,
@@ -43,7 +43,7 @@ class Announcement
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ApplicationLocalisedText $title;
+    public ApplicationLocalisedText $title;
 
     #[OneToOne(
         targetEntity: ApplicationLocalisedText::class,
@@ -58,61 +58,11 @@ class Announcement
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ApplicationLocalisedText $body;
+    public ApplicationLocalisedText $body;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $endsAt;
+    public DateTimeImmutable $endsAt;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $createdAt;
-
-    public function getLevel(): AlertTypes
-    {
-        return $this->level;
-    }
-
-    public function setLevel(AlertTypes $level): void
-    {
-        $this->level = $level;
-    }
-
-    public function getTitle(): ApplicationLocalisedText
-    {
-        return $this->title;
-    }
-
-    public function setTitle(ApplicationLocalisedText $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getBody(): ApplicationLocalisedText
-    {
-        return $this->body;
-    }
-
-    public function setBody(ApplicationLocalisedText $body): void
-    {
-        $this->body = $body;
-    }
-
-    public function getEndsAt(): DateTimeImmutable
-    {
-        return $this->endsAt;
-    }
-
-    public function setEndsAt(DateTimeImmutable $endsAt): void
-    {
-        $this->endsAt = $endsAt;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
+    public DateTimeImmutable $createdAt;
 }

@@ -48,6 +48,6 @@ final readonly class MaintenanceStatusProvider
 
     public function status(): MaintenanceStatus
     {
-        return $this->activeWindow()?->getStatus() ?? MaintenanceStatus::None;
+        return $this->activeWindow()->status ?? MaintenanceStatus::None;
     }
 }

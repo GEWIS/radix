@@ -223,7 +223,7 @@ abstract class AbstractSecurityController extends AbstractController
             || $this->userType !== $passwordReset->userType
             || $passwordReset->isExpired()
             || !SplitToken::matches(
-                $passwordReset->getHashedToken(),
+                $passwordReset->hashedToken,
                 $split['verifier'],
                 PasswordReset::HASH_ALGO,
             )

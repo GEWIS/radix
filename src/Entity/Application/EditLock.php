@@ -41,13 +41,13 @@ class EditLock
         type: Types::STRING,
         length: 32,
     )]
-    private string $resourceId;
+    public string $resourceId;
 
     /**
      * The aggregate's primary key within that resource type.
      */
     #[Column(type: Types::INTEGER)]
-    private int $resourceKey;
+    public int $resourceKey;
 
     /**
      * The user (a member's account) holding the lock. Mutually exclusive with {@see $lockedByCompanyUser}. Nulled out
@@ -60,7 +60,7 @@ class EditLock
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?UserModel $lockedBy = null;
+    public ?UserModel $lockedBy = null;
 
     /**
      * The company user holding the lock (careers portal). Mutually exclusive with {@see $lockedBy}.
@@ -71,73 +71,13 @@ class EditLock
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?CompanyUserModel $lockedByCompanyUser = null;
+    public ?CompanyUserModel $lockedByCompanyUser = null;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $acquiredAt;
+    public DateTime $acquiredAt;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $lastPingAt;
-
-    public function getResourceId(): string
-    {
-        return $this->resourceId;
-    }
-
-    public function setResourceId(string $resourceId): void
-    {
-        $this->resourceId = $resourceId;
-    }
-
-    public function getResourceKey(): int
-    {
-        return $this->resourceKey;
-    }
-
-    public function setResourceKey(int $resourceKey): void
-    {
-        $this->resourceKey = $resourceKey;
-    }
-
-    public function getLockedBy(): ?UserModel
-    {
-        return $this->lockedBy;
-    }
-
-    public function setLockedBy(?UserModel $lockedBy): void
-    {
-        $this->lockedBy = $lockedBy;
-    }
-
-    public function getLockedByCompanyUser(): ?CompanyUserModel
-    {
-        return $this->lockedByCompanyUser;
-    }
-
-    public function setLockedByCompanyUser(?CompanyUserModel $lockedByCompanyUser): void
-    {
-        $this->lockedByCompanyUser = $lockedByCompanyUser;
-    }
-
-    public function getAcquiredAt(): DateTime
-    {
-        return $this->acquiredAt;
-    }
-
-    public function setAcquiredAt(DateTime $acquiredAt): void
-    {
-        $this->acquiredAt = $acquiredAt;
-    }
-
-    public function getLastPingAt(): DateTime
-    {
-        return $this->lastPingAt;
-    }
-
-    public function setLastPingAt(DateTime $lastPingAt): void
-    {
-        $this->lastPingAt = $lastPingAt;
-    }
+    public DateTime $lastPingAt;
 
     /**
      * A human-readable name for whoever holds the lock, whether a member's account or a company user.

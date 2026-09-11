@@ -204,7 +204,7 @@ final class SignupManagerTest extends DatabaseTestCase
         );
         // ... and it expires after the one-day double-opt-in window.
         $this->assertExpiresAround(
-            $verification->getExpiresAt(),
+            $verification->expiresAt,
             '+1 day',
         );
 
@@ -214,7 +214,7 @@ final class SignupManagerTest extends DatabaseTestCase
             $this->sentPurposes(),
         );
         self::assertSame(
-            $verification->getSelector(),
+            $verification->selector,
             $this->selectorOf($this->sentTokenEmails()[0]),
         );
     }
@@ -270,7 +270,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ExternalSignupVerificationPurpose::Manage,
         );
         $this->assertExpiresAround(
-            $manage->getExpiresAt(),
+            $manage->expiresAt,
             '+1 year',
         );
         // The manage link is emailed, after the earlier verify email.
@@ -293,7 +293,7 @@ final class SignupManagerTest extends DatabaseTestCase
         $selector = $this->tokenFor(
             $signup,
             ExternalSignupVerificationPurpose::Verify,
-        )->getSelector();
+        )->selector;
 
         $this->signupManager()->withdraw($signup);
 
@@ -354,7 +354,7 @@ final class SignupManagerTest extends DatabaseTestCase
         $originalSelector = $this->tokenFor(
             $signup,
             ExternalSignupVerificationPurpose::Verify,
-        )->getSelector();
+        )->selector;
 
         $this->signupManager()->resendVerification(
             $list,

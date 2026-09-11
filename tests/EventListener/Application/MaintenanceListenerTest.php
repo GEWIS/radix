@@ -407,7 +407,7 @@ final class MaintenanceListenerTest extends TestCase
     private function window(MaintenanceStatus $status): MaintenanceWindow
     {
         $window = new MaintenanceWindow();
-        $window->setStatus($status);
+        $window->status = $status;
 
         return $window;
     }

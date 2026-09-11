@@ -37,7 +37,7 @@ trait HasSocialLinksTrait
     {
         $handles = [];
         foreach ($this->getSocialLinks() as $link) {
-            $handles[$link->getPlatform()->value] = $link->getHandle();
+            $handles[$link->getPlatform()->value] = $link->handle;
         }
 
         return $handles;

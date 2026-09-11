@@ -57,8 +57,8 @@ class AnnouncementController extends AbstractController
     public function create(Request $request): Response
     {
         $announcement = new Announcement();
-        $announcement->setTitle(new ApplicationLocalisedText());
-        $announcement->setBody(new ApplicationLocalisedText());
+        $announcement->title = new ApplicationLocalisedText();
+        $announcement->body = new ApplicationLocalisedText();
 
         $form = $this->createForm(
             AnnouncementType::class,

@@ -134,7 +134,7 @@ final readonly class MaintenanceListener
             return;
         }
 
-        if (MaintenanceStatus::Full === $window->getStatus()) {
+        if (MaintenanceStatus::Full === $window->status) {
             $event->setResponse($this->maintenancePage());
 
             return;

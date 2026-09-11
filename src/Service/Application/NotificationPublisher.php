@@ -49,9 +49,9 @@ final class NotificationPublisher
         AlertTypes $level = AlertTypes::Info,
     ): void {
         $notification = new Notification();
-        $notification->setType($type);
-        $notification->setLevel($level);
-        $notification->setContext($context);
+        $notification->type = $type;
+        $notification->level = $level;
+        $notification->context = $context;
         $notification->setRecipient(
             $recipient instanceof User ? $recipient : null,
             $recipient instanceof CompanyUser ? $recipient : null,
@@ -62,7 +62,7 @@ final class NotificationPublisher
 
     public function publish(Notification $notification): void
     {
-        $notification->setCreatedAt(new DateTimeImmutable());
+        $notification->createdAt = new DateTimeImmutable();
         $this->entityManager->persist($notification);
         $this->entityManager->flush();
 

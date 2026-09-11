@@ -138,7 +138,7 @@ class CompanyInviteController extends AbstractController
             null === $invite
             || $invite->isExpired()
             || !SplitToken::matches(
-                $invite->getHashedToken(),
+                $invite->hashedToken,
                 $split['verifier'],
                 CompanyUserInvite::HASH_ALGO,
             )

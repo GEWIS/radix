@@ -20,7 +20,7 @@ final class MaintenanceWindowTest extends TestCase
     public function testAWindowIsNotActiveBeforeItsStart(): void
     {
         $window = new MaintenanceWindow();
-        $window->setStartsAt(new DateTimeImmutable('2026-06-01 12:00'));
+        $window->startsAt = new DateTimeImmutable('2026-06-01 12:00');
 
         self::assertFalse($window->isActiveAt(new DateTimeImmutable('2026-06-01 11:59')));
         self::assertTrue($window->isActiveAt(new DateTimeImmutable('2026-06-01 12:00')));
@@ -29,7 +29,7 @@ final class MaintenanceWindowTest extends TestCase
     public function testAWindowIsNotActiveOnceItsEndPasses(): void
     {
         $window = new MaintenanceWindow();
-        $window->setEndsAt(new DateTimeImmutable('2026-06-01 12:00'));
+        $window->endsAt = new DateTimeImmutable('2026-06-01 12:00');
 
         self::assertTrue($window->isActiveAt(new DateTimeImmutable('2026-06-01 11:59')));
         self::assertFalse($window->isActiveAt(new DateTimeImmutable('2026-06-01 12:00')));
@@ -81,8 +81,8 @@ final class MaintenanceWindowTest extends TestCase
         string $end,
     ): MaintenanceWindow {
         $window = new MaintenanceWindow();
-        $window->setStartsAt(new DateTimeImmutable($start));
-        $window->setEndsAt(new DateTimeImmutable($end));
+        $window->startsAt = new DateTimeImmutable($start);
+        $window->endsAt = new DateTimeImmutable($end);
 
         return $window;
     }

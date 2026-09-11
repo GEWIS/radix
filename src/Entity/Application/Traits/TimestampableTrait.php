@@ -26,27 +26,14 @@ trait TimestampableTrait
     /**
      * The date at which the entity was updated.
      */
+    // Written by the class that is persisted rather than by the one that declares the column: an audit entry is
+    // stamped by whichever kind of entry it is.
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $updatedAt;
+    public protected(set) DateTime $updatedAt;
 
     public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
-    }
-
-    private function setCreatedAt(DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    private function setUpdatedAt(DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
     }
 
     /**
@@ -57,8 +44,8 @@ trait TimestampableTrait
     {
         $now = new DateTime();
 
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
     }
 
     /**
@@ -67,6 +54,6 @@ trait TimestampableTrait
     #[PreUpdate]
     public function preUpdate(): void
     {
-        $this->setUpdatedAt(new DateTime());
+        $this->updatedAt = new DateTime();
     }
 }

@@ -48,7 +48,7 @@ final readonly class AuditEntryRow
         );
 
         return new self(
-            $entry->getUpdatedAt(),
+            $entry->updatedAt,
             vsprintf(
                 $translator->trans($string['bodyFormatted']),
                 $arguments,

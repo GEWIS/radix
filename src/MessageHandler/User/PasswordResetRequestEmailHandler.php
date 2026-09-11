@@ -86,7 +86,7 @@ class PasswordResetRequestEmailHandler
             $minimumLifetime = new DateTimeImmutable('now')
                 ->add(new DateInterval('PT' . self::ACTIVE_TOKEN_REUSE_GRACE_SECONDS . 'S'));
 
-            if ($existingReset->getExpiresAt() > $minimumLifetime) {
+            if ($existingReset->expiresAt > $minimumLifetime) {
                 return;
             }
         }

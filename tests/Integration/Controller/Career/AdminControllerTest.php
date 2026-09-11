@@ -187,8 +187,8 @@ final class AdminControllerTest extends DatabaseTestCase
 
         $comment = new CompanyRevisionComment();
         $comment->setRevision($revision);
-        $comment->setAuthor($this->user());
-        $comment->setBody('Please shorten the slogan.');
+        $comment->author = $this->user();
+        $comment->body = 'Please shorten the slogan.';
         $this->entityManager->persist($comment);
         $this->entityManager->flush();
 

@@ -136,6 +136,6 @@ class MeetingDocument
             return;
         }
 
-        $this->setUpdatedAt(new DateTime());
+        $this->updatedAt = new DateTime();
     }
 }

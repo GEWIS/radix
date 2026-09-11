@@ -188,7 +188,7 @@ class AdminController extends AbstractController
 
         $session->set(
             $key,
-            $revision->getVersion(),
+            $revision->version,
         );
         $session->set(
             $key . '.run',

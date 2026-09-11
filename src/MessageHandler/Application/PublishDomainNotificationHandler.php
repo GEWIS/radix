@@ -49,8 +49,8 @@ class PublishDomainNotificationHandler
         }
 
         $notification = new Notification();
-        $notification->setType($type);
-        $notification->setSubjectId($subjectId);
+        $notification->type = $type;
+        $notification->subjectId = $subjectId;
         $notification->setRecipient(
             null,
             null,

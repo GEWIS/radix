@@ -89,8 +89,8 @@ class MaintenanceType extends AbstractType
             return;
         }
 
-        $startsAt = $window->getStartsAt();
-        $endsAt = $window->getEndsAt();
+        $startsAt = $window->startsAt;
+        $endsAt = $window->endsAt;
         if (
             $startsAt instanceof DateTimeImmutable
             && $endsAt instanceof DateTimeImmutable

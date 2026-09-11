@@ -27,7 +27,7 @@ final class MaintenanceControllerTest extends DatabaseTestCase
         $this->pushRequest();
 
         $window = new MaintenanceWindow();
-        $window->setStatus(MaintenanceStatus::ReadOnly);
+        $window->status = MaintenanceStatus::ReadOnly;
         $this->entityManager->persist($window);
         $this->entityManager->flush();
 
@@ -93,7 +93,7 @@ final class MaintenanceControllerTest extends DatabaseTestCase
         $this->pushRequest();
 
         $window = new MaintenanceWindow();
-        $window->setStatus($status);
+        $window->status = $status;
         $this->entityManager->persist($window);
         $this->entityManager->flush();
 

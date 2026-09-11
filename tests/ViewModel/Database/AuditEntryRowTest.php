@@ -128,15 +128,10 @@ class AuditEntryRowTest extends TestCase
             public function __construct(
                 private readonly string $bodyFormatted,
                 private readonly array $arguments,
-                private readonly DateTime $when,
+                DateTime $when,
                 private readonly ?int $who,
             ) {
-            }
-
-            #[Override]
-            public function getUpdatedAt(): DateTime
-            {
-                return $this->when;
+                $this->updatedAt = $when;
             }
 
             #[Override]

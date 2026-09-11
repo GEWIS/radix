@@ -94,7 +94,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
             'Twice Invited',
             null,
         );
-        $selector = $first->getSelector();
+        $selector = $first->selector;
 
         $second = $service->invite(
             $company,
@@ -109,7 +109,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
         );
         self::assertNotSame(
             $selector,
-            $second->getSelector(),
+            $second->selector,
         );
         self::assertCount(
             2,

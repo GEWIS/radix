@@ -62,7 +62,7 @@ class Notification
         length: 64,
         enumType: NotificationType::class,
     )]
-    private NotificationType $type;
+    public NotificationType $type;
 
     /**
      * The primary key of whatever this notification is about, read through {@see NotificationType}. A subject may
@@ -74,7 +74,7 @@ class Notification
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $subjectId = null;
+    public ?int $subjectId = null;
 
     /**
      * What a notification with no subject to point at has to say for itself, frozen when it was published. Such a
@@ -90,7 +90,7 @@ class Notification
         type: Types::JSON,
         nullable: true,
     )]
-    private ?array $context = null;
+    public ?array $context = null;
 
     /**
      * Who this notification is addressed to, or nobody in particular when both are null and it goes to everyone.
@@ -105,7 +105,7 @@ class Notification
         nullable: true,
         onDelete: 'CASCADE',
     )]
-    private ?User $recipientUser = null;
+    public private(set) ?User $recipientUser = null;
 
     /**
      * Addressed to whoever holds a role rather than to one account, for something a group is responsible for. Kept as
@@ -118,7 +118,7 @@ class Notification
         nullable: true,
         enumType: UserRoles::class,
     )]
-    private ?UserRoles $recipientRole = null;
+    public private(set) ?UserRoles $recipientRole = null;
 
     #[ManyToOne(targetEntity: CompanyUser::class)]
     #[JoinColumn(
@@ -127,68 +127,17 @@ class Notification
         nullable: true,
         onDelete: 'CASCADE',
     )]
-    private ?CompanyUser $recipientCompanyUser = null;
+    public private(set) ?CompanyUser $recipientCompanyUser = null;
 
     #[Column(
         type: Types::STRING,
         length: 16,
         enumType: AlertTypes::class,
     )]
-    private AlertTypes $level = AlertTypes::Info;
+    public AlertTypes $level = AlertTypes::Info;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $createdAt;
-
-    public function getType(): NotificationType
-    {
-        return $this->type;
-    }
-
-    public function setType(NotificationType $type): void
-    {
-        $this->type = $type;
-    }
-
-    public function getSubjectId(): ?int
-    {
-        return $this->subjectId;
-    }
-
-    public function setSubjectId(?int $subjectId): void
-    {
-        $this->subjectId = $subjectId;
-    }
-
-    /**
-     * @return array<string, string>|null
-     */
-    public function getContext(): ?array
-    {
-        return $this->context;
-    }
-
-    /**
-     * @param array<string, string>|null $context
-     */
-    public function setContext(?array $context): void
-    {
-        $this->context = $context;
-    }
-
-    public function getRecipientUser(): ?User
-    {
-        return $this->recipientUser;
-    }
-
-    public function getRecipientCompanyUser(): ?CompanyUser
-    {
-        return $this->recipientCompanyUser;
-    }
-
-    public function getRecipientRole(): ?UserRoles
-    {
-        return $this->recipientRole;
-    }
+    public DateTimeImmutable $createdAt;
 
     public function hasRecipient(): bool
     {
@@ -221,25 +170,5 @@ class Notification
         $this->recipientUser = $user;
         $this->recipientCompanyUser = $companyUser;
         $this->recipientRole = $role;
-    }
-
-    public function getLevel(): AlertTypes
-    {
-        return $this->level;
-    }
-
-    public function setLevel(AlertTypes $level): void
-    {
-        $this->level = $level;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
-    {
-        $this->createdAt = $createdAt;
     }
 }

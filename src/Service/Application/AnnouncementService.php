@@ -36,9 +36,9 @@ final readonly class AnnouncementService
         ?DateTimeImmutable $endsAt,
     ): void {
         $this->realtimeNotifier->toPublic(new RealtimePayload(
-            $announcement->getLevel(),
-            $announcement->getBody()->toArray(),
-            title: $announcement->getTitle()->toArray(),
+            $announcement->level,
+            $announcement->body->toArray(),
+            title: $announcement->title->toArray(),
         ));
 
         if (
@@ -48,8 +48,8 @@ final readonly class AnnouncementService
             return;
         }
 
-        $announcement->setEndsAt($endsAt);
-        $announcement->setCreatedAt(new DateTimeImmutable());
+        $announcement->endsAt = $endsAt;
+        $announcement->createdAt = new DateTimeImmutable();
 
         $this->entityManager->persist($announcement);
         $this->entityManager->flush();

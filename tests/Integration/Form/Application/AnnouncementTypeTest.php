@@ -33,10 +33,10 @@ final class AnnouncementTypeTest extends DatabaseTestCase
 
         self::assertTrue($form->isValid());
         // Empty Dutch is normalised to null, so it falls back to the English value.
-        self::assertNull($announcement->getTitle()->getValueNL());
+        self::assertNull($announcement->title->getValueNL());
         self::assertSame(
             'Hello',
-            $announcement->getTitle()->getText(Languages::Dutch),
+            $announcement->title->getText(Languages::Dutch),
         );
     }
 
@@ -66,8 +66,8 @@ final class AnnouncementTypeTest extends DatabaseTestCase
     private function submit(array $data): array
     {
         $announcement = new Announcement();
-        $announcement->setTitle(new ApplicationLocalisedText());
-        $announcement->setBody(new ApplicationLocalisedText());
+        $announcement->title = new ApplicationLocalisedText();
+        $announcement->body = new ApplicationLocalisedText();
 
         $form = self::getContainer()->get(FormFactoryInterface::class)->create(
             AnnouncementType::class,
