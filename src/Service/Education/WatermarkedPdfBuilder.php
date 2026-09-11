@@ -62,7 +62,7 @@ final readonly class WatermarkedPdfBuilder
         if ($pages->isEmpty()) {
             throw new RuntimeException(sprintf(
                 'Course document %d has no rendered pages to rebuild from.',
-                $document->getId() ?? 0,
+                $document->id ?? 0,
             ));
         }
 

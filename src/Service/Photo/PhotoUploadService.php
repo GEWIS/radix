@@ -83,7 +83,7 @@ final readonly class PhotoUploadService
         }
 
         if ($created > 0) {
-            $this->messageBus->dispatch(new GenerateAlbumCoverMessage(intval($album->getId())));
+            $this->messageBus->dispatch(new GenerateAlbumCoverMessage(intval($album->id)));
             // Only genuine EXIF capture times may adjust the album's date range; a no-EXIF photo (scan, export) keeps
             // the upload time for ordering but must never drag a board-curated range to today.
             $this->widenDateRange(
@@ -174,7 +174,7 @@ final readonly class PhotoUploadService
             $stored = $this->fileStorage->store(
                 StorageNamespace::PhotoOriginal,
                 $file->getPathname(),
-                strval($album->getId()),
+                strval($album->id),
             );
 
             if (

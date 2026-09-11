@@ -1167,7 +1167,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     'createdAt' => $at->format('Y-m-d H:i:s'),
                     'updatedAt' => $at->format('Y-m-d H:i:s'),
                 ],
-                ['id' => $signup->getId()],
+                ['id' => $signup->id],
             );
         }
     }

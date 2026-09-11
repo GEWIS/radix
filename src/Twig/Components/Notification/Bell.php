@@ -163,7 +163,7 @@ class Bell
         $currentSince = null;
 
         foreach ($notifications as $notification) {
-            $id = $notification->getId();
+            $id = $notification->id;
             if (null === $id) {
                 continue;
             }
@@ -370,7 +370,7 @@ class Bell
 
         $touched = false;
         foreach ($this->getEntries() as $entry) {
-            foreach (null === $entry['notification']->getId() ? [] : $entry['ids'] as $id) {
+            foreach (null === $entry['notification']->id ? [] : $entry['ids'] as $id) {
                 if (
                     !in_array(
                         $id,

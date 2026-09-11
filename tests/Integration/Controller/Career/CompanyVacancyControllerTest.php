@@ -152,7 +152,7 @@ final class CompanyVacancyControllerTest extends DatabaseTestCase
             $live,
             $draft,
         );
-        $draftId = (int) $draft?->getId();
+        $draftId = (int) $draft?->id;
 
         $this->controller()->discard(
             $vacancy,

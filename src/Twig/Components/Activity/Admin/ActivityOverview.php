@@ -158,7 +158,7 @@ final class ActivityOverview extends AbstractDoctrinePaginatedOverview
     {
         $ids = [];
         foreach ($this->getMember()->getCurrentOrganInstallations() as $installation) {
-            $id = $installation->organ->getId();
+            $id = $installation->organ->id;
             if (null === $id) {
                 continue;
             }

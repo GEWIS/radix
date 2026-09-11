@@ -188,7 +188,7 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             $revision,
         );
         $list = self::getContainer()->get(ActivityAdminService::class)->addSignupList($revision);
-        $listId = (int) $list->getId();
+        $listId = (int) $list->id;
         $step = ActivityFlowType::listStep(
             $list,
             SignupListSection::Basics,

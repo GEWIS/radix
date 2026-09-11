@@ -83,7 +83,7 @@ class AdminProposalDecisionController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_date_option_approve-" ~ args["option"].getId()'),
+        id: new Expression('"activity_date_option_approve-" ~ args["option"].id'),
         tokenKey: '_csrf_token',
     )]
     public function approveOption(
@@ -131,7 +131,7 @@ class AdminProposalDecisionController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_proposal_decline-" ~ args["proposal"].getId()'),
+        id: new Expression('"activity_proposal_decline-" ~ args["proposal"].id'),
         tokenKey: '_csrf_token',
     )]
     public function decline(
@@ -177,7 +177,7 @@ class AdminProposalDecisionController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_proposal_clearance-" ~ args["proposal"].getId()'),
+        id: new Expression('"activity_proposal_clearance-" ~ args["proposal"].id'),
         tokenKey: '_csrf_token',
     )]
     public function clearance(

@@ -103,7 +103,7 @@ final readonly class AlbumCoverService
         // Content-address the mosaic within the album's own scope, so an unchanged album keeps the same cover path.
         $path = sprintf(
             '%s/%s.webp',
-            StorageNamespace::PhotoCover->directory((string) $album->getId()),
+            StorageNamespace::PhotoCover->directory((string) $album->id),
             hash(
                 'sha256',
                 $bytes,

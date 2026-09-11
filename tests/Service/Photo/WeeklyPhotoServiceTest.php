@@ -300,7 +300,7 @@ final class WeeklyPhotoServiceTest extends TestCase
         $weeklyPhotoRepository->method('getCurrentPhotoOfTheWeek')->willReturn($current);
         $weeklyPhotoRepository->method('hasBeenPhotoOfTheWeek')->willReturnCallback(
             static fn (Photo $photo): bool => in_array(
-                $photo->getId(),
+                $photo->id,
                 $repeats,
                 true,
             ),

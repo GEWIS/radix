@@ -139,7 +139,7 @@ class AdminController extends AbstractController
             return $this->redirectToRoute(
                 'admin/activities/edit',
                 [
-                    'activity' => $activity->getId(),
+                    'activity' => $activity->id,
                     'flow' => $run,
                 ],
             );
@@ -180,7 +180,7 @@ class AdminController extends AbstractController
 
         if (
             $flow->isSubmitted()
-            || null === $revision->getId()
+            || null === $revision->id
             || $run === $session->get($key . '.run')
         ) {
             return;
@@ -215,7 +215,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_signup_lists-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_signup_lists-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function addSignupList(
@@ -249,7 +249,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_signup_lists-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_signup_lists-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function removeSignupList(
@@ -285,7 +285,7 @@ class AdminController extends AbstractController
         Request $request,
         Activity $activity,
     ): RedirectResponse {
-        $parameters = ['activity' => $activity->getId()];
+        $parameters = ['activity' => $activity->id];
         $run = $request->query->getString('flow');
 
         if ('' !== $run) {
@@ -453,7 +453,7 @@ class AdminController extends AbstractController
                 'revision' => $revision,
                 'schedule_locked' => $scheduleLocked,
                 'company_editable' => $companyEditable,
-                'bound_organ_id' => $revision->organ?->getId(),
+                'bound_organ_id' => $revision->organ?->id,
                 'finish_label' => $this->translator->trans('Save changes'),
             ],
         );
@@ -478,7 +478,7 @@ class AdminController extends AbstractController
                 return $this->redirectToRoute(
                     'admin/activities/edit',
                     [
-                        'activity' => $activity->getId(),
+                        'activity' => $activity->id,
                         'flow' => $run,
                     ],
                 );
@@ -527,7 +527,7 @@ class AdminController extends AbstractController
         // Optimistic-locking backstop for an in-place draft edit (a spawned draft is brand-new, nothing to race). The
         // base version is read from the server-side session (stamped when the form was opened), never from the request,
         // so it cannot be forged to slip a stale edit past the check.
-        if (null !== $revision->getId()) {
+        if (null !== $revision->id) {
             $baseVersion = $request->getSession()->get($this->editVersionKey($activity));
             if (!is_int($baseVersion)) {
                 return $this->flashAndBackToEdit(
@@ -612,7 +612,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_edit_lock-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_edit_lock-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function editPing(
@@ -633,7 +633,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_edit_lock-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_edit_lock-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function editRelease(
@@ -654,7 +654,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_reopen-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_reopen-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function reopen(
@@ -721,7 +721,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/activities/edit',
-            ['activity' => $activity->getId()],
+            ['activity' => $activity->id],
         );
     }
 
@@ -743,7 +743,7 @@ class AdminController extends AbstractController
     )]
     #[IsGranted(UserRoles::Board->value)]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_cancel-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_cancel-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function cancel(
@@ -788,7 +788,7 @@ class AdminController extends AbstractController
     )]
     #[IsGranted(UserRoles::Board->value)]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_uncancel-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_uncancel-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function uncancel(Activity $activity): Response
@@ -824,7 +824,7 @@ class AdminController extends AbstractController
     )]
     #[IsGranted(UserRoles::Board->value)]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_unpublish-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_unpublish-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function unpublish(
@@ -868,7 +868,7 @@ class AdminController extends AbstractController
     )]
     #[IsGranted(UserRoles::Board->value)]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_republish-" ~ args["activity"].getId()'),
+        id: new Expression('"activity_republish-" ~ args["activity"].id'),
         tokenKey: '_csrf_token',
     )]
     public function republish(Activity $activity): Response
@@ -1085,7 +1085,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/activities/edit',
-            ['activity' => $activity->getId()],
+            ['activity' => $activity->id],
         );
     }
 
@@ -1104,7 +1104,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/activities/signups',
-            ['activity' => $activity->getId()],
+            ['activity' => $activity->id],
         );
     }
 
@@ -1114,6 +1114,6 @@ class AdminController extends AbstractController
      */
     private function editVersionKey(Activity $activity): string
     {
-        return 'activity-edit-base-version-' . strval($activity->getId());
+        return 'activity-edit-base-version-' . strval($activity->id);
     }
 }

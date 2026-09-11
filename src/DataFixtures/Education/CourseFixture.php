@@ -205,7 +205,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
 
         $page = new CourseDocumentPage();
         $page->pageNumber = 1;
-        $page->path = $this->storePage(strval($document->getId()));
+        $page->path = $this->storePage(strval($document->id));
         $page->width = 1240;
         $page->height = 1754;
 

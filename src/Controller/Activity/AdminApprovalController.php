@@ -96,7 +96,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_review_comment-" ~ args["revision"].getId()'),
+        id: new Expression('"activity_review_comment-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function comment(
@@ -127,7 +127,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_discard-" ~ args["revision"].getId()'),
+        id: new Expression('"activity_discard-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function discard(ActivityRevision $revision): Response
@@ -230,7 +230,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
     {
         return $this->redirectToRoute(
             'admin/activities/approvals/review',
-            ['revision' => $revision->getId()],
+            ['revision' => $revision->id],
         );
     }
 }

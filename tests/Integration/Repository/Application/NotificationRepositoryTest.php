@@ -27,16 +27,16 @@ final class NotificationRepositoryTest extends DatabaseTestCase
             $recent,
         );
         self::assertSame(
-            $seeded['new']->getId(),
-            $recent[0]->getId(),
+            $seeded['new']->id,
+            $recent[0]->id,
         );
         self::assertSame(
-            $seeded['mid']->getId(),
-            $recent[1]->getId(),
+            $seeded['mid']->id,
+            $recent[1]->id,
         );
         self::assertSame(
-            $seeded['old']->getId(),
-            $recent[2]->getId(),
+            $seeded['old']->id,
+            $recent[2]->id,
         );
     }
 
@@ -62,11 +62,11 @@ final class NotificationRepositoryTest extends DatabaseTestCase
         $this->entityManager->flush();
 
         self::assertSame(
-            [$mine->getId()],
+            [$mine->id],
             $this->ids($this->findFor(8025)),
         );
         self::assertSame(
-            [$theirs->getId()],
+            [$theirs->id],
             $this->ids($this->findFor(8000)),
         );
     }
@@ -169,7 +169,7 @@ final class NotificationRepositoryTest extends DatabaseTestCase
     private function ids(array $notifications): array
     {
         return array_map(
-            static fn (Notification $notification): ?int => $notification->getId(),
+            static fn (Notification $notification): ?int => $notification->id,
             $notifications,
         );
     }

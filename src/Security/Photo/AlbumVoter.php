@@ -107,7 +107,7 @@ final class AlbumVoter extends Voter
             return true;
         }
 
-        $albumId = $album->getId();
+        $albumId = $album->id;
         if (null === $albumId) {
             return false;
         }

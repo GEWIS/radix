@@ -78,7 +78,7 @@ class ReferenceDocumentRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             ':document',
-            $document->getId(),
+            $document->id,
             Types::INTEGER,
         );
 

@@ -41,7 +41,7 @@ final readonly class ProfilePhotoService
     ): bool {
         if (
             null === $this->memberTagRepository->findTag(
-                (int) $photo->getId(),
+                (int) $photo->id,
                 $member->lidnr,
             )
             || null !== $this->hiddenPhotoRepository->findByMemberAndPhoto(

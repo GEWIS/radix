@@ -148,7 +148,7 @@ final class ActivityControllerTest extends DatabaseTestCase
             $activity,
         );
 
-        return (int) $activity->getId();
+        return (int) $activity->id;
     }
 
     private function pushRequest(): void

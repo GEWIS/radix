@@ -226,7 +226,7 @@ class PollComment
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'createdOn' => $this->createdOn->format(DateTimeInterface::ATOM),
             'author' => $this->author,
             'content' => $this->content,

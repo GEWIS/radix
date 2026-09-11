@@ -136,7 +136,7 @@ final class LapseOverdueOptionsCommand extends Command
             ) {
                 $this->logger->warning(
                     'A reserved day could not be released.',
-                    ['proposal' => $proposal->getId()],
+                    ['proposal' => $proposal->id],
                 );
 
                 continue;
@@ -192,7 +192,7 @@ final class LapseOverdueOptionsCommand extends Command
 
     private function tell(ActivityProposal $proposal): void
     {
-        $proposalId = $proposal->getId();
+        $proposalId = $proposal->id;
 
         if (null === $proposalId) {
             return;

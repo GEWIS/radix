@@ -110,7 +110,7 @@ class UnclaimedPageAddressValidator extends ConstraintValidator
 
             if (
                 null === $existing
-                || $existing->getId() === $value->pageId
+                || $existing->id === $value->pageId
             ) {
                 continue;
             }

@@ -130,10 +130,10 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         $vacancyIds = [];
         $revisionIds = [];
         foreach ($package->getVacancies() as $vacancy) {
-            $vacancyIds[] = $vacancy->getId();
+            $vacancyIds[] = $vacancy->id;
 
             foreach ($vacancy->getRevisions() as $revision) {
-                $revisionIds[] = $revision->getId();
+                $revisionIds[] = $revision->id;
             }
         }
 

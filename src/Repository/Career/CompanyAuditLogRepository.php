@@ -48,7 +48,7 @@ class CompanyAuditLogRepository extends ServiceEntityRepository
             ->where('log.company = :company')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->orderBy(

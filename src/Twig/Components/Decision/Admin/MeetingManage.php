@@ -145,14 +145,14 @@ final class MeetingManage
     {
         $selectionsByDocumentId = [];
         foreach ($this->getView()->references as $selection) {
-            $selectionsByDocumentId[(int) $selection->referenceDocument->getId()] = $selection;
+            $selectionsByDocumentId[(int) $selection->referenceDocument->id] = $selection;
         }
 
         $options = [];
         foreach ($this->referenceDocumentRepository->findAllWithUsageCounts() as [$document]) {
             $options[] = [
                 'document' => $document,
-                'selection' => $selectionsByDocumentId[(int) $document->getId()] ?? null,
+                'selection' => $selectionsByDocumentId[(int) $document->id] ?? null,
             ];
         }
 
@@ -212,17 +212,17 @@ final class MeetingManage
     private function seedEdits(MeetingView $view): void
     {
         foreach ($view->points as $pointView) {
-            $id = (string) $pointView->point->getId();
+            $id = (string) $pointView->point->id;
             $this->pointEdits[$id]['number'] ??= $pointView->point->number;
             $this->pointEdits[$id]['title'] ??= $pointView->point->title;
 
             foreach ($pointView->documents as $document) {
-                $this->documentEdits[(string) $document->getId()]['name'] ??= $document->name;
+                $this->documentEdits[(string) $document->id]['name'] ??= $document->name;
             }
         }
 
         foreach ($view->meetingLevelDocuments as $document) {
-            $this->documentEdits[(string) $document->getId()]['name'] ??= $document->name;
+            $this->documentEdits[(string) $document->id]['name'] ??= $document->name;
         }
 
         foreach ($view->references as $selection) {
@@ -232,7 +232,7 @@ final class MeetingManage
                 continue;
             }
 
-            $this->pins[(string) $selection->referenceDocument->getId()] ??= (string) $version->getId();
+            $this->pins[(string) $selection->referenceDocument->id] ??= (string) $version->id;
         }
 
         $this->details['startTime'] ??= $view->localDetails?->startTime?->format('H:i') ?? '';
@@ -324,7 +324,7 @@ final class MeetingManage
 
             $version = null;
             foreach ($document->getVersions() as $candidate) {
-                if ($candidate->getId() === (int) $versionId) {
+                if ($candidate->id === (int) $versionId) {
                     $version = $candidate;
                     break;
                 }
@@ -657,7 +657,7 @@ final class MeetingManage
     private function selectionFor(ReferenceDocument $document): ?MeetingReferenceSelection
     {
         foreach ($this->getView()->references as $selection) {
-            if ($selection->referenceDocument->getId() === $document->getId()) {
+            if ($selection->referenceDocument->id === $document->id) {
                 return $selection;
             }
         }

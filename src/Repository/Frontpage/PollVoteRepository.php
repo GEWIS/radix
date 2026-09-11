@@ -96,7 +96,7 @@ class PollVoteRepository extends ServiceEntityRepository
             ->where('v.poll = :poll')
             ->setParameter(
                 'poll',
-                $poll->getId(),
+                $poll->id,
             )
             ->groupBy('v.pollOption')
             ->getQuery()
@@ -121,7 +121,7 @@ class PollVoteRepository extends ServiceEntityRepository
             ->where('v.poll = :poll')
             ->setParameter(
                 'poll',
-                $poll->getId(),
+                $poll->id,
             )
             ->getQuery()
             ->execute());

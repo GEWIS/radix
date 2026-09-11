@@ -131,7 +131,7 @@ class AdminProposalLimitController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"proposal_limit_delete-" ~ args["limit"].getId()'),
+        id: new Expression('"proposal_limit_delete-" ~ args["limit"].id'),
         tokenKey: '_csrf_token',
     )]
     public function delete(ProposalLimit $limit): Response

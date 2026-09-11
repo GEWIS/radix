@@ -85,7 +85,7 @@ final readonly class StaleRevisionCleaner
 
                 // Anything behind the head is the chain's history, which is not abandoned work but the record of how
                 // the live version came about.
-                if ($revisable->getCurrentRevision()?->getId() !== $revision->getId()) {
+                if ($revisable->getCurrentRevision()?->id !== $revision->id) {
                     continue;
                 }
 
@@ -110,9 +110,9 @@ final readonly class StaleRevisionCleaner
                     $this->logger->info(sprintf(
                         '%s #%d: discarded abandoned %s revision #%d; reverted to the live version.',
                         $revisable->getResourceId(),
-                        $revisable->getId() ?? 0,
+                        $revisable->id ?? 0,
                         $revision->getStatus()->value,
-                        $revision->getId() ?? 0,
+                        $revision->id ?? 0,
                     ));
 
                     continue;
@@ -131,7 +131,7 @@ final readonly class StaleRevisionCleaner
                         $this->logger->warning(sprintf(
                             '%s #%d: abandoned %s revision kept because %s.',
                             $revisable->getResourceId(),
-                            $revisable->getId() ?? 0,
+                            $revisable->id ?? 0,
                             $revision->getStatus()->value,
                             $blockedBy->reason,
                         ));
@@ -158,7 +158,7 @@ final readonly class StaleRevisionCleaner
                     $this->logger->info(sprintf(
                         '%s #%d: deleted entirely (never approved, abandoned as %s).',
                         $revisable->getResourceId(),
-                        $revisable->getId() ?? 0,
+                        $revisable->id ?? 0,
                         $revision->getStatus()->value,
                     ));
 
@@ -169,7 +169,7 @@ final readonly class StaleRevisionCleaner
                 $this->logger->warning(sprintf(
                     '%s #%d: deleted entirely on a forced run (never approved, abandoned as %s) even though %s.',
                     $revisable->getResourceId(),
-                    $revisable->getId() ?? 0,
+                    $revisable->id ?? 0,
                     $revision->getStatus()->value,
                     $overruled,
                 ));

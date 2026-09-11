@@ -121,7 +121,7 @@ class PollController extends AbstractController
 
             return $this->redirectToRoute(
                 'poll/view',
-                ['poll' => $poll->getId()],
+                ['poll' => $poll->id],
             );
         }
 

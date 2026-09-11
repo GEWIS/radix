@@ -92,7 +92,7 @@ final class AdminVacancyControllerTest extends DatabaseTestCase
         $session = $this->pushRequestWithSession();
 
         $label = $this->labelInUse();
-        $labelId = (int) $label->getId();
+        $labelId = (int) $label->id;
 
         $this->labelController()->delete($label);
 
@@ -112,7 +112,7 @@ final class AdminVacancyControllerTest extends DatabaseTestCase
         );
         $this->entityManager->persist($label);
         $this->entityManager->flush();
-        $labelId = (int) $label->getId();
+        $labelId = (int) $label->id;
 
         $this->labelController()->delete($label);
 

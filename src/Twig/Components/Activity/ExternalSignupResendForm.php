@@ -131,7 +131,7 @@ final class ExternalSignupResendForm
         // timing never reveals whether this email is signed up (mirrors the password-reset request).
         $this->messageBus->dispatch(
             new ExternalSignupResendVerificationEmail(
-                (int) $this->signupList->getId(),
+                (int) $this->signupList->id,
                 $email,
             ),
         );
@@ -146,7 +146,7 @@ final class ExternalSignupResendForm
         return new RedirectResponse(
             $this->urlGenerator->generate(
                 'activity/view',
-                ['activity' => $this->signupList->getActivity()->getId()],
+                ['activity' => $this->signupList->getActivity()->id],
             ),
         );
     }

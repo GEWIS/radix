@@ -9,6 +9,7 @@ use App\Entity\Decision\Organ;
 use App\ViewModel\Decision\BodyIteration;
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 use function array_map;
 use function str_replace;
@@ -209,8 +210,18 @@ final class BodyIterationTest extends TestCase
         }
 
         // Two bodies are told apart by id, which a fresh entity has none of; the seed is what gives them one, so the
-        // test does the same by hand.
-        $organ->setId((int) ($foundedIn . str_replace('-', '', $foundedOn)));
+        // test does the same by hand. By reflection, because the identifier is Doctrine's to assign.
+        new ReflectionProperty(
+            Organ::class,
+            'id',
+        )->setValue(
+            $organ,
+            (int) ($foundedIn . str_replace(
+                '-',
+                '',
+                $foundedOn,
+            )),
+        );
 
         return $organ;
     }

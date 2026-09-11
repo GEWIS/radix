@@ -135,7 +135,7 @@ final readonly class PollService
         Member $member,
     ): ?PollOption {
         return $this->pollVoteRepository->findVote(
-            (int) $poll->getId(),
+            (int) $poll->id,
             $member->lidnr,
         )?->pollOption;
     }

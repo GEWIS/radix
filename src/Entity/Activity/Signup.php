@@ -166,7 +166,7 @@ abstract class Signup
         Languages $language,
     ): string {
         foreach ($this->getFieldValues() as $fieldValue) {
-            if ($fieldValue->field->getId() !== $field->getId()) {
+            if ($fieldValue->field->id !== $field->id) {
                 continue;
             }
 
@@ -207,11 +207,11 @@ abstract class Signup
         }
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'createdAt' => $this->getCreatedAt()->format(DateTimeInterface::ATOM),
             'updatedAt' => $this->updatedAt->format(DateTimeInterface::ATOM),
-            'activity_id' => $this->signupList->getActivity()->getId(),
-            'signupList_id' => $this->signupList->getId(),
+            'activity_id' => $this->signupList->getActivity()->id,
+            'signupList_id' => $this->signupList->id,
             'present' => $this->present,
             'role' => $this->role?->name,
             'fieldValues' => $fieldValues,
@@ -228,14 +228,14 @@ abstract class Signup
             $value = null;
 
             if (SignupFieldTypes::Choice === $fieldValue->field->type) {
-                $value = $fieldValue->option?->getId();
+                $value = $fieldValue->option?->id;
             } elseif (SignupFieldTypes::YesNo === $fieldValue->field->type) {
                 $value = 'Yes' === $fieldValue->value
                     ? '1'
                     : '0';
             }
 
-            $fieldValues[intval($fieldValue->field->getId())] = $value ?? $fieldValue->value;
+            $fieldValues[intval($fieldValue->field->id)] = $value ?? $fieldValue->value;
         }
 
         return $fieldValues;

@@ -109,7 +109,7 @@ final readonly class MemberBodyProvider implements ProviderInterface
 
         foreach ($installations as $installation) {
             $body = $installation->organ;
-            $id = $body->getId();
+            $id = $body->id;
             assert(null !== $id);
 
             $resources[] = new MemberBodyResource(

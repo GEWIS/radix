@@ -81,7 +81,7 @@ final readonly class PageImageStore
     ): ?string {
         // An unsaved page has no id, and an empty scope is the flat legacy namespace rather than a page's own.
         if (null !== $page) {
-            $id = $page->getId();
+            $id = $page->id;
 
             return null === $id
                 ? null

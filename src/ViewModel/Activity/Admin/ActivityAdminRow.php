@@ -73,10 +73,10 @@ final readonly class ActivityAdminRow
         Activity $activity,
         ActivityRevision $revision,
     ): self {
-        $id = $activity->getId();
+        $id = $activity->id;
         assert(null !== $id);
 
-        $revisionId = $revision->getId();
+        $revisionId = $revision->id;
         assert(null !== $revisionId);
 
         $beginTime = $revision->beginTime;

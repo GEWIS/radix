@@ -50,7 +50,7 @@ final class CompanyImageUploadServiceTest extends DatabaseTestCase
         self::assertTrue($this->storage()->exists($path));
         self::assertTrue(str_contains(
             $path,
-            'career/' . strval($company->getId()) . '/images',
+            'career/' . strval($company->id) . '/images',
         ));
         self::assertSame(
             ImageProfile::CompanyLogo,

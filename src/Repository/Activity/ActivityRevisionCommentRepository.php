@@ -43,7 +43,7 @@ class ActivityRevisionCommentRepository extends ServiceEntityRepository implemen
      */
     public function findThreadForActivity(Activity $activity): array
     {
-        return $this->findThread($activity->getId());
+        return $this->findThread($activity->id);
     }
 
     #[Override]

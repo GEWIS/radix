@@ -224,7 +224,7 @@ class PhotoController extends AbstractController
 
         if (
             null === $photoEntity
-            || $photoEntity->album->getId() !== $albumEntity->getId()
+            || $photoEntity->album->id !== $albumEntity->id
             || !$this->isGranted(
                 PhotoVoter::DOWNLOAD,
                 $photoEntity,
@@ -237,7 +237,7 @@ class PhotoController extends AbstractController
             '%s-%s-%d.%s',
             $this->slugger->slug($albumEntity->name)->lower(),
             $albumEntity->startDateTime?->format('Y') ?? 'undated',
-            $photoEntity->getId(),
+            $photoEntity->id,
             pathinfo(
                 $photoEntity->path,
                 PATHINFO_EXTENSION,

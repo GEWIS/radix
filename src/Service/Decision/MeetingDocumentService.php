@@ -145,7 +145,7 @@ final readonly class MeetingDocumentService
         $positions = array_flip($orderedIds);
 
         foreach ($meeting->getPoints() as $point) {
-            $position = $positions[(int) $point->getId()] ?? null;
+            $position = $positions[(int) $point->id] ?? null;
 
             if (null === $position) {
                 continue;
@@ -301,7 +301,7 @@ final readonly class MeetingDocumentService
                 continue;
             }
 
-            $position = $positions[(int) $document->getId()] ?? null;
+            $position = $positions[(int) $document->id] ?? null;
 
             if (null === $position) {
                 continue;

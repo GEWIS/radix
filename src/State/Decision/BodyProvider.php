@@ -136,7 +136,7 @@ final readonly class BodyProvider implements ProviderInterface
 
     private function resource(Organ $body): BodyResource
     {
-        $id = $body->getId();
+        $id = $body->id;
         assert(null !== $id);
 
         return new BodyResource(

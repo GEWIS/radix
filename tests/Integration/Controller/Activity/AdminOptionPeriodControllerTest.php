@@ -32,7 +32,7 @@ final class AdminOptionPeriodControllerTest extends DatabaseTestCase
         $this->pushRequestWithSession();
 
         $period = $this->aPeriodWithProposals();
-        $id = $period->getId();
+        $id = $period->id;
 
         $response = $this->controller()->delete($period);
 
@@ -63,8 +63,8 @@ final class AdminOptionPeriodControllerTest extends DatabaseTestCase
         $this->entityManager->persist($limit);
         $this->entityManager->flush();
 
-        $periodId = $period->getId();
-        $limitId = $limit->getId();
+        $periodId = $period->id;
+        $limitId = $limit->id;
 
         $this->controller()->delete($period);
 

@@ -41,7 +41,7 @@ final readonly class NotifyOnActivityApprovalListener
             return;
         }
 
-        $id = $activity->getId();
+        $id = $activity->id;
         if (null === $id) {
             return;
         }

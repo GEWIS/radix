@@ -239,7 +239,7 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
         );
 
         foreach ($organs as $organ) {
-            $organId = $organ->getId();
+            $organId = $organ->id;
             self::assertNotNull($organId);
 
             $single = $resolver->allowanceFor(

@@ -139,7 +139,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
 
     private function reread(Poll $poll): Poll
     {
-        $id = $poll->getId();
+        $id = $poll->id;
         $this->entityManager->clear();
 
         $fresh = $this->entityManager->find(
@@ -172,7 +172,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
             ->where('IDENTITY(c.poll) = :poll')
             ->setParameter(
                 'poll',
-                $poll->getId(),
+                $poll->id,
             )
             ->getQuery()
             ->getResult();
@@ -189,7 +189,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
             ->where('v.poll = :poll')
             ->setParameter(
                 'poll',
-                $poll->getId(),
+                $poll->id,
             )
             ->getQuery()
             ->getSingleScalarResult());

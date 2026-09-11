@@ -386,7 +386,7 @@ final readonly class CompanyImageGenerator
             return $this->fileStorage->store(
                 StorageNamespace::CompanyImage,
                 $temporaryFile,
-                strval($company->getId()),
+                strval($company->id),
             )->path;
         } finally {
             unlink($temporaryFile);

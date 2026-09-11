@@ -504,10 +504,10 @@ class SignupList
             $signUps,
             static fn (Signup $a, Signup $b): int => [
                 $a->drawPosition ?? PHP_INT_MAX,
-                $a->getId() ?? 0,
+                $a->id ?? 0,
             ] <=> [
                 $b->drawPosition ?? PHP_INT_MAX,
-                $b->getId() ?? 0,
+                $b->id ?? 0,
             ],
         );
 
@@ -1041,7 +1041,7 @@ class SignupList
         $rolesArrays = $this->rolesToArray();
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'name' => $this->name->getValueNL(),
             'nameEn' => $this->name->getValueEN(),
             'openDate' => $this->openDate,
@@ -1085,7 +1085,7 @@ class SignupList
         $rolesArrays = $this->rolesToArray();
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'name' => $this->name->toGdprArray(),
             'openDate' => $this->openDate?->format(DateTimeInterface::ATOM),
             'closeDate' => $this->closeDate?->format(DateTimeInterface::ATOM),

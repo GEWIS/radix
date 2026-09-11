@@ -165,7 +165,7 @@ class PollRepository extends ServiceEntityRepository
 
         foreach ($polls as $poll) {
             foreach ($poll->getOptions() as $option) {
-                $option->setCountedVotes($counted[intval($option->getId())] ?? 0);
+                $option->setCountedVotes($counted[intval($option->id)] ?? 0);
             }
         }
     }
@@ -290,7 +290,7 @@ class PollRepository extends ServiceEntityRepository
             ->andWhere('p.expiryDate <= :expiryDate')
             ->setParameter(
                 'poll',
-                $poll->getId(),
+                $poll->id,
             )
             ->setParameter(
                 'expiryDate',

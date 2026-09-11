@@ -83,7 +83,7 @@ class SignupType extends AbstractType
     ): array {
         $fieldData = [];
         foreach ($signupList->getFields() as $field) {
-            $fieldData[(int) $field->getId()] = $data[self::fieldKey((int) $field->getId())] ?? null;
+            $fieldData[(int) $field->id] = $data[self::fieldKey((int) $field->id)] ?? null;
         }
 
         return $fieldData;
@@ -102,8 +102,8 @@ class SignupType extends AbstractType
         $answers = $signup->toFormArray();
         $prefill = [];
         foreach ($signupList->getFields() as $field) {
-            $raw = $answers[intval($field->getId())] ?? null;
-            $prefill[self::fieldKey((int) $field->getId())] = SignupFieldTypes::Number === $field->type
+            $raw = $answers[intval($field->id)] ?? null;
+            $prefill[self::fieldKey((int) $field->id)] = SignupFieldTypes::Number === $field->type
                 ? (null === $raw ? null : (int) $raw)
                 : $raw;
         }
@@ -228,7 +228,7 @@ class SignupType extends AbstractType
         SignupField $field,
         Languages $language,
     ): void {
-        $name = self::fieldKey((int) $field->getId());
+        $name = self::fieldKey((int) $field->id);
         // The field label is author-provided localised content, so it is rendered verbatim (translation_domain false)
         // and the sensitive marker is appended, matching the footnote shown below the form.
         $label = ($field->name->getText($language) ?? '') . ($field->isSensitive ? '¹' : '');
@@ -298,7 +298,7 @@ class SignupType extends AbstractType
                 $optionIds = [];
                 $labelsById = [];
                 foreach ($field->getOptions() as $option) {
-                    $optionId = intval($option->getId());
+                    $optionId = intval($option->id);
                     $optionIds[] = $optionId;
                     $labelsById[$optionId] = $option->value->getText($language) ?? '';
                 }
@@ -348,7 +348,7 @@ class SignupType extends AbstractType
     {
         foreach ($field->getOptions() as $option) {
             if ($option->isDefault) {
-                return $option->getId();
+                return $option->id;
             }
         }
 

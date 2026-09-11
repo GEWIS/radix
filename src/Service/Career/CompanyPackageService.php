@@ -125,7 +125,7 @@ final readonly class CompanyPackageService
             $this->fileStorage->remove($discardedImage);
         }
 
-        $id = $banner->getId();
+        $id = $banner->id;
         if (null === $id) {
             return;
         }

@@ -49,7 +49,7 @@ final readonly class TagService
         if (
             null === $member
             || null !== $this->memberTagRepository->findTag(
-                (int) $photo->getId(),
+                (int) $photo->id,
                 $lidnr,
             )
             || ($this->userSettingsRepository->find($lidnr)->photoTaggingOptOut ?? false)
@@ -84,7 +84,7 @@ final readonly class TagService
         if (
             null === $organ
             || null !== $this->organTagRepository->findTag(
-                (int) $photo->getId(),
+                (int) $photo->id,
                 $organId,
             )
         ) {

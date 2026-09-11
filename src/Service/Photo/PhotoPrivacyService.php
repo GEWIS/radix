@@ -95,7 +95,7 @@ final readonly class PhotoPrivacyService
 
         return array_values(array_filter(
             $photos,
-            static fn (Photo $photo): bool => !isset($hidden[intval($photo->getId())]),
+            static fn (Photo $photo): bool => !isset($hidden[intval($photo->id)]),
         ));
     }
 
@@ -111,7 +111,7 @@ final readonly class PhotoPrivacyService
         array $photos,
     ): void {
         $photoIds = array_map(
-            static fn (Photo $photo): int => intval($photo->getId()),
+            static fn (Photo $photo): int => intval($photo->id),
             $photos,
         );
         $tagged = $this->memberTagRepository->findTaggedPhotoIds(
@@ -121,7 +121,7 @@ final readonly class PhotoPrivacyService
         $alreadyHidden = $this->hiddenPhotoRepository->getHiddenPhotoIds($member);
 
         foreach ($photos as $photo) {
-            $id = intval($photo->getId());
+            $id = intval($photo->id);
             if (
                 !isset($tagged[$id])
                 || isset($alreadyHidden[$id])
@@ -147,7 +147,7 @@ final readonly class PhotoPrivacyService
         array $photos,
     ): void {
         $photoIds = array_map(
-            static fn (Photo $photo): int => intval($photo->getId()),
+            static fn (Photo $photo): int => intval($photo->id),
             $photos,
         );
         foreach (

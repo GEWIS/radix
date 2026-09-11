@@ -77,7 +77,7 @@ class Vote
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'dateTime' => $this->dateTime->format(DateTimeInterface::ATOM),
             'photo' => $this->getPhoto()->toGdprArray(),
         ];

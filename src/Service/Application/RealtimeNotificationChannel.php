@@ -81,7 +81,7 @@ final readonly class RealtimeNotificationChannel implements NotificationChannelI
                 $recipient,
                 $notification->context ?? [],
             ),
-            notificationId: $notification->getId(),
+            notificationId: $notification->id,
         );
 
         if (null !== $recipient) {

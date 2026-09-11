@@ -45,12 +45,12 @@ final class AlbumRepositoryTest extends DatabaseTestCase
         );
 
         $ids = array_map(
-            static fn (Album $album): int => (int) $album->getId(),
+            static fn (Album $album): int => (int) $album->id,
             $this->repository()->searchPublishedAlbums($draft->name),
         );
 
         self::assertNotContains(
-            (int) $draft->getId(),
+            (int) $draft->id,
             $ids,
         );
     }

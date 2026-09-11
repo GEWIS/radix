@@ -77,7 +77,7 @@ trait FindsRevisionCommentsTrait
             ->where('c.revision = :revision')
             ->setParameter(
                 'revision',
-                $revision->getId(),
+                $revision->id,
                 Types::INTEGER,
             )
             ->getQuery()

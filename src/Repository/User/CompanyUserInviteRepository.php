@@ -56,7 +56,7 @@ class CompanyUserInviteRepository extends ServiceEntityRepository
             ->where('i.company = :company')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->orderBy(

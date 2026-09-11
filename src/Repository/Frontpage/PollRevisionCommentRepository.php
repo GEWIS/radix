@@ -43,7 +43,7 @@ class PollRevisionCommentRepository extends ServiceEntityRepository implements R
      */
     public function findThreadForPoll(Poll $poll): array
     {
-        return $this->findThread($poll->getId());
+        return $this->findThread($poll->id);
     }
 
     #[Override]

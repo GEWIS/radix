@@ -63,7 +63,7 @@ class ExternalAppAuthentication
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'app_id' => $this->externalApp->appId,
             'time' => $this->time->format(DateTimeInterface::ATOM),
         ];

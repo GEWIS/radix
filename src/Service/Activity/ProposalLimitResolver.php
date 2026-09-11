@@ -86,7 +86,7 @@ final readonly class ProposalLimitResolver
 
         $allowances = [];
         foreach ($organs as $organ) {
-            $organId = $organ->getId();
+            $organId = $organ->id;
 
             if (null === $organId) {
                 continue;

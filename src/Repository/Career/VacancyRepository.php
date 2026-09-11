@@ -75,7 +75,7 @@ class VacancyRepository extends ServiceEntityRepository
             ->andWhere('cr.category = :category')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->setParameter(
@@ -87,7 +87,7 @@ class VacancyRepository extends ServiceEntityRepository
                 $category->value,
             );
 
-        $exceptId = $except?->getId();
+        $exceptId = $except?->id;
         if (null !== $exceptId) {
             $qb->andWhere('v.id != :except')
                 ->setParameter(
@@ -818,7 +818,7 @@ class VacancyRepository extends ServiceEntityRepository
             ->where('p.company = :company')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->orderBy(
@@ -841,7 +841,7 @@ class VacancyRepository extends ServiceEntityRepository
             ->andWhere('c.id = :companyId')
             ->setParameter(
                 'companyId',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->orderBy(

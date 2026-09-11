@@ -165,7 +165,7 @@ final class ExternalSignupManage
     public function unsubscribe(): RedirectResponse
     {
         $signup = $this->signup();
-        $activityId = $signup->signupList->getActivity()->getId();
+        $activityId = $signup->signupList->getActivity()->id;
 
         if ($this->isEditable()) {
             $this->signupManager->withdraw($signup);

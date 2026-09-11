@@ -98,7 +98,7 @@ class SignupFieldValue
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'value' => $this->value,
             'option' => $this->option?->toGdprArray(),
         ];

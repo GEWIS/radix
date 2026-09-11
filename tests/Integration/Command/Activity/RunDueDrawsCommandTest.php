@@ -154,14 +154,14 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $actual = [];
         foreach ($list->getSignUps() as $index => $signup) {
             if ($index < 2) {
-                $expected[] = $signup->getId();
+                $expected[] = $signup->id;
             }
 
             if (!$signup->drawn) {
                 continue;
             }
 
-            $actual[] = $signup->getId();
+            $actual[] = $signup->id;
         }
 
         self::assertSame(
@@ -179,7 +179,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
             'ghost.guest@example.org',
             [],
         );
-        $externalId = (int) $external->getId();
+        $externalId = (int) $external->id;
 
         $this->reconfigure(
             6,
@@ -199,7 +199,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
             $this->drawnCount($list),
         );
         foreach ($list->getSignUps() as $signup) {
-            if ($signup->getId() !== $externalId) {
+            if ($signup->id !== $externalId) {
                 continue;
             }
 
@@ -298,7 +298,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         // it became a participant, so it queues behind the member who arrived half an hour ago -- an on-time draw
         // followed by this confirmation would have produced exactly that.
         $external = $this->createConfirmedExternal(6);
-        $externalId = (int) $external->getId();
+        $externalId = (int) $external->id;
 
         $memberIds = $this->memberSignupIds(6);
         $this->pinSignupCreatedAt(
@@ -345,7 +345,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         // With everyone admitted there is still a place left over, so the late-confirmed external gets it as the fill
         // -- confirming after the cutoff postpones participation, it never forfeits it.
         $external = $this->createConfirmedExternal(6);
-        $externalId = (int) $external->getId();
+        $externalId = (int) $external->id;
 
         foreach ($this->memberSignupIds(6) as $memberId) {
             $this->pinSignupCreatedAt(
@@ -421,7 +421,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $this->executeCommand();
 
         $this->entityManager->clear();
-        self::assertNull($this->list((int) $list->getId())->drawnAt);
+        self::assertNull($this->list((int) $list->id)->drawnAt);
     }
 
     private function listWithARole(): SignupList
@@ -494,7 +494,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
                 continue;
             }
 
-            $ids[] = (int) $signup->getId();
+            $ids[] = (int) $signup->id;
         }
 
         return $ids;
@@ -509,7 +509,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     {
         $ids = [];
         foreach ($this->list($listId)->getSignUps() as $signup) {
-            $ids[] = (int) $signup->getId();
+            $ids[] = (int) $signup->id;
         }
 
         return $ids;
@@ -529,7 +529,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
                 continue;
             }
 
-            $ids[] = (int) $signup->getId();
+            $ids[] = (int) $signup->id;
         }
 
         return $ids;
@@ -596,7 +596,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         ?int $durationHours = null,
         ?int $capacity = null,
     ): void {
-        $revisionId = $this->list($listId)->revision->getId();
+        $revisionId = $this->list($listId)->revision->id;
         $connection = $this->entityManager->getConnection();
 
         $fields = [

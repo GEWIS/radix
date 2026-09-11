@@ -28,8 +28,8 @@ final class FlattenDocumentsCommandTest extends DatabaseTestCase
     {
         $readable = $this->aPendingDocument();
         $unreadable = $this->aPendingDocument(readable: false);
-        $readableId = (int) $readable->getId();
-        $unreadableId = (int) $unreadable->getId();
+        $readableId = (int) $readable->id;
+        $unreadableId = (int) $unreadable->id;
 
         $this->assertCommandFailed(static::runCommand(
             'app:education:flatten-documents',
@@ -52,8 +52,8 @@ final class FlattenDocumentsCommandTest extends DatabaseTestCase
     {
         $first = $this->aPendingDocument();
         $second = $this->aPendingDocument();
-        $firstId = (int) $first->getId();
-        $secondId = (int) $second->getId();
+        $firstId = (int) $first->id;
+        $secondId = (int) $second->id;
 
         $this->assertCommandIsSuccessful(static::runCommand(
             'app:education:flatten-documents',

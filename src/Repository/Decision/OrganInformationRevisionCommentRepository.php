@@ -44,7 +44,7 @@ class OrganInformationRevisionCommentRepository extends ServiceEntityRepository 
      */
     public function findThreadForOrganInformation(OrganInformation $information): array
     {
-        return $this->findThread($information->getId());
+        return $this->findThread($information->id);
     }
 
     #[Override]

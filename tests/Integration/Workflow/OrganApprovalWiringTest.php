@@ -172,7 +172,7 @@ final class OrganApprovalWiringTest extends DatabaseTestCase
         );
         $draft->updateSocialLinks([SocialPlatform::Twitch->value => 'somethingelse']);
         $this->entityManager->flush();
-        $draftId = (int) $draft->getId();
+        $draftId = (int) $draft->id;
 
         self::getContainer()->get(RevisionDiscarder::class)->discardToLive($draft);
         $this->entityManager->flush();

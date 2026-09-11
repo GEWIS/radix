@@ -118,7 +118,7 @@ final readonly class AuthorizationService
         $this->entityManager->persist($authorization);
         $this->entityManager->flush();
 
-        $this->messageBus->dispatch(new AuthorizationCreatedEmail((int) $authorization->getId()));
+        $this->messageBus->dispatch(new AuthorizationCreatedEmail((int) $authorization->id));
 
         return $authorization;
     }
@@ -137,6 +137,6 @@ final readonly class AuthorizationService
         $authorization->revokedAt = new DateTime();
         $this->entityManager->flush();
 
-        $this->messageBus->dispatch(new AuthorizationRevokedEmail((int) $authorization->getId()));
+        $this->messageBus->dispatch(new AuthorizationRevokedEmail((int) $authorization->id));
     }
 }

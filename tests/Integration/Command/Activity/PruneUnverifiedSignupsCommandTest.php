@@ -31,7 +31,7 @@ final class PruneUnverifiedSignupsCommandTest extends DatabaseTestCase
             'expired.visitor@example.org',
             [],
         );
-        $expiredId = (int) $expired->getId();
+        $expiredId = (int) $expired->id;
         $this->ageVerification(
             $expiredId,
             '-1 hour',
@@ -44,7 +44,7 @@ final class PruneUnverifiedSignupsCommandTest extends DatabaseTestCase
             'pending.visitor@example.org',
             [],
         );
-        $pendingId = (int) $pending->getId();
+        $pendingId = (int) $pending->id;
 
         $this->assertCommandIsSuccessful(static::runCommand('app:activity:prune-unverified-signups'));
 

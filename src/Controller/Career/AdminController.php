@@ -309,7 +309,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"career_company_edit_lock-" ~ args["company"].getId()'),
+        id: new Expression('"career_company_edit_lock-" ~ args["company"].id'),
         tokenKey: '_csrf_token',
     )]
     public function editPing(
@@ -330,7 +330,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"career_company_edit_lock-" ~ args["company"].getId()'),
+        id: new Expression('"career_company_edit_lock-" ~ args["company"].id'),
         tokenKey: '_csrf_token',
     )]
     public function editRelease(
@@ -354,7 +354,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_revise-" ~ args["company"].getId()'),
+        id: new Expression('"company_revise-" ~ args["company"].id'),
         tokenKey: '_csrf_token',
     )]
     public function revise(
@@ -403,7 +403,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/career/companies/edit',
-            ['company' => $company->getId()],
+            ['company' => $company->id],
         );
     }
 
@@ -411,7 +411,7 @@ class AdminController extends AbstractController
     {
         return $this->redirectToRoute(
             'admin/career/companies/view',
-            ['company' => $company->getId()],
+            ['company' => $company->id],
         );
     }
 

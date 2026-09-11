@@ -48,7 +48,7 @@ class PeriodProposalLimitType extends AbstractType
                     'autocomplete' => true,
                     'placeholder' => t('Select a body'),
                     'constraints' => [new NotNull(message: 'Pick the body this applies to.')],
-                    'disabled' => null !== $options['data']?->getId(),
+                    'disabled' => null !== $options['data']?->id,
                 ],
             )
             ->add(

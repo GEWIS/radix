@@ -116,7 +116,7 @@ class MaintenanceWindowRepository extends ServiceEntityRepository
      */
     public function findOverlapping(MaintenanceWindow $window): array
     {
-        $id = $window->getId();
+        $id = $window->id;
         if (null === $id) {
             $others = $this->findAll();
         } else {

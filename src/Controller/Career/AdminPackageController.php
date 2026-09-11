@@ -254,7 +254,7 @@ class AdminPackageController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_package_delete-" ~ args["package"].getId()'),
+        id: new Expression('"company_package_delete-" ~ args["package"].id'),
         tokenKey: '_csrf_token',
     )]
     public function delete(
@@ -327,7 +327,7 @@ class AdminPackageController extends AbstractController
 
                 return $this->redirectToRoute(
                     'admin/career/packages/banner',
-                    ['package' => $package->getId()],
+                    ['package' => $package->id],
                 );
             }
 
@@ -357,7 +357,7 @@ class AdminPackageController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_banner_decide-" ~ args["package"].getId()'),
+        id: new Expression('"company_banner_decide-" ~ args["package"].id'),
         tokenKey: '_csrf_token',
     )]
     public function approveBanner(
@@ -390,7 +390,7 @@ class AdminPackageController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_banner_decide-" ~ args["package"].getId()'),
+        id: new Expression('"company_banner_decide-" ~ args["package"].id'),
         tokenKey: '_csrf_token',
     )]
     public function rejectBanner(
@@ -437,7 +437,7 @@ class AdminPackageController extends AbstractController
     {
         return $this->redirectToRoute(
             'admin/career/packages/company',
-            ['company' => $company->getId()],
+            ['company' => $company->id],
         );
     }
 }

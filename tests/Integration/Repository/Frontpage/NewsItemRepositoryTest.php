@@ -87,11 +87,11 @@ final class NewsItemRepositoryTest extends DatabaseTestCase
 
         self::assertSame(
             array_map(
-                static fn (NewsItem $item): ?int => $item->getId(),
+                static fn (NewsItem $item): ?int => $item->id,
                 $feed,
             ),
             array_map(
-                static fn (NewsItem $item): ?int => $item->getId(),
+                static fn (NewsItem $item): ?int => $item->id,
                 [...$paginator],
             ),
         );

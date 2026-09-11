@@ -140,7 +140,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"career_review_comment-" ~ args["revision"].getId()'),
+        id: new Expression('"career_review_comment-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function commentCompany(
@@ -163,7 +163,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"career_review_comment-" ~ args["revision"].getId()'),
+        id: new Expression('"career_review_comment-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function commentVacancy(
@@ -186,7 +186,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"career_discard-" ~ args["revision"].getId()'),
+        id: new Expression('"career_discard-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function discardCompany(CompanyRevision $revision): Response
@@ -194,7 +194,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         return $this->discardDraft(
             $revision,
             'admin/career/companies/view',
-            ['company' => $revision->company->getId()],
+            ['company' => $revision->company->id],
         );
     }
 
@@ -205,7 +205,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"career_discard-" ~ args["revision"].getId()'),
+        id: new Expression('"career_discard-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function discardVacancy(VacancyRevision $revision): Response
@@ -302,7 +302,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
     {
         return $this->redirectToRoute(
             $this->reviewRoute($revision),
-            ['revision' => $revision->getId()],
+            ['revision' => $revision->id],
         );
     }
 

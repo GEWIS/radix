@@ -282,7 +282,7 @@ class Photo
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'dateTime' => $this->dateTime->format(DateTimeInterface::ATOM),
             'path' => $this->path,
         ];

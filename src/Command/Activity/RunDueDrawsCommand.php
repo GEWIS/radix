@@ -83,8 +83,8 @@ final class RunDueDrawsCommand extends Command
             ++$performed;
             $this->logger->info(sprintf(
                 'Automatically drew sign-up list %d of activity %d.',
-                $list->getId() ?? 0,
-                $list->getActivity()->getId() ?? 0,
+                $list->id ?? 0,
+                $list->getActivity()->id ?? 0,
             ));
 
             $dueAt = $list->getAutoDrawAt();
@@ -102,8 +102,8 @@ final class RunDueDrawsCommand extends Command
 
             $this->logger->warning(sprintf(
                 'The draw of sign-up list %d of activity %d ran %d minutes past its announced moment.',
-                $list->getId() ?? 0,
-                $list->getActivity()->getId() ?? 0,
+                $list->id ?? 0,
+                $list->getActivity()->id ?? 0,
                 $minutesLate,
             ));
         }

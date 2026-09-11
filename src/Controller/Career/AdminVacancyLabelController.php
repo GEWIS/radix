@@ -134,7 +134,7 @@ class AdminVacancyLabelController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"vacancy_label_delete-" ~ args["label"].getId()'),
+        id: new Expression('"vacancy_label_delete-" ~ args["label"].id'),
         tokenKey: '_csrf_token',
     )]
     public function delete(VacancyLabel $label): Response

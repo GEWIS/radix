@@ -56,7 +56,7 @@ final readonly class SignupListMigrator
         if (null !== $blocker) {
             throw new RuntimeException(sprintf(
                 'Cannot approve revision #%d: %s.',
-                $incoming->getId() ?? 0,
+                $incoming->id ?? 0,
                 $blocker,
             ));
         }

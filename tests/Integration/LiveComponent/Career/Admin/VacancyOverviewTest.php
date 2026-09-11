@@ -92,7 +92,7 @@ final class VacancyOverviewTest extends DatabaseTestCase
     public function testPickingACompanyNarrowsTheList(): void
     {
         $component = $this->overview(pageSize: 100);
-        $component->companyFilter = strval($this->company('nexunt')->getId());
+        $component->companyFilter = strval($this->company('nexunt')->id);
 
         foreach ($component->getVacancies() as $vacancy) {
             self::assertSame(
@@ -109,7 +109,7 @@ final class VacancyOverviewTest extends DatabaseTestCase
     {
         $component = $this->overview(pageSize: 100);
         $component->company = $this->company('nexunt');
-        $component->companyFilter = strval($this->company('orbit-analytics')->getId());
+        $component->companyFilter = strval($this->company('orbit-analytics')->id);
 
         self::assertTrue($component->isPinnedToACompany());
         foreach ($component->getVacancies() as $vacancy) {

@@ -59,7 +59,7 @@ final readonly class ActivityFacilityNotifier
     {
         $unitOfWork = $this->entityManager->getUnitOfWork();
 
-        if (null === $revision->getId()) {
+        if (null === $revision->id) {
             $this->created($revision);
 
             return;

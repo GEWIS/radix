@@ -79,7 +79,7 @@ final readonly class SignupPeopleView
         $signupCount = 0;
 
         foreach ($signupLists as $signupList) {
-            $listId = $signupList->getId() ?? 0;
+            $listId = $signupList->id ?? 0;
             $listName = $signupList->name->getText($language) ?? '';
             $limited = $signupList->limitedCapacity;
             $lists[] = [
@@ -90,7 +90,7 @@ final readonly class SignupPeopleView
 
             $fields = $signupList->getFields()->getValues();
             foreach ($fields as $field) {
-                $fieldId = $field->getId() ?? 0;
+                $fieldId = $field->id ?? 0;
                 $hidden = in_array(
                     $fieldId,
                     $hiddenFieldIds,
@@ -263,11 +263,11 @@ final readonly class SignupPeopleView
             $statuses[$membership['listId']] = !$membership['limited']
                 ? 'signed'
                 : ($signup->drawn ? 'admitted' : 'waiting');
-            $signupIds[] = $signup->getId() ?? 0;
+            $signupIds[] = $signup->id ?? 0;
 
             if (
                 in_array(
-                    $signup->getId(),
+                    $signup->id,
                     $selectedIds,
                     true,
                 )
@@ -276,7 +276,7 @@ final readonly class SignupPeopleView
             }
 
             foreach ($membership['fields'] as $field) {
-                $answers[$membership['listId'] . ':' . ($field->getId() ?? 0)] = $signup->displayValueForField(
+                $answers[$membership['listId'] . ':' . ($field->id ?? 0)] = $signup->displayValueForField(
                     $field,
                     $translator,
                     $language,

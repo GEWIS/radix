@@ -183,7 +183,7 @@ final class CareerApprovalWiringTest extends DatabaseTestCase
         );
         $this->entityManager->persist($draft);
         $this->entityManager->flush();
-        $draftId = (int) $draft->getId();
+        $draftId = (int) $draft->id;
 
         self::getContainer()->get(RevisionDiscarder::class)->discardToLive($draft);
         $this->entityManager->flush();

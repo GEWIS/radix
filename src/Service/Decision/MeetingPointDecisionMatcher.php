@@ -72,7 +72,7 @@ final class MeetingPointDecisionMatcher
                 continue;
             }
 
-            $byPointId[(int) $point->getId()][] = $decision;
+            $byPointId[(int) $point->id][] = $decision;
         }
 
         return new DecisionMatchResult(

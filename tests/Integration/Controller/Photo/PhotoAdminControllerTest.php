@@ -122,11 +122,11 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         $request = new Request();
         $request->request->set(
             'photos',
-            [(string) $photo->getId()],
+            [(string) $photo->id],
         );
         $request->request->set(
             'destination',
-            (string) $gala->getId(),
+            (string) $gala->id,
         );
 
         $response = $this->controller()->movePhotos(
@@ -139,8 +139,8 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
             $response,
         );
         self::assertSame(
-            $gala->getId(),
-            $photo->album->getId(),
+            $gala->id,
+            $photo->album->id,
         );
     }
 
@@ -150,7 +150,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         $this->pushRequest();
         $trip = $this->album('Trip 2024');
         $photo = $this->storedPhoto($trip);
-        $id = (int) $photo->getId();
+        $id = (int) $photo->id;
 
         $request = new Request();
         $request->request->set(
@@ -268,7 +268,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         $stored = self::getContainer()->get(FileStorage::class)->store(
             StorageNamespace::PhotoOriginal,
             $file,
-            (string) $album->getId(),
+            (string) $album->id,
         );
         unlink($file);
 

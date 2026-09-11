@@ -113,7 +113,7 @@ class ExternalSignupController extends AbstractController
 
             return $this->redirectToRoute(
                 'activity/view',
-                ['activity' => $activity->getId()],
+                ['activity' => $activity->id],
             );
         }
 
@@ -126,7 +126,7 @@ class ExternalSignupController extends AbstractController
 
         return $this->redirectToRoute(
             'activity/view',
-            ['activity' => $activity->getId()],
+            ['activity' => $activity->id],
         );
     }
 

@@ -181,7 +181,7 @@ abstract class CourseDocument
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'course' => $this->course->toGdprArray(),
             'date' => $this->date->format(DateTimeInterface::ATOM),
             'language' => $this->language->value,

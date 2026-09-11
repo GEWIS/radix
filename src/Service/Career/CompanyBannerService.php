@@ -99,7 +99,7 @@ final readonly class CompanyBannerService
             $replaced,
         );
 
-        $id = $package->getId();
+        $id = $package->id;
         if (null !== $id) {
             $this->messageBus->dispatch(new PublishDomainNotificationMessage(
                 NotificationType::CompanyBannerAwaitingReview,

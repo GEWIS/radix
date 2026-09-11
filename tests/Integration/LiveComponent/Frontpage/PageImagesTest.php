@@ -117,7 +117,7 @@ final class PageImagesTest extends DatabaseTestCase
     private function component(Page $page): PageImages
     {
         $component = self::getContainer()->get(PageImages::class);
-        $component->mount($page->getId());
+        $component->mount($page->id);
 
         return $component;
     }

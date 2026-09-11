@@ -166,7 +166,7 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
 
         foreach ($revision?->getLabels() ?? [] as $label) {
             $tags[] = new RevisionTag(
-                $label->getId(),
+                $label->id,
                 $label->name,
             );
         }

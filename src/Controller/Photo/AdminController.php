@@ -202,7 +202,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/photos/album',
-            ['album' => $album->getId()],
+            ['album' => $album->id],
         );
     }
 
@@ -251,13 +251,13 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/photos/album',
-            ['album' => $album->getId()],
+            ['album' => $album->id],
         );
     }
 
     private function announceAlbumPublished(Album $album): void
     {
-        $id = $album->getId();
+        $id = $album->id;
         if (null === $id) {
             return;
         }
@@ -275,7 +275,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"photo_album_delete-" ~ args["album"].getId()'),
+        id: new Expression('"photo_album_delete-" ~ args["album"].id'),
         tokenKey: '_csrf_token',
     )]
     public function deleteAlbum(Album $album): Response
@@ -342,7 +342,7 @@ class AdminController extends AbstractController
                 $parent = $album->getParent();
 
                 return [
-                    'id' => $album->getId(),
+                    'id' => $album->id,
                     'label' => null === $parent
                         ? $album->name
                         : $parent->name . ' / ' . $album->name,
@@ -359,7 +359,7 @@ class AdminController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"photo_album_cover-" ~ args["album"].getId()'),
+        id: new Expression('"photo_album_cover-" ~ args["album"].id'),
         tokenKey: '_csrf_token',
     )]
     public function regenerateCover(
@@ -380,7 +380,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/photos/album',
-            ['album' => $album->getId()],
+            ['album' => $album->id],
         );
     }
 
@@ -435,7 +435,7 @@ class AdminController extends AbstractController
 
             return $this->redirectToRoute(
                 'admin/photos/album',
-                ['album' => $album->getId()],
+                ['album' => $album->id],
             );
         }
 
@@ -454,7 +454,7 @@ class AdminController extends AbstractController
 
             return $this->redirectToRoute(
                 'admin/photos/album',
-                ['album' => $album->getId()],
+                ['album' => $album->id],
             );
         }
 
@@ -465,7 +465,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/photos/album',
-            ['album' => $album->getId()],
+            ['album' => $album->id],
         );
     }
 
@@ -495,7 +495,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/photos/album',
-            ['album' => $album->getId()],
+            ['album' => $album->id],
         );
     }
 

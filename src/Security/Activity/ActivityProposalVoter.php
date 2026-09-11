@@ -128,7 +128,7 @@ final class ActivityProposalVoter extends Voter
         }
 
         foreach ($member->getCurrentOrganInstallations() as $installation) {
-            if ($installation->organ->getId() === $organ->getId()) {
+            if ($installation->organ->id === $organ->id) {
                 return true;
             }
         }

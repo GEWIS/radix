@@ -709,7 +709,7 @@ final class PhotoApiTest extends ApiTestCase
         foreach (
             [
                 '/api/photos/99999999/image/' . ImageVariant::W320->value,
-                '/api/photos/' . $this->aPhotoInAPublishedAlbum()->getId() . '/image/w9999',
+                '/api/photos/' . $this->aPhotoInAPublishedAlbum()->id . '/image/w9999',
             ] as $path
         ) {
             $response = $this->get(
@@ -737,7 +737,7 @@ final class PhotoApiTest extends ApiTestCase
         foreach (
             [
                 '/api/photos/seventeen/image/' . ImageVariant::W320->value,
-                '/api/photos/' . $this->aPhotoInAPublishedAlbum()->getId() . '/image/W320',
+                '/api/photos/' . $this->aPhotoInAPublishedAlbum()->id . '/image/W320',
             ] as $path
         ) {
             $response = $this->get(
@@ -760,7 +760,7 @@ final class PhotoApiTest extends ApiTestCase
 
     private function imagePath(PhotoEntity $photo): string
     {
-        return '/api/photos/' . $photo->getId() . '/image/' . ImageVariant::W320->value;
+        return '/api/photos/' . $photo->id . '/image/' . ImageVariant::W320->value;
     }
 
     private function bytes(Response $response): string
@@ -814,7 +814,7 @@ final class PhotoApiTest extends ApiTestCase
             $template,
             [
                 '{album}' => (string) $this->aPublishedAlbumWithSeveralPhotos(),
-                '{photo}' => (string) $this->aPhotoInAPublishedAlbum()->getId(),
+                '{photo}' => (string) $this->aPhotoInAPublishedAlbum()->id,
                 '{variant}' => ImageVariant::W320->value,
                 '{cover}' => ImageVariant::Cover->value,
             ],

@@ -167,7 +167,7 @@ final readonly class WeeklyPhotoService
     {
         return sprintf(
             'photos/weekly/%d.%s',
-            $photo->getId(),
+            $photo->id,
             pathinfo(
                 $photo->path,
                 PATHINFO_EXTENSION,

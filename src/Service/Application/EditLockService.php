@@ -241,7 +241,7 @@ final readonly class EditLockService
      */
     private function key(RevisableInterface $resource): int
     {
-        $id = $resource->getId();
+        $id = $resource->id;
         if (null === $id) {
             throw new LogicException('Cannot take an edit lock on an unpersisted aggregate.');
         }
@@ -263,7 +263,7 @@ final readonly class EditLockService
         $holder = $lock->lockedByCompanyUser;
 
         return null !== $holder
-            && $holder->getId() === $principal->getId();
+            && $holder->id === $principal->id;
     }
 
     private function assign(

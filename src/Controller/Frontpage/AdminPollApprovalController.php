@@ -98,7 +98,7 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"poll_review_comment-" ~ args["revision"].getId()'),
+        id: new Expression('"poll_review_comment-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function comment(
@@ -210,7 +210,7 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
     {
         return $this->redirectToRoute(
             'admin/frontpage/polls/approvals/review',
-            ['revision' => $revision->getId()],
+            ['revision' => $revision->id],
         );
     }
 }

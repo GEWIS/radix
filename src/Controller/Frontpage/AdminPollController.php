@@ -56,7 +56,7 @@ class AdminPollController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"poll_delete-" ~ args["poll"].getId()'),
+        id: new Expression('"poll_delete-" ~ args["poll"].id'),
         tokenKey: '_csrf_token',
     )]
     public function delete(Poll $poll): Response

@@ -115,7 +115,7 @@ final readonly class DocumentStagingService
 
         $this->fileStorage->remove($staged->path);
 
-        $this->messageBus->dispatch(new FlattenCourseDocumentMessage($document->getId() ?? 0));
+        $this->messageBus->dispatch(new FlattenCourseDocumentMessage($document->id ?? 0));
     }
 
     public function discard(CourseDocumentStaging $staged): void

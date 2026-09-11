@@ -43,7 +43,7 @@ final readonly class BodyPageRow
             page: $page,
             status: $current?->getStatus(),
             revisionNumber: $current?->getRevisionNumber(),
-            currentRevisionId: $current?->getId(),
+            currentRevisionId: $current?->id,
             published: true === $page?->isPublished(),
             liveRevisionNumber: $current?->getLiveCounterpart()?->getRevisionNumber(),
             changesRequested: RevisionStatus::Draft === $current?->getStatus()

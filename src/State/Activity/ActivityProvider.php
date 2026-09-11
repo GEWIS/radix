@@ -171,7 +171,7 @@ final readonly class ActivityProvider implements ProviderInterface
 
     private function resource(ActivityEntity $activity): ActivityResource
     {
-        $id = $activity->getId();
+        $id = $activity->id;
         assert(null !== $id);
 
         $revision = $activity->getLiveRevision();
@@ -224,7 +224,7 @@ final readonly class ActivityProvider implements ProviderInterface
             return null;
         }
 
-        $id = $organ->getId();
+        $id = $organ->id;
         assert(null !== $id);
 
         return [
@@ -245,7 +245,7 @@ final readonly class ActivityProvider implements ProviderInterface
             return null;
         }
 
-        $id = $company->getId();
+        $id = $company->id;
         assert(null !== $id);
 
         return [
@@ -262,7 +262,7 @@ final readonly class ActivityProvider implements ProviderInterface
         $labels = [];
 
         foreach ($revision->getLabels() as $label) {
-            $id = $label->getId();
+            $id = $label->id;
             assert(null !== $id);
 
             $labels[] = [
@@ -282,7 +282,7 @@ final readonly class ActivityProvider implements ProviderInterface
         $signupLists = [];
 
         foreach ($activity->getLiveSignupLists() as $signupList) {
-            $id = $signupList->getId();
+            $id = $signupList->id;
             assert(null !== $id);
 
             $openDate = $signupList->openDate;

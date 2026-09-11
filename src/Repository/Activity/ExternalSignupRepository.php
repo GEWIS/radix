@@ -36,7 +36,7 @@ class ExternalSignupRepository extends ServiceEntityRepository
             ->andWhere('LOWER(e.email) = LOWER(:email)')
             ->setParameter(
                 'list',
-                $signupList->getId(),
+                $signupList->id,
                 Types::INTEGER,
             )
             ->setParameter(

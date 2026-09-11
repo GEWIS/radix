@@ -17,6 +17,7 @@ use App\Entity\User\User;
 use App\Security\Application\RevisionVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use stdClass;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
@@ -325,7 +326,11 @@ final class RevisionVoterTest extends TestCase
     private function organ(int $id): Organ
     {
         $organ = self::createStub(Organ::class);
-        $organ->method('getId')->willReturn($id);
+        $this->assignIdentifier(
+            $organ,
+            Organ::class,
+            $id,
+        );
 
         return $organ;
     }
@@ -333,9 +338,33 @@ final class RevisionVoterTest extends TestCase
     private function companyEntity(int $id): Company
     {
         $company = self::createStub(Company::class);
-        $company->method('getId')->willReturn($id);
+        $this->assignIdentifier(
+            $company,
+            Company::class,
+            $id,
+        );
 
         return $company;
+    }
+
+    /**
+     * An entity carries an identifier here because the voter compares bodies and companies by it. Written by
+     * reflection, because the identifier is Doctrine's to assign and the entities say so with their set visibility.
+     *
+     * @param class-string $entity
+     */
+    private function assignIdentifier(
+        object $of,
+        string $entity,
+        int $id,
+    ): void {
+        new ReflectionProperty(
+            $entity,
+            'id',
+        )->setValue(
+            $of,
+            $id,
+        );
     }
 
     private function tokenFor(?object $user): TokenInterface

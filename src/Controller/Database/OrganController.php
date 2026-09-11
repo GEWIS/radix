@@ -84,7 +84,7 @@ final class OrganController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/bodies/view',
-            ['organ' => $organ->getId()],
+            ['organ' => $organ->id],
         );
     }
 

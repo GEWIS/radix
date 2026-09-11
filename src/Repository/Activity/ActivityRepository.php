@@ -639,7 +639,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->andWhere('lr.endTime > :now')
             ->setParameter(
                 'companyId',
-                $company->getId(),
+                $company->id,
             )
             ->setParameter(
                 'now',
@@ -683,7 +683,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->andWhere('lr.endTime > :now')
             ->setParameter(
                 'organId',
-                $organ->getId(),
+                $organ->id,
             )
             ->setParameter(
                 'now',

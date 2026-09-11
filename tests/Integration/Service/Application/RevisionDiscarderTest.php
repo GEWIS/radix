@@ -83,8 +83,8 @@ final class RevisionDiscarderTest extends DatabaseTestCase
         $comment = $this->commentOn($draft);
         $this->entityManager->flush();
 
-        $draftId = (int) $draft->getId();
-        $commentId = (int) $comment->getId();
+        $draftId = (int) $draft->id;
+        $commentId = (int) $comment->id;
         $revisionClass = $draft::class;
         $commentClass = $draft->getCommentClass();
 

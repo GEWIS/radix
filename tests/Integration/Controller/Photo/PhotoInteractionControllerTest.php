@@ -45,7 +45,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         );
 
         $response = $this->controller()->tag(
-            (int) $this->tripPhoto()->getId(),
+            (int) $this->tripPhoto()->id,
             $this->payload(['type' => 'member', 'id' => self::OTHER_MEMBER]),
         );
 
@@ -65,7 +65,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
 
         // The member is already tagged in the trip photo by the fixtures.
         $response = $this->controller()->tag(
-            (int) $this->tripPhoto()->getId(),
+            (int) $this->tripPhoto()->id,
             $this->payload(['type' => 'member', 'id' => self::MEMBER]),
         );
 
@@ -86,7 +86,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             self::MEMBER,
         );
 
-        $response = $this->controller()->removeTag((int) $tag->getId());
+        $response = $this->controller()->removeTag((int) $tag->id);
 
         self::assertTrue($this->decode($response)['success']);
     }
@@ -99,7 +99,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         );
         $graduateTag = $this->graduateTag();
 
-        $response = $this->controller()->removeTag((int) $graduateTag->getId());
+        $response = $this->controller()->removeTag((int) $graduateTag->id);
 
         self::assertTrue($this->decode($response)['success']);
     }
@@ -112,7 +112,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         );
         $graduateTag = $this->graduateTag();
 
-        $response = $this->controller()->removeTag((int) $graduateTag->getId());
+        $response = $this->controller()->removeTag((int) $graduateTag->id);
 
         self::assertTrue($this->decode($response)['success']);
     }
@@ -126,7 +126,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         );
         $graduateTag = $this->graduateTag();
 
-        $response = $this->controller()->removeTag((int) $graduateTag->getId());
+        $response = $this->controller()->removeTag((int) $graduateTag->id);
 
         self::assertTrue($this->decode($response)['success']);
     }
@@ -143,7 +143,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         );
 
         $this->expectException(AccessDeniedException::class);
-        $this->controller()->removeTag((int) $othersTag->getId());
+        $this->controller()->removeTag((int) $othersTag->id);
     }
 
     public function testAGraduateCannotTag(): void
@@ -153,7 +153,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             self::BEFORE_ALBUMS,
         );
-        $photoId = (int) $this->graduateTag()->photo->getId();
+        $photoId = (int) $this->graduateTag()->photo->id;
         $this->authenticate(
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             UserRoles::Graduate,
@@ -186,7 +186,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             UserRoles::Member,
         );
         // The dinner photo has already been photo of the week in the seed, so it may not be voted for again.
-        $photoId = (int) $this->graduateTag()->photo->getId();
+        $photoId = (int) $this->graduateTag()->photo->id;
 
         $this->expectException(AccessDeniedException::class);
         $this->controller()->vote($photoId);
@@ -198,7 +198,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             self::BEFORE_ALBUMS,
         );
-        $photoId = (int) $this->graduateTag()->photo->getId();
+        $photoId = (int) $this->graduateTag()->photo->id;
         $this->authenticate(
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             UserRoles::Graduate,
@@ -214,7 +214,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             self::MEMBER,
             UserRoles::Member,
         );
-        $photoId = (int) $this->graduateTag()->photo->getId();
+        $photoId = (int) $this->graduateTag()->photo->id;
 
         $details = $this->decode($this->controller()->details($photoId));
 
@@ -260,7 +260,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         self::assertNotNull($album);
         foreach (self::getContainer()->get(PhotoRepository::class)->getAlbumPhotos($album) as $photo) {
             if (null === $photo->weeklyPhoto) {
-                return (int) $photo->getId();
+                return (int) $photo->id;
             }
         }
 
@@ -285,7 +285,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         int $lidnr,
     ): MemberTag {
         $tag = self::getContainer()->get(MemberTagRepository::class)->findTag(
-            (int) $photo->getId(),
+            (int) $photo->id,
             $lidnr,
         );
         self::assertInstanceOf(

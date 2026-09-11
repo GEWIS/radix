@@ -124,7 +124,7 @@ final class VacancyOverview extends AbstractDoctrinePaginatedOverview
     private function companyId(): ?int
     {
         if (null !== $this->company) {
-            return $this->company->getId();
+            return $this->company->id;
         }
 
         return '' !== strval($this->companyFilter)

@@ -161,7 +161,7 @@ class ActivityController extends AbstractController
             location: $entity->getLocation()->getText($language),
             url: $this->generateUrl(
                 'activity/view',
-                ['activity' => $entity->getId()],
+                ['activity' => $entity->id],
                 UrlGeneratorInterface::ABSOLUTE_URL,
             ),
         );

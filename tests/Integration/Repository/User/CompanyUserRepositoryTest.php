@@ -47,8 +47,8 @@ final class CompanyUserRepositoryTest extends DatabaseTestCase
             $second,
         );
         self::assertNotSame(
-            $first->getId(),
-            $second->getId(),
+            $first->id,
+            $second->id,
         );
         self::assertSame(
             $first->company,

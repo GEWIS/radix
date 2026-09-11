@@ -338,11 +338,11 @@ final readonly class SignupManager
     ): void {
         $existing = [];
         foreach ($signup->getFieldValues() as $fieldValue) {
-            $existing[intval($fieldValue->field->getId())] = $fieldValue;
+            $existing[intval($fieldValue->field->id)] = $fieldValue;
         }
 
         foreach ($signup->signupList->getFields() as $field) {
-            $fieldValue = $existing[intval($field->getId())] ?? null;
+            $fieldValue = $existing[intval($field->id)] ?? null;
             if (null === $fieldValue) {
                 $fieldValue = new SignupFieldValue();
                 $fieldValue->field = $field;
@@ -353,12 +353,12 @@ final readonly class SignupManager
             $fieldValue->value = null;
             $fieldValue->option = null;
 
-            $submitted = $fieldData[intval($field->getId())] ?? null;
+            $submitted = $fieldData[intval($field->id)] ?? null;
 
             switch ($field->type) {
                 case SignupFieldTypes::Choice:
                     foreach ($field->getOptions() as $option) {
-                        if ($option->getId() === (int) $submitted) {
+                        if ($option->id === (int) $submitted) {
                             $fieldValue->option = $option;
 
                             break;
@@ -415,7 +415,7 @@ final readonly class SignupManager
     ): void {
         $this->messageBus->dispatch(
             new ExternalSignupTokenEmail(
-                (int) $signup->getId(),
+                (int) $signup->id,
                 $token,
                 $purpose,
             ),

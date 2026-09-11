@@ -47,7 +47,7 @@ class MemberTag extends Tag
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'photo' => $this->photo->toGdprArray(),
         ];
     }

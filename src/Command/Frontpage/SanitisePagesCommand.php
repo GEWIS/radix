@@ -79,7 +79,7 @@ final class SanitisePagesCommand extends Command
             ++$changed;
             $io->writeln(sprintf(
                 'Page #%d contains markup that is not allowed.',
-                $page->getId() ?? 0,
+                $page->id ?? 0,
             ));
 
             if ($dryRun) {

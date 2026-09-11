@@ -82,7 +82,7 @@ class PhotoInteractionController extends AbstractController
         foreach ($this->memberTagRepository->findByPhotoWithMember($photo) as $tag) {
             $taggedSelf = $taggedSelf || $tag->member->lidnr === $member->lidnr;
             $memberTags[] = [
-                'id' => $tag->getId(),
+                'id' => $tag->id,
                 'lidnr' => $tag->member->lidnr,
                 'fullName' => $tag->member->getFullName(),
                 'x' => $tag->positionX,
@@ -97,8 +97,8 @@ class PhotoInteractionController extends AbstractController
         $organTags = [];
         foreach ($this->organTagRepository->findByPhotoWithOrgan($photo) as $tag) {
             $organTags[] = [
-                'id' => $tag->getId(),
-                'organId' => $tag->organ->getId(),
+                'id' => $tag->id,
+                'organId' => $tag->organ->id,
                 'name' => $tag->organ->name,
                 'abbr' => $tag->organ->abbr,
                 'x' => $tag->positionX,
@@ -194,7 +194,7 @@ class PhotoInteractionController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'id' => $tag->getId(),
+            'id' => $tag->id,
         ]);
     }
 
@@ -299,7 +299,7 @@ class PhotoInteractionController extends AbstractController
     {
         return new JsonResponse(array_map(
             static fn (Organ $organ): array => [
-                'id' => $organ->getId(),
+                'id' => $organ->id,
                 'abbr' => $organ->abbr,
                 'name' => $organ->name,
             ],

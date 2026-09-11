@@ -223,7 +223,7 @@ final readonly class ActivityProposalManager
      */
     private function tellTheBoard(ActivityProposal $proposal): void
     {
-        $proposalId = $proposal->getId();
+        $proposalId = $proposal->id;
 
         if (null === $proposalId) {
             return;
@@ -250,8 +250,8 @@ final readonly class ActivityProposalManager
     ): string {
         return sprintf(
             'activity_proposal_%d_%d',
-            $proposal->period->getId() ?? 0,
-            $organ->getId() ?? 0,
+            $proposal->period->id ?? 0,
+            $organ->id ?? 0,
         );
     }
 }

@@ -333,14 +333,14 @@ class Poll implements RevisableInterface
         if (null !== $revision) {
             foreach ($revision->getOptions() as $option) {
                 $options[] = [
-                    'id' => $option->getId(),
+                    'id' => $option->id,
                     'value' => $option->text->toGdprArray(),
                 ];
             }
         }
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'expiryDate' => $this->expiryDate?->format(DateTimeInterface::ATOM),
             'question' => $revision?->question->toGdprArray(),
             'options' => $options,

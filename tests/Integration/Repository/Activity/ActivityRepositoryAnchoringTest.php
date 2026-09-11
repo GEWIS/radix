@@ -279,7 +279,7 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             ),
         );
 
-        return (int) $organ->getId();
+        return (int) $organ->id;
     }
 
     private function nonApprovedActivityIdByCreator(int $lidnr): int
@@ -316,7 +316,7 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
             ),
         );
 
-        return (int) $activity->getId();
+        return (int) $activity->id;
     }
 
     /**
@@ -332,7 +332,7 @@ final class ActivityRepositoryAnchoringTest extends DatabaseTestCase
                 Activity::class,
                 $activity,
             );
-            $ids[] = (int) $activity->getId();
+            $ids[] = (int) $activity->id;
         }
 
         return $ids;

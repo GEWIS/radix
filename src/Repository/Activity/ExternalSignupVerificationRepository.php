@@ -98,7 +98,7 @@ class ExternalSignupVerificationRepository extends ServiceEntityRepository
             ->where('v.externalSignup = :signup')
             ->setParameter(
                 'signup',
-                $externalSignup->getId(),
+                $externalSignup->id,
                 Types::INTEGER,
             )
             ->getQuery()

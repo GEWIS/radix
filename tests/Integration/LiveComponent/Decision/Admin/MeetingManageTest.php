@@ -60,13 +60,13 @@ final class MeetingManageTest extends DatabaseTestCase
         $document = $component->getView()->points[0]->documents[0];
 
         $component->pointEdits = [
-            (string) $point->getId() => [
+            (string) $point->id => [
                 'number' => '9',
                 'title' => 'Renumbered',
             ],
         ];
         $component->documentEdits = [
-            (string) $document->getId() => ['name' => 'Agenda (final)'],
+            (string) $document->id => ['name' => 'Agenda (final)'],
         ];
         $component->syncEdits();
 
@@ -95,7 +95,7 @@ final class MeetingManageTest extends DatabaseTestCase
         $component = $this->manageFor();
 
         $point = $this->point('2');
-        $component->deletePoint((int) $point->getId());
+        $component->deletePoint((int) $point->id);
 
         $view = $component->getView();
         $names = array_map(
@@ -118,7 +118,7 @@ final class MeetingManageTest extends DatabaseTestCase
         $component = $this->manageFor();
 
         $document = $component->getView()->meetingLevelDocuments[0];
-        $component->deleteDocument((int) $document->getId());
+        $component->deleteDocument((int) $document->id);
 
         self::assertSame(
             [],
@@ -132,7 +132,7 @@ final class MeetingManageTest extends DatabaseTestCase
         $component = $this->manageFor();
 
         $ids = array_map(
-            static fn (MeetingPointView $pointView) => (int) $pointView->point->getId(),
+            static fn (MeetingPointView $pointView) => (int) $pointView->point->id,
             $component->getView()->points,
         );
         $component->reorderPoints(array_reverse($ids));
@@ -140,7 +140,7 @@ final class MeetingManageTest extends DatabaseTestCase
         self::assertSame(
             array_reverse($ids),
             array_map(
-                static fn (MeetingPointView $pointView) => (int) $pointView->point->getId(),
+                static fn (MeetingPointView $pointView) => (int) $pointView->point->id,
                 $component->getView()->points,
             ),
         );
@@ -168,7 +168,7 @@ final class MeetingManageTest extends DatabaseTestCase
             $component->getView()->references,
         );
 
-        $component->toggleReference((int) $definitions->getId());
+        $component->toggleReference((int) $definitions->id);
         $references = $component->getView()->references;
         self::assertCount(
             2,
@@ -187,7 +187,7 @@ final class MeetingManageTest extends DatabaseTestCase
             );
         }
 
-        $component->toggleReference((int) $definitions->getId());
+        $component->toggleReference((int) $definitions->id);
         self::assertCount(
             1,
             $component->getView()->references,
@@ -234,7 +234,7 @@ final class MeetingManageTest extends DatabaseTestCase
         $original = $scenarios->getVersions()->first();
         self::assertNotFalse($original);
 
-        $component->pins = [(string) $scenarios->getId() => (string) $original->getId()];
+        $component->pins = [(string) $scenarios->id => (string) $original->id];
         $component->syncEdits();
 
         $selection = $component->getView()->references[0];
@@ -371,7 +371,7 @@ final class MeetingManageTest extends DatabaseTestCase
         self::assertNotEmpty($view->points);
 
         foreach ($view->points as $pointView) {
-            $id = (string) $pointView->point->getId();
+            $id = (string) $pointView->point->id;
 
             self::assertArrayHasKey(
                 $id,

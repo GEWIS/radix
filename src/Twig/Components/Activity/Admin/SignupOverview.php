@@ -295,7 +295,7 @@ final class SignupOverview
         foreach ($this->activity->getLiveSignupLists() as $signupList) {
             foreach ($this->confirmedSignups($signupList) as $signup) {
                 $memberships[$signup->personKey()][] = [
-                    'listId' => $signupList->getId() ?? 0,
+                    'listId' => $signupList->id ?? 0,
                     'name' => $signupList->name->getText($language) ?? '',
                     'waiting' => $signupList->limitedCapacity && !$signup->drawn,
                 ];
@@ -698,7 +698,7 @@ final class SignupOverview
                     RecipientScope::External => $external,
                     RecipientScope::Present => $signup->present,
                     RecipientScope::Selected => in_array(
-                        $signup->getId(),
+                        $signup->id,
                         $selected,
                         true,
                     ),
@@ -852,7 +852,7 @@ final class SignupOverview
 
         $chosen = null;
         foreach ($list->getRoles() as $role) {
-            if ($role->getId() !== $roleId) {
+            if ($role->id !== $roleId) {
                 continue;
             }
 
@@ -981,7 +981,7 @@ final class SignupOverview
 
         $selected = $this->selectedIds();
         foreach ($this->confirmedSignups($list) as $signup) {
-            $id = $signup->getId();
+            $id = $signup->id;
             if (
                 null === $id
                 || in_array(
@@ -1016,7 +1016,7 @@ final class SignupOverview
 
         $listIds = [];
         foreach ($list->getSignUps() as $signup) {
-            $id = $signup->getId();
+            $id = $signup->id;
             if (null === $id) {
                 continue;
             }
@@ -1570,7 +1570,7 @@ final class SignupOverview
             $include = match ($scope) {
                 RecipientScope::All => true,
                 RecipientScope::Selected => in_array(
-                    $signup->getId(),
+                    $signup->id,
                     $selected,
                     true,
                 ),
@@ -1610,7 +1610,7 @@ final class SignupOverview
     {
         foreach ($this->activity->getLiveSignupLists() as $signupList) {
             foreach ($this->confirmedSignups($signupList) as $signup) {
-                if ($signup->getId() === $signupId) {
+                if ($signup->id === $signupId) {
                     return $signup;
                 }
             }
@@ -1622,7 +1622,7 @@ final class SignupOverview
     private function findOwnedList(int $listId): ?SignupList
     {
         foreach ($this->activity->getLiveSignupLists() as $signupList) {
-            if ($signupList->getId() === $listId) {
+            if ($signupList->id === $listId) {
                 return $signupList;
             }
         }

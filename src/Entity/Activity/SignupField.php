@@ -197,7 +197,7 @@ class SignupField
         }
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'sensitive' => $this->isSensitive,
             'name' => $this->name->getValueNL(),
             'nameEn' => $this->name->getValueEN(),
@@ -221,7 +221,7 @@ class SignupField
         }
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'sensitive' => $this->isSensitive,
             'name' => $this->name->toGdprArray(),
             'type' => $this->type->value,

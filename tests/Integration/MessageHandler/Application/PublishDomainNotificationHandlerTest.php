@@ -22,7 +22,7 @@ final class PublishDomainNotificationHandlerTest extends DatabaseTestCase
     public function testAProposedBannerIsAnnouncedToTheCommittee(): void
     {
         $package = $this->bannerPackage();
-        $subjectId = $package->getId();
+        $subjectId = $package->id;
         self::assertNotNull($subjectId);
 
         $this->handler()(new PublishDomainNotificationMessage(

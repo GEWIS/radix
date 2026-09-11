@@ -100,7 +100,7 @@ class SignupOption
     public function toArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'value' => $this->value->getValueNL(),
             'valueEn' => $this->value->getValueEN(),
         ];
@@ -112,7 +112,7 @@ class SignupOption
     public function toGdprArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'value' => $this->value->toGdprArray(),
         ];
     }

@@ -77,7 +77,7 @@ final readonly class NotifyOnProposalDecisionListener
             return;
         }
 
-        $proposalId = $proposal->getId();
+        $proposalId = $proposal->id;
 
         if (null === $proposalId) {
             return;

@@ -35,7 +35,7 @@ final class PollNotificationSubjectNamer extends AbstractNotificationSubjectName
         $names = [];
 
         foreach ($this->revisionRepository->findBy(['id' => $subjectIds]) as $revision) {
-            $id = $revision->getId();
+            $id = $revision->id;
             if (null === $id) {
                 continue;
             }

@@ -199,7 +199,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->andWhere('p.expires > CURRENT_DATE()')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             );
 
@@ -220,7 +220,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->andWhere('p.expires > :now')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->setParameter(

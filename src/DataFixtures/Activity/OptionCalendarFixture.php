@@ -601,7 +601,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             )
                 ->setParameter(
                     'id',
-                    $proposal->getId(),
+                    $proposal->id,
                 )
                 ->execute();
         }

@@ -88,7 +88,7 @@ final class ActivityOverviewQueryTest extends DatabaseTestCase
         ));
 
         self::assertNotContains(
-            (int) $activity->getId(),
+            (int) $activity->id,
             $archiveIds,
         );
     }
@@ -122,7 +122,7 @@ final class ActivityOverviewQueryTest extends DatabaseTestCase
     private function ids(Paginator $paginator): array
     {
         return array_map(
-            static fn (Activity $activity): int => (int) $activity->getId(),
+            static fn (Activity $activity): int => (int) $activity->id,
             iterator_to_array(
                 $paginator->getIterator(),
                 false,

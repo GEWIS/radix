@@ -55,13 +55,13 @@ final readonly class PhotoOfTheWeekProvider implements ProviderInterface
         return new PhotoOfTheWeekResource(
             week: $weeklyPhoto->week->format(DateTimeInterface::ATOM),
             photo: [
-                'id' => (int) $photo->getId(),
+                'id' => (int) $photo->id,
                 'dateTime' => $photo->dateTime->format(DateTimeInterface::ATOM),
                 'artist' => $photo->artist,
                 'camera' => $photo->camera,
                 'aspectRatio' => $photo->aspectRatio,
                 'album' => [
-                    'id' => (int) $photo->album->getId(),
+                    'id' => (int) $photo->album->id,
                     'name' => $photo->album->name,
                 ],
             ],

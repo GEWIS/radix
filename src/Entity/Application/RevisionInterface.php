@@ -18,7 +18,7 @@ use DateTime;
  */
 interface RevisionInterface
 {
-    public function getId(): ?int;
+    public ?int $id { get; }
 
     public function getStatus(): RevisionStatus;
 

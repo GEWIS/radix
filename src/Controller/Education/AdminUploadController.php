@@ -61,7 +61,7 @@ class AdminUploadController extends AbstractController
 
         $forms = [];
         foreach ($staged as $document) {
-            $forms[$document->getId() ?? 0] = $this->createForm(
+            $forms[$document->id ?? 0] = $this->createForm(
                 StagedDocumentType::class,
                 $document,
             )->createView();
@@ -114,7 +114,7 @@ class AdminUploadController extends AbstractController
         }
 
         return $this->json([
-            'id' => $staged->getId(),
+            'id' => $staged->id,
             'filename' => $staged->originalFilename,
         ]);
     }
@@ -175,7 +175,7 @@ class AdminUploadController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"education_staged_discard-" ~ args["staged"].getId()'),
+        id: new Expression('"education_staged_discard-" ~ args["staged"].id'),
         tokenKey: '_csrf_token',
     )]
     public function discard(CourseDocumentStaging $staged): Response

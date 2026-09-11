@@ -169,7 +169,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
                 continue;
             }
 
-            $wanted[] = (int) $package->getId();
+            $wanted[] = (int) $package->id;
         }
 
         $choices = $this->build(company: $company)
@@ -198,7 +198,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
     public function testThePackageAVacancyIsAlreadySoldUnderStaysChoosable(): void
     {
         $vacancy = $this->seededVacancy('backend-engineer');
-        $current = (int) $vacancy->package->getId();
+        $current = (int) $vacancy->package->id;
 
         $data = new VacancyData();
         $data->step = VacancyData::STEP_GENERAL;
@@ -237,7 +237,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
 
         $general = $overrides + [
             'slugName' => 'a-new-role',
-            'packageId' => (string) $this->jobPackage($company)->getId(),
+            'packageId' => (string) $this->jobPackage($company)->id,
             'published' => '1',
             'category' => VacancyCategories::Jobs->value,
             'labelIds' => [],

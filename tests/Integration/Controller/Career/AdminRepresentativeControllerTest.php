@@ -61,7 +61,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $representative = $this->representative('talent@nexunt.example.com');
         $response = $this->controller()->disableRepresentative(
             $this->companyId(),
-            (int) $representative->getId(),
+            (int) $representative->id,
             $this->user(),
         );
 
@@ -84,7 +84,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $representative = $this->representative('former@nexunt.example.com');
         $this->controller()->enableRepresentative(
             $this->companyId(),
-            (int) $representative->getId(),
+            (int) $representative->id,
             $this->user(),
         );
 
@@ -107,8 +107,8 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $before = $company->primaryContact;
 
         $this->controller()->makePrimaryContact(
-            (int) $company->getId(),
-            (int) $this->representative('former@nexunt.example.com')->getId(),
+            (int) $company->id,
+            (int) $this->representative('former@nexunt.example.com')->id,
             $this->user(),
         );
 
@@ -128,8 +128,8 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $representative = $this->representative('talent@nexunt.example.com');
 
         $this->controller()->makePrimaryContact(
-            (int) $company->getId(),
-            (int) $representative->getId(),
+            (int) $company->id,
+            (int) $representative->id,
             $this->user(),
         );
 
@@ -154,10 +154,10 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
             CompanyUser::class,
             $primary,
         );
-        $representativeId = (int) $primary->getId();
+        $representativeId = (int) $primary->id;
 
         $this->controller()->removeRepresentative(
-            (int) $company->getId(),
+            (int) $company->id,
             $representativeId,
             $this->user(),
         );
@@ -180,7 +180,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->controller()->disableRepresentative(
             $this->companyId(),
-            (int) $this->representative('recruitment@orbit-analytics.example.com')->getId(),
+            (int) $this->representative('recruitment@orbit-analytics.example.com')->id,
             $this->user(),
         );
     }
@@ -200,7 +200,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
 
     private function companyId(): int
     {
-        return (int) $this->company()->getId();
+        return (int) $this->company()->id;
     }
 
     private function company(string $slug = 'nexunt'): Company

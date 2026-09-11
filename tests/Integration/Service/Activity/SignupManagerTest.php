@@ -289,7 +289,7 @@ final class SignupManagerTest extends DatabaseTestCase
             'bye.now@example.org',
             [],
         );
-        $signupId = (int) $signup->getId();
+        $signupId = (int) $signup->id;
         $selector = $this->tokenFor(
             $signup,
             ExternalSignupVerificationPurpose::Verify,
@@ -517,7 +517,7 @@ final class SignupManagerTest extends DatabaseTestCase
             )
             ->setParameter(
                 'id',
-                (int) $list->getId(),
+                (int) $list->id,
                 Types::INTEGER,
             )
             ->getQuery()
@@ -547,7 +547,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ->setMaxResults((int) $list->capacity)
             ->setParameter(
                 'list',
-                (int) $list->getId(),
+                (int) $list->id,
                 Types::INTEGER,
             )
             ->getQuery()
@@ -639,12 +639,12 @@ final class SignupManagerTest extends DatabaseTestCase
         foreach ($list->getFields() as $field) {
             if (SignupFieldTypes::Choice === $field->type) {
                 $options = $field->getOptions()->getValues();
-                $answers[(int) $field->getId()] = (int) $options[$optionIndex]->getId();
+                $answers[(int) $field->id] = (int) $options[$optionIndex]->id;
 
                 continue;
             }
 
-            $answers[(int) $field->getId()] = $text;
+            $answers[(int) $field->id] = $text;
         }
 
         return $answers;
@@ -667,12 +667,12 @@ final class SignupManagerTest extends DatabaseTestCase
         );
 
         foreach ($signup->getFieldValues() as $value) {
-            $submitted = $answers[(int) $value->field->getId()];
+            $submitted = $answers[(int) $value->field->id];
 
             if (SignupFieldTypes::Choice === $value->field->type) {
                 self::assertSame(
                     $submitted,
-                    $value->option?->getId(),
+                    $value->option?->id,
                 );
                 self::assertNull($value->value);
 

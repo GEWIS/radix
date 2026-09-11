@@ -545,7 +545,7 @@ class Activity implements RevisableInterface
         }
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'name' => $this->getName()->getValueNL(),
             'nameEn' => $this->getName()->getValueEN(),
             'beginTime' => $this->getBeginTime(),
@@ -586,15 +586,15 @@ class Activity implements RevisableInterface
         }
 
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'name' => $this->getName()->toGdprArray(),
             'beginTime' => $this->getBeginTime()->format(DateTimeInterface::ATOM),
             'endTime' => $this->getEndTime()->format(DateTimeInterface::ATOM),
             'location' => $this->getLocation()->toGdprArray(),
             'costs' => $this->getCosts()->toGdprArray(),
             'description' => $this->getDescription()->toGdprArray(),
-            'organ' => $this->getOrgan()?->getId(),
-            'company' => $this->getCompany()?->getId(),
+            'organ' => $this->getOrgan()?->id,
+            'company' => $this->getCompany()?->id,
             'category' => $this->getCategory()->value,
             'requireGEFLITST' => $this->getRequireGEFLITST(),
             'requireZettle' => $this->getRequireZettle(),

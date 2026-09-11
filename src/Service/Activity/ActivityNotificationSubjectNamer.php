@@ -41,7 +41,7 @@ final class ActivityNotificationSubjectNamer extends AbstractNotificationSubject
 
         if (NotificationType::ActivityPublished === $type) {
             foreach ($this->activityRepository->findBy(['id' => $subjectIds]) as $activity) {
-                $id = $activity->getId();
+                $id = $activity->id;
                 if (null === $id) {
                     continue;
                 }
@@ -53,7 +53,7 @@ final class ActivityNotificationSubjectNamer extends AbstractNotificationSubject
         }
 
         foreach ($this->revisionRepository->findBy(['id' => $subjectIds]) as $revision) {
-            $id = $revision->getId();
+            $id = $revision->id;
             if (null === $id) {
                 continue;
             }

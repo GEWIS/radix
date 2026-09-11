@@ -152,7 +152,7 @@ class OrganMember
     {
         return [
             'organ' => [
-                'id' => $this->organ->getId(),
+                'id' => $this->organ->id,
                 'abbreviation' => $this->organ->abbr,
             ],
             'function' => $this->function->value,

@@ -72,7 +72,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->setParameter(
                 'app_id',
-                $app->getId(),
+                $app->id,
             )
             ->setParameter(
                 'user_id',

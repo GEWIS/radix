@@ -126,14 +126,14 @@ final class VacancyData
         VacancyRevision $revision,
     ): self {
         $data = new self();
-        $data->vacancyId = $vacancy->getId();
+        $data->vacancyId = $vacancy->id;
         $data->slugName = $vacancy->slugName;
-        $data->packageId = $vacancy->package->getId();
+        $data->packageId = $vacancy->package->id;
         $data->published = $vacancy->published;
 
         $data->category = $revision->category;
         $data->labelIds = array_map(
-            static fn (VacancyLabel $label): int => (int) $label->getId(),
+            static fn (VacancyLabel $label): int => (int) $label->id,
             $revision->getLabels()->toArray(),
         );
         $data->startDate = null !== $revision->startDate

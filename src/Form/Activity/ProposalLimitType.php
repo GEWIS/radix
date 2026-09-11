@@ -50,7 +50,7 @@ class ProposalLimitType extends AbstractType
                     'placeholder' => t('Select a body'),
                     'constraints' => [new NotNull(message: 'Pick the body this applies to.')],
                     // The body an exception is about is what makes it unique, so it is settled when the row is created.
-                    'disabled' => null !== $options['data']?->getId(),
+                    'disabled' => null !== $options['data']?->id,
                 ],
             )
             ->add(

@@ -145,7 +145,7 @@ final class RemindOptionBudgetCommand extends Command
      */
     private function warn(ActivityProposal $proposal): void
     {
-        $proposalId = $proposal->getId();
+        $proposalId = $proposal->id;
 
         if (null === $proposalId) {
             return;

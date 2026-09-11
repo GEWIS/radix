@@ -40,9 +40,9 @@ class OrganTag extends Tag
     public function toArray(): array
     {
         return [
-            'id' => $this->getId(),
-            'photo_id' => $this->photo->getId(),
-            'organ_id' => $this->organ->getId(),
+            'id' => $this->id,
+            'photo_id' => $this->photo->id,
+            'organ_id' => $this->organ->id,
         ];
     }
 }

@@ -181,7 +181,7 @@ final class SignupList
                 return new RedirectResponse(
                     $this->urlGenerator->generate(
                         'activity/view',
-                        ['activity' => $this->signupList->getActivity()->getId()],
+                        ['activity' => $this->signupList->getActivity()->id],
                     ),
                 );
             }
@@ -192,7 +192,7 @@ final class SignupList
         // Close the modal client-side (scoped to this list) now that the panel will re-render to the signed-up state.
         $this->dispatchBrowserEvent(
             'signup:success',
-            ['listId' => $this->signupList->getId()],
+            ['listId' => $this->signupList->id],
         );
 
         return null;

@@ -17,6 +17,7 @@ use App\Service\Photo\PhotoPrivacyService;
 use App\Service\Photo\ProfilePhotoService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Bundle\SecurityBundle\Security;
 
 use function array_map;
@@ -188,7 +189,14 @@ final class PhotoPrivacyServiceTest extends TestCase
     private function photo(int $id): Photo
     {
         $photo = self::createStub(Photo::class);
-        $photo->method('getId')->willReturn($id);
+        // By reflection, because the identifier is Doctrine's to assign, and the hidden ids are keyed on it.
+        new ReflectionProperty(
+            Photo::class,
+            'id',
+        )->setValue(
+            $photo,
+            $id,
+        );
 
         return $photo;
     }
@@ -201,7 +209,7 @@ final class PhotoPrivacyServiceTest extends TestCase
     private function ids(array $photos): array
     {
         return array_map(
-            static fn (Photo $photo): int => intval($photo->getId()),
+            static fn (Photo $photo): int => intval($photo->id),
             $photos,
         );
     }

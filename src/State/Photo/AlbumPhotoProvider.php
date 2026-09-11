@@ -91,7 +91,7 @@ final readonly class AlbumPhotoProvider implements ProviderInterface
     private function resource(Photo $photo): PhotoResource
     {
         return new PhotoResource(
-            id: (int) $photo->getId(),
+            id: (int) $photo->id,
             dateTime: $photo->dateTime->format(DateTimeInterface::ATOM),
             artist: $photo->artist,
             camera: $photo->camera,
@@ -164,7 +164,7 @@ final readonly class AlbumPhotoProvider implements ProviderInterface
 
         if ($tag instanceof OrganTag) {
             return [
-                'organId' => (int) $tag->organ->getId(),
+                'organId' => (int) $tag->organ->id,
                 'abbreviation' => $tag->organ->abbr,
             ];
         }

@@ -38,7 +38,7 @@ final readonly class AlbumAdminService
      */
     public function regenerateCover(Album $album): void
     {
-        $this->messageBus->dispatch(new GenerateAlbumCoverMessage(intval($album->getId())));
+        $this->messageBus->dispatch(new GenerateAlbumCoverMessage(intval($album->id)));
     }
 
     /**
@@ -57,11 +57,11 @@ final readonly class AlbumAdminService
         $moved = 0;
         foreach ($photos as $photo) {
             $source = $photo->album;
-            if ($source->getId() === $destination->getId()) {
+            if ($source->id === $destination->id) {
                 continue;
             }
 
-            $affectedAlbumIds[intval($source->getId())] = true;
+            $affectedAlbumIds[intval($source->id)] = true;
             $photo->album = $destination;
             ++$moved;
         }
@@ -72,7 +72,7 @@ final readonly class AlbumAdminService
 
         $this->entityManager->flush();
 
-        $affectedAlbumIds[intval($destination->getId())] = true;
+        $affectedAlbumIds[intval($destination->id)] = true;
         foreach (array_keys($affectedAlbumIds) as $albumId) {
             $this->messageBus->dispatch(new GenerateAlbumCoverMessage($albumId));
         }
@@ -91,7 +91,7 @@ final readonly class AlbumAdminService
         $albumIds = [];
         foreach ($photos as $photo) {
             $paths[] = $photo->path;
-            $albumIds[intval($photo->album->getId())] = true;
+            $albumIds[intval($photo->album->id)] = true;
             $this->entityManager->remove($photo);
         }
 

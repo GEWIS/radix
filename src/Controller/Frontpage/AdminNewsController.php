@@ -133,7 +133,7 @@ class AdminNewsController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"news_delete-" ~ args["item"].getId()'),
+        id: new Expression('"news_delete-" ~ args["item"].id'),
         tokenKey: '_csrf_token',
     )]
     public function delete(NewsItem $item): Response

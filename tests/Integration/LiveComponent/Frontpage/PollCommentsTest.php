@@ -71,9 +71,9 @@ final class PollCommentsTest extends DatabaseTestCase
         $before = count($top->getReplies());
 
         $component->author = 'Somebody';
-        $component->startReply($top->getId() ?? 0);
+        $component->startReply($top->id ?? 0);
         $component->replyContent = 'Not for me.';
-        $component->reply($top->getId() ?? 0);
+        $component->reply($top->id ?? 0);
 
         self::assertNull($component->problem);
         self::assertCount(
@@ -90,7 +90,7 @@ final class PollCommentsTest extends DatabaseTestCase
         $comment = $component->topLevelComments()[0];
 
         $component->react(
-            $comment->getId() ?? 0,
+            $comment->id ?? 0,
             PollCommentReactionType::Love->value,
         );
         self::assertSame(
@@ -99,7 +99,7 @@ final class PollCommentsTest extends DatabaseTestCase
         );
 
         $component->react(
-            $comment->getId() ?? 0,
+            $comment->id ?? 0,
             PollCommentReactionType::Love->value,
         );
         self::assertNull($component->myReaction($comment));
@@ -131,7 +131,7 @@ final class PollCommentsTest extends DatabaseTestCase
 
         $component->problem = null;
         $component->react(
-            $comment->getId() ?? 0,
+            $comment->id ?? 0,
             PollCommentReactionType::Like->value,
         );
         self::assertNotNull($component->problem);

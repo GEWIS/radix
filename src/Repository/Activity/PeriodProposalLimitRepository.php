@@ -65,7 +65,7 @@ class PeriodProposalLimitRepository extends ServiceEntityRepository
 
         $byOrgan = [];
         foreach ($limits as $limit) {
-            $organId = $limit->organ->getId();
+            $organId = $limit->organ->id;
 
             if (null === $organId) {
                 continue;

@@ -156,7 +156,7 @@ final class ExternalSignupForm
             // reveals that the address was already used.
             $this->messageBus->dispatch(
                 new ExternalSignupResendVerificationEmail(
-                    (int) $this->signupList->getId(),
+                    (int) $this->signupList->id,
                     $email,
                 ),
             );
@@ -182,7 +182,7 @@ final class ExternalSignupForm
                 return new RedirectResponse(
                     $this->urlGenerator->generate(
                         'activity/view',
-                        ['activity' => $this->signupList->getActivity()->getId()],
+                        ['activity' => $this->signupList->getActivity()->id],
                     ),
                 );
             }
@@ -196,7 +196,7 @@ final class ExternalSignupForm
         return new RedirectResponse(
             $this->urlGenerator->generate(
                 'activity/view',
-                ['activity' => $this->signupList->getActivity()->getId()],
+                ['activity' => $this->signupList->getActivity()->id],
             ),
         );
     }

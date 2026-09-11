@@ -312,7 +312,7 @@ final class DrawManagerTest extends DatabaseTestCase
         // The external ranks below every member, so they are last on the waiting list rather than first.
         self::assertSame(
             $external,
-            (int) $ranked[count($ranked) - 1]->getId(),
+            (int) $ranked[count($ranked) - 1]->id,
         );
         self::assertFalse($ranked[count($ranked) - 1]->drawn);
     }
@@ -621,7 +621,7 @@ final class DrawManagerTest extends DatabaseTestCase
                 continue;
             }
 
-            return (int) $signup->getId();
+            return (int) $signup->id;
         }
 
         self::fail('The seed is expected to contain a confirmed external sign-up on this list.');
@@ -706,7 +706,7 @@ final class DrawManagerTest extends DatabaseTestCase
                 continue;
             }
 
-            $ids[] = (int) $signup->getId();
+            $ids[] = (int) $signup->id;
         }
 
         return $ids;
@@ -721,7 +721,7 @@ final class DrawManagerTest extends DatabaseTestCase
     {
         $ids = [];
         foreach ($this->list($listId)->getSignUps() as $signup) {
-            $ids[] = (int) $signup->getId();
+            $ids[] = (int) $signup->id;
         }
 
         return $ids;
@@ -757,7 +757,7 @@ final class DrawManagerTest extends DatabaseTestCase
         ?DrawCutoffRule $rule = null,
         ?string $cutoffAt = null,
     ): void {
-        $revisionId = $this->list($listId)->revision->getId();
+        $revisionId = $this->list($listId)->revision->id;
         $connection = $this->entityManager->getConnection();
 
         $fields = [

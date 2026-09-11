@@ -94,7 +94,7 @@ final class PageData
     public static function fromEntity(Page $page): self
     {
         $data = new self();
-        $data->pageId = $page->getId();
+        $data->pageId = $page->id;
         $data->requiredRole = $page->requiredRole;
         $data->categoryNL = $page->category->getValueNL();
         $data->categoryEN = $page->category->getValueEN();

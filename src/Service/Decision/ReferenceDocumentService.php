@@ -259,12 +259,12 @@ final readonly class ReferenceDocumentService
 
         $existing = [];
         foreach ($this->selectionRepository->findForMeeting($meeting) as $selection) {
-            $existing[(int) $selection->referenceDocument->getId()] = true;
+            $existing[(int) $selection->referenceDocument->id] = true;
         }
 
         $copied = 0;
         foreach ($this->selectionRepository->findForMeeting($previous[0]) as $selection) {
-            if (isset($existing[(int) $selection->referenceDocument->getId()])) {
+            if (isset($existing[(int) $selection->referenceDocument->id])) {
                 continue;
             }
 

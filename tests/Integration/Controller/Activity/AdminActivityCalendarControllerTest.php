@@ -135,8 +135,8 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
             [
                 'activity_proposal' => [
                     '_csrf_token' => 'csrf-token',
-                    'organ' => (string) $organ->getId(),
-                    'period' => (string) $period->getId(),
+                    'organ' => (string) $organ->id,
+                    'period' => (string) $period->id,
                     'name' => $name,
                     'description' => '',
                     'dateOptions' => [

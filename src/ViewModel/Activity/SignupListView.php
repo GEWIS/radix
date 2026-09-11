@@ -132,8 +132,8 @@ final readonly class SignupListView
         }
 
         return new self(
-            listId: (int) $signupList->getId(),
-            activityId: (int) $signupList->getActivity()->getId(),
+            listId: (int) $signupList->id,
+            activityId: (int) $signupList->getActivity()->id,
             name: $signupList->name->getText($language) ?? '',
             openDate: $signupList->openDate,
             closeDate: $signupList->closeDate,

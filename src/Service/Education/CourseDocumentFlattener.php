@@ -109,7 +109,7 @@ final readonly class CourseDocumentFlattener
         $document->clearPages();
         $this->entityManager->flush();
 
-        $scope = strval($document->getId());
+        $scope = strval($document->id);
 
         foreach ($renderedPages as $index => $renderedPage) {
             $dimensions = getimagesize($renderedPage);

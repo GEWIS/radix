@@ -43,7 +43,7 @@ class CompanyRevisionCommentRepository extends ServiceEntityRepository implement
      */
     public function findThreadForCompany(Company $company): array
     {
-        return $this->findThread($company->getId());
+        return $this->findThread($company->id);
     }
 
     #[Override]

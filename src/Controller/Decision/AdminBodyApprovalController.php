@@ -95,7 +95,7 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"body_review_comment-" ~ args["revision"].getId()'),
+        id: new Expression('"body_review_comment-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function comment(
@@ -124,7 +124,7 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"body_discard-" ~ args["revision"].getId()'),
+        id: new Expression('"body_discard-" ~ args["revision"].id'),
         tokenKey: '_csrf_token',
     )]
     public function discard(OrganInformationRevision $revision): Response
@@ -132,7 +132,7 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
         return $this->discardDraft(
             $revision,
             'admin/bodies/view',
-            ['organ' => $revision->getOrgan()->getId()],
+            ['organ' => $revision->getOrgan()->id],
         );
     }
 
@@ -169,7 +169,7 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
         return match ($transition) {
             'submit' => $this->redirectToRoute(
                 'admin/bodies/view',
-                ['organ' => $revision->getOrgan()->getId()],
+                ['organ' => $revision->getOrgan()->id],
             ),
             'start_review' => $this->reviewResponse($revision),
             default => $this->redirectToRoute('admin/bodies/approvals/index'),
@@ -198,7 +198,7 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
     {
         return $this->redirectToRoute(
             'admin/bodies/approvals/review',
-            ['revision' => $revision->getId()],
+            ['revision' => $revision->id],
         );
     }
 }

@@ -158,13 +158,13 @@ final readonly class SignupAdminListView
         array $memberships = [],
     ): self {
         $language = Languages::current();
-        $listId = $signupList->getId() ?? 0;
+        $listId = $signupList->id ?? 0;
 
         $fields = $signupList->getFields()->toArray();
         $fieldColumns = [];
         $visibleFieldCount = 0;
         foreach ($fields as $field) {
-            $fieldId = $field->getId() ?? 0;
+            $fieldId = $field->id ?? 0;
             $hidden = in_array(
                 $fieldId,
                 $hiddenFieldIds,
@@ -187,7 +187,7 @@ final readonly class SignupAdminListView
 
         $roleTaken = [];
         foreach ($signupList->getRoles() as $role) {
-            $roleTaken[$role->getId() ?? 0] = 0;
+            $roleTaken[$role->id ?? 0] = 0;
         }
 
         $committee = null === $signupList->organisingCommitteePlaces
@@ -230,11 +230,11 @@ final readonly class SignupAdminListView
 
             $role = $signup->role;
             if (null !== $role) {
-                $roleTaken[$role->getId() ?? 0] = ($roleTaken[$role->getId() ?? 0] ?? 0) + 1;
+                $roleTaken[$role->id ?? 0] = ($roleTaken[$role->id ?? 0] ?? 0) + 1;
             }
 
             $selected = in_array(
-                $signup->getId(),
+                $signup->id,
                 $selectedIds,
                 true,
             );
@@ -317,7 +317,7 @@ final readonly class SignupAdminListView
             }
 
             $rows[] = new SignupAdminRow(
-                signupId: $signup->getId() ?? 0,
+                signupId: $signup->id ?? 0,
                 position: $currentPosition,
                 fullName: $signup->getFullName(),
                 membershipTypeLabel: $membershipTypeLabel,
@@ -333,7 +333,7 @@ final readonly class SignupAdminListView
                     $signup,
                     $translator,
                 ),
-                roleId: $role?->getId(),
+                roleId: $role?->id,
                 roleName: $role?->name,
                 organisingBody: $organisingBody,
                 otherLists: $otherLists,
@@ -344,10 +344,10 @@ final readonly class SignupAdminListView
         $roles = [];
         foreach ($signupList->getRoles() as $role) {
             $roles[] = [
-                'id' => $role->getId() ?? 0,
+                'id' => $role->id ?? 0,
                 'name' => $role->name,
                 'minimum' => $role->minimum,
-                'taken' => $roleTaken[$role->getId() ?? 0] ?? 0,
+                'taken' => $roleTaken[$role->id ?? 0] ?? 0,
             ];
         }
 

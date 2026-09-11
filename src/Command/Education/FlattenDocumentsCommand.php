@@ -119,7 +119,7 @@ final class FlattenDocumentsCommand extends Command
                 0 !== $limit ? $limit : null,
             ) as $document
         ) {
-            $documentIds[] = (int) $document->getId();
+            $documentIds[] = (int) $document->id;
         }
 
         $this->entityManager->clear();

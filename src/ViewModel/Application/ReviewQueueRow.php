@@ -61,7 +61,7 @@ final readonly class ReviewQueueRow
             revisionNumber: $revision->getRevisionNumber(),
             status: $revision->getStatus(),
             reviewRoute: $reviewRoute,
-            revisionId: (int) $revision->getId(),
+            revisionId: (int) $revision->id,
             // Everything in a queue has been submitted; the fallback is for a revision that reached one before the
             // moment was recorded at all.
             submittedAt: $revision->getSubmittedAt() ?? $revision->getCreatedAt(),

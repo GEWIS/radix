@@ -113,8 +113,8 @@ final class ActivityData
         $data = new self();
         $data->scheduleLocked = $scheduleLocked;
         // A revision that was saved has answered both questions, so nothing is left unanswered on an edit.
-        $data->organId = self::identifier($revision->organ?->getId());
-        $data->companyId = self::identifier($revision->company?->getId());
+        $data->organId = self::identifier($revision->organ?->id);
+        $data->companyId = self::identifier($revision->company?->id);
         $data->beginTime = null !== $revision->beginTime
             ? DateTimeImmutable::createFromInterface($revision->beginTime)
             : null;
@@ -123,7 +123,7 @@ final class ActivityData
             : null;
         $data->category = $revision->category;
         $data->labelIds = array_map(
-            static fn (ActivityLabel $label): int => (int) $label->getId(),
+            static fn (ActivityLabel $label): int => (int) $label->id,
             $revision->getLabels()->toArray(),
         );
         $data->requireGEFLITST = $revision->requireGEFLITST;

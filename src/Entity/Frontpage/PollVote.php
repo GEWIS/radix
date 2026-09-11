@@ -87,7 +87,7 @@ class PollVote
     public function toGdprArray(): array
     {
         return [
-            'poll_id' => $this->poll->getId(),
+            'poll_id' => $this->poll->id,
             'option' => $this->pollOption->text->toGdprArray(),
         ];
     }

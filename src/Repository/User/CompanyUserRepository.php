@@ -83,7 +83,7 @@ class CompanyUserRepository extends ServiceEntityRepository implements PasswordU
             ->where('u.company = :company')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             )
             ->orderBy(

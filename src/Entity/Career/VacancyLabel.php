@@ -96,7 +96,7 @@ class VacancyLabel
     public function toArray(): array
     {
         return [
-            'id' => $this->getId(),
+            'id' => $this->id,
             'name' => $this->name->getValueNL(),
             'nameEn' => $this->name->getValueEN(),
         ];

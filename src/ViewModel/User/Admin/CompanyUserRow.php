@@ -24,7 +24,7 @@ final readonly class CompanyUserRow
     public static function fromCompanyUser(CompanyUser $companyUser): self
     {
         return new self(
-            id: (int) $companyUser->getId(),
+            id: (int) $companyUser->id,
             companyName: $companyUser->company->name,
             representativeName: $companyUser->name,
             representativeEmail: $companyUser->email,

@@ -43,7 +43,7 @@ class VacancyRevisionCommentRepository extends ServiceEntityRepository implement
      */
     public function findThreadForVacancy(Vacancy $vacancy): array
     {
-        return $this->findThread($vacancy->getId());
+        return $this->findThread($vacancy->id);
     }
 
     #[Override]

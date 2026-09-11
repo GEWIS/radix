@@ -160,7 +160,7 @@ class GeneralStepType extends AbstractType
             $qb->andWhere('p.company = :company')
                 ->setParameter(
                     'company',
-                    $company->getId(),
+                    $company->id,
                 );
         }
 
@@ -170,7 +170,7 @@ class GeneralStepType extends AbstractType
             assert($package instanceof CompanyJobPackage);
             $label = $package->company->name
                 . ' (' . $package->getExpirationDate()->format('Y-m-d') . ')';
-            $choices[$label] = (int) $package->getId();
+            $choices[$label] = (int) $package->id;
         }
 
         return $choices;
@@ -194,7 +194,7 @@ class GeneralStepType extends AbstractType
 
         foreach ($this->vacancyLabelRepository->findAll() as $label) {
             assert($label instanceof VacancyLabel);
-            $choices[$label->name->getText($language) ?? ''] = (int) $label->getId();
+            $choices[$label->name->getText($language) ?? ''] = (int) $label->id;
         }
 
         return $choices;

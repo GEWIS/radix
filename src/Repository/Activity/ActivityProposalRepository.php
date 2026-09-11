@@ -281,14 +281,14 @@ class ActivityProposalRepository extends ServiceEntityRepository
         QueryBuilder $qb,
         ?ActivityProposal $excluding,
     ): void {
-        if (null === $excluding?->getId()) {
+        if (null === $excluding?->id) {
             return;
         }
 
         $qb->andWhere('p.id <> :excluded')
             ->setParameter(
                 'excluded',
-                $excluding->getId(),
+                $excluding->id,
             );
     }
 }

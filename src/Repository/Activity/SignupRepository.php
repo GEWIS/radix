@@ -47,7 +47,7 @@ class SignupRepository extends ServiceEntityRepository
                 )
                 ->setParameter(
                     'list',
-                    $signupList->getId(),
+                    $signupList->id,
                     Types::INTEGER,
                 )
                 ->getQuery()

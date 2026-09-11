@@ -206,7 +206,7 @@ final readonly class CompanyUserInviteService
         string $token,
     ): void {
         $this->messageBus->dispatch(new CompanyUserInviteEmail(
-            (int) $invite->getId(),
+            (int) $invite->id,
             $token,
         ));
     }

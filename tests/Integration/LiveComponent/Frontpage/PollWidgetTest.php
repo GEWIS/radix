@@ -30,7 +30,7 @@ final class PollWidgetTest extends DatabaseTestCase
         self::assertNull($widget->chosen());
 
         $option = $widget->poll()->getOptions()->getValues()[0];
-        $widget->vote($option->getId() ?? 0);
+        $widget->vote($option->id ?? 0);
 
         self::assertNull($widget->problem);
         self::assertSame(
@@ -45,10 +45,10 @@ final class PollWidgetTest extends DatabaseTestCase
         $widget = $this->widget(8111);
         $options = $widget->poll()->getOptions()->getValues();
 
-        $widget->vote($options[0]->getId() ?? 0);
+        $widget->vote($options[0]->id ?? 0);
 
         $this->expectException(AccessDeniedException::class);
-        $widget->vote($options[1]->getId() ?? 0);
+        $widget->vote($options[1]->id ?? 0);
     }
 
     public function testAnAnswerFromAnotherPollIsRefused(): void
@@ -71,7 +71,7 @@ final class PollWidgetTest extends DatabaseTestCase
         self::assertNull($widget->chosen());
 
         $this->expectException(AccessDeniedException::class);
-        $widget->vote($widget->poll()->getOptions()->getValues()[0]->getId() ?? 0);
+        $widget->vote($widget->poll()->getOptions()->getValues()[0]->id ?? 0);
     }
 
     public function testThePanelOpensOnWhatTheReaderHasNotAnswered(): void
@@ -86,7 +86,7 @@ final class PollWidgetTest extends DatabaseTestCase
             $widget->index,
         );
 
-        $widget->vote($running[0]->getOptions()->getValues()[0]->getId() ?? 0);
+        $widget->vote($running[0]->getOptions()->getValues()[0]->id ?? 0);
 
         // Mounted again, as the next page load would.
         $widget->index = 0;

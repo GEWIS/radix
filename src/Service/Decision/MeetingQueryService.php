@@ -61,11 +61,11 @@ final readonly class MeetingQueryService
             $points,
             static fn (MeetingPoint $a, MeetingPoint $b): int => [
                 $a->displayPosition,
-                $a->getId(),
+                $a->id,
             ]
                 <=> [
                     $b->displayPosition,
-                    $b->getId(),
+                    $b->id,
                 ],
         );
 
@@ -84,7 +84,7 @@ final readonly class MeetingQueryService
                 continue;
             }
 
-            $documentsByPointId[(int) $point->getId()][] = $document;
+            $documentsByPointId[(int) $point->id][] = $document;
         }
 
         $match = $this->matcher->match(
@@ -98,7 +98,7 @@ final readonly class MeetingQueryService
             $matchedDecisions = $match->decisionsForPoint($point);
             $pointViews[] = new MeetingPointView(
                 $point,
-                $documentsByPointId[(int) $point->getId()] ?? [],
+                $documentsByPointId[(int) $point->id] ?? [],
                 $matchedDecisions,
             );
 
@@ -113,7 +113,7 @@ final readonly class MeetingQueryService
             $decisionEntries[] = new DecisionListEntry(
                 $decision,
                 $point,
-                null === $point ? 0 : count($documentsByPointId[(int) $point->getId()] ?? []),
+                null === $point ? 0 : count($documentsByPointId[(int) $point->id] ?? []),
             );
         }
 

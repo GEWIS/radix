@@ -109,7 +109,7 @@ final readonly class AlbumProvider implements ProviderInterface
         return $this->resource(
             $album,
             $children,
-            $this->urlBuilder->albumPhotosUrl((int) $album->getId()),
+            $this->urlBuilder->albumPhotosUrl((int) $album->id),
         );
     }
 
@@ -131,11 +131,11 @@ final readonly class AlbumProvider implements ProviderInterface
         ?string $photosUrl = null,
     ): AlbumResource {
         return new AlbumResource(
-            id: (int) $album->getId(),
+            id: (int) $album->id,
             name: $album->name,
             startDateTime: $album->startDateTime?->format(DateTimeInterface::ATOM),
             endDateTime: $album->endDateTime?->format(DateTimeInterface::ATOM),
-            parent: $album->getParent()?->getId(),
+            parent: $album->getParent()?->id,
             photoCount: $album->getPhotoCount(false),
             albumCount: $album->getPublishedAlbumCount(),
             coverUrl: $this->coverUrl($album),
@@ -158,7 +158,7 @@ final readonly class AlbumProvider implements ProviderInterface
     private function summary(PhotoAlbum $album): array
     {
         return [
-            'id' => (int) $album->getId(),
+            'id' => (int) $album->id,
             'name' => $album->name,
             'startDateTime' => $album->startDateTime?->format(DateTimeInterface::ATOM),
             'endDateTime' => $album->endDateTime?->format(DateTimeInterface::ATOM),
@@ -173,7 +173,7 @@ final readonly class AlbumProvider implements ProviderInterface
         return null === $album->coverPath
             ? null
             : $this->urlBuilder->albumCoverUrl(
-                (int) $album->getId(),
+                (int) $album->id,
                 self::COVER_VARIANT,
             );
     }

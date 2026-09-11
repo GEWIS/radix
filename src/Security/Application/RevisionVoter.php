@@ -163,8 +163,8 @@ final class RevisionVoter extends Voter
             $company = $revisable->getResourceCompany();
 
             return null !== $company
-                && null !== $company->getId()
-                && $company->getId() === $user->company->getId();
+                && null !== $company->id
+                && $company->id === $user->company->id;
         }
 
         return false;
@@ -179,7 +179,7 @@ final class RevisionVoter extends Voter
         }
 
         foreach ($member->getCurrentOrganInstallations() as $installation) {
-            if ($installation->organ->getId() === $organ->getId()) {
+            if ($installation->organ->id === $organ->id) {
                 return true;
             }
         }

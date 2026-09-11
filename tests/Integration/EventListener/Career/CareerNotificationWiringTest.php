@@ -44,7 +44,7 @@ final class CareerNotificationWiringTest extends DatabaseTestCase
             $this->publishedKinds(),
         );
         self::assertContains(
-            $draft->getId(),
+            $draft->id,
             array_map(
                 static fn (PublishDomainNotificationMessage $message): int => $message->getSubjectId(),
                 $this->sent(PublishDomainNotificationMessage::class),

@@ -58,7 +58,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         );
         $this->entityManager->persist($draft);
         $this->entityManager->flush();
-        $draftId = (int) $draft->getId();
+        $draftId = (int) $draft->id;
         $this->editLockService()->acquire(
             $activity,
             $this->user(8025),
@@ -85,7 +85,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         self::assertNull(
             $this->editLocks()->findOneByResource(
                 $activity->getResourceId(),
-                (int) $activity->getId(),
+                (int) $activity->id,
             ),
         );
     }
@@ -95,7 +95,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         // A brand-new (never-approved) draft has nothing to revert to; discarding it would delete the whole activity,
         // which is deliberately left to the stale-revision cleanup. The controller refuses and keeps the draft.
         $draft = $this->aNeverApprovedDraft();
-        $draftId = (int) $draft->getId();
+        $draftId = (int) $draft->id;
 
         $this->authenticate(['ROLE_BOARD']);
         $session = $this->pushRequestWithSession();
@@ -162,7 +162,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         $this->entityManager->persist($edit);
         $this->entityManager->flush();
 
-        $draftId = (int) $draft->getId();
+        $draftId = (int) $draft->id;
         $this->entityManager->clear();
         $draft = $this->entityManager->getRepository(ActivityRevision::class)->find($draftId);
         self::assertInstanceOf(

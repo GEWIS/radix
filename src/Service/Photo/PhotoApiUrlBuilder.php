@@ -29,7 +29,7 @@ final readonly class PhotoApiUrlBuilder
     ): string {
         return $this->absolute(sprintf(
             ApiController::IMAGE_PATH_TEMPLATE,
-            (int) $photo->getId(),
+            (int) $photo->id,
             $variant->value,
         ));
     }

@@ -177,7 +177,7 @@ class AdminBodyController extends AbstractRevisionController
 
             return $this->redirectToRoute(
                 'admin/bodies/view',
-                ['organ' => $organ->getId()],
+                ['organ' => $organ->id],
             );
         }
 
@@ -274,7 +274,7 @@ class AdminBodyController extends AbstractRevisionController
 
         return $this->redirectToRoute(
             'admin/bodies/view',
-            ['organ' => $organ->getId()],
+            ['organ' => $organ->id],
         );
     }
 
@@ -341,7 +341,7 @@ class AdminBodyController extends AbstractRevisionController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"body_revise-" ~ args["organ"].getId()'),
+        id: new Expression('"body_revise-" ~ args["organ"].id'),
         tokenKey: '_csrf_token',
     )]
     public function revise(
@@ -358,7 +358,7 @@ class AdminBodyController extends AbstractRevisionController
         if (null === $current) {
             return $this->redirectToRoute(
                 'admin/bodies/edit',
-                ['organ' => $organ->getId()],
+                ['organ' => $organ->id],
             );
         }
 
@@ -368,7 +368,7 @@ class AdminBodyController extends AbstractRevisionController
         if (ReviseRefusal::AlreadyADraft === $refusal) {
             return $this->redirectToRoute(
                 'admin/bodies/edit',
-                ['organ' => $organ->getId()],
+                ['organ' => $organ->id],
             );
         }
 
@@ -382,7 +382,7 @@ class AdminBodyController extends AbstractRevisionController
 
             return $this->redirectToRoute(
                 'admin/bodies/view',
-                ['organ' => $organ->getId()],
+                ['organ' => $organ->id],
             );
         }
 
@@ -394,7 +394,7 @@ class AdminBodyController extends AbstractRevisionController
 
             return $this->redirectToRoute(
                 'admin/bodies/view',
-                ['organ' => $organ->getId()],
+                ['organ' => $organ->id],
             );
         }
 
@@ -405,7 +405,7 @@ class AdminBodyController extends AbstractRevisionController
 
         return $this->redirectToRoute(
             'admin/bodies/edit',
-            ['organ' => $organ->getId()],
+            ['organ' => $organ->id],
         );
     }
 
@@ -461,7 +461,7 @@ class AdminBodyController extends AbstractRevisionController
         }
 
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
-            if ($installation->organ->getId() === $organ->getId()) {
+            if ($installation->organ->id === $organ->id) {
                 return true;
             }
         }

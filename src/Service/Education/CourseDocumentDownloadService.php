@@ -66,7 +66,7 @@ final readonly class CourseDocumentDownloadService
         $this->entityManager->persist($download);
         $this->entityManager->flush();
 
-        $this->messageBus->dispatch(new BuildWatermarkedDocumentMessage($download->getId() ?? 0));
+        $this->messageBus->dispatch(new BuildWatermarkedDocumentMessage($download->id ?? 0));
 
         return $download;
     }

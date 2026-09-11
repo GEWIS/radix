@@ -59,7 +59,7 @@ final readonly class SignupListOverviewRow
         }
 
         return new self(
-            id: $list->getId() ?? 0,
+            id: $list->id ?? 0,
             position: $position,
             name: SignupListRule::label(
                 $list,

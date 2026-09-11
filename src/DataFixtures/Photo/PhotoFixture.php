@@ -568,7 +568,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             $stored = $this->fileStorage->store(
                 StorageNamespace::PhotoOriginal,
                 $temporaryFile,
-                (string) $album->getId(),
+                (string) $album->id,
             );
         } finally {
             unlink($temporaryFile);

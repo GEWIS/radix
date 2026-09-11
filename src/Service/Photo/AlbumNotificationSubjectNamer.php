@@ -31,7 +31,7 @@ final class AlbumNotificationSubjectNamer extends AbstractNotificationSubjectNam
     ): array {
         $names = [];
         foreach ($this->albumRepository->findBy(['id' => $subjectIds]) as $album) {
-            $id = $album->getId();
+            $id = $album->id;
             if (null === $id) {
                 continue;
             }

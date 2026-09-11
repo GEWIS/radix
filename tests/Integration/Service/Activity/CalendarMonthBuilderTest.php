@@ -83,7 +83,7 @@ final class CalendarMonthBuilderTest extends DatabaseTestCase
 
         foreach ($this->allDays($month->weeks) as $day) {
             foreach ($day->entries as $entry) {
-                if ($entry->proposalId !== $proposal->getId()) {
+                if ($entry->proposalId !== $proposal->id) {
                     continue;
                 }
 

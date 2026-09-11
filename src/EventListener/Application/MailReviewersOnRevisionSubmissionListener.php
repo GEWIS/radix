@@ -48,7 +48,7 @@ final readonly class MailReviewersOnRevisionSubmissionListener
             return;
         }
 
-        $id = $revision->getId();
+        $id = $revision->id;
         $notification = $this->notifications->for($revision);
         if (
             null === $id

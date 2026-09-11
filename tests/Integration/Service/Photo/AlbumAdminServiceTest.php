@@ -52,12 +52,12 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         );
 
         self::assertSame(
-            $gala->getId(),
-            $photoA->album->getId(),
+            $gala->id,
+            $photoA->album->id,
         );
         self::assertSame(
-            $gala->getId(),
-            $photoB->album->getId(),
+            $gala->id,
+            $photoB->album->id,
         );
         // One cover per distinct affected album (the single source and the destination), not per photo.
         self::assertSame(
@@ -89,8 +89,8 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         );
 
         self::assertSame(
-            $trip->getId(),
-            $photo->album->getId(),
+            $trip->id,
+            $photo->album->id,
         );
         self::assertSame(
             0,
@@ -103,7 +103,7 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         $trip = $this->album('Trip 2024');
         $photo = $this->storedPhoto($trip);
         $path = $photo->path;
-        $id = (int) $photo->getId();
+        $id = (int) $photo->id;
         self::assertTrue($this->storage()->exists($path));
 
         $this->service()->deletePhotos([$photo]);
@@ -126,9 +126,9 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
 
         $photo = $this->storedPhoto($child);
         $path = $photo->path;
-        $parentId = (int) $parent->getId();
-        $childId = (int) $child->getId();
-        $photoId = (int) $photo->getId();
+        $parentId = (int) $parent->id;
+        $childId = (int) $child->id;
+        $photoId = (int) $photo->id;
         self::assertTrue($this->storage()->exists($path));
 
         // Reload the album exactly as the controller does from a route parameter, so the delete walks fresh
@@ -231,7 +231,7 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         $stored = $this->storage()->store(
             StorageNamespace::PhotoOriginal,
             $file,
-            (string) $album->getId(),
+            (string) $album->id,
         );
         unlink($file);
 

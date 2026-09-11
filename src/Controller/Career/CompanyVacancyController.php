@@ -170,7 +170,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
 
         return $this->redirectToRoute(
             'company/vacancies/status',
-            ['vacancy' => $vacancy->getId()],
+            ['vacancy' => $vacancy->id],
         );
     }
 
@@ -247,7 +247,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
             [
                 'company' => $company,
                 'identity_editable' => $identityEditable,
-                'current_package_id' => $vacancy->package->getId(),
+                'current_package_id' => $vacancy->package->id,
                 'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
             ],
@@ -303,7 +303,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_vacancy_edit_lock-" ~ args["vacancy"].getId()'),
+        id: new Expression('"company_vacancy_edit_lock-" ~ args["vacancy"].id'),
         tokenKey: '_csrf_token',
     )]
     public function editPing(
@@ -329,7 +329,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_vacancy_edit_lock-" ~ args["vacancy"].getId()'),
+        id: new Expression('"company_vacancy_edit_lock-" ~ args["vacancy"].id'),
         tokenKey: '_csrf_token',
     )]
     public function editRelease(
@@ -355,7 +355,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_vacancy_revise-" ~ args["vacancy"].getId()'),
+        id: new Expression('"company_vacancy_revise-" ~ args["vacancy"].id'),
         tokenKey: '_csrf_token',
     )]
     public function revise(
@@ -380,7 +380,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         if (ReviseRefusal::AlreadyADraft === $refusal) {
             return $this->redirectToRoute(
                 'company/vacancies/edit',
-                ['vacancy' => $vacancy->getId()],
+                ['vacancy' => $vacancy->id],
             );
         }
 
@@ -411,7 +411,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
 
         return $this->redirectToRoute(
             'company/vacancies/edit',
-            ['vacancy' => $vacancy->getId()],
+            ['vacancy' => $vacancy->id],
         );
     }
 
@@ -468,7 +468,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_vacancy_comment-" ~ args["vacancy"].getId()'),
+        id: new Expression('"company_vacancy_comment-" ~ args["vacancy"].id'),
         tokenKey: '_csrf_token',
     )]
     public function comment(
@@ -502,7 +502,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"company_vacancy_discard-" ~ args["vacancy"].getId()'),
+        id: new Expression('"company_vacancy_discard-" ~ args["vacancy"].id'),
         tokenKey: '_csrf_token',
     )]
     public function discard(
@@ -632,7 +632,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
     {
         return $this->redirectToRoute(
             'company/vacancies/status',
-            ['vacancy' => $vacancy->getId()],
+            ['vacancy' => $vacancy->id],
         );
     }
 }

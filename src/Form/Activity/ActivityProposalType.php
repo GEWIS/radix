@@ -274,12 +274,12 @@ class ActivityProposalType extends AbstractType
 
         $allowed = [];
         foreach ($selectableOrgans as $selectable) {
-            $allowed[] = intval($selectable->getId());
+            $allowed[] = intval($selectable->id);
         }
 
         if (
             in_array(
-                intval($organ->getId()),
+                intval($organ->id),
                 $allowed,
                 true,
             )
@@ -428,7 +428,7 @@ class ActivityProposalType extends AbstractType
         $organs = [];
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
             $organ = $installation->organ;
-            $organs[intval($organ->getId())] = $organ;
+            $organs[intval($organ->id)] = $organ;
         }
 
         return array_values($organs);

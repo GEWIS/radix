@@ -56,12 +56,12 @@ final class AuthorizationServiceTest extends DatabaseTestCase
 
         // A second call does not create another authorization.
         self::assertSame(
-            $authorization->getId(),
+            $authorization->id,
             $this->service->authorize(
                 $authorizer,
                 8007,
                 $meeting,
-            )->getId(),
+            )->id,
         );
     }
 

@@ -36,7 +36,7 @@ class PollCommentReactionRepository extends ServiceEntityRepository
     ): ?PollCommentReaction {
         return $this->findOneBy(
             [
-                'comment' => $comment->getId(),
+                'comment' => $comment->id,
                 'member' => $member->lidnr,
             ],
         );
@@ -61,7 +61,7 @@ class PollCommentReactionRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'poll',
-                $poll->getId(),
+                $poll->id,
             )
             ->getQuery()
             ->execute());

@@ -109,7 +109,7 @@ final class PollWidget
         foreach ($ordered as $at => $poll) {
             if (
                 array_key_exists(
-                    intval($poll->getId()),
+                    intval($poll->id),
                     $answered,
                 )
             ) {
@@ -179,7 +179,7 @@ final class PollWidget
 
         // The answer is what the render right after this is about, so what was resolved before it is out of date: the
         // results were counted on the way in, without the answer that has just been given.
-        unset($this->chosen[intval($poll->getId())]);
+        unset($this->chosen[intval($poll->id)]);
         $this->primeResults();
 
         return null;
@@ -187,7 +187,7 @@ final class PollWidget
 
     public function chosen(): ?PollOption
     {
-        $id = intval($this->poll()->getId());
+        $id = intval($this->poll()->id);
 
         if (
             array_key_exists(
@@ -243,7 +243,7 @@ final class PollWidget
         return new RedirectResponse(
             $this->urlGenerator->generate(
                 'poll/view',
-                ['poll' => $poll->getId()],
+                ['poll' => $poll->id],
             ),
         );
     }
@@ -251,7 +251,7 @@ final class PollWidget
     private function find(int $option): PollOption
     {
         foreach ($this->poll()->getOptions() as $candidate) {
-            if ($candidate->getId() !== $option) {
+            if ($candidate->id !== $option) {
                 continue;
             }
 

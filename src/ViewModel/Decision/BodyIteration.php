@@ -63,7 +63,7 @@ final readonly class BodyIteration
                 (int) $year,
                 null === $abrogation ? null : (int) $abrogation->format('Y'),
                 $shared,
-                $organ->getId() === $shown->getId(),
+                $organ->id === $shown->id,
             );
         }
 

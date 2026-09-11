@@ -229,7 +229,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
             ->where('e.revision = :revision')
             ->setParameter(
                 'revision',
-                $revision->getId(),
+                $revision->id,
             )
             ->getQuery()
             ->getSingleScalarResult();
@@ -250,7 +250,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
             )
             ->setParameter(
                 'revision',
-                $revision->getId(),
+                $revision->id,
             )
             ->setMaxResults(1)
             ->getQuery()

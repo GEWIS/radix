@@ -27,6 +27,6 @@ final readonly class DecisionMatchResult
      */
     public function decisionsForPoint(MeetingPoint $point): array
     {
-        return $this->byPointId[(int) $point->getId()] ?? [];
+        return $this->byPointId[(int) $point->id] ?? [];
     }
 }

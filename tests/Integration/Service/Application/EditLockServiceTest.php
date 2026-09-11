@@ -48,7 +48,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         // It is persisted under the resource's key, so a later look-up finds the same row.
         self::assertNotNull($this->locks()->findOneByResource(
             $resource->getResourceId(),
-            (int) $resource->getId(),
+            (int) $resource->id,
         ));
     }
 
@@ -76,8 +76,8 @@ final class EditLockServiceTest extends DatabaseTestCase
         );
         // The same row is refreshed, never a second lock for the same resource.
         self::assertSame(
-            $first->getId(),
-            $second->getId(),
+            $first->id,
+            $second->id,
         );
     }
 
@@ -101,7 +101,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         // The original holder keeps the lock.
         $lock = $this->locks()->findOneByResource(
             $resource->getResourceId(),
-            (int) $resource->getId(),
+            (int) $resource->id,
         );
         self::assertSame(
             $holder->lidnr,
@@ -248,7 +248,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         );
         self::assertNotNull($this->locks()->findOneByResource(
             $resource->getResourceId(),
-            (int) $resource->getId(),
+            (int) $resource->id,
         ));
 
         // ... but the holder can.
@@ -258,7 +258,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         );
         self::assertNull($this->locks()->findOneByResource(
             $resource->getResourceId(),
-            (int) $resource->getId(),
+            (int) $resource->id,
         ));
     }
 
@@ -316,7 +316,7 @@ final class EditLockServiceTest extends DatabaseTestCase
         $this->entityManager->flush();
         self::assertNull($this->locks()->findOneByResource(
             $resource->getResourceId(),
-            (int) $resource->getId(),
+            (int) $resource->id,
         ));
     }
 

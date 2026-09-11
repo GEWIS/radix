@@ -40,7 +40,7 @@ final readonly class NotifyOnRevisionSubmissionListener
             return;
         }
 
-        $id = $revision->getId();
+        $id = $revision->id;
         if (null === $id) {
             return;
         }

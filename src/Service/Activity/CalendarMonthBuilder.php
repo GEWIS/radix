@@ -167,7 +167,7 @@ final readonly class CalendarMonthBuilder
         foreach ($activities as $activity) {
             if (
                 null !== $organ
-                && $activity->getOrgan()?->getId() !== $organ->getId()
+                && $activity->getOrgan()?->id !== $organ->id
             ) {
                 continue;
             }
@@ -313,7 +313,7 @@ final readonly class CalendarMonthBuilder
             $proposal->name,
             $proposal->organ->abbr ?? '',
             $option->timeOfDay->value,
-            $proposal->getId(),
+            $proposal->id,
             $rank,
             $continuesBefore,
             $continuesAfter,

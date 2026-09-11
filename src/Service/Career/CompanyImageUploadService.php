@@ -33,7 +33,7 @@ final readonly class CompanyImageUploadService extends AbstractImageUploadServic
         return $this->storeAndQueue(
             StorageNamespace::CompanyImage,
             $file->getPathname(),
-            strval($company->getId()),
+            strval($company->id),
             ImageProfile::CompanyLogo,
         );
     }
@@ -49,7 +49,7 @@ final readonly class CompanyImageUploadService extends AbstractImageUploadServic
         return $this->storeAndQueue(
             StorageNamespace::CompanyImage,
             $file->getPathname(),
-            strval($company->getId()),
+            strval($company->id),
             $format->imageProfile(),
         );
     }

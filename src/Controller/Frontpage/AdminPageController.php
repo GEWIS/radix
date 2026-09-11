@@ -210,7 +210,7 @@ class AdminPageController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"page_delete-" ~ args["page"].getId()'),
+        id: new Expression('"page_delete-" ~ args["page"].id'),
         tokenKey: '_csrf_token',
     )]
     public function delete(Page $page): Response

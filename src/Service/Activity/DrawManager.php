@@ -260,7 +260,7 @@ final readonly class DrawManager
                     return $order;
                 }
 
-                return $a[1]->getId() <=> $b[1]->getId();
+                return $a[1]->id <=> $b[1]->id;
             },
         );
         foreach ($late as $entry) {

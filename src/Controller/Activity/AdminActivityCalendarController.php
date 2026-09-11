@@ -150,7 +150,7 @@ class AdminActivityCalendarController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/activities/calendar/proposal',
-            ['proposal' => $proposal->getId()],
+            ['proposal' => $proposal->id],
         );
     }
 
@@ -230,7 +230,7 @@ class AdminActivityCalendarController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/activities/calendar/proposal',
-            ['proposal' => $proposal->getId()],
+            ['proposal' => $proposal->id],
         );
     }
 
@@ -244,7 +244,7 @@ class AdminActivityCalendarController extends AbstractController
         methods: ['POST'],
     )]
     #[IsCsrfTokenValid(
-        id: new Expression('"activity_proposal_withdraw-" ~ args["proposal"].getId()'),
+        id: new Expression('"activity_proposal_withdraw-" ~ args["proposal"].id'),
         tokenKey: '_csrf_token',
     )]
     public function withdrawProposal(ActivityProposal $proposal): Response
@@ -262,7 +262,7 @@ class AdminActivityCalendarController extends AbstractController
 
             return $this->redirectToRoute(
                 'admin/activities/calendar/proposal',
-                ['proposal' => $proposal->getId()],
+                ['proposal' => $proposal->id],
             );
         }
 
@@ -290,7 +290,7 @@ class AdminActivityCalendarController extends AbstractController
         $organs = [];
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
             $organ = $installation->organ;
-            $organs[intval($organ->getId())] = $organ;
+            $organs[intval($organ->id)] = $organ;
         }
 
         return array_values($organs);

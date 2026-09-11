@@ -96,7 +96,7 @@ class VacancyRevisionRepository extends ServiceEntityRepository
             ->andWhere('p.company = :company')
             ->setParameter(
                 'company',
-                $company->getId(),
+                $company->id,
                 Types::INTEGER,
             );
 

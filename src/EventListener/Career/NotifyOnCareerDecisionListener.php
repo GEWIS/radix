@@ -46,7 +46,7 @@ final readonly class NotifyOnCareerDecisionListener
             return;
         }
 
-        $companyId = $company->getId();
+        $companyId = $company->id;
         if (null === $companyId) {
             return;
         }
