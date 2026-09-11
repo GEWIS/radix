@@ -19,6 +19,7 @@ use function mb_strtoupper;
 use function preg_match_all;
 use function preg_replace;
 use function preg_replace_callback;
+use function str_replace;
 use function trim;
 
 /**
@@ -47,8 +48,13 @@ final class AnnouncementPlaceholders
     /**
      * A placeholder as it is written. Spaces inside the braces are accepted because an organiser typing one by hand
      * writes them; the token is the upper-case name.
+     *
+     * Backslashes are accepted as well, and read as nothing. The composer is a Markdown editor and an underscore is
+     * emphasis in Markdown, so a placeholder inserted there is stored as `{{ACTIVITY\_NAME}}`. While this pattern
+     * refused those, every placeholder written in the composer was sent unreplaced, and silently:
+     * {@see self::unknownIn()} reads the same pattern, so it saw nothing to report either.
      */
-    private const string PATTERN = '/\{\{\s*([A-Z0-9_]+)\s*\}\}/';
+    private const string PATTERN = '/\{\{\s*([A-Z0-9_\\\\]+)\s*\}\}/';
 
     /**
      * The placeholders taken from the activity, and from the sign-up list when the message is addressed to one,
@@ -161,7 +167,7 @@ final class AnnouncementPlaceholders
         return preg_replace_callback(
             self::PATTERN,
             /** @param string[] $match */
-            static fn (array $match): string => $values[$match[1]] ?? $match[0],
+            static fn (array $match): string => $values[self::tokenOf($match[1])] ?? $match[0],
             $text,
         ) ?? $text;
     }
@@ -187,7 +193,8 @@ final class AnnouncementPlaceholders
 
         $known = array_keys($offered);
         $unknown = [];
-        foreach ($matches[1] as $token) {
+        foreach ($matches[1] as $written) {
+            $token = self::tokenOf($written);
             if (
                 in_array(
                     $token,
@@ -207,6 +214,19 @@ final class AnnouncementPlaceholders
         }
 
         return $unknown;
+    }
+
+    /**
+     * The name a placeholder was written with, as the application spells it: whatever Markdown escaping the composer
+     * added is not part of it.
+     */
+    private static function tokenOf(string $written): string
+    {
+        return str_replace(
+            '\\',
+            '',
+            $written,
+        );
     }
 
     /**

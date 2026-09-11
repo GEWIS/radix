@@ -116,6 +116,36 @@ final class AnnouncementPlaceholdersTest extends TestCase
         );
     }
 
+    /**
+     * The composer is a Markdown editor, and an underscore is emphasis in Markdown, so a placeholder inserted there
+     * arrives escaped. It has to be replaced, and reported when nothing replaces it, exactly as one typed by hand is.
+     */
+    public function testAPlaceholderTheComposerEscapedIsReadAsTheNameItStandsFor(): void
+    {
+        $text = 'We are at {{LOCATION}}, ask for {{ORGAN\_ABBR}} at {{ SIGNUPLIST\_NAME }}.';
+
+        self::assertSame(
+            ['ORGAN_ABBR'],
+            AnnouncementPlaceholders::unknownIn(
+                $text,
+                [
+                    'LOCATION' => 'Location',
+                    'SIGNUPLIST_NAME' => 'Sign-up list',
+                ],
+            ),
+        );
+        self::assertSame(
+            'We are at Room 2, ask for {{ORGAN\_ABBR}} at Participants.',
+            AnnouncementPlaceholders::apply(
+                $text,
+                [
+                    'LOCATION' => 'Room 2',
+                    'SIGNUPLIST_NAME' => 'Participants',
+                ],
+            ),
+        );
+    }
+
     private function listAsking(string ...$questions): SignupList
     {
         $signupList = new SignupList();
