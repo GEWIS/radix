@@ -10,6 +10,7 @@ use App\Service\Decision\MeetingReference;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 use function assert;
@@ -155,16 +156,16 @@ class DecisionRepository extends ServiceEntityRepository
             ))
                 ->orderBy(
                     'referenceRank',
-                    'ASC',
+                    SortDirection::Ascending,
                 )
                 ->addOrderBy(
                     'm.date',
-                    'DESC',
+                    SortDirection::Descending,
                 );
         } else {
             $qb->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             );
         }
 
@@ -234,15 +235,15 @@ class DecisionRepository extends ServiceEntityRepository
         ))
             ->orderBy(
                 'r.meeting_number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'r.point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'r.number',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $counterparts = [];

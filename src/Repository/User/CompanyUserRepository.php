@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
+use SortDirection;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -87,7 +88,7 @@ class CompanyUserRepository extends ServiceEntityRepository implements PasswordU
             )
             ->orderBy(
                 'u.id',
-                'ASC',
+                SortDirection::Ascending,
             );
     }
 
@@ -142,7 +143,7 @@ class CompanyUserRepository extends ServiceEntityRepository implements PasswordU
         };
         $qb->orderBy(
             $orderField,
-            'desc' === strtolower($direction) ? 'DESC' : 'ASC',
+            'desc' === strtolower($direction) ? SortDirection::Descending : SortDirection::Ascending,
         );
 
         $qb->setFirstResult(($page - 1) * $pageSize)->setMaxResults($pageSize);

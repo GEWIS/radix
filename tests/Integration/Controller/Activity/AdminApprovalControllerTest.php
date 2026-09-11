@@ -20,6 +20,7 @@ use App\Service\Activity\ActivityRevisionCloner;
 use App\Service\Application\EditLockService;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTime;
+use SortDirection;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -367,7 +368,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
             ->where('SIZE(r.signupLists) > 0')
             ->orderBy(
                 'SIZE(r.signupLists)',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults(1)
             ->getQuery()

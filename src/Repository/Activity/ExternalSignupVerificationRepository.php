@@ -68,7 +68,7 @@ class ExternalSignupVerificationRepository extends ServiceEntityRepository
             ->innerJoin(
                 ExternalSignupVerification::class,
                 'v',
-                Join::WITH,
+                Join::ON,
                 'v.externalSignup = es',
             )
             ->where('v.purpose = :purpose')

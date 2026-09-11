@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use NumberFormatter;
+use SortDirection;
 use ValueError;
 
 /**
@@ -73,8 +74,8 @@ class Meeting
         cascade: ['persist'],
     )]
     #[OrderBy(value: [
-        'point' => 'ASC',
-        'number' => 'ASC',
+        'point' => SortDirection::Ascending,
+        'number' => SortDirection::Ascending,
     ])]
     private Collection $decisions;
 

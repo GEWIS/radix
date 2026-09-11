@@ -52,4 +52,19 @@ final readonly class RegisterNetworkRoleHierarchy implements RoleHierarchyInterf
             self::REGISTER_ROLES,
         ));
     }
+
+    /**
+     * The register's roles are not withheld here. This answers which roles reach the ones handed in, a question about
+     * the shape of the hierarchy rather than about what the visitor holds, so the withholding stays in
+     * {@see self::getReachableRoleNames()}. `#[Override]` is absent because `RoleHierarchyInterface` carries the
+     * method as an `@method` annotation and does not declare it yet.
+     *
+     * @param string[] $roles
+     *
+     * @return list<string>
+     */
+    public function getParentRoleNames(array $roles): array
+    {
+        return $this->inner->getParentRoleNames($roles);
+    }
 }

@@ -8,6 +8,7 @@ use App\Entity\Decision\BoardMember;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<BoardMember>
@@ -62,15 +63,15 @@ class BoardMemberRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'bm.installDate',
-            'DESC',
+            SortDirection::Descending,
         )
             ->addOrderBy(
                 'm.lidnr',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'bm.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

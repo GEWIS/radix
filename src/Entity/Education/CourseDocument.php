@@ -23,6 +23,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * @phpstan-import-type CourseGdprArrayType from Course as ImportedCourseGdprArrayType
@@ -82,7 +83,7 @@ abstract class CourseDocument
         mappedBy: 'document',
         cascade: ['persist'],
     )]
-    #[OrderBy(value: ['pageNumber' => 'ASC'])]
+    #[OrderBy(value: ['pageNumber' => SortDirection::Ascending])]
     private Collection $pages;
 
     #[Column(

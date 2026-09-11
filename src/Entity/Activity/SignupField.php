@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * SignupField model.
@@ -144,8 +145,8 @@ class SignupField
         orphanRemoval: true,
     )]
     #[OrderBy([
-        'position' => 'ASC',
-        'id' => 'ASC',
+        'position' => SortDirection::Ascending,
+        'id' => SortDirection::Ascending,
     ])]
     private Collection $options;
 

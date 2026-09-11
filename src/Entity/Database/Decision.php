@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use RuntimeException;
+use SortDirection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function implode;
@@ -100,7 +101,7 @@ class Decision
             'remove',
         ],
     )]
-    #[OrderBy(value: ['sequence' => 'ASC'])]
+    #[OrderBy(value: ['sequence' => SortDirection::Ascending])]
     private Collection $subdecisions;
 
     /**

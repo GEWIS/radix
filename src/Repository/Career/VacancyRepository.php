@@ -19,6 +19,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_column;
 use function array_filter;
@@ -207,11 +208,11 @@ class VacancyRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'c.name',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'j.id',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $this->applyActivePredicate($qb);
@@ -324,11 +325,11 @@ class VacancyRepository extends ServiceEntityRepository
         $qb = $this->activeVacancyQueryBuilder()
             ->orderBy(
                 'lr.reviewedAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'j.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit);
 
@@ -398,11 +399,11 @@ class VacancyRepository extends ServiceEntityRepository
         $qb = $this->activeVacancyQueryBuilder()
             ->orderBy(
                 'c.name',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'j.id',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         return $this->applyHighlightedPredicate($qb)
@@ -727,11 +728,11 @@ class VacancyRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'c.name',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'v.id',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $search = trim($search);
@@ -822,7 +823,7 @@ class VacancyRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'v.id',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         return $qb->getQuery()->getResult();
@@ -845,11 +846,11 @@ class VacancyRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'lr.category',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'j.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

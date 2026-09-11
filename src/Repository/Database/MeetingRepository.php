@@ -19,6 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Meeting>
@@ -73,7 +74,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->orWhere('CONCAT(m.number, \'\') LIKE :search')
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $qb->setParameter(
@@ -109,22 +110,22 @@ class MeetingRepository extends ServiceEntityRepository
             )
             ->addOrderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'virtSort',
-                'ASC',
+                SortDirection::Ascending,
             )
             // Type and number are the identity of a meeting, and they are ordered on so that two meetings sharing a
             // date and a virtSort cannot swap places between the count query and the page query, which would show one
             // of them twice and leave the other out of the register entirely.
             ->addOrderBy(
                 'm.type',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'm.number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -261,12 +262,12 @@ class MeetingRepository extends ServiceEntityRepository
         if ($asc) {
             $qb->addOrderBy(
                 'm.date',
-                'ASC',
+                SortDirection::Ascending,
             );
         } else {
             $qb->addOrderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             );
         }
 
@@ -275,15 +276,15 @@ class MeetingRepository extends ServiceEntityRepository
         // has to make the same choice every time, so type and number settle the rest.
         $qb->addOrderBy(
             'virtSort',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->addOrderBy(
                 'm.type',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'm.number',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         return $qb->getQuery()->getResult();
@@ -301,7 +302,7 @@ class MeetingRepository extends ServiceEntityRepository
         )
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults(1);
 
@@ -334,23 +335,23 @@ class MeetingRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'm.type',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'm.number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'd.point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'd.number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 's.sequence',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $num = 0;
@@ -573,15 +574,15 @@ class MeetingRepository extends ServiceEntityRepository
             // first, because that is the one somebody is most likely to be looking for.
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'd.point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'd.number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults(self::SEARCH_LIMIT);
 
@@ -745,15 +746,15 @@ class MeetingRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'd.point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'd.number',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $clauses = [];

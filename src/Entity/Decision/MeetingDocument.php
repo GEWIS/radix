@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
 use Doctrine\ORM\Mapping\PreUpdate;
+use SortDirection;
 
 /**
  * A meeting document: the stable identity members see, with the actual files as {@see MeetingDocumentVersion}s.
@@ -89,7 +90,7 @@ class MeetingDocument
         targetEntity: MeetingDocumentVersion::class,
         mappedBy: 'document',
     )]
-    #[OrderBy(value: ['id' => 'ASC'])]
+    #[OrderBy(value: ['id' => SortDirection::Ascending])]
     private Collection $versions;
 
     public function __construct()

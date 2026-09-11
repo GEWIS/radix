@@ -15,6 +15,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 use function array_map;
@@ -96,22 +97,22 @@ class CourseRepository extends ServiceEntityRepository
         match ($sort) {
             CourseSort::Code => $qb->orderBy(
                 'c.code',
-                'ASC',
+                SortDirection::Ascending,
             ),
             CourseSort::MostMaterial => $qb->orderBy(
                 'documentCount',
-                'DESC',
+                SortDirection::Descending,
             )->addOrderBy(
                 'c.code',
-                'ASC',
+                SortDirection::Ascending,
             ),
             // Courses that never gained anything sort last rather than first, which is what a null date would do.
             CourseSort::RecentlyUpdated => $qb->orderBy(
                 'lastAddedAt',
-                'DESC',
+                SortDirection::Descending,
             )->addOrderBy(
                 'c.code',
-                'ASC',
+                SortDirection::Ascending,
             ),
         };
 
@@ -142,11 +143,11 @@ class CourseRepository extends ServiceEntityRepository
             ->having('COUNT(DISTINCT d.id) > 0')
             ->orderBy(
                 'documentCount',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'c.code',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults($limit);
 
@@ -221,7 +222,7 @@ class CourseRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->orderBy(
                 'c.code',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -345,13 +346,13 @@ class CourseRepository extends ServiceEntityRepository
             ->leftJoin(
                 Summary::class,
                 's',
-                'WITH',
+                'ON',
                 's.course = c',
             )
             ->leftJoin(
                 Exam::class,
                 'e',
-                'WITH',
+                'ON',
                 'e.course = c',
             )
             ->leftJoin(

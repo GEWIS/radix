@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_filter;
 use function array_values;
@@ -67,7 +68,7 @@ class MaintenanceWindowRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'w.startsAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->enableResultCache(

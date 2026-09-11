@@ -16,6 +16,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function strtolower;
 
@@ -263,30 +264,30 @@ class FoundationRepository extends ServiceEntityRepository
         $qb = $this->overviewQuery($search)
             ->orderBy(
                 'o.abbr',
-                'ASC',
+                SortDirection::Ascending,
             )
             // Abbreviations repeat, so on their own they leave the order of a page up to the database. The identity of
             // the founding decision settles the rest, so that paging through the list cannot show one body twice and
             // skip another.
             ->addOrderBy(
                 'o.meeting_type',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'o.meeting_number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'o.decision_point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'o.decision_number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'o.sequence',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

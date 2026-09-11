@@ -19,6 +19,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 use function array_keys;
@@ -68,7 +69,7 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'cr.updatedAt',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $paginator = new Paginator(
@@ -108,7 +109,7 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'cr.beginTime',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $paginator = new Paginator(
@@ -423,24 +424,24 @@ class ActivityRepository extends ServiceEntityRepository
             $qb->andWhere('lr.endTime < :now')
                 ->orderBy(
                     'lr.beginTime',
-                    'DESC',
+                    SortDirection::Descending,
                 );
         } elseif (false === $past) {
             $qb->andWhere('lr.endTime > :now')
                 ->orderBy(
                     'lr.beginTime',
-                    'ASC',
+                    SortDirection::Ascending,
                 );
         } else {
             $qb->orderBy(
                 'lr.beginTime',
-                'DESC',
+                SortDirection::Descending,
             );
         }
 
         $qb->addOrderBy(
             'a.id',
-            'ASC',
+            SortDirection::Ascending,
         );
 
         $search = trim($search);
@@ -647,7 +648,7 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'lr.beginTime',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults($limit)
             ->getQuery()
@@ -691,7 +692,7 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'lr.beginTime',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults($limit)
             ->getQuery()
@@ -736,7 +737,7 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'lr.beginTime',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults($limit);
 
@@ -792,7 +793,7 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'lr.beginTime',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

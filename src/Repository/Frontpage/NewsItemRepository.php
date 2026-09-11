@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 use function array_keys;
@@ -78,7 +79,7 @@ class NewsItemRepository extends ServiceEntityRepository
         $builder = $this->createQueryBuilder('newsItem')
             ->orderBy(
                 'newsItem.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit);
 
@@ -175,11 +176,11 @@ class NewsItemRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('newsItem')
             ->addOrderBy(
                 'newsItem.pinned',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'newsItem.date',
-                'DESC',
+                SortDirection::Descending,
             );
     }
 }

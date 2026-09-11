@@ -9,6 +9,7 @@ use App\Entity\Database\Meeting;
 use App\Entity\Database\SubDecision\Annulment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Annulment>
@@ -36,15 +37,15 @@ class AnnulmentRepository extends ServiceEntityRepository
             ->andWhere('a.meeting_number = :meeting_number')
             ->orderBy(
                 'a.decision_point',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'a.decision_number',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->addOrderBy(
                 'a.sequence',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setParameter(
                 'meeting_type',

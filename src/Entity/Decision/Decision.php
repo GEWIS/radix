@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * Decision model.
@@ -107,7 +108,7 @@ class Decision
             'remove',
         ],
     )]
-    #[OrderBy(value: ['sequence' => 'ASC'])]
+    #[OrderBy(value: ['sequence' => SortDirection::Ascending])]
     private Collection $subdecisions;
 
     /**

@@ -15,6 +15,7 @@ use Doctrine\ORM\Query\Expr\Join as JoinExpr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function addcslashes;
 use function is_numeric;
@@ -68,7 +69,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
         $qb->leftJoin(
             CheckoutSession::class,
             'cs',
-            JoinExpr::WITH,
+            JoinExpr::ON,
             'cs.prospectiveMember = m.lidnr',
         );
 
@@ -192,7 +193,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('m')
             ->orderBy(
                 'm.lidnr',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -277,7 +278,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
         $qb->leftJoin(
             CheckoutSession::class,
             'cs',
-            JoinExpr::WITH,
+            JoinExpr::ON,
             'cs.prospectiveMember = m.lidnr',
         )
             ->andWhere($qb->expr()->orX(

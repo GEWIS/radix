@@ -8,6 +8,7 @@ use App\Entity\Decision\Keyholder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Keyholder>
@@ -55,11 +56,11 @@ class KeyholderRepository extends ServiceEntityRepository
 
         $qb->orderBy(
             'm.lidnr',
-            'ASC',
+            SortDirection::Ascending,
         )
             ->addOrderBy(
                 'k.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);

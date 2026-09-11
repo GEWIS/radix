@@ -12,6 +12,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_filter;
 use function array_map;
@@ -118,11 +119,11 @@ class SecurityLogRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('l')
             ->orderBy(
                 'l.occurredAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'l.id',
-                'DESC',
+                SortDirection::Descending,
             );
 
         $search = trim($search);

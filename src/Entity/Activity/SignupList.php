@@ -29,6 +29,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use SortDirection;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
@@ -355,8 +356,8 @@ class SignupList
         orphanRemoval: true,
     )]
     #[OrderBy([
-        'position' => 'ASC',
-        'id' => 'ASC',
+        'position' => SortDirection::Ascending,
+        'id' => SortDirection::Ascending,
     ])]
     private Collection $roles;
 
@@ -375,8 +376,8 @@ class SignupList
         orphanRemoval: true,
     )]
     #[OrderBy([
-        'position' => 'ASC',
-        'id' => 'ASC',
+        'position' => SortDirection::Ascending,
+        'id' => SortDirection::Ascending,
     ])]
     private Collection $fields;
 
@@ -391,7 +392,7 @@ class SignupList
         orphanRemoval: true,
         fetch: 'EXTRA_LAZY',
     )]
-    #[OrderBy(value: ['id' => 'ASC'])]
+    #[OrderBy(value: ['id' => SortDirection::Ascending])]
     private Collection $signUps;
 
     /**

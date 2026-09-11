@@ -9,6 +9,7 @@ use App\Entity\Decision\ReferenceDocument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function sprintf;
 
@@ -45,7 +46,7 @@ class ReferenceDocumentRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'document.name',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         /** @var list<array{0: ReferenceDocument, usageCount: int<0, max>}> $rows */

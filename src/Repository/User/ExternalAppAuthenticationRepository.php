@@ -10,6 +10,7 @@ use App\Entity\User\ExternalAppAuthentication;
 use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ExternalAppAuthentication>
@@ -44,7 +45,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             ->leftJoin(
                 ExternalApp::class,
                 'app',
-                'WITH',
+                'ON',
                 'a.externalApp = app.id',
             )
             ->where('a.user = :user_id')
@@ -66,7 +67,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             ->andWhere('a.user = :user_id')
             ->orderBy(
                 'a.time',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults(1)
             ->setParameter(
@@ -92,7 +93,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             ->groupBy('a.externalApp')
             ->orderBy(
                 'a.time',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 'user_id',

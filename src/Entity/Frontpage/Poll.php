@@ -25,6 +25,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
 use RuntimeException;
+use SortDirection;
 
 /**
  * A question put to the members, which is a stable thing the votes and the discussion hang off while the question
@@ -63,7 +64,7 @@ class Poll implements RevisableInterface
         mappedBy: 'poll',
         cascade: ['persist'],
     )]
-    #[OrderBy(['revisionNumber' => 'DESC'])]
+    #[OrderBy(['revisionNumber' => SortDirection::Descending])]
     private Collection $revisions;
 
     #[ManyToOne(targetEntity: PollRevision::class)]
@@ -89,7 +90,7 @@ class Poll implements RevisableInterface
             'remove',
         ],
     )]
-    #[OrderBy(['createdOn' => 'ASC'])]
+    #[OrderBy(['createdOn' => SortDirection::Ascending])]
     private Collection $comments;
 
     /**

@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_filter;
 use function array_map;
@@ -357,7 +358,7 @@ class CompanyRepository extends ServiceEntityRepository
                 )
                 ->orderBy(
                     'c.name',
-                    'ASC',
+                    SortDirection::Ascending,
                 )
                 ->getQuery()
                 ->getArrayResult() as $row
@@ -396,7 +397,7 @@ class CompanyRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'c.name',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         $search = trim($search);

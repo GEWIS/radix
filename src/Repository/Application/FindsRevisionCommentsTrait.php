@@ -8,6 +8,7 @@ use App\Entity\Application\AbstractRevisionComment;
 use App\Entity\Application\RevisionInterface;
 use Doctrine\DBAL\Types\Types;
 use Override;
+use SortDirection;
 
 /**
  * Reading a review discussion, which is the same query in every domain: the `revision` association is mapped on each
@@ -60,7 +61,7 @@ trait FindsRevisionCommentsTrait
             )
             ->orderBy(
                 'c.createdAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

@@ -9,6 +9,7 @@ use App\Entity\Application\Enums\RevisionStatus;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use SortDirection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -61,7 +62,7 @@ final readonly class StaleRevisionRepository
             )
             ->orderBy(
                 'r.updatedAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

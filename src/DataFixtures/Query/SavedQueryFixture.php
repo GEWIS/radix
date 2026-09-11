@@ -57,8 +57,8 @@ class SavedQueryFixture extends Fixture implements FixtureGroupInterface
                 a.type,
                 m.supremum
             FROM db:Member AS m
-                INNER JOIN db:Address AS a WITH a.member = m
-                LEFT JOIN db:OrganMember AS o WITH o.member = m
+                INNER JOIN db:Address AS a ON a.member = m
+                LEFT JOIN db:OrganMember AS o ON o.member = m
             WHERE (m.lidnr in (9006, 9093))
                         AND ((a.type = 'home' AND NOT EXISTS(SELECT mad
                                 FROM db:Member as mad

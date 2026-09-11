@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
 use Override;
+use SortDirection;
 
 use function array_filter;
 use function count;
@@ -36,7 +37,7 @@ class CompanyJobPackage extends CompanyPackage
             'remove',
         ],
     )]
-    #[OrderBy(['updatedAt' => 'DESC'])]
+    #[OrderBy(['updatedAt' => SortDirection::Descending])]
     private Collection $vacancies;
 
     public function __construct()

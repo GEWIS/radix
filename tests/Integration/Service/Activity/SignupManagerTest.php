@@ -19,6 +19,7 @@ use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Types\Types;
+use SortDirection;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 use function count;
@@ -488,7 +489,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ->andWhere('sl.capacity IS NOT NULL')
             ->orderBy(
                 'sl.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults(1)
             ->getQuery()
@@ -541,7 +542,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ->where('s.signupList = :list')
             ->orderBy(
                 's.id',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setMaxResults((int) $list->getCapacity())
             ->setParameter(

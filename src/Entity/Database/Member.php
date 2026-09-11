@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
 use RuntimeException;
+use SortDirection;
 use Symfony\Component\Mime\Address as MailAddress;
 
 use function is_string;
@@ -106,7 +107,7 @@ class Member
             'remove',
         ],
     )]
-    #[OrderBy(['startDate' => 'ASC'])]
+    #[OrderBy(['startDate' => SortDirection::Ascending])]
     private Collection $memberships;
 
     /**

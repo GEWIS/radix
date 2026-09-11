@@ -10,6 +10,7 @@ use App\Entity\Frontpage\PollRevision;
 use App\Repository\Application\FindsRevisionsForReviewTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<PollRevision>
@@ -90,7 +91,7 @@ class PollRevisionRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'r.reviewedAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();

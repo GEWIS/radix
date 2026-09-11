@@ -16,6 +16,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function count;
 
@@ -69,7 +70,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->andWhere('p.expires <= :date')
             ->orderBy(
                 'p.expires',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setParameter(
                 'date',
@@ -117,7 +118,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->andWhere('p.starts <= :date')
             ->orderBy(
                 'p.starts',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setParameter(
                 'date',
@@ -157,7 +158,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->where('p.pendingImage IS NOT NULL')
             ->orderBy(
                 'p.pendingImageSubmittedAt',
-                'ASC',
+                SortDirection::Ascending,
             );
 
         return $qb->getQuery()->getResult();

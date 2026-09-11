@@ -8,6 +8,7 @@ use App\Entity\User\PendingNotificationEmail;
 use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_values;
 
@@ -60,7 +61,7 @@ class PendingNotificationEmailRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'n.createdAt',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

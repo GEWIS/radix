@@ -13,6 +13,7 @@ use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTime;
+use SortDirection;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -245,7 +246,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
             ->where('e.revision = :revision')
             ->orderBy(
                 'e.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 'revision',

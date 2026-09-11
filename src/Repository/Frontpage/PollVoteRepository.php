@@ -9,6 +9,7 @@ use App\Entity\Frontpage\Poll;
 use App\Entity\Frontpage\PollVote;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function intval;
 
@@ -137,7 +138,7 @@ class PollVoteRepository extends ServiceEntityRepository
         $qb->where('v.respondent = :member')
             ->orderBy(
                 'v.poll',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 'member',

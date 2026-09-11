@@ -1,5 +1,10 @@
 {% extends 'database/email/_base.html.twig' %}
 {% import 'emails/_partials/blocks.html.twig' as blocks %}
+{% macro section(title) %}
+    <hr style="color: #F2F2F2;"/>
+    <p style="font-size: 18px; text-align: center; font-weight: bolder; margin-bottom: 6px;">{{ title }}</p>
+{% endmacro %}
+{% import _self as welcome %}
 
 {% block emailTitle %}Registration Completed GEWIS{% endblock %}
 {% block preheader %}{% endblock %}
@@ -34,13 +39,6 @@
         <br>The board of GEWIS
     </p>
     
-        {% macro section(title) %}
-            <hr style="color: #F2F2F2;"/>
-            <p style="font-size: 18px; text-align: center; font-weight: bolder; margin-bottom: 6px;">{{ title }}</p>
-        {% endmacro %}
-        
-        {% import _self as welcome %}
-        
         <p>
             You might have noticed that GEWIS has its own website, but that it might not be as easy to access as you had
             hoped. Fear not, as this instruction mail should help you in no time! There are several different tabs in which

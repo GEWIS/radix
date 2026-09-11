@@ -29,6 +29,7 @@ use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Override;
 use RuntimeException;
+use SortDirection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use function array_filter;
@@ -98,7 +99,7 @@ class Company implements RevisableInterface
         mappedBy: 'company',
         cascade: ['persist'],
     )]
-    #[OrderBy(['revisionNumber' => 'DESC'])]
+    #[OrderBy(['revisionNumber' => SortDirection::Descending])]
     private Collection $revisions;
 
     /**

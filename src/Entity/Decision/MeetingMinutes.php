@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * Meeting minutes: at most one per meeting, with the actual files as {@see MeetingMinutesVersion}s. Uploading minutes
@@ -71,7 +72,7 @@ class MeetingMinutes
         targetEntity: MeetingMinutesVersion::class,
         mappedBy: 'minutes',
     )]
-    #[OrderBy(value: ['id' => 'ASC'])]
+    #[OrderBy(value: ['id' => SortDirection::Ascending])]
     private Collection $versions;
 
     public function __construct()

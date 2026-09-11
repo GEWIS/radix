@@ -9,6 +9,7 @@ use App\Entity\Frontpage\Poll;
 use App\Entity\Frontpage\PollComment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function intval;
 
@@ -142,7 +143,7 @@ class PollCommentRepository extends ServiceEntityRepository
         $qb->where('c.user = :member')
             ->orderBy(
                 'c.createdOn',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 'member',

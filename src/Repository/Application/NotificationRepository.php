@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @template-extends ServiceEntityRepository<Notification>
@@ -77,7 +78,7 @@ class NotificationRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'n.createdAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit)
             ->getQuery()

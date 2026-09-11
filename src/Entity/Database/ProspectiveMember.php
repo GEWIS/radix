@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 use function assert;
 use function in_array;
@@ -162,7 +163,7 @@ class ProspectiveMember
         orphanRemoval: true,
         cascade: ['remove'],
     )]
-    #[OrderBy(['created' => 'ASC'])]
+    #[OrderBy(['created' => SortDirection::Ascending])]
     private Collection $checkoutSessions;
 
     /**

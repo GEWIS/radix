@@ -8,6 +8,7 @@ use App\Entity\User\DataExportRequest;
 use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<DataExportRequest>
@@ -32,7 +33,7 @@ class DataExportRequestRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'r.requestedAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults(1)
             ->getQuery()

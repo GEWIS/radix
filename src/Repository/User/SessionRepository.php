@@ -8,6 +8,7 @@ use App\Entity\User\Session;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Session>
@@ -153,7 +154,7 @@ class SessionRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 's.lastUsedAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();
@@ -177,7 +178,7 @@ class SessionRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 's.lastUsedAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();
@@ -198,7 +199,7 @@ class SessionRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 's.lastUsedAt',
-                'DESC',
+                SortDirection::Descending,
             )
             ->getQuery()
             ->getResult();

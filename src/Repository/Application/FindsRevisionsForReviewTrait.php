@@ -6,6 +6,7 @@ namespace App\Repository\Application;
 
 use App\Entity\Application\Enums\RevisionStatus;
 use Doctrine\ORM\QueryBuilder;
+use SortDirection;
 
 use function intval;
 
@@ -62,7 +63,7 @@ trait FindsRevisionsForReviewTrait
     ): QueryBuilder {
         return $builder->orderBy(
             $alias . '.submittedAt',
-            'ASC',
+            SortDirection::Ascending,
         );
     }
 }

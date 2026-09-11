@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use SortDirection;
 
 /**
  * A round of the option calendar, opened by the board before a quartile.
@@ -96,7 +97,7 @@ class OptionPeriod
         targetEntity: ActivityProposal::class,
         mappedBy: 'period',
     )]
-    #[OrderBy(['createdAt' => 'ASC'])]
+    #[OrderBy(['createdAt' => SortDirection::Ascending])]
     private Collection $proposals;
 
     public function __construct()

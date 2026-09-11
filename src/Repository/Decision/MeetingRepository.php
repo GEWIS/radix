@@ -16,6 +16,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 use function array_merge;
 use function array_reverse;
@@ -62,7 +63,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->groupBy('m')
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             );
 
         if (
@@ -96,7 +97,7 @@ class MeetingRepository extends ServiceEntityRepository
         $qb->where('m.type = :type')
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 ':type',
@@ -121,7 +122,7 @@ class MeetingRepository extends ServiceEntityRepository
         $qb->where('m.number = :number')
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 ':number',
@@ -160,7 +161,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->andWhere('m.type = :type')
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 'date',
@@ -285,7 +286,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->andWhere('m.date >= :date')
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setParameter(
                 'gmm',
@@ -317,7 +318,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->andWhere('m.date >= :date')
             ->orderBy(
                 'm.date',
-                'ASC',
+                SortDirection::Ascending,
             )
             ->setParameter(
                 'gmm',
@@ -347,7 +348,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->andWhere('m.date >= :date')
             ->orderBy(
                 'm.date',
-                'ASC',
+                SortDirection::Ascending,
             );
         $this->selectOneToOneSides($qb);
 
@@ -425,11 +426,11 @@ class MeetingRepository extends ServiceEntityRepository
             ))
             ->orderBy(
                 'm.date',
-                'DESC',
+                SortDirection::Descending,
             )
             ->addOrderBy(
                 'm.number',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
@@ -468,7 +469,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->andWhere('m.number < :number')
             ->orderBy(
                 'm.number',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults($limit);
         $this->selectOneToOneSides($qb);
@@ -501,13 +502,13 @@ class MeetingRepository extends ServiceEntityRepository
         $before = $this->nearbyQuery(
             $meeting,
             '<',
-            'DESC',
+            SortDirection::Descending,
             $total,
         );
         $after = $this->nearbyQuery(
             $meeting,
             '>',
-            'ASC',
+            SortDirection::Ascending,
             $total,
         );
 
@@ -544,7 +545,7 @@ class MeetingRepository extends ServiceEntityRepository
     private function nearbyQuery(
         Meeting $meeting,
         string $comparison,
-        string $direction,
+        SortDirection $direction,
         int $limit,
     ): array {
         $qb = $this->createQueryBuilder('m');

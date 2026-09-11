@@ -15,6 +15,7 @@ use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityAdminService;
 use App\Tests\Integration\DatabaseTestCase;
+use SortDirection;
 use Symfony\Component\Form\Flow\DataStorage\SessionDataStorage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -450,7 +451,7 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             )
             ->orderBy(
                 'ar.id',
-                'DESC',
+                SortDirection::Descending,
             )
             ->setMaxResults(1)
             ->getQuery()
