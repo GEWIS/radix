@@ -45,7 +45,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             ->leftJoin(
                 ExternalApp::class,
                 'app',
-                'WITH',
+                'ON',
                 'a.externalApp = app.id',
             )
             ->where('a.user = :user_id')

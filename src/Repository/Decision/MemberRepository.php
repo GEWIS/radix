@@ -450,7 +450,7 @@ class MemberRepository extends ServiceEntityRepository
             ->leftJoin(
                 OrganMember::class,
                 'om',
-                Join::WITH,
+                Join::ON,
                 'm.lidnr = om.member',
             )
             ->where('om.dischargeDate IS NULL OR om.dischargeDate > CURRENT_DATE()')
@@ -506,7 +506,7 @@ class MemberRepository extends ServiceEntityRepository
             ->leftJoin(
                 User::class,
                 'u',
-                'WITH',
+                'ON',
                 'm.lidnr = u.lidnr',
             );
 
@@ -624,7 +624,7 @@ class MemberRepository extends ServiceEntityRepository
         $qb->leftJoin(
             User::class,
             'u',
-            'WITH',
+            'ON',
             'm.lidnr = u.lidnr',
         )
             ->addSelect('u')

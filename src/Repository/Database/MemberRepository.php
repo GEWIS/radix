@@ -605,7 +605,7 @@ class MemberRepository extends ServiceEntityRepository
             ->innerJoin(
                 Member::class,
                 'm',
-                Join::WITH,
+                Join::ON,
                 'm = ms.member',
             )
             ->where('m.deleted = False')

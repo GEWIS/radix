@@ -59,7 +59,7 @@ class PhotoRepository extends ServiceEntityRepository
             $qb->innerJoin(
                 MemberTag::class,
                 't',
-                'WITH',
+                'ON',
                 't.photo = p AND t.member = :member',
             )
                 ->setParameter(
@@ -78,7 +78,7 @@ class PhotoRepository extends ServiceEntityRepository
             $qb->innerJoin(
                 OrganTag::class,
                 't',
-                'WITH',
+                'ON',
                 't.photo = p AND t.organ = :organ',
             )
                 ->setParameter(

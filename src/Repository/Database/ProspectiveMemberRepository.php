@@ -69,7 +69,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
         $qb->leftJoin(
             CheckoutSession::class,
             'cs',
-            JoinExpr::WITH,
+            JoinExpr::ON,
             'cs.prospectiveMember = m.lidnr',
         );
 
@@ -278,7 +278,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
         $qb->leftJoin(
             CheckoutSession::class,
             'cs',
-            JoinExpr::WITH,
+            JoinExpr::ON,
             'cs.prospectiveMember = m.lidnr',
         )
             ->andWhere($qb->expr()->orX(

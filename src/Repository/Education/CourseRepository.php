@@ -346,13 +346,13 @@ class CourseRepository extends ServiceEntityRepository
             ->leftJoin(
                 Summary::class,
                 's',
-                'WITH',
+                'ON',
                 's.course = c',
             )
             ->leftJoin(
                 Exam::class,
                 'e',
-                'WITH',
+                'ON',
                 'e.course = c',
             )
             ->leftJoin(
