@@ -127,7 +127,7 @@ final readonly class AdmissionOrder
         $membership = $list->getMembershipTierOrder();
         if (
             null !== $membership
-            && MembershipPriorityMode::Ordering === $list->getMembershipPriorityMode()
+            && MembershipPriorityMode::Ordering === $list->membershipPriorityMode
         ) {
             $ranks[] = static fn (Signup $signup): int => self::positionIn(
                 $membership,
@@ -188,7 +188,7 @@ final readonly class AdmissionOrder
         array $ordered,
     ): array {
         $places = $list->getMembershipPlaces();
-        $committeePlaces = $list->getOrganisingCommitteePlaces();
+        $committeePlaces = $list->organisingCommitteePlaces;
         if (
             [] === $places
             && null === $committeePlaces
@@ -209,7 +209,7 @@ final readonly class AdmissionOrder
                 static function (Signup $signup) use ($committee): bool {
                     return $signup instanceof UserSignup
                         && array_key_exists(
-                            $signup->getUser()->getLidnr(),
+                            $signup->user->getLidnr(),
                             $committee,
                         );
                 },
@@ -299,7 +299,7 @@ final readonly class AdmissionOrder
         SignupList $list,
         array $ordered,
     ): array {
-        $capacity = $list->getCapacity();
+        $capacity = $list->capacity;
         if (
             null === $capacity
             || $capacity < 1
@@ -329,7 +329,7 @@ final readonly class AdmissionOrder
         SignupRole $role,
         int $capacity,
     ): array {
-        $needed = $role->getMinimum() - $this->holdersAdmitted(
+        $needed = $role->minimum - $this->holdersAdmitted(
             $ordered,
             $role,
             $capacity,
@@ -397,7 +397,7 @@ final readonly class AdmissionOrder
                 $capacity,
             ) as $signup
         ) {
-            if ($signup->getRole() !== $role) {
+            if ($signup->role !== $role) {
                 continue;
             }
 
@@ -416,7 +416,7 @@ final readonly class AdmissionOrder
         int $capacity,
     ): ?int {
         for ($index = $capacity; $index < count($ordered); ++$index) {
-            if ($ordered[$index]->getRole() !== $role) {
+            if ($ordered[$index]->role !== $role) {
                 continue;
             }
 
@@ -439,7 +439,7 @@ final readonly class AdmissionOrder
                 count($ordered),
             ) - 1; $index >= 0; --$index
         ) {
-            if (null !== $ordered[$index]->getRole()) {
+            if (null !== $ordered[$index]->role) {
                 continue;
             }
 

@@ -127,7 +127,7 @@ final class SignupOverviewTest extends DatabaseTestCase
         // Capacity is two, so exactly two of the four sign-ups are admitted and the draw is locked with an audit stamp.
         $drawn = 0;
         foreach ($list->getSignUps() as $signup) {
-            if (!$signup->isDrawn()) {
+            if (!$signup->drawn) {
                 continue;
             }
 
@@ -138,8 +138,8 @@ final class SignupOverviewTest extends DatabaseTestCase
             2,
             $drawn,
         );
-        self::assertNotNull($list->getDrawnAt());
-        self::assertNotNull($list->getDrawnBy());
+        self::assertNotNull($list->drawnAt);
+        self::assertNotNull($list->drawnBy);
     }
 
     public function testTheListReadingDrawsTheRailAndTheTable(): void

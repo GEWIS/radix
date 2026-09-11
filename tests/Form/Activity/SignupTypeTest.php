@@ -205,11 +205,11 @@ final class SignupTypeTest extends TypeTestCase
             $field,
             $fieldId,
         );
-        $field->setName(new ActivityLocalisedText(
+        $field->name = new ActivityLocalisedText(
             'Kleur',
             'Colour',
-        ));
-        $field->setType(SignupFieldTypes::Choice);
+        );
+        $field->type = SignupFieldTypes::Choice;
 
         foreach ($options as $optionId => $isDefault) {
             $option = new SignupOption();
@@ -217,11 +217,11 @@ final class SignupTypeTest extends TypeTestCase
                 $option,
                 $optionId,
             );
-            $option->setValue(new ActivityLocalisedText(
+            $option->value = new ActivityLocalisedText(
                 'Waarde ' . $optionId,
                 'Value ' . $optionId,
-            ));
-            $option->setIsDefault($isDefault);
+            );
+            $option->isDefault = $isDefault;
             $field->addOption($option);
         }
 
@@ -235,11 +235,11 @@ final class SignupTypeTest extends TypeTestCase
             $field,
             100,
         );
-        $field->setName(new ActivityLocalisedText(
+        $field->name = new ActivityLocalisedText(
             'Kleur',
             'Colour',
-        ));
-        $field->setType(SignupFieldTypes::Choice);
+        );
+        $field->type = SignupFieldTypes::Choice;
 
         foreach (
             [
@@ -253,10 +253,10 @@ final class SignupTypeTest extends TypeTestCase
                 $optionId,
             );
             // Deliberately identical labels on both options.
-            $option->setValue(new ActivityLocalisedText(
+            $option->value = new ActivityLocalisedText(
                 'Zelfde',
                 'Same',
-            ));
+            );
             $field->addOption($option);
         }
 

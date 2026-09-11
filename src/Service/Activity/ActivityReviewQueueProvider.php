@@ -49,7 +49,7 @@ final readonly class ActivityReviewQueueProvider implements ReviewQueueProviderI
                 static function (RevisionInterface $revision): string {
                     assert($revision instanceof ActivityRevision);
 
-                    return strval($revision->getName()->getText(Languages::current()));
+                    return strval($revision->name->getText(Languages::current()));
                 },
                 'admin/activities/approvals/review',
             ),

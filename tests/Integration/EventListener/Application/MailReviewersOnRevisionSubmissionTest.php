@@ -129,7 +129,7 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
         foreach (self::getContainer()->get(ActivityRevisionRepository::class)->findAll() as $revision) {
             if (
                 RevisionStatus::Draft !== $revision->getStatus()
-                || $revision->getActivity()->getBeginTime() < new DateTime()
+                || $revision->activity->getBeginTime() < new DateTime()
             ) {
                 continue;
             }

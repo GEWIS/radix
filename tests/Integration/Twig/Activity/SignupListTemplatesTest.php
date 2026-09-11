@@ -93,7 +93,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     {
         $revision = $this->revisionWithList();
         $list = $revision->getSignupLists()->getValues()[0];
-        $list->setOnlyGEWIS(false);
+        $list->onlyGEWIS = false;
         $list->setMembershipTierOrder([
             [
                 MembershipTier::Ordinary,
@@ -129,7 +129,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     {
         $revision = $this->revisionWithList();
         $list = $revision->getSignupLists()->getValues()[0];
-        $list->setOnlyGEWIS(false);
+        $list->onlyGEWIS = false;
 
         $html = $this->renderStep(
             $revision,
@@ -226,8 +226,8 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     {
         $revision = $this->revisionWithList();
         $list = $revision->getSignupLists()->getValues()[0];
-        $list->setOpenDate(null);
-        $list->setCloseDate(null);
+        $list->openDate = null;
+        $list->closeDate = null;
 
         $this->pushRequest();
 
@@ -241,7 +241,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
                         SignupListSection::Allocation,
                     ),
                 )->createView(),
-                'activity' => $revision->getActivity(),
+                'activity' => $revision->activity,
             ],
         );
 
@@ -258,7 +258,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     public function testAStepWhoseQuestionsAreAnsweredCanBeGoneToFromTheHeader(): void
     {
         $revision = $this->revisionWithList();
-        $activity = $revision->getActivity();
+        $activity = $revision->activity;
 
         $this->pushRequest();
 
@@ -295,7 +295,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
                     $revision,
                     ActivityData::STEP_GENERAL,
                 )->createView(),
-                'activity' => $revision->getActivity(),
+                'activity' => $revision->activity,
             ],
         );
 
@@ -364,12 +364,12 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     {
         $previous = $this->revisionWithList();
         $previousList = $previous->getSignupLists()->getValues()[0];
-        $previousList->setOrganisingCommitteePlaces(1);
+        $previousList->organisingCommitteePlaces = 1;
 
         $revision = $this->revisionWithList();
         $list = $revision->getSignupLists()->getValues()[0];
-        $list->setLineageId($previousList->getLineageId());
-        $list->setOrganisingCommitteePlaces(4);
+        $list->lineageId = $previousList->lineageId;
+        $list->organisingCommitteePlaces = 4;
 
         $html = $this->renderPane(
             $revision,
@@ -489,25 +489,25 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     private function list(): SignupList
     {
         $list = new SignupList();
-        $list->setName(new ActivityLocalisedText(
+        $list->name = new ActivityLocalisedText(
             'Participants',
             'Participants',
-        ));
-        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
-        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
-        $list->setOnlyGEWIS(true);
-        $list->setLimitedCapacity(true);
-        $list->setCapacity(10);
+        );
+        $list->openDate = new DateTime('2030-01-01 12:00');
+        $list->closeDate = new DateTime('2030-02-01 12:00');
+        $list->onlyGEWIS = true;
+        $list->limitedCapacity = true;
+        $list->capacity = 10;
         $list->setMembershipTierOrder([
             [MembershipTier::Graduate],
             [MembershipTier::Ordinary],
         ]);
-        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedPlaces);
+        $list->membershipPriorityMode = MembershipPriorityMode::ReservedPlaces;
         $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 2]);
 
         $role = new SignupRole();
-        $role->setName('Driver');
-        $role->setMinimum(2);
+        $role->name = 'Driver';
+        $role->minimum = 2;
         $list->addRole($role);
 
         return $list;
@@ -516,7 +516,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
     private function renderForm(SignupListSection $section): string
     {
         $revision = $this->revisionWithList();
-        $activity = $revision->getActivity();
+        $activity = $revision->activity;
         $list = $revision->getSignupLists()->getValues()[0];
         $step = ActivityFlowType::listStep(
             $list,

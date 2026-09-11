@@ -170,10 +170,10 @@ final readonly class RevisionAuditListener
             }
 
             $edit = new ActivityRevisionEdit();
-            $edit->setRevision($revision);
+            $edit->revision = $revision;
             $edit->setEditor($editor);
-            $edit->setEditedAt(new DateTime());
-            $edit->setChangedFields(array_keys($fields));
+            $edit->editedAt = new DateTime();
+            $edit->changedFields = array_keys($fields);
 
             $entityManager->persist($edit);
             $unitOfWork->computeChangeSet(
@@ -190,9 +190,9 @@ final readonly class RevisionAuditListener
     private function owningRevisionOfSignupStructure(object $entity): ?ActivityRevision
     {
         return match (true) {
-            $entity instanceof SignupList => $entity->getRevision(),
-            $entity instanceof SignupField => $entity->getSignupList()->getRevision(),
-            $entity instanceof SignupOption => $entity->getField()->getSignupList()->getRevision(),
+            $entity instanceof SignupList => $entity->revision,
+            $entity instanceof SignupField => $entity->signupList->revision,
+            $entity instanceof SignupOption => $entity->field->signupList->revision,
             default => null,
         };
     }
@@ -224,10 +224,10 @@ final readonly class RevisionAuditListener
         }
 
         $texts = [
-            'name' => $revision->getName(),
-            'location' => $revision->getLocation(),
-            'costs' => $revision->getCosts(),
-            'description' => $revision->getDescription(),
+            'name' => $revision->name,
+            'location' => $revision->location,
+            'costs' => $revision->costs,
+            'description' => $revision->description,
         ];
         foreach ($texts as $field => $text) {
             if ([] === $unitOfWork->getEntityChangeSet($text)) {

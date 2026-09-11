@@ -58,7 +58,7 @@ final class ActivityNotificationSubjectNamer extends AbstractNotificationSubject
                 continue;
             }
 
-            $names[$id] = $this->localised($revision->getName());
+            $names[$id] = $this->localised($revision->name);
         }
 
         return $names;

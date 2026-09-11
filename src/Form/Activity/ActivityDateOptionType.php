@@ -58,7 +58,7 @@ class ActivityDateOptionType extends AbstractType
                             return;
                         }
 
-                        $option->setBeginsAt($value);
+                        $option->beginsAt = $value;
                     },
                 ],
             )
@@ -74,7 +74,7 @@ class ActivityDateOptionType extends AbstractType
                             return;
                         }
 
-                        $option->setEndsAt($value);
+                        $option->endsAt = $value;
                     },
                 ],
             );

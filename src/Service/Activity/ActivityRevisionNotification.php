@@ -56,7 +56,7 @@ final readonly class ActivityRevisionNotification implements RevisionNotificatio
 
         return sprintf(
             'Activity submitted for review: %s',
-            $revision->getName()->getText(Languages::English) ?? '',
+            $revision->name->getText(Languages::English) ?? '',
         );
     }
 }

@@ -175,11 +175,11 @@ class AdminActivityCalendarController extends AbstractController
                     $proposal,
                     'withdraw',
                 ),
-                'allowance' => null === $proposal->getOrgan()
+                'allowance' => null === $proposal->organ
                     ? null
                     : $this->limitResolver->allowanceFor(
-                        $proposal->getOrgan(),
-                        $proposal->getPeriod(),
+                        $proposal->organ,
+                        $proposal->period,
                     ),
             ],
         );

@@ -116,7 +116,7 @@ final class SignupTiers
             return MembershipTier::NonMember;
         }
 
-        return MembershipTier::of($signup->getUser()->getType());
+        return MembershipTier::of($signup->user->getType());
     }
 
     public static function cohort(Signup $signup): CohortTier
@@ -125,7 +125,7 @@ final class SignupTiers
             return CohortTier::Unknown;
         }
 
-        $generation = $signup->getUser()->getGeneration();
+        $generation = $signup->user->getGeneration();
         if ($generation < 1) {
             return CohortTier::Unknown;
         }
@@ -143,6 +143,6 @@ final class SignupTiers
             return ProgramType::Other;
         }
 
-        return $signup->getUser()->getStudy()->getProgramType();
+        return $signup->user->getStudy()->getProgramType();
     }
 }

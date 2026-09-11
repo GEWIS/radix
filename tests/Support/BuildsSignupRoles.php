@@ -15,8 +15,8 @@ trait BuildsSignupRoles
         int $minimum,
     ): SignupRole {
         $role = new SignupRole();
-        $role->setName($name);
-        $role->setMinimum($minimum);
+        $role->name = $name;
+        $role->minimum = $minimum;
         $list->addRole($role);
 
         return $role;

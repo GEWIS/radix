@@ -39,7 +39,7 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     {
         assert($source instanceof ActivityRevision);
 
-        $activity = $source->getActivity();
+        $activity = $source->activity;
 
         $draft = new ActivityRevision();
         $draft->setPreviousRevision($source);
@@ -57,19 +57,19 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
         assert($source instanceof ActivityRevision);
         assert($draft instanceof ActivityRevision);
 
-        $draft->setName($source->getName()->copy());
-        $draft->setLocation($source->getLocation()->copy());
-        $draft->setCosts($source->getCosts()->copy());
-        $draft->setDescription($source->getDescription()->copy());
-        $draft->setBeginTime($this->copyDate($source->getBeginTime()));
-        $draft->setEndTime($this->copyDate($source->getEndTime()));
-        $draft->setCategory($source->getCategory());
-        $draft->setRequireGEFLITST($source->getRequireGEFLITST());
-        $draft->setRequireZettle($source->getRequireZettle());
+        $draft->name = $source->name->copy();
+        $draft->location = $source->location->copy();
+        $draft->costs = $source->costs->copy();
+        $draft->description = $source->description->copy();
+        $draft->beginTime = $this->copyDate($source->beginTime);
+        $draft->endTime = $this->copyDate($source->endTime);
+        $draft->category = $source->category;
+        $draft->requireGEFLITST = $source->requireGEFLITST;
+        $draft->requireZettle = $source->requireZettle;
         // Organ and company are reference entities, copied by reference; the labels (also references) are re-assigned
         // to the draft. Without this the draft would lose the organiser and labels carried by the source revision.
-        $draft->setOrgan($source->getOrgan());
-        $draft->setCompany($source->getCompany());
+        $draft->organ = $source->organ;
+        $draft->company = $source->company;
         $draft->addLabels($source->getLabels()->toArray());
 
         foreach ($source->getSignupLists() as $list) {
@@ -91,41 +91,47 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     private function copySignupList(SignupList $source): SignupList
     {
         $list = new SignupList();
-        $list->setName($source->getName()->copy());
-        $openDate = $source->getOpenDate();
-        $closeDate = $source->getCloseDate();
-        $list->setOpenDate(null !== $openDate ? clone $openDate : null);
-        $list->setCloseDate(null !== $closeDate ? clone $closeDate : null);
-        $list->setOnlyGEWIS($source->getOnlyGEWIS());
-        $list->setDisplaySubscribedNumber($source->getDisplaySubscribedNumber());
-        $list->setLimitedCapacity($source->getLimitedCapacity());
-        $list->setCapacity($source->getCapacity());
+        $list->name = $source->name->copy();
+        $openDate = $source->openDate;
+        $closeDate = $source->closeDate;
+        $list->openDate = null !== $openDate
+            ? clone $openDate
+            : null;
+        $list->closeDate = null !== $closeDate
+            ? clone $closeDate
+            : null;
+        $list->onlyGEWIS = $source->onlyGEWIS;
+        $list->displaySubscribedNumber = $source->displaySubscribedNumber;
+        $list->limitedCapacity = $source->limitedCapacity;
+        $list->capacity = $source->capacity;
         // Snapshot the draw lock + its audit (and presence, below) at clone time so a fresh draft opens showing the
         // live state. This is only a starting point: the live list stays authoritative until approval, and
         // {@see SignupListMigrator::migrate()} re-syncs these onto the clone then in case a draw or presence sweep
         // happened while the draft was open.
-        $list->setDrawnAt($source->getDrawnAt());
-        $list->setDrawnBy($source->getDrawnBy());
+        $list->drawnAt = $source->drawnAt;
+        $list->drawnBy = $source->drawnBy;
         // Allocation method + its per-method settings are list config, carried forward like the other settings.
-        $list->setAllocationMethod($source->getAllocationMethod());
-        $list->setDrawCutoffRule($source->getDrawCutoffRule());
-        $cutoffAt = $source->getDrawCutoffAt();
-        $list->setDrawCutoffAt(null !== $cutoffAt ? clone $cutoffAt : null);
-        $list->setDrawAfterDurationHours($source->getDrawAfterDurationHours());
-        $list->setExternalPolicyUrl($source->getExternalPolicyUrl());
-        $list->setExternalForceOrdering($source->getExternalForceOrdering());
-        $list->setExternalPaymentByExternal($source->getExternalPaymentByExternal());
-        $list->setCustomMethodDescription($source->getCustomMethodDescription());
+        $list->allocationMethod = $source->allocationMethod;
+        $list->drawCutoffRule = $source->drawCutoffRule;
+        $cutoffAt = $source->drawCutoffAt;
+        $list->drawCutoffAt = null !== $cutoffAt
+            ? clone $cutoffAt
+            : null;
+        $list->drawAfterDurationHours = $source->drawAfterDurationHours;
+        $list->externalPolicyUrl = $source->externalPolicyUrl;
+        $list->externalForceOrdering = $source->externalForceOrdering;
+        $list->externalPaymentByExternal = $source->externalPaymentByExternal;
+        $list->customMethodDescription = $source->customMethodDescription;
         $list->setMembershipTierOrder($source->getMembershipTierOrder());
-        $list->setMembershipPriorityMode($source->getMembershipPriorityMode());
+        $list->membershipPriorityMode = $source->membershipPriorityMode;
         $list->setHeldMembershipPlaces($source->getHeldMembershipPlaces());
         $list->setCohortTierOrder($source->getCohortTierOrder());
         $list->setProgramTypeOrder($source->getProgramTypeOrder());
-        $list->setOrganisingCommitteePlaces($source->getOrganisingCommitteePlaces());
-        $list->setPresenceTaken($source->isPresenceTaken());
-        $list->setPromoted($source->isPromoted());
+        $list->organisingCommitteePlaces = $source->organisingCommitteePlaces;
+        $list->presenceTaken = $source->presenceTaken;
+        $list->promoted = $source->promoted;
         // Carry the lineage forward so approval can migrate the live sign-ups onto this clone.
-        $list->setLineageId($source->getLineageId());
+        $list->lineageId = $source->lineageId;
 
         foreach ($source->getFields() as $field) {
             $list->addField($this->copySignupField($field));
@@ -141,9 +147,9 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     private function copySignupRole(SignupRole $source): SignupRole
     {
         $role = new SignupRole();
-        $role->setName($source->getName());
-        $role->setMinimum($source->getMinimum());
-        $role->setPosition($source->getPosition());
+        $role->name = $source->name;
+        $role->minimum = $source->minimum;
+        $role->position = $source->position;
 
         return $role;
     }
@@ -151,13 +157,13 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     private function copySignupField(SignupField $source): SignupField
     {
         $field = new SignupField();
-        $field->setName($source->getName()->copy());
-        $field->setType($source->getType());
-        $field->setIsSensitive($source->isSensitive());
-        $field->setMinimumValue($source->getMinimumValue());
-        $field->setMaximumValue($source->getMaximumValue());
+        $field->name = $source->name->copy();
+        $field->type = $source->type;
+        $field->isSensitive = $source->isSensitive;
+        $field->minimumValue = $source->minimumValue;
+        $field->maximumValue = $source->maximumValue;
         // Carry the display order forward, otherwise a reordered list would revert to id order on the next draft.
-        $field->setPosition($source->getPosition());
+        $field->position = $source->position;
 
         foreach ($source->getOptions() as $option) {
             $field->addOption($this->copySignupOption($option));
@@ -169,10 +175,10 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     private function copySignupOption(SignupOption $source): SignupOption
     {
         $option = new SignupOption();
-        $option->setValue($source->getValue()->copy());
+        $option->value = $source->value->copy();
         // Carry the display order and the default marker forward, like the field's own position.
-        $option->setPosition($source->getPosition());
-        $option->setIsDefault($source->isDefault());
+        $option->position = $source->position;
+        $option->isDefault = $source->isDefault;
 
         return $option;
     }

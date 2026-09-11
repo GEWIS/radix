@@ -56,31 +56,31 @@ class OptionPeriod
         type: Types::STRING,
         length: 128,
     )]
-    private string $name;
+    public string $name;
 
     /**
      * From when bodies may hand in proposals for this period.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $submissionOpensAt;
+    public DateTime $submissionOpensAt;
 
     /**
      * Until when bodies may hand in proposals for this period.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $submissionClosesAt;
+    public DateTime $submissionClosesAt;
 
     /**
      * The first day a proposed activity may take place on.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $startsAt;
+    public DateTime $startsAt;
 
     /**
      * The last day a proposed activity may take place on.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $endsAt;
+    public DateTime $endsAt;
 
     /**
      * How many activities a body may propose in this period, when the board wants a different number than usual.
@@ -90,7 +90,7 @@ class OptionPeriod
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $defaultMaxProposals = null;
+    public ?int $defaultMaxProposals = null;
 
     /** @var Collection<array-key, ActivityProposal> */
     #[OneToMany(
@@ -103,66 +103,6 @@ class OptionPeriod
     public function __construct()
     {
         $this->proposals = new ArrayCollection();
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getSubmissionOpensAt(): DateTime
-    {
-        return $this->submissionOpensAt;
-    }
-
-    public function setSubmissionOpensAt(DateTime $submissionOpensAt): void
-    {
-        $this->submissionOpensAt = $submissionOpensAt;
-    }
-
-    public function getSubmissionClosesAt(): DateTime
-    {
-        return $this->submissionClosesAt;
-    }
-
-    public function setSubmissionClosesAt(DateTime $submissionClosesAt): void
-    {
-        $this->submissionClosesAt = $submissionClosesAt;
-    }
-
-    public function getStartsAt(): DateTime
-    {
-        return $this->startsAt;
-    }
-
-    public function setStartsAt(DateTime $startsAt): void
-    {
-        $this->startsAt = $startsAt;
-    }
-
-    public function getEndsAt(): DateTime
-    {
-        return $this->endsAt;
-    }
-
-    public function setEndsAt(DateTime $endsAt): void
-    {
-        $this->endsAt = $endsAt;
-    }
-
-    public function getDefaultMaxProposals(): ?int
-    {
-        return $this->defaultMaxProposals;
-    }
-
-    public function setDefaultMaxProposals(?int $defaultMaxProposals): void
-    {
-        $this->defaultMaxProposals = $defaultMaxProposals;
     }
 
     /**
@@ -178,8 +118,8 @@ class OptionPeriod
      */
     public function isOpenAt(DateTimeInterface $moment): bool
     {
-        return $this->getSubmissionOpensAt() <= $moment
-            && $this->getSubmissionClosesAt() >= $moment;
+        return $this->submissionOpensAt <= $moment
+            && $this->submissionClosesAt >= $moment;
     }
 
     /**
@@ -189,7 +129,7 @@ class OptionPeriod
         DateTimeInterface $from,
         DateTimeInterface $until,
     ): bool {
-        return $this->getStartsAt() <= $from
-            && $this->getEndsAt() >= $until;
+        return $this->startsAt <= $from
+            && $this->endsAt >= $until;
     }
 }

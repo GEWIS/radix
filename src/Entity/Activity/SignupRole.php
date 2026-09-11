@@ -27,57 +27,17 @@ class SignupRole
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private SignupList $signupList;
+    public SignupList $signupList;
 
     #[Column(type: Types::STRING)]
-    private string $name = '';
+    public string $name = '';
 
     #[Column(type: Types::INTEGER)]
-    private int $minimum = 1;
+    public int $minimum = 1;
 
     #[Column(
         type: Types::INTEGER,
         options: ['default' => 0],
     )]
-    private int $position = 0;
-
-    public function getSignupList(): SignupList
-    {
-        return $this->signupList;
-    }
-
-    public function setSignupList(SignupList $signupList): void
-    {
-        $this->signupList = $signupList;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getMinimum(): int
-    {
-        return $this->minimum;
-    }
-
-    public function setMinimum(int $minimum): void
-    {
-        $this->minimum = $minimum;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): void
-    {
-        $this->position = $position;
-    }
+    public int $position = 0;
 }

@@ -74,10 +74,10 @@ final readonly class ReleaseProposalDaysListener
             return;
         }
 
-        $proposal->setBudgetClearance(null);
-        $proposal->setBudgetClearedBy(null);
-        $proposal->setBudgetClearedAt(null);
-        $proposal->setBudgetRemindedAt(null);
+        $proposal->budgetClearance = null;
+        $proposal->budgetClearedBy = null;
+        $proposal->budgetClearedAt = null;
+        $proposal->budgetRemindedAt = null;
     }
 
     /**
@@ -94,11 +94,11 @@ final readonly class ReleaseProposalDaysListener
         }
 
         foreach ($proposal->getDateOptions() as $dateOption) {
-            if (!$dateOption->getStatus()->isStanding()) {
+            if (!$dateOption->status->isStanding()) {
                 continue;
             }
 
-            $dateOption->setStatus($status);
+            $dateOption->status = $status;
         }
     }
 }

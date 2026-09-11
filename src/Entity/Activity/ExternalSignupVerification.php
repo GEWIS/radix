@@ -44,13 +44,13 @@ class ExternalSignupVerification
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private ExternalSignup $externalSignup;
+    public private(set) ExternalSignup $externalSignup;
 
     #[Column(
         type: Types::STRING,
         enumType: ExternalSignupVerificationPurpose::class,
     )]
-    private ExternalSignupVerificationPurpose $purpose;
+    public private(set) ExternalSignupVerificationPurpose $purpose;
 
     public function __construct(
         ExternalSignup $externalSignup,
@@ -64,15 +64,5 @@ class ExternalSignupVerification
         $this->selector = $selector;
         $this->hashedToken = $hashedToken;
         $this->expiresAt = $expiresAt;
-    }
-
-    public function getExternalSignup(): ExternalSignup
-    {
-        return $this->externalSignup;
-    }
-
-    public function getPurpose(): ExternalSignupVerificationPurpose
-    {
-        return $this->purpose;
     }
 }

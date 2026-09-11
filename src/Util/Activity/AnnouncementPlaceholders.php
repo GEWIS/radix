@@ -124,7 +124,7 @@ final class AnnouncementPlaceholders
     ): array {
         $questions = [];
         foreach (self::tokens($signupList) as [$field, $token]) {
-            $questions[$token] = $field->getName()->getText($language) ?? '';
+            $questions[$token] = $field->name->getText($language) ?? '';
         }
 
         return $questions;
@@ -143,7 +143,7 @@ final class AnnouncementPlaceholders
         Languages $language,
     ): array {
         $answers = [];
-        foreach (self::tokens($signup->getSignupList()) as [$field, $token]) {
+        foreach (self::tokens($signup->signupList) as [$field, $token]) {
             $answers[$token] = $signup->displayValueForField(
                 $field,
                 $translator,
@@ -241,7 +241,7 @@ final class AnnouncementPlaceholders
     ): string {
         return match ($placeholder) {
             AnnouncementPlaceholder::ActivityName => $activity->getName()->getText($language) ?? '',
-            AnnouncementPlaceholder::SignupListName => $signupList?->getName()->getText($language) ?? '',
+            AnnouncementPlaceholder::SignupListName => $signupList?->name->getText($language) ?? '',
             // An activity without a body of its own is the board's, which is what the option calendar's own email
             // states for a proposal without one. There is nothing to abbreviate, so both use the same text.
             AnnouncementPlaceholder::OrganName => $activity->getOrgan()?->getName() ?? 'the board',
@@ -276,7 +276,7 @@ final class AnnouncementPlaceholders
                 (string) preg_replace(
                     '/[^A-Z0-9]+/',
                     '_',
-                    mb_strtoupper($field->getName()->getText(Languages::English) ?? ''),
+                    mb_strtoupper($field->name->getText(Languages::English) ?? ''),
                 ),
                 '_',
             );

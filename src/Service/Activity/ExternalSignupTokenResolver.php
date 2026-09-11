@@ -34,7 +34,7 @@ final readonly class ExternalSignupTokenResolver
         $verification = $this->verificationRepository->findBySelector($split['selector']);
         if (
             null === $verification
-            || $verification->getPurpose() !== $purpose
+            || $verification->purpose !== $purpose
             || $verification->isExpired()
         ) {
             return null;

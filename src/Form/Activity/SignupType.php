@@ -103,7 +103,7 @@ class SignupType extends AbstractType
         $prefill = [];
         foreach ($signupList->getFields() as $field) {
             $raw = $answers[intval($field->getId())] ?? null;
-            $prefill[self::fieldKey((int) $field->getId())] = SignupFieldTypes::Number === $field->getType()
+            $prefill[self::fieldKey((int) $field->getId())] = SignupFieldTypes::Number === $field->type
                 ? (null === $raw ? null : (int) $raw)
                 : $raw;
         }
@@ -231,13 +231,13 @@ class SignupType extends AbstractType
         $name = self::fieldKey((int) $field->getId());
         // The field label is author-provided localised content, so it is rendered verbatim (translation_domain false)
         // and the sensitive marker is appended, matching the footnote shown below the form.
-        $label = ($field->getName()->getText($language) ?? '') . ($field->isSensitive() ? '¹' : '');
+        $label = ($field->name->getText($language) ?? '') . ($field->isSensitive ? '¹' : '');
         $shared = [
             'label' => $label,
             'translation_domain' => false,
         ];
 
-        switch ($field->getType()) {
+        switch ($field->type) {
             case SignupFieldTypes::Text:
                 $builder->add(
                     $name,
@@ -271,13 +271,13 @@ class SignupType extends AbstractType
             case SignupFieldTypes::Number:
                 $constraints = [new NotNull(message: 'This field is required.')];
                 if (
-                    null !== $field->getMinimumValue()
-                    || null !== $field->getMaximumValue()
+                    null !== $field->minimumValue
+                    || null !== $field->maximumValue
                 ) {
                     $constraints[] = new Range(
                         notInRangeMessage: 'Enter a value between {{ min }} and {{ max }}.',
-                        min: $field->getMinimumValue(),
-                        max: $field->getMaximumValue(),
+                        min: $field->minimumValue,
+                        max: $field->maximumValue,
                     );
                 }
 
@@ -300,7 +300,7 @@ class SignupType extends AbstractType
                 foreach ($field->getOptions() as $option) {
                     $optionId = intval($option->getId());
                     $optionIds[] = $optionId;
-                    $labelsById[$optionId] = $option->getValue()->getText($language) ?? '';
+                    $labelsById[$optionId] = $option->value->getText($language) ?? '';
                 }
 
                 $defaultOptionId = self::defaultOptionId($field);
@@ -347,7 +347,7 @@ class SignupType extends AbstractType
     private static function defaultOptionId(SignupField $field): ?int
     {
         foreach ($field->getOptions() as $option) {
-            if ($option->isDefault()) {
+            if ($option->isDefault) {
                 return $option->getId();
             }
         }

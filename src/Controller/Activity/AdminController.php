@@ -266,7 +266,7 @@ class AdminController extends AbstractController
 
         if (
             $revision instanceof ActivityRevision
-            && $list->getRevision() === $revision
+            && $list->revision === $revision
             && !$this->activityAdminService->removeSignupList($list)
         ) {
             $this->addFlash(
@@ -453,7 +453,7 @@ class AdminController extends AbstractController
                 'revision' => $revision,
                 'schedule_locked' => $scheduleLocked,
                 'company_editable' => $companyEditable,
-                'bound_organ_id' => $revision->getOrgan()?->getId(),
+                'bound_organ_id' => $revision->organ?->getId(),
                 'finish_label' => $this->translator->trans('Save changes'),
             ],
         );
@@ -571,7 +571,7 @@ class AdminController extends AbstractController
      */
     private function scheduleIsLocked(ActivityRevision $revision): bool
     {
-        $live = $revision->getActivity()->getLiveRevision();
+        $live = $revision->activity->getLiveRevision();
 
         if (
             null === $live
@@ -580,7 +580,7 @@ class AdminController extends AbstractController
             return false;
         }
 
-        $beginTime = $live->getBeginTime();
+        $beginTime = $live->beginTime;
 
         return null !== $beginTime
             && $beginTime <= new DateTime();
@@ -971,7 +971,7 @@ class AdminController extends AbstractController
         // The list must be this activity's publicly live list; a crafted id must not reach a draft or another activity.
         if (
             $signupList->getActivity() !== $activity
-            || $activity->getLiveRevision() !== $signupList->getRevision()
+            || $activity->getLiveRevision() !== $signupList->revision
         ) {
             throw $this->createNotFoundException();
         }
@@ -994,7 +994,7 @@ class AdminController extends AbstractController
         }
 
         // Externals must never land on a members-only list (the public guest path rejects this too).
-        if ($signupList->getOnlyGEWIS()) {
+        if ($signupList->onlyGEWIS) {
             return $this->flashAndBackToSignups(
                 $activity,
                 AlertTypes::Warning->value,

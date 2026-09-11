@@ -140,7 +140,7 @@ class Activity implements RevisableInterface
         type: 'datetime',
         nullable: true,
     )]
-    private ?DateTime $cancelledAt = null;
+    public private(set) ?DateTime $cancelledAt = null;
 
     /**
      * The board member who cancelled this activity, or null when it is not cancelled.
@@ -151,7 +151,7 @@ class Activity implements RevisableInterface
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?MemberModel $cancelledBy = null;
+    public private(set) ?MemberModel $cancelledBy = null;
 
     /**
      * When the board unpublished this activity, or null when it is published. An unpublished activity is removed from
@@ -162,7 +162,7 @@ class Activity implements RevisableInterface
         type: 'datetime',
         nullable: true,
     )]
-    private ?DateTime $unpublishedAt = null;
+    public private(set) ?DateTime $unpublishedAt = null;
 
     /**
      * The board member who unpublished this activity, or null when it is published.
@@ -173,7 +173,7 @@ class Activity implements RevisableInterface
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?MemberModel $unpublishedBy = null;
+    public private(set) ?MemberModel $unpublishedBy = null;
 
     public function __construct()
     {
@@ -196,7 +196,7 @@ class Activity implements RevisableInterface
         }
 
         $this->revisions->add($revision);
-        $revision->setActivity($this);
+        $revision->activity = $this;
     }
 
     #[Override]
@@ -283,20 +283,20 @@ class Activity implements RevisableInterface
         $upcoming = null;
 
         foreach ($this->getLiveSignupLists() as $signupList) {
-            if ($signupList->getCloseDate() <= $now) {
+            if ($signupList->closeDate <= $now) {
                 continue;
             }
 
-            if ($signupList->getOpenDate() <= $now) {
+            if ($signupList->openDate <= $now) {
                 if (
                     null === $open
-                    || $signupList->getCloseDate() < $open->getCloseDate()
+                    || $signupList->closeDate < $open->closeDate
                 ) {
                     $open = $signupList;
                 }
             } elseif (
                 null === $upcoming
-                || $signupList->getOpenDate() < $upcoming->getOpenDate()
+                || $signupList->openDate < $upcoming->openDate
             ) {
                 $upcoming = $signupList;
             }
@@ -315,7 +315,7 @@ class Activity implements RevisableInterface
         $count = 0;
 
         foreach ($this->getLiveSignupLists() as $signupList) {
-            if ($signupList->getCloseDate() <= $now) {
+            if ($signupList->closeDate <= $now) {
                 continue;
             }
 
@@ -346,16 +346,6 @@ class Activity implements RevisableInterface
         $this->creator = $creator;
     }
 
-    public function getCancelledAt(): ?DateTime
-    {
-        return $this->cancelledAt;
-    }
-
-    public function getCancelledBy(): ?MemberModel
-    {
-        return $this->cancelledBy;
-    }
-
     public function isCancelled(): bool
     {
         return null !== $this->cancelledAt;
@@ -371,16 +361,6 @@ class Activity implements RevisableInterface
     {
         $this->cancelledAt = null;
         $this->cancelledBy = null;
-    }
-
-    public function getUnpublishedAt(): ?DateTime
-    {
-        return $this->unpublishedAt;
-    }
-
-    public function getUnpublishedBy(): ?MemberModel
-    {
-        return $this->unpublishedBy;
     }
 
     public function isUnpublished(): bool
@@ -414,7 +394,7 @@ class Activity implements RevisableInterface
      */
     public function getOrgan(): ?OrganModel
     {
-        return $this->getDisplayRevision()->getOrgan();
+        return $this->getDisplayRevision()->organ;
     }
 
     /**
@@ -422,7 +402,7 @@ class Activity implements RevisableInterface
      */
     public function getCompany(): ?CompanyModel
     {
-        return $this->getDisplayRevision()->getCompany();
+        return $this->getDisplayRevision()->company;
     }
 
     /**
@@ -431,29 +411,29 @@ class Activity implements RevisableInterface
      */
     public function getName(): ActivityLocalisedText
     {
-        return $this->getDisplayRevision()->getName();
+        return $this->getDisplayRevision()->name;
     }
 
     public function getLocation(): ActivityLocalisedText
     {
-        return $this->getDisplayRevision()->getLocation();
+        return $this->getDisplayRevision()->location;
     }
 
     public function getCosts(): ActivityLocalisedText
     {
-        return $this->getDisplayRevision()->getCosts();
+        return $this->getDisplayRevision()->costs;
     }
 
     public function getDescription(): ActivityLocalisedText
     {
-        return $this->getDisplayRevision()->getDescription();
+        return $this->getDisplayRevision()->description;
     }
 
     public function getBeginTime(): DateTime
     {
         // A displayed revision is always persisted, and the form's NotBlank constraint guarantees a schedule, so this
         // is never null in practice; the revision getter is only nullable to let a brand-new draft render empty fields.
-        $beginTime = $this->getDisplayRevision()->getBeginTime();
+        $beginTime = $this->getDisplayRevision()->beginTime;
         assert(null !== $beginTime);
 
         return $beginTime;
@@ -461,7 +441,7 @@ class Activity implements RevisableInterface
 
     public function getEndTime(): DateTime
     {
-        $endTime = $this->getDisplayRevision()->getEndTime();
+        $endTime = $this->getDisplayRevision()->endTime;
         assert(null !== $endTime);
 
         return $endTime;
@@ -481,17 +461,17 @@ class Activity implements RevisableInterface
 
     public function getCategory(): ActivityCategories
     {
-        return $this->getDisplayRevision()->getCategory();
+        return $this->getDisplayRevision()->category;
     }
 
     public function getRequireGEFLITST(): bool
     {
-        return $this->getDisplayRevision()->getRequireGEFLITST();
+        return $this->getDisplayRevision()->requireGEFLITST;
     }
 
     public function getRequireZettle(): bool
     {
-        return $this->getDisplayRevision()->getRequireZettle();
+        return $this->getDisplayRevision()->requireZettle;
     }
 
     /**
@@ -525,7 +505,7 @@ class Activity implements RevisableInterface
     #[Override]
     public function getResourceOrgan(): ?OrganModel
     {
-        return $this->getCurrentRevision()?->getOrgan();
+        return $this->getCurrentRevision()?->organ;
     }
 
     /**

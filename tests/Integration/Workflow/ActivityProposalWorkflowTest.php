@@ -38,7 +38,7 @@ final class ActivityProposalWorkflowTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Scheduled,
-            $proposal->getStatus(),
+            $proposal->status,
         );
         self::assertTrue($this->workflow()->getMarking($proposal)->has(ProposalStatus::Scheduled->value));
     }
@@ -59,7 +59,7 @@ final class ActivityProposalWorkflowTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Cleared,
-            $proposal->getStatus(),
+            $proposal->status,
         );
     }
 
@@ -176,7 +176,7 @@ final class ActivityProposalWorkflowTest extends DatabaseTestCase
         if (ProposalStatus::Cleared === $status) {
             self::assertInstanceOf(
                 BudgetClearance::class,
-                $proposal->getBudgetClearance(),
+                $proposal->budgetClearance,
             );
         }
 

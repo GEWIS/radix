@@ -69,7 +69,7 @@ final readonly class SignupListView
         $fields = $signupList->getFields()->toArray();
         $fieldNames = [];
         foreach ($fields as $field) {
-            $fieldNames[] = $field->getName()->getText($language) ?? '';
+            $fieldNames[] = $field->name->getText($language) ?? '';
         }
 
         // Hide externals that have not confirmed their email yet from both the count and the rows. A confirmed sign-up
@@ -78,7 +78,7 @@ final readonly class SignupListView
         foreach ($signupList->getSignUpsInAdmissionOrder() as $signup) {
             if (
                 $signup instanceof ExternalSignup
-                && null === $signup->getVerifiedAt()
+                && null === $signup->verifiedAt
             ) {
                 continue;
             }
@@ -93,7 +93,7 @@ final readonly class SignupListView
             foreach ($visibleSignups as $signup) {
                 $isOwn = $signup instanceof UserSignup
                     && null !== $viewerLidnr
-                    && $viewerLidnr === $signup->getUser()->getLidnr();
+                    && $viewerLidnr === $signup->user->getLidnr();
 
                 if ($isOwn) {
                     $viewerHasSignup = true;
@@ -102,7 +102,7 @@ final readonly class SignupListView
                 $cells = [];
                 foreach ($fields as $field) {
                     if (
-                        $field->isSensitive()
+                        $field->isSensitive
                         && !$isOwn
                     ) {
                         $cells[] = [
@@ -134,19 +134,19 @@ final readonly class SignupListView
         return new self(
             listId: (int) $signupList->getId(),
             activityId: (int) $signupList->getActivity()->getId(),
-            name: $signupList->getName()->getText($language) ?? '',
-            openDate: $signupList->getOpenDate(),
-            closeDate: $signupList->getCloseDate(),
-            limitedCapacity: $signupList->getLimitedCapacity(),
-            capacity: $signupList->getCapacity(),
-            drawAt: AllocationMethod::ConditionalDraw === $signupList->getAllocationMethod()
+            name: $signupList->name->getText($language) ?? '',
+            openDate: $signupList->openDate,
+            closeDate: $signupList->closeDate,
+            limitedCapacity: $signupList->limitedCapacity,
+            capacity: $signupList->capacity,
+            drawAt: AllocationMethod::ConditionalDraw === $signupList->allocationMethod
                 && !$signupList->isDrawLocked()
                     ? $signupList->getAutoDrawAt()
                     : null,
             drawnByHand: $signupList->isDrawnByHand(),
-            onlyGEWIS: $signupList->getOnlyGEWIS(),
-            displaySubscribedNumber: $signupList->getDisplaySubscribedNumber(),
-            promoted: $signupList->isPromoted(),
+            onlyGEWIS: $signupList->onlyGEWIS,
+            displaySubscribedNumber: $signupList->displaySubscribedNumber,
+            promoted: $signupList->promoted,
             isOpen: $signupList->isOpen(),
             isClosed: $signupList->isClosed(),
             cancelled: $signupList->getActivity()->isCancelled(),

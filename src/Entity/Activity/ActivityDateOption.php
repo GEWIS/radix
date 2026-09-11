@@ -44,40 +44,40 @@ class ActivityDateOption
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityProposal $proposal;
+    public ActivityProposal $proposal;
 
     /**
      * The first day the activity would take place on.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $beginsAt;
+    public DateTime $beginsAt;
 
     /**
      * The last day the activity would take place on, the same as {@see self::$beginsAt} for anything within one day.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $endsAt;
+    public DateTime $endsAt;
 
     #[Column(
         type: Types::STRING,
         length: 32,
         enumType: TimeOfDay::class,
     )]
-    private TimeOfDay $timeOfDay = TimeOfDay::Evening;
+    public TimeOfDay $timeOfDay = TimeOfDay::Evening;
 
     /**
      * Where this date sits in the body's own order of preference, counting from one. The board is not bound by it,
      * but it is what the body would rather have.
      */
     #[Column(type: Types::SMALLINT)]
-    private int $position = 1;
+    public int $position = 1;
 
     #[Column(
         type: Types::STRING,
         length: 32,
         enumType: DateOptionStatus::class,
     )]
-    private DateOptionStatus $status = DateOptionStatus::Proposed;
+    public DateOptionStatus $status = DateOptionStatus::Proposed;
 
     #[ManyToOne(targetEntity: Member::class)]
     #[JoinColumn(
@@ -85,105 +85,25 @@ class ActivityDateOption
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?Member $decidedBy = null;
+    public ?Member $decidedBy = null;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $decidedAt = null;
-
-    public function getProposal(): ActivityProposal
-    {
-        return $this->proposal;
-    }
-
-    public function setProposal(ActivityProposal $proposal): void
-    {
-        $this->proposal = $proposal;
-    }
-
-    public function getBeginsAt(): DateTime
-    {
-        return $this->beginsAt;
-    }
-
-    public function setBeginsAt(DateTime $beginsAt): void
-    {
-        $this->beginsAt = $beginsAt;
-    }
-
-    public function getEndsAt(): DateTime
-    {
-        return $this->endsAt;
-    }
-
-    public function setEndsAt(DateTime $endsAt): void
-    {
-        $this->endsAt = $endsAt;
-    }
-
-    public function getTimeOfDay(): TimeOfDay
-    {
-        return $this->timeOfDay;
-    }
-
-    public function setTimeOfDay(TimeOfDay $timeOfDay): void
-    {
-        $this->timeOfDay = $timeOfDay;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): void
-    {
-        $this->position = $position;
-    }
-
-    public function getStatus(): DateOptionStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(DateOptionStatus $status): void
-    {
-        $this->status = $status;
-    }
-
-    public function getDecidedBy(): ?Member
-    {
-        return $this->decidedBy;
-    }
-
-    public function setDecidedBy(?Member $decidedBy): void
-    {
-        $this->decidedBy = $decidedBy;
-    }
-
-    public function getDecidedAt(): ?DateTime
-    {
-        return $this->decidedAt;
-    }
-
-    public function setDecidedAt(?DateTime $decidedAt): void
-    {
-        $this->decidedAt = $decidedAt;
-    }
+    public ?DateTime $decidedAt = null;
 
     /**
      * Whether this option takes up the given day, which for anything spanning several days is every day in between.
      */
     public function coversDay(DateTimeInterface $day): bool
     {
-        return $this->getBeginsAt()->format('Y-m-d') <= $day->format('Y-m-d')
-            && $this->getEndsAt()->format('Y-m-d') >= $day->format('Y-m-d');
+        return $this->beginsAt->format('Y-m-d') <= $day->format('Y-m-d')
+            && $this->endsAt->format('Y-m-d') >= $day->format('Y-m-d');
     }
 
     public function spansMultipleDays(): bool
     {
-        return $this->getBeginsAt()->format('Y-m-d') !== $this->getEndsAt()->format('Y-m-d');
+        return $this->beginsAt->format('Y-m-d') !== $this->endsAt->format('Y-m-d');
     }
 }

@@ -91,7 +91,7 @@ class AdminProposalDecisionController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $proposal = $option->getProposal();
+        $proposal = $option->proposal;
 
         if (
             !$this->activityProposalStateMachine->can(
@@ -107,8 +107,8 @@ class AdminProposalDecisionController extends AbstractController
             return $this->redirectToRoute('admin/activities/calendar/decisions/index');
         }
 
-        $option->setDecidedBy($user->member);
-        $option->setDecidedAt(new DateTime());
+        $option->decidedBy = $user->member;
+        $option->decidedAt = new DateTime();
 
         $this->proposalManager->schedule(
             $proposal,
@@ -254,11 +254,11 @@ class AdminProposalDecisionController extends AbstractController
 
         foreach ($waiting as $proposal) {
             foreach ($proposal->getDateOptions() as $dateOption) {
-                if (!$dateOption->getStatus()->isStanding()) {
+                if (!$dateOption->status->isStanding()) {
                     continue;
                 }
 
-                $byDay[$dateOption->getBeginsAt()->format('Y-m-d')][] = $dateOption;
+                $byDay[$dateOption->beginsAt->format('Y-m-d')][] = $dateOption;
             }
         }
 

@@ -50,7 +50,7 @@ class ActivityRevision extends AbstractRevision
         inversedBy: 'revisions',
     )]
     #[JoinColumn(nullable: false)]
-    private Activity $activity;
+    public Activity $activity;
 
     /**
      * The revision this one supersedes (null for the first revision in the chain).
@@ -73,7 +73,7 @@ class ActivityRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $name;
+    public ActivityLocalisedText $name;
 
     #[OneToOne(
         targetEntity: ActivityLocalisedText::class,
@@ -89,7 +89,7 @@ class ActivityRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $location;
+    public ActivityLocalisedText $location;
 
     #[OneToOne(
         targetEntity: ActivityLocalisedText::class,
@@ -105,7 +105,7 @@ class ActivityRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $costs;
+    public ActivityLocalisedText $costs;
 
     #[OneToOne(
         targetEntity: ActivityLocalisedText::class,
@@ -121,27 +121,27 @@ class ActivityRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $description;
+    public ActivityLocalisedText $description;
 
     // PHP-nullable so a not-yet-filled draft renders an empty field; the column stays NOT NULL and the form's NotBlank
     // constraint guarantees a value before persist, so a saved revision always has a schedule.
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTime $beginTime = null;
+    public ?DateTime $beginTime = null;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTime $endTime = null;
+    public ?DateTime $endTime = null;
 
     #[Column(
         type: Types::STRING,
         enumType: ActivityCategories::class,
     )]
-    private ActivityCategories $category;
+    public ActivityCategories $category;
 
     #[Column(type: Types::BOOLEAN)]
-    private bool $requireGEFLITST = false;
+    public bool $requireGEFLITST = false;
 
     #[Column(type: Types::BOOLEAN)]
-    private bool $requireZettle = false;
+    public bool $requireZettle = false;
 
     /**
      * The sign-up lists for this revision. Each revision owns its own lists (cloned from the previous revision), so
@@ -173,7 +173,7 @@ class ActivityRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: true,
     )]
-    private ?OrganModel $organ = null;
+    public ?OrganModel $organ = null;
 
     /**
      * The company organising this revision of the activity.
@@ -183,7 +183,7 @@ class ActivityRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: true,
     )]
-    private ?CompanyModel $company = null;
+    public ?CompanyModel $company = null;
 
     /**
      * The labels of this revision of the activity. Each revision owns its own assignments (carried forward when a draft
@@ -264,7 +264,7 @@ class ActivityRevision extends AbstractRevision
     {
         $byLineage = [];
         foreach ($this->signupLists as $list) {
-            $byLineage[$list->getLineageId()->toRfc4122()] = $list;
+            $byLineage[$list->lineageId->toRfc4122()] = $list;
         }
 
         return $byLineage;
@@ -277,22 +277,12 @@ class ActivityRevision extends AbstractRevision
         }
 
         $this->signupLists->add($signupList);
-        $signupList->setRevision($this);
+        $signupList->revision = $this;
     }
 
     public function removeSignupList(SignupList $signupList): void
     {
         $this->signupLists->removeElement($signupList);
-    }
-
-    public function getActivity(): Activity
-    {
-        return $this->activity;
-    }
-
-    public function setActivity(Activity $activity): void
-    {
-        $this->activity = $activity;
     }
 
     #[Override]
@@ -353,116 +343,6 @@ class ActivityRevision extends AbstractRevision
         }
 
         return false;
-    }
-
-    public function getName(): ActivityLocalisedText
-    {
-        return $this->name;
-    }
-
-    public function setName(ActivityLocalisedText $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getLocation(): ActivityLocalisedText
-    {
-        return $this->location;
-    }
-
-    public function setLocation(ActivityLocalisedText $location): void
-    {
-        $this->location = $location;
-    }
-
-    public function getCosts(): ActivityLocalisedText
-    {
-        return $this->costs;
-    }
-
-    public function setCosts(ActivityLocalisedText $costs): void
-    {
-        $this->costs = $costs;
-    }
-
-    public function getDescription(): ActivityLocalisedText
-    {
-        return $this->description;
-    }
-
-    public function setDescription(ActivityLocalisedText $description): void
-    {
-        $this->description = $description;
-    }
-
-    public function getBeginTime(): ?DateTime
-    {
-        return $this->beginTime;
-    }
-
-    public function setBeginTime(?DateTime $beginTime): void
-    {
-        $this->beginTime = $beginTime;
-    }
-
-    public function getEndTime(): ?DateTime
-    {
-        return $this->endTime;
-    }
-
-    public function setEndTime(?DateTime $endTime): void
-    {
-        $this->endTime = $endTime;
-    }
-
-    public function getCategory(): ActivityCategories
-    {
-        return $this->category;
-    }
-
-    public function setCategory(ActivityCategories $category): void
-    {
-        $this->category = $category;
-    }
-
-    public function getRequireGEFLITST(): bool
-    {
-        return $this->requireGEFLITST;
-    }
-
-    public function setRequireGEFLITST(bool $requireGEFLITST): void
-    {
-        $this->requireGEFLITST = $requireGEFLITST;
-    }
-
-    public function getRequireZettle(): bool
-    {
-        return $this->requireZettle;
-    }
-
-    public function setRequireZettle(bool $requireZettle): void
-    {
-        $this->requireZettle = $requireZettle;
-    }
-
-    public function getOrgan(): ?OrganModel
-    {
-        return $this->organ;
-    }
-
-    public function setOrgan(?OrganModel $organ): void
-    {
-        $this->organ = $organ;
-    }
-
-    public function getCompany(): ?CompanyModel
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?CompanyModel $company): void
-    {
-        $this->company = $company;
     }
 
     /**

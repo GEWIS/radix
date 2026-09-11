@@ -132,13 +132,13 @@ class SignupFieldType extends AbstractType
     ): void {
         if (
             !$field instanceof SignupField
-            || SignupFieldTypes::Number !== $field->getType()
+            || SignupFieldTypes::Number !== $field->type
         ) {
             return;
         }
 
-        $minimum = $field->getMinimumValue();
-        $maximum = $field->getMaximumValue();
+        $minimum = $field->minimumValue;
+        $maximum = $field->maximumValue;
 
         if (null === $minimum) {
             $context->buildViolation(t(
@@ -183,12 +183,12 @@ class SignupFieldType extends AbstractType
 
         if (
             !$field instanceof SignupField
-            || SignupFieldTypes::Number === $field->getType()
+            || SignupFieldTypes::Number === $field->type
         ) {
             return;
         }
 
-        $field->setMinimumValue(null);
-        $field->setMaximumValue(null);
+        $field->minimumValue = null;
+        $field->maximumValue = null;
     }
 }

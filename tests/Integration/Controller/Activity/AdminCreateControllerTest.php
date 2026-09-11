@@ -126,11 +126,11 @@ final class AdminCreateControllerTest extends DatabaseTestCase
         );
 
         $revision = $this->newestRevision();
-        self::assertNotNull($revision->getBeginTime());
-        self::assertNotNull($revision->getEndTime());
+        self::assertNotNull($revision->beginTime);
+        self::assertNotNull($revision->endTime);
         self::assertSame(
             'Test activity',
-            $revision->getName()->getValueEN(),
+            $revision->name->getValueEN(),
         );
     }
 
@@ -229,11 +229,11 @@ final class AdminCreateControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             'Dinner',
-            $saved->getName()->getValueEN(),
+            $saved->name->getValueEN(),
         );
         self::assertSame(
             '2030-05-01 12:00',
-            $saved->getOpenDate()?->format('Y-m-d H:i'),
+            $saved->openDate?->format('Y-m-d H:i'),
         );
     }
 
@@ -278,7 +278,7 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             $this->user(),
         );
 
-        return $this->newestRevision()->getActivity();
+        return $this->newestRevision()->activity;
     }
 
     /**

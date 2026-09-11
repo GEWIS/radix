@@ -46,8 +46,8 @@ final readonly class ActivityFacilityNotifier
     {
         $this->notify(
             $revision,
-            $revision->getRequireGEFLITST(),
-            $revision->getRequireZettle(),
+            $revision->requireGEFLITST,
+            $revision->requireZettle,
         );
     }
 
@@ -121,7 +121,7 @@ final readonly class ActivityFacilityNotifier
             'emails/activity/facility-zettle.html.twig',
             [
                 'name' => $this->title($revision),
-                'beginTime' => $revision->getBeginTime(),
+                'beginTime' => $revision->beginTime,
                 'requester' => $this->requester($revision),
             ],
         );
@@ -134,7 +134,7 @@ final readonly class ActivityFacilityNotifier
      */
     private function requestGeflitst(ActivityRevision $revision): void
     {
-        $organ = $revision->getOrgan();
+        $organ = $revision->organ;
         $requester = $this->requester($revision);
 
         $subject = null === $organ
@@ -172,10 +172,10 @@ final readonly class ActivityFacilityNotifier
             $subject,
             'emails/activity/facility-geflitst.html.twig',
             [
-                'nameNL' => $revision->getName()->getText(Languages::Dutch),
-                'nameEN' => $revision->getName()->getText(Languages::English),
-                'descriptionNL' => $revision->getDescription()->getText(Languages::Dutch),
-                'descriptionEN' => $revision->getDescription()->getText(Languages::English),
+                'nameNL' => $revision->name->getText(Languages::Dutch),
+                'nameEN' => $revision->name->getText(Languages::English),
+                'descriptionNL' => $revision->description->getText(Languages::Dutch),
+                'descriptionEN' => $revision->description->getText(Languages::English),
                 'requester' => $requester,
             ],
             $replyTo,
@@ -186,19 +186,19 @@ final readonly class ActivityFacilityNotifier
 
     private function requester(ActivityRevision $revision): string
     {
-        return $revision->getOrgan()?->getName()
+        return $revision->organ?->getName()
             ?? $revision->getAuthorDisplayName();
     }
 
     private function title(ActivityRevision $revision): string
     {
-        return $revision->getName()->getText(Languages::English)
-            ?? $revision->getName()->getText(Languages::Dutch)
+        return $revision->name->getText(Languages::English)
+            ?? $revision->name->getText(Languages::Dutch)
             ?? '';
     }
 
     private function when(ActivityRevision $revision): string
     {
-        return $revision->getBeginTime()?->format('d-m-Y H:i') ?? '';
+        return $revision->beginTime?->format('d-m-Y H:i') ?? '';
     }
 }

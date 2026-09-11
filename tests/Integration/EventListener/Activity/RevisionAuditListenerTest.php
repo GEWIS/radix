@@ -30,8 +30,8 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         $editor = $this->anEditor();
         $before = $this->auditCount($revision);
 
-        $revision->setRequireGEFLITST(!$revision->getRequireGEFLITST());
-        $revision->getName()->updateValueEN('Edited name');
+        $revision->requireGEFLITST = !$revision->requireGEFLITST;
+        $revision->name->updateValueEN('Edited name');
         $revision->setLastEditedBy($editor);
         $this->entityManager->flush();
 
@@ -52,15 +52,15 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         // Both the changed scalar and the edited localised text are recorded; bookkeeping columns are not.
         self::assertContains(
             'requireGEFLITST',
-            $latest->getChangedFields(),
+            $latest->changedFields,
         );
         self::assertContains(
             'name',
-            $latest->getChangedFields(),
+            $latest->changedFields,
         );
         self::assertNotContains(
             'lastEditedBy',
-            $latest->getChangedFields(),
+            $latest->changedFields,
         );
     }
 
@@ -72,8 +72,8 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         $before = $this->auditCount($revision);
 
         // A capacity-only tweak to a draft's list is a content edit of the revision, surfaced via the synthetic marker.
-        $list->setLimitedCapacity(true);
-        $list->setCapacity(42);
+        $list->limitedCapacity = true;
+        $list->capacity = 42;
         $revision->setLastEditedBy($editor);
         $this->entityManager->flush();
 
@@ -88,7 +88,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         );
         self::assertSame(
             ['signupLists'],
-            $latest->getChangedFields(),
+            $latest->changedFields,
         );
     }
 
@@ -120,7 +120,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         );
         self::assertSame(
             ['labels'],
-            $latest->getChangedFields(),
+            $latest->changedFields,
         );
     }
 
@@ -130,7 +130,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         $before = $this->auditCount($revision);
 
         // No lastEditedBy set: a fixture/cron/approval-style flush is never attributed to a member.
-        $revision->setRequireGEFLITST(!$revision->getRequireGEFLITST());
+        $revision->requireGEFLITST = !$revision->requireGEFLITST;
         $this->entityManager->flush();
 
         self::assertSame(
@@ -147,7 +147,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
 
         // In-place edits only happen on a Draft; a later flush carrying a stale editor must not append a phantom row.
         $revision->setStatus(RevisionStatus::Submitted);
-        $revision->setRequireGEFLITST(!$revision->getRequireGEFLITST());
+        $revision->requireGEFLITST = !$revision->requireGEFLITST;
         $revision->setLastEditedBy($editor);
         $this->entityManager->flush();
 
@@ -189,13 +189,13 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
     private function persistedListOn(ActivityRevision $revision): SignupList
     {
         $list = new SignupList();
-        $list->setLineageId(Uuid::v4());
-        $list->setName(new ActivityLocalisedText(
+        $list->lineageId = Uuid::v4();
+        $list->name = new ActivityLocalisedText(
             'Lijst',
             'List',
-        ));
-        $list->setOpenDate(new DateTime('2026-01-01 00:00:00'));
-        $list->setCloseDate(new DateTime('2026-12-31 00:00:00'));
+        );
+        $list->openDate = new DateTime('2026-01-01 00:00:00');
+        $list->closeDate = new DateTime('2026-12-31 00:00:00');
         $revision->addSignupList($list);
         $this->entityManager->persist($list);
         // System flush (no editor set): creates the list without appending an audit row, so the subsequent change under

@@ -64,7 +64,7 @@ class SignupField
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private SignupList $signupList;
+    public SignupList $signupList;
 
     /**
      * The name of the SignupField.
@@ -83,14 +83,14 @@ class SignupField
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $name;
+    public ActivityLocalisedText $name;
 
     /**
      * Whether this SignupField is sensitive. If it is sensitive, it is only visible to the board and the organiser of
      * the activity.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $isSensitive = false;
+    public bool $isSensitive = false;
 
     /**
      * The type of the SignupField.
@@ -99,7 +99,7 @@ class SignupField
         type: Types::STRING,
         enumType: SignupFieldTypes::class,
     )]
-    private SignupFieldTypes $type = SignupFieldTypes::Text;
+    public SignupFieldTypes $type = SignupFieldTypes::Text;
 
     /**
      * The minimal value constraint for the ``number'' type.
@@ -108,7 +108,7 @@ class SignupField
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $minimumValue = null;
+    public ?int $minimumValue = null;
 
     /**
      * The maximal value constraint for the ``number'' type.
@@ -117,7 +117,7 @@ class SignupField
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $maximumValue = null;
+    public ?int $maximumValue = null;
 
     /**
      * The position of this field among the sign-up list's fields; the organiser reorders them in the editor and this
@@ -128,7 +128,7 @@ class SignupField
         type: Types::INTEGER,
         options: ['default' => 0],
     )]
-    private int $position = 0;
+    public int $position = 0;
 
     /**
      * The allowed options for the SignupField of the ``option'' type.
@@ -164,32 +164,12 @@ class SignupField
         }
 
         $this->options->add($option);
-        $option->setField($this);
+        $option->field = $this;
     }
 
     public function removeOption(SignupOption $option): void
     {
         $this->options->removeElement($option);
-    }
-
-    public function getSignupList(): SignupList
-    {
-        return $this->signupList;
-    }
-
-    public function setSignupList(SignupList $signupList): void
-    {
-        $this->signupList = $signupList;
-    }
-
-    public function isSensitive(): bool
-    {
-        return $this->isSensitive;
-    }
-
-    public function setIsSensitive(bool $isSensitive): void
-    {
-        $this->isSensitive = $isSensitive;
     }
 
     /**
@@ -198,56 +178,6 @@ class SignupField
     public function getOptions(): Collection
     {
         return $this->options;
-    }
-
-    public function getName(): ActivityLocalisedText
-    {
-        return $this->name;
-    }
-
-    public function setName(ActivityLocalisedText $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getType(): SignupFieldTypes
-    {
-        return $this->type;
-    }
-
-    public function setType(SignupFieldTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    public function getMinimumValue(): ?int
-    {
-        return $this->minimumValue;
-    }
-
-    public function setMinimumValue(?int $minimumValue): void
-    {
-        $this->minimumValue = $minimumValue;
-    }
-
-    public function getMaximumValue(): ?int
-    {
-        return $this->maximumValue;
-    }
-
-    public function setMaximumValue(?int $maximumValue): void
-    {
-        $this->maximumValue = $maximumValue;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): void
-    {
-        $this->position = $position;
     }
 
     /**
@@ -268,12 +198,12 @@ class SignupField
 
         return [
             'id' => $this->getId(),
-            'sensitive' => $this->isSensitive(),
-            'name' => $this->getName()->getValueNL(),
-            'nameEn' => $this->getName()->getValueEN(),
-            'type' => $this->getType()->value,
-            'minimumValue' => $this->getMinimumValue(),
-            'maximumValue' => $this->getMaximumValue(),
+            'sensitive' => $this->isSensitive,
+            'name' => $this->name->getValueNL(),
+            'nameEn' => $this->name->getValueEN(),
+            'type' => $this->type->value,
+            'minimumValue' => $this->minimumValue,
+            'maximumValue' => $this->maximumValue,
             'options' => $optionsArrays,
             'optionsEn' => $optionsEn,
         ];
@@ -292,11 +222,11 @@ class SignupField
 
         return [
             'id' => $this->getId(),
-            'sensitive' => $this->isSensitive(),
-            'name' => $this->getName()->toGdprArray(),
-            'type' => $this->getType()->value,
-            'minimumValue' => $this->getMinimumValue(),
-            'maximumValue' => $this->getMaximumValue(),
+            'sensitive' => $this->isSensitive,
+            'name' => $this->name->toGdprArray(),
+            'type' => $this->type->value,
+            'minimumValue' => $this->minimumValue,
+            'maximumValue' => $this->maximumValue,
             'options' => $options,
         ];
     }

@@ -62,7 +62,7 @@ final class SignupListRule
         int $position,
         TranslatorInterface $translator,
     ): string {
-        $name = trim($list->getName()->getText(Languages::current()) ?? '');
+        $name = trim($list->name->getText(Languages::current()) ?? '');
 
         if ('' !== $name) {
             return $name;

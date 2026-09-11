@@ -108,9 +108,9 @@ final class RemindOptionBudgetCommand extends Command
         foreach ($proposals as $proposal) {
             $ui->text(sprintf(
                 '%s (%s) on %s',
-                $proposal->getName(),
-                $proposal->getOrgan()?->getAbbr() ?? 'the board',
-                $proposal->getChosenOption()?->getBeginsAt()->format('Y-m-d') ?? '?',
+                $proposal->name,
+                $proposal->organ?->getAbbr() ?? 'the board',
+                $proposal->chosenOption?->beginsAt->format('Y-m-d') ?? '?',
             ));
 
             if ($dryRun) {
@@ -158,7 +158,7 @@ final class RemindOptionBudgetCommand extends Command
 
         // A body whose member no longer has an account still gets its day released on time; there is simply nobody to
         // warn first, so the stamp is set anyway rather than looking again every night.
-        $proposal->setBudgetRemindedAt(new DateTime());
+        $proposal->budgetRemindedAt = new DateTime();
 
         if (null === $user) {
             return;
@@ -169,7 +169,7 @@ final class RemindOptionBudgetCommand extends Command
             NotificationType::ActivityProposalBudgetDue,
             [
                 'proposal' => strval($proposalId),
-                'proposalName' => $proposal->getName(),
+                'proposalName' => $proposal->name,
             ],
             AlertTypes::Warning,
         );

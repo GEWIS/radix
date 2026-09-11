@@ -43,7 +43,7 @@ class ExternalSignup extends Signup
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $verifiedAt = null;
+    public ?DateTime $verifiedAt = null;
 
     /**
      * Whether an organiser/board member entered this sign-up on the person's behalf. A manually added external never
@@ -51,7 +51,7 @@ class ExternalSignup extends Signup
      * exist without that agreement).
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $addedManually = false;
+    public bool $addedManually = false;
 
     /**
      * Gets the full name of the user who signed up for the activity.
@@ -91,25 +91,5 @@ class ExternalSignup extends Signup
     public function setEmail(string $email): void
     {
         $this->email = $email;
-    }
-
-    public function getVerifiedAt(): ?DateTime
-    {
-        return $this->verifiedAt;
-    }
-
-    public function setVerifiedAt(?DateTime $verifiedAt): void
-    {
-        $this->verifiedAt = $verifiedAt;
-    }
-
-    public function isAddedManually(): bool
-    {
-        return $this->addedManually;
-    }
-
-    public function setAddedManually(bool $addedManually): void
-    {
-        $this->addedManually = $addedManually;
     }
 }

@@ -49,8 +49,8 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Organising organ'),
                         RevisionFieldKind::Reference,
-                        $previous?->getOrgan()?->getAbbr(),
-                        $revision->getOrgan()?->getAbbr(),
+                        $previous?->organ?->getAbbr(),
+                        $revision->organ?->getAbbr(),
                         $comparable,
                         ['width' => 'half'],
                         emptyLabel: t('None'),
@@ -58,8 +58,8 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Organising company'),
                         RevisionFieldKind::Reference,
-                        $previous?->getCompany()?->name,
-                        $revision->getCompany()?->name,
+                        $previous?->company?->name,
+                        $revision->company?->name,
                         $comparable,
                         ['width' => 'half'],
                         emptyLabel: t('None'),
@@ -68,12 +68,12 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                         t('Date and time'),
                         RevisionFieldKind::DateRange,
                         null === $previous ? null : new RevisionDateRange(
-                            $previous->getBeginTime(),
-                            $previous->getEndTime(),
+                            $previous->beginTime,
+                            $previous->endTime,
                         ),
                         new RevisionDateRange(
-                            $revision->getBeginTime(),
-                            $revision->getEndTime(),
+                            $revision->beginTime,
+                            $revision->endTime,
                         ),
                         $comparable,
                         ['format' => 'activity'],
@@ -81,8 +81,8 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Category'),
                         RevisionFieldKind::Badge,
-                        $previous?->getCategory(),
-                        $revision->getCategory(),
+                        $previous?->category,
+                        $revision->category,
                         $comparable,
                         ['badgeClass' => 'badge-gewis-primary'],
                     ),
@@ -101,13 +101,13 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                         [
                             new RevisionFlag(
                                 t('GEFLITST'),
-                                $previous?->getRequireGEFLITST(),
-                                $revision->getRequireGEFLITST(),
+                                $previous?->requireGEFLITST,
+                                $revision->requireGEFLITST,
                             ),
                             new RevisionFlag(
                                 t('Zettle'),
-                                $previous?->getRequireZettle(),
-                                $revision->getRequireZettle(),
+                                $previous?->requireZettle,
+                                $revision->requireZettle,
                             ),
                         ],
                         $comparable,
@@ -121,26 +121,26 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                 [
                     $this->localisedField(
                         t('Name'),
-                        $previous?->getName(),
-                        $revision->getName(),
+                        $previous?->name,
+                        $revision->name,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Location'),
-                        $previous?->getLocation(),
-                        $revision->getLocation(),
+                        $previous?->location,
+                        $revision->location,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Costs'),
-                        $previous?->getCosts(),
-                        $revision->getCosts(),
+                        $previous?->costs,
+                        $revision->costs,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Description'),
-                        $previous?->getDescription(),
-                        $revision->getDescription(),
+                        $previous?->description,
+                        $revision->description,
                         $comparable,
                         RevisionFieldKind::LongText,
                     ),
@@ -164,7 +164,7 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
         foreach ($revision?->getLabels() ?? [] as $label) {
             $tags[] = new RevisionTag(
                 $label->getId(),
-                $label->getName(),
+                $label->name,
             );
         }
 

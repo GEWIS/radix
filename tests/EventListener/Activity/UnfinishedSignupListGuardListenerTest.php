@@ -62,8 +62,8 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
     public function testBlocksWhenTheCapacityIsMissingFromALimitedList(): void
     {
         $list = $this->filledList();
-        $list->setLimitedCapacity(true);
-        $list->setCapacity(null);
+        $list->limitedCapacity = true;
+        $list->capacity = null;
 
         $event = $this->guardEvent($this->revisionWith($list));
         ($this->listener)($event);
@@ -102,10 +102,10 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
     {
         $revision = new ActivityRevision();
         new Activity()->addRevision($revision);
-        $revision->setName(new ActivityLocalisedText('Test activity'));
-        $revision->setLocation(new ActivityLocalisedText());
-        $revision->setCosts(new ActivityLocalisedText());
-        $revision->setDescription(new ActivityLocalisedText());
+        $revision->name = new ActivityLocalisedText('Test activity');
+        $revision->location = new ActivityLocalisedText();
+        $revision->costs = new ActivityLocalisedText();
+        $revision->description = new ActivityLocalisedText();
 
         return $revision;
     }
@@ -121,7 +121,7 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
     private function emptyList(): SignupList
     {
         $list = new SignupList();
-        $list->setName(new ActivityLocalisedText());
+        $list->name = new ActivityLocalisedText();
 
         return $list;
     }
@@ -129,12 +129,12 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
     private function filledList(): SignupList
     {
         $list = $this->emptyList();
-        $list->setName(new ActivityLocalisedText(
+        $list->name = new ActivityLocalisedText(
             'Deelnemers',
             'Participants',
-        ));
-        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
-        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+        );
+        $list->openDate = new DateTime('2030-01-01 12:00');
+        $list->closeDate = new DateTime('2030-02-01 12:00');
 
         return $list;
     }

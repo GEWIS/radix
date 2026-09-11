@@ -65,7 +65,7 @@ final readonly class SignupListSections
 
         foreach ($revision->getSignupLists() as $list) {
             ++$position;
-            $lineage = $list->getLineageId()->toRfc4122();
+            $lineage = $list->lineageId->toRfc4122();
             $counterpart = $before[$lineage] ?? null;
             unset($before[$lineage]);
 
@@ -131,7 +131,7 @@ final readonly class SignupListSections
         );
 
         $group = new RevisionSectionGroup(
-            $named->getLineageId()->toRfc4122(),
+            $named->lineageId->toRfc4122(),
             SignupListRule::label(
                 $named,
                 $position,
@@ -228,22 +228,22 @@ final readonly class SignupListSections
         return [
             $this->localisedField(
                 t('Name'),
-                $old?->getName(),
-                $new?->getName(),
+                $old?->name,
+                $new?->name,
                 $comparable,
             ),
             $this->field(
                 t('Opens'),
                 RevisionFieldKind::Moment,
-                $old?->getOpenDate(),
-                $new?->getOpenDate(),
+                $old?->openDate,
+                $new?->openDate,
                 $comparable,
             ),
             $this->field(
                 t('Closes'),
                 RevisionFieldKind::Moment,
-                $old?->getCloseDate(),
-                $new?->getCloseDate(),
+                $old?->closeDate,
+                $new?->closeDate,
                 $comparable,
             ),
             $this->flags(
@@ -251,18 +251,18 @@ final readonly class SignupListSections
                 [
                     [
                         t('Members only'),
-                        $old?->getOnlyGEWIS(),
-                        $new?->getOnlyGEWIS(),
+                        $old?->onlyGEWIS,
+                        $new?->onlyGEWIS,
                     ],
                     [
                         t('Show the number of sign-ups to logged-out visitors'),
-                        $old?->getDisplaySubscribedNumber(),
-                        $new?->getDisplaySubscribedNumber(),
+                        $old?->displaySubscribedNumber,
+                        $new?->displaySubscribedNumber,
                     ],
                     [
                         t('Promoted'),
-                        $old?->isPromoted(),
-                        $new?->isPromoted(),
+                        $old?->promoted,
+                        $new?->promoted,
                     ],
                 ],
                 $comparable,
@@ -289,8 +289,8 @@ final readonly class SignupListSections
             ),
         ];
 
-        $limited = true === $old?->getLimitedCapacity()
-            || true === $new?->getLimitedCapacity();
+        $limited = true === $old?->limitedCapacity
+            || true === $new?->limitedCapacity;
 
         if (!$limited) {
             return $fields;
@@ -299,8 +299,8 @@ final readonly class SignupListSections
         $fields[] = $this->field(
             t('Allocation method'),
             RevisionFieldKind::Badge,
-            $old?->getAllocationMethod(),
-            $new?->getAllocationMethod(),
+            $old?->allocationMethod,
+            $new?->allocationMethod,
             $comparable,
         );
 
@@ -309,14 +309,14 @@ final readonly class SignupListSections
                 $old,
                 $new,
                 static fn (SignupList $list): bool => AllocationMethod::ConditionalDraw
-                    === $list->getAllocationMethod(),
+                    === $list->allocationMethod,
             )
         ) {
             $fields[] = $this->field(
                 t('When to draw'),
                 RevisionFieldKind::Badge,
-                $old?->getDrawCutoffRule(),
-                $new?->getDrawCutoffRule(),
+                $old?->drawCutoffRule,
+                $new?->drawCutoffRule,
                 $comparable,
             );
 
@@ -324,14 +324,14 @@ final readonly class SignupListSections
                 $this->uses(
                     $old,
                     $new,
-                    static fn (SignupList $list): bool => DrawCutoffRule::IfFullBefore === $list->getDrawCutoffRule(),
+                    static fn (SignupList $list): bool => DrawCutoffRule::IfFullBefore === $list->drawCutoffRule,
                 )
             ) {
                 $fields[] = $this->field(
                     t('Draw cutoff moment'),
                     RevisionFieldKind::Moment,
-                    $old?->getDrawCutoffAt(),
-                    $new?->getDrawCutoffAt(),
+                    $old?->drawCutoffAt,
+                    $new?->drawCutoffAt,
                     $comparable,
                 );
             }
@@ -341,14 +341,14 @@ final readonly class SignupListSections
                     $old,
                     $new,
                     static fn (SignupList $list): bool => DrawCutoffRule::AfterDurationOpen
-                        === $list->getDrawCutoffRule(),
+                        === $list->drawCutoffRule,
                 )
             ) {
                 $fields[] = $this->field(
                     t('Draw after being open for (hours)'),
                     RevisionFieldKind::Text,
-                    $this->number($old?->getDrawAfterDurationHours()),
-                    $this->number($new?->getDrawAfterDurationHours()),
+                    $this->number($old?->drawAfterDurationHours),
+                    $this->number($new?->drawAfterDurationHours),
                     $comparable,
                 );
             }
@@ -358,14 +358,14 @@ final readonly class SignupListSections
             $this->uses(
                 $old,
                 $new,
-                static fn (SignupList $list): bool => AllocationMethod::ExternalParty === $list->getAllocationMethod(),
+                static fn (SignupList $list): bool => AllocationMethod::ExternalParty === $list->allocationMethod,
             )
         ) {
             $fields[] = $this->field(
                 t('External party policy URL'),
                 RevisionFieldKind::Text,
-                $old?->getExternalPolicyUrl(),
-                $new?->getExternalPolicyUrl(),
+                $old?->externalPolicyUrl,
+                $new?->externalPolicyUrl,
                 $comparable,
             );
             $fields[] = $this->flags(
@@ -373,13 +373,13 @@ final readonly class SignupListSections
                 [
                     [
                         t('Dictates the order of admissions'),
-                        $old?->getExternalForceOrdering(),
-                        $new?->getExternalForceOrdering(),
+                        $old?->externalForceOrdering,
+                        $new?->externalForceOrdering,
                     ],
                     [
                         t('Collects the payment'),
-                        $old?->getExternalPaymentByExternal(),
-                        $new?->getExternalPaymentByExternal(),
+                        $old?->externalPaymentByExternal,
+                        $new?->externalPaymentByExternal,
                     ],
                 ],
                 $comparable,
@@ -391,14 +391,14 @@ final readonly class SignupListSections
             $this->uses(
                 $old,
                 $new,
-                static fn (SignupList $list): bool => AllocationMethod::Custom === $list->getAllocationMethod(),
+                static fn (SignupList $list): bool => AllocationMethod::Custom === $list->allocationMethod,
             )
         ) {
             $fields[] = $this->field(
                 t('Describe the allocation method'),
                 RevisionFieldKind::LongText,
-                $old?->getCustomMethodDescription(),
-                $new?->getCustomMethodDescription(),
+                $old?->customMethodDescription,
+                $new?->customMethodDescription,
                 $comparable,
             );
         }
@@ -439,8 +439,8 @@ final readonly class SignupListSections
             $fields[] = $this->field(
                 t('How the membership order is applied'),
                 RevisionFieldKind::Badge,
-                $old?->getMembershipPriorityMode(),
-                $new?->getMembershipPriorityMode(),
+                $old?->membershipPriorityMode,
+                $new?->membershipPriorityMode,
                 $comparable,
             );
         }
@@ -450,7 +450,7 @@ final readonly class SignupListSections
                 $old,
                 $new,
                 static fn (SignupList $list): bool => MembershipPriorityMode::ReservedPlaces
-                === $list->getMembershipPriorityMode(),
+                === $list->membershipPriorityMode,
             )
         ) {
             // The places are held for a rank of the order, so they are read back against the tiers that share them.
@@ -525,8 +525,8 @@ final readonly class SignupListSections
         }
 
         $places = [
-            $this->number($old?->getOrganisingCommitteePlaces()),
-            $this->number($new?->getOrganisingCommitteePlaces()),
+            $this->number($old?->organisingCommitteePlaces),
+            $this->number($new?->organisingCommitteePlaces),
         ];
 
         if ($this->said($places)) {
@@ -705,9 +705,9 @@ final readonly class SignupListSections
         return implode(
             "\x1f",
             [
-                trim($question->getName()->getValueNL() ?? ''),
-                trim($question->getName()->getValueEN() ?? ''),
-                $question->getType()->value,
+                trim($question->name->getValueNL() ?? ''),
+                trim($question->name->getValueEN() ?? ''),
+                $question->type->value,
             ],
         );
     }
@@ -723,15 +723,15 @@ final readonly class SignupListSections
         $fields = [
             $this->localisedField(
                 t('Question'),
-                $old?->getName(),
-                $new?->getName(),
+                $old?->name,
+                $new?->name,
                 $comparable,
             ),
             $this->field(
                 t('Answer type'),
                 RevisionFieldKind::Badge,
-                $old?->getType(),
-                $new?->getType(),
+                $old?->type,
+                $new?->type,
                 $comparable,
             ),
             $this->flags(
@@ -739,8 +739,8 @@ final readonly class SignupListSections
                 [
                     [
                         t('Only visible to the board and organiser'),
-                        $old?->isSensitive(),
-                        $new?->isSensitive(),
+                        $old?->isSensitive,
+                        $new?->isSensitive,
                     ],
                 ],
                 $comparable,
@@ -752,7 +752,7 @@ final readonly class SignupListSections
             $this->uses(
                 $old,
                 $new,
-                static fn (SignupField $question): bool => SignupFieldTypes::Number === $question->getType(),
+                static fn (SignupField $question): bool => SignupFieldTypes::Number === $question->type,
             )
         ) {
             $fields[] = $this->field(
@@ -784,7 +784,7 @@ final readonly class SignupListSections
             $this->questionTitle($named),
             $fields,
             $options,
-            $named?->getType(),
+            $named?->type,
             null === $wasAt || $wasAt === $position ? null : t(
                 'Was question %number%.',
                 ['%number%' => $wasAt],
@@ -847,12 +847,12 @@ final readonly class SignupListSections
     ): array {
         $before = [];
         foreach ($comparable ? $old?->getOptions() ?? [] : [] as $option) {
-            $before[] = $option->getValue();
+            $before[] = $option->value;
         }
 
         $after = [];
         foreach ($new?->getOptions() ?? [] as $option) {
-            $after[] = $option->getValue();
+            $after[] = $option->value;
         }
 
         if (
@@ -924,7 +924,7 @@ final readonly class SignupListSections
             return '';
         }
 
-        $name = trim($question->getName()->getText(Languages::current()) ?? '');
+        $name = trim($question->name->getText(Languages::current()) ?? '');
 
         return '' === $name
             ? $this->translator->trans('Unnamed question')
@@ -935,15 +935,15 @@ final readonly class SignupListSections
     {
         if (
             null === $question
-            || SignupFieldTypes::Number !== $question->getType()
+            || SignupFieldTypes::Number !== $question->type
         ) {
             return null;
         }
 
         return sprintf(
             '[%s, %s]',
-            $question->getMinimumValue() ?? '…',
-            $question->getMaximumValue() ?? '…',
+            $question->minimumValue ?? '…',
+            $question->maximumValue ?? '…',
         );
     }
 
@@ -979,8 +979,8 @@ final readonly class SignupListSections
         foreach ($list->getRoles() as $role) {
             $roles[] = sprintf(
                 '%s (%d)',
-                $role->getName(),
-                $role->getMinimum(),
+                $role->name,
+                $role->minimum,
             );
         }
 
@@ -1062,10 +1062,10 @@ final readonly class SignupListSections
             return null;
         }
 
-        if (!$list->getLimitedCapacity()) {
+        if (!$list->limitedCapacity) {
             return $this->translator->trans('Unlimited');
         }
 
-        return $this->number($list->getCapacity());
+        return $this->number($list->capacity);
     }
 }

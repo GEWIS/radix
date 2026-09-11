@@ -45,32 +45,12 @@ class ProposalLimit
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Organ $organ;
+    public Organ $organ;
 
     /**
      * How many activities this body may propose in a period. Zero is a real answer here, and the only way a body ends
      * up unable to propose anything: the board has to write it down deliberately.
      */
     #[Column(type: Types::INTEGER)]
-    private int $maxProposals;
-
-    public function getOrgan(): Organ
-    {
-        return $this->organ;
-    }
-
-    public function setOrgan(Organ $organ): void
-    {
-        $this->organ = $organ;
-    }
-
-    public function getMaxProposals(): int
-    {
-        return $this->maxProposals;
-    }
-
-    public function setMaxProposals(int $maxProposals): void
-    {
-        $this->maxProposals = $maxProposals;
-    }
+    public int $maxProposals;
 }

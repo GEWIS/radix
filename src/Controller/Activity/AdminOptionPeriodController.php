@@ -201,7 +201,7 @@ class AdminOptionPeriodController extends AbstractController
         OptionPeriod $period,
     ): Response {
         $limit = new PeriodProposalLimit();
-        $limit->setPeriod($period);
+        $limit->period = $period;
 
         $form = $this->createForm(
             PeriodProposalLimitType::class,

@@ -88,7 +88,7 @@ final class ExternalSignupManage
             throw new NotFoundHttpException();
         }
 
-        return $this->resolvedSignup = $verification->getExternalSignup();
+        return $this->resolvedSignup = $verification->externalSignup;
     }
 
     /**
@@ -97,11 +97,11 @@ final class ExternalSignupManage
      */
     public function isEditable(): bool
     {
-        $signupList = $this->signup()->getSignupList();
+        $signupList = $this->signup()->signupList;
 
         return $signupList->isOpen()
             && !$signupList->getActivity()->isFrozen()
-            && $signupList->getActivity()->getLiveRevision() === $signupList->getRevision();
+            && $signupList->getActivity()->getLiveRevision() === $signupList->revision;
     }
 
     /**
@@ -111,7 +111,7 @@ final class ExternalSignupManage
     protected function instantiateForm(): FormInterface
     {
         $signup = $this->signup();
-        $signupList = $signup->getSignupList();
+        $signupList = $signup->signupList;
 
         return $this->formFactory->create(
             SignupType::class,
@@ -148,7 +148,7 @@ final class ExternalSignupManage
             $signup,
             strval($data['fullName'] ?? ''),
             SignupType::extractFieldData(
-                $signup->getSignupList(),
+                $signup->signupList,
                 $data,
             ),
         );
@@ -165,7 +165,7 @@ final class ExternalSignupManage
     public function unsubscribe(): RedirectResponse
     {
         $signup = $this->signup();
-        $activityId = $signup->getSignupList()->getActivity()->getId();
+        $activityId = $signup->signupList->getActivity()->getId();
 
         if ($this->isEditable()) {
             $this->signupManager->withdraw($signup);

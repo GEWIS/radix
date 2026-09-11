@@ -157,9 +157,9 @@ final class ExternalSignupResendForm
     private function assertList(): void
     {
         if (
-            $this->signupList->getOnlyGEWIS()
+            $this->signupList->onlyGEWIS
             || $this->signupList->getActivity()->isFrozen()
-            || $this->signupList->getActivity()->getLiveRevision() !== $this->signupList->getRevision()
+            || $this->signupList->getActivity()->getLiveRevision() !== $this->signupList->revision
         ) {
             throw new AccessDeniedException();
         }

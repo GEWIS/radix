@@ -90,7 +90,7 @@ abstract class Signup
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private SignupList $signupList;
+    public SignupList $signupList;
 
     /**
      * Additional field values for this Signup.
@@ -111,7 +111,7 @@ abstract class Signup
      * Determines if the user was present or not
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $present = false;
+    public bool $present = false;
 
     /**
      * Whether this sign-up has been admitted (drawn). Defaults to false, the safe default: on a limited-capacity
@@ -120,7 +120,7 @@ abstract class Signup
      * (drawn = !limitedCapacity); see ActivityFixture and the public subscribe flow.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $drawn = false;
+    public bool $drawn = false;
 
     /**
      * Where the draw ranked this sign-up, admitted or not, so the waiting list keeps the order the draw gave it: who
@@ -131,7 +131,7 @@ abstract class Signup
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $drawPosition = null;
+    public ?int $drawPosition = null;
 
     #[ManyToOne(targetEntity: SignupRole::class)]
     #[JoinColumn(
@@ -140,27 +140,11 @@ abstract class Signup
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?SignupRole $role = null;
+    public ?SignupRole $role = null;
 
     public function __construct()
     {
         $this->fieldValues = new ArrayCollection();
-    }
-
-    /**
-     * Get the SignupList which the user is signed up for.
-     */
-    public function getSignupList(): SignupList
-    {
-        return $this->signupList;
-    }
-
-    /**
-     * Set the SignupList that the user signed up for.
-     */
-    public function setSignupList(SignupList $signupList): void
-    {
-        $this->signupList = $signupList;
     }
 
     /**
@@ -182,7 +166,7 @@ abstract class Signup
         Languages $language,
     ): string {
         foreach ($this->getFieldValues() as $fieldValue) {
-            if ($fieldValue->getField()->getId() !== $field->getId()) {
+            if ($fieldValue->field->getId() !== $field->getId()) {
                 continue;
             }
 
@@ -193,58 +177,6 @@ abstract class Signup
         }
 
         return '';
-    }
-
-    /**
-     * Get presence of the user
-     */
-    public function isPresent(): bool
-    {
-        return $this->present;
-    }
-
-    /**
-     * Set presence of the user
-     */
-    public function setPresent(bool $present): void
-    {
-        $this->present = $present;
-    }
-
-    /**
-     * Get draw status of the user
-     */
-    public function isDrawn(): bool
-    {
-        return $this->drawn;
-    }
-
-    /**
-     * Set the draw status of the user
-     */
-    public function setDrawn(bool $drawn): void
-    {
-        $this->drawn = $drawn;
-    }
-
-    public function getDrawPosition(): ?int
-    {
-        return $this->drawPosition;
-    }
-
-    public function setDrawPosition(?int $position): void
-    {
-        $this->drawPosition = $position;
-    }
-
-    public function getRole(): ?SignupRole
-    {
-        return $this->role;
-    }
-
-    public function setRole(?SignupRole $role): void
-    {
-        $this->role = $role;
     }
 
     /**
@@ -278,10 +210,10 @@ abstract class Signup
             'id' => $this->getId(),
             'createdAt' => $this->getCreatedAt()->format(DateTimeInterface::ATOM),
             'updatedAt' => $this->getUpdatedAt()->format(DateTimeInterface::ATOM),
-            'activity_id' => $this->getSignupList()->getActivity()->getId(),
-            'signupList_id' => $this->getSignupList()->getId(),
-            'present' => $this->isPresent(),
-            'role' => $this->getRole()?->getName(),
+            'activity_id' => $this->signupList->getActivity()->getId(),
+            'signupList_id' => $this->signupList->getId(),
+            'present' => $this->present,
+            'role' => $this->role?->name,
             'fieldValues' => $fieldValues,
         ];
     }
@@ -295,15 +227,15 @@ abstract class Signup
         foreach ($this->getFieldValues() as $fieldValue) {
             $value = null;
 
-            if (SignupFieldTypes::Choice === $fieldValue->getField()->getType()) {
-                $value = $fieldValue->getOption()?->getId();
-            } elseif (SignupFieldTypes::YesNo === $fieldValue->getField()->getType()) {
-                $value = 'Yes' === $fieldValue->getValue()
+            if (SignupFieldTypes::Choice === $fieldValue->field->type) {
+                $value = $fieldValue->option?->getId();
+            } elseif (SignupFieldTypes::YesNo === $fieldValue->field->type) {
+                $value = 'Yes' === $fieldValue->value
                     ? '1'
                     : '0';
             }
 
-            $fieldValues[intval($fieldValue->getField()->getId())] = $value ?? $fieldValue->getValue();
+            $fieldValues[intval($fieldValue->field->getId())] = $value ?? $fieldValue->value;
         }
 
         return $fieldValues;

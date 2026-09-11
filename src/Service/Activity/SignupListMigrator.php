@@ -62,7 +62,7 @@ final readonly class SignupListMigrator
         }
 
         foreach ($outgoing->getSignupLists() as $oldList) {
-            $newList = $byLineage[$oldList->getLineageId()->toRfc4122()] ?? null;
+            $newList = $byLineage[$oldList->lineageId->toRfc4122()] ?? null;
             if (!$newList instanceof SignupList) {
                 continue;
             }
@@ -70,9 +70,9 @@ final readonly class SignupListMigrator
             // Carry the live list's draw/presence state onto the incoming clone, independent of whether it has any
             // sign-ups: the clone snapshots these at clone time, but the live list stays authoritative until approval
             // (a draw or a presence sweep may have happened in between), so re-sync them here for every lineage match.
-            $newList->setDrawnAt($oldList->getDrawnAt());
-            $newList->setDrawnBy($oldList->getDrawnBy());
-            $newList->setPresenceTaken($oldList->isPresenceTaken());
+            $newList->drawnAt = $oldList->drawnAt;
+            $newList->drawnBy = $oldList->drawnBy;
+            $newList->presenceTaken = $oldList->presenceTaken;
 
             if ($oldList->getSignUps()->isEmpty()) {
                 continue;
@@ -102,7 +102,7 @@ final readonly class SignupListMigrator
                 continue;
             }
 
-            $newList = $byLineage[$oldList->getLineageId()->toRfc4122()] ?? null;
+            $newList = $byLineage[$oldList->lineageId->toRfc4122()] ?? null;
             if (!$newList instanceof SignupList) {
                 return 'a sign-up list with sign-ups was removed in this revision';
             }
@@ -148,12 +148,12 @@ final readonly class SignupListMigrator
         foreach ($oldFields as $i => $oldField) {
             $newField = $newFields[$i];
             if (
-                $oldField->getType() !== $newField->getType()
-                || $oldField->getMinimumValue() !== $newField->getMinimumValue()
-                || $oldField->getMaximumValue() !== $newField->getMaximumValue()
+                $oldField->type !== $newField->type
+                || $oldField->minimumValue !== $newField->minimumValue
+                || $oldField->maximumValue !== $newField->maximumValue
                 || !$this->localisedTextMatches(
-                    $oldField->getName(),
-                    $newField->getName(),
+                    $oldField->name,
+                    $newField->name,
                 )
                 || !$this->optionsMatch(
                     $oldField,
@@ -180,8 +180,8 @@ final readonly class SignupListMigrator
 
         foreach ($oldRoles as $i => $oldRole) {
             if (
-                $oldRole->getName() !== $newRoles[$i]->getName()
-                || $oldRole->getMinimum() !== $newRoles[$i]->getMinimum()
+                $oldRole->name !== $newRoles[$i]->name
+                || $oldRole->minimum !== $newRoles[$i]->minimum
             ) {
                 return false;
             }
@@ -207,8 +207,8 @@ final readonly class SignupListMigrator
         foreach ($oldOptions as $i => $oldOption) {
             if (
                 !$this->localisedTextMatches(
-                    $oldOption->getValue(),
-                    $newOptions[$i]->getValue(),
+                    $oldOption->value,
+                    $newOptions[$i]->value,
                 )
             ) {
                 return false;
@@ -255,24 +255,26 @@ final readonly class SignupListMigrator
         }
 
         foreach ($oldList->getSignUps() as $signup) {
-            $signup->setSignupList($newList);
+            $signup->signupList = $newList;
 
-            $oldRole = $signup->getRole();
+            $oldRole = $signup->role;
             if (null !== $oldRole) {
                 $j = $roleIndex[spl_object_id($oldRole)] ?? null;
-                $signup->setRole(null === $j ? null : $newRoles[$j]);
+                $signup->role = null === $j
+                    ? null
+                    : $newRoles[$j];
             }
 
             foreach ($signup->getFieldValues() as $fieldValue) {
-                $i = $fieldIndex[spl_object_id($fieldValue->getField())] ?? null;
+                $i = $fieldIndex[spl_object_id($fieldValue->field)] ?? null;
                 if (null === $i) {
                     continue;
                 }
 
                 $newField = $newFields[$i];
-                $fieldValue->setField($newField);
+                $fieldValue->field = $newField;
 
-                $oldOption = $fieldValue->getOption();
+                $oldOption = $fieldValue->option;
                 if (null === $oldOption) {
                     continue;
                 }
@@ -282,7 +284,7 @@ final readonly class SignupListMigrator
                     continue;
                 }
 
-                $fieldValue->setOption($newField->getOptions()->getValues()[$j]);
+                $fieldValue->option = $newField->getOptions()->getValues()[$j];
             }
         }
     }

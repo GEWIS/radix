@@ -70,7 +70,7 @@ final readonly class DrawManager
     public function drawAutomatically(SignupList $list): bool
     {
         if (
-            $list->getAllocationMethod()->isManual()
+            $list->allocationMethod->isManual()
             || $list->isDrawnByHand()
         ) {
             return false;
@@ -78,7 +78,7 @@ final readonly class DrawManager
 
         return $this->runDraw(
             $list,
-            $list->getAllocationMethod(),
+            $list->allocationMethod,
             null,
             requireDue: true,
         );
@@ -148,10 +148,10 @@ final readonly class DrawManager
         AllocationMethod $method,
         bool $requireDue,
     ): bool {
-        $allowed = $list->getLimitedCapacity()
-            && null !== $list->getCapacity()
-            && $list->getCapacity() >= 1
-            && $list->getAllocationMethod() === $method
+        $allowed = $list->limitedCapacity
+            && null !== $list->capacity
+            && $list->capacity >= 1
+            && $list->allocationMethod === $method
             && !$list->isDrawLocked()
             && !$list->getActivity()->isFrozen()
             && SignupAdminWindow::canChangeAdmission($list->getActivity()->getEndTime());
@@ -183,21 +183,21 @@ final readonly class DrawManager
         array $orderedSignups,
         ?Member $drawnBy,
     ): void {
-        $capacity = $list->getCapacity() ?? 0;
+        $capacity = $list->capacity ?? 0;
         $position = 0;
         foreach ($orderedSignups as $signup) {
             $admitted = $position < $capacity;
-            $signup->setDrawn($admitted);
-            $signup->setDrawPosition($position + 1);
+            $signup->drawn = $admitted;
+            $signup->drawPosition = $position + 1;
             if (!$admitted) {
-                $signup->setPresent(false);
+                $signup->present = false;
             }
 
             ++$position;
         }
 
-        $list->setDrawnAt(new DateTime());
-        $list->setDrawnBy($drawnBy);
+        $list->drawnAt = new DateTime();
+        $list->drawnBy = $drawnBy;
 
         $this->entityManager->flush();
     }
@@ -219,7 +219,7 @@ final readonly class DrawManager
         SignupList $list,
         AllocationMethod $method,
     ): array {
-        $cutoff = $list->getAutoDrawAt() ?? $list->getCloseDate();
+        $cutoff = $list->getAutoDrawAt() ?? $list->closeDate;
 
         $pool = [];
         $late = [];
@@ -280,7 +280,7 @@ final readonly class DrawManager
     private function subscribedAt(Signup $signup): ?DateTime
     {
         return $signup instanceof ExternalSignup
-            ? $signup->getVerifiedAt()
+            ? $signup->verifiedAt
             : $signup->getCreatedAt();
     }
 }

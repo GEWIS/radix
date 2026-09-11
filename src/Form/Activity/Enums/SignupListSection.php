@@ -38,7 +38,7 @@ enum SignupListSection: string implements TranslatableInterface
     {
         return sprintf(
             'list:%s:%s',
-            $list->getLineageId()->toRfc4122(),
+            $list->lineageId->toRfc4122(),
             $this->value,
         );
     }
@@ -58,10 +58,10 @@ enum SignupListSection: string implements TranslatableInterface
                 $list,
                 $languages,
             )
-                && null !== $list->getOpenDate()
-                && null !== $list->getCloseDate(),
-            self::Allocation => !$list->getLimitedCapacity()
-                || ($list->getCapacity() ?? 0) >= 1,
+                && null !== $list->openDate
+                && null !== $list->closeDate,
+            self::Allocation => !$list->limitedCapacity
+                || ($list->capacity ?? 0) >= 1,
             self::Questions => true,
         };
     }
@@ -74,7 +74,7 @@ enum SignupListSection: string implements TranslatableInterface
         array $languages,
     ): bool {
         foreach ($languages as $language) {
-            if ('' === trim($list->getName()->getExactText($language) ?? '')) {
+            if ('' === trim($list->name->getExactText($language) ?? '')) {
                 return false;
             }
         }

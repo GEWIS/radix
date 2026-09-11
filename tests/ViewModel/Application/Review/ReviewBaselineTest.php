@@ -18,7 +18,7 @@ final class ReviewBaselineTest extends TestCase
             $live,
             $sentBack, $inReview
         ] = $this->chain(4);
-        $activity = $inReview->getActivity();
+        $activity = $inReview->activity;
         $activity->setLiveRevision($live);
 
         $baseline = ReviewBaseline::resolve(
@@ -59,7 +59,7 @@ final class ReviewBaselineTest extends TestCase
             $live,
             $sentBack, $inReview
         ] = $this->chain(4);
-        $inReview->getActivity()->setLiveRevision($live);
+        $inReview->activity->setLiveRevision($live);
 
         $baseline = ReviewBaseline::resolve(
             $inReview,
@@ -96,7 +96,7 @@ final class ReviewBaselineTest extends TestCase
         [
             $live, $inReview
         ] = $this->chain(2);
-        $inReview->getActivity()->setLiveRevision($live);
+        $inReview->activity->setLiveRevision($live);
 
         $baseline = ReviewBaseline::resolve(
             $inReview,

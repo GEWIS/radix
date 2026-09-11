@@ -66,7 +66,7 @@ final class AdmissionOrderTest extends TestCase
     {
         $list = $this->list();
         $list->setMembershipTierOrder(self::ranks(MembershipTier::defaultOrder()));
-        $list->setMembershipPriorityMode(MembershipPriorityMode::Ordering);
+        $list->membershipPriorityMode = MembershipPriorityMode::Ordering;
 
         $pool = [
             $this->external('external'),
@@ -100,7 +100,7 @@ final class AdmissionOrderTest extends TestCase
             ],
             [MembershipTier::NonMember],
         ]);
-        $list->setMembershipPriorityMode(MembershipPriorityMode::Ordering);
+        $list->membershipPriorityMode = MembershipPriorityMode::Ordering;
 
         $pool = [
             $this->external('external'),
@@ -130,7 +130,7 @@ final class AdmissionOrderTest extends TestCase
     {
         $list = $this->list();
         $list->setMembershipTierOrder(self::ranks(MembershipTier::defaultOrder()));
-        $list->setMembershipPriorityMode(MembershipPriorityMode::Ordering);
+        $list->membershipPriorityMode = MembershipPriorityMode::Ordering;
 
         $pool = [
             $this->external('external-first'),
@@ -161,7 +161,7 @@ final class AdmissionOrderTest extends TestCase
             [MembershipTier::Ordinary],
             [MembershipTier::Graduate],
         ]);
-        $list->setMembershipPriorityMode(MembershipPriorityMode::Ordering);
+        $list->membershipPriorityMode = MembershipPriorityMode::Ordering;
 
         $pool = [
             $this->member('member'),
@@ -184,7 +184,7 @@ final class AdmissionOrderTest extends TestCase
     {
         $list = $this->list();
         $list->setMembershipTierOrder(self::ranks(MembershipTier::defaultOrder()));
-        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedPlaces);
+        $list->membershipPriorityMode = MembershipPriorityMode::ReservedPlaces;
         $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 1]);
 
         $pool = [
@@ -211,7 +211,7 @@ final class AdmissionOrderTest extends TestCase
     public function testMasterStudentsCanBeAdmittedBeforeBachelorStudents(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(true);
+        $list->onlyGEWIS = true;
         $list->setProgramTypeOrder([
             [ProgramType::Master],
             [ProgramType::Bachelor],
@@ -250,7 +250,7 @@ final class AdmissionOrderTest extends TestCase
     public function testFreshmenCanBeAdmittedFirst(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(true);
+        $list->onlyGEWIS = true;
         $list->setCohortTierOrder(self::ranks(CohortTier::defaultOrder()));
 
         $current = AssociationYear::fromDate(new DateTime())->getYear();
@@ -291,7 +291,7 @@ final class AdmissionOrderTest extends TestCase
     {
         $list = $this->list();
         $list->setMembershipTierOrder(self::ranks(MembershipTier::defaultOrder()));
-        $list->setMembershipPriorityMode(MembershipPriorityMode::Ordering);
+        $list->membershipPriorityMode = MembershipPriorityMode::Ordering;
         $list->setProgramTypeOrder([
             [ProgramType::Master],
             [ProgramType::Bachelor],
@@ -499,8 +499,8 @@ final class AdmissionOrderTest extends TestCase
     private function list(int $capacity = 10): SignupList
     {
         $list = new SignupList();
-        $list->setLimitedCapacity(true);
-        $list->setCapacity($capacity);
+        $list->limitedCapacity = true;
+        $list->capacity = $capacity;
 
         return $list;
     }
@@ -518,8 +518,8 @@ final class AdmissionOrderTest extends TestCase
         $member->setGeneration($generation);
 
         $signup = new UserSignup();
-        $signup->setUser($member);
-        $signup->setRole($role);
+        $signup->user = $member;
+        $signup->role = $role;
 
         return $this->named(
             $signup,

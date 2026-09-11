@@ -77,7 +77,7 @@ class OptionPeriodType extends AbstractType
                             return;
                         }
 
-                        $period->setSubmissionOpensAt($value);
+                        $period->submissionOpensAt = $value;
                     },
                 ],
             )
@@ -93,7 +93,7 @@ class OptionPeriodType extends AbstractType
                             return;
                         }
 
-                        $period->setSubmissionClosesAt($value);
+                        $period->submissionClosesAt = $value;
                     },
                 ],
             )
@@ -109,7 +109,7 @@ class OptionPeriodType extends AbstractType
                             return;
                         }
 
-                        $period->setStartsAt($value);
+                        $period->startsAt = $value;
                     },
                 ],
             )
@@ -125,7 +125,7 @@ class OptionPeriodType extends AbstractType
                             return;
                         }
 
-                        $period->setEndsAt($value);
+                        $period->endsAt = $value;
                     },
                 ],
             )
@@ -173,7 +173,7 @@ class OptionPeriodType extends AbstractType
         if (
             $form->get('submissionOpensAt')->getData() instanceof DateTime
             && $form->get('submissionClosesAt')->getData() instanceof DateTime
-            && $period->getSubmissionClosesAt() <= $period->getSubmissionOpensAt()
+            && $period->submissionClosesAt <= $period->submissionOpensAt
         ) {
             $form->get('submissionClosesAt')->addError(new FormError(
                 $this->translator->trans(
@@ -187,7 +187,7 @@ class OptionPeriodType extends AbstractType
         if (
             !($form->get('startsAt')->getData() instanceof DateTime)
             || !($form->get('endsAt')->getData() instanceof DateTime)
-            || $period->getEndsAt() >= $period->getStartsAt()
+            || $period->endsAt >= $period->startsAt
         ) {
             return;
         }

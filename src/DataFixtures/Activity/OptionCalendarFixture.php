@@ -136,15 +136,15 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
 
         // KEUR is a small body and the board holds it to two activities a quartile, every quartile.
         $standing = new ProposalLimit();
-        $standing->setOrgan($keur);
-        $standing->setMaxProposals(2);
+        $standing->organ = $keur;
+        $standing->maxProposals = 2;
         $manager->persist($standing);
 
         // GETÉST is held to two in the round that is open alone, because that quartile is already busy.
         $override = new PeriodProposalLimit();
-        $override->setPeriod($open);
-        $override->setOrgan($getest);
-        $override->setMaxProposals(2);
+        $override->period = $open;
+        $override->organ = $getest;
+        $override->maxProposals = 2;
         $manager->persist($override);
 
         // Three bodies want the same day, which is what the queue orders by who asked first.
@@ -269,13 +269,13 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             $scheduledOption,
             $boardMember,
         );
-        $scheduled->setActivity($this->draftActivity(
+        $scheduled->activity = $this->draftActivity(
             $manager,
             $getestMember,
             $getest,
-            $scheduled->getName(),
+            $scheduled->name,
             $scheduledOption,
-        ));
+        );
         $manager->persist($scheduled);
 
         // Budget approved at a board meeting: nothing chases this one any more.
@@ -355,9 +355,9 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             $lapsedOption,
             $boardMember,
         );
-        $lapsed->setStatus(ProposalStatus::Lapsed);
-        $lapsedOption->setStatus(DateOptionStatus::Declined);
-        $lapsed->setBudgetRemindedAt($this->days(-21));
+        $lapsed->status = ProposalStatus::Lapsed;
+        $lapsedOption->status = DateOptionStatus::Declined;
+        $lapsed->budgetRemindedAt = $this->days(-21);
         $manager->persist($lapsed);
 
         $withdrawn = $this->proposal(
@@ -382,7 +382,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             $this->days(39),
             TimeOfDay::MultipleDays,
         );
-        $withdrawn->setStatus(ProposalStatus::Withdrawn);
+        $withdrawn->status = ProposalStatus::Withdrawn;
         $this->settleRemainingOptions(
             $withdrawn,
             DateOptionStatus::Withdrawn,
@@ -404,9 +404,9 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             $this->days(-150),
             TimeOfDay::LunchBreak,
         );
-        $declined->setStatus(ProposalStatus::Declined);
-        $declined->setDecidedBy($boardMember);
-        $declined->setDecidedAt($this->days(-245));
+        $declined->status = ProposalStatus::Declined;
+        $declined->decidedBy = $boardMember;
+        $declined->decidedAt = $this->days(-245);
         $this->settleRemainingOptions(
             $declined,
             DateOptionStatus::Declined,
@@ -462,11 +462,11 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         int $endsInDays,
     ): OptionPeriod {
         $period = new OptionPeriod();
-        $period->setName($name);
-        $period->setSubmissionOpensAt($this->days($opensInDays));
-        $period->setSubmissionClosesAt($this->days($closesInDays));
-        $period->setStartsAt($this->days($startsInDays));
-        $period->setEndsAt($this->days($endsInDays));
+        $period->name = $name;
+        $period->submissionOpensAt = $this->days($opensInDays);
+        $period->submissionClosesAt = $this->days($closesInDays);
+        $period->startsAt = $this->days($startsInDays);
+        $period->endsAt = $this->days($endsInDays);
 
         return $period;
     }
@@ -480,11 +480,11 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         int $createdDaysAgo,
     ): ActivityProposal {
         $proposal = new ActivityProposal();
-        $proposal->setPeriod($period);
-        $proposal->setOrgan($organ);
+        $proposal->period = $period;
+        $proposal->organ = $organ;
         $proposal->setCreatedBy($createdBy);
-        $proposal->setName($name);
-        $proposal->setDescription($description);
+        $proposal->name = $name;
+        $proposal->description = $description;
 
         $this->backdated[] = [
             $proposal,
@@ -502,10 +502,10 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         TimeOfDay $timeOfDay,
     ): ActivityDateOption {
         $option = new ActivityDateOption();
-        $option->setPosition($position);
-        $option->setBeginsAt($beginsAt);
-        $option->setEndsAt($endsAt);
-        $option->setTimeOfDay($timeOfDay);
+        $option->position = $position;
+        $option->beginsAt = $beginsAt;
+        $option->endsAt = $endsAt;
+        $option->timeOfDay = $timeOfDay;
         $proposal->addDateOption($option);
 
         return $option;
@@ -516,15 +516,15 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         ActivityDateOption $option,
         Member $decidedBy,
     ): void {
-        $option->setStatus(DateOptionStatus::Approved);
-        $option->setDecidedBy($decidedBy);
-        $option->setDecidedAt($this->days(-40));
+        $option->status = DateOptionStatus::Approved;
+        $option->decidedBy = $decidedBy;
+        $option->decidedAt = $this->days(-40);
 
         $proposal->declineDateOptionsOtherThan($option);
-        $proposal->setChosenOption($option);
-        $proposal->setStatus(ProposalStatus::Scheduled);
-        $proposal->setDecidedBy($decidedBy);
-        $proposal->setDecidedAt($this->days(-40));
+        $proposal->chosenOption = $option;
+        $proposal->status = ProposalStatus::Scheduled;
+        $proposal->decidedBy = $decidedBy;
+        $proposal->decidedAt = $this->days(-40);
     }
 
     private function clear(
@@ -532,10 +532,10 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         BudgetClearance $clearance,
         Member $clearedBy,
     ): void {
-        $proposal->setStatus(ProposalStatus::Cleared);
-        $proposal->setBudgetClearance($clearance);
-        $proposal->setBudgetClearedBy($clearedBy);
-        $proposal->setBudgetClearedAt($this->days(-35));
+        $proposal->status = ProposalStatus::Cleared;
+        $proposal->budgetClearance = $clearance;
+        $proposal->budgetClearedBy = $clearedBy;
+        $proposal->budgetClearedAt = $this->days(-35);
     }
 
     private function settleRemainingOptions(
@@ -543,7 +543,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         DateOptionStatus $status,
     ): void {
         foreach ($proposal->getDateOptions() as $option) {
-            $option->setStatus($status);
+            $option->status = $status;
         }
     }
 
@@ -563,14 +563,17 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
 
         $revision = new ActivityRevision();
         $revision->setAuthor($creator);
-        $revision->setOrgan($organ);
-        $revision->setName(new ActivityLocalisedText($name, $name));
-        $revision->setLocation(new ActivityLocalisedText());
-        $revision->setCosts(new ActivityLocalisedText());
-        $revision->setDescription(new ActivityLocalisedText());
-        $revision->setCategory(ActivityCategories::Other);
-        $revision->setBeginTime(new DateTime(sprintf('%s 00:00:00', $option->getBeginsAt()->format('Y-m-d'))));
-        $revision->setEndTime(new DateTime(sprintf('%s 23:59:59', $option->getEndsAt()->format('Y-m-d'))));
+        $revision->organ = $organ;
+        $revision->name = new ActivityLocalisedText(
+            $name,
+            $name,
+        );
+        $revision->location = new ActivityLocalisedText();
+        $revision->costs = new ActivityLocalisedText();
+        $revision->description = new ActivityLocalisedText();
+        $revision->category = ActivityCategories::Other;
+        $revision->beginTime = new DateTime(sprintf('%s 00:00:00', $option->beginsAt->format('Y-m-d')));
+        $revision->endTime = new DateTime(sprintf('%s 23:59:59', $option->endsAt->format('Y-m-d')));
 
         $activity->addRevision($revision);
         $activity->setCurrentRevision($revision);

@@ -57,7 +57,7 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             ProposalStatus::Submitted,
-            $stored->getStatus(),
+            $stored->status,
         );
         self::assertCount(
             1,
@@ -71,7 +71,7 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
         // The order the days were put in is the body's order of preference, numbered from one.
         self::assertSame(
             1,
-            $first->getPosition(),
+            $first->position,
         );
     }
 
@@ -105,7 +105,7 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
         $response = $this->submit(
             $this->body('KEUR'),
             'Ver buiten de ronde',
-            (clone $period->getEndsAt())->modify('+30 days'),
+            (clone $period->endsAt)->modify('+30 days'),
         );
 
         self::assertFalse($response instanceof RedirectResponse);
@@ -125,7 +125,7 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
         ?DateTime $day = null,
     ): mixed {
         $period = $this->openPeriod();
-        $day ??= (clone $period->getStartsAt())->modify('+3 days');
+        $day ??= (clone $period->startsAt)->modify('+3 days');
 
         // Stateless CSRF: the rendered token really is the literal `csrf-token`, and the manager only accepts it
         // together with a same-origin fetch header. Both are needed, neither alone is enough.

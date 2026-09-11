@@ -36,8 +36,8 @@ class ExternalSignupTokenEmailHandler
             return;
         }
 
-        $activityName = $signup->getSignupList()->getActivity()->getName()->getText(Languages::English) ?? '';
-        $signupListName = $signup->getSignupList()->getName()->getText(Languages::English) ?? '';
+        $activityName = $signup->signupList->getActivity()->getName()->getText(Languages::English) ?? '';
+        $signupListName = $signup->signupList->name->getText(Languages::English) ?? '';
         $purpose = $message->getPurpose();
 
         $url = $this->urlGenerator->generate(

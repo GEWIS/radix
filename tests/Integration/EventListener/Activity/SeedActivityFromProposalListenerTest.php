@@ -31,7 +31,7 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
         $proposal = $this->aWaitingProposalWithSeveralDays();
         $chosen = $proposal->getDateOptions()->first();
         self::assertNotFalse($chosen);
-        $proposal->setChosenOption($chosen);
+        $proposal->chosenOption = $chosen;
 
         $this->workflow()->apply(
             $proposal,
@@ -39,7 +39,7 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
         );
         $this->entityManager->flush();
 
-        $activity = $proposal->getActivity();
+        $activity = $proposal->activity;
         self::assertNotNull(
             $activity,
             'Reserving a day has to start the activity it is for.',
@@ -53,16 +53,16 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
             'It is the body that finishes the activity, so it starts as their draft.',
         );
         self::assertSame(
-            $proposal->getName(),
-            $revision->getName()->getValueEN(),
+            $proposal->name,
+            $revision->name->getValueEN(),
         );
         self::assertSame(
-            $proposal->getOrgan(),
-            $revision->getOrgan(),
+            $proposal->organ,
+            $revision->organ,
         );
         self::assertSame(
-            $chosen->getBeginsAt()->format('Y-m-d'),
-            $revision->getBeginTime()?->format('Y-m-d'),
+            $chosen->beginsAt->format('Y-m-d'),
+            $revision->beginTime?->format('Y-m-d'),
         );
 
         foreach ($proposal->getDateOptions() as $dateOption) {
@@ -72,7 +72,7 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
 
             self::assertSame(
                 $expected,
-                $dateOption->getStatus(),
+                $dateOption->status,
                 'Every day that was not picked has to be free for whoever is next in line.',
             );
         }
@@ -89,7 +89,7 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
             ActivityProposal::class,
             $proposal,
         );
-        $activity = $proposal->getActivity();
+        $activity = $proposal->activity;
 
         $this->workflow()->apply(
             $proposal,
@@ -99,14 +99,14 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
 
         foreach ($proposal->getDateOptions() as $dateOption) {
             self::assertFalse(
-                $dateOption->getStatus()->isStanding(),
+                $dateOption->status->isStanding(),
                 'A day nobody is holding must not stand in anybody else\'s way.',
             );
         }
 
         self::assertSame(
             $activity,
-            $proposal->getActivity(),
+            $proposal->activity,
             'Losing a day is no reason to throw away what somebody already wrote.',
         );
     }
@@ -125,7 +125,7 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
             ActivityProposal::class,
             $proposal,
         );
-        $activity = $proposal->getActivity();
+        $activity = $proposal->activity;
 
         $this->workflow()->apply(
             $proposal,
@@ -143,7 +143,7 @@ final class SeedActivityFromProposalListenerTest extends DatabaseTestCase
 
         self::assertSame(
             $activity,
-            $proposal->getActivity(),
+            $proposal->activity,
         );
     }
 

@@ -68,9 +68,9 @@ final readonly class SignupManager
         array $fieldData,
     ): UserSignup {
         $signup = new UserSignup();
-        $signup->setSignupList($signupList);
-        $signup->setUser($member);
-        $signup->setDrawn($this->initialDrawnState($signupList));
+        $signup->signupList = $signupList;
+        $signup->user = $member;
+        $signup->drawn = $this->initialDrawnState($signupList);
 
         $this->entityManager->persist($signup);
         $this->mapFieldValues(
@@ -139,11 +139,11 @@ final readonly class SignupManager
             $email,
         );
         // Flag the manual entry: the subscriber never saw the form, so they did not themselves accept the policies.
-        $signup->setAddedManually(true);
+        $signup->addedManually = true;
         // Immediately confirmed (no Verify token), so it becomes a subscriber right now and gets the same admission
         // decision as a member sign-up.
-        $signup->setVerifiedAt(new DateTime());
-        $signup->setDrawn($this->initialDrawnState($signupList));
+        $signup->verifiedAt = new DateTime();
+        $signup->drawn = $this->initialDrawnState($signupList);
 
         $this->entityManager->persist($signup);
         $this->mapFieldValues(
@@ -213,21 +213,21 @@ final readonly class SignupManager
      */
     public function confirmExternalSignup(ExternalSignupVerification $verification): void
     {
-        $signup = $verification->getExternalSignup();
+        $signup = $verification->externalSignup;
 
         $this->entityManager->remove($verification);
-        $signup->setVerifiedAt(new DateTime());
+        $signup->verifiedAt = new DateTime();
 
         // Confirmation is the moment an external becomes a real subscriber, so the admission decision that member
         // sign-ups get at creation happens here: on a locked (drawn) limited list a remaining place admits them
         // first-come-first-served. This sign-up itself is not admitted, so it never inflates its own count.
-        $signupList = $signup->getSignupList();
+        $signupList = $signup->signupList;
         if (
-            $signupList->getLimitedCapacity()
+            $signupList->limitedCapacity
             && $signupList->isDrawLocked()
-            && !$signup->isDrawn()
+            && !$signup->drawn
         ) {
-            $signup->setDrawn($this->initialDrawnState($signupList));
+            $signup->drawn = $this->initialDrawnState($signupList);
         }
 
         $token = $this->issueToken(
@@ -289,14 +289,14 @@ final readonly class SignupManager
         string $email,
     ): ExternalSignup {
         $signup = new ExternalSignup();
-        $signup->setSignupList($signupList);
+        $signup->signupList = $signupList;
         $signup->setFullName($fullName);
         $signup->setEmail($email);
         // An unlimited list admits on sign-up; on a limited list an external starts on the waiting list even when the
         // draw is locked: it is unverified at this point, and a never-confirmed sign-up must not hold a place. The
         // admission decision happens at confirmation ({@see self::confirmExternalSignup()}) or, for an
         // organiser-added external, in {@see self::addExternalSignupByOrganiser()}.
-        $signup->setDrawn(!$signupList->getLimitedCapacity());
+        $signup->drawn = !$signupList->limitedCapacity;
 
         return $signup;
     }
@@ -311,7 +311,7 @@ final readonly class SignupManager
      */
     private function initialDrawnState(SignupList $signupList): bool
     {
-        if (!$signupList->getLimitedCapacity()) {
+        if (!$signupList->limitedCapacity) {
             return true;
         }
 
@@ -319,7 +319,7 @@ final readonly class SignupManager
             return false;
         }
 
-        $capacity = $signupList->getCapacity();
+        $capacity = $signupList->capacity;
 
         return null !== $capacity
             && $this->signupRepository->countConfirmedAdmitted($signupList) < $capacity;
@@ -338,28 +338,28 @@ final readonly class SignupManager
     ): void {
         $existing = [];
         foreach ($signup->getFieldValues() as $fieldValue) {
-            $existing[intval($fieldValue->getField()->getId())] = $fieldValue;
+            $existing[intval($fieldValue->field->getId())] = $fieldValue;
         }
 
-        foreach ($signup->getSignupList()->getFields() as $field) {
+        foreach ($signup->signupList->getFields() as $field) {
             $fieldValue = $existing[intval($field->getId())] ?? null;
             if (null === $fieldValue) {
                 $fieldValue = new SignupFieldValue();
-                $fieldValue->setField($field);
-                $fieldValue->setSignup($signup);
+                $fieldValue->field = $field;
+                $fieldValue->signup = $signup;
                 $signup->getFieldValues()->add($fieldValue);
             }
 
-            $fieldValue->setValue(null);
-            $fieldValue->setOption(null);
+            $fieldValue->value = null;
+            $fieldValue->option = null;
 
             $submitted = $fieldData[intval($field->getId())] ?? null;
 
-            switch ($field->getType()) {
+            switch ($field->type) {
                 case SignupFieldTypes::Choice:
                     foreach ($field->getOptions() as $option) {
                         if ($option->getId() === (int) $submitted) {
-                            $fieldValue->setOption($option);
+                            $fieldValue->option = $option;
 
                             break;
                         }
@@ -367,12 +367,16 @@ final readonly class SignupManager
 
                     break;
                 case SignupFieldTypes::YesNo:
-                    $fieldValue->setValue('1' === strval($submitted) ? 'Yes' : 'No');
+                    $fieldValue->value = '1' === strval($submitted)
+                        ? 'Yes'
+                        : 'No';
 
                     break;
                 default:
                     // Text and Number are both stored as their raw string.
-                    $fieldValue->setValue(null === $submitted ? null : strval($submitted));
+                    $fieldValue->value = null === $submitted
+                        ? null
+                        : strval($submitted);
             }
         }
     }

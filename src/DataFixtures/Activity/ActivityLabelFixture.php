@@ -59,7 +59,10 @@ class ActivityLabelFixture extends Fixture implements FixtureGroupInterface
 
         foreach ($labels as $reference => $data) {
             $label = new ActivityLabel();
-            $label->setName(new ActivityLocalisedText($data['en'], $data['nl']));
+            $label->name = new ActivityLocalisedText(
+                $data['en'],
+                $data['nl'],
+            );
 
             $manager->persist($label);
             $this->addReference(

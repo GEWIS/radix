@@ -97,7 +97,7 @@ final readonly class NotifyOnProposalDecisionListener
             $type,
             [
                 'proposal' => strval($proposalId),
-                'proposalName' => $proposal->getName(),
+                'proposalName' => $proposal->name,
             ],
             $level,
         );

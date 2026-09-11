@@ -146,19 +146,19 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
 
         $draft->setLastEditedBy($this->user(8025));
         $list = new SignupList();
-        $list->setName(new ActivityLocalisedText(
+        $list->name = new ActivityLocalisedText(
             'Deelnemers',
             'Participants',
-        ));
-        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
-        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+        );
+        $list->openDate = new DateTime('2030-01-01 12:00');
+        $list->closeDate = new DateTime('2030-02-01 12:00');
         $draft->addSignupList($list);
 
         $edit = new ActivityRevisionEdit();
-        $edit->setRevision($draft);
+        $edit->revision = $draft;
         $edit->setEditor($this->user(8025));
-        $edit->setEditedAt(new DateTime());
-        $edit->setChangedFields(['name']);
+        $edit->editedAt = new DateTime();
+        $edit->changedFields = ['name'];
         $this->entityManager->persist($edit);
         $this->entityManager->flush();
 
@@ -200,7 +200,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
     {
         $draft = $this->aNeverApprovedDraft();
         $list = new SignupList();
-        $list->setName(new ActivityLocalisedText());
+        $list->name = new ActivityLocalisedText();
         $draft->addSignupList($list);
 
         $this->authenticateAsBoardWithSudo();

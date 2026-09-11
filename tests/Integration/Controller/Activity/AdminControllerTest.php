@@ -41,13 +41,13 @@ final class AdminControllerTest extends DatabaseTestCase
         );
         self::assertTrue($activity->isCancelled());
         self::assertTrue($activity->isFrozen());
-        self::assertNotNull($activity->getCancelledBy());
+        self::assertNotNull($activity->cancelledBy);
 
         $this->controller()->uncancel($activity);
 
         self::assertFalse($activity->isCancelled());
         self::assertFalse($activity->isFrozen());
-        self::assertNull($activity->getCancelledBy());
+        self::assertNull($activity->cancelledBy);
     }
 
     public function testUnpublishAndRepublishAnApprovedActivity(): void
@@ -65,13 +65,13 @@ final class AdminControllerTest extends DatabaseTestCase
 
         self::assertTrue($activity->isUnpublished());
         self::assertTrue($activity->isFrozen());
-        self::assertNotNull($activity->getUnpublishedBy());
+        self::assertNotNull($activity->unpublishedBy);
 
         $this->controller()->republish($activity);
 
         self::assertFalse($activity->isUnpublished());
         self::assertFalse($activity->isFrozen());
-        self::assertNull($activity->getUnpublishedBy());
+        self::assertNull($activity->unpublishedBy);
     }
 
     public function testCancelIsRefusedForAnActivityWithoutALiveRevision(): void
@@ -168,8 +168,8 @@ final class AdminControllerTest extends DatabaseTestCase
         $revision = $activity->getLiveRevision();
         self::assertNotNull($revision);
 
-        $revision->setBeginTime(new DateTime('-2 days'));
-        $revision->setEndTime(new DateTime('-1 day'));
+        $revision->beginTime = new DateTime('-2 days');
+        $revision->endTime = new DateTime('-1 day');
 
         self::assertTrue($activity->hasPassed());
     }

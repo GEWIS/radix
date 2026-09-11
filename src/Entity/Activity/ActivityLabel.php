@@ -62,7 +62,7 @@ class ActivityLabel
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $name;
+    public ActivityLocalisedText $name;
 
     public function __construct()
     {
@@ -87,16 +87,6 @@ class ActivityLabel
         $this->revisions->removeElement($revision);
     }
 
-    public function getName(): ActivityLocalisedText
-    {
-        return $this->name;
-    }
-
-    public function setName(ActivityLocalisedText $name): void
-    {
-        $this->name = $name;
-    }
-
     /**
      * @return ActivityRevision[]
      */
@@ -112,8 +102,8 @@ class ActivityLabel
     {
         return [
             'id' => $this->getId(),
-            'name' => $this->getName()->getValueNL(),
-            'nameEn' => $this->getName()->getValueEN(),
+            'name' => $this->name->getValueNL(),
+            'nameEn' => $this->name->getValueEN(),
         ];
     }
 
@@ -124,7 +114,7 @@ class ActivityLabel
     {
         return [
             'id' => $this->getId(),
-            'name' => $this->getName()->toGdprArray(),
+            'name' => $this->name->toGdprArray(),
         ];
     }
 }

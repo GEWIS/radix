@@ -52,10 +52,10 @@ final class SignupManagerTest extends DatabaseTestCase
 
         self::assertSame(
             $member->getLidnr(),
-            $signup->getUser()->getLidnr(),
+            $signup->user->getLidnr(),
         );
         // The list is limited, so the member starts on the waiting list until the organiser draws.
-        self::assertFalse($signup->isDrawn());
+        self::assertFalse($signup->drawn);
         $this->assertAnswersStored(
             $signup,
             $answers,
@@ -75,7 +75,7 @@ final class SignupManagerTest extends DatabaseTestCase
             [],
         );
 
-        self::assertTrue($signup->isDrawn());
+        self::assertTrue($signup->drawn);
     }
 
     public function testCreateUserSignupAfterALockedDrawIsAdmittedWhileCapacityRemains(): void
@@ -90,7 +90,7 @@ final class SignupManagerTest extends DatabaseTestCase
             [],
         );
 
-        self::assertTrue($signup->isDrawn());
+        self::assertTrue($signup->drawn);
     }
 
     public function testCreateUserSignupAfterALockedDrawIsWaitlistedWhenTheListIsFull(): void
@@ -104,7 +104,7 @@ final class SignupManagerTest extends DatabaseTestCase
             [],
         );
 
-        self::assertFalse($signup->isDrawn());
+        self::assertFalse($signup->drawn);
     }
 
     public function testOrganiserAddedExternalAfterALockedDrawIsAdmittedWhileCapacityRemains(): void
@@ -118,7 +118,7 @@ final class SignupManagerTest extends DatabaseTestCase
             [],
         );
 
-        self::assertTrue($signup->isDrawn());
+        self::assertTrue($signup->drawn);
     }
 
     public function testASelfServiceExternalIsOnlyAdmittedAtConfirmation(): void
@@ -133,7 +133,7 @@ final class SignupManagerTest extends DatabaseTestCase
             'prompt.guest@example.org',
             [],
         );
-        self::assertFalse($signup->isDrawn());
+        self::assertFalse($signup->drawn);
 
         // ... and confirming is the moment the first-come-first-served decision happens.
         $this->signupManager()->confirmExternalSignup($this->tokenFor(
@@ -141,7 +141,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ExternalSignupVerificationPurpose::Verify,
         ));
 
-        self::assertTrue($signup->isDrawn());
+        self::assertTrue($signup->drawn);
     }
 
     public function testASelfServiceExternalStaysWaitlistedAtConfirmationWhenTheListIsFull(): void
@@ -160,7 +160,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ExternalSignupVerificationPurpose::Verify,
         ));
 
-        self::assertFalse($signup->isDrawn());
+        self::assertFalse($signup->drawn);
     }
 
     public function testCreateExternalSignupIsUnverifiedAndQueuesAVerifyEmail(): void
@@ -188,7 +188,7 @@ final class SignupManagerTest extends DatabaseTestCase
             $signup->getEmail(),
         );
         // A self sign-up, not an organiser entry.
-        self::assertFalse($signup->isAddedManually());
+        self::assertFalse($signup->addedManually);
         $this->assertAnswersStored(
             $signup,
             $answers,
@@ -196,7 +196,7 @@ final class SignupManagerTest extends DatabaseTestCase
 
         // Born unverified: no participation moment yet and a live Verify token exists (so the sign-up is hidden from
         // lists, counts and admission) ...
-        self::assertNull($signup->getVerifiedAt());
+        self::assertNull($signup->verifiedAt);
         self::assertTrue($this->verifications()->hasPendingVerification($signup));
         $verification = $this->tokenFor(
             $signup,
@@ -235,10 +235,10 @@ final class SignupManagerTest extends DatabaseTestCase
         );
 
         // The organiser vouches for the subscriber, and the sign-up is flagged as such ...
-        self::assertTrue($signup->isAddedManually());
+        self::assertTrue($signup->addedManually);
         // ... and there is no double opt-in, so no token and no confirmation e-mail; the sign-up is a participant
         // from the moment it was added.
-        self::assertNotNull($signup->getVerifiedAt());
+        self::assertNotNull($signup->verifiedAt);
         self::assertFalse($this->verifications()->hasPendingVerification($signup));
         self::assertSame(
             [],
@@ -263,7 +263,7 @@ final class SignupManagerTest extends DatabaseTestCase
 
         // The double-opt-in token is gone and the confirmation moment recorded (the sign-up is now live) ...
         self::assertFalse($this->verifications()->hasPendingVerification($signup));
-        self::assertNotNull($signup->getVerifiedAt());
+        self::assertNotNull($signup->verifiedAt);
         // ... replaced by a long-lived manage token for self-service editing.
         $manage = $this->tokenFor(
             $signup,
@@ -544,7 +544,7 @@ final class SignupManagerTest extends DatabaseTestCase
                 's.id',
                 SortDirection::Ascending,
             )
-            ->setMaxResults((int) $list->getCapacity())
+            ->setMaxResults((int) $list->capacity)
             ->setParameter(
                 'list',
                 (int) $list->getId(),
@@ -637,7 +637,7 @@ final class SignupManagerTest extends DatabaseTestCase
     ): array {
         $answers = [];
         foreach ($list->getFields() as $field) {
-            if (SignupFieldTypes::Choice === $field->getType()) {
+            if (SignupFieldTypes::Choice === $field->type) {
                 $options = $field->getOptions()->getValues();
                 $answers[(int) $field->getId()] = (int) $options[$optionIndex]->getId();
 
@@ -667,23 +667,23 @@ final class SignupManagerTest extends DatabaseTestCase
         );
 
         foreach ($signup->getFieldValues() as $value) {
-            $submitted = $answers[(int) $value->getField()->getId()];
+            $submitted = $answers[(int) $value->field->getId()];
 
-            if (SignupFieldTypes::Choice === $value->getField()->getType()) {
+            if (SignupFieldTypes::Choice === $value->field->type) {
                 self::assertSame(
                     $submitted,
-                    $value->getOption()?->getId(),
+                    $value->option?->getId(),
                 );
-                self::assertNull($value->getValue());
+                self::assertNull($value->value);
 
                 continue;
             }
 
             self::assertSame(
                 strval($submitted),
-                $value->getValue(),
+                $value->value,
             );
-            self::assertNull($value->getOption());
+            self::assertNull($value->option);
         }
     }
 

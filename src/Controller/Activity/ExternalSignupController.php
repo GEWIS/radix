@@ -61,7 +61,7 @@ class ExternalSignupController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $signupList = $verification->getExternalSignup()->getSignupList();
+        $signupList = $verification->externalSignup->signupList;
 
         return $this->render(
             'activity/external-signup-verify.html.twig',
@@ -97,7 +97,7 @@ class ExternalSignupController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $activity = $verification->getExternalSignup()->getSignupList()->getActivity();
+        $activity = $verification->externalSignup->signupList->getActivity();
 
         // A cancelled or unpublished activity has all sign-up interaction frozen: do not confirm, and send the visitor
         // somewhere sensible (an unpublished activity's own page 404s, so fall back to the overview there).
@@ -150,7 +150,7 @@ class ExternalSignupController extends AbstractController
             'activity/external-signup-manage.html.twig',
             [
                 'token' => $token,
-                'activity' => $verification->getExternalSignup()->getSignupList()->getActivity(),
+                'activity' => $verification->externalSignup->signupList->getActivity(),
             ],
         );
     }

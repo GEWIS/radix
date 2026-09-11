@@ -39,9 +39,9 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $this->executeCommand();
 
         $list = $this->list(11);
-        self::assertNotNull($list->getDrawnAt());
+        self::assertNotNull($list->drawnAt);
         // An automated draw has no board member behind it.
-        self::assertNull($list->getDrawnBy());
+        self::assertNull($list->drawnBy);
         // Capacity is two, so exactly two of the four sign-ups are admitted.
         self::assertSame(
             2,
@@ -59,7 +59,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
         $this->executeCommand();
 
-        self::assertNull($this->list(6)->getDrawnAt());
+        self::assertNull($this->list(6)->drawnAt);
     }
 
     public function testIfFullBeforeDrawsAtTheCutoffWhileSignupIsStillOpen(): void
@@ -77,8 +77,8 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $list = $this->list(6);
         // Drawn even though the list is open for another week: the cutoff, not close, is the moment.
         self::assertTrue($list->isOpen());
-        self::assertNotNull($list->getDrawnAt());
-        self::assertNull($list->getDrawnBy());
+        self::assertNotNull($list->drawnAt);
+        self::assertNull($list->drawnBy);
         self::assertSame(
             2,
             $this->drawnCount($list),
@@ -100,7 +100,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
         $list = $this->list(6);
         self::assertTrue($list->isOpen());
-        self::assertNotNull($list->getDrawnAt());
+        self::assertNotNull($list->drawnAt);
     }
 
     public function testAfterDurationOpenLeavesAListWhoseDurationHasNotElapsed(): void
@@ -118,7 +118,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
         $this->executeCommand();
 
-        self::assertNull($this->list(11)->getDrawnAt());
+        self::assertNull($this->list(11)->drawnAt);
     }
 
     public function testRespectsTheAdmissionWindow(): void
@@ -133,7 +133,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
         $this->executeCommand();
 
-        self::assertNull($this->list(11)->getDrawnAt());
+        self::assertNull($this->list(11)->drawnAt);
     }
 
     public function testDrawsAFirstComeFirstServedListAtCloseInSignupOrder(): void
@@ -148,7 +148,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $this->executeCommand();
 
         $list = $this->list(11);
-        self::assertNotNull($list->getDrawnAt());
+        self::assertNotNull($list->drawnAt);
         // First-come-first-served admits in creation order: the two earliest sign-ups, never a shuffle.
         $expected = [];
         $actual = [];
@@ -157,7 +157,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
                 $expected[] = $signup->getId();
             }
 
-            if (!$signup->isDrawn()) {
+            if (!$signup->drawn) {
                 continue;
             }
 
@@ -192,7 +192,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $this->executeCommand();
 
         $list = $this->list(6);
-        self::assertNotNull($list->getDrawnAt());
+        self::assertNotNull($list->drawnAt);
         // Two of the four members are admitted; the unverified external took part in nothing.
         self::assertSame(
             2,
@@ -203,7 +203,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
                 continue;
             }
 
-            self::assertFalse($signup->isDrawn());
+            self::assertFalse($signup->drawn);
         }
     }
 
@@ -241,7 +241,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $this->executeCommand();
 
         $list = $this->list(6);
-        self::assertNotNull($list->getDrawnAt());
+        self::assertNotNull($list->drawnAt);
         self::assertSame(
             [
                 $ids[2],
@@ -421,7 +421,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         $this->executeCommand();
 
         $this->entityManager->clear();
-        self::assertNull($this->list((int) $list->getId())->getDrawnAt());
+        self::assertNull($this->list((int) $list->getId())->drawnAt);
     }
 
     private function listWithARole(): SignupList
@@ -471,7 +471,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     {
         $drawn = 0;
         foreach ($list->getSignUps() as $signup) {
-            if (!$signup->isDrawn()) {
+            if (!$signup->drawn) {
                 continue;
             }
 
@@ -490,7 +490,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     {
         $ids = [];
         foreach ($list->getSignUps() as $signup) {
-            if (!$signup->isDrawn()) {
+            if (!$signup->drawn) {
                 continue;
             }
 
@@ -596,7 +596,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
         ?int $durationHours = null,
         ?int $capacity = null,
     ): void {
-        $revisionId = $this->list($listId)->getRevision()->getId();
+        $revisionId = $this->list($listId)->revision->getId();
         $connection = $this->entityManager->getConnection();
 
         $fields = [

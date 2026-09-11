@@ -49,17 +49,17 @@ final class AdminOptionPeriodControllerTest extends DatabaseTestCase
         $this->pushRequestWithSession();
 
         $period = new OptionPeriod();
-        $period->setName('A round nobody used');
-        $period->setSubmissionOpensAt(new DateTime('-1 day'));
-        $period->setSubmissionClosesAt(new DateTime('+1 day'));
-        $period->setStartsAt(new DateTime('+300 days'));
-        $period->setEndsAt(new DateTime('+390 days'));
+        $period->name = 'A round nobody used';
+        $period->submissionOpensAt = new DateTime('-1 day');
+        $period->submissionClosesAt = new DateTime('+1 day');
+        $period->startsAt = new DateTime('+300 days');
+        $period->endsAt = new DateTime('+390 days');
         $this->entityManager->persist($period);
 
         $limit = new PeriodProposalLimit();
-        $limit->setPeriod($period);
-        $limit->setOrgan($this->entityManager->getRepository(Organ::class)->findAll()[0]);
-        $limit->setMaxProposals(1);
+        $limit->period = $period;
+        $limit->organ = $this->entityManager->getRepository(Organ::class)->findAll()[0];
+        $limit->maxProposals = 1;
         $this->entityManager->persist($limit);
         $this->entityManager->flush();
 

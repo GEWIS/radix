@@ -23,12 +23,12 @@ final class RevisionApprovalWiringTest extends DatabaseTestCase
     public function testApprovingAnActivityRevisionPromotesItLiveAndStampsTheReview(): void
     {
         $revision = $this->aBrandNewInReviewRevision();
-        $activity = $revision->getActivity();
+        $activity = $revision->activity;
 
         // Neutralise the past-activity guard; the seed's dates are orthogonal here and already covered by
         // PastActivityGuardListenerTest.
-        $revision->setBeginTime(new DateTime('+1 month'));
-        $revision->setEndTime(new DateTime('+1 month +2 hours'));
+        $revision->beginTime = new DateTime('+1 month');
+        $revision->endTime = new DateTime('+1 month +2 hours');
 
         $this->authenticateBoardMember();
 

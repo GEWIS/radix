@@ -81,7 +81,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testDeletesAStaleNeverApprovedActivityEntirely(): void
     {
         $draft = $this->aNeverApprovedActivityDraft();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
         $this->backdate(
             ActivityRevision::class,
             (int) $draft->getId(),
@@ -103,7 +103,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testDryRunReportsButChangesNothing(): void
     {
         $draft = $this->aNeverApprovedActivityDraft();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
         $draftId = (int) $draft->getId();
         $this->backdate(
             ActivityRevision::class,
@@ -171,7 +171,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testKeepsAnUntouchedHeadWhoseActivityIsStillToCome(): void
     {
         $draft = $this->aNeverApprovedActivityDraft();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
         $draftId = (int) $draft->getId();
         $this->backdate(
             ActivityRevision::class,
@@ -435,7 +435,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testKeepsAStaleActivityThatSomehowHasSignups(): void
     {
         $draft = $this->aNeverApprovedActivityDraftWithASignup();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
 
         $this->executeCommand();
 
@@ -452,7 +452,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testForceDeletesAStaleActivityTogetherWithItsSignups(): void
     {
         $draft = $this->aNeverApprovedActivityDraftWithASignup();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
         $signupId = (int) $this->theSignupOn($draft)->getId();
 
         $this->executeCommand(['--force' => true]);
@@ -478,7 +478,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testForceStillOnlyReachesWhatIsAlreadyStale(): void
     {
         $draft = $this->aNeverApprovedActivityDraftWithASignup();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
         $this->backdate(
             ActivityRevision::class,
             (int) $draft->getId(),
@@ -499,7 +499,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testAForcedDryRunReportsTheActivityButLeavesItStanding(): void
     {
         $draft = $this->aNeverApprovedActivityDraftWithASignup();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
 
         $this->executeCommand([
             '--force' => true,
@@ -518,7 +518,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     public function testDecliningTheConfirmationForcesNothing(): void
     {
         $draft = $this->aNeverApprovedActivityDraftWithASignup();
-        $activityId = (int) $draft->getActivity()->getId();
+        $activityId = (int) $draft->activity->getId();
 
         $this->executeCommand(
             ['--force' => true],
@@ -846,45 +846,39 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $draft = $this->aNeverApprovedActivityDraft();
 
         $signupList = new SignupList();
-        $signupList->setName(
-            new ActivityLocalisedText(
-                'Attendees',
-                'Aanwezigen',
-            ),
+        $signupList->name = new ActivityLocalisedText(
+            'Attendees',
+            'Aanwezigen',
         );
-        $signupList->setRevision($draft);
+        $signupList->revision = $draft;
         $draft->addSignupList($signupList);
 
         $field = new SignupField();
-        $field->setName(
-            new ActivityLocalisedText(
-                'Preference',
-                'Voorkeur',
-            ),
+        $field->name = new ActivityLocalisedText(
+            'Preference',
+            'Voorkeur',
         );
-        $field->setType(SignupFieldTypes::Choice);
-        $field->setPosition(0);
+        $field->type = SignupFieldTypes::Choice;
+        $field->position = 0;
 
         $option = new SignupOption();
-        $option->setValue(
-            new ActivityLocalisedText(
-                'Either',
-                'Maakt niet uit',
-            ),
+        $option->value = new ActivityLocalisedText(
+            'Either',
+            'Maakt niet uit',
         );
-        $option->setPosition(0);
+        $option->position = 0;
         $field->addOption($option);
         $signupList->addField($field);
 
         $signup = new UserSignup();
-        $signup->setSignupList($signupList);
-        $signup->setUser($this->aMember());
+        $signup->signupList = $signupList;
+        $signup->user = $this->aMember();
         $signupList->getSignUps()->add($signup);
 
         $fieldValue = new SignupFieldValue();
-        $fieldValue->setSignup($signup);
-        $fieldValue->setField($field);
-        $fieldValue->setOption($option);
+        $fieldValue->signup = $signup;
+        $fieldValue->field = $field;
+        $fieldValue->option = $option;
         $signup->getFieldValues()->add($fieldValue);
 
         $this->entityManager->persist($signupList);

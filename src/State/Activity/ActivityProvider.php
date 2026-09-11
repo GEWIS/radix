@@ -177,25 +177,25 @@ final readonly class ActivityProvider implements ProviderInterface
         $revision = $activity->getLiveRevision();
         assert(null !== $revision);
 
-        $beginTime = $revision->getBeginTime();
+        $beginTime = $revision->beginTime;
         assert(null !== $beginTime);
 
-        $endTime = $revision->getEndTime();
+        $endTime = $revision->endTime;
         assert(null !== $endTime);
 
         return new ActivityResource(
             id: $id,
-            name: $this->text($revision->getName()),
-            description: $this->text($revision->getDescription()),
-            location: $this->text($revision->getLocation()),
-            costs: $this->text($revision->getCosts()),
+            name: $this->text($revision->name),
+            description: $this->text($revision->description),
+            location: $this->text($revision->location),
+            costs: $this->text($revision->costs),
             beginTime: $beginTime->format(DateTimeInterface::ATOM),
             endTime: $endTime->format(DateTimeInterface::ATOM),
-            category: $revision->getCategory()->value,
+            category: $revision->category->value,
             organ: $this->organ($revision),
             company: $this->company($revision),
-            requireGEFLITST: $revision->getRequireGEFLITST(),
-            requireZettle: $revision->getRequireZettle(),
+            requireGEFLITST: $revision->requireGEFLITST,
+            requireZettle: $revision->requireZettle,
             cancelled: $activity->isCancelled(),
             labels: $this->labels($revision),
             signupLists: $this->signupLists($activity),
@@ -218,7 +218,7 @@ final readonly class ActivityProvider implements ProviderInterface
      */
     private function organ(ActivityRevision $revision): ?array
     {
-        $organ = $revision->getOrgan();
+        $organ = $revision->organ;
 
         if (null === $organ) {
             return null;
@@ -239,7 +239,7 @@ final readonly class ActivityProvider implements ProviderInterface
      */
     private function company(ActivityRevision $revision): ?array
     {
-        $company = $revision->getCompany();
+        $company = $revision->company;
 
         if (null === $company) {
             return null;
@@ -267,7 +267,7 @@ final readonly class ActivityProvider implements ProviderInterface
 
             $labels[] = [
                 'id' => $id,
-                'name' => $this->text($label->getName()),
+                'name' => $this->text($label->name),
             ];
         }
 
@@ -285,18 +285,18 @@ final readonly class ActivityProvider implements ProviderInterface
             $id = $signupList->getId();
             assert(null !== $id);
 
-            $openDate = $signupList->getOpenDate();
-            $closeDate = $signupList->getCloseDate();
+            $openDate = $signupList->openDate;
+            $closeDate = $signupList->closeDate;
             assert(null !== $openDate && null !== $closeDate);
 
             $signupLists[] = [
                 'id' => $id,
-                'name' => $this->text($signupList->getName()),
+                'name' => $this->text($signupList->name),
                 'openDate' => $openDate->format(DateTimeInterface::ATOM),
                 'closeDate' => $closeDate->format(DateTimeInterface::ATOM),
-                'onlyGEWIS' => $signupList->getOnlyGEWIS(),
-                'limitedCapacity' => $signupList->getLimitedCapacity(),
-                'capacity' => $signupList->getCapacity(),
+                'onlyGEWIS' => $signupList->onlyGEWIS,
+                'limitedCapacity' => $signupList->limitedCapacity,
+                'capacity' => $signupList->capacity,
             ];
         }
 

@@ -220,7 +220,7 @@ final class SignupList
      */
     private function isOpenForSignup(): bool
     {
-        return $this->signupList->getActivity()->getLiveRevision() === $this->signupList->getRevision()
+        return $this->signupList->getActivity()->getLiveRevision() === $this->signupList->revision
             && !$this->signupList->getActivity()->isFrozen()
             && $this->signupList->isOpen();
     }

@@ -49,48 +49,18 @@ class PeriodProposalLimit
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private OptionPeriod $period;
+    public OptionPeriod $period;
 
     #[ManyToOne(targetEntity: Organ::class)]
     #[JoinColumn(
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Organ $organ;
+    public Organ $organ;
 
     /**
      * How many activities this body may propose in this period. Zero is a real answer, deliberately written down.
      */
     #[Column(type: Types::INTEGER)]
-    private int $maxProposals;
-
-    public function getPeriod(): OptionPeriod
-    {
-        return $this->period;
-    }
-
-    public function setPeriod(OptionPeriod $period): void
-    {
-        $this->period = $period;
-    }
-
-    public function getOrgan(): Organ
-    {
-        return $this->organ;
-    }
-
-    public function setOrgan(Organ $organ): void
-    {
-        $this->organ = $organ;
-    }
-
-    public function getMaxProposals(): int
-    {
-        return $this->maxProposals;
-    }
-
-    public function setMaxProposals(int $maxProposals): void
-    {
-        $this->maxProposals = $maxProposals;
-    }
+    public int $maxProposals;
 }

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Service\Activity;
 
 use App\Entity\Activity\Enums\ExternalSignupVerificationPurpose;
+use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\ExternalSignupVerification;
 use App\Repository\Activity\ExternalSignupVerificationRepository;
 use App\Service\Activity\ExternalSignupTokenResolver;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 use function hash;
@@ -115,14 +117,17 @@ final class ExternalSignupTokenResolverTest extends TestCase
         bool $expired,
         string $verifier,
     ): ExternalSignupVerification {
-        $verification = self::createStub(ExternalSignupVerification::class);
-        $verification->method('getPurpose')->willReturn($purpose);
-        $verification->method('isExpired')->willReturn($expired);
-        $verification->method('getHashedToken')->willReturn(hash(
-            ExternalSignupVerification::HASH_ALGO,
-            $verifier,
-        ));
-
-        return $verification;
+        // Built rather than stubbed: the purpose is read-only, and the expiry and the hash a stub would have
+        // answered for are exactly what the constructor is given.
+        return new ExternalSignupVerification(
+            self::createStub(ExternalSignup::class),
+            $purpose,
+            'a-selector',
+            hash(
+                ExternalSignupVerification::HASH_ALGO,
+                $verifier,
+            ),
+            new DateTimeImmutable($expired ? '-1 hour' : '+1 hour'),
+        );
     }
 }

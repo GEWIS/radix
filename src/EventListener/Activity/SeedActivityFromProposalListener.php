@@ -49,7 +49,7 @@ final readonly class SeedActivityFromProposalListener
             return;
         }
 
-        $chosen = $proposal->getChosenOption();
+        $chosen = $proposal->chosenOption;
 
         // Scheduling without a day picked is meaningless; whoever applied the transition owes us one.
         if (null === $chosen) {
@@ -60,10 +60,10 @@ final readonly class SeedActivityFromProposalListener
         // queue, from a script or from a test all end up in the same state: the chosen day held, every other day the
         // body asked for released for whoever is next in line.
         $proposal->declineDateOptionsOtherThan($chosen);
-        $chosen->setStatus(DateOptionStatus::Approved);
+        $chosen->status = DateOptionStatus::Approved;
 
         // Reopening and scheduling again must not start a second activity.
-        if (null !== $proposal->getActivity()) {
+        if (null !== $proposal->activity) {
             return;
         }
 
@@ -74,33 +74,33 @@ final readonly class SeedActivityFromProposalListener
             return;
         }
 
-        $revision->setOrgan($proposal->getOrgan());
-        $revision->setName(new ActivityLocalisedText(
-            $proposal->getName(),
-            $proposal->getName(),
-        ));
+        $revision->organ = $proposal->organ;
+        $revision->name = new ActivityLocalisedText(
+            $proposal->name,
+            $proposal->name,
+        );
 
-        $description = $proposal->getDescription();
+        $description = $proposal->description;
 
         if (null !== $description) {
-            $revision->setDescription(new ActivityLocalisedText(
+            $revision->description = new ActivityLocalisedText(
                 $description,
                 $description,
-            ));
+            );
         }
 
-        $revision->setBeginTime($this->startOf($chosen));
-        $revision->setEndTime($this->endOf($chosen));
+        $revision->beginTime = $this->startOf($chosen);
+        $revision->endTime = $this->endOf($chosen);
 
         $this->entityManager->persist($activity);
-        $proposal->setActivity($activity);
+        $proposal->activity = $activity;
     }
 
     private function startOf(ActivityDateOption $option): DateTime
     {
         return new DateTime(sprintf(
             '%s 00:00:00',
-            $option->getBeginsAt()->format('Y-m-d'),
+            $option->beginsAt->format('Y-m-d'),
         ));
     }
 
@@ -108,7 +108,7 @@ final readonly class SeedActivityFromProposalListener
     {
         return new DateTime(sprintf(
             '%s 23:59:59',
-            $option->getEndsAt()->format('Y-m-d'),
+            $option->endsAt->format('Y-m-d'),
         ));
     }
 }

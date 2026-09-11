@@ -185,7 +185,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
 
         // When this revision restructured/removed a sign-up list that the live revision has sign-ups on, the workflow
         // withholds approve/submit (SignupMigrationGuardListener); explain why on the screen.
-        $live = $revision->getActivity()->getLiveRevision();
+        $live = $revision->activity->getLiveRevision();
         $migrationBlocked = null !== $live
             && $live !== $revision
             && !$this->signupListMigrator->isMigratable(
@@ -209,8 +209,8 @@ class AdminApprovalController extends AbstractRevisionReviewController
         $unfinished = SignupListRule::firstUnfinished($revision);
 
         return [
-            'activity' => $revision->getActivity(),
-            'comments' => $this->commentRepository->findThreadForActivity($revision->getActivity()),
+            'activity' => $revision->activity,
+            'comments' => $this->commentRepository->findThreadForActivity($revision->activity),
             'migrationBlocked' => $migrationBlocked,
             'activityPassed' => $liveEnded || $debutMissed,
             'debutMissed' => $debutMissed,

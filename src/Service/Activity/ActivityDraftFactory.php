@@ -28,11 +28,11 @@ final readonly class ActivityDraftFactory
     public function newRevision(): ActivityRevision
     {
         $revision = new ActivityRevision();
-        $revision->setName(new ActivityLocalisedText());
-        $revision->setLocation(new ActivityLocalisedText());
-        $revision->setCosts(new ActivityLocalisedText());
-        $revision->setDescription(new ActivityLocalisedText());
-        $revision->setCategory(ActivityCategories::Other);
+        $revision->name = new ActivityLocalisedText();
+        $revision->location = new ActivityLocalisedText();
+        $revision->costs = new ActivityLocalisedText();
+        $revision->description = new ActivityLocalisedText();
+        $revision->category = ActivityCategories::Other;
 
         return $revision;
     }

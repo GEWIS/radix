@@ -42,7 +42,7 @@ final readonly class MigrateSignupsOnApprovalListener
             return;
         }
 
-        $activity = $revision->getActivity();
+        $activity = $revision->activity;
         $outgoing = $activity->getLiveRevision();
 
         if (

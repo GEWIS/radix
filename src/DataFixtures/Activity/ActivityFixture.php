@@ -967,8 +967,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 1,
                 null,
             );
-            $revision->setRequireGEFLITST($data['requireGEFLITST']);
-            $revision->setRequireZettle($data['requireZettle']);
+            $revision->requireGEFLITST = $data['requireGEFLITST'];
+            $revision->requireZettle = $data['requireZettle'];
 
             foreach ($data['labels'] ?? [] as $labelReference) {
                 $revision->addLabel($this->getReference($labelReference, ActivityLabel::class));
@@ -976,21 +976,17 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
             // The organ behind the activity, which is what the places held for the organising body are read against.
             if (isset($data['organ'])) {
-                $revision->setOrgan(
-                    $this->getReference(
-                        $data['organ'],
-                        Organ::class,
-                    ),
+                $revision->organ = $this->getReference(
+                    $data['organ'],
+                    Organ::class,
                 );
             }
 
             // The organising company (a reviewable, display-only field) surfaces on that company's career detail page.
             if (isset($data['company'])) {
-                $revision->setCompany(
-                    $this->getReference(
-                        'career-company-' . $data['company'],
-                        Company::class,
-                    ),
+                $revision->company = $this->getReference(
+                    'career-company-' . $data['company'],
+                    Company::class,
                 );
             }
 
@@ -1024,17 +1020,23 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 $fields = [];
                 foreach ($signupListData['fields'] ?? [] as $fieldIndex => $fieldData) {
                     $field = new SignupField();
-                    $field->setName(new ActivityLocalisedText($fieldData['name']['en'], $fieldData['name']['nl']));
-                    $field->setType($fieldData['type']);
-                    $field->setPosition($fieldIndex);
+                    $field->name = new ActivityLocalisedText(
+                        $fieldData['name']['en'],
+                        $fieldData['name']['nl'],
+                    );
+                    $field->type = $fieldData['type'];
+                    $field->position = $fieldIndex;
                     $signupList->addField($field);
 
                     $options = [];
                     foreach ($fieldData['options'] ?? [] as $optionIndex => $optionData) {
                         $option = new SignupOption();
-                        $option->setValue(new ActivityLocalisedText($optionData['en'], $optionData['nl']));
-                        $option->setPosition($optionIndex);
-                        $option->setIsDefault($optionData['default'] ?? false);
+                        $option->value = new ActivityLocalisedText(
+                            $optionData['en'],
+                            $optionData['nl'],
+                        );
+                        $option->position = $optionIndex;
+                        $option->isDefault = $optionData['default'] ?? false;
                         $field->addOption($option);
                         $options[$optionData['en']] = $option;
                     }
@@ -1053,22 +1055,25 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                         : ['member' => $subscriber];
 
                     $signup = new UserSignup();
-                    $signup->setSignupList($signupList);
-                    $signup->setUser($this->getReference('member-' . $entry['member'], Member::class));
+                    $signup->signupList = $signupList;
+                    $signup->user = $this->getReference(
+                        'member-' . $entry['member'],
+                        Member::class,
+                    );
                     // A sign-up to a limited list starts on the waiting list (not drawn) until the organiser admits it;
                     // a sign-up to an unlimited list is admitted automatically. The future public subscribe flow MUST
                     // apply this same rule (drawn = !limitedCapacity) when it creates sign-ups.
-                    $signup->setDrawn($entry['drawn'] ?? !$signupList->getLimitedCapacity());
-                    $signup->setPresent($entry['present'] ?? false);
+                    $signup->drawn = $entry['drawn'] ?? !$signupList->limitedCapacity;
+                    $signup->present = $entry['present'] ?? false;
                     // A role is handed out by the organiser once sign-up has closed, so the draw has something to
                     // make up the shortfall from.
                     if (isset($entry['role'])) {
                         foreach ($signupList->getRoles() as $role) {
-                            if ($role->getName() !== $entry['role']) {
+                            if ($role->name !== $entry['role']) {
                                 continue;
                             }
 
-                            $signup->setRole($role);
+                            $signup->role = $role;
                         }
                     }
 
@@ -1089,17 +1094,17 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
                 foreach ($signupListData['externals'] ?? [] as $index => $external) {
                     $signup = new ExternalSignup();
-                    $signup->setSignupList($signupList);
+                    $signup->signupList = $signupList;
                     $signup->setFullName($external['fullName']);
                     $signup->setEmail($external['email']);
                     // No token rows are seeded, so seeded externals are confirmed subscribers, mirroring the
                     // organiser-add path; without the stamp they would count as unverified everywhere.
-                    $signup->setVerifiedAt($this->signedUp(
+                    $signup->verifiedAt = $this->signedUp(
                         $signup,
                         count($signupListData['subscribers'] ?? []) + $index,
-                    ));
-                    $signup->setDrawn($external['drawn']);
-                    $signup->setPresent($external['present']);
+                    );
+                    $signup->drawn = $external['drawn'];
+                    $signup->present = $external['present'];
                     $signups[] = $signup;
                     $manager->persist($signup);
 
@@ -1115,7 +1120,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 // the order the modifiers put it in, the first capacity of it admitted, and everybody holding the
                 // place they were given. Seeding that by hand would be seeding a claim about the algorithm.
                 if ($signupListData['draw'] ?? false) {
-                    $capacity = $signupList->getCapacity() ?? 0;
+                    $capacity = $signupList->capacity ?? 0;
                     $position = 0;
 
                     foreach (
@@ -1124,8 +1129,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                             $signups,
                         ) as $signup
                     ) {
-                        $signup->setDrawn($position < $capacity);
-                        $signup->setDrawPosition(++$position);
+                        $signup->drawn = $position < $capacity;
+                        $signup->drawPosition = ++$position;
                     }
 
                     continue;
@@ -1139,11 +1144,11 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 $position = 0;
                 foreach ([true, false] as $admitted) {
                     foreach ($signups as $signup) {
-                        if ($signup->isDrawn() !== $admitted) {
+                        if ($signup->drawn !== $admitted) {
                             continue;
                         }
 
-                        $signup->setDrawPosition(++$position);
+                        $signup->drawPosition = ++$position;
                     }
                 }
             }
@@ -1176,7 +1181,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         Signup $signup,
         int $index,
     ): DateTime {
-        $openDate = $signup->getSignupList()->getOpenDate();
+        $openDate = $signup->signupList->openDate;
         $now = new DateTime();
 
         if (
@@ -1691,7 +1696,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             1,
             null,
         );
-        $hackathonRevision->setOrgan($getest);
+        $hackathonRevision->organ = $getest;
         $hackathon->addRevision($hackathonRevision);
         $hackathon->setCurrentRevision($hackathonRevision);
         $manager->persist($hackathon);
@@ -1733,7 +1738,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         );
         $beerRevision1->setReviewer($boardA);
         $beerRevision1->setReviewedAt(new DateTime('-2 days'));
-        $beerRevision1->setOrgan($getest);
+        $beerRevision1->organ = $getest;
         $beer->addRevision($beerRevision1);
         $manager->persist($beer);
         $manager->persist($beerRevision1);
@@ -1776,7 +1781,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             2,
             $beerRevision1,
         );
-        $beerRevision2->setOrgan($getest);
+        $beerRevision2->organ = $getest;
         $beer->addRevision($beerRevision2);
         $beer->setCurrentRevision($beerRevision2);
         $manager->persist($beerRevision2);
@@ -1818,7 +1823,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         $casinoRevision->setReviewer($boardB);
         $casinoRevision->setReviewedAt(new DateTime('-5 days'));
         // KEUR (disjoint from GETÉST) so organ scoping can be told apart between the two organs.
-        $casinoRevision->setOrgan($keur);
+        $casinoRevision->organ = $keur;
         $casino->addRevision($casinoRevision);
         $casino->setCurrentRevision($casinoRevision);
         $manager->persist($casino);
@@ -1865,18 +1870,25 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
         $revision->setRevisionNumber($revisionNumber);
         $revision->setPreviousRevision($previous);
-        $revision->setName(new ActivityLocalisedText($content['name']['en'], $content['name']['nl']));
-        $revision->setLocation(new ActivityLocalisedText($content['location']['en'], $content['location']['nl']));
-        $revision->setCosts(new ActivityLocalisedText($content['costs']['en'], $content['costs']['nl']));
-        $revision->setDescription(
-            new ActivityLocalisedText(
-                $content['description']['en'],
-                $content['description']['nl'],
-            ),
+        $revision->name = new ActivityLocalisedText(
+            $content['name']['en'],
+            $content['name']['nl'],
         );
-        $revision->setBeginTime(new DateTime($content['beginTime']));
-        $revision->setEndTime(new DateTime($content['endTime']));
-        $revision->setCategory($content['category']);
+        $revision->location = new ActivityLocalisedText(
+            $content['location']['en'],
+            $content['location']['nl'],
+        );
+        $revision->costs = new ActivityLocalisedText(
+            $content['costs']['en'],
+            $content['costs']['nl'],
+        );
+        $revision->description = new ActivityLocalisedText(
+            $content['description']['en'],
+            $content['description']['nl'],
+        );
+        $revision->beginTime = new DateTime($content['beginTime']);
+        $revision->endTime = new DateTime($content['endTime']);
+        $revision->category = $content['category'];
 
         return $revision;
     }
@@ -1903,44 +1915,52 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
     private function createSignupList(array $data): SignupList
     {
         $signupList = new SignupList();
-        $signupList->setName(new ActivityLocalisedText($data['name']['en'], $data['name']['nl']));
-        $signupList->setOpenDate(new DateTime($data['openDate']));
-        $signupList->setCloseDate(new DateTime($data['closeDate']));
-        $signupList->setOnlyGEWIS($data['onlyGEWIS']);
-        $signupList->setDisplaySubscribedNumber($data['displaySubscribedNumber']);
-        $signupList->setLimitedCapacity($data['limitedCapacity']);
-        $signupList->setCapacity($data['capacity'] ?? null);
-        $signupList->setAllocationMethod($data['allocationMethod'] ?? AllocationMethod::FirstComeFirstServed);
-        $signupList->setDrawCutoffRule($data['drawCutoffRule'] ?? null);
-        $signupList->setDrawCutoffAt(isset($data['drawCutoffAt']) ? new DateTime($data['drawCutoffAt']) : null);
-        $signupList->setDrawAfterDurationHours($data['drawAfterDurationHours'] ?? null);
-        $signupList->setExternalPolicyUrl($data['externalPolicyUrl'] ?? null);
-        $signupList->setCustomMethodDescription($data['customMethodDescription'] ?? null);
-        $signupList->setPromoted($data['promoted'] ?? false);
-        $signupList->setPresenceTaken($data['presenceTaken'] ?? false);
+        $signupList->name = new ActivityLocalisedText(
+            $data['name']['en'],
+            $data['name']['nl'],
+        );
+        $signupList->openDate = new DateTime($data['openDate']);
+        $signupList->closeDate = new DateTime($data['closeDate']);
+        $signupList->onlyGEWIS = $data['onlyGEWIS'];
+        $signupList->displaySubscribedNumber = $data['displaySubscribedNumber'];
+        $signupList->limitedCapacity = $data['limitedCapacity'];
+        $signupList->capacity = $data['capacity'] ?? null;
+        $signupList->allocationMethod = $data['allocationMethod'] ?? AllocationMethod::FirstComeFirstServed;
+        $signupList->drawCutoffRule = $data['drawCutoffRule'] ?? null;
+        $signupList->drawCutoffAt = isset($data['drawCutoffAt'])
+            ? new DateTime($data['drawCutoffAt'])
+            : null;
+        $signupList->drawAfterDurationHours = $data['drawAfterDurationHours'] ?? null;
+        $signupList->externalPolicyUrl = $data['externalPolicyUrl'] ?? null;
+        $signupList->customMethodDescription = $data['customMethodDescription'] ?? null;
+        $signupList->promoted = $data['promoted'] ?? false;
+        $signupList->presenceTaken = $data['presenceTaken'] ?? false;
         $signupList->setMembershipTierOrder($data['membershipTierOrder'] ?? null);
-        $signupList->setMembershipPriorityMode($data['membershipPriorityMode'] ?? null);
+        $signupList->membershipPriorityMode = $data['membershipPriorityMode'] ?? null;
         $signupList->setHeldMembershipPlaces($data['membershipPlaces'] ?? null);
         $signupList->setCohortTierOrder($data['cohortTierOrder'] ?? null);
         $signupList->setProgramTypeOrder($data['programTypeOrder'] ?? null);
-        $signupList->setOrganisingCommitteePlaces($data['organisingCommitteePlaces'] ?? null);
+        $signupList->organisingCommitteePlaces = $data['organisingCommitteePlaces'] ?? null;
 
         $position = 0;
         foreach ($data['roles'] ?? [] as $role) {
             $signupRole = new SignupRole();
-            $signupRole->setName($role['name']);
-            $signupRole->setMinimum($role['minimum']);
-            $signupRole->setPosition($position++);
+            $signupRole->name = $role['name'];
+            $signupRole->minimum = $role['minimum'];
+            $signupRole->position = $position++;
             $signupList->addRole($signupRole);
         }
 
         // A list that has already been drawn carries its lock and its audit: a board member by lidnr, or nobody at
         // all, which is what an automated draw leaves behind.
         if (isset($data['drawnAt'])) {
-            $signupList->setDrawnAt(new DateTime($data['drawnAt']));
+            $signupList->drawnAt = new DateTime($data['drawnAt']);
 
             if (isset($data['drawnBy'])) {
-                $signupList->setDrawnBy($this->getReference('member-' . $data['drawnBy'], Member::class));
+                $signupList->drawnBy = $this->getReference(
+                    'member-' . $data['drawnBy'],
+                    Member::class,
+                );
             }
         }
 
@@ -1967,13 +1987,13 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
             $field = $fields[$fieldName]['field'];
             $fieldValue = new SignupFieldValue();
-            $fieldValue->setSignup($signup);
-            $fieldValue->setField($field);
+            $fieldValue->signup = $signup;
+            $fieldValue->field = $field;
 
-            if (SignupFieldTypes::Choice === $field->getType()) {
-                $fieldValue->setOption($fields[$fieldName]['options'][$answer] ?? null);
+            if (SignupFieldTypes::Choice === $field->type) {
+                $fieldValue->option = $fields[$fieldName]['options'][$answer] ?? null;
             } else {
-                $fieldValue->setValue($answer);
+                $fieldValue->value = $answer;
             }
 
             $manager->persist($fieldValue);

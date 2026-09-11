@@ -117,7 +117,7 @@ final class PastActivityGuardListenerTest extends TestCase
         $activity = new Activity();
         $revision = new ActivityRevision();
         $activity->addRevision($revision);
-        $revision->setBeginTime($beginTime);
+        $revision->beginTime = $beginTime;
 
         return $revision;
     }
@@ -131,7 +131,7 @@ final class PastActivityGuardListenerTest extends TestCase
 
         $live = new ActivityRevision();
         $activity->addRevision($live);
-        $live->setEndTime($liveEndTime);
+        $live->endTime = $liveEndTime;
         $activity->setLiveRevision($live);
 
         $inFlight = new ActivityRevision();

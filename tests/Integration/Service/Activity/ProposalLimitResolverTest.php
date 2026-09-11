@@ -59,11 +59,11 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
     public function testOpeningAPeriodGivesEveryBodyAnAllowanceWithoutWritingAnything(): void
     {
         $period = new OptionPeriod();
-        $period->setName('A round nobody has been set up for');
-        $period->setSubmissionOpensAt(new DateTime('-1 day'));
-        $period->setSubmissionClosesAt(new DateTime('+30 days'));
-        $period->setStartsAt(new DateTime('+200 days'));
-        $period->setEndsAt(new DateTime('+290 days'));
+        $period->name = 'A round nobody has been set up for';
+        $period->submissionOpensAt = new DateTime('-1 day');
+        $period->submissionClosesAt = new DateTime('+30 days');
+        $period->startsAt = new DateTime('+200 days');
+        $period->endsAt = new DateTime('+290 days');
 
         $this->entityManager->persist($period);
         $this->entityManager->flush();
@@ -129,9 +129,9 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
         $keur = $this->body('KEUR');
 
         $override = new PeriodProposalLimit();
-        $override->setPeriod($period);
-        $override->setOrgan($keur);
-        $override->setMaxProposals(5);
+        $override->period = $period;
+        $override->organ = $keur;
+        $override->maxProposals = 5;
 
         $this->entityManager->persist($override);
         $this->entityManager->flush();
@@ -154,7 +154,7 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
     public function testThePeriodDefaultAnswersWhenNothingIsSetForTheBody(): void
     {
         $period = $this->openPeriod();
-        $period->setDefaultMaxProposals(1);
+        $period->defaultMaxProposals = 1;
         $this->entityManager->flush();
 
         $allowance = $this->resolver()->allowanceFor(

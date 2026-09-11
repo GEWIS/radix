@@ -171,7 +171,7 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
     public function testAListNamedInOneLanguageIsUnfinishedWhileTheActivityIsWrittenInTwo(): void
     {
         $revision = $this->revisionWithLists('Dinner');
-        $revision->getSignupLists()->getValues()[0]->setName(new ActivityLocalisedText('Dinner'));
+        $revision->getSignupLists()->getValues()[0]->name = new ActivityLocalisedText('Dinner');
         $data = $this->answered(ActivityData::STEP_SIGNUP_LISTS);
         $data->languageDutch = true;
         $data->nameNL = 'Testactiviteit';
@@ -255,12 +255,12 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
 
         foreach ($names as $name) {
             $list = new SignupList();
-            $list->setName(new ActivityLocalisedText(
+            $list->name = new ActivityLocalisedText(
                 $name,
                 $name,
-            ));
-            $list->setOpenDate(new DateTime('2030-01-01 12:00'));
-            $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+            );
+            $list->openDate = new DateTime('2030-01-01 12:00');
+            $list->closeDate = new DateTime('2030-02-01 12:00');
             $revision->addSignupList($list);
         }
 

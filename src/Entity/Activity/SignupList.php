@@ -135,14 +135,14 @@ class SignupList
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityRevision $revision;
+    public ActivityRevision $revision;
 
     /**
      * Stable identity shared by every clone of this logical list across revisions. On approval, sign-ups are migrated
      * from the outgoing live revision's list to the newly-approved revision's clone with the same lineage id.
      */
     #[Column(type: UuidType::NAME)]
-    private Uuid $lineageId;
+    public Uuid $lineageId;
 
     /**
      * The name of the SignupList.
@@ -161,19 +161,19 @@ class SignupList
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ActivityLocalisedText $name;
+    public ActivityLocalisedText $name;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $openDate = null;
+    public ?DateTime $openDate = null;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $closeDate = null;
+    public ?DateTime $closeDate = null;
 
     /**
      * When subscribers were told this was about to close, so they are told once rather than every time the reminder
@@ -183,26 +183,26 @@ class SignupList
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $remindedAt = null;
+    public ?DateTimeImmutable $remindedAt = null;
 
     /**
      * Determines if people outside of GEWIS can sign up.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $onlyGEWIS = false;
+    public bool $onlyGEWIS = false;
 
     /**
      * Determines if the number of signed up members should be displayed
      * when the user is NOT logged in.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $displaySubscribedNumber = false;
+    public bool $displaySubscribedNumber = false;
 
     /**
      * If the sign-up list has limited capacity, we should show users a warning that this is the case.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $limitedCapacity = false;
+    public bool $limitedCapacity = false;
 
     /**
      * The maximum number of admitted sign-ups when {@see self::$limitedCapacity} is set; null when unlimited.
@@ -212,7 +212,7 @@ class SignupList
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $capacity = null;
+    public ?int $capacity = null;
 
     /**
      * When the admission draw was performed and locked, or null if it has not been drawn yet. A non-null value marks
@@ -223,7 +223,7 @@ class SignupList
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $drawnAt = null;
+    public ?DateTime $drawnAt = null;
 
     /**
      * The board member who performed (and locked) the draw; null while not drawn, and also for a draw performed
@@ -235,7 +235,7 @@ class SignupList
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?MemberModel $drawnBy = null;
+    public ?MemberModel $drawnBy = null;
 
     /**
      * How the limited places are allocated among subscribers (only meaningful when {@see self::$limitedCapacity}).
@@ -244,7 +244,7 @@ class SignupList
         type: Types::STRING,
         enumType: AllocationMethod::class,
     )]
-    private AllocationMethod $allocationMethod = AllocationMethod::FirstComeFirstServed;
+    public AllocationMethod $allocationMethod = AllocationMethod::FirstComeFirstServed;
 
     /**
      * For an {@see AllocationMethod::ConditionalDraw}: when the draw should be performed.
@@ -254,7 +254,7 @@ class SignupList
         nullable: true,
         enumType: DrawCutoffRule::class,
     )]
-    private ?DrawCutoffRule $drawCutoffRule = null;
+    public ?DrawCutoffRule $drawCutoffRule = null;
 
     /**
      * For {@see DrawCutoffRule::IfFullBefore}: the moment the list must be full by.
@@ -263,7 +263,7 @@ class SignupList
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $drawCutoffAt = null;
+    public ?DateTime $drawCutoffAt = null;
 
     /**
      * For {@see DrawCutoffRule::AfterDurationOpen}: how many hours after opening the draw happens.
@@ -272,7 +272,7 @@ class SignupList
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $drawAfterDurationHours = null;
+    public ?int $drawAfterDurationHours = null;
 
     /**
      * For an {@see AllocationMethod::ExternalParty}: a URL describing the external party's allocation policy.
@@ -281,19 +281,19 @@ class SignupList
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $externalPolicyUrl = null;
+    public ?string $externalPolicyUrl = null;
 
     /**
      * For an {@see AllocationMethod::ExternalParty}: whether the external party dictates the ordering of admissions.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $externalForceOrdering = false;
+    public bool $externalForceOrdering = false;
 
     /**
      * For an {@see AllocationMethod::ExternalParty}: whether payment is collected by the external party.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $externalPaymentByExternal = false;
+    public bool $externalPaymentByExternal = false;
 
     /**
      * For a {@see AllocationMethod::Custom}: a free-form description of how places are allocated.
@@ -302,7 +302,7 @@ class SignupList
         type: Types::TEXT,
         nullable: true,
     )]
-    private ?string $customMethodDescription = null;
+    public ?string $customMethodDescription = null;
 
     /** @var ?list<list<string>> */
     #[Column(
@@ -316,7 +316,7 @@ class SignupList
         nullable: true,
         enumType: MembershipPriorityMode::class,
     )]
-    private ?MembershipPriorityMode $membershipPriorityMode = null;
+    public ?MembershipPriorityMode $membershipPriorityMode = null;
 
     /** @var ?array<string, int> */
     #[Column(
@@ -343,7 +343,7 @@ class SignupList
         type: Types::INTEGER,
         nullable: true,
     )]
-    private ?int $organisingCommitteePlaces = null;
+    public ?int $organisingCommitteePlaces = null;
 
     /** @var Collection<array-key, SignupRole> */
     #[OneToMany(
@@ -399,13 +399,13 @@ class SignupList
      * Determines if presence was taken for this SignupList
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $presenceTaken = false;
+    public bool $presenceTaken = false;
 
     /**
      * Determines if the signup list should appear before other signup lists on the same activity.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $promoted = false;
+    public bool $promoted = false;
 
     public function __construct()
     {
@@ -426,7 +426,7 @@ class SignupList
         }
 
         $this->fields->add($field);
-        $field->setSignupList($this);
+        $field->signupList = $this;
     }
 
     public function removeField(SignupField $field): void
@@ -460,17 +460,17 @@ class SignupList
      */
     public function liveCounterpart(): ?SignupList
     {
-        if (!$this->hasRevision()) {
+        if (!$this->belongsToRevision()) {
             return null;
         }
 
-        $live = $this->revision->getActivity()->getLiveRevision();
+        $live = $this->revision->activity->getLiveRevision();
         if (null === $live) {
             return null;
         }
 
         foreach ($live->getSignupLists() as $liveList) {
-            if ($liveList->getLineageId()->equals($this->lineageId)) {
+            if ($liveList->lineageId->equals($this->lineageId)) {
                 return $liveList;
             }
         }
@@ -503,10 +503,10 @@ class SignupList
         usort(
             $signUps,
             static fn (Signup $a, Signup $b): int => [
-                $a->getDrawPosition() ?? PHP_INT_MAX,
+                $a->drawPosition ?? PHP_INT_MAX,
                 $a->getId() ?? 0,
             ] <=> [
-                $b->getDrawPosition() ?? PHP_INT_MAX,
+                $b->drawPosition ?? PHP_INT_MAX,
                 $b->getId() ?? 0,
             ],
         );
@@ -529,7 +529,7 @@ class SignupList
     public function hasSensitiveField(): bool
     {
         foreach ($this->fields as $field) {
-            if ($field->isSensitive()) {
+            if ($field->isSensitive) {
                 return true;
             }
         }
@@ -551,58 +551,6 @@ class SignupList
     public function setFields(Collection $fields): void
     {
         $this->fields = $fields;
-    }
-
-    public function getName(): ActivityLocalisedText
-    {
-        return $this->name;
-    }
-
-    public function setName(ActivityLocalisedText $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Returns the opening DateTime of this SignupList.
-     */
-    public function getOpenDate(): ?DateTime
-    {
-        return $this->openDate;
-    }
-
-    /**
-     * Sets the opening DateTime of this SignupList.
-     */
-    public function setOpenDate(?DateTime $openDate): void
-    {
-        $this->openDate = $openDate;
-    }
-
-    /**
-     * Returns the closing DateTime of this SignupList.
-     */
-    public function getRemindedAt(): ?DateTimeImmutable
-    {
-        return $this->remindedAt;
-    }
-
-    public function setRemindedAt(?DateTimeImmutable $remindedAt): void
-    {
-        $this->remindedAt = $remindedAt;
-    }
-
-    public function getCloseDate(): ?DateTime
-    {
-        return $this->closeDate;
-    }
-
-    /**
-     * Sets the closing DateTime of this SignupList.
-     */
-    public function setCloseDate(?DateTime $closeDate): void
-    {
-        $this->closeDate = $closeDate;
     }
 
     /**
@@ -634,82 +582,6 @@ class SignupList
     {
         return null !== $this->closeDate
             && new DateTime('now') >= $this->closeDate;
-    }
-
-    /**
-     * Returns true if this SignupList is only available to members of GEWIS.
-     */
-    public function getOnlyGEWIS(): bool
-    {
-        return $this->onlyGEWIS;
-    }
-
-    /**
-     * Sets whether or not this SignupList is available to members of GEWIS.
-     */
-    public function setOnlyGEWIS(bool $onlyGEWIS): void
-    {
-        $this->onlyGEWIS = $onlyGEWIS;
-    }
-
-    /**
-     * Returns true if this SignupList shows the number of members who signed up
-     * when the user is not logged in.
-     */
-    public function getDisplaySubscribedNumber(): bool
-    {
-        return $this->displaySubscribedNumber;
-    }
-
-    /**
-     * Sets whether or not this SignupList should show the number of members who
-     * signed up when the user is not logged in.
-     */
-    public function setDisplaySubscribedNumber(bool $displaySubscribedNumber): void
-    {
-        $this->displaySubscribedNumber = $displaySubscribedNumber;
-    }
-
-    /**
-     * Returns true if this SignupList has a limited capacity.
-     */
-    public function getLimitedCapacity(): bool
-    {
-        return $this->limitedCapacity;
-    }
-
-    /**
-     * Sets whether or not this SignupList has limited capacity.
-     */
-    public function setLimitedCapacity(bool $limitedCapacity): void
-    {
-        $this->limitedCapacity = $limitedCapacity;
-    }
-
-    /**
-     * The maximum number of admitted sign-ups (only meaningful when limited capacity); null when unlimited.
-     */
-    public function getCapacity(): ?int
-    {
-        return $this->capacity;
-    }
-
-    public function setCapacity(?int $capacity): void
-    {
-        $this->capacity = $capacity;
-    }
-
-    /**
-     * When the draw was performed and locked; null while not yet drawn. A non-null value means the draw is locked.
-     */
-    public function getDrawnAt(): ?DateTime
-    {
-        return $this->drawnAt;
-    }
-
-    public function setDrawnAt(?DateTime $drawnAt): void
-    {
-        $this->drawnAt = $drawnAt;
     }
 
     /**
@@ -773,96 +645,6 @@ class SignupList
 
         return null !== $dueAt
             && new DateTime('now') >= $dueAt;
-    }
-
-    public function getDrawnBy(): ?MemberModel
-    {
-        return $this->drawnBy;
-    }
-
-    public function setDrawnBy(?MemberModel $drawnBy): void
-    {
-        $this->drawnBy = $drawnBy;
-    }
-
-    public function getAllocationMethod(): AllocationMethod
-    {
-        return $this->allocationMethod;
-    }
-
-    public function setAllocationMethod(AllocationMethod $allocationMethod): void
-    {
-        $this->allocationMethod = $allocationMethod;
-    }
-
-    public function getDrawCutoffRule(): ?DrawCutoffRule
-    {
-        return $this->drawCutoffRule;
-    }
-
-    public function setDrawCutoffRule(?DrawCutoffRule $drawCutoffRule): void
-    {
-        $this->drawCutoffRule = $drawCutoffRule;
-    }
-
-    public function getDrawCutoffAt(): ?DateTime
-    {
-        return $this->drawCutoffAt;
-    }
-
-    public function setDrawCutoffAt(?DateTime $drawCutoffAt): void
-    {
-        $this->drawCutoffAt = $drawCutoffAt;
-    }
-
-    public function getDrawAfterDurationHours(): ?int
-    {
-        return $this->drawAfterDurationHours;
-    }
-
-    public function setDrawAfterDurationHours(?int $drawAfterDurationHours): void
-    {
-        $this->drawAfterDurationHours = $drawAfterDurationHours;
-    }
-
-    public function getExternalPolicyUrl(): ?string
-    {
-        return $this->externalPolicyUrl;
-    }
-
-    public function setExternalPolicyUrl(?string $externalPolicyUrl): void
-    {
-        $this->externalPolicyUrl = $externalPolicyUrl;
-    }
-
-    public function getExternalForceOrdering(): bool
-    {
-        return $this->externalForceOrdering;
-    }
-
-    public function setExternalForceOrdering(bool $externalForceOrdering): void
-    {
-        $this->externalForceOrdering = $externalForceOrdering;
-    }
-
-    public function getExternalPaymentByExternal(): bool
-    {
-        return $this->externalPaymentByExternal;
-    }
-
-    public function setExternalPaymentByExternal(bool $externalPaymentByExternal): void
-    {
-        $this->externalPaymentByExternal = $externalPaymentByExternal;
-    }
-
-    public function getCustomMethodDescription(): ?string
-    {
-        return $this->customMethodDescription;
-    }
-
-    public function setCustomMethodDescription(?string $customMethodDescription): void
-    {
-        $this->customMethodDescription = $customMethodDescription;
     }
 
     /**
@@ -954,16 +736,6 @@ class SignupList
     public function setMembershipTierOrder(?array $order): void
     {
         $this->membershipTierOrder = self::tierValues($order);
-    }
-
-    public function getMembershipPriorityMode(): ?MembershipPriorityMode
-    {
-        return $this->membershipPriorityMode;
-    }
-
-    public function setMembershipPriorityMode(?MembershipPriorityMode $mode): void
-    {
-        $this->membershipPriorityMode = $mode;
     }
 
     /**
@@ -1088,16 +860,6 @@ class SignupList
         $this->programTypeOrder = self::tierValues($order);
     }
 
-    public function getOrganisingCommitteePlaces(): ?int
-    {
-        return $this->organisingCommitteePlaces;
-    }
-
-    public function setOrganisingCommitteePlaces(?int $places): void
-    {
-        $this->organisingCommitteePlaces = $places;
-    }
-
     /**
      * @return Collection<array-key, SignupRole>
      */
@@ -1113,7 +875,7 @@ class SignupList
         }
 
         $this->roles->add($role);
-        $role->setSignupList($this);
+        $role->signupList = $this;
     }
 
     public function removeRole(SignupRole $role): void
@@ -1234,25 +996,9 @@ class SignupList
      * Whether this list has been attached to a revision yet. A brand-new list added through the form has none until
      * it is bound; a cloned draft list already does (so its date/freeze rules look through its lineage).
      */
-    public function hasRevision(): bool
+    public function belongsToRevision(): bool
     {
         return isset($this->revision);
-    }
-
-    /**
-     * Returns the owning revision.
-     */
-    public function getRevision(): ActivityRevision
-    {
-        return $this->revision;
-    }
-
-    /**
-     * Sets the owning revision.
-     */
-    public function setRevision(ActivityRevision $revision): void
-    {
-        $this->revision = $revision;
     }
 
     /**
@@ -1261,49 +1007,7 @@ class SignupList
      */
     public function getActivity(): Activity
     {
-        return $this->revision->getActivity();
-    }
-
-    public function getLineageId(): Uuid
-    {
-        return $this->lineageId;
-    }
-
-    public function setLineageId(Uuid $lineageId): void
-    {
-        $this->lineageId = $lineageId;
-    }
-
-    /**
-     * Gets presenceTaken for this SignupList
-     */
-    public function isPresenceTaken(): bool
-    {
-        return $this->presenceTaken;
-    }
-
-    /**
-     * Sets presenceTaken for this SignupList
-     */
-    public function setPresenceTaken(bool $presenceTaken): void
-    {
-        $this->presenceTaken = $presenceTaken;
-    }
-
-    /**
-     * Get whether signup list is promoted.
-     */
-    public function isPromoted(): bool
-    {
-        return $this->promoted;
-    }
-
-    /**
-     * Set promoted state of signup list.
-     */
-    public function setPromoted(bool $promoted): void
-    {
-        $this->promoted = $promoted;
+        return $this->revision->activity;
     }
 
     /**
@@ -1314,8 +1018,8 @@ class SignupList
         $roles = [];
         foreach ($this->getRoles() as $role) {
             $roles[] = [
-                'name' => $role->getName(),
-                'minimum' => $role->getMinimum(),
+                'name' => $role->name,
+                'minimum' => $role->minimum,
             ];
         }
 
@@ -1338,31 +1042,31 @@ class SignupList
 
         return [
             'id' => $this->getId(),
-            'name' => $this->getName()->getValueNL(),
-            'nameEn' => $this->getName()->getValueEN(),
-            'openDate' => $this->getOpenDate(),
-            'closeDate' => $this->getCloseDate(),
-            'onlyGEWIS' => $this->getOnlyGEWIS(),
-            'displaySubscribedNumber' => $this->getDisplaySubscribedNumber(),
-            'limitedCapacity' => $this->getLimitedCapacity(),
-            'capacity' => $this->getCapacity(),
-            'allocationMethod' => $this->getAllocationMethod()->value,
-            'drawCutoffRule' => $this->getDrawCutoffRule()?->value,
-            'drawCutoffAt' => $this->getDrawCutoffAt(),
-            'drawAfterDurationHours' => $this->getDrawAfterDurationHours(),
-            'externalPolicyUrl' => $this->getExternalPolicyUrl(),
-            'externalForceOrdering' => $this->getExternalForceOrdering(),
-            'externalPaymentByExternal' => $this->getExternalPaymentByExternal(),
-            'customMethodDescription' => $this->getCustomMethodDescription(),
+            'name' => $this->name->getValueNL(),
+            'nameEn' => $this->name->getValueEN(),
+            'openDate' => $this->openDate,
+            'closeDate' => $this->closeDate,
+            'onlyGEWIS' => $this->onlyGEWIS,
+            'displaySubscribedNumber' => $this->displaySubscribedNumber,
+            'limitedCapacity' => $this->limitedCapacity,
+            'capacity' => $this->capacity,
+            'allocationMethod' => $this->allocationMethod->value,
+            'drawCutoffRule' => $this->drawCutoffRule?->value,
+            'drawCutoffAt' => $this->drawCutoffAt,
+            'drawAfterDurationHours' => $this->drawAfterDurationHours,
+            'externalPolicyUrl' => $this->externalPolicyUrl,
+            'externalForceOrdering' => $this->externalForceOrdering,
+            'externalPaymentByExternal' => $this->externalPaymentByExternal,
+            'customMethodDescription' => $this->customMethodDescription,
             'membershipTierOrder' => self::tierValues($this->getMembershipTierOrder()),
-            'membershipPriorityMode' => $this->getMembershipPriorityMode()?->value,
+            'membershipPriorityMode' => $this->membershipPriorityMode?->value,
             'membershipPlaces' => $this->membershipPlaces,
             'cohortTierOrder' => self::tierValues($this->getCohortTierOrder()),
             'programTypeOrder' => self::tierValues($this->getProgramTypeOrder()),
-            'organisingCommitteePlaces' => $this->getOrganisingCommitteePlaces(),
+            'organisingCommitteePlaces' => $this->organisingCommitteePlaces,
             'roles' => $rolesArrays,
-            'presenceTaken' => $this->isPresenceTaken(),
-            'promoted' => $this->isPromoted(),
+            'presenceTaken' => $this->presenceTaken,
+            'promoted' => $this->promoted,
             'fields' => $fieldsArrays,
         ];
     }
@@ -1382,30 +1086,30 @@ class SignupList
 
         return [
             'id' => $this->getId(),
-            'name' => $this->getName()->toGdprArray(),
-            'openDate' => $this->getOpenDate()?->format(DateTimeInterface::ATOM),
-            'closeDate' => $this->getCloseDate()?->format(DateTimeInterface::ATOM),
-            'onlyGEWIS' => $this->getOnlyGEWIS(),
-            'displaySubscribedNumber' => $this->getDisplaySubscribedNumber(),
-            'limitedCapacity' => $this->getLimitedCapacity(),
-            'capacity' => $this->getCapacity(),
-            'allocationMethod' => $this->getAllocationMethod()->value,
-            'drawCutoffRule' => $this->getDrawCutoffRule()?->value,
-            'drawCutoffAt' => $this->getDrawCutoffAt()?->format(DateTimeInterface::ATOM),
-            'drawAfterDurationHours' => $this->getDrawAfterDurationHours(),
-            'externalPolicyUrl' => $this->getExternalPolicyUrl(),
-            'externalForceOrdering' => $this->getExternalForceOrdering(),
-            'externalPaymentByExternal' => $this->getExternalPaymentByExternal(),
-            'customMethodDescription' => $this->getCustomMethodDescription(),
+            'name' => $this->name->toGdprArray(),
+            'openDate' => $this->openDate?->format(DateTimeInterface::ATOM),
+            'closeDate' => $this->closeDate?->format(DateTimeInterface::ATOM),
+            'onlyGEWIS' => $this->onlyGEWIS,
+            'displaySubscribedNumber' => $this->displaySubscribedNumber,
+            'limitedCapacity' => $this->limitedCapacity,
+            'capacity' => $this->capacity,
+            'allocationMethod' => $this->allocationMethod->value,
+            'drawCutoffRule' => $this->drawCutoffRule?->value,
+            'drawCutoffAt' => $this->drawCutoffAt?->format(DateTimeInterface::ATOM),
+            'drawAfterDurationHours' => $this->drawAfterDurationHours,
+            'externalPolicyUrl' => $this->externalPolicyUrl,
+            'externalForceOrdering' => $this->externalForceOrdering,
+            'externalPaymentByExternal' => $this->externalPaymentByExternal,
+            'customMethodDescription' => $this->customMethodDescription,
             'membershipTierOrder' => self::tierValues($this->getMembershipTierOrder()),
-            'membershipPriorityMode' => $this->getMembershipPriorityMode()?->value,
+            'membershipPriorityMode' => $this->membershipPriorityMode?->value,
             'membershipPlaces' => $this->membershipPlaces,
             'cohortTierOrder' => self::tierValues($this->getCohortTierOrder()),
             'programTypeOrder' => self::tierValues($this->getProgramTypeOrder()),
-            'organisingCommitteePlaces' => $this->getOrganisingCommitteePlaces(),
+            'organisingCommitteePlaces' => $this->organisingCommitteePlaces,
             'roles' => $rolesArrays,
-            'presenceTaken' => $this->isPresenceTaken(),
-            'promoted' => $this->isPromoted(),
+            'presenceTaken' => $this->presenceTaken,
+            'promoted' => $this->promoted,
             'fields' => $fieldsArrays,
         ];
     }

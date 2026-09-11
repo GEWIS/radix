@@ -457,12 +457,12 @@ class SignupListType extends AbstractType
     ): void {
         if (
             !$list instanceof SignupList
-            || !$list->getLimitedCapacity()
+            || !$list->limitedCapacity
         ) {
             return;
         }
 
-        $capacity = $list->getCapacity();
+        $capacity = $list->capacity;
         if (
             null === $capacity
             || $capacity < 1
@@ -490,15 +490,15 @@ class SignupListType extends AbstractType
         SignupList $list,
         ExecutionContextInterface $context,
     ): void {
-        if ($list->getAllocationMethod()->isManual()) {
+        if ($list->allocationMethod->isManual()) {
             return;
         }
 
-        $capacity = $list->getCapacity() ?? 0;
+        $capacity = $list->capacity ?? 0;
 
         if (
             null !== $list->getMembershipTierOrder()
-            && null === $list->getMembershipPriorityMode()
+            && null === $list->membershipPriorityMode
         ) {
             $context->buildViolation(t(
                 'Choose how the membership tiers are admitted.',
@@ -510,7 +510,7 @@ class SignupListType extends AbstractType
         }
 
         $reserved = 0;
-        if (MembershipPriorityMode::ReservedPlaces === $list->getMembershipPriorityMode()) {
+        if (MembershipPriorityMode::ReservedPlaces === $list->membershipPriorityMode) {
             foreach ($list->getMembershipPlaces() as $places) {
                 if ($places >= 0) {
                     $reserved += $places;
@@ -528,7 +528,7 @@ class SignupListType extends AbstractType
             }
         }
 
-        $committee = $list->getOrganisingCommitteePlaces();
+        $committee = $list->organisingCommitteePlaces;
         if (null !== $committee) {
             if ($committee < 1) {
                 $context->buildViolation(t(
@@ -557,7 +557,7 @@ class SignupListType extends AbstractType
         }
 
         $guaranteed = array_sum(array_map(
-            static fn (SignupRole $role): int => $role->getMinimum(),
+            static fn (SignupRole $role): int => $role->minimum,
             $list->getRoles()->toArray(),
         ));
         if (
@@ -724,9 +724,9 @@ class SignupListType extends AbstractType
         SignupList $list,
         ExecutionContextInterface $context,
     ): void {
-        switch ($list->getAllocationMethod()) {
+        switch ($list->allocationMethod) {
             case AllocationMethod::ConditionalDraw:
-                $rule = $list->getDrawCutoffRule();
+                $rule = $list->drawCutoffRule;
                 if (null === $rule) {
                     $context->buildViolation(t(
                         'Choose when the draw happens.',
@@ -741,7 +741,7 @@ class SignupListType extends AbstractType
 
                 if (
                     DrawCutoffRule::IfFullBefore === $rule
-                    && null === $list->getDrawCutoffAt()
+                    && null === $list->drawCutoffAt
                 ) {
                     $context->buildViolation(t(
                         'Enter the moment the list must be full by.',
@@ -755,8 +755,8 @@ class SignupListType extends AbstractType
                 if (
                     DrawCutoffRule::AfterDurationOpen === $rule
                     && (
-                        null === $list->getDrawAfterDurationHours()
-                        || $list->getDrawAfterDurationHours() < 1
+                        null === $list->drawAfterDurationHours
+                        || $list->drawAfterDurationHours < 1
                     )
                 ) {
                     $context->buildViolation(t(
@@ -770,7 +770,7 @@ class SignupListType extends AbstractType
 
                 break;
             case AllocationMethod::ExternalParty:
-                if ('' === trim($list->getExternalPolicyUrl() ?? '')) {
+                if ('' === trim($list->externalPolicyUrl ?? '')) {
                     $context->buildViolation(t(
                         'Enter the external party policy URL.',
                         [],
@@ -782,7 +782,7 @@ class SignupListType extends AbstractType
 
                 break;
             case AllocationMethod::Custom:
-                if ('' === trim($list->getCustomMethodDescription() ?? '')) {
+                if ('' === trim($list->customMethodDescription ?? '')) {
                     $context->buildViolation(t(
                         'Describe the allocation method.',
                         [],
@@ -836,7 +836,7 @@ class SignupListType extends AbstractType
                 : $list->getMembershipTierOrder() ?? $list->membershipRanks(),
             'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
             'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
-            'onlyGEWIS' => $list?->getOnlyGEWIS() ?? true,
+            'onlyGEWIS' => $list->onlyGEWIS ?? true,
             // The places held for each rank of the membership order, which the control asks for on the rank itself.
             'membershipPlaces' => $list?->getHeldMembershipPlaces() ?? [],
         ];
@@ -876,17 +876,17 @@ class SignupListType extends AbstractType
     {
         if (
             !$list instanceof SignupList
-            || !$list->hasRevision()
+            || !$list->belongsToRevision()
         ) {
             return false;
         }
 
-        $live = $list->getRevision()->getActivity()->getLiveRevision();
+        $live = $list->revision->activity->getLiveRevision();
         if (null === $live) {
             return false;
         }
 
-        $begin = $live->getBeginTime();
+        $begin = $live->beginTime;
 
         return null !== $begin && $begin <= new DateTime();
     }
@@ -994,39 +994,39 @@ class SignupListType extends AbstractType
             return;
         }
 
-        if (!$list->getLimitedCapacity()) {
-            $list->setCapacity(null);
-            $list->setAllocationMethod(AllocationMethod::FirstComeFirstServed);
+        if (!$list->limitedCapacity) {
+            $list->capacity = null;
+            $list->allocationMethod = AllocationMethod::FirstComeFirstServed;
         }
 
-        $method = $list->getAllocationMethod();
+        $method = $list->allocationMethod;
 
         if (
             AllocationMethod::ConditionalDraw !== $method
-            || DrawCutoffRule::IfFullBefore !== $list->getDrawCutoffRule()
+            || DrawCutoffRule::IfFullBefore !== $list->drawCutoffRule
         ) {
-            $list->setDrawCutoffAt(null);
+            $list->drawCutoffAt = null;
         }
 
         if (
             AllocationMethod::ConditionalDraw !== $method
-            || DrawCutoffRule::AfterDurationOpen !== $list->getDrawCutoffRule()
+            || DrawCutoffRule::AfterDurationOpen !== $list->drawCutoffRule
         ) {
-            $list->setDrawAfterDurationHours(null);
+            $list->drawAfterDurationHours = null;
         }
 
         if (AllocationMethod::ConditionalDraw !== $method) {
-            $list->setDrawCutoffRule(null);
+            $list->drawCutoffRule = null;
         }
 
         if (AllocationMethod::ExternalParty !== $method) {
-            $list->setExternalPolicyUrl(null);
-            $list->setExternalForceOrdering(false);
-            $list->setExternalPaymentByExternal(false);
+            $list->externalPolicyUrl = null;
+            $list->externalForceOrdering = false;
+            $list->externalPaymentByExternal = false;
         }
 
         if (AllocationMethod::Custom !== $method) {
-            $list->setCustomMethodDescription(null);
+            $list->customMethodDescription = null;
         }
 
         $this->clearInapplicablePriority($list);
@@ -1040,29 +1040,29 @@ class SignupListType extends AbstractType
     private function clearInapplicablePriority(SignupList $list): void
     {
         if (
-            !$list->getLimitedCapacity()
-            || $list->getAllocationMethod()->isManual()
+            !$list->limitedCapacity
+            || $list->allocationMethod->isManual()
         ) {
             $list->setMembershipTierOrder(null);
             $list->setCohortTierOrder(null);
             $list->setProgramTypeOrder(null);
-            $list->setOrganisingCommitteePlaces(null);
+            $list->organisingCommitteePlaces = null;
 
             foreach ($list->getRoles()->toArray() as $role) {
                 $list->removeRole($role);
             }
         }
 
-        if (!$list->getOnlyGEWIS()) {
+        if (!$list->onlyGEWIS) {
             $list->setCohortTierOrder(null);
             $list->setProgramTypeOrder(null);
         }
 
         if (null === $list->getMembershipTierOrder()) {
-            $list->setMembershipPriorityMode(null);
+            $list->membershipPriorityMode = null;
         }
 
-        if (MembershipPriorityMode::ReservedPlaces !== $list->getMembershipPriorityMode()) {
+        if (MembershipPriorityMode::ReservedPlaces !== $list->membershipPriorityMode) {
             $list->setHeldMembershipPlaces(null);
 
             return;
@@ -1092,8 +1092,8 @@ class SignupListType extends AbstractType
         if (
             null === $live
             || !$event->getForm()->has('openDate')
-            || null === $live->getOpenDate()
-            || $live->getOpenDate() > new DateTime()
+            || null === $live->openDate
+            || $live->openDate > new DateTime()
         ) {
             return;
         }
@@ -1113,8 +1113,8 @@ class SignupListType extends AbstractType
         if (
             null === $live
             || !$event->getForm()->has('closeDate')
-            || null === $live->getCloseDate()
-            || $live->getCloseDate() > new DateTime()
+            || null === $live->closeDate
+            || $live->closeDate > new DateTime()
         ) {
             return;
         }

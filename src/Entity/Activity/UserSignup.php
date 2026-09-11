@@ -29,7 +29,7 @@ class UserSignup extends Signup
         referencedColumnName: 'lidnr',
         onDelete: 'CASCADE',
     )]
-    private MemberModel $user;
+    public MemberModel $user;
 
     /**
      * Get the full name of the user whom signed up for the activity.
@@ -37,23 +37,7 @@ class UserSignup extends Signup
     #[Override]
     public function getFullName(): string
     {
-        return $this->getUser()->getFullName();
-    }
-
-    /**
-     * Get the user that is signed up.
-     */
-    public function getUser(): MemberModel
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set the user for the activity signup.
-     */
-    public function setUser(MemberModel $user): void
-    {
-        $this->user = $user;
+        return $this->user->getFullName();
     }
 
     /**
@@ -62,12 +46,12 @@ class UserSignup extends Signup
     #[Override]
     public function getEmail(): ?string
     {
-        return $this->getUser()->getEmail();
+        return $this->user->getEmail();
     }
 
     #[Override]
     public function personKey(): string
     {
-        return 'member:' . $this->getUser()->getLidnr();
+        return 'member:' . $this->user->getLidnr();
     }
 }

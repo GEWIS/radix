@@ -39,7 +39,7 @@ class SignupFieldValue
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private SignupField $field;
+    public SignupField $field;
 
     /**
      * Signup which the value belongs to. An answer is part of the sign-up and never outlives it, which the ORM cascade
@@ -56,7 +56,7 @@ class SignupFieldValue
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private Signup $signup;
+    public Signup $signup;
 
     /**
      * The value of the associated field, is not an option.
@@ -65,7 +65,7 @@ class SignupFieldValue
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $value = null;
+    public ?string $value = null;
 
     /**
      * The option chosen.
@@ -75,56 +75,7 @@ class SignupFieldValue
         name: 'option_id',
         referencedColumnName: 'id',
     )]
-    private ?SignupOption $option = null;
-
-    public function getField(): SignupField
-    {
-        return $this->field;
-    }
-
-    /**
-     * Set the field.
-     */
-    public function setField(SignupField $field): void
-    {
-        $this->field = $field;
-    }
-
-    public function getSignup(): Signup
-    {
-        return $this->signup;
-    }
-
-    /**
-     * Set the signup.
-     */
-    public function setSignup(Signup $signup): void
-    {
-        $this->signup = $signup;
-    }
-
-    public function getValue(): ?string
-    {
-        return $this->value;
-    }
-
-    /**
-     * Set the value.
-     */
-    public function setValue(?string $value): void
-    {
-        $this->value = $value;
-    }
-
-    public function getOption(): ?SignupOption
-    {
-        return $this->option;
-    }
-
-    public function setOption(?SignupOption $option): void
-    {
-        $this->option = $option;
-    }
+    public ?SignupOption $option = null;
 
     /**
      * The human-readable, localised value for display: yes/no answers are translated, choice answers resolve to the
@@ -134,10 +85,10 @@ class SignupFieldValue
         TranslatorInterface $translator,
         Languages $language,
     ): string {
-        return match ($this->getField()->getType()) {
-            SignupFieldTypes::YesNo => $translator->trans($this->getValue() ?? ''),
-            SignupFieldTypes::Choice => $this->getOption()?->getValue()->getText($language) ?? '',
-            default => $this->getValue() ?? '',
+        return match ($this->field->type) {
+            SignupFieldTypes::YesNo => $translator->trans($this->value ?? ''),
+            SignupFieldTypes::Choice => $this->option?->value->getText($language) ?? '',
+            default => $this->value ?? '',
         };
     }
 
@@ -148,8 +99,8 @@ class SignupFieldValue
     {
         return [
             'id' => $this->getId(),
-            'value' => $this->getValue(),
-            'option' => $this->getOption()?->toGdprArray(),
+            'value' => $this->value,
+            'option' => $this->option?->toGdprArray(),
         ];
     }
 }

@@ -80,13 +80,13 @@ final class SignupListMigratorTest extends TestCase
         $clonedField = $clone->getFields()->getValues()[0];
         self::assertSame(
             $clone,
-            $signup->getSignupList(),
+            $signup->signupList,
         );
         self::assertSame(
             $clonedField,
-            $fieldValue->getField(),
+            $fieldValue->field,
         );
-        $migratedOption = $fieldValue->getOption();
+        $migratedOption = $fieldValue->option;
         self::assertNotNull($migratedOption);
         self::assertSame(
             $clonedField->getOptions()->getValues()[0],
@@ -94,7 +94,7 @@ final class SignupListMigratorTest extends TestCase
         );
         self::assertSame(
             'Red',
-            $migratedOption->getValue()->getValueEN(),
+            $migratedOption->value->getValueEN(),
         );
     }
 
@@ -164,24 +164,24 @@ final class SignupListMigratorTest extends TestCase
         // clone's same-ordinal field and leaves the value (and the null option) untouched.
         self::assertSame(
             $clone,
-            $signup->getSignupList(),
+            $signup->signupList,
         );
         $clonedFields = $clone->getFields()->getValues();
         foreach ($fieldValues as $ordinal => $fieldValue) {
             self::assertSame(
                 $clonedFields[$ordinal],
-                $fieldValue->getField(),
+                $fieldValue->field,
             );
-            self::assertNull($fieldValue->getOption());
+            self::assertNull($fieldValue->option);
         }
 
         self::assertSame(
             'Alice',
-            $fieldValues[0]->getValue(),
+            $fieldValues[0]->value,
         );
         self::assertSame(
             '3',
-            $fieldValues[1]->getValue(),
+            $fieldValues[1]->value,
         );
     }
 
@@ -498,7 +498,7 @@ final class SignupListMigratorTest extends TestCase
 
         self::assertSame(
             $liveFaithful,
-            $faithfulSignup->getSignupList(),
+            $faithfulSignup->signupList,
         );
     }
 
@@ -518,9 +518,9 @@ final class SignupListMigratorTest extends TestCase
         );
         $drawnAt = new DateTime('2026-01-02 03:04:05');
         $drawnBy = self::createStub(Member::class);
-        $live->setDrawnAt($drawnAt);
-        $live->setDrawnBy($drawnBy);
-        $live->setPresenceTaken(true);
+        $live->drawnAt = $drawnAt;
+        $live->drawnBy = $drawnBy;
+        $live->presenceTaken = true;
         $outgoing = $this->revisionWith($live);
         $this->answerFirstOption($live);
 
@@ -533,9 +533,9 @@ final class SignupListMigratorTest extends TestCase
             ],
         );
         // The clone starts from a pre-draw snapshot.
-        $clone->setDrawnAt(null);
-        $clone->setDrawnBy(null);
-        $clone->setPresenceTaken(false);
+        $clone->drawnAt = null;
+        $clone->drawnBy = null;
+        $clone->presenceTaken = false;
         $incoming = $this->revisionWith($clone);
 
         $this->migrator->migrate(
@@ -545,13 +545,13 @@ final class SignupListMigratorTest extends TestCase
 
         self::assertSame(
             $drawnAt,
-            $clone->getDrawnAt(),
+            $clone->drawnAt,
         );
         self::assertSame(
             $drawnBy,
-            $clone->getDrawnBy(),
+            $clone->drawnBy,
         );
-        self::assertTrue($clone->isPresenceTaken());
+        self::assertTrue($clone->presenceTaken);
     }
 
     public function testCarriesDrawAndPresenceStateEvenForListsWithoutSignups(): void
@@ -569,8 +569,8 @@ final class SignupListMigratorTest extends TestCase
             ],
         );
         $drawnAt = new DateTime('2026-02-03 04:05:06');
-        $live->setDrawnAt($drawnAt);
-        $live->setPresenceTaken(true);
+        $live->drawnAt = $drawnAt;
+        $live->presenceTaken = true;
         $outgoing = $this->revisionWith($live);
 
         $clone = $this->choiceFieldList(
@@ -581,8 +581,8 @@ final class SignupListMigratorTest extends TestCase
                 'Blue',
             ],
         );
-        $clone->setDrawnAt(null);
-        $clone->setPresenceTaken(false);
+        $clone->drawnAt = null;
+        $clone->presenceTaken = false;
         $incoming = $this->revisionWith($clone);
 
         $this->migrator->migrate(
@@ -592,9 +592,9 @@ final class SignupListMigratorTest extends TestCase
 
         self::assertSame(
             $drawnAt,
-            $clone->getDrawnAt(),
+            $clone->drawnAt,
         );
-        self::assertTrue($clone->isPresenceTaken());
+        self::assertTrue($clone->presenceTaken);
     }
 
     public function testIgnoresListsWithoutSignupsWhenJudgingMigratability(): void
@@ -639,8 +639,8 @@ final class SignupListMigratorTest extends TestCase
         );
 
         $signup = new ExternalSignup();
-        $signup->setSignupList($outgoingList);
-        $signup->setRole($outgoingRole);
+        $signup->signupList = $outgoingList;
+        $signup->role = $outgoingRole;
         $outgoingList->getSignUps()->add($signup);
 
         $outgoing = $this->revisionWith($outgoingList);
@@ -658,7 +658,7 @@ final class SignupListMigratorTest extends TestCase
 
         self::assertSame(
             $incomingRole,
-            $signup->getRole(),
+            $signup->role,
         );
     }
 
@@ -679,7 +679,7 @@ final class SignupListMigratorTest extends TestCase
         );
 
         $signup = new ExternalSignup();
-        $signup->setSignupList($outgoingList);
+        $signup->signupList = $outgoingList;
         $outgoingList->getSignUps()->add($signup);
 
         self::assertFalse($this->migrator->isMigratable(
@@ -728,7 +728,7 @@ final class SignupListMigratorTest extends TestCase
         SignupField ...$fields,
     ): SignupList {
         $list = new SignupList();
-        $list->setLineageId($lineageId);
+        $list->lineageId = $lineageId;
 
         foreach ($fields as $field) {
             $list->addField($field);
@@ -748,14 +748,14 @@ final class SignupListMigratorTest extends TestCase
         array $optionLabels = [],
     ): SignupField {
         $field = new SignupField();
-        $field->setName($this->text($name));
-        $field->setType($type);
-        $field->setMinimumValue($minimumValue);
-        $field->setMaximumValue($maximumValue);
+        $field->name = $this->text($name);
+        $field->type = $type;
+        $field->minimumValue = $minimumValue;
+        $field->maximumValue = $maximumValue;
 
         foreach ($optionLabels as $label) {
             $option = new SignupOption();
-            $option->setValue($this->text($label));
+            $option->value = $this->text($label);
             $field->addOption($option);
         }
 
@@ -773,13 +773,13 @@ final class SignupListMigratorTest extends TestCase
         $option = $field->getOptions()->getValues()[0];
 
         $signup = new ExternalSignup();
-        $signup->setSignupList($list);
+        $signup->signupList = $list;
         $list->getSignUps()->add($signup);
 
         $fieldValue = new SignupFieldValue();
-        $fieldValue->setField($field);
-        $fieldValue->setSignup($signup);
-        $fieldValue->setOption($option);
+        $fieldValue->field = $field;
+        $fieldValue->signup = $signup;
+        $fieldValue->option = $option;
         $signup->getFieldValues()->add($fieldValue);
 
         return [
@@ -801,15 +801,15 @@ final class SignupListMigratorTest extends TestCase
         array $valuesByOrdinal,
     ): array {
         $signup = new ExternalSignup();
-        $signup->setSignupList($list);
+        $signup->signupList = $list;
         $list->getSignUps()->add($signup);
 
         $fieldValues = [];
         foreach ($list->getFields()->getValues() as $ordinal => $field) {
             $fieldValue = new SignupFieldValue();
-            $fieldValue->setField($field);
-            $fieldValue->setSignup($signup);
-            $fieldValue->setValue($valuesByOrdinal[$ordinal] ?? null);
+            $fieldValue->field = $field;
+            $fieldValue->signup = $signup;
+            $fieldValue->value = $valuesByOrdinal[$ordinal] ?? null;
             $signup->getFieldValues()->add($fieldValue);
             $fieldValues[] = $fieldValue;
         }

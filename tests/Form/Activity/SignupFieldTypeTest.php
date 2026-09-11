@@ -90,8 +90,8 @@ final class SignupFieldTypeTest extends TypeTestCase
             $form->isValid(),
             (string) $form->getErrors(true),
         );
-        self::assertNull($field->getMinimumValue());
-        self::assertNull($field->getMaximumValue());
+        self::assertNull($field->minimumValue);
+        self::assertNull($field->maximumValue);
     }
 
     /**

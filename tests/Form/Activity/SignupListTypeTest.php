@@ -201,21 +201,21 @@ final class SignupListTypeTest extends TypeTestCase
         // The string position round-trips to the entity's int property (the HiddenType model transformer).
         self::assertSame(
             2,
-            $fields[0]->getPosition(),
+            $fields[0]->position,
         );
 
         $options = $fields[0]->getOptions()->getValues();
         self::assertSame(
             5,
-            $options[0]->getPosition(),
+            $options[0]->position,
         );
-        self::assertTrue($options[0]->isDefault());
+        self::assertTrue($options[0]->isDefault);
         self::assertSame(
             3,
-            $options[1]->getPosition(),
+            $options[1]->position,
         );
         // An unchecked "default" checkbox is simply absent from the submission and maps to false.
-        self::assertFalse($options[1]->isDefault());
+        self::assertFalse($options[1]->isDefault);
     }
 
     /**
@@ -374,7 +374,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAnOrderThatNamesNoTierIsTheModifierSwitchedOff(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(true);
+        $list->onlyGEWIS = true;
         $form = $this->submitList(
             [
                 'membershipTierOrder' => '',
@@ -404,7 +404,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAnOpenListRanksOnNeitherStudyPhaseNorCohort(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(false);
+        $list->onlyGEWIS = false;
 
         $this->submitList(
             [
@@ -422,7 +422,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAnIncompleteOrderIsCompletedWithTheTiersItLeftOut(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(true);
+        $list->onlyGEWIS = true;
         $this->submitList(
             ['cohortTierOrder' => 'unknown'],
             $list,
@@ -489,9 +489,9 @@ final class SignupListTypeTest extends TypeTestCase
         );
 
         self::assertNull($list->getMembershipTierOrder());
-        self::assertNull($list->getMembershipPriorityMode());
+        self::assertNull($list->membershipPriorityMode);
         self::assertNull($list->getCohortTierOrder());
-        self::assertNull($list->getOrganisingCommitteePlaces());
+        self::assertNull($list->organisingCommitteePlaces);
         self::assertFalse($list->hasPriorityModifiers());
     }
 
@@ -529,8 +529,8 @@ final class SignupListTypeTest extends TypeTestCase
     {
         $list = new SignupList();
 
-        self::assertNull($list->getOpenDate());
-        self::assertNull($list->getCloseDate());
+        self::assertNull($list->openDate);
+        self::assertNull($list->closeDate);
         self::assertFalse($list->isOpen());
         self::assertFalse($list->isClosed());
         self::assertFalse(SignupListSection::Basics->isFilledIn(
@@ -542,8 +542,8 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAListWithANameAndAWindowIsFilledIn(): void
     {
         $list = $this->list();
-        $list->setOpenDate(new DateTime('2030-01-01 12:00'));
-        $list->setCloseDate(new DateTime('2030-02-01 12:00'));
+        $list->openDate = new DateTime('2030-01-01 12:00');
+        $list->closeDate = new DateTime('2030-02-01 12:00');
 
         self::assertTrue(SignupListSection::Basics->isFilledIn(
             $list,
@@ -567,7 +567,7 @@ final class SignupListTypeTest extends TypeTestCase
         );
 
         $membersOnly = $this->list();
-        $membersOnly->setOnlyGEWIS(true);
+        $membersOnly->onlyGEWIS = true;
         $form = $this->section(
             SignupListSection::Allocation,
             $membersOnly,
@@ -589,7 +589,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAMembersOnlyListDoesNotOfferTheNonMemberTier(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(true);
+        $list->onlyGEWIS = true;
         $list->setMembershipTierOrder(array_map(
             static fn (MembershipTier $tier): array => [$tier],
             MembershipTier::defaultOrder(),
@@ -624,7 +624,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testPlacesAreNotHeldForNonMembersOnAMembersOnlyList(): void
     {
         $list = $this->list();
-        $list->setOnlyGEWIS(true);
+        $list->onlyGEWIS = true;
 
         $this->submitList(
             [
@@ -654,8 +654,8 @@ final class SignupListTypeTest extends TypeTestCase
     public function testTheWindowOfAListThatIsNotLiveStaysEditable(): void
     {
         $list = $this->list();
-        $list->setOpenDate(new DateTime('-1 week'));
-        $list->setCloseDate(new DateTime('-1 day'));
+        $list->openDate = new DateTime('-1 week');
+        $list->closeDate = new DateTime('-1 day');
         $this->attachToDraft($list);
 
         $form = $this->section(
@@ -725,10 +725,10 @@ final class SignupListTypeTest extends TypeTestCase
         $activity->setLiveRevision($liveRevision);
 
         $liveList = new SignupList();
-        $liveList->setName(new ActivityLocalisedText());
-        $liveList->setLineageId($list->getLineageId());
-        $liveList->setOpenDate(new DateTime('-1 week'));
-        $liveList->setCloseDate(new DateTime('-1 day'));
+        $liveList->name = new ActivityLocalisedText();
+        $liveList->lineageId = $list->lineageId;
+        $liveList->openDate = new DateTime('-1 week');
+        $liveList->closeDate = new DateTime('-1 day');
         $liveRevision->addSignupList($liveList);
     }
 
@@ -781,10 +781,10 @@ final class SignupListTypeTest extends TypeTestCase
     private function list(): SignupList
     {
         $list = new SignupList();
-        $list->setName(new ActivityLocalisedText(
+        $list->name = new ActivityLocalisedText(
             'Naam',
             'Name',
-        ));
+        );
 
         return $list;
     }

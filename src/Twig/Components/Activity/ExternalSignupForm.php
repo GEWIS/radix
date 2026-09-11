@@ -208,10 +208,10 @@ final class ExternalSignupForm
     {
         if (
             $this->security->isGranted(UserRoles::User->value)
-            || $this->signupList->getOnlyGEWIS()
+            || $this->signupList->onlyGEWIS
             || !$this->signupList->isOpen()
             || $this->signupList->getActivity()->isFrozen()
-            || $this->signupList->getActivity()->getLiveRevision() !== $this->signupList->getRevision()
+            || $this->signupList->getActivity()->getLiveRevision() !== $this->signupList->revision
         ) {
             throw new AccessDeniedException();
         }

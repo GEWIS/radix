@@ -47,10 +47,10 @@ final class DrawManagerTest extends DatabaseTestCase
             $board,
         ));
 
-        self::assertNotNull($list->getDrawnAt());
+        self::assertNotNull($list->drawnAt);
         self::assertSame(
             $board->getLidnr(),
-            $list->getDrawnBy()?->getLidnr(),
+            $list->drawnBy?->getLidnr(),
         );
         self::assertSame(
             2,
@@ -74,7 +74,7 @@ final class DrawManagerTest extends DatabaseTestCase
             $board,
         ));
         // The runner refreshes the row inside its lock, so compare at the column's (second) precision.
-        $drawnAt = $list->getDrawnAt()?->format('Y-m-d H:i:s');
+        $drawnAt = $list->drawnAt?->format('Y-m-d H:i:s');
 
         // The second draw bails on the lock recheck: the result of a lottery never changes.
         self::assertFalse($this->drawManager()->drawManually(
@@ -84,7 +84,7 @@ final class DrawManagerTest extends DatabaseTestCase
         ));
         self::assertSame(
             $drawnAt,
-            $list->getDrawnAt()?->format('Y-m-d H:i:s'),
+            $list->drawnAt?->format('Y-m-d H:i:s'),
         );
     }
 
@@ -103,7 +103,7 @@ final class DrawManagerTest extends DatabaseTestCase
             AllocationMethod::ConditionalDraw,
             $this->member(8025),
         ));
-        self::assertNull($list->getDrawnAt());
+        self::assertNull($list->drawnAt);
     }
 
     public function testManualDrawIsAllowedBeforeCloseOnceTheDrawMomentHasPassed(): void
@@ -141,7 +141,7 @@ final class DrawManagerTest extends DatabaseTestCase
             AllocationMethod::FirstComeFirstServed,
             $this->member(8025),
         ));
-        self::assertNull($list->getDrawnAt());
+        self::assertNull($list->drawnAt);
     }
 
     public function testAutomaticDrawIsRefusedBeforeTheDrawMoment(): void
@@ -166,19 +166,19 @@ final class DrawManagerTest extends DatabaseTestCase
 
         self::assertTrue($this->drawManager()->drawAutomatically($list));
 
-        self::assertNotNull($list->getDrawnAt());
-        self::assertNull($list->getDrawnBy());
+        self::assertNotNull($list->drawnAt);
+        self::assertNull($list->drawnBy);
         self::assertSame(
             2,
             $this->drawnCount($list),
         );
         // The rest is waitlisted with attendance cleared: you cannot have attended without being admitted.
         foreach ($list->getSignUps() as $signup) {
-            if ($signup->isDrawn()) {
+            if ($signup->drawn) {
                 continue;
             }
 
-            self::assertFalse($signup->isPresent());
+            self::assertFalse($signup->present);
         }
     }
 
@@ -187,7 +187,7 @@ final class DrawManagerTest extends DatabaseTestCase
         $list = $this->manualMethodList();
 
         self::assertFalse($this->drawManager()->drawAutomatically($list));
-        self::assertNull($list->getDrawnAt());
+        self::assertNull($list->drawnAt);
     }
 
     public function testManualDrawUsesTheSameCutoffSnapshot(): void
@@ -294,7 +294,7 @@ final class DrawManagerTest extends DatabaseTestCase
 
         $ranked = [];
         foreach ($this->list(3)->getSignUpsInAdmissionOrder() as $signup) {
-            if (null === $signup->getDrawPosition()) {
+            if (null === $signup->drawPosition) {
                 continue;
             }
 
@@ -305,7 +305,7 @@ final class DrawManagerTest extends DatabaseTestCase
         foreach ($ranked as $place => $signup) {
             self::assertSame(
                 $place + 1,
-                $signup->getDrawPosition(),
+                $signup->drawPosition,
             );
         }
 
@@ -314,7 +314,7 @@ final class DrawManagerTest extends DatabaseTestCase
             $external,
             (int) $ranked[count($ranked) - 1]->getId(),
         );
-        self::assertFalse($ranked[count($ranked) - 1]->isDrawn());
+        self::assertFalse($ranked[count($ranked) - 1]->drawn);
     }
 
     public function testTurningTheMembershipOrderAroundServesNonMembersFirst(): void
@@ -370,7 +370,7 @@ final class DrawManagerTest extends DatabaseTestCase
 
         self::assertTrue($list->isAutoDrawDue());
         self::assertFalse($this->drawManager()->drawAutomatically($list));
-        self::assertNull($list->getDrawnAt());
+        self::assertNull($list->drawnAt);
     }
 
     public function testAListGuaranteeingARoleIsNotDrawnByHandBeforeItCloses(): void
@@ -394,7 +394,7 @@ final class DrawManagerTest extends DatabaseTestCase
             AllocationMethod::ConditionalDraw,
             $this->member(8025),
         ));
-        self::assertNull($list->getDrawnAt());
+        self::assertNull($list->drawnAt);
     }
 
     public function testTheDrawMakesUpAShortfallInAGuaranteedRole(): void
@@ -450,8 +450,8 @@ final class DrawManagerTest extends DatabaseTestCase
         $drivers = 0;
         foreach ($list->getSignUps() as $signup) {
             if (
-                null === $signup->getRole()
-                || !$signup->isDrawn()
+                null === $signup->role
+                || !$signup->drawn
             ) {
                 continue;
             }
@@ -683,7 +683,7 @@ final class DrawManagerTest extends DatabaseTestCase
     {
         $drawn = 0;
         foreach ($list->getSignUps() as $signup) {
-            if (!$signup->isDrawn()) {
+            if (!$signup->drawn) {
                 continue;
             }
 
@@ -702,7 +702,7 @@ final class DrawManagerTest extends DatabaseTestCase
     {
         $ids = [];
         foreach ($list->getSignUps() as $signup) {
-            if (!$signup->isDrawn()) {
+            if (!$signup->drawn) {
                 continue;
             }
 
@@ -757,7 +757,7 @@ final class DrawManagerTest extends DatabaseTestCase
         ?DrawCutoffRule $rule = null,
         ?string $cutoffAt = null,
     ): void {
-        $revisionId = $this->list($listId)->getRevision()->getId();
+        $revisionId = $this->list($listId)->revision->getId();
         $connection = $this->entityManager->getConnection();
 
         $fields = [

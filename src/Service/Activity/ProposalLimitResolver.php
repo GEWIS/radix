@@ -51,8 +51,8 @@ final readonly class ProposalLimitResolver
             $this->periodLimitRepository->findForPeriodAndOrgan(
                 $period,
                 $organ,
-            )?->getMaxProposals(),
-            $this->limitRepository->findForOrgan($organ)?->getMaxProposals(),
+            )?->maxProposals,
+            $this->limitRepository->findForOrgan($organ)?->maxProposals,
             $period,
             $this->proposalRepository->countForPeriodAndOrgan(
                 $period,
@@ -93,8 +93,8 @@ final readonly class ProposalLimitResolver
             }
 
             $allowances[$organId] = $this->decide(
-                ($periodLimits[$organId] ?? null)?->getMaxProposals(),
-                ($standingLimits[$organId] ?? null)?->getMaxProposals(),
+                ($periodLimits[$organId] ?? null)?->maxProposals,
+                ($standingLimits[$organId] ?? null)?->maxProposals,
                 $period,
                 $used[$organId] ?? 0,
             );
@@ -128,7 +128,7 @@ final readonly class ProposalLimitResolver
             );
         }
 
-        $periodDefault = $period->getDefaultMaxProposals();
+        $periodDefault = $period->defaultMaxProposals;
 
         if (null !== $periodDefault) {
             return new ProposalAllowance(

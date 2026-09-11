@@ -31,7 +31,7 @@ class ActivityRevisionEdit
         inversedBy: 'editHistory',
     )]
     #[JoinColumn(nullable: false)]
-    private ActivityRevision $revision;
+    public ActivityRevision $revision;
 
     /**
      * The user (a member's account) who made the edit; activities are only ever edited by members. Null once that
@@ -47,7 +47,7 @@ class ActivityRevisionEdit
     private ?UserModel $editor = null;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $editedAt;
+    public DateTime $editedAt;
 
     /**
      * The names of the revision fields that changed in this save (e.g. ['organ', 'name', 'beginTime']).
@@ -55,17 +55,7 @@ class ActivityRevisionEdit
      * @var string[]
      */
     #[Column(type: Types::JSON)]
-    private array $changedFields = [];
-
-    public function getRevision(): ActivityRevision
-    {
-        return $this->revision;
-    }
-
-    public function setRevision(ActivityRevision $revision): void
-    {
-        $this->revision = $revision;
-    }
+    public array $changedFields = [];
 
     public function getEditor(): ?UserModel
     {
@@ -79,32 +69,6 @@ class ActivityRevisionEdit
     public function setEditor(UserModel $editor): void
     {
         $this->editor = $editor;
-    }
-
-    public function getEditedAt(): DateTime
-    {
-        return $this->editedAt;
-    }
-
-    public function setEditedAt(DateTime $editedAt): void
-    {
-        $this->editedAt = $editedAt;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getChangedFields(): array
-    {
-        return $this->changedFields;
-    }
-
-    /**
-     * @param string[] $changedFields
-     */
-    public function setChangedFields(array $changedFields): void
-    {
-        $this->changedFields = $changedFields;
     }
 
     /**

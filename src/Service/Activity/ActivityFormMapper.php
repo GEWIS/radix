@@ -32,34 +32,26 @@ class ActivityFormMapper
         ActivityData $data,
         ActivityRevision $revision,
     ): void {
-        $revision->setOrgan(
-            null !== ($organId = self::identifier($data->organId))
-                ? $this->organRepository->find($organId)
-                : null,
-        );
-        $revision->setCompany(
-            null !== ($companyId = self::identifier($data->companyId))
-                ? $this->companyRepository->find($companyId)
-                : null,
-        );
+        $revision->organ = null !== ($organId = self::identifier($data->organId))
+            ? $this->organRepository->find($organId)
+            : null;
+        $revision->company = null !== ($companyId = self::identifier($data->companyId))
+            ? $this->companyRepository->find($companyId)
+            : null;
 
-        $revision->setBeginTime(
-            null !== $data->beginTime
-                ? DateTime::createFromInterface($data->beginTime)
-                : null,
-        );
-        $revision->setEndTime(
-            null !== $data->endTime
-                ? DateTime::createFromInterface($data->endTime)
-                : null,
-        );
+        $revision->beginTime = null !== $data->beginTime
+            ? DateTime::createFromInterface($data->beginTime)
+            : null;
+        $revision->endTime = null !== $data->endTime
+            ? DateTime::createFromInterface($data->endTime)
+            : null;
 
         if (null !== $data->category) {
-            $revision->setCategory($data->category);
+            $revision->category = $data->category;
         }
 
-        $revision->setRequireGEFLITST($data->requireGEFLITST);
-        $revision->setRequireZettle($data->requireZettle);
+        $revision->requireGEFLITST = $data->requireGEFLITST;
+        $revision->requireZettle = $data->requireZettle;
 
         $data->applyTexts($revision);
 

@@ -47,7 +47,7 @@ final class ActivityRevisionClonerTest extends TestCase
     public function testLinksTheDraftIntoTheChainAsTheNewWorkingHead(): void
     {
         $source = $this->approvedSource();
-        $activity = $source->getActivity();
+        $activity = $source->activity;
 
         $draft = $this->cloner->cloneAsDraft($source);
         self::assertInstanceOf(
@@ -61,7 +61,7 @@ final class ActivityRevisionClonerTest extends TestCase
         );
         self::assertSame(
             $activity,
-            $draft->getActivity(),
+            $draft->activity,
         );
         self::assertSame(
             $draft,
@@ -112,20 +112,20 @@ final class ActivityRevisionClonerTest extends TestCase
         // The texts must be distinct instances with equal values: the OneToOne relations are orphan-removing, so a
         // shared row would be deleted out from under the source revision when the draft is later discarded.
         $this->assertCopiedNotShared(
-            $source->getName(),
-            $draft->getName(),
+            $source->name,
+            $draft->name,
         );
         $this->assertCopiedNotShared(
-            $source->getLocation(),
-            $draft->getLocation(),
+            $source->location,
+            $draft->location,
         );
         $this->assertCopiedNotShared(
-            $source->getCosts(),
-            $draft->getCosts(),
+            $source->costs,
+            $draft->costs,
         );
         $this->assertCopiedNotShared(
-            $source->getDescription(),
-            $draft->getDescription(),
+            $source->description,
+            $draft->description,
         );
     }
 
@@ -141,28 +141,28 @@ final class ActivityRevisionClonerTest extends TestCase
 
         // The schedule is mutable state, so it is cloned (equal value, distinct instance) rather than shared.
         self::assertEquals(
-            $source->getBeginTime(),
-            $draft->getBeginTime(),
+            $source->beginTime,
+            $draft->beginTime,
         );
         self::assertNotSame(
-            $source->getBeginTime(),
-            $draft->getBeginTime(),
+            $source->beginTime,
+            $draft->beginTime,
         );
         self::assertEquals(
-            $source->getEndTime(),
-            $draft->getEndTime(),
+            $source->endTime,
+            $draft->endTime,
         );
         self::assertNotSame(
-            $source->getEndTime(),
-            $draft->getEndTime(),
+            $source->endTime,
+            $draft->endTime,
         );
 
         self::assertSame(
             ActivityCategories::Workshop,
-            $draft->getCategory(),
+            $draft->category,
         );
-        self::assertTrue($draft->getRequireGEFLITST());
-        self::assertTrue($draft->getRequireZettle());
+        self::assertTrue($draft->requireGEFLITST);
+        self::assertTrue($draft->requireZettle);
     }
 
     public function testCarriesTheReferenceEntitiesOverByReference(): void
@@ -186,11 +186,11 @@ final class ActivityRevisionClonerTest extends TestCase
         // same instances rather than copies.
         self::assertSame(
             $organ,
-            $draft->getOrgan(),
+            $draft->organ,
         );
         self::assertSame(
             $company,
-            $draft->getCompany(),
+            $draft->company,
         );
         self::assertTrue($draft->getLabels()->contains($label));
     }
@@ -220,9 +220,9 @@ final class ActivityRevisionClonerTest extends TestCase
         );
         self::assertSame(
             $draft,
-            $draftList->getRevision(),
+            $draftList->revision,
         );
-        self::assertTrue($draftList->getLineageId()->equals($sourceList->getLineageId()));
+        self::assertTrue($draftList->lineageId->equals($sourceList->lineageId));
         // The sign-ups are deliberately NOT carried: they stay on the live revision until the approval migration.
         self::assertTrue($draftList->getSignUps()->isEmpty());
         self::assertFalse($sourceList->getSignUps()->isEmpty());
@@ -236,12 +236,12 @@ final class ActivityRevisionClonerTest extends TestCase
             $draftField,
         );
         self::assertSame(
-            $sourceField->getType(),
-            $draftField->getType(),
+            $sourceField->type,
+            $draftField->type,
         );
         $this->assertCopiedNotShared(
-            $sourceField->getName(),
-            $draftField->getName(),
+            $sourceField->name,
+            $draftField->name,
         );
 
         $sourceOption = $sourceField->getOptions()->getValues()[0];
@@ -251,21 +251,21 @@ final class ActivityRevisionClonerTest extends TestCase
             $draftOption,
         );
         $this->assertCopiedNotShared(
-            $sourceOption->getValue(),
-            $draftOption->getValue(),
+            $sourceOption->value,
+            $draftOption->value,
         );
 
         // The reorder position and the default marker are carried forward too, else a reordered list or a chosen
         // default would silently revert to id order / no default on the next draft.
         self::assertSame(
             2,
-            $draftField->getPosition(),
+            $draftField->position,
         );
         self::assertSame(
             3,
-            $draftOption->getPosition(),
+            $draftOption->position,
         );
-        self::assertTrue($draftOption->isDefault());
+        self::assertTrue($draftOption->isDefault);
     }
 
     public function testCarriesThePriorityModifiersAndDeepClonesTheRoles(): void
@@ -295,7 +295,7 @@ final class ActivityRevisionClonerTest extends TestCase
         );
         self::assertSame(
             MembershipPriorityMode::ReservedPlaces,
-            $draftList->getMembershipPriorityMode(),
+            $draftList->membershipPriorityMode,
         );
         self::assertSame(
             [MembershipTier::Ordinary->value => 3],
@@ -303,7 +303,7 @@ final class ActivityRevisionClonerTest extends TestCase
         );
         self::assertSame(
             2,
-            $draftList->getOrganisingCommitteePlaces(),
+            $draftList->organisingCommitteePlaces,
         );
 
         $sourceRole = $sourceList->getRoles()->getValues()[0];
@@ -314,19 +314,19 @@ final class ActivityRevisionClonerTest extends TestCase
         );
         self::assertSame(
             'Driver',
-            $draftRole->getName(),
+            $draftRole->name,
         );
         self::assertSame(
             4,
-            $draftRole->getMinimum(),
+            $draftRole->minimum,
         );
         self::assertSame(
             1,
-            $draftRole->getPosition(),
+            $draftRole->position,
         );
         self::assertSame(
             $draftList,
-            $draftRole->getSignupList(),
+            $draftRole->signupList,
         );
     }
 
@@ -369,29 +369,29 @@ final class ActivityRevisionClonerTest extends TestCase
         $source->setStatus(RevisionStatus::Approved);
         $source->setRevisionNumber(1);
         $source->setAuthor($author ?? self::createStub(Member::class));
-        $source->setName($this->text(
+        $source->name = $this->text(
             'Lecture',
             'College',
-        ));
-        $source->setLocation($this->text(
+        );
+        $source->location = $this->text(
             'Aula',
             'Aula',
-        ));
-        $source->setCosts($this->text(
+        );
+        $source->costs = $this->text(
             'Free',
             'Gratis',
-        ));
-        $source->setDescription($this->text(
+        );
+        $source->description = $this->text(
             'A talk.',
             'Een praatje.',
-        ));
-        $source->setBeginTime(new DateTime('2026-07-01 18:00'));
-        $source->setEndTime(new DateTime('2026-07-01 22:00'));
-        $source->setCategory(ActivityCategories::Workshop);
-        $source->setRequireGEFLITST(true);
-        $source->setRequireZettle(true);
-        $source->setOrgan($organ ?? self::createStub(Organ::class));
-        $source->setCompany($company ?? self::createStub(Company::class));
+        );
+        $source->beginTime = new DateTime('2026-07-01 18:00');
+        $source->endTime = new DateTime('2026-07-01 22:00');
+        $source->category = ActivityCategories::Workshop;
+        $source->requireGEFLITST = true;
+        $source->requireZettle = true;
+        $source->organ = $organ ?? self::createStub(Organ::class);
+        $source->company = $company ?? self::createStub(Company::class);
         $source->addLabel($label ?? self::createStub(ActivityLabel::class));
         $source->addSignupList($this->signupListWithSignup());
 
@@ -401,33 +401,33 @@ final class ActivityRevisionClonerTest extends TestCase
     private function signupListWithSignup(): SignupList
     {
         $list = new SignupList();
-        $list->setName($this->text(
+        $list->name = $this->text(
             'Attendees',
             'Aanwezigen',
-        ));
+        );
 
         $field = new SignupField();
-        $field->setName($this->text(
+        $field->name = $this->text(
             'Colour',
             'Kleur',
-        ));
-        $field->setType(SignupFieldTypes::Choice);
-        $field->setPosition(2);
+        );
+        $field->type = SignupFieldTypes::Choice;
+        $field->position = 2;
 
         $option = new SignupOption();
-        $option->setValue($this->text(
+        $option->value = $this->text(
             'Red',
             'Rood',
-        ));
-        $option->setPosition(3);
-        $option->setIsDefault(true);
+        );
+        $option->position = 3;
+        $option->isDefault = true;
         $field->addOption($option);
         $list->addField($field);
 
         $role = new SignupRole();
-        $role->setName('Driver');
-        $role->setMinimum(4);
-        $role->setPosition(1);
+        $role->name = 'Driver';
+        $role->minimum = 4;
+        $role->position = 1;
         $list->addRole($role);
 
         $list->setMembershipTierOrder([
@@ -435,12 +435,12 @@ final class ActivityRevisionClonerTest extends TestCase
             [MembershipTier::Ordinary],
             [MembershipTier::Graduate],
         ]);
-        $list->setMembershipPriorityMode(MembershipPriorityMode::ReservedPlaces);
+        $list->membershipPriorityMode = MembershipPriorityMode::ReservedPlaces;
         $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 3]);
-        $list->setOrganisingCommitteePlaces(2);
+        $list->organisingCommitteePlaces = 2;
 
         $signup = new ExternalSignup();
-        $signup->setSignupList($list);
+        $signup->signupList = $list;
         $list->getSignUps()->add($signup);
 
         return $list;

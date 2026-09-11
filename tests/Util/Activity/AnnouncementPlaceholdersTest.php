@@ -149,17 +149,17 @@ final class AnnouncementPlaceholdersTest extends TestCase
     private function listAsking(string ...$questions): SignupList
     {
         $signupList = new SignupList();
-        $signupList->setName(new ActivityLocalisedText(
+        $signupList->name = new ActivityLocalisedText(
             'Participants',
             'Deelnemers',
-        ));
+        );
 
         foreach ($questions as $question) {
             $field = new SignupField();
-            $field->setName(new ActivityLocalisedText(
+            $field->name = new ActivityLocalisedText(
                 $question,
                 $question,
-            ));
+            );
             $signupList->addField($field);
         }
 

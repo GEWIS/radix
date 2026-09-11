@@ -70,7 +70,7 @@ class ActivityProposal
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private OptionPeriod $period;
+    public OptionPeriod $period;
 
     /**
      * The body hosting the activity, or null when the board is hosting it itself. The board is not a body, so it
@@ -81,7 +81,7 @@ class ActivityProposal
         referencedColumnName: 'id',
         nullable: true,
     )]
-    private ?Organ $organ = null;
+    public ?Organ $organ = null;
 
     /**
      * A working title. Everyone reads it on the calendar, so it has to say what the activity is.
@@ -90,7 +90,7 @@ class ActivityProposal
         type: Types::STRING,
         length: 128,
     )]
-    private string $name;
+    public string $name;
 
     /**
      * Anything the board should know while deciding, such as a dependency on somebody outside the association.
@@ -99,7 +99,7 @@ class ActivityProposal
         type: Types::TEXT,
         nullable: true,
     )]
-    private ?string $description = null;
+    public ?string $description = null;
 
     /**
      * The member who handed the proposal in, or null once that member has been removed from the register. The
@@ -118,7 +118,7 @@ class ActivityProposal
         length: 32,
         enumType: ProposalStatus::class,
     )]
-    private ProposalStatus $status = ProposalStatus::Submitted;
+    public ProposalStatus $status = ProposalStatus::Submitted;
 
     /** @var Collection<array-key, ActivityDateOption> */
     #[OneToMany(
@@ -142,7 +142,7 @@ class ActivityProposal
         referencedColumnName: 'id',
         nullable: true,
     )]
-    private ?ActivityDateOption $chosenOption = null;
+    public ?ActivityDateOption $chosenOption = null;
 
     /**
      * The activity this proposal became, started off as a draft the moment a date was reserved.
@@ -157,7 +157,7 @@ class ActivityProposal
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?Activity $activity = null;
+    public ?Activity $activity = null;
 
     #[ManyToOne(targetEntity: Member::class)]
     #[JoinColumn(
@@ -165,13 +165,13 @@ class ActivityProposal
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?Member $decidedBy = null;
+    public ?Member $decidedBy = null;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $decidedAt = null;
+    public ?DateTime $decidedAt = null;
 
     /**
      * How the financial side was settled, or null while it has not been. Null is what the reminder and the lapse
@@ -183,7 +183,7 @@ class ActivityProposal
         nullable: true,
         enumType: BudgetClearance::class,
     )]
-    private ?BudgetClearance $budgetClearance = null;
+    public ?BudgetClearance $budgetClearance = null;
 
     #[ManyToOne(targetEntity: Member::class)]
     #[JoinColumn(
@@ -191,13 +191,13 @@ class ActivityProposal
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?Member $budgetClearedBy = null;
+    public ?Member $budgetClearedBy = null;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $budgetClearedAt = null;
+    public ?DateTime $budgetClearedAt = null;
 
     /**
      * When the body was last told the date is at risk, so a nightly run does not tell them again every night.
@@ -206,51 +206,11 @@ class ActivityProposal
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $budgetRemindedAt = null;
+    public ?DateTime $budgetRemindedAt = null;
 
     public function __construct()
     {
         $this->dateOptions = new ArrayCollection();
-    }
-
-    public function getPeriod(): OptionPeriod
-    {
-        return $this->period;
-    }
-
-    public function setPeriod(OptionPeriod $period): void
-    {
-        $this->period = $period;
-    }
-
-    public function getOrgan(): ?Organ
-    {
-        return $this->organ;
-    }
-
-    public function setOrgan(?Organ $organ): void
-    {
-        $this->organ = $organ;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): void
-    {
-        $this->description = $description;
     }
 
     public function getCreatedBy(): ?Member
@@ -261,16 +221,6 @@ class ActivityProposal
     public function setCreatedBy(Member $createdBy): void
     {
         $this->createdBy = $createdBy;
-    }
-
-    public function getStatus(): ProposalStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(ProposalStatus $status): void
-    {
-        $this->status = $status;
     }
 
     /**
@@ -290,7 +240,7 @@ class ActivityProposal
         $this->assertRoomForAnotherDateOption();
 
         $this->dateOptions->add($dateOption);
-        $dateOption->setProposal($this);
+        $dateOption->proposal = $this;
     }
 
     public function removeDateOption(ActivityDateOption $dateOption): void
@@ -306,88 +256,8 @@ class ActivityProposal
     public function getStandingDateOptions(): array
     {
         return $this->dateOptions
-            ->filter(static fn (ActivityDateOption $option): bool => $option->getStatus()->isStanding())
+            ->filter(static fn (ActivityDateOption $option): bool => $option->status->isStanding())
             ->getValues();
-    }
-
-    public function getChosenOption(): ?ActivityDateOption
-    {
-        return $this->chosenOption;
-    }
-
-    public function setChosenOption(?ActivityDateOption $chosenOption): void
-    {
-        $this->chosenOption = $chosenOption;
-    }
-
-    public function getActivity(): ?Activity
-    {
-        return $this->activity;
-    }
-
-    public function setActivity(?Activity $activity): void
-    {
-        $this->activity = $activity;
-    }
-
-    public function getDecidedBy(): ?Member
-    {
-        return $this->decidedBy;
-    }
-
-    public function setDecidedBy(?Member $decidedBy): void
-    {
-        $this->decidedBy = $decidedBy;
-    }
-
-    public function getDecidedAt(): ?DateTime
-    {
-        return $this->decidedAt;
-    }
-
-    public function setDecidedAt(?DateTime $decidedAt): void
-    {
-        $this->decidedAt = $decidedAt;
-    }
-
-    public function getBudgetClearance(): ?BudgetClearance
-    {
-        return $this->budgetClearance;
-    }
-
-    public function setBudgetClearance(?BudgetClearance $budgetClearance): void
-    {
-        $this->budgetClearance = $budgetClearance;
-    }
-
-    public function getBudgetClearedBy(): ?Member
-    {
-        return $this->budgetClearedBy;
-    }
-
-    public function setBudgetClearedBy(?Member $budgetClearedBy): void
-    {
-        $this->budgetClearedBy = $budgetClearedBy;
-    }
-
-    public function getBudgetClearedAt(): ?DateTime
-    {
-        return $this->budgetClearedAt;
-    }
-
-    public function setBudgetClearedAt(?DateTime $budgetClearedAt): void
-    {
-        $this->budgetClearedAt = $budgetClearedAt;
-    }
-
-    public function getBudgetRemindedAt(): ?DateTime
-    {
-        return $this->budgetRemindedAt;
-    }
-
-    public function setBudgetRemindedAt(?DateTime $budgetRemindedAt): void
-    {
-        $this->budgetRemindedAt = $budgetRemindedAt;
     }
 
     /**
@@ -408,7 +278,7 @@ class ActivityProposal
                 continue;
             }
 
-            $dateOption->setStatus(DateOptionStatus::Declined);
+            $dateOption->status = DateOptionStatus::Declined;
         }
     }
 

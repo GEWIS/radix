@@ -147,26 +147,26 @@ final class SignupMigrationGuardListenerTest extends TestCase
         $activity->addRevision($revision);
 
         $list = new SignupList();
-        $list->setLineageId($lineageId);
+        $list->lineageId = $lineageId;
 
         $field = new SignupField();
-        $field->setName($this->text('Colour'));
-        $field->setType(SignupFieldTypes::Choice);
+        $field->name = $this->text('Colour');
+        $field->type = SignupFieldTypes::Choice;
         $option = new SignupOption();
-        $option->setValue($this->text('Red'));
+        $option->value = $this->text('Red');
         $field->addOption($option);
         $list->addField($field);
         $revision->addSignupList($list);
 
         if ($withSignup) {
             $signup = new ExternalSignup();
-            $signup->setSignupList($list);
+            $signup->signupList = $list;
             $list->getSignUps()->add($signup);
 
             $fieldValue = new SignupFieldValue();
-            $fieldValue->setField($field);
-            $fieldValue->setSignup($signup);
-            $fieldValue->setOption($option);
+            $fieldValue->field = $field;
+            $fieldValue->signup = $signup;
+            $fieldValue->option = $option;
             $signup->getFieldValues()->add($fieldValue);
         }
 

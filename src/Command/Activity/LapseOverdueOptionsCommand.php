@@ -117,9 +117,9 @@ final class LapseOverdueOptionsCommand extends Command
         foreach ($proposals as $proposal) {
             $ui->text(sprintf(
                 '%s (%s) on %s',
-                $proposal->getName(),
-                $proposal->getOrgan()?->getAbbr() ?? 'the board',
-                $proposal->getChosenOption()?->getBeginsAt()->format('Y-m-d') ?? '?',
+                $proposal->name,
+                $proposal->organ?->getAbbr() ?? 'the board',
+                $proposal->chosenOption?->beginsAt->format('Y-m-d') ?? '?',
             ));
 
             if ($dryRun) {
@@ -212,7 +212,7 @@ final class LapseOverdueOptionsCommand extends Command
             NotificationType::ActivityProposalLapsed,
             [
                 'proposal' => strval($proposalId),
-                'proposalName' => $proposal->getName(),
+                'proposalName' => $proposal->name,
             ],
             AlertTypes::Warning,
         );

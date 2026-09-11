@@ -35,7 +35,7 @@ final readonly class ActivityStaleRevisionPolicy implements StaleRevisionPolicyI
 
         // A revision that never got as far as a schedule is a draft somebody opened and closed again; there is
         // nothing it is ahead of.
-        return $revision->getEndTime();
+        return $revision->endTime;
     }
 
     #[Override]

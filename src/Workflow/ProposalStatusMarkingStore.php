@@ -26,7 +26,7 @@ final class ProposalStatusMarkingStore implements MarkingStoreInterface
     {
         assert($subject instanceof ActivityProposal);
 
-        return new Marking([$subject->getStatus()->value => 1]);
+        return new Marking([$subject->status->value => 1]);
     }
 
     /**
@@ -43,6 +43,6 @@ final class ProposalStatusMarkingStore implements MarkingStoreInterface
         $place = array_key_first($marking->getPlaces());
         assert(null !== $place);
 
-        $subject->setStatus(ProposalStatus::from($place));
+        $subject->status = ProposalStatus::from($place);
     }
 }

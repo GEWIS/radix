@@ -57,7 +57,7 @@ final readonly class SignupMigrationGuardListener
             return;
         }
 
-        $live = $revision->getActivity()->getLiveRevision();
+        $live = $revision->activity->getLiveRevision();
         if (
             null === $live
             || $live === $revision

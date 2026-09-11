@@ -34,12 +34,12 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Lapsed,
-            $proposal->getStatus(),
+            $proposal->status,
         );
 
         foreach ($proposal->getDateOptions() as $dateOption) {
             self::assertFalse(
-                $dateOption->getStatus()->isStanding(),
+                $dateOption->status->isStanding(),
                 'A released day has to be out of everybody else\'s way.',
             );
         }
@@ -58,7 +58,7 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Cleared,
-            $proposal->getStatus(),
+            $proposal->status,
         );
     }
 
@@ -75,7 +75,7 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Cleared,
-            $proposal->getStatus(),
+            $proposal->status,
             'An activity with no budget to hand in must never lose its day over one.',
         );
     }
@@ -89,7 +89,7 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Scheduled,
-            $proposal->getStatus(),
+            $proposal->status,
         );
     }
 
@@ -102,7 +102,7 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
 
         self::assertSame(
             ProposalStatus::Scheduled,
-            $proposal->getStatus(),
+            $proposal->status,
         );
     }
 
@@ -130,15 +130,15 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
             $proposal,
         );
 
-        $option = $proposal->getChosenOption();
+        $option = $proposal->chosenOption;
         self::assertNotNull($option);
 
         $day = new DateTime(sprintf(
             '+%d days',
             $days,
         ));
-        $option->setBeginsAt($day);
-        $option->setEndsAt($day);
+        $option->beginsAt = $day;
+        $option->endsAt = $day;
         $this->entityManager->flush();
 
         return $proposal;
@@ -148,9 +148,9 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
         ActivityProposal $proposal,
         BudgetClearance $clearance,
     ): void {
-        $proposal->setStatus(ProposalStatus::Cleared);
-        $proposal->setBudgetClearance($clearance);
-        $proposal->setBudgetClearedAt(new DateTime());
+        $proposal->status = ProposalStatus::Cleared;
+        $proposal->budgetClearance = $clearance;
+        $proposal->budgetClearedAt = new DateTime();
         $this->entityManager->flush();
     }
 }

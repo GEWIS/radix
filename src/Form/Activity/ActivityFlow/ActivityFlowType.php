@@ -36,7 +36,7 @@ class ActivityFlowType extends AbstractStepperFlowType
     {
         return sprintf(
             'list:%s',
-            $list->getLineageId()->toRfc4122(),
+            $list->lineageId->toRfc4122(),
         );
     }
 

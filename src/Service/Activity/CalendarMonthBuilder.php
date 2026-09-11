@@ -269,11 +269,11 @@ final readonly class CalendarMonthBuilder
         DateTimeImmutable $from,
         DateTimeImmutable $until,
     ): array {
-        $begins = DateTimeImmutable::createFromInterface($option->getBeginsAt())->setTime(
+        $begins = DateTimeImmutable::createFromInterface($option->beginsAt)->setTime(
             0,
             0,
         );
-        $ends = DateTimeImmutable::createFromInterface($option->getEndsAt())->setTime(
+        $ends = DateTimeImmutable::createFromInterface($option->endsAt)->setTime(
             0,
             0,
         );
@@ -304,15 +304,15 @@ final readonly class CalendarMonthBuilder
         bool $continuesBefore,
         bool $continuesAfter,
     ): CalendarEntry {
-        $proposal = $option->getProposal();
+        $proposal = $option->proposal;
 
         return new CalendarEntry(
-            DateOptionStatus::Approved === $option->getStatus()
+            DateOptionStatus::Approved === $option->status
                 ? CalendarEntryKind::ReservedDay
                 : CalendarEntryKind::RequestedDay,
-            $proposal->getName(),
-            $proposal->getOrgan()?->getAbbr() ?? '',
-            $option->getTimeOfDay()->value,
+            $proposal->name,
+            $proposal->organ?->getAbbr() ?? '',
+            $option->timeOfDay->value,
             $proposal->getId(),
             $rank,
             $continuesBefore,

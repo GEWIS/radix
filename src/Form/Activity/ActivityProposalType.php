@@ -191,7 +191,7 @@ class ActivityProposalType extends AbstractType
         // that order without asking anybody to fill in a number.
         $position = 1;
         foreach ($proposal->getDateOptions() as $dateOption) {
-            $dateOption->setPosition($position);
+            $dateOption->position = $position;
             ++$position;
         }
 
@@ -261,7 +261,7 @@ class ActivityProposalType extends AbstractType
         array $selectableOrgans,
         bool $isBoard,
     ): void {
-        $organ = $proposal->getOrgan();
+        $organ = $proposal->organ;
 
         if (null === $organ) {
             if ($isBoard) {
@@ -305,7 +305,7 @@ class ActivityProposalType extends AbstractType
         OptionPeriod $period,
         bool $isBoard,
     ): void {
-        $organ = $proposal->getOrgan();
+        $organ = $proposal->organ;
 
         // An activity the board hosts itself is held to nothing.
         if (null === $organ) {
@@ -399,8 +399,8 @@ class ActivityProposalType extends AbstractType
             $row->get('beginsAt')->addError(new FormError($this->translator->trans(
                 'This round only covers %from% to %until%.',
                 [
-                    '%from%' => $period->getStartsAt()->format('d-m-Y'),
-                    '%until%' => $period->getEndsAt()->format('d-m-Y'),
+                    '%from%' => $period->startsAt->format('d-m-Y'),
+                    '%until%' => $period->endsAt->format('d-m-Y'),
                 ],
                 'validators',
             )));

@@ -172,7 +172,7 @@ final readonly class SignupAdminListView
             );
             $fieldColumns[] = [
                 'id' => $fieldId,
-                'name' => $field->getName()->getText($language) ?? '',
+                'name' => $field->name->getText($language) ?? '',
                 'hidden' => $hidden,
             ];
 
@@ -190,7 +190,7 @@ final readonly class SignupAdminListView
             $roleTaken[$role->getId() ?? 0] = 0;
         }
 
-        $committee = null === $signupList->getOrganisingCommitteePlaces()
+        $committee = null === $signupList->organisingCommitteePlaces
             ? []
             : SignupTiers::organisingCommittee($signupList);
         $ranksOn = [
@@ -198,7 +198,7 @@ final readonly class SignupAdminListView
             'program' => null !== $signupList->getProgramTypeOrder(),
             'cohort' => null !== $signupList->getCohortTierOrder(),
         ];
-        $limited = $signupList->getLimitedCapacity();
+        $limited = $signupList->limitedCapacity;
 
         $rows = [];
         $position = 1;
@@ -213,22 +213,22 @@ final readonly class SignupAdminListView
             // confirmed sign-up is exactly one with a set verification moment (manual entries have it set immediately).
             if (
                 $signup instanceof ExternalSignup
-                && null === $signup->getVerifiedAt()
+                && null === $signup->verifiedAt
             ) {
                 continue;
             }
 
             ++$subscriberCount;
 
-            if ($signup->isPresent()) {
+            if ($signup->present) {
                 ++$presentCount;
             }
 
-            if ($signup->isDrawn()) {
+            if ($signup->drawn) {
                 ++$admittedCount;
             }
 
-            $role = $signup->getRole();
+            $role = $signup->role;
             if (null !== $role) {
                 $roleTaken[$role->getId() ?? 0] = ($roleTaken[$role->getId() ?? 0] ?? 0) + 1;
             }
@@ -244,7 +244,7 @@ final readonly class SignupAdminListView
             }
 
             if ($signup instanceof UserSignup) {
-                $member = $signup->getUser();
+                $member = $signup->user;
                 $membershipTypeLabel = $translator->trans(
                     'User (%type%)',
                     ['%type%' => $member->getType()->trans($translator)],
@@ -298,8 +298,8 @@ final readonly class SignupAdminListView
 
             $kept = match ($quickFilter) {
                 SignupFilter::All, SignupFilter::One => true,
-                SignupFilter::Admitted => $signup->isDrawn(),
-                SignupFilter::Waiting => $limited && !$signup->isDrawn(),
+                SignupFilter::Admitted => $signup->drawn,
+                SignupFilter::Waiting => $limited && !$signup->drawn,
                 SignupFilter::External => $external,
                 SignupFilter::Multi => [] !== $otherLists,
             };
@@ -325,8 +325,8 @@ final readonly class SignupAdminListView
                 external: $external,
                 email: $signup->getEmail(),
                 signedUpAt: $signup->getCreatedAt(),
-                present: $signup->isPresent(),
-                drawn: $signup->isDrawn(),
+                present: $signup->present,
+                drawn: $signup->drawn,
                 cells: $cells,
                 priority: self::priorityLabels(
                     $ranksOn,
@@ -334,7 +334,7 @@ final readonly class SignupAdminListView
                     $translator,
                 ),
                 roleId: $role?->getId(),
-                roleName: $role?->getName(),
+                roleName: $role?->name,
                 organisingBody: $organisingBody,
                 otherLists: $otherLists,
                 selected: $selected,
@@ -345,27 +345,27 @@ final readonly class SignupAdminListView
         foreach ($signupList->getRoles() as $role) {
             $roles[] = [
                 'id' => $role->getId() ?? 0,
-                'name' => $role->getName(),
-                'minimum' => $role->getMinimum(),
+                'name' => $role->name,
+                'minimum' => $role->minimum,
                 'taken' => $roleTaken[$role->getId() ?? 0] ?? 0,
             ];
         }
 
         return new self(
             listId: $listId,
-            name: $signupList->getName()->getText($language) ?? '',
-            openDate: $signupList->getOpenDate(),
-            closeDate: $signupList->getCloseDate(),
-            onlyGEWIS: $signupList->getOnlyGEWIS(),
-            displaySubscribedNumber: $signupList->getDisplaySubscribedNumber(),
+            name: $signupList->name->getText($language) ?? '',
+            openDate: $signupList->openDate,
+            closeDate: $signupList->closeDate,
+            onlyGEWIS: $signupList->onlyGEWIS,
+            displaySubscribedNumber: $signupList->displaySubscribedNumber,
             limitedCapacity: $limited,
-            capacity: $signupList->getCapacity(),
-            allocationMethod: $signupList->getAllocationMethod(),
-            promoted: $signupList->isPromoted(),
-            presenceTaken: $signupList->isPresenceTaken(),
+            capacity: $signupList->capacity,
+            allocationMethod: $signupList->allocationMethod,
+            promoted: $signupList->promoted,
+            presenceTaken: $signupList->presenceTaken,
             drawLocked: $signupList->isDrawLocked(),
-            drawnAt: $signupList->getDrawnAt(),
-            drawnByName: $signupList->getDrawnBy()?->getFullName(),
+            drawnAt: $signupList->drawnAt,
+            drawnByName: $signupList->drawnBy?->getFullName(),
             autoDrawAt: $signupList->getAutoDrawAt(),
             autoDrawDue: $signupList->isAutoDrawDue(),
             drawnByHand: $signupList->isDrawnByHand(),
@@ -466,7 +466,7 @@ final readonly class SignupAdminListView
             );
         }
 
-        $committee = $signupList->getOrganisingCommitteePlaces();
+        $committee = $signupList->organisingCommitteePlaces;
         if (null !== $committee) {
             $held[] = sprintf(
                 '%s: %d',

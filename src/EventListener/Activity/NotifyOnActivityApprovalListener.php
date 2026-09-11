@@ -36,7 +36,7 @@ final readonly class NotifyOnActivityApprovalListener
             return;
         }
 
-        $activity = $revision->getActivity();
+        $activity = $revision->activity;
         if (null !== $activity->getLiveRevision()) {
             return;
         }

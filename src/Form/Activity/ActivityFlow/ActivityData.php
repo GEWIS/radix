@@ -113,30 +113,30 @@ final class ActivityData
         $data = new self();
         $data->scheduleLocked = $scheduleLocked;
         // A revision that was saved has answered both questions, so nothing is left unanswered on an edit.
-        $data->organId = self::identifier($revision->getOrgan()?->getId());
-        $data->companyId = self::identifier($revision->getCompany()?->getId());
-        $data->beginTime = null !== $revision->getBeginTime()
-            ? DateTimeImmutable::createFromInterface($revision->getBeginTime())
+        $data->organId = self::identifier($revision->organ?->getId());
+        $data->companyId = self::identifier($revision->company?->getId());
+        $data->beginTime = null !== $revision->beginTime
+            ? DateTimeImmutable::createFromInterface($revision->beginTime)
             : null;
-        $data->endTime = null !== $revision->getEndTime()
-            ? DateTimeImmutable::createFromInterface($revision->getEndTime())
+        $data->endTime = null !== $revision->endTime
+            ? DateTimeImmutable::createFromInterface($revision->endTime)
             : null;
-        $data->category = $revision->getCategory();
+        $data->category = $revision->category;
         $data->labelIds = array_map(
             static fn (ActivityLabel $label): int => (int) $label->getId(),
             $revision->getLabels()->toArray(),
         );
-        $data->requireGEFLITST = $revision->getRequireGEFLITST();
-        $data->requireZettle = $revision->getRequireZettle();
+        $data->requireGEFLITST = $revision->requireGEFLITST;
+        $data->requireZettle = $revision->requireZettle;
 
-        $data->nameNL = $revision->getName()->getValueNL();
-        $data->nameEN = $revision->getName()->getValueEN();
-        $data->locationNL = $revision->getLocation()->getValueNL();
-        $data->locationEN = $revision->getLocation()->getValueEN();
-        $data->costsNL = $revision->getCosts()->getValueNL();
-        $data->costsEN = $revision->getCosts()->getValueEN();
-        $data->descriptionNL = $revision->getDescription()->getValueNL();
-        $data->descriptionEN = $revision->getDescription()->getValueEN();
+        $data->nameNL = $revision->name->getValueNL();
+        $data->nameEN = $revision->name->getValueEN();
+        $data->locationNL = $revision->location->getValueNL();
+        $data->locationEN = $revision->location->getValueEN();
+        $data->costsNL = $revision->costs->getValueNL();
+        $data->costsEN = $revision->costs->getValueEN();
+        $data->descriptionNL = $revision->description->getValueNL();
+        $data->descriptionEN = $revision->description->getValueEN();
 
         $languages = $revision->languages();
         $data->languageDutch = in_array(
@@ -187,10 +187,10 @@ final class ActivityData
     {
         foreach (
             [
-                'name' => $revision->getName(),
-                'location' => $revision->getLocation(),
-                'costs' => $revision->getCosts(),
-                'description' => $revision->getDescription(),
+                'name' => $revision->name,
+                'location' => $revision->location,
+                'costs' => $revision->costs,
+                'description' => $revision->description,
             ] as $field => $text
         ) {
             $text->updateValues(

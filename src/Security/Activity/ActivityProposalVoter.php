@@ -88,7 +88,7 @@ final class ActivityProposalVoter extends Voter
             self::VIEW => $isBoard || $isOwner,
             // Only a proposal still waiting for a decision may be changed. Once a date is held, changing the dates
             // would mean holding one nobody approved, so the way out is to withdraw and propose again.
-            self::EDIT => $subject->getStatus()->isEditableByAuthor() && ($isBoard || $isOwner),
+            self::EDIT => $subject->status->isEditableByAuthor() && ($isBoard || $isOwner),
             self::WITHDRAW => $isBoard || $isOwner,
             self::DECIDE => $isBoard,
             default => false,
@@ -115,7 +115,7 @@ final class ActivityProposalVoter extends Voter
 
         return $this->isOrganMember(
             $member,
-            $proposal->getOrgan(),
+            $proposal->organ,
         );
     }
 

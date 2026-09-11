@@ -24,7 +24,7 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
     public function testAskingForAPhotographerWritesToGeflitstAndTheirBoard(): void
     {
         $revision = $this->draft();
-        $revision->setRequireGEFLITST(true);
+        $revision->requireGEFLITST = true;
 
         self::getContainer()->get(ActivityFacilityNotifier::class)->created($revision);
 
@@ -55,7 +55,7 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
     public function testTheRequesterIsWhoAReplyReaches(): void
     {
         $revision = $this->draft();
-        $revision->setRequireGEFLITST(true);
+        $revision->requireGEFLITST = true;
 
         self::getContainer()->get(ActivityFacilityNotifier::class)->created($revision);
 
@@ -68,8 +68,8 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
     public function testAnActivityThatAsksForNothingSendsNothing(): void
     {
         $revision = $this->draft();
-        $revision->setRequireGEFLITST(false);
-        $revision->setRequireZettle(false);
+        $revision->requireGEFLITST = false;
+        $revision->requireZettle = false;
 
         self::getContainer()->get(ActivityFacilityNotifier::class)->created($revision);
 

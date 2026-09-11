@@ -25,7 +25,7 @@ final class PastActivityRule
      */
     public static function ended(ActivityRevision $revision): bool
     {
-        $endTime = $revision->getEndTime();
+        $endTime = $revision->endTime;
 
         return null !== $endTime && $endTime < new DateTime();
     }
@@ -35,7 +35,7 @@ final class PastActivityRule
      */
     public static function started(ActivityRevision $revision): bool
     {
-        $beginTime = $revision->getBeginTime();
+        $beginTime = $revision->beginTime;
 
         return null !== $beginTime && $beginTime < new DateTime();
     }

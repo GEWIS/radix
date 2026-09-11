@@ -59,7 +59,7 @@ final readonly class PastActivityGuardListener
         // stays editable while it runs, so its content is frozen only once it has ended. A brand-new activity
         // awaiting its first publication is judged by its own *start*: one that has already started can never debut,
         // since its sign-up lists close before it begins, so it could never be joined.
-        $live = $revision->getActivity()->getLiveRevision();
+        $live = $revision->activity->getLiveRevision();
 
         if (
             PastActivityRule::liveEnded(

@@ -241,7 +241,7 @@ class GeneralStepType extends AbstractType
 
         foreach ($this->activityLabelRepository->findAllWithName() as $label) {
             assert($label instanceof ActivityLabel);
-            $choices[$label->getName()->getText($language) ?? ''] = intval($label->getId());
+            $choices[$label->name->getText($language) ?? ''] = intval($label->getId());
         }
 
         return $choices;

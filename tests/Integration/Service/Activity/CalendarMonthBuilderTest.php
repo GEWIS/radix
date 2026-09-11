@@ -172,7 +172,7 @@ final class CalendarMonthBuilderTest extends DatabaseTestCase
             $option,
         );
 
-        return DateTimeImmutable::createFromInterface($option->getBeginsAt());
+        return DateTimeImmutable::createFromInterface($option->beginsAt);
     }
 
     private function aProposalSpanning(
@@ -192,15 +192,15 @@ final class CalendarMonthBuilderTest extends DatabaseTestCase
         );
 
         $proposal = new ActivityProposal();
-        $proposal->setPeriod($period);
-        $proposal->setOrgan($organ);
+        $proposal->period = $period;
+        $proposal->organ = $organ;
         $proposal->setCreatedBy($member);
-        $proposal->setName('Een weekend weg');
+        $proposal->name = 'Een weekend weg';
 
         $option = new ActivityDateOption();
-        $option->setBeginsAt($from);
-        $option->setEndsAt($until);
-        $option->setTimeOfDay(TimeOfDay::MultipleDays);
+        $option->beginsAt = $from;
+        $option->endsAt = $until;
+        $option->timeOfDay = TimeOfDay::MultipleDays;
         $proposal->addDateOption($option);
 
         $this->entityManager->persist($proposal);
