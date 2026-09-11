@@ -38,7 +38,7 @@ class AbolishMapper extends AbstractDecisionMapper
         foreach ($foundation->getReferences() as $reference) {
             if (
                 !($reference instanceof Installation)
-                || null !== $reference->getDischarge()
+                || null !== $reference->discharge
             ) {
                 continue;
             }
@@ -53,14 +53,14 @@ class AbolishMapper extends AbstractDecisionMapper
 
         foreach ($installations as $installation) {
             $discharge = new Discharge();
-            $discharge->setInstallation($installation);
-            $discharge->setSequence($sequence++);
+            $discharge->installation = $installation;
+            $discharge->sequence = $sequence++;
             $discharge->setDecision($decision);
         }
 
         $abrogation = new Abrogation();
-        $abrogation->setFoundation($foundation);
-        $abrogation->setSequence($sequence);
+        $abrogation->foundation = $foundation;
+        $abrogation->sequence = $sequence;
         $abrogation->setDecision($decision);
     }
 }

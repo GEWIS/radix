@@ -56,7 +56,7 @@ class DecisionTest extends TestCase
         );
         self::assertSame(
             $meeting,
-            $decision->getMeeting(),
+            $decision->meeting,
         );
         self::assertTrue($meeting->getDecisions()->contains($decision));
     }
@@ -210,6 +210,6 @@ class DecisionTest extends TestCase
         $decision = $this->decision();
 
         self::assertFalse($decision->isAnnulled());
-        self::assertNull($decision->getAnnulledBy());
+        self::assertNull($decision->annulledBy);
     }
 }

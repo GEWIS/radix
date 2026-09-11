@@ -53,19 +53,19 @@ class MeetingCounterpartTest extends KernelTestCase
         $this->entityManager->flush();
 
         self::assertTrue($this->meetingService->linkVirtualCounterpart(
-            $board->getType(),
+            $board->type,
             $board->getNumber(),
-            $original->getPoint(),
-            $original->getNumber(),
-            $virtual->getType(),
+            $original->point,
+            $original->number,
+            $virtual->type,
             $virtual->getNumber(),
-            $repeat->getPoint(),
-            $repeat->getNumber(),
+            $repeat->point,
+            $repeat->number,
         ));
 
         self::assertSame(
             $original,
-            $repeat->getCounterpart(),
+            $repeat->counterpart,
         );
     }
 
@@ -84,14 +84,14 @@ class MeetingCounterpartTest extends KernelTestCase
 
         foreach ([$first, $second] as $repeat) {
             $this->meetingService->linkVirtualCounterpart(
-                $board->getType(),
+                $board->type,
                 $board->getNumber(),
-                $original->getPoint(),
-                $original->getNumber(),
-                $virtual->getType(),
+                $original->point,
+                $original->number,
+                $virtual->type,
                 $virtual->getNumber(),
-                $repeat->getPoint(),
-                $repeat->getNumber(),
+                $repeat->point,
+                $repeat->number,
             );
         }
 
@@ -111,17 +111,17 @@ class MeetingCounterpartTest extends KernelTestCase
         $original = $this->build->decision($board);
         $this->entityManager->flush();
 
-        $repeat->setCounterpart($original);
+        $repeat->counterpart = $original;
         $this->entityManager->flush();
 
         self::assertTrue($this->meetingService->unlinkVirtualCounterpart(
-            $virtual->getType(),
+            $virtual->type,
             $virtual->getNumber(),
-            $repeat->getPoint(),
-            $repeat->getNumber(),
+            $repeat->point,
+            $repeat->number,
         ));
 
-        self::assertNull($repeat->getCounterpart());
+        self::assertNull($repeat->counterpart);
     }
 
     /**
@@ -138,9 +138,9 @@ class MeetingCounterpartTest extends KernelTestCase
 
         $reference = sprintf(
             '%s %d.%d.',
-            $virtual->getType()->value,
+            $virtual->type->value,
             $virtual->getNumber(),
-            $taken->getPoint(),
+            $taken->point,
         );
 
         self::assertCount(
@@ -151,7 +151,7 @@ class MeetingCounterpartTest extends KernelTestCase
             ),
         );
 
-        $taken->setCounterpart($original);
+        $taken->counterpart = $original;
         $this->entityManager->flush();
 
         self::assertSame(
@@ -166,9 +166,9 @@ class MeetingCounterpartTest extends KernelTestCase
         self::assertNotEmpty($this->meetingService->searchDecisions(
             sprintf(
                 '%s %d.%d.',
-                $virtual->getType()->value,
+                $virtual->type->value,
                 $virtual->getNumber(),
-                $free->getPoint(),
+                $free->point,
             ),
             onlyUnlinkedVirtual: true,
         ));
@@ -187,14 +187,14 @@ class MeetingCounterpartTest extends KernelTestCase
         $this->expectException(CounterpartNotPossible::class);
 
         $this->meetingService->linkVirtualCounterpart(
-            $virtual->getType(),
+            $virtual->type,
             $virtual->getNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
-            $virtual->getType(),
+            $decision->point,
+            $decision->number,
+            $virtual->type,
             $virtual->getNumber(),
-            $other->getPoint(),
-            $other->getNumber(),
+            $other->point,
+            $other->number,
         );
     }
 
@@ -211,14 +211,14 @@ class MeetingCounterpartTest extends KernelTestCase
         $this->expectException(CounterpartNotPossible::class);
 
         $this->meetingService->linkVirtualCounterpart(
-            $board->getType(),
+            $board->type,
             $board->getNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
-            $board->getType(),
+            $decision->point,
+            $decision->number,
+            $board->type,
             $board->getNumber(),
-            $other->getPoint(),
-            $other->getNumber(),
+            $other->point,
+            $other->number,
         );
     }
 }

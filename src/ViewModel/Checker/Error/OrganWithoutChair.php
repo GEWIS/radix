@@ -44,7 +44,7 @@ class OrganWithoutChair extends Error
     {
         return sprintf(
             '%s has no chair.',
-            $this->getOrgan()->getAbbr(),
+            $this->getOrgan()->abbr,
         );
     }
 }

@@ -84,28 +84,32 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
             $displayName = ucfirst($name);
 
             $list = new MailingList();
-            $list->setName($name);
+            $list->name = $name;
             $list->setNlDescription($definition['nl']);
             $list->setEnDescription($definition['en']);
-            $list->setOnForm($definition['on_form']);
-            $list->setDefaultSub($definition['default']);
+            $list->onForm = $definition['on_form'];
+            $list->defaultSub = $definition['default'];
 
             if (null === $definition['listmonk']) {
                 $mailman = new MailmanMailingList();
-                $mailman->setMailmanId(sprintf('%s.%s', $name, $this->hostname));
-                $mailman->setName($displayName);
+                $mailman->mailmanId = sprintf(
+                    '%s.%s',
+                    $name,
+                    $this->hostname,
+                );
+                $mailman->name = $displayName;
                 $mailman->setLastSeen();
                 $manager->persist($mailman);
 
-                $list->setMailmanList($mailman);
+                $list->mailmanList = $mailman;
             } else {
                 $listmonk = new ListmonkMailingList();
-                $listmonk->setListmonkId($definition['listmonk']);
-                $listmonk->setName($displayName);
+                $listmonk->listmonkId = $definition['listmonk'];
+                $listmonk->name = $displayName;
                 $listmonk->setLastSeen();
                 $manager->persist($listmonk);
 
-                $list->setListmonkList($listmonk);
+                $list->listmonkList = $listmonk;
             }
 
             $manager->persist($list);

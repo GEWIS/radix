@@ -230,7 +230,7 @@ class MailmanService
         $lists = $this->mailingListRepository->findAll();
 
         foreach ($lists as $list) {
-            if (!$list->hasMailmanList()) {
+            if (!$list->isOnMailman()) {
                 continue;
             }
 
@@ -264,15 +264,15 @@ class MailmanService
         $output->writeln(
             sprintf(
                 '-> Syncing membership changes for <info>%s</info> (%s)',
-                $dbList->getName(),
-                $dbList->getMailmanList()->getMailmanId(),
+                $dbList->name,
+                $dbList->mailmanList->mailmanId,
             ),
             OutputInterface::VERBOSITY_VERBOSE,
         );
 
         $verifyTime = new DateTime()->sub(new DateInterval('P1D'));
 
-        $listId = $dbList->getMailmanList()->getMailmanId();
+        $listId = $dbList->mailmanList->mailmanId;
         $knownMembers = $this->getMailmanListSubscriberEmails($listId);
 
         // Phase 1: Sync all pending changes from DB side
@@ -280,21 +280,21 @@ class MailmanService
         // (e.g. when changing email addresses twice)
         foreach ($dbMemberships as $mailingListMember) {
             if (
-                $mailingListMember->isToBeDeleted()
-                || null === $mailingListMember->getMember()
+                $mailingListMember->toBeDeleted
+                || null === $mailingListMember->member
             ) {
                 $this->unsubscribeMemberFromMailingList(
                     mailingListMember: $mailingListMember,
                     output: $output,
                     dryRun: $dryRun,
                 );
-            } elseif ($mailingListMember->isToBeCreated()) {
+            } elseif ($mailingListMember->toBeCreated) {
                 $this->subscribeMemberToMailingList(
                     mailingListMember: $mailingListMember,
                     output: $output,
                     dryRun: $dryRun,
                 );
-            } elseif ($mailingListMember->getLastSyncOn() < $verifyTime) {
+            } elseif ($mailingListMember->lastSyncOn < $verifyTime) {
                 $this->verifyMemberOnMailingList(
                     mailingListMember: $mailingListMember,
                     output: $output,
@@ -305,7 +305,7 @@ class MailmanService
         }
 
         // Phase 2: once per 24 hours
-        if ($dbList->getMailmanList()->getLastCheck() > $verifyTime) {
+        if ($dbList->mailmanList->lastCheck > $verifyTime) {
             return;
         }
 
@@ -396,8 +396,8 @@ class MailmanService
                 $l = new MailmanMailingList();
             }
 
-            $l->setName($list['display_name']);
-            $l->setMailmanId($list['list_id']);
+            $l->name = $list['display_name'];
+            $l->mailmanId = $list['list_id'];
             $l->setLastSeen();
 
             $this->mailmanMailingListRepository->persist($l);
@@ -458,13 +458,13 @@ class MailmanService
         OutputInterface $output,
         bool $dryRun,
     ): void {
-        $member = $mailingListMember->getMember();
-        $listId = $mailingListMember->getMailingList()->getMailmanList()->getMailmanId();
+        $member = $mailingListMember->member;
+        $listId = $mailingListMember->mailingList->mailmanList->mailmanId;
 
         // Create the data for the request
         $data = [
             'list_id' => $listId,
-            'subscriber' => $mailingListMember->getEmail(),
+            'subscriber' => $mailingListMember->email,
             'display_name' => $member->getFullName(),
             'role' => self::MM_ROLE_MEMBER,
             'pre_verified' => true,
@@ -502,10 +502,10 @@ class MailmanService
         // Check if the request was successful
         // Status code 201 + empty array means success
         if ([] === $response) {
-            $mailingListMember->setLastSyncSuccess(true);
-            $mailingListMember->setToBeCreated(false);
+            $mailingListMember->lastSyncSuccess = true;
+            $mailingListMember->toBeCreated = false;
         } else {
-            $mailingListMember->setLastSyncSuccess(false);
+            $mailingListMember->lastSyncSuccess = false;
         }
 
         $this->mailingListMemberRepository->persist($mailingListMember);
@@ -516,11 +516,11 @@ class MailmanService
         OutputInterface $output,
         bool $dryRun,
     ): void {
-        $listId = $mailingListMember->getMailingList()->getMailmanList()->getMailmanId();
+        $listId = $mailingListMember->mailingList->mailmanList->mailmanId;
 
         $data = [
             'list_id' => $listId,
-            'subscriber' => $mailingListMember->getEmail(),
+            'subscriber' => $mailingListMember->email,
             'role' => self::MM_ROLE_MEMBER,
         ];
 
@@ -554,19 +554,19 @@ class MailmanService
             return;
         }
 
-        $member = $mailingListMember->getMember();
+        $member = $mailingListMember->member;
 
         if (
             null !== $member
-            && false === $mailingListMember->isToBeDeleted()
+            && false === $mailingListMember->toBeDeleted
         ) {
             $this->auditService->persist(
                 AuditMailingListMembership::create(
                     MailingListMemberAction::Remove,
                     MailingListMemberOrigin::SyncMailman,
                     $member,
-                    $mailingListMember->getMailingList(),
-                    $mailingListMember->getEmail(),
+                    $mailingListMember->mailingList,
+                    $mailingListMember->email,
                 ),
             );
         }
@@ -598,15 +598,15 @@ class MailmanService
         array $knownMembers,
     ): void {
         // If there is no associated mailman list, assume this is right
-        if (!$mailingListMember->getMailingList()->hasMailmanList()) {
+        if (!$mailingListMember->mailingList->isOnMailman()) {
             throw new LogicException('Cannot verify mailing list subscription for non-mailman list');
         }
 
-        $listId = $mailingListMember->getMailingList()->getMailmanList()->getMailmanId();
+        $listId = $mailingListMember->mailingList->mailmanList->mailmanId;
 
         if (
             in_array(
-                $mailingListMember->getEmail(),
+                $mailingListMember->email,
                 $knownMembers,
             )
         ) {
@@ -619,7 +619,7 @@ class MailmanService
         $output->writeln(
             sprintf(
                 '--> %s is not in the list of known members of %s, verifying in mailman',
-                $mailingListMember->getEmail(),
+                $mailingListMember->email,
                 $listId,
             ),
             OutputInterface::VERBOSITY_VERY_VERBOSE,
@@ -627,7 +627,7 @@ class MailmanService
 
         $data = [
             'list_id' => $listId,
-            'subscriber' => $mailingListMember->getEmail(),
+            'subscriber' => $mailingListMember->email,
             'role' => self::MM_ROLE_MEMBER,
         ];
 
@@ -668,19 +668,19 @@ class MailmanService
             return;
         }
 
-        $member = $mailingListMember->getMember();
+        $member = $mailingListMember->member;
 
         if (
             null !== $member
-            && false === $mailingListMember->isToBeDeleted()
+            && false === $mailingListMember->toBeDeleted
         ) {
             $this->auditService->persist(
                 AuditMailingListMembership::create(
                     MailingListMemberAction::Remove,
                     MailingListMemberOrigin::SyncMailman,
                     $member,
-                    $mailingListMember->getMailingList(),
-                    $mailingListMember->getEmail(),
+                    $mailingListMember->mailingList,
+                    $mailingListMember->email,
                 ),
             );
         }
@@ -697,12 +697,12 @@ class MailmanService
         OutputInterface $output,
         bool $dryRun,
     ): void {
-        $mmList = $mailingList->getMailmanList();
+        $mmList = $mailingList->mailmanList;
         $membersDB = $mailingList->getMailingListMemberships();
-        $listId = $mailingList->getMailmanList()->getMailmanId();
+        $listId = $mailingList->mailmanList->mailmanId;
 
         $memberEmails = array_flip(array_map(
-            static fn (MailingListMember $member): string => $member->getEmail(),
+            static fn (MailingListMember $member): string => $member->email,
             $membersDB->toArray(),
         ));
 
@@ -752,10 +752,10 @@ class MailmanService
                     );
 
                     $mailingListMember = new MailingListMember();
-                    $mailingListMember->setMailingList($mailingList);
+                    $mailingListMember->mailingList = $mailingList;
                     $mailingListMember->setMember($foundMember);
-                    $mailingListMember->setEmail($entry['email']);
-                    $mailingListMember->setToBeCreated(false);
+                    $mailingListMember->email = $entry['email'];
+                    $mailingListMember->toBeCreated = false;
                     $this->mailingListMemberRepository->persist($mailingListMember);
                 }
             }

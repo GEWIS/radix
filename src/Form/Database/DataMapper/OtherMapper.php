@@ -32,9 +32,9 @@ class OtherMapper extends AbstractDecisionMapper
         }
 
         $subdecision = new Other();
-        $subdecision->setSequence(1);
-        $subdecision->setContentNL($contentNL);
-        $subdecision->setContentEN($contentEN);
+        $subdecision->sequence = 1;
+        $subdecision->contentNL = $contentNL;
+        $subdecision->contentEN = $contentEN;
         $subdecision->setDecision($decision);
     }
 }

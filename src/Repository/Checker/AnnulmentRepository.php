@@ -49,7 +49,7 @@ class AnnulmentRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'meeting_type',
-                $meeting->getType(),
+                $meeting->type,
             )
             ->setParameter(
                 'meeting_number',

@@ -225,7 +225,7 @@ class RegistrationServiceTest extends TestCase
     public function testRefusesAPaymentLinkThatIsUnknownOrAlreadyUsed(): void
     {
         $used = $this->paymentLink();
-        $used->setUsed(true);
+        $used->used = true;
 
         $this->stripeService = self::createStub(StripeService::class);
         $this->stripeService->method('getPaymentLink')->willReturn(null);
@@ -325,7 +325,7 @@ class RegistrationServiceTest extends TestCase
     {
         $prospectiveMember = self::createStub(ProspectiveMember::class);
         $prospectiveMember->method('canBeDeleted')->willReturn(true);
-        $prospectiveMember->method('hasPaid')->willReturn(false);
+        $prospectiveMember->method('isPaymentSettled')->willReturn(false);
 
         $stripeService = $this->createMock(StripeService::class);
         $stripeService->expects(self::never())->method('createRefund');
@@ -410,7 +410,7 @@ class RegistrationServiceTest extends TestCase
     private function paymentLink(): PaymentLink
     {
         $paymentLink = new PaymentLink();
-        $paymentLink->setProspectiveMember(new ProspectiveMember());
+        $paymentLink->prospectiveMember = new ProspectiveMember();
 
         return $paymentLink;
     }
@@ -419,7 +419,7 @@ class RegistrationServiceTest extends TestCase
     {
         $prospectiveMember = self::createStub(ProspectiveMember::class);
         $prospectiveMember->method('canBeDeleted')->willReturn(true);
-        $prospectiveMember->method('hasPaid')->willReturn(true);
+        $prospectiveMember->method('isPaymentSettled')->willReturn(true);
 
         return $prospectiveMember;
     }

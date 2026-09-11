@@ -28,7 +28,7 @@ class WarningMapper extends AbstractDecisionMapper
         }
 
         $warning = new Warning();
-        $warning->setSequence(1);
+        $warning->sequence = 1;
         $warning->setMember($member);
         $warning->setDecision($decision);
     }

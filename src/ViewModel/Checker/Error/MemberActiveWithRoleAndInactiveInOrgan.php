@@ -44,7 +44,7 @@ class MemberActiveWithRoleAndInactiveInOrgan extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -53,8 +53,8 @@ class MemberActiveWithRoleAndInactiveInOrgan extends Error
         return sprintf(
             'Member %s (%d) is installed as "Lid" in %s with special roles but is also installed as "Inactief Lid".',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
-            $this->getOrgan()->getName(),
+            $this->getMember()->lidnr,
+            $this->getOrgan()->name,
         );
     }
 }

@@ -92,14 +92,14 @@ class Member
         }
 
         $prospectiveMember = new ProspectiveMemberModel();
-        $prospectiveMember->setEmail($data->email);
-        $prospectiveMember->setInitials((string) $data->initials);
-        $prospectiveMember->setFirstName((string) $data->firstName);
-        $prospectiveMember->setMiddleName($data->middleName);
-        $prospectiveMember->setLastName((string) $data->lastName);
-        $prospectiveMember->setStudentNumber($data->studentNumber);
-        $prospectiveMember->setBirth(DateTime::createFromInterface($data->birth ?? new DateTime()));
-        $prospectiveMember->setStudy($data->study ?? Studies::Other);
+        $prospectiveMember->email = $data->email;
+        $prospectiveMember->initials = (string) $data->initials;
+        $prospectiveMember->firstName = (string) $data->firstName;
+        $prospectiveMember->middleName = $data->middleName;
+        $prospectiveMember->lastName = (string) $data->lastName;
+        $prospectiveMember->studentNumber = $data->studentNumber;
+        $prospectiveMember->birth = DateTime::createFromInterface($data->birth ?? new DateTime());
+        $prospectiveMember->study = $data->study ?? Studies::Other;
 
         // changed on date
         $date = new DateTime();
@@ -107,17 +107,17 @@ class Member
             0,
             0,
         );
-        $prospectiveMember->setChangedOn($date);
+        $prospectiveMember->changedOn = $date;
 
         // store the address
         $address = new AddressModel();
-        $address->setType(AddressTypes::Student);
-        $address->setCountry($data->country ?? PostalRegions::Netherlands);
-        $address->setStreet((string) $data->street);
-        $address->setNumber((string) $data->number);
-        $address->setPostalCode((string) $data->postalCode);
-        $address->setCity((string) $data->city);
-        $address->setPhone($data->phone);
+        $address->type = AddressTypes::Student;
+        $address->country = $data->country ?? PostalRegions::Netherlands;
+        $address->street = (string) $data->street;
+        $address->number = (string) $data->number;
+        $address->postalCode = (string) $data->postalCode;
+        $address->city = (string) $data->city;
+        $address->phone = $data->phone;
         $prospectiveMember->setAddress($address);
 
         // check mailing lists
@@ -125,14 +125,14 @@ class Member
 
         // subscribe to default mailing lists not on the form
         foreach ($this->mailingListRepository->findDefault() as $list) {
-            $prospectiveMember->addList($list->getName());
+            $prospectiveMember->addList($list->name);
         }
 
         $this->prospectiveMemberRepository->persist($prospectiveMember);
 
         // Create a payment link for the prospective member in the event that the checkout did not succeed.
         $paymentLink = new PaymentLink();
-        $paymentLink->setProspectiveMember($prospectiveMember);
+        $paymentLink->prospectiveMember = $prospectiveMember;
         $prospectiveMember->setPaymentLink($paymentLink);
         $this->actionLinkRepository->persist($paymentLink);
 
@@ -154,7 +154,7 @@ class Member
         $this->bus->dispatch(
             new RegistrationUpdateEmail(
                 $type,
-                $member->getLidnr(),
+                $member->lidnr,
             ),
         );
     }
@@ -185,20 +185,20 @@ class Member
             return null;
         }
 
-        if ($this->memberRepository->hasMemberWith($prospectiveMember->getEmail())) {
+        if ($this->memberRepository->hasMemberWith($prospectiveMember->email)) {
             // phpcs:ignore -- user-visible strings should not be split
             throw new RuntimeException('You cannot approve this member. A member with this email address already exists. Make sure this is not an error in the database. Disapproving will refund the member, so make sure they paid twice before refunding.');
         }
 
         $member = new MemberModel();
-        $member->setInitials($prospectiveMember->getInitials());
-        $member->setFirstName($prospectiveMember->getFirstName());
-        $member->setMiddleName($prospectiveMember->getMiddleName());
-        $member->setLastName($prospectiveMember->getLastName());
-        $member->setEmail($prospectiveMember->getEmail());
-        $member->setBirth($prospectiveMember->getBirth());
-        $member->setStudy($prospectiveMember->getStudy());
-        $member->setStudentNumber($prospectiveMember->getStudentNumber());
+        $member->initials = $prospectiveMember->initials;
+        $member->firstName = $prospectiveMember->firstName;
+        $member->middleName = $prospectiveMember->middleName;
+        $member->lastName = $prospectiveMember->lastName;
+        $member->setEmail($prospectiveMember->email);
+        $member->setBirth($prospectiveMember->birth);
+        $member->study = $prospectiveMember->study;
+        $member->studentNumber = $prospectiveMember->studentNumber;
 
         // changed on date
         $date = new DateTime();
@@ -206,7 +206,7 @@ class Member
             0,
             0,
         );
-        $member->setChangedOn($date);
+        $member->changedOn = $date;
 
         // creating the first membership for the member
         // sensible defaults are set in the creation
@@ -227,7 +227,7 @@ class Member
         foreach ($this->mailingListRepository->findAllOnForm() as $list) {
             if (
                 !in_array(
-                    $list->getName(),
+                    $list->name,
                     $prospectiveMember->getLists(),
                     true,
                 )
@@ -235,19 +235,19 @@ class Member
                 continue;
             }
 
-            $lists[$list->getName()] = $list;
+            $lists[$list->name] = $list;
         }
 
         // subscribe to default mailing lists not on the form
         foreach ($this->mailingListRepository->findDefault() as $list) {
-            $lists[$list->getName()] = $list;
+            $lists[$list->name] = $list;
         }
 
         foreach ($lists as $list) {
             // Ignore Mailman/listmonk sync lock here as we _always_ need to persist this information.
             // Will be cascade persisted through `$member`.
             $mailingListMember = new MailingListMemberModel();
-            $mailingListMember->setMailingList($list);
+            $mailingListMember->mailingList = $list;
             $mailingListMember->setMember($member);
             // Force cascade by adding to member.
             $member->addList($mailingListMember);
@@ -320,13 +320,13 @@ class Member
             ];
         }
 
-        if ($member->getStudy()->isMcsStudy()) {
+        if ($member->study->isMcsStudy()) {
             $approveMessages[] = [
                 'success',
                 // phpcs:ignore -- user-visible strings should not be split
                 '<b>Info:</b> Member studies at department. Recommended membership type: <strong>Gewoon lid</strong>.',
             ];
-        } elseif ($member->getStudy()->isEngDPhD()) {
+        } elseif ($member->study->isEngDPhD()) {
             $approveMessages[] = [
                 'warning',
                 // phpcs:ignore -- user-visible strings should not be split
@@ -355,7 +355,7 @@ class Member
         MemberModel $member,
         string $value,
     ): void {
-        $member->setSupremum($value);
+        $member->supremum = $value;
 
         $this->memberRepository->persist($member);
     }
@@ -384,7 +384,7 @@ class Member
     public function remove(MemberModel $member): void
     {
         foreach ($member->getMailingListMemberships() as $mailingListMembership) {
-            $mailingListMembership->setToBeDeleted(true);
+            $mailingListMembership->toBeDeleted = true;
             $mailingListMembership->unsetMember();
             $this->mailingListMemberRepository->persist($mailingListMembership);
         }
@@ -448,14 +448,14 @@ class Member
         $date = new DateTime('0001-01-01 00:00:00');
 
         $member->setEmail(null);
-        $member->setStudentNumber(null);
-        $member->setStudy(Studies::Unknown);
-        $member->setLastCheckedOn(null);
-        $member->setChangedOn(new DateTime());
+        $member->studentNumber = null;
+        $member->study = Studies::Unknown;
+        $member->lastCheckedOn = null;
+        $member->changedOn = new DateTime();
         $member->setBirth($date);
-        $member->setSupremum('optout');
-        $member->setHidden(true);
-        $member->setDeleted(true);
+        $member->supremum = 'optout';
+        $member->hidden = true;
+        $member->deleted = true;
         $member->unsetMemberships();
         $this->unsubscribeLists(
             $member,
@@ -484,7 +484,7 @@ class Member
             0,
             0,
         );
-        $member->setChangedOn($date);
+        $member->changedOn = $date;
 
         $this->memberRepository->persist($member);
 
@@ -500,7 +500,7 @@ class Member
     ): ?MemberModel {
         // It is not possible to have another membership type after being an honorary member and there does not exist a
         // good transition to a different membership type (because of the dates/expiration etc.).
-        if (MembershipTypes::Honorary === $member->getCurrentOrLastMembership()->getType()) {
+        if (MembershipTypes::Honorary === $member->getCurrentOrLastMembership()->type) {
             throw new RuntimeException('Unable to change membership type of honorary member.');
         }
 
@@ -517,8 +517,8 @@ class Member
 
         // The secretary has now done what a renewal link would have invited the member to do themselves, so the
         // link must not stay usable.
-        foreach ($this->actionLinkRepository->findRenewalByMember($member->getLidnr()) ?? [] as $renewalLink) {
-            $renewalLink->setUsed(true);
+        foreach ($this->actionLinkRepository->findRenewalByMember($member->lidnr) ?? [] as $renewalLink) {
+            $renewalLink->used = true;
             $this->actionLinkRepository->persist($renewalLink);
         }
 
@@ -590,7 +590,7 @@ class Member
                 $preview['rows'][$index]['member'] = $this->applyMembershipChange(
                     $row['member'],
                     $membershipType,
-                    clone $lastMembership->getEndDate(),
+                    clone $lastMembership->endDate,
                 );
                 $preview['rows'][$index]['executed'] = true;
                 $preview['rows'][$index]['message'] = $this->translator->trans('Renewed.');
@@ -653,7 +653,7 @@ class Member
                 continue;
             }
 
-            if ($member->getDeleted()) {
+            if ($member->deleted) {
                 $rows[] = [
                     'member_id' => $memberId,
                     'member' => $member,
@@ -691,7 +691,7 @@ class Member
                 $resolvedChange = $this->resolveMembershipChange(
                     $member,
                     $membershipType,
-                    clone $lastMembership->getEndDate(),
+                    clone $lastMembership->endDate,
                 );
 
                 $rows[] = [
@@ -738,9 +738,9 @@ class Member
 
         return new MembershipModel(
             member: $member,
-            type: $membership->getType(),
-            startDate: clone $membership->getEndDate(),
-        )->getEndDate();
+            type: $membership->type,
+            startDate: clone $membership->endDate,
+        )->endDate;
     }
 
     /**
@@ -756,8 +756,8 @@ class Member
 
         $newMembership = new MembershipModel(
             member: $member,
-            type: $member->getCurrentOrLastMembership()->getType(),
-            startDate: $member->getCurrentOrLastMembership()->getEndDate(),
+            type: $member->getCurrentOrLastMembership()->type,
+            startDate: $member->getCurrentOrLastMembership()->endDate,
             endDate: null,
         );
         $member->addMembership($newMembership);
@@ -837,7 +837,7 @@ class Member
         $selectedLists = $data['lists'] ?: [];
         $currentLists = $member->getMailingListMemberships()->map(
             static function (MailingListMemberModel $subscription) {
-                return $subscription->getMailingList()->getName();
+                return $subscription->mailingList->name;
             },
         )->toArray();
 
@@ -868,7 +868,7 @@ class Member
                 $list,
                 $member,
             );
-            $membership->setToBeDeleted(true);
+            $membership->toBeDeleted = true;
 
             $this->auditService->persist(
                 AuditMailingListMembership::create(
@@ -876,7 +876,7 @@ class Member
                     MailingListMemberOrigin::Manual,
                     $member,
                     $list,
-                    $membership->getEmail(),
+                    $membership->email,
                     $this->auditUser(),
                 ),
             );
@@ -891,7 +891,7 @@ class Member
             }
 
             $mailingListMember = new MailingListMemberModel();
-            $mailingListMember->setMailingList($list);
+            $mailingListMember->mailingList = $list;
             $mailingListMember->setMember($member);
             // Force cascade by adding to member.
             $member->addList($mailingListMember);
@@ -902,7 +902,7 @@ class Member
                     MailingListMemberOrigin::Manual,
                     $member,
                     $list,
-                    $mailingListMember->getEmail(),
+                    $mailingListMember->email,
                     $this->auditUser(),
                 ),
             );
@@ -923,7 +923,7 @@ class Member
         bool $recordAudit = true,
     ): void {
         foreach ($member->getMailingListMemberships() as $mailingListMembership) {
-            $mailingListMembership->setToBeDeleted(true);
+            $mailingListMembership->toBeDeleted = true;
 
             if ($recordAudit) {
                 $this->auditService->persist(
@@ -931,8 +931,8 @@ class Member
                         MailingListMemberAction::Remove,
                         MailingListMemberOrigin::Manual,
                         $member,
-                        $mailingListMembership->getMailingList(),
-                        $mailingListMembership->getEmail(),
+                        $mailingListMembership->mailingList,
+                        $mailingListMembership->email,
                         $this->auditUser(),
                     ),
                 );
@@ -955,7 +955,7 @@ class Member
 
         $auditNote = $form->getData();
         assert($auditNote instanceof AuditNoteModel);
-        $auditNote->setUser($this->auditUser());
+        $auditNote->user = $this->auditUser();
 
         $this->addAuditEntry(
             $member,
@@ -1136,7 +1136,7 @@ class Member
             throw new RuntimeException('Unable to change membership type without a membership.');
         }
 
-        if (MembershipTypes::Honorary === $currentMembership->getType()) {
+        if (MembershipTypes::Honorary === $currentMembership->type) {
             throw new RuntimeException('Unable to change membership type of honorary member.');
         }
 
@@ -1155,20 +1155,20 @@ class Member
             $effectiveChangeDate = clone $lastMembership->getStartDate();
         }
 
-        if ($effectiveChangeDate > $lastMembership->getEndDate()) {
-            $effectiveChangeDate = clone $lastMembership->getEndDate();
+        if ($effectiveChangeDate > $lastMembership->endDate) {
+            $effectiveChangeDate = clone $lastMembership->endDate;
         }
 
         $newExpiration = $effectiveChangeDate->getTimestamp() === $lastMembership->getStartDate()->getTimestamp()
-            ? clone $lastMembership->getEndDate()
+            ? clone $lastMembership->endDate
             : new MembershipModel(
                 $member,
                 $newType,
                 clone $effectiveChangeDate,
-            )->getEndDate();
+            )->endDate;
 
         return [
-            'currentType' => $lastMembership->getType(),
+            'currentType' => $lastMembership->type,
             'oldExpiration' => clone $member->getExpiration(),
             'newExpiration' => $newExpiration,
             'changeDate' => $effectiveChangeDate,
@@ -1192,16 +1192,16 @@ class Member
             0,
             0,
         );
-        $member->setChangedOn($date);
+        $member->changedOn = $date;
 
         $renewalAudit = new AuditRenewalModel();
-        $renewalAudit->setOldExpiration($resolvedChange['oldExpiration']);
+        $renewalAudit->oldExpiration = $resolvedChange['oldExpiration'];
 
         $lastMembership = $resolvedChange['lastMembership'];
         $effectiveChangeDate = $resolvedChange['changeDate'];
 
         if ($effectiveChangeDate->getTimestamp() === $lastMembership->getStartDate()->getTimestamp()) {
-            $lastMembership->setType($newType);
+            $lastMembership->type = $newType;
         } else {
             $lastMembership->setEndDate(clone $effectiveChangeDate);
             $member->addMembership(new MembershipModel(
@@ -1212,8 +1212,8 @@ class Member
             ));
         }
 
-        $renewalAudit->setNewExpiration($resolvedChange['newExpiration']);
-        $renewalAudit->setUser($this->auditUser());
+        $renewalAudit->newExpiration = $resolvedChange['newExpiration'];
+        $renewalAudit->user = $this->auditUser();
         $this->addAuditEntry(
             $member,
             $renewalAudit,
@@ -1251,7 +1251,7 @@ class Member
         if ($create) {
             $address = new AddressModel();
             $address->setMember($member);
-            $address->setType($type);
+            $address->type = $type;
 
             return $address;
         }
@@ -1329,20 +1329,20 @@ class Member
         foreach (AttentionReasons::cases() as $reason) {
             if ($reason->includeBulkActiveMemberRenewal()) {
                 foreach ($combined[$reason->value] ?? [] as $member) {
-                    $bulkRenewalShortcuts['expiring_active'][] = $member->getLidnr();
+                    $bulkRenewalShortcuts['expiring_active'][] = $member->lidnr;
                 }
             }
 
             if ($reason->includeBulkGraduateConversion()) {
                 foreach ($combined[$reason->value] ?? [] as $member) {
-                    $bulkRenewalShortcuts['expiring_non_active'][] = $member->getLidnr();
+                    $bulkRenewalShortcuts['expiring_non_active'][] = $member->lidnr;
                 }
             }
 
             // A member can turn up under several reasons, which are gathered onto the one row they get.
             foreach ($combined[$reason->value] ?? [] as $member) {
-                $members[$member->getLidnr()] = $member;
-                $reasons[$member->getLidnr()][] = $reason;
+                $members[$member->lidnr] = $member;
+                $reasons[$member->lidnr][] = $reason;
             }
         }
 
@@ -1350,8 +1350,8 @@ class Member
             $members,
             static function (MemberModel $a, MemberModel $b) {
                 return ($a->getExpiration() <=> $b->getExpiration()) * 10
-                    + ($a->getLastName() <=> $b->getLastName()) * 2
-                    + ($a->getFirstName() <=> $b->getFirstName());
+                    + ($a->lastName <=> $b->lastName) * 2
+                    + ($a->firstName <=> $b->firstName);
             },
         );
 
@@ -1386,7 +1386,7 @@ class Member
 
         if (
             null === $renewalLink
-            || $renewalLink->isUsed()
+            || $renewalLink->used
             || $renewalLink->linkExpired()
         ) {
             return null;
@@ -1405,7 +1405,7 @@ class Member
         string $email,
         MemberModel $member,
     ): bool {
-        if ($email === $member->getEmail()) {
+        if ($email === $member->email) {
             return false;
         }
 
@@ -1422,15 +1422,15 @@ class Member
         RenewalLinkModel $renewalLink,
         DateTime $newExpiration,
     ): MemberModel {
-        $member->setChangedOn(new DateTime());
+        $member->changedOn = new DateTime();
 
-        $renewalLink->setUsed(true);
+        $renewalLink->used = true;
         $this->actionLinkRepository->persist($renewalLink);
         $this->renewalService->sendRenewalSuccessEmail($renewalLink);
 
         // Record a renewal audit entry
         $renewalAudit = AuditRenewalModel::fromRenewalLink($renewalLink);
-        $renewalAudit->setNewExpiration($newExpiration);
+        $renewalAudit->newExpiration = $newExpiration;
         $this->addAuditEntry(
             $member,
             $renewalAudit,
@@ -1438,8 +1438,8 @@ class Member
 
         $newMembership = new MembershipModel(
             member: $member,
-            type: $member->getCurrentOrLastMembership()->getType(),
-            startDate: $member->getCurrentOrLastMembership()->getEndDate(),
+            type: $member->getCurrentOrLastMembership()->type,
+            startDate: $member->getCurrentOrLastMembership()->endDate,
             endDate: $newExpiration,
         );
         $member->addMembership($newMembership);

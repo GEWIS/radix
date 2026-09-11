@@ -25,19 +25,19 @@ class ListmonkMailingList
         name: 'id',
         type: 'integer',
     )]
-    private int $listmonkId;
+    public int $listmonkId;
 
     /**
      * Name of this list in the listmonk side
      */
     #[Column(type: 'string')]
-    private string $name;
+    public string $name;
 
     /**
      * When this list was last observed in listmonk
      */
     #[Column(type: 'datetime')]
-    private DateTime $lastSeen;
+    public private(set) DateTime $lastSeen;
 
     /**
      * When the last full check of this mailing list took place
@@ -46,7 +46,7 @@ class ListmonkMailingList
         type: 'datetime',
         nullable: true,
     )]
-    private ?DateTime $lastCheck = null;
+    public private(set) ?DateTime $lastCheck = null;
 
     /**
      * The corresponding mailing list in the register
@@ -56,49 +56,7 @@ class ListmonkMailingList
         targetEntity: MailingList::class,
         mappedBy: 'listmonkList',
     )]
-    private ?MailingList $mailingList = null;
-
-    /**
-     * Get the listmonk ID
-     */
-    public function getListmonkId(): int
-    {
-        return $this->listmonkId;
-    }
-
-    /**
-     * Set the listmonk ID
-     * It is only sensible if this happens during a sync
-     */
-    public function setListmonkId(int $listmonkId): void
-    {
-        $this->listmonkId = $listmonkId;
-    }
-
-    /**
-     * Get the name of the list in listmonk
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name of the list in listmonk
-     * It is only sensible if this happens during a sync
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Get the date the list was last seen
-     */
-    public function getLastSeen(): DateTime
-    {
-        return $this->lastSeen;
-    }
+    public private(set) ?MailingList $mailingList = null;
 
     /**
      * Set the date the list was last seen
@@ -110,27 +68,11 @@ class ListmonkMailingList
     }
 
     /**
-     * Get the date the list was last fully checked
-     */
-    public function getLastCheck(): ?DateTime
-    {
-        return $this->lastCheck;
-    }
-
-    /**
      * Set the date the list was last fully checked
      */
     public function setLastCheck(DateTime $lastCheck = new DateTime()): void
     {
         $this->lastCheck = $lastCheck;
-    }
-
-    /**
-     * Get the mailing list corresponding to this listmonk list
-     */
-    public function getMailingList(): ?MailingList
-    {
-        return $this->mailingList;
     }
 
     /**

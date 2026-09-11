@@ -68,9 +68,9 @@ class QueryService
         // (we require unique names even across categories)
         $savedQuery = $this->savedQueryRepository->findByName($name) ?? new SavedQuery();
 
-        $savedQuery->setName($name);
-        $savedQuery->setCategory($category);
-        $savedQuery->setQuery($query);
+        $savedQuery->name = $name;
+        $savedQuery->category = $category;
+        $savedQuery->query = $query;
 
         $this->savedQueryRepository->persist($savedQuery);
 

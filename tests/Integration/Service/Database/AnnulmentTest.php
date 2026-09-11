@@ -44,7 +44,7 @@ class AnnulmentTest extends KernelTestCase
 
         self::assertSame(
             [],
-            $this->annulment->assertDecisionCanBeAnnulled($foundation->getDecision()),
+            $this->annulment->assertDecisionCanBeAnnulled($foundation->decision),
         );
     }
 
@@ -64,7 +64,7 @@ class AnnulmentTest extends KernelTestCase
 
         $this->expectException(AnnulmentNotPossible::class);
 
-        $this->annulment->assertDecisionCanBeAnnulled($foundation->getDecision());
+        $this->annulment->assertDecisionCanBeAnnulled($foundation->decision);
     }
 
     public function testRefusesToAnnulAnInstallationThatWasDischargedAgain(): void
@@ -77,7 +77,7 @@ class AnnulmentTest extends KernelTestCase
 
         $this->expectException(AnnulmentNotPossible::class);
 
-        $this->annulment->assertDecisionCanBeAnnulled($installation->getDecision());
+        $this->annulment->assertDecisionCanBeAnnulled($installation->decision);
     }
 
     /**
@@ -93,7 +93,7 @@ class AnnulmentTest extends KernelTestCase
 
         $this->expectException(AnnulmentNotPossible::class);
 
-        $this->annulment->assertDecisionCanBeAnnulled($installation->getDecision());
+        $this->annulment->assertDecisionCanBeAnnulled($installation->decision);
     }
 
     /**
@@ -116,7 +116,7 @@ class AnnulmentTest extends KernelTestCase
 
         $this->expectException(AnnulmentNotPossible::class);
 
-        $this->annulment->assertDecisionCanBeAnnulled($abrogation->getDecision());
+        $this->annulment->assertDecisionCanBeAnnulled($abrogation->decision);
     }
 
     public function testRefusesToAnnulABoardInstallationThatWasReleased(): void
@@ -132,7 +132,7 @@ class AnnulmentTest extends KernelTestCase
 
         $this->expectException(AnnulmentNotPossible::class);
 
-        $this->annulment->assertDecisionCanBeAnnulled($installation->getDecision());
+        $this->annulment->assertDecisionCanBeAnnulled($installation->decision);
     }
 
     public function testRefusesToAnnulAKeyGrantingThatWasWithdrawn(): void
@@ -148,7 +148,7 @@ class AnnulmentTest extends KernelTestCase
 
         $this->expectException(AnnulmentNotPossible::class);
 
-        $this->annulment->assertDecisionCanBeAnnulled($granting->getDecision());
+        $this->annulment->assertDecisionCanBeAnnulled($granting->decision);
     }
 
     /**
@@ -167,7 +167,7 @@ class AnnulmentTest extends KernelTestCase
 
         self::assertSame(
             [],
-            $this->annulment->assertDecisionCanBeAnnulled($withdrawal->getDecision()),
+            $this->annulment->assertDecisionCanBeAnnulled($withdrawal->decision),
         );
     }
 
@@ -181,7 +181,7 @@ class AnnulmentTest extends KernelTestCase
 
         self::assertSame(
             [],
-            $this->annulment->assertDecisionCanBeAnnulled($discharge->getDecision()),
+            $this->annulment->assertDecisionCanBeAnnulled($discharge->decision),
         );
     }
 
@@ -201,7 +201,7 @@ class AnnulmentTest extends KernelTestCase
             $installation,
         );
 
-        $warnings = $this->annulment->assertDecisionCanBeAnnulled($reappointment->getDecision());
+        $warnings = $this->annulment->assertDecisionCanBeAnnulled($reappointment->decision);
 
         self::assertCount(
             1,
@@ -221,7 +221,7 @@ class AnnulmentTest extends KernelTestCase
         $foundation = $this->build->foundOrgan($this->build->meeting());
         $annulment = $this->build->annul(
             $this->build->meeting(date: '2027-02-01'),
-            $foundation->getDecision(),
+            $foundation->decision,
         );
 
         $this->annulment->assertAnnulmentCanBeDeleted($annulment);
@@ -243,7 +243,7 @@ class AnnulmentTest extends KernelTestCase
         );
         $annulment = $this->build->annul(
             $this->build->meeting(date: '2027-06-01'),
-            $discharge->getDecision(),
+            $discharge->decision,
         );
         $this->build->discharge(
             $this->build->meeting(date: '2027-10-01'),

@@ -122,16 +122,16 @@ final class QueryController extends AbstractController
         $form = $this->createForm(
             QuerySaveType::class,
             null === $savedQuery ? null : [
-                'query' => $savedQuery->getQuery(),
-                'category' => $savedQuery->getCategory(),
-                'name' => $savedQuery->getName(),
+                'query' => $savedQuery->query,
+                'category' => $savedQuery->category,
+                'name' => $savedQuery->name,
             ],
         );
         $form->handleRequest($request);
 
         // A stored query is run as it was opened, until the editor is submitted, from which point on what was
         // typed is what runs.
-        $query = $savedQuery?->getQuery();
+        $query = $savedQuery?->query;
 
         if ($form->isSubmitted()) {
             $query = null;
@@ -154,7 +154,7 @@ final class QueryController extends AbstractController
 
                     return $this->redirectToRoute(
                         'query_show',
-                        ['query' => $stored->getId()],
+                        ['query' => $stored->id],
                     );
                 }
 
@@ -185,7 +185,7 @@ final class QueryController extends AbstractController
                         'query' => $query,
                         'name' => null === $savedQuery
                             ? null
-                            : $savedQuery->getCategory() . ' - ' . $savedQuery->getName(),
+                            : $savedQuery->category . ' - ' . $savedQuery->name,
                     ],
                 ),
                 'entities' => $this->queryService->getEntities(),

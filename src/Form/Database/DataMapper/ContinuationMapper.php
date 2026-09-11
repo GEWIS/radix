@@ -27,8 +27,8 @@ class ContinuationMapper extends AbstractDecisionMapper
         }
 
         $continuation = new Continuation();
-        $continuation->setFoundation($foundation);
-        $continuation->setSequence(1);
+        $continuation->foundation = $foundation;
+        $continuation->sequence = 1;
         $continuation->setDecision($decision);
     }
 }

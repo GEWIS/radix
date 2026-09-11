@@ -50,13 +50,13 @@ class Minutes extends SubDecision implements NamesMember
      * If the minutes were approved.
      */
     #[Column(type: 'boolean')]
-    private bool $approval;
+    public bool $approval;
 
     /**
      * If there were changes made.
      */
     #[Column(type: 'boolean')]
-    private bool $changes;
+    public bool $changes;
 
     /**
      * Get the member.
@@ -84,38 +84,6 @@ class Minutes extends SubDecision implements NamesMember
         $this->meeting = $meeting;
     }
 
-    /**
-     * Get approval status.
-     */
-    public function getApproval(): bool
-    {
-        return $this->approval;
-    }
-
-    /**
-     * Set approval status.
-     */
-    public function setApproval(bool $approval): void
-    {
-        $this->approval = $approval;
-    }
-
-    /**
-     * Get if changes were made.
-     */
-    public function getChanges(): bool
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Set if changes were made.
-     */
-    public function setChanges(bool $changes): void
-    {
-        $this->changes = $changes;
-    }
-
     #[Override]
     protected function getTranslatedTemplate(
         TranslatorInterface $translator,
@@ -133,9 +101,9 @@ class Minutes extends SubDecision implements NamesMember
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%TYPE%' => $this->getTarget()->getType()->value,
+            '%TYPE%' => $this->getTarget()->type->value,
             '%NUMBERORDINAL%' => strval($this->getTarget()->getNumberAsOrdinal($language->getLocale())),
-            '%APPROVAL%' => $this->getApproval()
+            '%APPROVAL%' => $this->approval
                 ? $translator->trans(
                     'goedgekeurd',
                     locale: $language->getLangParam(),
@@ -144,20 +112,20 @@ class Minutes extends SubDecision implements NamesMember
                     'afgekeurd',
                     locale: $language->getLangParam(),
                 ),
-            '%AUTHOR%' => MeetingTypes::BV === $this->getTarget()->getType()
+            '%AUTHOR%' => MeetingTypes::BV === $this->getTarget()->type
                 ? ''
                 : $translator->trans(
                     ' door ',
                     locale: $language->getLangParam(),
                 )
                     . $this->getMember()->getFullName(),
-            '%CHANGES%' => $this->getApproval() && $this->getChanges()
+            '%CHANGES%' => $this->approval && $this->changes
                 ? $translator->trans(
                     ' met genoemde wijzigingen',
                     locale: $language->getLangParam(),
                 )
                 : '',
-            '%THANK%' => MeetingTypes::BV === $this->getTarget()->getType()
+            '%THANK%' => MeetingTypes::BV === $this->getTarget()->type
                 ? $translator->trans(
                     ' met dank aan de notulist',
                     locale: $language->getLangParam(),

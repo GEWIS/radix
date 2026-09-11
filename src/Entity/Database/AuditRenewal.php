@@ -22,54 +22,22 @@ class AuditRenewal extends AuditEntry
      * Expiration value before this renewal took place
      */
     #[Column(type: 'datetime')]
-    private DateTime $oldExpiration;
+    public DateTime $oldExpiration;
 
     /**
      * Expiration value after the renewal
      */
     #[Column(type: 'datetime')]
-    private DateTime $newExpiration;
+    public DateTime $newExpiration;
 
     final public static function fromRenewalLink(RenewalLink $renewalLink): AuditRenewal
     {
         $auditRenewal = new AuditRenewal();
-        $auditRenewal->setOldExpiration($renewalLink->getCurrentExpiration());
-        $auditRenewal->setNewExpiration($renewalLink->getNewExpiration());
-        $auditRenewal->setMember($renewalLink->getMember());
+        $auditRenewal->oldExpiration = $renewalLink->currentExpiration;
+        $auditRenewal->newExpiration = $renewalLink->newExpiration;
+        $auditRenewal->setMember($renewalLink->member);
 
         return $auditRenewal;
-    }
-
-    /**
-     * Get the old expiration date.
-     */
-    public function getOldExpiration(): DateTime
-    {
-        return $this->oldExpiration;
-    }
-
-    /**
-     * Set the old expiration date.
-     */
-    public function setOldExpiration(DateTime $oldExpiration): void
-    {
-        $this->oldExpiration = $oldExpiration;
-    }
-
-    /**
-     * Get the new expiration date.
-     */
-    public function getNewExpiration(): DateTime
-    {
-        return $this->newExpiration;
-    }
-
-    /**
-     * Set the new expiration date.
-     */
-    public function setNewExpiration(DateTime $newExpiration): void
-    {
-        $this->newExpiration = $newExpiration;
     }
 
     /**
@@ -104,8 +72,8 @@ class AuditRenewal extends AuditEntry
     {
         return [
             $this->getStringRenewalType(),
-            $this->getMember()->getFullName(),
-            $this->getNewExpiration()->format('l j F Y'),
+            $this->member->getFullName(),
+            $this->newExpiration->format('l j F Y'),
         ];
     }
 }

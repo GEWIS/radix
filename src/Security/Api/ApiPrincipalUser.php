@@ -40,7 +40,7 @@ final class ApiPrincipalUser implements UserInterface
     #[Override]
     public function getUserIdentifier(): string
     {
-        return 'api-principal-' . $this->principal->getId();
+        return 'api-principal-' . $this->principal->id;
     }
 
     /**

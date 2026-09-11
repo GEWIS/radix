@@ -40,7 +40,7 @@ final readonly class MemberLookupTransformer implements DataTransformerInterface
 
         return [
             'name' => $value->getFullName(),
-            'lidnr' => (string) $value->getLidnr(),
+            'lidnr' => (string) $value->lidnr,
         ];
     }
 

@@ -47,7 +47,7 @@ class OtherTest extends TestCase
             'Er wordt een taart gekocht.',
         );
 
-        self::assertNull($other->getContentEN());
+        self::assertNull($other->contentEN);
         self::assertSame(
             'Er wordt een taart gekocht.',
             $other->getTranslatedContent(
@@ -70,11 +70,11 @@ class OtherTest extends TestCase
             $this->decision(),
             'Er wordt een taart gekocht.',
         );
-        $other->setContentEN('A cake is bought.');
+        $other->contentEN = 'A cake is bought.';
 
         self::assertSame(
             'Er wordt een taart gekocht.',
-            $other->getContentNL(),
+            $other->contentNL,
         );
         self::assertSame(
             'A cake is bought.',

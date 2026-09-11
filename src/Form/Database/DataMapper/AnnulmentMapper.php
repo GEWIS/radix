@@ -26,8 +26,8 @@ class AnnulmentMapper extends AbstractDecisionMapper
         }
 
         $annulment = new Annulment();
-        $annulment->setTarget($target);
-        $annulment->setSequence(0);
+        $annulment->target = $target;
+        $annulment->sequence = 0;
         $annulment->setDecision($decision);
     }
 }

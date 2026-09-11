@@ -42,24 +42,24 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
         // installed had joined, and long enough ago that the installations count as current. The discharge meeting is
         // ten days back, after the misclassified member's membership had already expired.
         $founding = new Meeting();
-        $founding->setType(MeetingTypes::BV);
+        $founding->type = MeetingTypes::BV;
         $founding->setNumber(2);
-        $founding->setDate(new DateTime()->modify('-3 years'));
+        $founding->date = new DateTime()->modify('-3 years');
         $manager->persist($founding);
 
         $discharge = new Meeting();
-        $discharge->setType(MeetingTypes::BV);
+        $discharge->type = MeetingTypes::BV;
         $discharge->setNumber(3);
-        $discharge->setDate(new DateTime()->modify('-10 days'));
+        $discharge->date = new DateTime()->modify('-10 days');
         $manager->persist($discharge);
 
         // A fraternity may only be founded at a general members' meeting, and has been able to only there since the
         // Internal Regulations changed on 7 October 2021, so it gets a GMM of its own rather than sharing the board
         // meeting above.
         $gmm = new Meeting();
-        $gmm->setType(MeetingTypes::ALV);
+        $gmm->type = MeetingTypes::ALV;
         $gmm->setNumber(1);
-        $gmm->setDate(new DateTime()->modify('-3 years')->modify('+1 week'));
+        $gmm->date = new DateTime()->modify('-3 years')->modify('+1 week');
         $manager->persist($gmm);
 
         $this->loadCommittee(
@@ -249,14 +249,14 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
     ): Foundation {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($point);
-        $decision->setNumber(1);
+        $decision->point = $point;
+        $decision->number = 1;
 
         $organ = new Foundation();
-        $organ->setAbbr($abbreviation);
-        $organ->setName($name);
-        $organ->setOrganType($type);
-        $organ->setSequence(1);
+        $organ->abbr = $abbreviation;
+        $organ->name = $name;
+        $organ->organType = $type;
+        $organ->sequence = 1;
         $organ->setDecision($decision);
         $decision->addSubdecision($organ);
 
@@ -278,18 +278,18 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
     ): void {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($point);
-        $decision->setNumber(1);
+        $decision->point = $point;
+        $decision->number = 1;
 
         $regulation = new OrganRegulation();
-        $regulation->setAbbr($organ->getAbbr());
-        $regulation->setOrganType($organ->getOrganType());
-        $regulation->setVersion('1.0');
-        $regulation->setDate(clone $meeting->getDate());
-        $regulation->setApproval(true);
-        $regulation->setChanges(false);
+        $regulation->abbr = $organ->abbr;
+        $regulation->organType = $organ->organType;
+        $regulation->version = '1.0';
+        $regulation->date = clone $meeting->date;
+        $regulation->approval = true;
+        $regulation->changes = false;
         $regulation->setMember($chair);
-        $regulation->setSequence(1);
+        $regulation->sequence = 1;
         $regulation->setDecision($decision);
         $decision->addSubdecision($regulation);
 
@@ -315,8 +315,8 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
     ): Installation {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($point);
-        $decision->setNumber(1);
+        $decision->point = $point;
+        $decision->number = 1;
         $manager->persist($decision);
 
         $installations = [];
@@ -324,10 +324,10 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
 
         foreach ($functions as $function) {
             $installation = new Installation();
-            $installation->setFoundation($organ);
+            $installation->foundation = $organ;
             $installation->setMember($member);
-            $installation->setFunction($function);
-            $installation->setSequence($sequence++);
+            $installation->function = $function;
+            $installation->sequence = $sequence++;
             $installation->setDecision($decision);
             $decision->addSubdecision($installation);
 
@@ -347,12 +347,12 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
     ): void {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($point);
-        $decision->setNumber(1);
+        $decision->point = $point;
+        $decision->number = 1;
 
         $discharge = new Discharge();
-        $discharge->setInstallation($installation);
-        $discharge->setSequence(1);
+        $discharge->installation = $installation;
+        $discharge->sequence = 1;
         $discharge->setDecision($decision);
         $decision->addSubdecision($discharge);
 

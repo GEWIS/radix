@@ -43,7 +43,7 @@ class MemberExpiredButStillInOrgan extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -52,8 +52,8 @@ class MemberExpiredButStillInOrgan extends Error
         return sprintf(
             'Member %s (%d) is installed in %s, however, their GEWIS membership has expired.',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
-            $this->getOrgan()->getName(),
+            $this->getMember()->lidnr,
+            $this->getOrgan()->name,
         );
     }
 }

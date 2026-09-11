@@ -24,8 +24,8 @@ final readonly class DecisionReference
         return new self(
             $decision->getMeetingType()->value,
             $decision->getMeetingNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
+            $decision->point,
+            $decision->number,
         );
     }
 }

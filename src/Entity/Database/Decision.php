@@ -49,7 +49,7 @@ class Decision
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public private(set) Meeting $meeting;
 
     /**
      * Meeting type.
@@ -79,14 +79,14 @@ class Decision
      */
     #[Id]
     #[Column(type: 'integer')]
-    private int $point;
+    public int $point;
 
     /**
      * Decision number.
      */
     #[Id]
     #[Column(type: 'integer')]
-    private int $number;
+    public int $number;
 
     /**
      * Subdecisions.
@@ -136,7 +136,7 @@ class Decision
         name: 'c_number',
         referencedColumnName: 'number',
     )]
-    private ?Decision $counterpart = null;
+    public ?Decision $counterpart = null;
 
     /**
      * The virtual decisions that are this one's counterpart.
@@ -160,7 +160,7 @@ class Decision
         targetEntity: Annulment::class,
         mappedBy: 'target',
     )]
-    private ?Annulment $annulledBy = null;
+    public private(set) ?Annulment $annulledBy = null;
 
     /**
      * A decision that was just made has no counterpart either way; Doctrine fills both in for one that was loaded.
@@ -180,7 +180,7 @@ class Decision
         $this->subdecisions = new ArrayCollection();
 
         $meeting->addDecision($this);
-        $this->meeting_type = $meeting->getType();
+        $this->meeting_type = $meeting->type;
         $this->meeting_number = $meeting->getNumber();
         $this->meeting = $meeting;
     }
@@ -199,46 +199,6 @@ class Decision
     public function getMeetingNumber(): int
     {
         return $this->meeting_number;
-    }
-
-    /**
-     * Get the meeting.
-     */
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
-    /**
-     * Set the point number.
-     */
-    public function setPoint(int $point): void
-    {
-        $this->point = $point;
-    }
-
-    /**
-     * Get the point number.
-     */
-    public function getPoint(): int
-    {
-        return $this->point;
-    }
-
-    /**
-     * Set the decision number.
-     */
-    public function setNumber(int $number): void
-    {
-        $this->number = $number;
-    }
-
-    /**
-     * Get the decision number.
-     */
-    public function getNumber(): int
-    {
-        return $this->number;
     }
 
     /**
@@ -288,32 +248,6 @@ class Decision
     }
 
     /**
-     * Get the decision this one is the counterpart of, if it is one.
-     */
-    public function getCounterpart(): ?Decision
-    {
-        return $this->counterpart;
-    }
-
-    /**
-     * Set the decision this one is the counterpart of.
-     */
-    public function setCounterpart(?Decision $counterpart): void
-    {
-        $this->counterpart = $counterpart;
-    }
-
-    /**
-     * Get the subdecision by which this decision is annulled.
-     *
-     * Or null, if it wasn't annulled.
-     */
-    public function getAnnulledBy(): ?Annulment
-    {
-        return $this->annulledBy;
-    }
-
-    /**
      * Check if this decision is annulled by another decision.
      */
     public function isAnnulled(): bool
@@ -333,8 +267,8 @@ class Decision
             '%s %d.%d.%d',
             $this->getMeetingType()->value,
             $this->getMeetingNumber(),
-            $this->getPoint(),
-            $this->getNumber(),
+            $this->point,
+            $this->number,
         );
     }
 
@@ -436,10 +370,10 @@ class Decision
         $content = $this->getContent($translator);
 
         return [
-            'meeting_type' => $this->getMeeting()->getType(),
-            'meeting_number' => $this->getMeeting()->getNumber(),
-            'decision_point' => $this->getPoint(),
-            'decision_number' => $this->getNumber(),
+            'meeting_type' => $this->meeting->type,
+            'meeting_number' => $this->meeting->getNumber(),
+            'decision_point' => $this->point,
+            'decision_number' => $this->number,
             'content' => $content,
         ];
     }

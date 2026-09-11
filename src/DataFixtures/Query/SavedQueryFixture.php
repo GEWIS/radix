@@ -22,13 +22,13 @@ class SavedQueryFixture extends Fixture implements FixtureGroupInterface
     public function load(ObjectManager $manager): void
     {
         $underage = new SavedQuery();
-        $underage->setCategory('BAC/BHV');
-        $underage->setName('Underage members (18-)');
-        $underage->setQuery(<<<'DQL'
+        $underage->category = 'BAC/BHV';
+        $underage->name = 'Underage members (18-)';
+        $underage->query = <<<'DQL'
             SELECT m FROM db:Member as m
             WHERE DATE_ADD(m.birth, 216, 'MONTH') > CURRENT_DATE() AND m.generation >= YEAR(CURRENT_DATE()) - 18
             ORDER BY m.birth
-            DQL);
+            DQL;
         $manager->persist($underage);
         $this->addReference(
             self::REF_QUERY_UNDERAGE,
@@ -37,9 +37,9 @@ class SavedQueryFixture extends Fixture implements FixtureGroupInterface
 
         // Used for attendance lists at a GMM, among other things.
         $details = new SavedQuery();
-        $details->setCategory('Secretary');
-        $details->setName('Get member details based on membership number');
-        $details->setQuery(<<<'DQL'
+        $details->category = 'Secretary';
+        $details->name = 'Get member details based on membership number';
+        $details->query = <<<'DQL'
             SELECT DISTINCT
                 m.lidnr,
                 m.email,
@@ -70,7 +70,7 @@ class SavedQueryFixture extends Fixture implements FixtureGroupInterface
                                 WHERE ads.type = 'mail' AND mads.lidnr = m.lidnr))
                             OR (a.type = 'mail'))
             ORDER BY m.lidnr ASC
-            DQL);
+            DQL;
         $manager->persist($details);
         $this->addReference(
             self::REF_QUERY_MEMBER_DETAILS,

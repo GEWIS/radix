@@ -49,23 +49,7 @@ class Discharge extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Installation $installation;
-
-    /**
-     * Get installation.
-     */
-    public function getInstallation(): Installation
-    {
-        return $this->installation;
-    }
-
-    /**
-     * Set the installation.
-     */
-    public function setInstallation(Installation $installation): void
-    {
-        $this->installation = $installation;
-    }
+    public Installation $installation;
 
     #[Override]
     protected function getTranslatedTemplate(
@@ -84,8 +68,8 @@ class Discharge extends SubDecision
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%MEMBER%' => $this->getInstallation()->getMember()->getFullName(),
-            '%FUNCTION%' => $this->getInstallation()->getFunction()->trans(
+            '%MEMBER%' => $this->installation->getMember()->getFullName(),
+            '%FUNCTION%' => $this->installation->function->trans(
                 $translator,
                 $language->getLangParam(),
             ),

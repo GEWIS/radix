@@ -37,7 +37,7 @@ class AnnulmentOfLaterDecision extends Error
      */
     public function getTarget(): DecisionModel
     {
-        return $this->getSubDecision()->getTarget();
+        return $this->getSubDecision()->target;
     }
 
     #[Override]
@@ -45,7 +45,7 @@ class AnnulmentOfLaterDecision extends Error
     {
         return sprintf(
             'Decision %s annuls %s, which was only taken afterwards.',
-            $this->getSubDecision()->getDecision()->getHash(),
+            $this->getSubDecision()->decision->getHash(),
             $this->getTarget()->getHash(),
         );
     }

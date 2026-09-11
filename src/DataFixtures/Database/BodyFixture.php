@@ -411,12 +411,12 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         $this->annul(
             $manager,
             $annulling,
-            $installed->getDecision(),
+            $installed->decision,
         );
         $this->annul(
             $manager,
             $annulling,
-            $discharge->getDecision(),
+            $discharge->decision,
         );
     }
 
@@ -433,10 +433,10 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         );
 
         $foundation = new Foundation();
-        $foundation->setAbbr($abbreviation);
-        $foundation->setName($name);
-        $foundation->setOrganType($type);
-        $foundation->setSequence(1);
+        $foundation->abbr = $abbreviation;
+        $foundation->name = $name;
+        $foundation->organType = $type;
+        $foundation->sequence = 1;
         $foundation->setDecision($decision);
         $decision->addSubdecision($foundation);
 
@@ -467,10 +467,10 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
 
         foreach ($functions as $function) {
             $installation = new Installation();
-            $installation->setFoundation($foundation);
+            $installation->foundation = $foundation;
             $installation->setMember($member);
-            $installation->setFunction($function);
-            $installation->setSequence($sequence++);
+            $installation->function = $function;
+            $installation->sequence = $sequence++;
             $installation->setDecision($decision);
             $decision->addSubdecision($installation);
 
@@ -493,8 +493,8 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         );
 
         $discharge = new Discharge();
-        $discharge->setInstallation($installation);
-        $discharge->setSequence(1);
+        $discharge->installation = $installation;
+        $discharge->sequence = 1;
         $discharge->setDecision($decision);
         $decision->addSubdecision($discharge);
 
@@ -514,8 +514,8 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         );
 
         $reappointment = new Reappointment();
-        $reappointment->setInstallation($installation);
-        $reappointment->setSequence(1);
+        $reappointment->installation = $installation;
+        $reappointment->sequence = 1;
         $reappointment->setDecision($decision);
         $decision->addSubdecision($reappointment);
 
@@ -533,8 +533,8 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         );
 
         $abrogation = new Abrogation();
-        $abrogation->setFoundation($foundation);
-        $abrogation->setSequence(1);
+        $abrogation->foundation = $foundation;
+        $abrogation->sequence = 1;
         $abrogation->setDecision($decision);
         $decision->addSubdecision($abrogation);
 
@@ -552,8 +552,8 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         );
 
         $annulment = new Annulment();
-        $annulment->setTarget($target);
-        $annulment->setSequence(1);
+        $annulment->target = $target;
+        $annulment->sequence = 1;
         $annulment->setDecision($decision);
         $decision->addSubdecision($annulment);
 
@@ -571,9 +571,9 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         assert($number >= self::FIRST_MEETING_NUMBER);
 
         $meeting = new Meeting();
-        $meeting->setType($type);
+        $meeting->type = $type;
         $meeting->setNumber($number);
-        $meeting->setDate($on);
+        $meeting->date = $on;
 
         $manager->persist($meeting);
 
@@ -589,8 +589,8 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
     ): Decision {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($meeting->getDecisions()->count() + 1);
-        $decision->setNumber(1);
+        $decision->point = $meeting->getDecisions()->count() + 1;
+        $decision->number = 1;
 
         $manager->persist($decision);
 

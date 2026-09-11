@@ -54,45 +54,13 @@ class Release extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Installation $installation;
+    public Installation $installation;
 
     /**
      * Date of the discharge.
      */
     #[Column(type: 'date')]
-    private DateTime $date;
-
-    /**
-     * Get installation.
-     */
-    public function getInstallation(): Installation
-    {
-        return $this->installation;
-    }
-
-    /**
-     * Set the installation.
-     */
-    public function setInstallation(Installation $installation): void
-    {
-        $this->installation = $installation;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
+    public DateTime $date;
 
     #[Override]
     protected function getTranslatedTemplate(
@@ -111,12 +79,12 @@ class Release extends SubDecision
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%MEMBER%' => $this->getInstallation()->getMember()->getFullName(),
+            '%MEMBER%' => $this->installation->getMember()->getFullName(),
             '%DATE%' => $this->formatDate(
                 $this->date,
                 $language,
             ),
-            '%FUNCTION%' => $this->getInstallation()->getFunction()->trans(
+            '%FUNCTION%' => $this->installation->function->trans(
                 $translator,
                 $language->getLangParam(),
             ),

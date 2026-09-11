@@ -20,7 +20,7 @@ class KeyWithdrawnPastOriginalGranting extends Error
     public function __construct(KeyWithdrawalModel $withdrawal)
     {
         parent::__construct(
-            $withdrawal->getDecision()->getMeeting(),
+            $withdrawal->decision->meeting,
             $withdrawal,
         );
     }
@@ -38,9 +38,9 @@ class KeyWithdrawnPastOriginalGranting extends Error
     {
         return sprintf(
             'Key code of %s withdrawn per %s, this is after the original expiration %s.',
-            $this->getWithdrawal()->getGranting()->getMember()->getFullName(),
-            $this->getWithdrawal()->getWithdrawnOn()->format('Y-m-d'),
-            $this->getWithdrawal()->getGranting()->getUntil()->format('Y-m-d'),
+            $this->getWithdrawal()->granting->getMember()->getFullName(),
+            $this->getWithdrawal()->withdrawnOn->format('Y-m-d'),
+            $this->getWithdrawal()->granting->until->format('Y-m-d'),
         );
     }
 }

@@ -45,11 +45,11 @@ class MiscService
     public function generateList(DatabaseMailingList $list): void
     {
         $repo = $this->emReport->getRepository(ReportMailingList::class);
-        $reportList = $repo->find($list->getName());
+        $reportList = $repo->find($list->name);
 
         if (null === $reportList) {
             $reportList = new ReportMailingList();
-            $reportList->name = $list->getName();
+            $reportList->name = $list->name;
         }
 
         $reportList->setEnDescription($list->getEnDescription());
@@ -64,7 +64,7 @@ class MiscService
     public function deleteList(DatabaseMailingList $list): void
     {
         $repo = $this->emReport->getRepository(ReportMailingList::class);
-        $reportList = $repo->find($list->getName());
+        $reportList = $repo->find($list->name);
 
         if (null === $reportList) {
             return;
@@ -80,20 +80,20 @@ class MiscService
     {
         $repo = $this->emReport->getRepository(ReportMailingListMember::class);
         $reportListMembership = $repo->find([
-            'mailingList' => $mailingListMember->getMailingList()->getName(),
-            'email' => $mailingListMember->getEmail(),
+            'mailingList' => $mailingListMember->mailingList->name,
+            'email' => $mailingListMember->email,
         ]);
 
         if (null === $reportListMembership) {
             $reportList = $this->emReport->getRepository(ReportMailingList::class)
-                ->find($mailingListMember->getMailingList()->getName());
+                ->find($mailingListMember->mailingList->name);
 
             if (null === $reportList) {
                 throw new LogicException('List membership without list');
             }
 
             $reportMember = $this->emReport->getRepository(ReportMember::class)
-                ->find($mailingListMember->getMember()->getLidnr());
+                ->find($mailingListMember->member->lidnr);
 
             if (null === $reportMember) {
                 throw new LogicException('List membership without member');
@@ -102,7 +102,7 @@ class MiscService
             $reportListMembership = new ReportMailingListMember();
             $reportListMembership->mailingList = $reportList;
             $reportListMembership->member = $reportMember;
-            $reportListMembership->email = $mailingListMember->getEmail();
+            $reportListMembership->email = $mailingListMember->email;
         }
 
         // There is no possibility of updating an entry, all values are a key
@@ -117,8 +117,8 @@ class MiscService
     {
         $repo = $this->emReport->getRepository(ReportMailingListMember::class);
         $reportListMembership = $repo->find([
-            'mailingList' => $mailingListMember->getMailingList()->getName(),
-            'email' => $mailingListMember->getEmail(),
+            'mailingList' => $mailingListMember->mailingList->name,
+            'email' => $mailingListMember->email,
         ]);
 
         if (null === $reportListMembership) {

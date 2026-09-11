@@ -21,6 +21,7 @@ use Stripe\Checkout\Session as CheckoutSession;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\SignatureVerificationException;
+use Stripe\PaymentIntent;
 use Stripe\Refund;
 use Stripe\StripeClient;
 use Stripe\Webhook;
@@ -68,20 +69,16 @@ class StripeService
         }
 
         $checkoutSession = new CheckoutSessionModel();
-        $checkoutSession->setProspectiveMember($prospectiveMember);
-        $checkoutSession->setCheckoutId($session->id);
-        $checkoutSession->setCreated(
-            DateTime::createFromFormat(
-                'U',
-                (string) $session->created,
-            )->setTimezone(new DateTimeZone('Europe/Amsterdam')),
-        );
-        $checkoutSession->setExpiration(
-            DateTime::createFromFormat(
-                'U',
-                (string) $session->expires_at,
-            )->setTimezone(new DateTimeZone('Europe/Amsterdam')),
-        );
+        $checkoutSession->prospectiveMember = $prospectiveMember;
+        $checkoutSession->checkoutId = $session->id;
+        $checkoutSession->created = DateTime::createFromFormat(
+            'U',
+            (string) $session->created,
+        )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+        $checkoutSession->expiration = DateTime::createFromFormat(
+            'U',
+            (string) $session->expires_at,
+        )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
         $this->checkoutSessionRepository->persist($checkoutSession);
 
         return $session->url;
@@ -123,8 +120,8 @@ class StripeService
 
         // We have at least one known Checkout Session on file.
         if (
-            CheckoutSessionStates::Paid === $lastCheckoutStub->getState()
-            || CheckoutSessionStates::Pending === $lastCheckoutStub->getState()
+            CheckoutSessionStates::Paid === $lastCheckoutStub->state
+            || CheckoutSessionStates::Pending === $lastCheckoutStub->state
         ) {
             // Checkout Session is finalised or will be after payment processing. Do not allow the prospective member to
             // do something else.
@@ -135,21 +132,21 @@ class StripeService
         // expiration and Recovery URL).
         $lastCheckoutStub = $lastCheckoutStub->getRecoveredFrom() ?? $lastCheckoutStub;
 
-        if (CheckoutSessionStates::Failed === $lastCheckoutStub->getState()) {
+        if (CheckoutSessionStates::Failed === $lastCheckoutStub->state) {
             // Last payment failed, so we need to create a new Checkout Session for the user to be able to try again.
             return $this->getCheckoutLink($prospectiveMember);
         }
 
-        if (CheckoutSessionStates::Expired === $lastCheckoutStub->getState()) {
+        if (CheckoutSessionStates::Expired === $lastCheckoutStub->state) {
             // The Checkout Session has already been abandoned.
 
-            if (new DateTime() >= $lastCheckoutStub->getExpiration()) {
+            if (new DateTime() >= $lastCheckoutStub->expiration) {
                 // The Checkout Session is completely abandoned, as the maximum expiration for the recovery URL of 30
                 // days has passed. Do NOT allow recovery of this session before scheduled deletion.
 
                 if (null !== ($paymentLink = $prospectiveMember->getPaymentLink())) {
                     // Disable the payment link in case the prospective member tries again.
-                    $paymentLink->setUsed(true);
+                    $paymentLink->used = true;
                     $this->actionLinkRepository->persist($paymentLink);
                 }
 
@@ -163,7 +160,7 @@ class StripeService
         // Checkout Session is still valid (at this point, not necessarily when the prospective member finally submits).
         // We try to retrieve the actual Checkout Session, if this succeeds we return the URL. If not we fail and let
         // the prospective member know.
-        return $this->getCheckoutSession($lastCheckoutStub->getCheckoutId())?->url;
+        return $this->getCheckoutSession($lastCheckoutStub->checkoutId)?->url;
     }
 
     /**
@@ -182,7 +179,7 @@ class StripeService
                 ],
                 'mode' => 'payment',
                 'payment_intent_data' => [
-                    'statement_descriptor' => 'GEWIS Membership ' . $prospectiveMember->getLidnr(),
+                    'statement_descriptor' => 'GEWIS Membership ' . $prospectiveMember->lidnr,
                 ],
                 'cancel_url' => $this->stripeCancelUrl,
                 'success_url' => $this->stripeSuccessUrl,
@@ -192,8 +189,8 @@ class StripeService
                         'enabled' => true,
                     ],
                 ],
-                'client_reference_id' => $prospectiveMember->getLidnr(),
-                'customer_email' => $prospectiveMember->getEmail(),
+                'client_reference_id' => $prospectiveMember->lidnr,
+                'customer_email' => $prospectiveMember->email,
             ]);
         } catch (ApiErrorException $e) {
             // We must never throw, as this will break the enrolment flow, however, we do want to know what happened.
@@ -223,7 +220,7 @@ class StripeService
         if (null !== ($checkoutSession = $this->checkoutSessionRepository->findLatest($prospectiveMember))) {
             try {
                 // Get last PaymentIntent to obtain the latest Charge.
-                $paymentIntent = $this->getClient()->paymentIntents->retrieve($checkoutSession->getPaymentIntentId());
+                $paymentIntent = $this->getClient()->paymentIntents->retrieve($checkoutSession->paymentIntentId);
 
                 // Get the Charge.
                 $charge = $paymentIntent->latest_charge;
@@ -235,7 +232,7 @@ class StripeService
                     $this->logger->error(
                         sprintf(
                             'No charge found for payment intent %s. Not refunding.',
-                            $checkoutSession->getPaymentIntentId(),
+                            $checkoutSession->paymentIntentId,
                         ),
                     );
 
@@ -270,7 +267,7 @@ class StripeService
     public function hasRefund(ProspectiveMemberModel $prospectiveMember): ?bool
     {
         if (null !== ($checkoutSession = $this->checkoutSessionRepository->findLatest($prospectiveMember))) {
-            $paymentIntentId = $checkoutSession->getPaymentIntentId();
+            $paymentIntentId = $checkoutSession->paymentIntentId;
             if (null === $paymentIntentId) {
                 // We have no PaymentIntent, so we cannot have a Refund.
                 return null;
@@ -394,7 +391,7 @@ class StripeService
 
             // See if we have recovered from this Checkout Session before.
             if (false !== ($lastCheckoutStub = $originalCheckoutSession->getRecoveredBy()->last())) {
-                if (CheckoutSessionStates::Paid === $lastCheckoutStub->getState()) {
+                if (CheckoutSessionStates::Paid === $lastCheckoutStub->state) {
                     // Do not allow processing of new events if the last recovered Checkout Session is 'PAID'.
                     return;
                 }
@@ -403,20 +400,16 @@ class StripeService
             // Create new Checkout Session for this recovery. Leave the state for it on 'CREATED', if something goes
             // wrong we can easily track what has happened.
             $storedCheckoutSession = new CheckoutSessionModel();
-            $storedCheckoutSession->setProspectiveMember($originalCheckoutSession->getProspectiveMember());
-            $storedCheckoutSession->setCheckoutId($session->id);
-            $storedCheckoutSession->setCreated(
-                DateTime::createFromFormat(
-                    'U',
-                    (string) $session->created,
-                )->setTimezone(new DateTimeZone('Europe/Amsterdam')),
-            );
-            $storedCheckoutSession->setExpiration(
-                DateTime::createFromFormat(
-                    'U',
-                    (string) $session->expires_at,
-                )->setTimezone(new DateTimeZone('Europe/Amsterdam')),
-            );
+            $storedCheckoutSession->prospectiveMember = $originalCheckoutSession->prospectiveMember;
+            $storedCheckoutSession->checkoutId = $session->id;
+            $storedCheckoutSession->created = DateTime::createFromFormat(
+                'U',
+                (string) $session->created,
+            )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+            $storedCheckoutSession->expiration = DateTime::createFromFormat(
+                'U',
+                (string) $session->expires_at,
+            )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
             // Link recovered Checkout Session to the old one.
             $storedCheckoutSession->setRecoveredFrom($originalCheckoutSession);
 
@@ -433,7 +426,7 @@ class StripeService
             case Event::CHECKOUT_SESSION_EXPIRED:
                 // The prospective member did not complete the checkout within 24 hours. We mark the stored checkout
                 // session as expired.
-                $storedCheckoutSession->setState(CheckoutSessionStates::Expired);
+                $storedCheckoutSession->state = CheckoutSessionStates::Expired;
 
                 if (
                     null !== $session->after_expiration &&
@@ -441,15 +434,17 @@ class StripeService
                 ) {
                     // We are handling the expiration of the very first Checkout Session of the prospective member. The
                     // Recovery URL is valid for 30 days.
-                    $storedCheckoutSession->setExpiration(DateTime::createFromFormat(
+                    $storedCheckoutSession->expiration = DateTime::createFromFormat(
                         'U',
                         (string) $session->after_expiration->recovery->expires_at,
-                    )->setTimezone(new DateTimeZone('Europe/Amsterdam')));
+                    )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
                     $storedCheckoutSession->setRecoveryUrl($session->after_expiration->recovery->url);
                 }
 
                 // (re)set the used state of the payment link to enable it.
-                $paymentLink?->setUsed(false);
+                if (null !== $paymentLink) {
+                    $paymentLink->used = false;
+                }
 
                 // Save changes before sending e-mail. This ensures we do not lose information if the e-mail fails.
                 $this->checkoutSessionRepository->persist($storedCheckoutSession);
@@ -459,7 +454,7 @@ class StripeService
                     // only send the e-mail once, when the first Checkout Session expires. Any restarts will not result
                     // in e-mails for the prospective member.
                     $this->memberService->sendRegistrationUpdateEmail(
-                        $storedCheckoutSession->getProspectiveMember(),
+                        $storedCheckoutSession->prospectiveMember,
                         RegistrationUpdate::CheckoutExpired,
                     );
                 }
@@ -469,34 +464,42 @@ class StripeService
                 // The prospective member has completed the checkout but the payment may be delayed. If the payment is
                 // not delayed we directly mark the stored checkout session as 'PAID', otherwise it will be 'PENDING'.
                 if ('paid' === $session->payment_status) {
-                    $storedCheckoutSession->setState(CheckoutSessionStates::Paid);
-                    $storedCheckoutSession->setPaymentIntentId($session->payment_intent);
+                    $storedCheckoutSession->state = CheckoutSessionStates::Paid;
+                    $storedCheckoutSession->paymentIntentId = self::paymentIntentId($session->payment_intent);
                 } else {
-                    $storedCheckoutSession->setState(CheckoutSessionStates::Pending);
+                    $storedCheckoutSession->state = CheckoutSessionStates::Pending;
                 }
 
                 // Either way, the payment link should not be active.
-                $paymentLink?->setUsed(true);
+                if (null !== $paymentLink) {
+                    $paymentLink->used = true;
+                }
 
                 break;
             case Event::CHECKOUT_SESSION_ASYNC_PAYMENT_SUCCEEDED:
                 // A delayed payment has succeeded. So we mark the stored checkout session as 'PAID'.
-                $storedCheckoutSession->setState(CheckoutSessionStates::Paid);
-                $storedCheckoutSession->setPaymentIntentId($session->payment_intent);
-                $paymentLink?->setUsed(true);
+                $storedCheckoutSession->state = CheckoutSessionStates::Paid;
+                $storedCheckoutSession->paymentIntentId = self::paymentIntentId($session->payment_intent);
+
+                if (null !== $paymentLink) {
+                    $paymentLink->used = true;
+                }
 
                 break;
             case Event::CHECKOUT_SESSION_ASYNC_PAYMENT_FAILED:
                 // A delayed payment has failed.
-                $storedCheckoutSession->setState(CheckoutSessionStates::Failed);
-                $paymentLink?->setUsed(false);
+                $storedCheckoutSession->state = CheckoutSessionStates::Failed;
+
+                if (null !== $paymentLink) {
+                    $paymentLink->used = false;
+                }
 
                 // Save changes before sending e-mail. This ensures we do not lose information if the e-mail fails.
                 $this->checkoutSessionRepository->persist($storedCheckoutSession);
 
                 // Send e-mail.
                 $this->memberService->sendRegistrationUpdateEmail(
-                    $storedCheckoutSession->getProspectiveMember(),
+                    $storedCheckoutSession->prospectiveMember,
                     RegistrationUpdate::CheckoutFailed,
                 );
 
@@ -602,5 +605,16 @@ class StripeService
                 get_debug_type($object),
             ),
         );
+    }
+
+    /**
+     * The identifier of a payment intent. Stripe types an expandable field as either the id it was returned as or the
+     * object that id stands for, and what is stored here is the id.
+     */
+    private static function paymentIntentId(string|PaymentIntent|null $paymentIntent): ?string
+    {
+        return $paymentIntent instanceof PaymentIntent
+            ? $paymentIntent->id
+            : $paymentIntent;
     }
 }

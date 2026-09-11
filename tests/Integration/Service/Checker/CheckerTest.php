@@ -414,7 +414,7 @@ class CheckerTest extends KernelTestCase
         self::assertCount(
             1,
             $this->errorsAbout(
-                $this->checker->checkKeyWithdrawalTime($withdrawal->getDecision()->getMeeting()),
+                $this->checker->checkKeyWithdrawalTime($withdrawal->decision->meeting),
                 $withdrawal,
                 KeyWithdrawnPastOriginalGranting::class,
             ),
@@ -432,12 +432,12 @@ class CheckerTest extends KernelTestCase
         );
         $first = $this->build->annul(
             $this->build->meeting(date: '2027-01-15'),
-            $foundation->getDecision(),
+            $foundation->decision,
         );
         $meeting = $this->build->meeting(date: '2027-06-01');
         $second = $this->build->annul(
             $meeting,
-            $first->getDecision(),
+            $first->decision,
         );
 
         self::assertCount(
@@ -462,7 +462,7 @@ class CheckerTest extends KernelTestCase
         );
         $annulment = $this->build->annul(
             $meeting,
-            $later->getDecision(),
+            $later->decision,
         );
 
         self::assertCount(

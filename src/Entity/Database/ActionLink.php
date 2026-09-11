@@ -46,13 +46,13 @@ abstract class ActionLink
      * If the URL was clicked
      */
     #[Column(type: 'boolean')]
-    private bool $used = false;
+    public bool $used = false;
 
     /**
      * The token in the URL
      */
     #[Column(type: 'string')]
-    private string $token;
+    public private(set) string $token;
 
     public function __construct()
     {
@@ -70,20 +70,5 @@ abstract class ActionLink
             '-',
             $token,
         );
-    }
-
-    public function getToken(): string
-    {
-        return $this->token;
-    }
-
-    public function isUsed(): bool
-    {
-        return $this->used;
-    }
-
-    public function setUsed(bool $used): void
-    {
-        $this->used = $used;
     }
 }

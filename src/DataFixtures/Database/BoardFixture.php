@@ -227,9 +227,9 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
         for ($seat = 0; $seat < $seats; $seat++) {
             $installation = new Installation();
             $installation->setMember($this->member($firstMember + $seat));
-            $installation->setFunction(self::SEATS[$seat]);
-            $installation->setDate(clone $takesEffect);
-            $installation->setSequence($sequence++);
+            $installation->function = self::SEATS[$seat];
+            $installation->date = clone $takesEffect;
+            $installation->sequence = $sequence++;
             $installation->setDecision($decision);
             $decision->addSubdecision($installation);
 
@@ -258,9 +258,9 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
 
         foreach ($installations as $installation) {
             $release = new Release();
-            $release->setInstallation($installation);
-            $release->setDate(clone $on);
-            $release->setSequence($sequence++);
+            $release->installation = $installation;
+            $release->date = clone $on;
+            $release->sequence = $sequence++;
             $release->setDecision($decision);
             $decision->addSubdecision($release);
 
@@ -284,8 +284,8 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
 
         foreach ($installations as $installation) {
             $discharge = new Discharge();
-            $discharge->setInstallation($installation);
-            $discharge->setSequence($sequence++);
+            $discharge->installation = $installation;
+            $discharge->sequence = $sequence++;
             $discharge->setDecision($decision);
             $decision->addSubdecision($discharge);
 
@@ -309,13 +309,13 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
         ));
 
         $meeting = new Meeting();
-        $meeting->setType(MeetingTypes::ALV);
+        $meeting->type = MeetingTypes::ALV;
         // Narrowed for the setter, which takes a meeting number rather than any integer. The series starts
         // above zero and only climbs, so this holds by construction.
         $number = $this->meetingNumber++;
         assert($number >= self::FIRST_MEETING_NUMBER);
         $meeting->setNumber($number);
-        $meeting->setDate($on);
+        $meeting->date = $on;
 
         $manager->persist($meeting);
 
@@ -328,8 +328,8 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     ): Decision {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint(1);
-        $decision->setNumber(1);
+        $decision->point = 1;
+        $decision->number = 1;
 
         $manager->persist($decision);
 

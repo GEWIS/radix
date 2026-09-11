@@ -27,7 +27,7 @@ class Budget extends SubDecision implements NamesMember
      * Name of the budget.
      */
     #[Column(type: 'string')]
-    private string $name;
+    public string $name;
 
     /**
      * Version of the budget.
@@ -36,25 +36,25 @@ class Budget extends SubDecision implements NamesMember
         type: 'string',
         length: 32,
     )]
-    private string $version;
+    public string $version;
 
     /**
      * Date of the budget.
      */
     #[Column(type: 'date')]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * If the budget was approved.
      */
     #[Column(type: 'boolean')]
-    private bool $approval;
+    public bool $approval;
 
     /**
      * If there were changes made.
      */
     #[Column(type: 'boolean')]
-    private bool $changes;
+    public bool $changes;
 
     /**
      * Get the member.
@@ -67,86 +67,6 @@ class Budget extends SubDecision implements NamesMember
     public function getMember(): ?Member
     {
         return $this->member;
-    }
-
-    /**
-     * Get the name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Get the version.
-     */
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
-
-    /**
-     * Set the version.
-     */
-    public function setVersion(string $version): void
-    {
-        $this->version = $version;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * Get approval status.
-     */
-    public function getApproval(): bool
-    {
-        return $this->approval;
-    }
-
-    /**
-     * Set approval status.
-     */
-    public function setApproval(bool $approval): void
-    {
-        $this->approval = $approval;
-    }
-
-    /**
-     * Get if changes were made.
-     */
-    public function getChanges(): bool
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Set if changes were made.
-     */
-    public function setChanges(bool $changes): void
-    {
-        $this->changes = $changes;
     }
 
     #[Override]
@@ -166,18 +86,18 @@ class Budget extends SubDecision implements NamesMember
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%NAME%' => $this->getName(),
+            '%NAME%' => $this->name,
             '%AUTHOR%' => $this->getMember()?->getFullName()
                 ?? $translator->trans(
                     'onbekend',
                     locale: $language->getLangParam(),
                 ),
-            '%VERSION%' => $this->getVersion(),
+            '%VERSION%' => $this->version,
             '%DATE%' => $this->formatDate(
-                $this->getDate(),
+                $this->date,
                 $language,
             ),
-            '%APPROVAL%' => $this->getApproval()
+            '%APPROVAL%' => $this->approval
                 ? $translator->trans(
                     'goedgekeurd',
                     locale: $language->getLangParam(),
@@ -186,7 +106,7 @@ class Budget extends SubDecision implements NamesMember
                     'afgekeurd',
                     locale: $language->getLangParam(),
                 ),
-            '%CHANGES%' => $this->getApproval() && $this->getChanges()
+            '%CHANGES%' => $this->approval && $this->changes
                 ? $translator->trans(
                     ' met genoemde wijzigingen',
                     locale: $language->getLangParam(),

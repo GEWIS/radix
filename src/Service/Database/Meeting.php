@@ -106,8 +106,8 @@ class Meeting
 
         foreach ($meeting->getDecisions() as $decision) {
             $decisions[] = new DecisionRow(
-                $decision->getPoint(),
-                $decision->getNumber(),
+                $decision->point,
+                $decision->number,
                 // The same join `Decision::getTranslatedContent()` does, in the language being read rather than
                 // always in Dutch.
                 implode(
@@ -118,20 +118,20 @@ class Meeting
                     ),
                 ),
                 $this->getCopyContent($decision),
-                null === $decision->getAnnulledBy()
+                null === $decision->annulledBy
                     ? null
-                    : DecisionReference::fromDecision($decision->getAnnulledBy()->getDecision()),
-                null === $decision->getCounterpart()
+                    : DecisionReference::fromDecision($decision->annulledBy->decision),
+                null === $decision->counterpart
                     ? null
-                    : DecisionReference::fromDecision($decision->getCounterpart()),
+                    : DecisionReference::fromDecision($decision->counterpart),
                 array_map(
                     static fn (DecisionModel $virtual): DecisionReference => DecisionReference::fromDecision($virtual),
                     $decision->getVirtualCounterparts()->toArray(),
                 ),
             );
 
-            $point = $decision->getPoint();
-            $next = $decision->getNumber() + 1;
+            $point = $decision->point;
+            $next = $decision->number + 1;
 
             if (($nextDecisionNumbers[$point] ?? 0) >= $next) {
                 continue;
@@ -158,7 +158,7 @@ class Meeting
         // builds a fresh entity either way and cannot tell.
         if (
             null !== $this->getMeeting(
-                $meeting->getType(),
+                $meeting->type,
                 $meeting->getNumber(),
             )
         ) {
@@ -208,7 +208,7 @@ class Meeting
     {
         $warnings = $this->checkAnnulment($decision);
 
-        $this->meetingRepository->persist($decision->getMeeting());
+        $this->meetingRepository->persist($decision->meeting);
         $this->apiService->pauseSync(self::SYNC_PAUSE_AFTER_DECISION);
 
         return new RecordedDecision(
@@ -304,7 +304,7 @@ class Meeting
             // something removing goes through by itself.
             if (
                 $subdecision instanceof NamesMember
-                && true === $subdecision->getMember()?->getDeleted()
+                && true === $subdecision->getMember()?->deleted
             ) {
                 throw new DecisionNamesDeletedMember(
                     'This decision names a member who has been deleted.',
@@ -389,8 +389,8 @@ class Meeting
             return false;
         }
 
-        $virtual->setCounterpart($model);
-        $this->meetingRepository->persist($virtual->getMeeting());
+        $virtual->counterpart = $model;
+        $this->meetingRepository->persist($virtual->meeting);
 
         return true;
     }
@@ -420,8 +420,8 @@ class Meeting
             return false;
         }
 
-        $virtual->setCounterpart(null);
-        $this->meetingRepository->persist($virtual->getMeeting());
+        $virtual->counterpart = null;
+        $this->meetingRepository->persist($virtual->meeting);
 
         return true;
     }
@@ -463,7 +463,7 @@ class Meeting
 
             $categories[$this->getCategory($first)][] = new ExportedDecision(
                 $decision->getHash(),
-                $decision->getMeeting()->getDate(),
+                $decision->meeting->date,
                 $decision->getContent(
                     $this->translator,
                     true,
@@ -606,7 +606,7 @@ class Meeting
             }
 
             $member = $reference->getMember();
-            $lidnr = $member->getLidnr();
+            $lidnr = $member->lidnr;
 
             if (
                 !array_key_exists(
@@ -630,9 +630,9 @@ class Meeting
                 'meeting_number' => $reference->getMeetingNumber(),
                 'decision_point' => $reference->getDecisionPoint(),
                 'decision_number' => $reference->getDecisionNumber(),
-                'subdecision_sequence' => $reference->getSequence(),
-                'function' => $reference->getFunction(),
-                'functionName' => $reference->getFunction()->trans($this->translator),
+                'subdecision_sequence' => $reference->sequence,
+                'function' => $reference->function,
+                'functionName' => $reference->function->trans($this->translator),
             ];
         }
 
@@ -668,14 +668,14 @@ class Meeting
             return [];
         }
 
-        $target = $annulment->getTarget();
+        $target = $annulment->target;
 
         try {
             if (
                 $target->getMeetingType() === $decision->getMeetingType()
                 && $target->getMeetingNumber() === $decision->getMeetingNumber()
-                && $target->getPoint() === $decision->getPoint()
-                && $target->getNumber() === $decision->getNumber()
+                && $target->point === $decision->point
+                && $target->number === $decision->number
             ) {
                 throw new AnnulmentNotPossible($this->translator->trans('A decision cannot annul itself.'));
             }
@@ -709,7 +709,7 @@ class Meeting
         } catch (AnnulmentNotPossible $e) {
             // Building the decision already attached it to its meeting, which cascades persists; a decision that is
             // turned down has to be taken back out again.
-            $decision->getMeeting()->removeDecision($decision);
+            $decision->meeting->removeDecision($decision);
 
             throw $e;
         }

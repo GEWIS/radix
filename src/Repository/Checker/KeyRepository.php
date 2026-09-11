@@ -48,7 +48,7 @@ class KeyRepository
             )
             ->setParameter(
                 'meeting_type',
-                $meeting->getType(),
+                $meeting->type,
             );
 
         /** @var Granting[] $result */
@@ -82,7 +82,7 @@ class KeyRepository
             )
             ->setParameter(
                 'meeting_type',
-                $meeting->getType(),
+                $meeting->type,
             );
 
         /** @var Withdrawal[] $result */

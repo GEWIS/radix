@@ -31,9 +31,9 @@ class MeetingFixture extends Fixture implements DependentFixtureInterface, Fixtu
     public function load(ObjectManager $manager): void
     {
         $meeting = new Meeting();
-        $meeting->setDate(new DateTime('2000-01-01'));
+        $meeting->date = new DateTime('2000-01-01');
         $meeting->setNumber(1);
-        $meeting->setType(MeetingTypes::BV);
+        $meeting->type = MeetingTypes::BV;
         $manager->persist($meeting);
         $this->addReference(
             self::REF_MEETING_BV1,
@@ -42,14 +42,14 @@ class MeetingFixture extends Fixture implements DependentFixtureInterface, Fixtu
 
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint(1);
-        $decision->setNumber(1);
+        $decision->point = 1;
+        $decision->number = 1;
 
         $installation = new BoardInstallation();
-        $installation->setDate(new DateTime('2000-01-01'));
-        $installation->setFunction(BoardFunctions::Chair);
+        $installation->date = new DateTime('2000-01-01');
+        $installation->function = BoardFunctions::Chair;
         $installation->setMember($this->getReference(MemberFixture::REF_MEMBER_STUDENT, MemberModel::class));
-        $installation->setSequence(1);
+        $installation->sequence = 1;
         $installation->setDecision($decision);
         $decision->addSubdecision($installation);
 

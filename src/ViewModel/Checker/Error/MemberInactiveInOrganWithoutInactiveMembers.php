@@ -46,7 +46,7 @@ class MemberInactiveInOrganWithoutInactiveMembers extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -55,9 +55,9 @@ class MemberInactiveInOrganWithoutInactiveMembers extends Error
         return sprintf(
             'Member %s (%d) is an inactive member of %s, which is a %s and does not have those.',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
-            $this->getOrgan()->getAbbr(),
-            $this->getOrgan()->getOrganType()->getName()->getMessage(),
+            $this->getMember()->lidnr,
+            $this->getOrgan()->abbr,
+            $this->getOrgan()->organType->getName()->getMessage(),
         );
     }
 }

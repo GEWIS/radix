@@ -49,11 +49,11 @@ class ApiPrincipalRepository extends ServiceEntityRepository
     public function stampUsage(ApiPrincipal $principal): void
     {
         $today = new DateTime('today');
-        $id = $principal->getId();
+        $id = $principal->id;
 
         if (
             null === $id
-            || $today->format('Y-m-d') === $principal->getLastUsedAt()?->format('Y-m-d')
+            || $today->format('Y-m-d') === $principal->lastUsedAt?->format('Y-m-d')
         ) {
             return;
         }

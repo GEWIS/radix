@@ -46,8 +46,8 @@ class InstallMapper extends AbstractDecisionMapper
             }
 
             $reappointment = new Reappointment();
-            $reappointment->setInstallation($installation);
-            $reappointment->setSequence($sequence++);
+            $reappointment->installation = $installation;
+            $reappointment->sequence = $sequence++;
             $reappointment->setDecision($decision);
         }
 
@@ -57,8 +57,8 @@ class InstallMapper extends AbstractDecisionMapper
             }
 
             $discharge = new Discharge();
-            $discharge->setInstallation($installation);
-            $discharge->setSequence($sequence++);
+            $discharge->installation = $installation;
+            $discharge->sequence = $sequence++;
             $discharge->setDecision($decision);
         }
 
@@ -78,9 +78,9 @@ class InstallMapper extends AbstractDecisionMapper
             }
 
             $installation = new Installation();
-            $installation->setSequence($sequence++);
-            $installation->setFoundation($foundation);
-            $installation->setFunction($function);
+            $installation->sequence = $sequence++;
+            $installation->foundation = $foundation;
+            $installation->function = $function;
             $installation->setMember($member);
             $installation->setDecision($decision);
         }

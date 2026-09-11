@@ -29,9 +29,9 @@ trait BuildsDecisions
         string $date = '2026-08-20',
     ): Meeting {
         $meeting = new Meeting();
-        $meeting->setType($type);
+        $meeting->type = $type;
         $meeting->setNumber($number);
-        $meeting->setDate(new DateTime($date));
+        $meeting->date = new DateTime($date);
 
         return $meeting;
     }
@@ -44,8 +44,8 @@ trait BuildsDecisions
         $decision = new Decision();
         // Also what gives the decision its collection of subdecisions, so nothing may be added before this.
         $decision->setMeeting($meeting ?? $this->meeting());
-        $decision->setPoint($point);
-        $decision->setNumber($number);
+        $decision->point = $point;
+        $decision->number = $number;
 
         return $decision;
     }
@@ -60,9 +60,9 @@ trait BuildsDecisions
         ?string $contentEN = null,
     ): Other {
         $other = new Other();
-        $other->setContentNL($content);
-        $other->setContentEN($contentEN);
-        $other->setSequence($sequence);
+        $other->contentNL = $content;
+        $other->contentEN = $contentEN;
+        $other->sequence = $sequence;
         $other->setDecision($decision);
 
         return $other;

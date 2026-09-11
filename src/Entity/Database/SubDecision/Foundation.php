@@ -27,13 +27,13 @@ class Foundation extends SubDecision
      * Abbreviation (only for when organs are created)
      */
     #[Column(type: 'string')]
-    private string $abbr;
+    public string $abbr;
 
     /**
      * Name (only for when organs are created)
      */
     #[Column(type: 'string')]
-    private string $name;
+    public string $name;
 
     /**
      * Purpose (only for when organs are created)
@@ -50,7 +50,7 @@ class Foundation extends SubDecision
     #[Column(
         enumType: OrganTypes::class,
     )]
-    private OrganTypes $organType;
+    public OrganTypes $organType;
 
     /**
      * References from other subdecisions to this organ.
@@ -66,38 +66,6 @@ class Foundation extends SubDecision
     public function __construct()
     {
         $this->references = new ArrayCollection();
-    }
-
-    /**
-     * Get the abbreviation.
-     */
-    public function getAbbr(): string
-    {
-        return $this->abbr;
-    }
-
-    /**
-     * Set the abbreviation.
-     */
-    public function setAbbr(string $abbr): void
-    {
-        $this->abbr = $abbr;
-    }
-
-    /**
-     * Get the name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     /**
@@ -117,22 +85,6 @@ class Foundation extends SubDecision
     }
 
     /**
-     * Get the type.
-     */
-    public function getOrganType(): OrganTypes
-    {
-        return $this->organType;
-    }
-
-    /**
-     * Set the type.
-     */
-    public function setOrganType(OrganTypes $organType): void
-    {
-        $this->organType = $organType;
-    }
-
-    /**
      * Get the references.
      *
      * @return Collection<array-key, FoundationReference>
@@ -147,7 +99,7 @@ class Foundation extends SubDecision
         TranslatorInterface $translator,
         AppLanguages $language,
     ): string {
-        if (OrganTypes::SC !== $this->getOrganType()) {
+        if (OrganTypes::SC !== $this->organType) {
             return $translator->trans(
                 '%ORGAN_TYPE% %ORGAN_NAME% met afkorting %ORGAN_ABBR% wordt opgericht.',
                 locale: $language->getLangParam(),
@@ -166,16 +118,16 @@ class Foundation extends SubDecision
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%ORGAN_ABBR%' => $this->getAbbr(),
+            '%ORGAN_ABBR%' => $this->abbr,
         ];
 
-        if (OrganTypes::SC !== $this->getOrganType()) {
+        if (OrganTypes::SC !== $this->organType) {
             $replacements += [
-                '%ORGAN_TYPE%' => $this->getOrganType()->trans(
+                '%ORGAN_TYPE%' => $this->organType->trans(
                     $translator,
                     $language->getLangParam(),
                 ),
-                '%ORGAN_NAME%' => $this->getName(),
+                '%ORGAN_NAME%' => $this->name,
             ];
         } else {
             $replacements += [
@@ -217,18 +169,18 @@ class Foundation extends SubDecision
      */
     public function toArray(): array
     {
-        $decision = $this->getDecision();
+        $decision = $this->decision;
 
         return [
-            'meeting_type' => $decision->getMeeting()->getType(),
-            'meeting_number' => $decision->getMeeting()->getNumber(),
-            'decision_point' => $decision->getPoint(),
-            'decision_number' => $decision->getNumber(),
-            'subdecision_sequence' => $this->getSequence(),
-            'name' => $this->getName(),
-            'abbr' => $this->getAbbr(),
+            'meeting_type' => $decision->meeting->type,
+            'meeting_number' => $decision->meeting->getNumber(),
+            'decision_point' => $decision->point,
+            'decision_number' => $decision->number,
+            'subdecision_sequence' => $this->sequence,
+            'name' => $this->name,
+            'abbr' => $this->abbr,
             'purpose' => $this->getPurpose(),
-            'organtype' => $this->getOrganType(),
+            'organtype' => $this->organType,
         ];
     }
 }

@@ -62,7 +62,7 @@ final class QueryControllerTest extends DatabaseTestCase
             'The seed is expected to contain a stored query.',
         );
 
-        $id = $savedQuery->getId();
+        $id = $savedQuery->id;
         self::assertNotNull($id);
 
         $response = self::getContainer()->get(QueryController::class)->show(
@@ -93,7 +93,7 @@ final class QueryControllerTest extends DatabaseTestCase
             'The seed is expected to contain a stored query.',
         );
 
-        $id = $savedQuery->getId();
+        $id = $savedQuery->id;
         self::assertNotNull($id);
 
         $response = self::getContainer()->get(QueryController::class)->delete($id);

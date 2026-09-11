@@ -33,9 +33,9 @@ class WithdrawMapper extends AbstractDecisionMapper
         }
 
         $withdrawal = new Withdrawal();
-        $withdrawal->setSequence(1);
-        $withdrawal->setGranting($granting);
-        $withdrawal->setWithdrawnOn($withdrawOn);
+        $withdrawal->sequence = 1;
+        $withdrawal->granting = $granting;
+        $withdrawal->withdrawnOn = $withdrawOn;
         $withdrawal->setDecision($decision);
     }
 }

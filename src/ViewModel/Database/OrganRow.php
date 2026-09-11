@@ -25,10 +25,10 @@ final readonly class OrganRow
         Installation $installation,
         UrlGeneratorInterface $urlGenerator,
     ): self {
-        $foundation = $installation->getFoundation();
+        $foundation = $installation->foundation;
 
         return new self(
-            $foundation->getAbbr(),
+            $foundation->abbr,
             $urlGenerator->generate(
                 'decision_organ_view',
                 [
@@ -36,7 +36,7 @@ final readonly class OrganRow
                     'number' => $foundation->getMeetingNumber(),
                     'point' => $foundation->getDecisionPoint(),
                     'decision' => $foundation->getDecisionNumber(),
-                    'sequence' => $foundation->getSequence(),
+                    'sequence' => $foundation->sequence,
                 ],
             ),
         );

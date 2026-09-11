@@ -47,7 +47,7 @@ class AddressEditType extends AbstractType
                         return;
                     }
 
-                    $address->setCountry($country);
+                    $address->country = $country;
                 },
             ],
         );

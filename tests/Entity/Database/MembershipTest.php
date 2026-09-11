@@ -32,7 +32,7 @@ class MembershipTest extends TestCase
 
         self::assertSame(
             $endDate,
-            $membership->getEndDate()->format('Y-m-d H:i:s'),
+            $membership->endDate->format('Y-m-d H:i:s'),
         );
     }
 
@@ -70,7 +70,7 @@ class MembershipTest extends TestCase
 
         self::assertSame(
             '2127-07-01 00:00:00',
-            $membership->getEndDate()->format('Y-m-d H:i:s'),
+            $membership->endDate->format('Y-m-d H:i:s'),
         );
     }
 
@@ -92,7 +92,7 @@ class MembershipTest extends TestCase
         );
         self::assertSame(
             '2026-09-30 00:00:00',
-            $membership->getEndDate()->format('Y-m-d H:i:s'),
+            $membership->endDate->format('Y-m-d H:i:s'),
         );
     }
 
@@ -104,7 +104,7 @@ class MembershipTest extends TestCase
 
         self::assertSame(
             '2026-12-31 00:00:00',
-            $membership->getEndDate()->format('Y-m-d H:i:s'),
+            $membership->endDate->format('Y-m-d H:i:s'),
         );
     }
 

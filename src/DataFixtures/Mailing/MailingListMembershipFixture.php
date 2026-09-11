@@ -58,9 +58,9 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
             $announcements,
             $external,
         );
-        $carried->setToBeCreated(false);
+        $carried->toBeCreated = false;
         $carried->setLastSyncOn();
-        $carried->setLastSyncSuccess(true);
+        $carried->lastSyncSuccess = true;
         $manager->persist($carried);
 
         // A membership on its way out: the record stays until the servers have been told.
@@ -68,10 +68,10 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
             $activities,
             $graduate,
         );
-        $leaving->setToBeCreated(false);
-        $leaving->setToBeDeleted(true);
+        $leaving->toBeCreated = false;
+        $leaving->toBeDeleted = true;
         $leaving->setLastSyncOn();
-        $leaving->setLastSyncSuccess(true);
+        $leaving->lastSyncSuccess = true;
         $manager->persist($leaving);
 
         $manager->persist($this->subscribe($activities, $student));
@@ -84,11 +84,9 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
         MemberModel $member,
     ): MailingListMember {
         $membership = new MailingListMember();
-        $membership->setMailingList($list);
+        $membership->mailingList = $list;
         $membership->setMember($member);
-        $membership->setEmail(
-            $member->getEmail() ?? throw new LogicException('The seeded member has no e-mail address.'),
-        );
+        $membership->email = $member->email ?? throw new LogicException('The seeded member has no e-mail address.');
 
         return $membership;
     }

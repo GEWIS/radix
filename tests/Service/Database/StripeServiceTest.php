@@ -17,6 +17,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Stripe\Checkout\Session as StripeCheckoutSession;
+use Stripe\Event;
+use Stripe\PaymentIntent;
 
 /**
  * What the checkout decides before it talks to Stripe.
@@ -78,7 +81,7 @@ class StripeServiceTest extends TestCase
     {
         $prospectiveMember = new ProspectiveMember();
         $paymentLink = new PaymentLink();
-        $paymentLink->setProspectiveMember($prospectiveMember);
+        $paymentLink->prospectiveMember = $prospectiveMember;
         $prospectiveMember->setPaymentLink($paymentLink);
 
         $actionLinkRepository = $this->createMock(ActionLinkRepository::class);
@@ -95,7 +98,7 @@ class StripeServiceTest extends TestCase
         );
 
         self::assertNull($service->restartCheckoutLink($prospectiveMember));
-        self::assertTrue($paymentLink->isUsed());
+        self::assertTrue($paymentLink->used);
     }
 
     /**
@@ -152,15 +155,58 @@ class StripeServiceTest extends TestCase
         self::assertNull($this->service($withoutPaymentIntent)->hasRefund($prospectiveMember));
     }
 
+    /**
+     * Stripe types an expandable field as either the id it was returned as or the object that id stands for,
+     * depending on what the request asked to have expanded, and `payment_intent` is one of those. What is stored is
+     * the id, whichever of the two arrives, because it is what a refund is looked up by later.
+     */
+    #[DataProvider('paymentIntentsOfASucceededPayment')]
+    public function testStoresAPaymentIntentAsItsIdentifierHoweverStripeSendsIt(
+        string|PaymentIntent $paymentIntent,
+    ): void {
+        $stored = $this->checkoutSession(CheckoutSessionStates::Pending);
+
+        $this->service(storedSession: $stored)->handleEvent(Event::constructFrom([
+            'type' => Event::CHECKOUT_SESSION_ASYNC_PAYMENT_SUCCEEDED,
+            'data' => [
+                'object' => StripeCheckoutSession::constructFrom([
+                    'id' => 'cs_test',
+                    'client_reference_id' => '8000',
+                    'payment_intent' => $paymentIntent,
+                ]),
+            ],
+        ]));
+
+        self::assertSame(
+            CheckoutSessionStates::Paid,
+            $stored->state,
+        );
+        self::assertSame(
+            'pi_test',
+            $stored->paymentIntentId,
+        );
+    }
+
+    /**
+     * @return array<string, array{string|PaymentIntent}>
+     */
+    public static function paymentIntentsOfASucceededPayment(): array
+    {
+        return [
+            'the id on its own' => ['pi_test'],
+            'the object it stands for' => [PaymentIntent::constructFrom(['id' => 'pi_test'])],
+        ];
+    }
+
     private function checkoutSession(
         CheckoutSessionStates $state,
         string $expiration = '+1 day',
     ): CheckoutSession {
         $session = new CheckoutSession();
-        $session->setCheckoutId('cs_test');
-        $session->setState($state);
-        $session->setCreated(new DateTime('-1 hour'));
-        $session->setExpiration(new DateTime($expiration));
+        $session->checkoutId = 'cs_test';
+        $session->state = $state;
+        $session->created = new DateTime('-1 hour');
+        $session->expiration = new DateTime($expiration);
 
         return $session;
     }
@@ -168,9 +214,11 @@ class StripeServiceTest extends TestCase
     private function service(
         ?CheckoutSession $lastSession = null,
         ?ActionLinkRepository $actionLinkRepository = null,
+        ?CheckoutSession $storedSession = null,
     ): StripeService {
         $checkoutSessionRepository = self::createStub(CheckoutSessionRepository::class);
         $checkoutSessionRepository->method('findLatest')->willReturn($lastSession);
+        $checkoutSessionRepository->method('findById')->willReturn($storedSession);
 
         return new StripeService(
             self::createStub(LoggerInterface::class),

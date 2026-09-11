@@ -33,9 +33,9 @@ class GrantMapper extends AbstractDecisionMapper
         }
 
         $granting = new Granting();
-        $granting->setSequence(1);
+        $granting->sequence = 1;
         $granting->setMember($grantee);
-        $granting->setUntil($until);
+        $granting->until = $until;
         $granting->setDecision($decision);
     }
 }

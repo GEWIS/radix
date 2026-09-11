@@ -46,9 +46,9 @@ final readonly class MeetingLookupTransformer implements DataTransformerInterfac
         }
 
         return [
-            'type' => $value->getType(),
+            'type' => $value->type,
             'number' => (string) $value->getNumber(),
-            'date' => $value->getDate()->format(DateTimeInterface::ATOM),
+            'date' => $value->date->format(DateTimeInterface::ATOM),
         ];
     }
 

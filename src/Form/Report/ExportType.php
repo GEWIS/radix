@@ -69,10 +69,10 @@ class ExportType extends AbstractType
 
         foreach ($this->meetingRepository->findAllWithDecisionCount() as $result) {
             $meeting = $result[0];
-            $label = strtoupper($meeting->getType()->value) . ' ' . $meeting->getNumber()
-                   . '   (' . $meeting->getDate()->format('j F Y') . ')';
+            $label = strtoupper($meeting->type->value) . ' ' . $meeting->getNumber()
+                   . '   (' . $meeting->date->format('j F Y') . ')';
 
-            $choices[$label] = $meeting->getType()->value . '-' . $meeting->getNumber();
+            $choices[$label] = $meeting->type->value . '-' . $meeting->getNumber();
         }
 
         return $choices;

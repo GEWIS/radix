@@ -35,7 +35,7 @@ class ListsStepType extends AbstractType
 
         foreach ($options['mailing_lists'] as $list) {
             assert($list instanceof MailingList);
-            $byName[$list->getName()] = $list;
+            $byName[$list->name] = $list;
         }
 
         $names = array_keys($byName);

@@ -50,7 +50,7 @@ class CandidacyType extends AbstractType
                     // The board a meeting puts candidates forward for is the one after the association year the
                     // meeting itself falls in, which is what the field starts on.
                     'data' => $meeting instanceof Meeting
-                        ? AssociationYear::fromDate($meeting->getDate())->getYear() + 1
+                        ? AssociationYear::fromDate($meeting->date)->getYear() + 1
                         : null,
                     'help' => t('The first of the two years, so 2026 for the board of 2026 - 2027.'),
                     'constraints' => [

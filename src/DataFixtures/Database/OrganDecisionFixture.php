@@ -40,12 +40,12 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         // Installment of GETÉST, at the oldest BM.
         $decision = new Decision();
         $decision->setMeeting($this->getReference('ledger-meeting-BV-1800', Meeting::class));
-        $decision->setPoint(1);
-        $decision->setNumber(1);
+        $decision->point = 1;
+        $decision->number = 1;
 
         $manager->persist($decision);
         $this->addReference(
-            'decision-BV-1800-' . $decision->getPoint() . '-' . $decision->getNumber(),
+            'decision-BV-1800-' . $decision->point . '-' . $decision->number,
             $decision,
         );
 
@@ -53,16 +53,16 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         $iSubdecisions = [];
 
         $foundation = new Foundation();
-        $foundation->setAbbr('GETÉST');
-        $foundation->setName('GEWIS\'ers Testen Éigenlijk Structureel Te-weinig');
-        $foundation->setOrganType(OrganTypes::Committee);
+        $foundation->abbr = 'GETÉST';
+        $foundation->name = 'GEWIS\'ers Testen Éigenlijk Structureel Te-weinig';
+        $foundation->organType = OrganTypes::Committee;
         $foundation->setDecision($decision);
-        $foundation->setSequence($sequence);
+        $foundation->sequence = $sequence;
 
         $manager->persist($foundation);
         $iSubdecisions[] = $foundation;
         $this->addReference(
-            'foundation-' . $foundation->getSequence(),
+            'foundation-' . $foundation->sequence,
             $foundation,
         );
 
@@ -131,12 +131,12 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         // Discharge of members of GETEST, a few weeks later.
         $decision = new Decision();
         $decision->setMeeting($this->getReference('ledger-meeting-BV-1806', Meeting::class));
-        $decision->setPoint(1);
-        $decision->setNumber(1);
+        $decision->point = 1;
+        $decision->number = 1;
 
         $manager->persist($decision);
         $this->addReference(
-            'decision-BV-1806-' . $decision->getPoint() . '-' . $decision->getNumber(),
+            'decision-BV-1806-' . $decision->point . '-' . $decision->number,
             $decision,
         );
 
@@ -187,17 +187,17 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
     {
         $decision = new Decision();
         $decision->setMeeting($this->getReference('ledger-meeting-BV-1800', Meeting::class));
-        $decision->setPoint(2);
-        $decision->setNumber(1);
+        $decision->point = 2;
+        $decision->number = 1;
 
         $manager->persist($decision);
 
         $foundation = new Foundation();
-        $foundation->setAbbr('KEUR');
-        $foundation->setName('Keuringscommissie');
-        $foundation->setOrganType(OrganTypes::Committee);
+        $foundation->abbr = 'KEUR';
+        $foundation->name = 'Keuringscommissie';
+        $foundation->organType = OrganTypes::Committee;
         $foundation->setDecision($decision);
-        $foundation->setSequence(1);
+        $foundation->sequence = 1;
 
         $manager->persist($foundation);
 
@@ -212,10 +212,10 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         foreach ($functions as $lidnr => $function) {
             $sequence++;
             $installation = new Installation();
-            $installation->setFunction($function);
+            $installation->function = $function;
             $installation->setMember($this->getReference('ledger-member-' . $lidnr, Member::class));
-            $installation->setSequence($sequence);
-            $installation->setFoundation($foundation);
+            $installation->sequence = $sequence;
+            $installation->foundation = $foundation;
             $installation->setDecision($decision);
 
             $manager->persist($installation);
@@ -233,17 +233,17 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
     {
         $decision = new Decision();
         $decision->setMeeting($this->getReference('ledger-meeting-BV-1800', Meeting::class));
-        $decision->setPoint(3);
-        $decision->setNumber(1);
+        $decision->point = 3;
+        $decision->number = 1;
 
         $manager->persist($decision);
 
         $foundation = new Foundation();
-        $foundation->setAbbr('GETÉST');
-        $foundation->setName('GEWIS\'ers Testten Éigenlijk Structureel Te-weinig');
-        $foundation->setOrganType(OrganTypes::Committee);
+        $foundation->abbr = 'GETÉST';
+        $foundation->name = 'GEWIS\'ers Testten Éigenlijk Structureel Te-weinig';
+        $foundation->organType = OrganTypes::Committee;
         $foundation->setDecision($decision);
-        $foundation->setSequence(1);
+        $foundation->sequence = 1;
 
         $manager->persist($foundation);
 
@@ -254,14 +254,14 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             'ledger-meeting-BV-1806',
             Meeting::class,
         ));
-        $closing->setPoint(4);
-        $closing->setNumber(1);
+        $closing->point = 4;
+        $closing->number = 1;
 
         $manager->persist($closing);
 
         $abrogation = new Abrogation();
-        $abrogation->setFoundation($foundation);
-        $abrogation->setSequence(1);
+        $abrogation->foundation = $foundation;
+        $abrogation->sequence = 1;
         $abrogation->setDecision($closing);
         $closing->addSubdecision($abrogation);
 
@@ -379,15 +379,15 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
 
         $decision = new Decision();
         $decision->setMeeting($this->getReference('ledger-meeting-BV-1804', Meeting::class));
-        $decision->setPoint(1);
-        $decision->setNumber(1);
+        $decision->point = 1;
+        $decision->number = 1;
         $manager->persist($decision);
 
         assert($annulmentTarget instanceof Decision);
 
         $annulment = new Annulment();
-        $annulment->setTarget($annulmentTarget);
-        $annulment->setSequence(1);
+        $annulment->target = $annulmentTarget;
+        $annulment->sequence = 1;
         $annulment->setDecision($decision);
         $manager->persist($annulment);
 
@@ -461,10 +461,10 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             'Het bestuur besluit de begroting van het introductieweekend ter hoogte van € 1.250,00 goed te keuren.',
             'The board decides to approve the budget of the introduction weekend amounting to € 1,250.00.',
         );
-        $repeat->setCounterpart($this->getReference(
+        $repeat->counterpart = $this->getReference(
             self::REPEATED_DECISION,
             Decision::class,
-        ));
+        );
 
         $manager->flush();
     }
@@ -482,15 +482,15 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             $meetingReference,
             Meeting::class,
         ));
-        $decision->setPoint($point);
-        $decision->setNumber($number);
+        $decision->point = $point;
+        $decision->number = $number;
 
         // A decision says what its subdecisions say, so free text is a subdecision rather than a field on the
         // decision; the replay reads the projection's content off it.
         $other = new Other();
-        $other->setContentNL($contentNL);
-        $other->setContentEN($contentEN);
-        $other->setSequence(1);
+        $other->contentNL = $contentNL;
+        $other->contentEN = $contentEN;
+        $other->sequence = 1;
         $other->setDecision($decision);
         $decision->addSubdecision($other);
 
@@ -509,15 +509,15 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         ObjectManager $manager,
     ): Installation {
         $installation = new Installation();
-        $installation->setFunction($function);
+        $installation->function = $function;
         $installation->setMember($this->getReference('ledger-member-' . $lidnr, Member::class));
-        $installation->setSequence($sequence);
-        $installation->setFoundation($foundation);
+        $installation->sequence = $sequence;
+        $installation->foundation = $foundation;
         $installation->setDecision($decision);
 
         $manager->persist($installation);
         $this->addReference(
-            'installation-' . $installation->getSequence(),
+            'installation-' . $installation->sequence,
             $installation,
         );
 
@@ -531,13 +531,16 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         ObjectManager $manager,
     ): Discharge {
         $discharge = new Discharge();
-        $discharge->setInstallation($this->getReference('installation-' . $installationSequence, Installation::class));
-        $discharge->setSequence($sequence);
+        $discharge->installation = $this->getReference(
+            'installation-' . $installationSequence,
+            Installation::class,
+        );
+        $discharge->sequence = $sequence;
         $discharge->setDecision($decision);
 
         $manager->persist($discharge);
         $this->addReference(
-            'discharge-' . $discharge->getSequence(),
+            'discharge-' . $discharge->sequence,
             $discharge,
         );
 

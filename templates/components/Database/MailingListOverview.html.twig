@@ -39,9 +39,9 @@
                                 {{ list.name }}
                                 {# A list synchronises with at most one external system, so at most one of these is
                                    set. #}
-                                ({% if list.hasListmonkList %}
+                                ({% if list.isOnListmonk %}
                                     {{ list.listmonkList.name }}
-                                {% elseif list.hasMailmanList %}
+                                {% elseif list.isOnMailman %}
                                     {{ list.mailmanList.mailmanId }}
                                 {% else %}
                                     {{ 'n/a'|trans }}

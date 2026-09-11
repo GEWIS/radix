@@ -235,9 +235,9 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
         assert($number > 0);
 
         $meeting = new Meeting();
-        $meeting->setType($type);
+        $meeting->type = $type;
         $meeting->setNumber($number);
-        $meeting->setDate($date);
+        $meeting->date = $date;
 
         $manager->persist($meeting);
         $this->addReference(

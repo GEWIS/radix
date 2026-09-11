@@ -20,7 +20,7 @@ class KeyGrantedInThePast extends Error
     public function __construct(KeyGrantingModel $granting)
     {
         parent::__construct(
-            $granting->getDecision()->getMeeting(),
+            $granting->decision->meeting,
             $granting,
         );
     }
@@ -39,8 +39,8 @@ class KeyGrantedInThePast extends Error
         return sprintf(
             'Key code granted to %s has an expiration of %s, this is before %s.',
             $this->getGranting()->getMember()->getFullName(),
-            $this->getGranting()->getUntil()->format('Y-m-d'),
-            $this->getMeeting()->getDate()->format('Y-m-d'),
+            $this->getGranting()->until->format('Y-m-d'),
+            $this->getMeeting()->date->format('Y-m-d'),
         );
     }
 }

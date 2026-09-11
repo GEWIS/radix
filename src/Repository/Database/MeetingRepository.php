@@ -216,7 +216,7 @@ class MeetingRepository extends ServiceEntityRepository
             );
             $qb->setParameter(
                 'type' . $index,
-                $meeting->getType(),
+                $meeting->type,
             )
                 ->setParameter(
                     'number' . $index,
@@ -683,11 +683,11 @@ class MeetingRepository extends ServiceEntityRepository
 
             $qb->setParameter(
                 'before_date',
-                $before->getDate(),
+                $before->date,
             )
                 ->setParameter(
                     'before_type',
-                    $before->getType(),
+                    $before->type,
                 )
                 ->setParameter(
                     'before_number',

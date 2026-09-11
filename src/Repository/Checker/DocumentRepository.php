@@ -81,7 +81,7 @@ class DocumentRepository
             )
             ->setParameter(
                 'meeting_type',
-                $meeting->getType(),
+                $meeting->type,
             );
     }
 }

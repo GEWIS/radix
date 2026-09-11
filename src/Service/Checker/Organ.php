@@ -48,7 +48,7 @@ class Organ
      */
     public function getAllOrganFoundations(MeetingModel $meeting): array
     {
-        $key = $meeting->getType()->value . '-' . $meeting->getNumber();
+        $key = $meeting->type->value . '-' . $meeting->getNumber();
 
         if (
             null !== $this->foundations
@@ -59,7 +59,7 @@ class Organ
 
         $abrogated = array_map(
             static function (AbrogationModel $organ): string {
-                return $organ->getFoundation()->getHash();
+                return $organ->foundation->getHash();
             },
             $this->organRepository->getAllOrganAbrogations($meeting),
         );

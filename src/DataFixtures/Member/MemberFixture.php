@@ -65,24 +65,24 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
     private function loadProspective(ObjectManager $manager): void
     {
         $prospective = new ProspectiveMember();
-        $prospective->setInitials('T.A.');
-        $prospective->setFirstName('Tara');
-        $prospective->setMiddleName('');
-        $prospective->setLastName('Testdata');
-        $prospective->setStudentNumber('1000012');
-        $prospective->setBirth(new DateTime('2001-01-01'));
-        $prospective->setEmail('tara@example.com');
-        $prospective->setPaid(20);
-        $prospective->setChangedOn(new DateTime());
-        $prospective->setStudy(Studies::BAM);
+        $prospective->initials = 'T.A.';
+        $prospective->firstName = 'Tara';
+        $prospective->middleName = '';
+        $prospective->lastName = 'Testdata';
+        $prospective->studentNumber = '1000012';
+        $prospective->birth = new DateTime('2001-01-01');
+        $prospective->email = 'tara@example.com';
+        $prospective->paid = 20;
+        $prospective->changedOn = new DateTime();
+        $prospective->study = Studies::BAM;
 
         $address = new Address();
-        $address->setStreet('Teststraat');
-        $address->setNumber('123');
-        $address->setPostalCode('5600 AA');
-        $address->setCity('Eindhoven');
-        $address->setPhone('1');
-        $address->setCountry(PostalRegions::Netherlands);
+        $address->street = 'Teststraat';
+        $address->number = '123';
+        $address->postalCode = '5600 AA';
+        $address->city = 'Eindhoven';
+        $address->phone = '1';
+        $address->country = PostalRegions::Netherlands;
         $prospective->setAddress($address);
 
         $manager->persist($prospective);
@@ -92,26 +92,26 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         );
 
         $checkout = new CheckoutSession();
-        $checkout->setCheckoutId('123');
-        $checkout->setProspectiveMember($prospective);
-        $checkout->setCreated(new DateTime());
-        $checkout->setExpiration(new DateTime());
-        $checkout->setState(CheckoutSessionStates::Paid);
+        $checkout->checkoutId = '123';
+        $checkout->prospectiveMember = $prospective;
+        $checkout->created = new DateTime();
+        $checkout->expiration = new DateTime();
+        $checkout->state = CheckoutSessionStates::Paid;
         $manager->persist($checkout);
     }
 
     private function loadPlainMembers(ObjectManager $manager): void
     {
         $student = new MemberModel();
-        $student->setInitials('T.');
-        $student->setFirstName('Timon');
-        $student->setMiddleName('de');
-        $student->setLastName('Teststudent');
+        $student->initials = 'T.';
+        $student->firstName = 'Timon';
+        $student->middleName = 'de';
+        $student->lastName = 'Teststudent';
         $student->setEmail('timon@example.com');
         $student->setBirth(new DateTime('2000-01-01'));
-        $student->setChangedOn(new DateTime());
-        $student->setStudentNumber('1000020');
-        $student->setStudy(Studies::BAM);
+        $student->changedOn = new DateTime();
+        $student->studentNumber = '1000020';
+        $student->study = Studies::BAM;
         $this->chainMemberships(
             $student,
             new DateTime('2018-08-14 midnight'),
@@ -123,14 +123,14 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         );
 
         $external = new MemberModel();
-        $external->setInitials('J.');
-        $external->setFirstName('Joe');
-        $external->setMiddleName('');
-        $external->setLastName('Bloggs');
+        $external->initials = 'J.';
+        $external->firstName = 'Joe';
+        $external->middleName = '';
+        $external->lastName = 'Bloggs';
         $external->setEmail('joe@example.com');
         $external->setBirth(new DateTime('1999-01-01'));
-        $external->setChangedOn(new DateTime());
-        $external->setStudy(Studies::Other);
+        $external->changedOn = new DateTime();
+        $external->study = Studies::Other;
         $this->chainMemberships(
             $external,
             new DateTime('2017-08-15 midnight'),
@@ -144,14 +144,14 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         );
 
         $graduate = new MemberModel();
-        $graduate->setInitials('J.H.');
-        $graduate->setFirstName('Jack');
-        $graduate->setMiddleName('van');
-        $graduate->setLastName('Lint');
+        $graduate->initials = 'J.H.';
+        $graduate->firstName = 'Jack';
+        $graduate->middleName = 'van';
+        $graduate->lastName = 'Lint';
         $graduate->setEmail('vanlint@example.com');
         $graduate->setBirth(new DateTime('1932-09-01'));
-        $graduate->setChangedOn(new DateTime('1990-07-01'));
-        $graduate->setStudy(Studies::None);
+        $graduate->changedOn = new DateTime('1990-07-01');
+        $graduate->study = Studies::None;
         $this->chainMemberships(
             $graduate,
             new DateTime('1989-08-15 midnight'),
@@ -165,16 +165,16 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         );
 
         $deleted = new MemberModel();
-        $deleted->setInitials('R.');
-        $deleted->setFirstName('Rita');
-        $deleted->setMiddleName('');
-        $deleted->setLastName('Removed');
+        $deleted->initials = 'R.';
+        $deleted->firstName = 'Rita';
+        $deleted->middleName = '';
+        $deleted->lastName = 'Removed';
         $deleted->setEmail('rita@example.com');
         $deleted->setBirth(new DateTime('1998-01-01'));
-        $deleted->setChangedOn(new DateTime());
-        $deleted->setStudentNumber('1000030');
-        $deleted->setStudy(Studies::BAM);
-        $deleted->setDeleted(true);
+        $deleted->changedOn = new DateTime();
+        $deleted->studentNumber = '1000030';
+        $deleted->study = Studies::BAM;
+        $deleted->deleted = true;
         $this->chainMemberships(
             $deleted,
             new DateTime('2019-08-13 midnight'),
@@ -210,7 +210,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             );
             $member->addMembership($membership);
 
-            $startDate = $membership->getEndDate();
+            $startDate = $membership->endDate;
         }
     }
 
@@ -581,24 +581,24 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         bool $hidden = false,
     ): MemberModel {
         $member = new MemberModel();
-        $member->setInitials($initials);
-        $member->setFirstName($firstName);
-        $member->setMiddleName('');
-        $member->setLastName($lastName);
+        $member->initials = $initials;
+        $member->firstName = $firstName;
+        $member->middleName = '';
+        $member->lastName = $lastName;
         $member->setBirth(new DateTime()->modify('-' . $ageInYears . ' years'));
-        $member->setChangedOn(new DateTime());
-        $member->setStudy($study);
+        $member->changedOn = new DateTime();
+        $member->study = $study;
 
         if (null !== $email) {
             $member->setEmail($email);
         }
 
         if (null !== $studentNumber) {
-            $member->setStudentNumber($studentNumber);
+            $member->studentNumber = $studentNumber;
         }
 
         if ($hidden) {
-            $member->setHidden(true);
+            $member->hidden = true;
         }
 
         foreach ($segments as [$type, $startDate, $endDate]) {

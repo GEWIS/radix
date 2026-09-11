@@ -63,9 +63,9 @@ final class LedgerBuilder
         string $date = '2026-08-20',
     ): Meeting {
         $meeting = new Meeting();
-        $meeting->setType($type);
+        $meeting->type = $type;
         $meeting->setNumber(++$this->meetingNumber);
-        $meeting->setDate(new DateTime($date));
+        $meeting->date = new DateTime($date);
 
         $this->entityManager->persist($meeting);
         $this->entityManager->flush();
@@ -84,13 +84,16 @@ final class LedgerBuilder
         $number = ++$this->memberCounter;
 
         $member = new Member();
-        $member->setInitials('T.');
-        $member->setFirstName('Test');
-        $member->setMiddleName('');
-        $member->setLastName(sprintf('Testlid %d', $number));
+        $member->initials = 'T.';
+        $member->firstName = 'Test';
+        $member->middleName = '';
+        $member->lastName = sprintf(
+            'Testlid %d',
+            $number,
+        );
         $member->setEmail(sprintf('testlid-%d@example.org', $number));
         $member->setBirth(new DateTime('2000-01-01'));
-        $member->setChangedOn(new DateTime());
+        $member->changedOn = new DateTime();
 
         $member->addMembership(
             new Membership(
@@ -114,10 +117,10 @@ final class LedgerBuilder
         OrganTypes $type = OrganTypes::Committee,
     ): Foundation {
         $foundation = new Foundation();
-        $foundation->setAbbr($abbreviation);
-        $foundation->setName($name);
-        $foundation->setOrganType($type);
-        $foundation->setSequence(1);
+        $foundation->abbr = $abbreviation;
+        $foundation->name = $name;
+        $foundation->organType = $type;
+        $foundation->sequence = 1;
         $foundation->setDecision($this->decision($meeting));
 
         return $this->persist($foundation);
@@ -140,10 +143,10 @@ final class LedgerBuilder
 
         foreach ($functions as $function) {
             $installation = new Installation();
-            $installation->setFoundation($foundation);
+            $installation->foundation = $foundation;
             $installation->setMember($member);
-            $installation->setFunction($function);
-            $installation->setSequence($sequence++);
+            $installation->function = $function;
+            $installation->sequence = $sequence++;
             $installation->setDecision($decision);
 
             $this->entityManager->persist($installation);
@@ -161,8 +164,8 @@ final class LedgerBuilder
         Installation $installation,
     ): Discharge {
         $discharge = new Discharge();
-        $discharge->setInstallation($installation);
-        $discharge->setSequence(1);
+        $discharge->installation = $installation;
+        $discharge->sequence = 1;
         $discharge->setDecision($this->decision($meeting));
 
         return $this->persist($discharge);
@@ -173,8 +176,8 @@ final class LedgerBuilder
         Installation $installation,
     ): Reappointment {
         $reappointment = new Reappointment();
-        $reappointment->setInstallation($installation);
-        $reappointment->setSequence(1);
+        $reappointment->installation = $installation;
+        $reappointment->sequence = 1;
         $reappointment->setDecision($this->decision($meeting));
 
         return $this->persist($reappointment);
@@ -185,8 +188,8 @@ final class LedgerBuilder
         Foundation $foundation,
     ): Abrogation {
         $abrogation = new Abrogation();
-        $abrogation->setFoundation($foundation);
-        $abrogation->setSequence(1);
+        $abrogation->foundation = $foundation;
+        $abrogation->sequence = 1;
         $abrogation->setDecision($this->decision($meeting));
 
         return $this->persist($abrogation);
@@ -199,8 +202,8 @@ final class LedgerBuilder
     ): Granting {
         $granting = new Granting();
         $granting->setMember($member);
-        $granting->setUntil(new DateTime($until));
-        $granting->setSequence(1);
+        $granting->until = new DateTime($until);
+        $granting->sequence = 1;
         $granting->setDecision($this->decision($meeting));
 
         return $this->persist($granting);
@@ -212,9 +215,9 @@ final class LedgerBuilder
         string $withdrawnOn = '+1 month',
     ): Withdrawal {
         $withdrawal = new Withdrawal();
-        $withdrawal->setGranting($granting);
-        $withdrawal->setWithdrawnOn(new DateTime($withdrawnOn));
-        $withdrawal->setSequence(1);
+        $withdrawal->granting = $granting;
+        $withdrawal->withdrawnOn = new DateTime($withdrawnOn);
+        $withdrawal->sequence = 1;
         $withdrawal->setDecision($this->decision($meeting));
 
         return $this->persist($withdrawal);
@@ -228,9 +231,9 @@ final class LedgerBuilder
     ): BoardInstallation {
         $installation = new BoardInstallation();
         $installation->setMember($member);
-        $installation->setFunction($function);
-        $installation->setDate(new DateTime($date));
-        $installation->setSequence(1);
+        $installation->function = $function;
+        $installation->date = new DateTime($date);
+        $installation->sequence = 1;
         $installation->setDecision($this->decision($meeting));
 
         return $this->persist($installation);
@@ -242,9 +245,9 @@ final class LedgerBuilder
         string $date = '2027-09-01',
     ): BoardRelease {
         $release = new BoardRelease();
-        $release->setInstallation($installation);
-        $release->setDate(new DateTime($date));
-        $release->setSequence(1);
+        $release->installation = $installation;
+        $release->date = new DateTime($date);
+        $release->sequence = 1;
         $release->setDecision($this->decision($meeting));
 
         return $this->persist($release);
@@ -255,8 +258,8 @@ final class LedgerBuilder
         Decision $target,
     ): Annulment {
         $annulment = new Annulment();
-        $annulment->setTarget($target);
-        $annulment->setSequence(1);
+        $annulment->target = $target;
+        $annulment->sequence = 1;
         $annulment->setDecision($this->decision($meeting));
 
         return $this->persist($annulment);
@@ -271,12 +274,12 @@ final class LedgerBuilder
         string $name = 'Begroting',
     ): Budget {
         $budget = new Budget();
-        $budget->setName($name);
-        $budget->setVersion('1.0');
-        $budget->setDate(new DateTime($date));
-        $budget->setApproval(true);
-        $budget->setChanges(false);
-        $budget->setSequence(1);
+        $budget->name = $name;
+        $budget->version = '1.0';
+        $budget->date = new DateTime($date);
+        $budget->approval = true;
+        $budget->changes = false;
+        $budget->sequence = 1;
         $budget->setDecision($this->decision($meeting));
 
         return $this->persist($budget);
@@ -291,14 +294,14 @@ final class LedgerBuilder
         string $abbreviation = 'TC',
     ): OrganRegulation {
         $regulation = new OrganRegulation();
-        $regulation->setAbbr($abbreviation);
-        $regulation->setOrganType(OrganTypes::Committee);
-        $regulation->setVersion('1.0');
-        $regulation->setDate(new DateTime($date));
-        $regulation->setApproval(true);
-        $regulation->setChanges(false);
+        $regulation->abbr = $abbreviation;
+        $regulation->organType = OrganTypes::Committee;
+        $regulation->version = '1.0';
+        $regulation->date = new DateTime($date);
+        $regulation->approval = true;
+        $regulation->changes = false;
         $regulation->setMember($this->member());
-        $regulation->setSequence(1);
+        $regulation->sequence = 1;
         $regulation->setDecision($this->decision($meeting));
 
         return $this->persist($regulation);
@@ -310,9 +313,9 @@ final class LedgerBuilder
         ?string $contentEN = null,
     ): Other {
         $other = new Other();
-        $other->setContentNL($contentNL);
-        $other->setContentEN($contentEN);
-        $other->setSequence(1);
+        $other->contentNL = $contentNL;
+        $other->contentEN = $contentEN;
+        $other->sequence = 1;
         $other->setDecision($this->decision($meeting));
 
         return $this->persist($other);
@@ -326,8 +329,8 @@ final class LedgerBuilder
 
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($point);
-        $decision->setNumber(1);
+        $decision->point = $point;
+        $decision->number = 1;
 
         $this->entityManager->persist($decision);
 

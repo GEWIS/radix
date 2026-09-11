@@ -114,8 +114,8 @@ class MailingListType extends AbstractType
                 'choice_label' => static function (MailmanMailingList $mailmanList): string {
                     return sprintf(
                         '%s (%s)',
-                        $mailmanList->getName(),
-                        $mailmanList->getMailmanId(),
+                        $mailmanList->name,
+                        $mailmanList->mailmanId,
                     );
                 },
                 'placeholder' => t('Choose a mailing list'),
@@ -133,8 +133,8 @@ class MailingListType extends AbstractType
                 'choice_label' => static function (ListmonkMailingList $listmonkList): string {
                     return sprintf(
                         '%s (%s)',
-                        $listmonkList->getName(),
-                        $listmonkList->getListmonkId(),
+                        $listmonkList->name,
+                        $listmonkList->listmonkId,
                     );
                 },
                 'placeholder' => t('Choose a mailing list'),
@@ -162,7 +162,7 @@ class MailingListType extends AbstractType
                     return;
                 }
 
-                $list->setOnForm(true);
+                $list->onForm = true;
             },
         );
     }
@@ -196,8 +196,8 @@ class MailingListType extends AbstractType
     ): void {
         if (
             null === $list
-            || !$list->hasMailmanList()
-            || !$list->hasListmonkList()
+            || !$list->isOnMailman()
+            || !$list->isOnListmonk()
         ) {
             return;
         }

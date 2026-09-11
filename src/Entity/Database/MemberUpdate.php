@@ -39,31 +39,31 @@ class MemberUpdate
      * Member's email address.
      */
     #[Column(type: 'string')]
-    private string $email;
+    public string $email;
 
     /**
      * Member's last name.
      */
     #[Column(type: 'string')]
-    private string $lastName;
+    public string $lastName;
 
     /**
      * Middle name.
      */
     #[Column(type: 'string')]
-    private string $middleName;
+    public string $middleName;
 
     /**
      * Initials.
      */
     #[Column(type: 'string')]
-    private string $initials;
+    public string $initials;
 
     /**
      * First name.
      */
     #[Column(type: 'string')]
-    private string $firstName;
+    public string $firstName;
 
     /**
      * Get the member.
@@ -84,86 +84,6 @@ class MemberUpdate
     }
 
     /**
-     * Get the member's email address.
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Set the member's email address.
-     */
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Get the member's last name.
-     */
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * Set the member's last name.
-     */
-    public function setLastName(string $lastName): void
-    {
-        $this->lastName = $lastName;
-    }
-
-    /**
-     * Get the member's middle name.
-     */
-    public function getMiddleName(): string
-    {
-        return $this->middleName;
-    }
-
-    /**
-     * Set the member's middle name.
-     */
-    public function setMiddleName(string $middleName): void
-    {
-        $this->middleName = $middleName;
-    }
-
-    /**
-     * Get the member's initials.
-     */
-    public function getInitials(): string
-    {
-        return $this->initials;
-    }
-
-    /**
-     * Set the member's initials.
-     */
-    public function setInitials(string $initials): void
-    {
-        $this->initials = $initials;
-    }
-
-    /**
-     * Get the member's first name.
-     */
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * Set the member's first name.
-     */
-    public function setFirstName(string $firstName): void
-    {
-        $this->firstName = $firstName;
-    }
-
-    /**
      * Convert most relevant items to array.
      *
      * @return array{
@@ -177,11 +97,11 @@ class MemberUpdate
     public function toArray(): array
     {
         return [
-            'email' => $this->getEmail(),
-            'lastName' => $this->getLastName(),
-            'middleName' => $this->getMiddleName(),
-            'initials' => $this->getInitials(),
-            'firstName' => $this->getFirstName(),
+            'email' => $this->email,
+            'lastName' => $this->lastName,
+            'middleName' => $this->middleName,
+            'initials' => $this->initials,
+            'firstName' => $this->firstName,
         ];
     }
 }

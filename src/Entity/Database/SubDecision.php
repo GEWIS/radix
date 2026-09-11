@@ -103,7 +103,7 @@ abstract class SubDecision
         name: 'decision_number',
         referencedColumnName: 'number',
     )]
-    protected Decision $decision;
+    public protected(set) Decision $decision;
 
     /**
      * Meeting type.
@@ -151,15 +151,7 @@ abstract class SubDecision
      */
     #[Id]
     #[Column(type: 'integer')]
-    protected int $sequence;
-
-    /**
-     * Get the decision.
-     */
-    public function getDecision(): Decision
-    {
-        return $this->decision;
-    }
+    public int $sequence;
 
     /**
      * Set the decision.
@@ -169,8 +161,8 @@ abstract class SubDecision
         $decision->addSubdecision($this);
         $this->meeting_type = $decision->getMeetingType();
         $this->meeting_number = $decision->getMeetingNumber();
-        $this->decision_point = $decision->getPoint();
-        $this->decision_number = $decision->getNumber();
+        $this->decision_point = $decision->point;
+        $this->decision_number = $decision->number;
         $this->decision = $decision;
     }
 
@@ -207,22 +199,6 @@ abstract class SubDecision
     }
 
     /**
-     * Get the sequence number.
-     */
-    public function getSequence(): int
-    {
-        return $this->sequence;
-    }
-
-    /**
-     * Set the sequence number.
-     */
-    public function setSequence(int $sequence): void
-    {
-        $this->sequence = $sequence;
-    }
-
-    /**
      * Get the string ("hash") that uniquely identifies this subdecision.
      *
      * The sibling of {@see Decision::getHash()} one level down; matching subdecisions across two sets should always
@@ -236,7 +212,7 @@ abstract class SubDecision
             $this->getMeetingNumber(),
             $this->getDecisionPoint(),
             $this->getDecisionNumber(),
-            $this->getSequence(),
+            $this->sequence,
         );
     }
 

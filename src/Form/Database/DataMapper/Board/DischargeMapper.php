@@ -28,8 +28,8 @@ class DischargeMapper extends AbstractDecisionMapper
         }
 
         $discharge = new Discharge();
-        $discharge->setSequence(1);
-        $discharge->setInstallation($installation);
+        $discharge->sequence = 1;
+        $discharge->installation = $installation;
         $discharge->setDecision($decision);
     }
 }

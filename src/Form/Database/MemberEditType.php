@@ -163,7 +163,7 @@ class MemberEditType extends AbstractType
                         return;
                     }
 
-                    $member->setStudy($study);
+                    $member->study = $study;
                 },
             ],
         );

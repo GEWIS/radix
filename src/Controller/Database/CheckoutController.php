@@ -142,13 +142,13 @@ final class CheckoutController extends AbstractController
                 '',
             ),
         );
-        $token = $prospectiveMember?->getPaymentLink()?->getToken();
+        $token = $prospectiveMember?->getPaymentLink()?->token;
 
         return $this->render(
             'database/join/checkout-status.html.twig',
             [
                 'status' => $status,
-                'first_name' => $prospectiveMember?->getFirstName(),
+                'first_name' => $prospectiveMember?->firstName,
                 'restart_url' => null === $token
                     ? null
                     : $this->generateUrl(

@@ -36,37 +36,37 @@ class ProspectiveMember
     #[Id]
     #[Column(type: 'integer')]
     #[GeneratedValue(strategy: 'AUTO')]
-    private int $lidnr;
+    public int $lidnr;
 
     /**
      * Member's email address.
      */
     #[Column(type: 'string')]
-    private string $email;
+    public string $email;
 
     /**
      * Member's last name.
      */
     #[Column(type: 'string')]
-    private string $lastName;
+    public string $lastName;
 
     /**
      * Middle name.
      */
     #[Column(type: 'string')]
-    private string $middleName;
+    public string $middleName;
 
     /**
      * Initials.
      */
     #[Column(type: 'string')]
-    private string $initials;
+    public string $initials;
 
     /**
      * First name.
      */
     #[Column(type: 'string')]
-    private string $firstName;
+    public string $firstName;
 
     /**
      * TU/e student number.
@@ -75,7 +75,7 @@ class ProspectiveMember
         type: 'string',
         nullable: true,
     )]
-    private ?string $studentNumber = null;
+    public ?string $studentNumber = null;
 
     /**
      * Study of the member.
@@ -83,25 +83,25 @@ class ProspectiveMember
     #[Column(
         enumType: Studies::class,
     )]
-    private Studies $study = Studies::Unknown;
+    public Studies $study = Studies::Unknown;
 
     /**
      * Last changed date of membership.
      */
     #[Column(type: 'date')]
-    private DateTime $changedOn;
+    public DateTime $changedOn;
 
     /**
      * Member birthdate.
      */
     #[Column(type: 'date')]
-    private DateTime $birth;
+    public DateTime $birth;
 
     /**
      * How much the member has paid for membership. 0 by default.
      */
     #[Column(type: 'integer')]
-    private int $paid = 0;
+    public int $paid = 0;
 
     /**
      * Country.
@@ -109,37 +109,37 @@ class ProspectiveMember
     #[Column(
         enumType: PostalRegions::class,
     )]
-    private PostalRegions $country;
+    public private(set) PostalRegions $country;
 
     /**
      * Street.
      */
     #[Column(type: 'string')]
-    private string $street;
+    public private(set) string $street;
 
     /**
      * House number (+ suffix)
      */
     #[Column(type: 'string')]
-    private string $number;
+    public private(set) string $number;
 
     /**
      * Postal code.
      */
     #[Column(type: 'string')]
-    private string $postalCode;
+    public private(set) string $postalCode;
 
     /**
      * City.
      */
     #[Column(type: 'string')]
-    private string $city;
+    public private(set) string $city;
 
     /**
      * Phone number.
      */
     #[Column(type: 'string')]
-    private string $phone;
+    public private(set) string $phone;
 
     /**
      * Memberships of mailing lists.
@@ -181,224 +181,18 @@ class ProspectiveMember
     }
 
     /**
-     * Get the membership number.
-     */
-    public function getLidnr(): int
-    {
-        return $this->lidnr;
-    }
-
-    /**
-     * Get the member's email address.
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Get the member's last name.
-     */
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * Get the member's middle name.
-     */
-    public function getMiddleName(): string
-    {
-        return $this->middleName;
-    }
-
-    /**
-     * Get the member's initials.
-     */
-    public function getInitials(): string
-    {
-        return $this->initials;
-    }
-
-    /**
-     * Get the member's first name.
-     */
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * Set the lidnr.
-     */
-    public function setLidnr(int $lidnr): void
-    {
-        $this->lidnr = $lidnr;
-    }
-
-    /**
-     * Set the member's email address.
-     */
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Set the member's last name.
-     */
-    public function setLastName(string $lastName): void
-    {
-        $this->lastName = $lastName;
-    }
-
-    /**
-     * Set the member's middle name.
-     */
-    public function setMiddleName(string $middleName): void
-    {
-        $this->middleName = $middleName;
-    }
-
-    /**
-     * Set the member's initials.
-     */
-    public function setInitials(string $initials): void
-    {
-        $this->initials = $initials;
-    }
-
-    /**
-     * Set the member's first name.
-     */
-    public function setFirstName(string $firstName): void
-    {
-        $this->firstName = $firstName;
-    }
-
-    /**
      * Assemble the member's full name.
      */
     public function getFullName(): string
     {
-        $name = $this->getFirstName() . ' ';
+        $name = $this->firstName . ' ';
 
-        $middle = $this->getMiddleName();
+        $middle = $this->middleName;
         if (!empty($middle)) {
             $name .= $middle . ' ';
         }
 
-        return $name . $this->getLastName();
-    }
-
-    /**
-     * Get the TU/e student number.
-     */
-    public function getStudentNumber(): ?string
-    {
-        return $this->studentNumber;
-    }
-
-    /**
-     * Set the TU/e student number.
-     */
-    public function setStudentNumber(?string $studentNumber): void
-    {
-        $this->studentNumber = $studentNumber;
-    }
-
-    /**
-     * Get the study.
-     */
-    public function getStudy(): Studies
-    {
-        return $this->study;
-    }
-
-    /**
-     * Set the study (null should never happen, but made consistent with Member)
-     */
-    public function setStudy(Studies $study): void
-    {
-        $this->study = $study;
-    }
-
-    /**
-     * Get the birth date.
-     */
-    public function getBirth(): DateTime
-    {
-        return $this->birth;
-    }
-
-    /**
-     * Set the birthdate.
-     */
-    public function setBirth(DateTime $birth): void
-    {
-        $this->birth = $birth;
-    }
-
-    public function getCountry(): PostalRegions
-    {
-        return $this->country;
-    }
-
-    public function getStreet(): string
-    {
-        return $this->street;
-    }
-
-    public function getNumber(): string
-    {
-        return $this->number;
-    }
-
-    public function getPostalCode(): string
-    {
-        return $this->postalCode;
-    }
-
-    public function getCity(): string
-    {
-        return $this->city;
-    }
-
-    public function getPhone(): string
-    {
-        return $this->phone;
-    }
-
-    /**
-     * Get the date of the last membership change.
-     */
-    public function getChangedOn(): DateTime
-    {
-        return $this->changedOn;
-    }
-
-    /**
-     * Set the date of the last membership change.
-     */
-    public function setChangedOn(DateTime $changedOn): void
-    {
-        $this->changedOn = $changedOn;
-    }
-
-    /**
-     * Get how much has been paid.
-     */
-    public function getPaid(): int
-    {
-        return $this->paid;
-    }
-
-    /**
-     * Set how much has been paid.
-     */
-    public function setPaid(int $paid): void
-    {
-        $this->paid = $paid;
+        return $name . $this->lastName;
     }
 
     /**
@@ -432,16 +226,16 @@ class ProspectiveMember
     public function toArray(): array
     {
         return [
-            'lidnr' => $this->getLidnr(),
-            'email' => $this->getEmail(),
+            'lidnr' => $this->lidnr,
+            'email' => $this->email,
             'fullName' => $this->getFullName(),
-            'lastName' => $this->getLastName(),
-            'middleName' => $this->getMiddleName(),
-            'initials' => $this->getInitials(),
-            'firstName' => $this->getFirstName(),
-            'studentNumber' => $this->getStudentNumber(),
-            'study' => $this->getStudy()->getName()->getMessage(),
-            'birth' => $this->getBirth()->format('Y-m-d'),
+            'lastName' => $this->lastName,
+            'middleName' => $this->middleName,
+            'initials' => $this->initials,
+            'firstName' => $this->firstName,
+            'studentNumber' => $this->studentNumber,
+            'study' => $this->study->getName()->getMessage(),
+            'birth' => $this->birth->format('Y-m-d'),
             'lists' => $this->getLists(),
             'address' => $this->getAddresses()['studentAddress']->toArray(),
             'agreed' => '1',
@@ -457,13 +251,13 @@ class ProspectiveMember
     public function getAddresses(): array
     {
         $address = new Address();
-        $address->setType(AddressTypes::Student);
-        $address->setCountry($this->country);
-        $address->setStreet($this->street);
-        $address->setNumber($this->number);
-        $address->setPostalCode($this->postalCode);
-        $address->setCity($this->city);
-        $address->setPhone($this->phone);
+        $address->type = AddressTypes::Student;
+        $address->country = $this->country;
+        $address->street = $this->street;
+        $address->number = $this->number;
+        $address->postalCode = $this->postalCode;
+        $address->city = $this->city;
+        $address->phone = $this->phone;
 
         return ['studentAddress' => $address];
     }
@@ -473,12 +267,12 @@ class ProspectiveMember
      */
     public function setAddress(Address $address): void
     {
-        $this->country = $address->getCountry();
-        $this->street = $address->getStreet();
-        $this->number = $address->getNumber();
-        $this->postalCode = $address->getPostalCode();
-        $this->city = $address->getCity();
-        $this->phone = $address->getPhone();
+        $this->country = $address->country;
+        $this->street = $address->street;
+        $this->number = $address->number;
+        $this->postalCode = $address->postalCode;
+        $this->city = $address->city;
+        $this->phone = $address->phone;
     }
 
     /**
@@ -566,11 +360,11 @@ class ProspectiveMember
             return false;
         }
 
-        $lastState = $lastCheckoutSession->getState();
+        $lastState = $lastCheckoutSession->state;
 
         if (CheckoutSessionStates::Expired === $lastState) {
             // Checkout Session is fully expired, it cannot be recovered and is scheduled for automatic removal.
-            return (new DateTime()) >= $lastCheckoutSession->getExpiration();
+            return (new DateTime()) >= $lastCheckoutSession->expiration;
         }
 
         return CheckoutSessionStates::Paid === $lastState;
@@ -580,7 +374,7 @@ class ProspectiveMember
      * Determine whether the prospective member has paid. This should only be possible if the Checkout Session's state
      * is 'PAID'.
      */
-    public function hasPaid(): bool
+    public function isPaymentSettled(): bool
     {
         $lastState = $this->getLastCheckoutSessionState();
 
@@ -605,7 +399,7 @@ class ProspectiveMember
             return null;
         }
 
-        return $lastCheckoutSession->getState();
+        return $lastCheckoutSession->state;
     }
 
     /**

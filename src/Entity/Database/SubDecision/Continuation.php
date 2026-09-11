@@ -37,11 +37,11 @@ class Continuation extends FoundationReference
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%ORGAN_TYPE%' => $this->getFoundation()->getOrganType()->trans(
+            '%ORGAN_TYPE%' => $this->foundation->organType->trans(
                 $translator,
                 $language->getLangParam(),
             ),
-            '%ORGAN_ABBR%' => $this->getFoundation()->getAbbr(),
+            '%ORGAN_ABBR%' => $this->foundation->abbr,
         ];
 
         return $this->replaceContentPlaceholders(

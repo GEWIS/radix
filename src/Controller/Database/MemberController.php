@@ -489,7 +489,7 @@ final class MemberController extends AbstractMemberController
                 $member,
                 $this->generateUrl(
                     'member_show',
-                    ['lidnr' => $member->getLidnr()],
+                    ['lidnr' => $member->lidnr],
                 ),
             ),
             $members,

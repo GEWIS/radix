@@ -53,23 +53,7 @@ class Annulment extends SubDecision
         name: 'r_decision_number',
         referencedColumnName: 'number',
     )]
-    private Decision $target;
-
-    /**
-     * Get the target.
-     */
-    public function getTarget(): Decision
-    {
-        return $this->target;
-    }
-
-    /**
-     * Set the target.
-     */
-    public function setTarget(Decision $target): void
-    {
-        $this->target = $target;
-    }
+    public Decision $target;
 
     #[Override]
     protected function getTranslatedTemplate(
@@ -88,8 +72,8 @@ class Annulment extends SubDecision
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%DECISION_HASH%' => $this->getTarget()->getHash(), // We do not provide an alternative to the hash.
-            '%DECISION_CONTENT%' => $this->getTarget()->getTranslatedContent(
+            '%DECISION_HASH%' => $this->target->getHash(), // We do not provide an alternative to the hash.
+            '%DECISION_CONTENT%' => $this->target->getTranslatedContent(
                 $translator,
                 $language,
             ),

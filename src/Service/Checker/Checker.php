@@ -124,7 +124,7 @@ class Checker
         $installations = $this->installationService->getAllInstallations($meeting);
 
         foreach ($installations as $installation) {
-            $installationToOrganFoundation = $installation->getFoundation()->getHash();
+            $installationToOrganFoundation = $installation->foundation->getHash();
 
             if (
                 in_array(
@@ -162,8 +162,8 @@ class Checker
             $member = $installation->getMember();
 
             if (
-                $member->getExpiration() >= $meeting->getDate()
-                || $member->getDeleted()
+                $member->getExpiration() >= $meeting->date
+                || $member->deleted
             ) {
                 continue;
             }
@@ -262,8 +262,8 @@ class Checker
         $organs = $this->organService->getOrgansCreatedAtMeeting($meeting);
 
         foreach ($organs as $organ) {
-            $organType = $organ->getOrganType();
-            $meetingType = $organ->getDecision()->getMeeting()->getType();
+            $organType = $organ->organType;
+            $meetingType = $organ->decision->meeting->type;
 
             // Chair's Meetings (VV) cannot be used to found an(y) organ. During General Members Meetings (ALV) only
             // specific organs can be founded, namely: AVC, AVW, KCC, Fraternity, RvA, and SC. Furthermore, these organ
@@ -310,7 +310,7 @@ class Checker
             if (
                 OrganTypes::Fraternity === $organType
                 && MeetingTypes::BV === $meetingType
-                && $organ->getDecision()->getMeeting()->getDate() <= new DateTime('2021-10-06')
+                && $organ->decision->meeting->date <= new DateTime('2021-10-06')
             ) {
                 continue;
             }
@@ -339,13 +339,13 @@ class Checker
         $maxOneYearCutOff = new DateTime('2025-07-01 midnight');
 
         // `$today` is when the meeting took place
-        $today = $meeting->getDate();
+        $today = $meeting->date;
         $todayNextYear = (clone $today)->add(new DateInterval('P1Y'));
 
         $septemberFirstNextAssociationYear = AssociationYear::fromDate($today)->septemberFirst();
 
         foreach ($grantings as $granting) {
-            $until = $granting->getUntil();
+            $until = $granting->until;
 
             if ($until < $today) {
                 $errors[] = new ErrorModel\KeyGrantedInThePast($granting);
@@ -382,7 +382,7 @@ class Checker
         );
 
         foreach ($documents as $document) {
-            if ($document->getDate() <= $meeting->getDate()) {
+            if ($document->date <= $meeting->date) {
                 continue;
             }
 
@@ -401,7 +401,7 @@ class Checker
         $withdrawals = $this->keyService->getKeysWithdrawnDuringMeeting($meeting);
 
         foreach ($withdrawals as $withdrawal) {
-            if ($withdrawal->getWithdrawnOn() <= $withdrawal->getGranting()->getUntil()) {
+            if ($withdrawal->withdrawnOn <= $withdrawal->granting->until) {
                 continue;
             }
 
@@ -426,17 +426,17 @@ class Checker
         $installations = [];
 
         foreach ($this->installationService->getAllInstallations($meeting) as $installation) {
-            $installations[$installation->getFoundation()->getHash()][] = $installation;
+            $installations[$installation->foundation->getHash()][] = $installation;
         }
 
         foreach ($organs as $hash => $organ) {
-            $type = $organ->getOrganType();
+            $type = $organ->organType;
             $members = [];
             $chairs = [];
 
             foreach ($installations[$hash] ?? [] as $installation) {
-                $function = $installation->getFunction();
-                $lidnr = $installation->getMember()->getLidnr();
+                $function = $installation->function;
+                $lidnr = $installation->getMember()->lidnr;
 
                 if (InstallationFunctions::Member === $function) {
                     $members[$lidnr] = $lidnr;

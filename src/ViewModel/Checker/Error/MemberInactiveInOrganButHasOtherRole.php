@@ -52,7 +52,7 @@ class MemberInactiveInOrganButHasOtherRole extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -61,8 +61,8 @@ class MemberInactiveInOrganButHasOtherRole extends Error
         return sprintf(
             'Member %s (%d) is installed as "Inactief Lid" of %s but has a special role "%s".',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
-            $this->getOrgan()->getName(),
+            $this->getMember()->lidnr,
+            $this->getOrgan()->name,
             $this->getRole(),
         );
     }

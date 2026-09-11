@@ -36,7 +36,7 @@ class Member
     #[Id]
     #[Column(type: 'integer')]
     #[GeneratedValue(strategy: 'AUTO')]
-    private int $lidnr;
+    public int $lidnr;
 
     /**
      * Member's email address.
@@ -45,31 +45,31 @@ class Member
         type: 'string',
         nullable: true,
     )]
-    private ?string $email = null;
+    public private(set) ?string $email = null;
 
     /**
      * Member's last name.
      */
     #[Column(type: 'string')]
-    private string $lastName;
+    public string $lastName;
 
     /**
      * Middle name.
      */
     #[Column(type: 'string')]
-    private string $middleName;
+    public string $middleName;
 
     /**
      * Initials.
      */
     #[Column(type: 'string')]
-    private string $initials;
+    public string $initials;
 
     /**
      * First name.
      */
     #[Column(type: 'string')]
-    private string $firstName;
+    public string $firstName;
 
     /**
      * TU/e student number.
@@ -78,7 +78,7 @@ class Member
         type: 'string',
         nullable: true,
     )]
-    private ?string $studentNumber = null;
+    public ?string $studentNumber = null;
 
     /**
      * Study of the member.
@@ -86,13 +86,13 @@ class Member
     #[Column(
         enumType: Studies::class,
     )]
-    private Studies $study = Studies::Unknown;
+    public Studies $study = Studies::Unknown;
 
     /**
      * Last changed date of member.
      */
     #[Column(type: 'date')]
-    private DateTime $changedOn;
+    public DateTime $changedOn;
 
     /**
      * Memberships of this member
@@ -117,13 +117,13 @@ class Member
         type: 'date',
         nullable: true,
     )]
-    private ?DateTime $lastCheckedOn = null;
+    public ?DateTime $lastCheckedOn = null;
 
     /**
      * Member birthdate.
      */
     #[Column(type: 'date')]
-    private DateTime $birth;
+    public private(set) DateTime $birth;
 
     /**
      * If the member receives a 'supremum'
@@ -132,7 +132,7 @@ class Member
         type: 'string',
         nullable: true,
     )]
-    private ?string $supremum = null;
+    public ?string $supremum = null;
 
     /**
      * Stores whether a member should be 'hidden'.
@@ -144,7 +144,7 @@ class Member
         type: 'boolean',
         options: ['default' => false],
     )]
-    private bool $hidden = false;
+    public bool $hidden = false;
 
     /**
      * Addresses of this member.
@@ -226,7 +226,7 @@ class Member
         type: 'boolean',
         options: ['default' => false],
     )]
-    private bool $deleted = false;
+    public bool $deleted = false;
 
     public function __construct()
     {
@@ -241,74 +241,18 @@ class Member
     }
 
     /**
-     * Get the membership number.
-     */
-    public function getLidnr(): int
-    {
-        return $this->lidnr;
-    }
-
-    /**
-     * Get the member's email address.
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
      * Get the member as an email recipient
      */
     public function getEmailRecipient(): ?MailAddress
     {
-        if (null === $this->getEmail()) {
+        if (null === $this->email) {
             return null;
         }
 
         return new MailAddress(
-            $this->getEmail(),
+            $this->email,
             $this->getFullName(),
         );
-    }
-
-    /**
-     * Get the member's last name.
-     */
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * Get the member's middle name.
-     */
-    public function getMiddleName(): string
-    {
-        return $this->middleName;
-    }
-
-    /**
-     * Get the member's initials.
-     */
-    public function getInitials(): string
-    {
-        return $this->initials;
-    }
-
-    /**
-     * Get the member's first name.
-     */
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * Set the lidnr.
-     */
-    public function setLidnr(int $lidnr): void
-    {
-        $this->lidnr = $lidnr;
     }
 
     /**
@@ -330,7 +274,7 @@ class Member
 
         $mailAddressExists = $this->mailingListMemberships->exists(
             static function ($key, MailingListMember $list) use ($newEmail) {
-                return $newEmail === $list->getEmail();
+                return $newEmail === $list->email;
             },
         );
         if ($mailAddressExists) {
@@ -344,49 +288,17 @@ class Member
         // registration using the new email address
         // Will be persisted with the member
         foreach ($this->mailingListMemberships as $mailingListMembership) {
-            if ($mailingListMembership->isToBeDeleted()) {
+            if ($mailingListMembership->toBeDeleted) {
                 continue;
             }
 
-            $mailingListMembership->setToBeDeleted(true);
+            $mailingListMembership->toBeDeleted = true;
             $newMembership = new MailingListMember();
+            // Takes the address with it: the member's own is what was just set.
             $newMembership->setMember($this);
-            $newMembership->setEmail($newEmail);
-            $newMembership->setMailingList($mailingListMembership->getMailingList());
+            $newMembership->mailingList = $mailingListMembership->mailingList;
             $this->addList($newMembership);
         }
-    }
-
-    /**
-     * Set the member's last name.
-     */
-    public function setLastName(string $lastName): void
-    {
-        $this->lastName = $lastName;
-    }
-
-    /**
-     * Set the member's middle name.
-     */
-    public function setMiddleName(string $middleName): void
-    {
-        $this->middleName = $middleName;
-    }
-
-    /**
-     * Set the member's initials.
-     */
-    public function setInitials(string $initials): void
-    {
-        $this->initials = $initials;
-    }
-
-    /**
-     * Set the member's first name.
-     */
-    public function setFirstName(string $firstName): void
-    {
-        $this->firstName = $firstName;
     }
 
     /**
@@ -394,14 +306,14 @@ class Member
      */
     public function getFullName(): string
     {
-        $name = $this->getFirstName() . ' ';
+        $name = $this->firstName . ' ';
 
-        $middle = $this->getMiddleName();
+        $middle = $this->middleName;
         if (!empty($middle)) {
             $name .= $middle . ' ';
         }
 
-        return $name . $this->getLastName();
+        return $name . $this->lastName;
     }
 
     /**
@@ -420,51 +332,11 @@ class Member
     }
 
     /**
-     * Get the TU/e student number.
-     */
-    public function getStudentNumber(): ?string
-    {
-        return $this->studentNumber;
-    }
-
-    /**
-     * Set the TU/e student number.
-     */
-    public function setStudentNumber(?string $studentNumber): void
-    {
-        $this->studentNumber = $studentNumber;
-    }
-
-    /**
-     * Get the study.
-     */
-    public function getStudy(): Studies
-    {
-        return $this->study;
-    }
-
-    /**
-     * Set the study.
-     */
-    public function setStudy(Studies $study): void
-    {
-        $this->study = $study;
-    }
-
-    /**
      * Get the expiration date.
      */
     public function getExpiration(): DateTime
     {
         return $this->computeMembershipEndDate(formalMemberOnly: false) ?? new DateTime('0001-01-01 00:00:00');
-    }
-
-    /**
-     * Get the birthdate.
-     */
-    public function getBirth(): DateTime
-    {
-        return $this->birth;
     }
 
     /**
@@ -477,22 +349,6 @@ class Member
         }
 
         $this->birth = $birth;
-    }
-
-    /**
-     * Get the date of the last member change.
-     */
-    public function getChangedOn(): DateTime
-    {
-        return $this->changedOn;
-    }
-
-    /**
-     * Set the date of the last member change.
-     */
-    public function setChangedOn(DateTime $changedOn): void
-    {
-        $this->changedOn = $changedOn;
     }
 
     /**
@@ -523,7 +379,7 @@ class Member
 
         foreach ($this->getMemberships() as $membership) {
             if (
-                !$membership->getType()->isFormalMember()
+                !$membership->type->isFormalMember()
                 && $formalMemberOnly
             ) {
                 continue;
@@ -531,12 +387,12 @@ class Member
 
             if (
                 null !== $expiration
-                && $membership->getEndDate() <= $expiration
+                && $membership->endDate <= $expiration
             ) {
                 continue;
             }
 
-            $expiration = $membership->getEndDate();
+            $expiration = $membership->endDate;
         }
 
         return $expiration;
@@ -557,7 +413,7 @@ class Member
      */
     public function addMembership(Membership $membership): void
     {
-        if ($membership->getMember() !== $this) {
+        if ($membership->member !== $this) {
             throw new RuntimeException('Membership does not belong to this member.');
         }
 
@@ -615,54 +471,6 @@ class Member
     }
 
     /**
-     * Get the date of when the membership status was last checked.
-     */
-    public function getLastCheckedOn(): ?DateTime
-    {
-        return $this->lastCheckedOn;
-    }
-
-    /**
-     * Set the date of when the membership status was last checked.
-     */
-    public function setLastCheckedOn(?DateTime $lastCheckedOn): void
-    {
-        $this->lastCheckedOn = $lastCheckedOn;
-    }
-
-    /**
-     * Get if the member wants a supremum.
-     */
-    public function getSupremum(): ?string
-    {
-        return $this->supremum;
-    }
-
-    /**
-     * Set if the member wants a supremum.
-     */
-    public function setSupremum(?string $supremum): void
-    {
-        $this->supremum = $supremum;
-    }
-
-    /**
-     * Get if the member is hidden.
-     */
-    public function getHidden(): bool
-    {
-        return $this->hidden;
-    }
-
-    /**
-     * Set if the member is hidden.
-     */
-    public function setHidden(bool $hidden): void
-    {
-        $this->hidden = $hidden;
-    }
-
-    /**
      * Get the installations.
      *
      * @return Collection<array-key, Installation>
@@ -680,22 +488,6 @@ class Member
     public function getAuditEntries(): Collection
     {
         return $this->auditEntries;
-    }
-
-    /**
-     * Get if the member is deleted.
-     */
-    public function getDeleted(): bool
-    {
-        return $this->deleted;
-    }
-
-    /**
-     * Set if the member is deleted.
-     */
-    public function setDeleted(bool $deleted): void
-    {
-        $this->deleted = $deleted;
     }
 
     /**
@@ -718,16 +510,16 @@ class Member
     public function toArray(): array
     {
         return [
-            'lidnr' => $this->getLidnr(),
-            'email' => $this->getEmail(),
+            'lidnr' => $this->lidnr,
+            'email' => $this->email,
             'fullName' => $this->getFullName(),
-            'lastName' => $this->getLastName(),
-            'middleName' => $this->getMiddleName(),
-            'initials' => $this->getInitials(),
-            'firstName' => $this->getFirstName(),
+            'lastName' => $this->lastName,
+            'middleName' => $this->middleName,
+            'initials' => $this->initials,
+            'firstName' => $this->firstName,
             'generation' => $this->getGeneration(),
-            'hidden' => $this->getHidden(),
-            'deleted' => $this->getDeleted(),
+            'hidden' => $this->hidden,
+            'deleted' => $this->deleted,
             'expiration' => $this->getExpiration()->format(DateTimeInterface::ATOM),
         ];
     }

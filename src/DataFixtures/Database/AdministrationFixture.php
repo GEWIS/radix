@@ -37,11 +37,11 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $meeting = new Meeting();
-        $meeting->setType(MeetingTypes::BV);
+        $meeting->type = MeetingTypes::BV;
         $meeting->setNumber(4);
         // Later than the board meeting DecisionFixture holds, because meetings of a type are numbered in the
         // order they are held.
-        $meeting->setDate(new DateTime()->modify('-3 days'));
+        $meeting->date = new DateTime()->modify('-3 days');
         $manager->persist($meeting);
         $this->addReference(
             self::REF_MEETING_BV4,
@@ -71,9 +71,9 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         $minutes = new Minutes();
         $minutes->setMember($treasurer);
         $minutes->setTarget($this->getReference(MeetingFixture::REF_MEETING_BV1, Meeting::class));
-        $minutes->setApproval(true);
-        $minutes->setChanges(false);
-        $minutes->setSequence(1);
+        $minutes->approval = true;
+        $minutes->changes = false;
+        $minutes->sequence = 1;
         $minutes->setDecision($decision);
         $decision->addSubdecision($minutes);
         $manager->persist($minutes);
@@ -85,13 +85,13 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
             2,
         );
         $budget = new Budget();
-        $budget->setName('Begroting Attention Test Committee');
-        $budget->setVersion('1.0');
-        $budget->setDate(new DateTime()->modify('-2 months'));
-        $budget->setApproval(true);
-        $budget->setChanges(false);
+        $budget->name = 'Begroting Attention Test Committee';
+        $budget->version = '1.0';
+        $budget->date = new DateTime()->modify('-2 months');
+        $budget->approval = true;
+        $budget->changes = false;
         $budget->setMember($treasurer);
-        $budget->setSequence(1);
+        $budget->sequence = 1;
         $budget->setDecision($decision);
         $decision->addSubdecision($budget);
         $manager->persist($budget);
@@ -103,13 +103,13 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
             3,
         );
         $statement = new Statement();
-        $statement->setName('Afrekening Attention Test Committee');
-        $statement->setVersion('1.1');
-        $statement->setDate(new DateTime()->modify('-2 months'));
-        $statement->setApproval(true);
-        $statement->setChanges(true);
+        $statement->name = 'Afrekening Attention Test Committee';
+        $statement->version = '1.1';
+        $statement->date = new DateTime()->modify('-2 months');
+        $statement->approval = true;
+        $statement->changes = true;
         $statement->setMember($treasurer);
-        $statement->setSequence(1);
+        $statement->sequence = 1;
         $statement->setDecision($decision);
         $decision->addSubdecision($statement);
         $manager->persist($statement);
@@ -122,8 +122,8 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         );
         $granting = new Granting();
         $granting->setMember($keyholder);
-        $granting->setUntil(new DateTime()->modify('+6 months'));
-        $granting->setSequence(1);
+        $granting->until = new DateTime()->modify('+6 months');
+        $granting->sequence = 1;
         $granting->setDecision($decision);
         $decision->addSubdecision($granting);
         $manager->persist($granting);
@@ -140,16 +140,16 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         );
         $earlier = new Granting();
         $earlier->setMember($formerKeyholder);
-        $earlier->setUntil(new DateTime()->modify('+1 year'));
-        $earlier->setSequence(1);
+        $earlier->until = new DateTime()->modify('+1 year');
+        $earlier->sequence = 1;
         $earlier->setDecision($decision);
         $decision->addSubdecision($earlier);
         $manager->persist($earlier);
 
         $withdrawal = new Withdrawal();
-        $withdrawal->setGranting($earlier);
-        $withdrawal->setWithdrawnOn(clone $meeting->getDate());
-        $withdrawal->setSequence(2);
+        $withdrawal->granting = $earlier;
+        $withdrawal->withdrawnOn = clone $meeting->date;
+        $withdrawal->sequence = 2;
         $withdrawal->setDecision($decision);
         $decision->addSubdecision($withdrawal);
         $manager->persist($withdrawal);
@@ -164,8 +164,8 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
     ): Decision {
         $decision = new Decision();
         $decision->setMeeting($meeting);
-        $decision->setPoint($point);
-        $decision->setNumber(1);
+        $decision->point = $point;
+        $decision->number = 1;
         $manager->persist($decision);
 
         return $decision;

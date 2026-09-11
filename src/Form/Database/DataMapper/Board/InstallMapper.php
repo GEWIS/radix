@@ -36,10 +36,10 @@ class InstallMapper extends AbstractDecisionMapper
         }
 
         $installation = new Installation();
-        $installation->setSequence(1);
+        $installation->sequence = 1;
         $installation->setMember($member);
-        $installation->setFunction($function);
-        $installation->setDate($date);
+        $installation->function = $function;
+        $installation->date = $date;
         $installation->setDecision($decision);
     }
 }

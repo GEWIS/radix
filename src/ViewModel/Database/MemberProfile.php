@@ -54,13 +54,13 @@ final readonly class MemberProfile
             $hasCorrectInstallations,
             $member->getMembershipEndDate(),
             null !== $lastMembership
-                && MembershipTypes::Honorary !== $lastMembership->getType(),
+                && MembershipTypes::Honorary !== $lastMembership->type,
             // Only the types that have to be renewed by hand can be extended, and only once less than a year of the
             // membership is left: the extension always lands on the first of July after the current expiration.
             null !== $lastMembership
                 && $member->getExpiration() < new DateTime('+1 year')
                 && in_array(
-                    $lastMembership->getType(),
+                    $lastMembership->type,
                     [
                         MembershipTypes::External,
                         MembershipTypes::Graduate,

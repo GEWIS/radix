@@ -30,7 +30,7 @@ final class ApiAuthenticationTest extends ApiTestCase
                 'sha256',
                 $token,
             ),
-            $principal->getTokenHash(),
+            $principal->tokenHash,
             'the column holds a hash, so a read of the table is not a read of the credential',
         );
         self::assertStringNotContainsString(
@@ -69,14 +69,14 @@ final class ApiAuthenticationTest extends ApiTestCase
 
         self::assertSame(
             new DateTime('today')->format('Y-m-d'),
-            $this->principalFor($token)->getLastUsedAt()?->format('Y-m-d'),
+            $this->principalFor($token)->lastUsedAt?->format('Y-m-d'),
         );
     }
 
     public function testAFreshTokenHasNeverBeenUsed(): void
     {
         self::assertNull(
-            $this->principalFor($this->principalWith([ApiPermissions::HealthR]))->getLastUsedAt(),
+            $this->principalFor($this->principalWith([ApiPermissions::HealthR]))->lastUsedAt,
         );
     }
 
@@ -84,7 +84,7 @@ final class ApiAuthenticationTest extends ApiTestCase
     {
         $token = $this->principalWith([ApiPermissions::HealthR]);
         $principal = $this->principalFor($token);
-        $principal->setExpiresAt(new DateTime('yesterday'));
+        $principal->expiresAt = new DateTime('yesterday');
         $this->saveLedger();
 
         self::assertSame(
@@ -100,7 +100,7 @@ final class ApiAuthenticationTest extends ApiTestCase
     {
         $token = $this->principalWith([ApiPermissions::HealthR]);
         $principal = $this->principalFor($token);
-        $principal->setExpiresAt(new DateTime('today'));
+        $principal->expiresAt = new DateTime('today');
         $this->saveLedger();
 
         self::assertSame(

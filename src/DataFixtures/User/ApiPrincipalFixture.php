@@ -55,7 +55,7 @@ class ApiPrincipalFixture extends Fixture implements FixtureGroupInterface
 
         foreach (self::PRINCIPALS as $seed) {
             $principal = new ApiPrincipal();
-            $principal->setDescription($seed['description']);
+            $principal->description = $seed['description'];
             $principal->setPermissions($seed['permissions']);
             $metadata->setFieldValue(
                 $principal,

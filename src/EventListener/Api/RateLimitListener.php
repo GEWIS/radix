@@ -54,7 +54,7 @@ final readonly class RateLimitListener
         }
 
         $limit = $this->limiter
-            ->create('api-principal-' . $token->getApiPrincipal()->getId())
+            ->create('api-principal-' . $token->getApiPrincipal()->id)
             ->consume();
 
         if ($limit->isAccepted()) {

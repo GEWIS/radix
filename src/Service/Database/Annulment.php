@@ -88,7 +88,7 @@ class Annulment
      */
     public function assertAnnulmentCanBeDeleted(AnnulmentModel $annulment): void
     {
-        $target = $annulment->getTarget();
+        $target = $annulment->target;
 
         $this->assertDecisionCanBeAnnulled($target);
 
@@ -126,7 +126,7 @@ class Annulment
                 $laterAnnulments = $this->meetingRepository->findReferencingSubDecisions(
                     AnnulmentModel::class,
                     'target',
-                    $related->getDecision(),
+                    $related->decision,
                 );
 
                 foreach ($laterAnnulments as $laterAnnulment) {
@@ -238,9 +238,9 @@ class Annulment
         foreach ($decision->getSubdecisions() as $subDecision) {
             $foundation = match (true) {
                 $subDecision instanceof FoundationModel => $subDecision,
-                $subDecision instanceof FoundationReferenceModel => $subDecision->getFoundation(),
+                $subDecision instanceof FoundationReferenceModel => $subDecision->foundation,
                 $subDecision instanceof DischargeModel,
-                $subDecision instanceof ReappointmentModel => $subDecision->getInstallation()->getFoundation(),
+                $subDecision instanceof ReappointmentModel => $subDecision->installation->foundation,
                 default => null,
             };
 
@@ -269,7 +269,7 @@ class Annulment
     ): ?array {
         if (
             $this->countsAsAnnulled(
-                $foundation->getDecision(),
+                $foundation->decision,
                 $toggled,
                 $annulled,
             )
@@ -287,7 +287,7 @@ class Annulment
         foreach ($references as $reference) {
             if (
                 $this->countsAsAnnulled(
-                    $reference->getDecision(),
+                    $reference->decision,
                     $toggled,
                     $annulled,
                 )
@@ -312,7 +312,7 @@ class Annulment
             ) {
                 if (
                     $this->countsAsAnnulled(
-                        $discharge->getDecision(),
+                        $discharge->decision,
                         $toggled,
                         $annulled,
                     )
@@ -342,15 +342,15 @@ class Annulment
         array $installations,
     ): array {
         $violations = [];
-        $abbr = $foundation->getAbbr();
-        $type = $foundation->getOrganType();
+        $abbr = $foundation->abbr;
+        $type = $foundation->organType;
 
         /** @var array<int, array<string, InstallationFunctions>> $functionsPerMember */
         $functionsPerMember = [];
 
         foreach ($installations as $installation) {
-            $function = $installation->getFunction();
-            $functionsPerMember[$installation->getMember()->getLidnr()][$function->value] = $function;
+            $function = $installation->function;
+            $functionsPerMember[$installation->getMember()->lidnr][$function->value] = $function;
         }
 
         $members = 0;
@@ -475,7 +475,7 @@ class Annulment
                 break;
 
             case $subDecision instanceof AbrogationModel:
-                $foundation = $subDecision->getFoundation();
+                $foundation = $subDecision->foundation;
                 $this->assertNone(
                     $this->findDependents(
                         AbrogationModel::class,
@@ -532,7 +532,7 @@ class Annulment
                 // saying when it ended. The register cannot invent the discharge that would say so, so this is
                 // pointed out rather than refused; whoever enters the annulment can follow it with a discharge if one
                 // is needed.
-                $installation = $subDecision->getInstallation();
+                $installation = $subDecision->installation;
                 $warnings = [
                     ...$warnings,
                     ...$this->warnAbout(
@@ -569,7 +569,7 @@ class Annulment
                     $this->findDependents(
                         DischargeModel::class,
                         'installation',
-                        $subDecision->getInstallation(),
+                        $subDecision->installation,
                         $subDecision,
                     ),
                     $subDecision,
@@ -601,7 +601,7 @@ class Annulment
                 break;
 
             case $subDecision instanceof BoardReleaseModel:
-                $installation = $subDecision->getInstallation();
+                $installation = $subDecision->installation;
                 $this->assertNone(
                     $this->findDependents(
                         BoardReleaseModel::class,
@@ -629,7 +629,7 @@ class Annulment
                     $this->findDependents(
                         BoardDischargeModel::class,
                         'installation',
-                        $subDecision->getInstallation(),
+                        $subDecision->installation,
                         $subDecision,
                     ),
                     $subDecision,
@@ -655,7 +655,7 @@ class Annulment
                     $this->findDependents(
                         KeyWithdrawalModel::class,
                         'granting',
-                        $subDecision->getGranting(),
+                        $subDecision->granting,
                         $subDecision,
                     ),
                     $subDecision,
@@ -681,7 +681,7 @@ class Annulment
             return [];
         }
 
-        $decision = $subDecision->getDecision();
+        $decision = $subDecision->decision;
 
         return [
             sprintf(
@@ -691,8 +691,8 @@ class Annulment
                 ),
                 $decision->getMeetingType()->value,
                 $decision->getMeetingNumber(),
-                $decision->getPoint(),
-                $decision->getNumber(),
+                $decision->point,
+                $decision->number,
                 $reason,
             ),
         ];
@@ -723,15 +723,15 @@ class Annulment
         string $reason,
     ): AnnulmentNotPossible {
         $decision = $decision instanceof SubDecisionModel
-            ? $decision->getDecision()
+            ? $decision->decision
             : $decision;
 
         return new AnnulmentNotPossible(sprintf(
             $this->translator->trans('Decision %s %d.%d.%d cannot be annulled, because %s.'),
             $decision->getMeetingType()->value,
             $decision->getMeetingNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
+            $decision->point,
+            $decision->number,
             $reason,
         ));
     }
@@ -840,12 +840,12 @@ class Annulment
             // An organ installation only concerns that one membership, but founding or abolishing an organ concerns
             // every membership in it.
             $subDecision instanceof InstallationModel => $subDecision,
-            $subDecision instanceof FoundationReferenceModel => $subDecision->getFoundation(),
+            $subDecision instanceof FoundationReferenceModel => $subDecision->foundation,
             $subDecision instanceof DischargeModel,
-            $subDecision instanceof ReappointmentModel => $subDecision->getInstallation(),
+            $subDecision instanceof ReappointmentModel => $subDecision->installation,
             $subDecision instanceof BoardReleaseModel,
-            $subDecision instanceof BoardDischargeModel => $subDecision->getInstallation(),
-            $subDecision instanceof KeyWithdrawalModel => $subDecision->getGranting(),
+            $subDecision instanceof BoardDischargeModel => $subDecision->installation,
+            $subDecision instanceof KeyWithdrawalModel => $subDecision->granting,
             default => $subDecision,
         };
     }
@@ -882,7 +882,7 @@ class Annulment
                     return false;
                 }
 
-                return !$this->isAnnulled($reference->getDecision());
+                return !$this->isAnnulled($reference->decision);
             },
         ));
     }
@@ -922,8 +922,8 @@ class Annulment
         SubDecisionModel $a,
         SubDecisionModel $b,
     ): bool {
-        $dateA = $a->getDecision()->getMeeting()->getDate()->getTimestamp();
-        $dateB = $b->getDecision()->getMeeting()->getDate()->getTimestamp();
+        $dateA = $a->decision->meeting->date->getTimestamp();
+        $dateB = $b->decision->meeting->date->getTimestamp();
 
         if ($dateA !== $dateB) {
             return $dateA > $dateB;
@@ -945,7 +945,7 @@ class Annulment
             return $a->getDecisionNumber() > $b->getDecisionNumber();
         }
 
-        return $a->getSequence() > $b->getSequence();
+        return $a->sequence > $b->sequence;
     }
 
     /**
@@ -958,8 +958,8 @@ class Annulment
         DecisionModel $a,
         DecisionModel $b,
     ): bool {
-        $dateA = $a->getMeeting()->getDate()->getTimestamp();
-        $dateB = $b->getMeeting()->getDate()->getTimestamp();
+        $dateA = $a->meeting->date->getTimestamp();
+        $dateB = $b->meeting->date->getTimestamp();
 
         if ($dateA !== $dateB) {
             return $dateA < $dateB;
@@ -973,11 +973,11 @@ class Annulment
             return $a->getMeetingNumber() < $b->getMeetingNumber();
         }
 
-        if ($a->getPoint() !== $b->getPoint()) {
-            return $a->getPoint() < $b->getPoint();
+        if ($a->point !== $b->point) {
+            return $a->point < $b->point;
         }
 
-        return $a->getNumber() < $b->getNumber();
+        return $a->number < $b->number;
     }
 
     /**

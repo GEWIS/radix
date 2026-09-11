@@ -86,7 +86,7 @@ class MemberTest extends KernelTestCase
         );
         self::assertSame(
             '2027-07-01',
-            $added->getEndDate()->format('Y-m-d'),
+            $added->endDate->format('Y-m-d'),
         );
     }
 
@@ -107,7 +107,7 @@ class MemberTest extends KernelTestCase
     public function testRemovesAMemberThatNothingRefersTo(): void
     {
         $member = $this->build->member();
-        $lidnr = $member->getLidnr();
+        $lidnr = $member->lidnr;
 
         self::assertTrue($this->memberService->canRemove($member));
 
@@ -135,7 +135,7 @@ class MemberTest extends KernelTestCase
             $member,
             InstallationFunctions::Member,
         );
-        $lidnr = $member->getLidnr();
+        $lidnr = $member->lidnr;
 
         self::assertFalse($this->memberService->canRemove($member));
 
@@ -146,17 +146,17 @@ class MemberTest extends KernelTestCase
         $kept = $this->entityManager->getRepository(MemberModel::class)->find($lidnr);
 
         self::assertNotNull($kept);
-        self::assertTrue($kept->getDeleted());
-        self::assertTrue($kept->getHidden());
-        self::assertNull($kept->getEmail());
-        self::assertNull($kept->getStudentNumber());
+        self::assertTrue($kept->deleted);
+        self::assertTrue($kept->hidden);
+        self::assertNull($kept->email);
+        self::assertNull($kept->studentNumber);
         self::assertSame(
             Studies::Unknown,
-            $kept->getStudy(),
+            $kept->study,
         );
         self::assertSame(
             '0001-01-01',
-            $kept->getBirth()->format('Y-m-d'),
+            $kept->birth->format('Y-m-d'),
         );
     }
 
@@ -171,8 +171,8 @@ class MemberTest extends KernelTestCase
             '2020-07-01',
         );
         $current = $this->build->member();
-        $expiredLidnr = $expired->getLidnr();
-        $currentLidnr = $current->getLidnr();
+        $expiredLidnr = $expired->lidnr;
+        $currentLidnr = $current->lidnr;
 
         $this->memberService->removeExpiredMembers(new DateTime('2020-07-01'));
         $this->entityManager->flush();

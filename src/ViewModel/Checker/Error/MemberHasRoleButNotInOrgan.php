@@ -52,7 +52,7 @@ class MemberHasRoleButNotInOrgan extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -61,9 +61,9 @@ class MemberHasRoleButNotInOrgan extends Error
         return sprintf(
             'Member %s (%d) has a special role "%s" in %s but is not installed as "Lid".',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
+            $this->getMember()->lidnr,
             $this->getRole(),
-            $this->getOrgan()->getName(),
+            $this->getOrgan()->name,
         );
     }
 }

@@ -70,7 +70,7 @@ final class ListController extends AbstractController
 
             return $this->redirectToRoute(
                 'mailing_list_edit',
-                ['name' => $list->getName()],
+                ['name' => $list->name],
             );
         }
 
@@ -124,7 +124,7 @@ final class ListController extends AbstractController
 
             return $this->redirectToRoute(
                 'mailing_list_edit',
-                ['name' => $list->getName()],
+                ['name' => $list->name],
             );
         }
 

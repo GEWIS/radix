@@ -81,7 +81,7 @@ class GrantType extends AbstractType
         if (
             !$value instanceof DateTimeInterface
             || null === $meeting
-            || $value >= $meeting->getDate()
+            || $value >= $meeting->date
         ) {
             return;
         }
@@ -109,7 +109,7 @@ class GrantType extends AbstractType
             return;
         }
 
-        $limit = AssociationYear::fromDate($meeting->getDate())->septemberFirst();
+        $limit = AssociationYear::fromDate($meeting->date)->septemberFirst();
 
         if ($value <= $limit) {
             return;

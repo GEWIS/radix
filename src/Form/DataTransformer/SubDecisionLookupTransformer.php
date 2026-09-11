@@ -66,7 +66,7 @@ final readonly class SubDecisionLookupTransformer implements DataTransformerInte
             'meeting_number' => (string) $value->getMeetingNumber(),
             'decision_point' => (string) $value->getDecisionPoint(),
             'decision_number' => (string) $value->getDecisionNumber(),
-            'sequence' => (string) $value->getSequence(),
+            'sequence' => (string) $value->sequence,
         ];
     }
 

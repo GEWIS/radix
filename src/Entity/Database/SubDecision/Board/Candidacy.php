@@ -27,23 +27,7 @@ class Candidacy extends SubDecision
      * The first calendar year of the association year the candidates stand for.
      */
     #[Column(type: 'integer')]
-    private int $boardYear;
-
-    /**
-     * Get the first calendar year of the association year.
-     */
-    public function getBoardYear(): int
-    {
-        return $this->boardYear;
-    }
-
-    /**
-     * Set the first calendar year of the association year.
-     */
-    public function setBoardYear(int $boardYear): void
-    {
-        $this->boardYear = $boardYear;
-    }
+    public int $boardYear;
 
     #[Override]
     protected function getTranslatedTemplate(
@@ -64,8 +48,8 @@ class Candidacy extends SubDecision
         $replacements = [
             '%BOARD_YEAR%' => sprintf(
                 '%d - %d',
-                $this->getBoardYear(),
-                $this->getBoardYear() + 1,
+                $this->boardYear,
+                $this->boardYear + 1,
             ),
         ];
 

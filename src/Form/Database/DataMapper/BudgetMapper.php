@@ -42,13 +42,13 @@ class BudgetMapper extends AbstractDecisionMapper
             ? new Budget()
             : new Statement();
 
-        $subdecision->setSequence(1);
-        $subdecision->setDate($date);
-        $subdecision->setName($name);
+        $subdecision->sequence = 1;
+        $subdecision->date = $date;
+        $subdecision->name = $name;
         $subdecision->setMember($author);
-        $subdecision->setVersion($version);
-        $subdecision->setApproval((bool) $forms['approve']->getData());
-        $subdecision->setChanges((bool) $forms['changes']->getData());
+        $subdecision->version = $version;
+        $subdecision->approval = (bool) $forms['approve']->getData();
+        $subdecision->changes = (bool) $forms['changes']->getData();
         $subdecision->setDecision($decision);
     }
 }

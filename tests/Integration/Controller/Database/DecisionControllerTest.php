@@ -121,7 +121,7 @@ final class DecisionControllerTest extends DatabaseTestCase
             $subdecision->getMeetingNumber(),
             $subdecision->getDecisionPoint(),
             $subdecision->getDecisionNumber(),
-            $subdecision->getSequence(),
+            $subdecision->sequence,
         );
 
         $request = $this->translationRequest(
@@ -137,7 +137,7 @@ final class DecisionControllerTest extends DatabaseTestCase
             $subdecision->getMeetingNumber(),
             $subdecision->getDecisionPoint(),
             $subdecision->getDecisionNumber(),
-            $subdecision->getSequence(),
+            $subdecision->sequence,
         );
 
         self::assertSame(
@@ -146,14 +146,14 @@ final class DecisionControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             'The board decides to buy a cake.',
-            $subdecision->getContentEN(),
+            $subdecision->contentEN,
         );
         self::assertNull($service->getUntranslatedDecision(
             $subdecision->getMeetingType(),
             $subdecision->getMeetingNumber(),
             $subdecision->getDecisionPoint(),
             $subdecision->getDecisionNumber(),
-            $subdecision->getSequence(),
+            $subdecision->sequence,
         ));
     }
 

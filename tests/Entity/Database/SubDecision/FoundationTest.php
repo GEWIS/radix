@@ -21,9 +21,9 @@ class FoundationTest extends TestCase
     public function testFoundsAnOrganUnderItsTypeNameAndAbbreviation(): void
     {
         $foundation = $this->foundation($this->decision());
-        $foundation->setOrganType(OrganTypes::Committee);
-        $foundation->setName('Taartcommissie');
-        $foundation->setAbbr('TC');
+        $foundation->organType = OrganTypes::Committee;
+        $foundation->name = 'Taartcommissie';
+        $foundation->abbr = 'TC';
 
         self::assertSame(
             'Commissie Taartcommissie met afkorting TC wordt opgericht.',
@@ -41,10 +41,10 @@ class FoundationTest extends TestCase
     public function testFoundsABallotCommitteeAfterTheMeetingItServes(): void
     {
         $foundation = $this->foundation($this->decision($this->meeting(MeetingTypes::ALV, 42)));
-        $foundation->setOrganType(OrganTypes::SC);
-        $foundation->setName('Stemcommissie');
+        $foundation->organType = OrganTypes::SC;
+        $foundation->name = 'Stemcommissie';
         $foundation->setPurpose('de verkiezing van het bestuur');
-        $foundation->setAbbr('SC');
+        $foundation->abbr = 'SC';
 
         self::assertSame(
             'De stemcommissie voor de verkiezing van het bestuur van de 42e ALV met afkorting SC wordt opgericht.',
@@ -58,7 +58,7 @@ class FoundationTest extends TestCase
     private function foundation(Decision $decision): Foundation
     {
         $foundation = new Foundation();
-        $foundation->setSequence(1);
+        $foundation->sequence = 1;
         $foundation->setDecision($decision);
 
         return $foundation;

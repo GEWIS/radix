@@ -62,26 +62,26 @@ class Renewal
 
     private function sendRenewalEmail(RenewalLinkModel $link): void
     {
-        $reportMember = $this->reportMemberRepository->findSimple($link->getMember()->getLidnr());
+        $reportMember = $this->reportMemberRepository->findSimple($link->member->lidnr);
         $isInstalled = !$reportMember->getOrganInstallations()
             ->filter(static fn (OrganMemberModel $member) => $member->isCurrent())
             ->isEmpty();
 
         $this->emailService->send(
-            $link->getMember()->getEmailRecipient(),
-            'Graduate Renewal (' . $link->getMember()->getLidnr() . ')',
+            $link->member->getEmailRecipient(),
+            'Graduate Renewal (' . $link->member->lidnr . ')',
             'database/email/graduate-renewal.html.twig',
             [
-                'firstName' => $link->getMember()->getFirstName(),
+                'firstName' => $link->member->firstName,
                 'isInstalled' => $isInstalled,
-                'currentExpiration' => $link->getCurrentExpiration(),
-                'newExpiration' => $link->getNewExpiration(),
+                'currentExpiration' => $link->currentExpiration,
+                'newExpiration' => $link->newExpiration,
                 // The message is in English, so ask for the English page rather than whatever the router holds.
                 'url' => $this->urlGenerator->generate(
                     'join_renew',
                     [
                         '_locale' => Languages::English->getLangParam(),
-                        'token' => $link->getToken(),
+                        'token' => $link->token,
                     ],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),
@@ -96,13 +96,13 @@ class Renewal
     public function sendRenewalSuccessEmail(RenewalLinkModel $link): void
     {
         $this->emailService->send(
-            $link->getMember()->getEmailRecipient(),
-            'Graduate Renewal (' . $link->getMember()->getLidnr() . ')',
+            $link->member->getEmailRecipient(),
+            'Graduate Renewal (' . $link->member->lidnr . ')',
             'database/email/graduate-renewal-success.html.twig',
             [
-                'firstName' => $link->getMember()->getFirstName(),
-                'oldExpiration' => $link->getCurrentExpiration(),
-                'newExpiration' => $link->getNewExpiration(),
+                'firstName' => $link->member->firstName,
+                'oldExpiration' => $link->currentExpiration,
+                'newExpiration' => $link->newExpiration,
             ],
             $this->emailService->secretary(),
             bccReplyTo: true,

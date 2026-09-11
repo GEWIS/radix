@@ -30,25 +30,25 @@ class RenewalLinkTest extends TestCase
         $second = $this->link();
 
         self::assertNotSame(
-            $first->getToken(),
-            $second->getToken(),
+            $first->token,
+            $second->token,
         );
         self::assertGreaterThanOrEqual(
             128,
-            strlen($first->getToken()),
+            strlen($first->token),
         );
-        self::assertFalse(str_contains($first->getToken(), '/'));
+        self::assertFalse(str_contains($first->token, '/'));
     }
 
     public function testStartsOutUnused(): void
     {
         $link = $this->link();
 
-        self::assertFalse($link->isUsed());
+        self::assertFalse($link->used);
 
-        $link->setUsed(true);
+        $link->used = true;
 
-        self::assertTrue($link->isUsed());
+        self::assertTrue($link->used);
     }
 
     /**
@@ -64,15 +64,15 @@ class RenewalLinkTest extends TestCase
 
         self::assertSame(
             '2026-07-01',
-            $link->getCurrentExpiration()->format('Y-m-d'),
+            $link->currentExpiration->format('Y-m-d'),
         );
         self::assertSame(
             '2027-07-01',
-            $link->getNewExpiration()->format('Y-m-d'),
+            $link->newExpiration->format('Y-m-d'),
         );
         self::assertSame(
             $member,
-            $link->getMember(),
+            $link->member,
         );
 
         $this->expectException(InvalidArgumentException::class);

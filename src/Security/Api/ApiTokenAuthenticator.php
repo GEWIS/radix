@@ -71,7 +71,7 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
             // because that one is somebody's own token still being used after it was withdrawn.
             $this->securityEvents->record(
                 SecurityEventType::ApiTokenRejected,
-                null !== $principal ? 'api-principal-' . $principal->getId() : null,
+                null !== $principal ? 'api-principal-' . $principal->id : null,
                 'api',
                 [
                     'reason' => null === $principal ? 'unknown_token' : 'token_not_usable',

@@ -45,7 +45,7 @@ class InstallationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'meeting_date',
-                $meeting->getDate()->format('Y-m-d'),
+                $meeting->date->format('Y-m-d'),
             );
 
         /** @var Discharge[] $result */
@@ -74,7 +74,7 @@ class InstallationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'meeting_date',
-                $meeting->getDate()->format('Y-m-d'),
+                $meeting->date->format('Y-m-d'),
             );
 
         /** @var Installation[] $result */

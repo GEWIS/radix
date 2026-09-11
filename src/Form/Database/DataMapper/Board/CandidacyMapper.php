@@ -35,8 +35,8 @@ class CandidacyMapper extends AbstractDecisionMapper
         }
 
         $candidacy = new Candidacy();
-        $candidacy->setSequence(1);
-        $candidacy->setBoardYear($boardYear);
+        $candidacy->sequence = 1;
+        $candidacy->boardYear = $boardYear;
         $candidacy->setDecision($decision);
 
         // The sequence is the constitutional order the candidates were entered in, which is the order the decision
@@ -49,7 +49,7 @@ class CandidacyMapper extends AbstractDecisionMapper
             }
 
             $candidate = new Candidate();
-            $candidate->setSequence($sequence++);
+            $candidate->sequence = $sequence++;
             $candidate->setMember($member);
             $candidate->setDecision($decision);
         }

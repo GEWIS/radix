@@ -34,13 +34,13 @@ class Installation extends SubDecision implements NamesMember
     #[Column(
         enumType: BoardFunctions::class,
     )]
-    private BoardFunctions $function;
+    public BoardFunctions $function;
 
     /**
      * The date at which the installation is in effect.
      */
     #[Column(type: 'date')]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * Discharge.
@@ -61,22 +61,6 @@ class Installation extends SubDecision implements NamesMember
     private ?Release $release = null;
 
     /**
-     * Get the function.
-     */
-    public function getFunction(): BoardFunctions
-    {
-        return $this->function;
-    }
-
-    /**
-     * Set the function.
-     */
-    public function setFunction(BoardFunctions $function): void
-    {
-        $this->function = $function;
-    }
-
-    /**
      * Get the member.
      *
      * @psalm-suppress InvalidNullableReturnType
@@ -84,22 +68,6 @@ class Installation extends SubDecision implements NamesMember
     public function getMember(): Member
     {
         return $this->member;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
     }
 
     #[Override]
@@ -121,10 +89,10 @@ class Installation extends SubDecision implements NamesMember
         $replacements = [
             '%MEMBER%' => $this->getMember()->getFullName(),
             '%DATE%' => $this->formatDate(
-                $this->getDate(),
+                $this->date,
                 $language,
             ),
-            '%FUNCTION%' => $this->getFunction()->trans(
+            '%FUNCTION%' => $this->function->trans(
                 $translator,
                 $language->getLangParam(),
             ),

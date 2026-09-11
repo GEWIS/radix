@@ -71,7 +71,7 @@ abstract class AuditEntry
         onDelete: 'set null',
         nullable: true,
     )]
-    protected ?Member $user = null;
+    public ?Member $user = null;
 
     /**
      * If this entry is linked to a member, the member who this entry is linked to
@@ -86,7 +86,7 @@ abstract class AuditEntry
         onDelete: 'cascade',
         nullable: true,
     )]
-    private ?Member $member = null;
+    public private(set) ?Member $member = null;
 
     public function getId(): ?int
     {
@@ -98,16 +98,6 @@ abstract class AuditEntry
         $this->id = $id;
     }
 
-    public function getUser(): ?Member
-    {
-        return $this->user;
-    }
-
-    public function setUser(?Member $user): void
-    {
-        $this->user = $user;
-    }
-
     /**
      * The member number of whoever made the entry, or null once that member is gone.
      *
@@ -116,12 +106,7 @@ abstract class AuditEntry
      */
     public function getUserLidnr(): ?int
     {
-        return $this->user?->getLidnr();
-    }
-
-    public function getMember(): ?Member
-    {
-        return $this->member;
+        return $this->user?->lidnr;
     }
 
     public function setMember(Member $member): void

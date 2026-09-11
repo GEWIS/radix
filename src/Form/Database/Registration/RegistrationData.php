@@ -158,11 +158,11 @@ final class RegistrationData
         $data = new self();
 
         foreach ($mailingLists as $list) {
-            if (!$list->getDefaultSub()) {
+            if (!$list->defaultSub) {
                 continue;
             }
 
-            $data->lists[] = $list->getName();
+            $data->lists[] = $list->name;
         }
 
         return $data;

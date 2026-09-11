@@ -49,7 +49,7 @@ class MemberListsType extends AbstractType
         $subscriptions = $this->subscriptionStates($options['member']);
         $locked = $this->lockedLists($subscriptions);
         $listNames = array_map(
-            static fn (MailingList $list): string => $list->getName(),
+            static fn (MailingList $list): string => $list->name,
             $this->mailingListRepository->findAll(),
         );
 
@@ -140,11 +140,11 @@ class MemberListsType extends AbstractType
         $states = [];
 
         foreach ($member->getMailingListMemberships() as $subscription) {
-            $name = $subscription->getMailingList()->getName();
+            $name = $subscription->mailingList->name;
 
             $states[$name] = [
-                ($states[$name][0] ?? false) || $subscription->isToBeCreated(),
-                ($states[$name][1] ?? false) || $subscription->isToBeDeleted(),
+                ($states[$name][0] ?? false) || $subscription->toBeCreated,
+                ($states[$name][1] ?? false) || $subscription->toBeDeleted,
             ];
         }
 

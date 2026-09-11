@@ -71,9 +71,9 @@
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
-                                        <a class="btn btn-sm {{ prospective.hasPaid ? 'btn-gewis-primary' : 'btn-outline-gewis-primary' }}"
+                                        <a class="btn btn-sm {{ prospective.isPaymentSettled ? 'btn-gewis-primary' : 'btn-outline-gewis-primary' }}"
                                            href="{{ path('join_prospective_member_show', {id: prospective.lidnr}) }}">
-                                            {{ prospective.hasPaid ? 'Review'|trans : 'Open'|trans }}
+                                            {{ prospective.isPaymentSettled ? 'Review'|trans : 'Open'|trans }}
                                         </a>
                                     </td>
                                 </tr>

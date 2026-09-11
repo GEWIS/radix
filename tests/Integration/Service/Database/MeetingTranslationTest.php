@@ -56,12 +56,12 @@ class MeetingTranslationTest extends KernelTestCase
         $offered = $this->offeredContents();
 
         self::assertTrue(in_array(
-            $untranslated->getContentNL(),
+            $untranslated->contentNL,
             $offered,
             true,
         ));
         self::assertFalse(in_array(
-            $translated->getContentNL(),
+            $translated->contentNL,
             $offered,
             true,
         ));
@@ -74,7 +74,7 @@ class MeetingTranslationTest extends KernelTestCase
             'Het bestuur besluit een taart te kopen.',
         );
 
-        $other->setContentEN('The board decides to buy a cake.');
+        $other->contentEN = 'The board decides to buy a cake.';
         $this->meetingService->translateDecision($other);
 
         self::assertSame(
@@ -92,7 +92,7 @@ class MeetingTranslationTest extends KernelTestCase
             ),
         );
         self::assertFalse(in_array(
-            $other->getContentNL(),
+            $other->contentNL,
             $this->offeredContents(),
             true,
         ));
@@ -101,7 +101,7 @@ class MeetingTranslationTest extends KernelTestCase
             $other->getMeetingNumber(),
             $other->getDecisionPoint(),
             $other->getDecisionNumber(),
-            $other->getSequence(),
+            $other->sequence,
         ));
     }
 
@@ -111,7 +111,7 @@ class MeetingTranslationTest extends KernelTestCase
     private function offeredContents(): array
     {
         return array_map(
-            static fn (Other $other): string => $other->getContentNL(),
+            static fn (Other $other): string => $other->contentNL,
             $this->meetingService->getUntranslatedDecisions(
                 1,
                 100,

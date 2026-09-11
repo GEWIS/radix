@@ -37,7 +37,7 @@ class DecisionAnnulledMoreThanOnce extends Error
      */
     public function getTarget(): DecisionModel
     {
-        return $this->getSubDecision()->getTarget();
+        return $this->getSubDecision()->target;
     }
 
     #[Override]
@@ -45,7 +45,7 @@ class DecisionAnnulledMoreThanOnce extends Error
     {
         return sprintf(
             'Decision %s annuls %s, which was already annulled by another decision.',
-            $this->getSubDecision()->getDecision()->getHash(),
+            $this->getSubDecision()->decision->getHash(),
             $this->getTarget()->getHash(),
         );
     }

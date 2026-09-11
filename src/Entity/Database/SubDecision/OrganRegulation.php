@@ -29,7 +29,7 @@ class OrganRegulation extends SubDecision implements NamesMember
      * Abbreviation of the organ.
      */
     #[Column(type: 'string')]
-    private string $abbr;
+    public string $abbr;
 
     /**
      * Type of the organ.
@@ -37,7 +37,7 @@ class OrganRegulation extends SubDecision implements NamesMember
     #[Column(
         enumType: OrganTypes::class,
     )]
-    private OrganTypes $organType;
+    public OrganTypes $organType;
 
     /**
      * Version of the regulation.
@@ -46,25 +46,25 @@ class OrganRegulation extends SubDecision implements NamesMember
         type: 'string',
         length: 32,
     )]
-    private string $version;
+    public string $version;
 
     /**
      * Date of the regulation.
      */
     #[Column(type: 'date')]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * If the regulation was approved.
      */
     #[Column(type: 'boolean')]
-    private bool $approval;
+    public bool $approval;
 
     /**
      * If there were changes made.
      */
     #[Column(type: 'boolean')]
-    private bool $changes;
+    public bool $changes;
 
     /**
      * Get the member.
@@ -74,102 +74,6 @@ class OrganRegulation extends SubDecision implements NamesMember
     public function getMember(): Member
     {
         return $this->member;
-    }
-
-    /**
-     * Get the type.
-     */
-    public function getOrganType(): OrganTypes
-    {
-        return $this->organType;
-    }
-
-    /**
-     * Set the organ type
-     */
-    public function setOrganType(OrganTypes $organType): void
-    {
-        $this->organType = $organType;
-    }
-
-    /**
-     * Get the abbreviation.
-     */
-    public function getAbbr(): string
-    {
-        return $this->abbr;
-    }
-
-    /**
-     * Set the abbreviation.
-     */
-    public function setAbbr(string $abbr): void
-    {
-        $this->abbr = $abbr;
-    }
-
-    /**
-     * Get the version.
-     */
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
-
-    /**
-     * Set the version.
-     */
-    public function setVersion(string $version): void
-    {
-        $this->version = $version;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * Get approval status.
-     */
-    public function getApproval(): bool
-    {
-        return $this->approval;
-    }
-
-    /**
-     * Set approval status.
-     */
-    public function setApproval(bool $approval): void
-    {
-        $this->approval = $approval;
-    }
-
-    /**
-     * Get if changes were made.
-     */
-    public function getChanges(): bool
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Set if changes were made.
-     */
-    public function setChanges(bool $changes): void
-    {
-        $this->changes = $changes;
     }
 
     #[Override]
@@ -189,14 +93,14 @@ class OrganRegulation extends SubDecision implements NamesMember
         AppLanguages $language,
     ): string {
         if (
-            OrganTypes::Committee === $this->getOrganType()
-            || OrganTypes::KCC === $this->getOrganType()
+            OrganTypes::Committee === $this->organType
+            || OrganTypes::KCC === $this->organType
         ) {
             $documentType = $translator->trans(
                 'commissiereglement',
                 locale: $language->getLangParam(),
             );
-        } elseif (OrganTypes::Fraternity === $this->getOrganType()) {
+        } elseif (OrganTypes::Fraternity === $this->organType) {
             $documentType = $translator->trans(
                 'dispuutsreglement',
                 locale: $language->getLangParam(),
@@ -206,15 +110,15 @@ class OrganRegulation extends SubDecision implements NamesMember
         }
 
         $replacements = [
-            '%NAME%' => $this->getAbbr(),
+            '%NAME%' => $this->abbr,
             '%AUTHOR%' => $this->getMember()->getFullName(),
             '%DOCUMENTTYPE%' => $documentType,
-            '%VERSION%' => $this->getVersion(),
+            '%VERSION%' => $this->version,
             '%DATE%' => $this->formatDate(
-                $this->getDate(),
+                $this->date,
                 $language,
             ),
-            '%APPROVAL%' => $this->getApproval()
+            '%APPROVAL%' => $this->approval
                 ? $translator->trans(
                     'goedgekeurd',
                     locale: $language->getLangParam(),
@@ -223,7 +127,7 @@ class OrganRegulation extends SubDecision implements NamesMember
                     'afgekeurd',
                     locale: $language->getLangParam(),
                 ),
-            '%CHANGES%' => $this->getApproval() && $this->getChanges()
+            '%CHANGES%' => $this->approval && $this->changes
                 ? $translator->trans(
                     ' met genoemde wijzigingen',
                     locale: $language->getLangParam(),

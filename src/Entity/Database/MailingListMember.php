@@ -51,7 +51,7 @@ class MailingListMember
         name: 'mailingList',
         referencedColumnName: 'name',
     )]
-    private MailingList $mailingList;
+    public MailingList $mailingList;
 
     /**
      * Member.
@@ -65,7 +65,7 @@ class MailingListMember
         referencedColumnName: 'lidnr',
         nullable: true,
     )]
-    private ?Member $member = null;
+    public private(set) ?Member $member = null;
 
     /**
      * In case of email address changes, we need to know the email address that is on the list
@@ -77,7 +77,7 @@ class MailingListMember
         type: 'string',
         nullable: false,
     )]
-    private string $email;
+    public string $email;
 
     /**
      * When this association was last synced to/from Mailman.
@@ -86,7 +86,7 @@ class MailingListMember
         type: 'datetime',
         nullable: true,
     )]
-    private ?DateTime $lastSyncOn = null;
+    public private(set) ?DateTime $lastSyncOn = null;
 
     /**
      * Whether the last attempted sync was successful.
@@ -95,7 +95,7 @@ class MailingListMember
      * we default to `false`.
      */
     #[Column(type: 'boolean')]
-    private bool $lastSyncSuccess = false;
+    public bool $lastSyncSuccess = false;
 
     /**
      * Whether this entry still needs to be created in Mailman.
@@ -103,7 +103,7 @@ class MailingListMember
      * It indicates that a new registration on a mailing list should be performed
      */
     #[Column(type: 'boolean')]
-    private bool $toBeCreated = true;
+    public bool $toBeCreated = true;
 
     /**
      * Whether this entry still needs to be removed from Mailman.
@@ -111,34 +111,10 @@ class MailingListMember
      * It indicates that there is no longer an association between the mailing list and the member.
      */
     #[Column(type: 'boolean')]
-    private bool $toBeDeleted = false;
+    public bool $toBeDeleted = false;
 
     public function __construct()
     {
-    }
-
-    /**
-     * Get the mailing list.
-     */
-    public function getMailingList(): MailingList
-    {
-        return $this->mailingList;
-    }
-
-    /**
-     * Set the mailing list.
-     */
-    public function setMailingList(MailingList $mailingList): void
-    {
-        $this->mailingList = $mailingList;
-    }
-
-    /**
-     * Get the member.
-     */
-    public function getMember(): ?Member
-    {
-        return $this->member;
     }
 
     /**
@@ -148,7 +124,9 @@ class MailingListMember
     public function setMember(Member $member): void
     {
         $this->member = $member;
-        $this->setEmail($member->getEmail());
+        // A membership is entered against an address, so a member without one has nothing to be entered on a list
+        // with. Assigning it was already a type error; saying so names what went wrong.
+        $this->email = $member->email ?? throw new LogicException('member without an e-mail address');
     }
 
     /**
@@ -157,7 +135,7 @@ class MailingListMember
      */
     public function unsetMember(): void
     {
-        if (!$this->isToBeDeleted()) {
+        if (!$this->toBeDeleted) {
             throw new LogicException(
                 'MailingListMember member can only be unset when the mailing list membership is marked to be deleted.',
             );
@@ -167,82 +145,10 @@ class MailingListMember
     }
 
     /**
-     * Get the email address of this subscription
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Set the email address of this subscription
-     */
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Get when the last sync happened.
-     */
-    public function getLastSyncOn(): ?DateTime
-    {
-        return $this->lastSyncOn;
-    }
-
-    /**
      * Set when the last sync happened.
      */
     public function setLastSyncOn(DateTime $lastSyncOn = new DateTime()): void
     {
         $this->lastSyncOn = $lastSyncOn;
-    }
-
-    /**
-     * Get whether the last sync was successful.
-     */
-    public function isLastSyncSuccess(): bool
-    {
-        return $this->lastSyncSuccess;
-    }
-
-    /**
-     * Set whether the last sync was successful.
-     */
-    public function setLastSyncSuccess(bool $lastSyncSuccess): void
-    {
-        $this->lastSyncSuccess = $lastSyncSuccess;
-    }
-
-    /**
-     * Get whether the entry must still be created in Mailman.
-     */
-    public function isToBeCreated(): bool
-    {
-        return $this->toBeCreated;
-    }
-
-    /**
-     * Set whether the entry must still be created in Mailman.
-     */
-    public function setToBeCreated(bool $toBeCreated): void
-    {
-        $this->toBeCreated = $toBeCreated;
-    }
-
-    /**
-     * Get whether the entry must still be removed from Mailman.
-     */
-    public function isToBeDeleted(): bool
-    {
-        return $this->toBeDeleted;
-    }
-
-    /**
-     * Set whether the entry must still be removed from Mailman.
-     */
-    public function setToBeDeleted(bool $toBeDeleted): void
-    {
-        $this->toBeDeleted = $toBeDeleted;
     }
 }

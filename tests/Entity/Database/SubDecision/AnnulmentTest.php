@@ -103,7 +103,7 @@ class AnnulmentTest extends TestCase
         );
         self::assertSame(
             $target,
-            $annulment->getTarget(),
+            $annulment->target,
         );
     }
 
@@ -112,9 +112,9 @@ class AnnulmentTest extends TestCase
         ?Meeting $meeting = null,
     ): Annulment {
         $annulment = new Annulment();
-        $annulment->setSequence(1);
+        $annulment->sequence = 1;
         $annulment->setDecision($this->decision($meeting ?? $this->meeting(MeetingTypes::ALV, 43)));
-        $annulment->setTarget($target);
+        $annulment->target = $target;
 
         return $annulment;
     }

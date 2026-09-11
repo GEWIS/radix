@@ -45,7 +45,7 @@ class MeetingDeletionTest extends KernelTestCase
         $foundation = $this->build->foundOrgan($meeting);
 
         $member = $this->build->member();
-        $member->setDeleted(true);
+        $member->deleted = true;
 
         $installation = $this->build->install(
             $this->build->meeting(date: '2026-10-01'),
@@ -55,15 +55,15 @@ class MeetingDeletionTest extends KernelTestCase
         );
         $this->entityManager->flush();
 
-        $decision = $installation->getDecision();
+        $decision = $installation->decision;
 
         $this->expectException(DecisionNamesDeletedMember::class);
 
         $this->meetingService->deleteDecision(
             $decision->getMeetingType(),
             $decision->getMeetingNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
+            $decision->point,
+            $decision->number,
         );
     }
 
@@ -82,13 +82,13 @@ class MeetingDeletionTest extends KernelTestCase
             InstallationFunctions::Chair,
         );
 
-        $decision = $installation->getDecision();
+        $decision = $installation->decision;
 
         self::assertTrue($this->meetingService->deleteDecision(
             $decision->getMeetingType(),
             $decision->getMeetingNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
+            $decision->point,
+            $decision->number,
         ));
     }
 }

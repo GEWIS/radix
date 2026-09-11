@@ -20,34 +20,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class Other extends SubDecision
 {
     #[Column(type: 'text')]
-    private string $contentNL;
+    public string $contentNL;
 
     /** Null for the decisions recorded before the form asked for a translation. */
     #[Column(
         type: 'text',
         nullable: true,
     )]
-    private ?string $contentEN = null;
-
-    public function getContentNL(): string
-    {
-        return $this->contentNL;
-    }
-
-    public function setContentNL(string $contentNL): void
-    {
-        $this->contentNL = $contentNL;
-    }
-
-    public function getContentEN(): ?string
-    {
-        return $this->contentEN;
-    }
-
-    public function setContentEN(?string $contentEN): void
-    {
-        $this->contentEN = $contentEN;
-    }
+    public ?string $contentEN = null;
 
     #[Override]
     protected function getTranslatedTemplate(

@@ -47,21 +47,5 @@ abstract class FoundationReference extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Foundation $foundation;
-
-    /**
-     * Get organ foundation.
-     */
-    public function getFoundation(): Foundation
-    {
-        return $this->foundation;
-    }
-
-    /**
-     * Set organ foundation.
-     */
-    public function setFoundation(Foundation $foundation): void
-    {
-        $this->foundation = $foundation;
-    }
+    public Foundation $foundation;
 }

@@ -60,8 +60,8 @@ abstract class AbstractDecisionMapper implements DataMapperInterface
         // Setting the meeting is what gives the decision its sub-decision collection, so it has to happen before any
         // sub-decision attaches itself to the decision.
         $viewData->setMeeting($meeting);
-        $viewData->setPoint((int) $children['point']->getData());
-        $viewData->setNumber((int) $children['decision']->getData());
+        $viewData->point = (int) $children['point']->getData();
+        $viewData->number = (int) $children['decision']->getData();
 
         $this->mapSubDecisions(
             $children,

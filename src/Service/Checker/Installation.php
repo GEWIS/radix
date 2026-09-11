@@ -34,7 +34,7 @@ class Installation
      */
     public function getAllInstallations(MeetingModel $meeting): array
     {
-        $key = $meeting->getType()->value . '-' . $meeting->getNumber();
+        $key = $meeting->type->value . '-' . $meeting->getNumber();
 
         if (
             null !== $this->installations
@@ -52,7 +52,7 @@ class Installation
         }
 
         foreach ($deletedMembers as $dm) {
-            $hash = $dm->getInstallation()->getHash();
+            $hash = $dm->installation->getHash();
 
             if (!isset($members[$hash])) {
                 continue;
@@ -79,9 +79,9 @@ class Installation
         $roles = [];
 
         foreach ($installations as $installation) {
-            $memberId = $installation->getMember()->getLidnr();
-            $function = $installation->getFunction()->value;
-            $organName = $installation->getFoundation()->getAbbr();
+            $memberId = $installation->getMember()->lidnr;
+            $function = $installation->function->value;
+            $organName = $installation->foundation->abbr;
 
             $roles[$organName][$memberId][$function] = $installation;
         }

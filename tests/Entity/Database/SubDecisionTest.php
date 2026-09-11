@@ -78,7 +78,7 @@ class SubDecisionTest extends TestCase
         );
         self::assertSame(
             $decision,
-            $subdecision->getDecision(),
+            $subdecision->decision,
         );
         self::assertTrue($decision->getSubdecisions()->contains($subdecision));
     }

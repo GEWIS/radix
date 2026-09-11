@@ -24,9 +24,9 @@ class MemberTest extends TestCase
         string $fullName,
     ): void {
         $member = new Member();
-        $member->setFirstName($firstName);
-        $member->setMiddleName($middleName);
-        $member->setLastName($lastName);
+        $member->firstName = $firstName;
+        $member->middleName = $middleName;
+        $member->lastName = $lastName;
 
         self::assertSame(
             $fullName,

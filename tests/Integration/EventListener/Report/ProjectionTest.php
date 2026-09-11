@@ -54,15 +54,15 @@ class ProjectionTest extends KernelTestCase
     {
         $member = $this->build->member();
 
-        $projected = $this->report->getRepository(ReportMember::class)->find($member->getLidnr());
+        $projected = $this->report->getRepository(ReportMember::class)->find($member->lidnr);
 
         self::assertNotNull($projected);
         self::assertSame(
-            $member->getLastName(),
+            $member->lastName,
             $projected->lastName,
         );
         self::assertSame(
-            $member->getEmail(),
+            $member->email,
             $projected->email,
         );
     }
@@ -74,10 +74,10 @@ class ProjectionTest extends KernelTestCase
     public function testWritingAMemberWritesTheirStudy(): void
     {
         $member = $this->build->member();
-        $member->setStudy(Studies::MCSE);
+        $member->study = Studies::MCSE;
         $this->ledger->flush();
 
-        $projected = $this->report->getRepository(ReportMember::class)->find($member->getLidnr());
+        $projected = $this->report->getRepository(ReportMember::class)->find($member->lidnr);
 
         self::assertNotNull($projected);
         self::assertSame(
@@ -91,13 +91,13 @@ class ProjectionTest extends KernelTestCase
         $meeting = $this->build->meeting();
 
         $projected = $this->report->getRepository(ReportMeeting::class)->find([
-            'type' => $meeting->getType(),
+            'type' => $meeting->type,
             'number' => $meeting->getNumber(),
         ]);
 
         self::assertNotNull($projected);
         self::assertEquals(
-            $meeting->getDate(),
+            $meeting->date,
             $projected->date,
         );
     }
@@ -114,7 +114,7 @@ class ProjectionTest extends KernelTestCase
             'Testtaartcommissie',
         );
 
-        $organ = $this->organOf($foundation->getAbbr());
+        $organ = $this->organOf($foundation->abbr);
 
         self::assertNotNull($organ);
         self::assertSame(
@@ -167,7 +167,7 @@ class ProjectionTest extends KernelTestCase
 
         self::assertNotNull($organMember);
         self::assertSame(
-            $member->getLidnr(),
+            $member->lidnr,
             $organMember->member->lidnr,
         );
         self::assertSame(
@@ -217,7 +217,7 @@ class ProjectionTest extends KernelTestCase
 
         self::assertNotNull($this->organOf('RTC'));
 
-        $this->ledger->remove($foundation->getDecision());
+        $this->ledger->remove($foundation->decision);
         $this->ledger->flush();
 
         self::assertNull($this->organOf('RTC'));
@@ -241,7 +241,7 @@ class ProjectionTest extends KernelTestCase
             $projected->contentEN,
         );
 
-        $other->setContentEN('A cake is bought.');
+        $other->contentEN = 'A cake is bought.';
         $this->ledger->flush();
 
         self::assertSame(

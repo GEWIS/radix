@@ -164,7 +164,7 @@ class BudgetType extends AbstractType
         if (
             !$value instanceof DateTimeInterface
             || !$meeting instanceof Meeting
-            || $value <= $meeting->getDate()
+            || $value <= $meeting->date
         ) {
             return;
         }

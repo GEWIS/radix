@@ -34,9 +34,9 @@ class MinutesMapper extends AbstractDecisionMapper
         $subdecision = new Minutes();
         $subdecision->setTarget($target);
         $subdecision->setMember($author);
-        $subdecision->setApproval((bool) $forms['approve']->getData());
-        $subdecision->setChanges((bool) $forms['changes']->getData());
+        $subdecision->approval = (bool) $forms['approve']->getData();
+        $subdecision->changes = (bool) $forms['changes']->getData();
         $subdecision->setDecision($decision);
-        $subdecision->setSequence(1);
+        $subdecision->sequence = 1;
     }
 }

@@ -400,11 +400,14 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         bool $deleted = false,
     ): Member {
         $member = new Member();
-        $member->setLidnr($lidnr);
-        $member->setFirstName($firstName);
-        $member->setMiddleName('');
-        $member->setLastName(self::pick(self::LAST_NAMES, $lidnr * 7));
-        $member->setInitials(implode(
+        $member->lidnr = $lidnr;
+        $member->firstName = $firstName;
+        $member->middleName = '';
+        $member->lastName = self::pick(
+            self::LAST_NAMES,
+            $lidnr * 7,
+        );
+        $member->initials = implode(
             '.',
             array_map(
                 static fn (string $part): string => mb_substr(
@@ -417,7 +420,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
                     $firstName,
                 ),
             ),
-        ) . '.');
+        ) . '.';
 
         $member->setEmail(sprintf(
             '%d@example.com',
@@ -436,15 +439,17 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
                 1 + $lidnr % 28,
             )));
 
-        $member->setStudy(MembershipTypes::External === $type ? Studies::Other : Studies::BAM);
-        $member->setStudentNumber(sprintf(
+        $member->study = MembershipTypes::External === $type
+            ? Studies::Other
+            : Studies::BAM;
+        $member->studentNumber = sprintf(
             '1%06d',
             $lidnr,
-        ));
-        $member->setChangedOn(new DateTime());
-        $member->setHidden($hidden);
-        $member->setDeleted($deleted);
-        $member->setSupremum('nee');
+        );
+        $member->changedOn = new DateTime();
+        $member->hidden = $hidden;
+        $member->deleted = $deleted;
+        $member->supremum = 'nee';
 
         $this->chain(
             $member,
@@ -478,19 +483,25 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         int $lidnr,
     ): void {
         $home = new Address();
-        $home->setType(AddressTypes::Home);
-        $home->setStreet(self::pick(self::STREETS, $lidnr));
-        $home->setNumber((string) (1 + $lidnr % 200));
+        $home->type = AddressTypes::Home;
+        $home->street = self::pick(
+            self::STREETS,
+            $lidnr,
+        );
+        $home->number = (string) (1 + $lidnr % 200);
         // Four digits and two letters, which is what a postcode is in the country these addresses say they are in.
-        $home->setPostalCode(sprintf(
+        $home->postalCode = sprintf(
             '%d %s%s',
             5600 + $lidnr % 100,
             chr(65 + $lidnr % 26),
             chr(65 + ($lidnr * 3) % 26),
-        ));
-        $home->setCity(self::pick(self::CITIES, $lidnr));
-        $home->setCountry(PostalRegions::Netherlands);
-        $home->setPhone('1');
+        );
+        $home->city = self::pick(
+            self::CITIES,
+            $lidnr,
+        );
+        $home->country = PostalRegions::Netherlands;
+        $home->phone = '1';
         $member->setHomeAddress($home);
 
         if (self::STUDENT_ADDRESS_ONLY !== $lidnr) {
@@ -500,13 +511,13 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         $member->setEmail('student@student.tue.nl');
 
         $student = new Address();
-        $student->setType(AddressTypes::Student);
-        $student->setStreet('Groene Loper');
-        $student->setNumber('5');
-        $student->setPostalCode('5612 AE');
-        $student->setCity('Eindhoven');
-        $student->setCountry(PostalRegions::Netherlands);
-        $student->setPhone('1');
+        $student->type = AddressTypes::Student;
+        $student->street = 'Groene Loper';
+        $student->number = '5';
+        $student->postalCode = '5612 AE';
+        $student->city = 'Eindhoven';
+        $student->country = PostalRegions::Netherlands;
+        $student->phone = '1';
         $member->setStudentAddress($student);
     }
 
@@ -551,7 +562,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             );
             $member->addMembership($membership);
 
-            $start = $membership->getEndDate();
+            $start = $membership->endDate;
         }
     }
 

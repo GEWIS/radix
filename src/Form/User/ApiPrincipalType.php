@@ -107,7 +107,7 @@ class ApiPrincipalType extends AbstractType
 
                 if (
                     !$principal instanceof ApiPrincipal
-                    || null === $principal->getId()
+                    || null === $principal->id
                 ) {
                     return;
                 }

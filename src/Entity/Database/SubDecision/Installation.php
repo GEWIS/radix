@@ -52,7 +52,7 @@ class Installation extends FoundationReference implements NamesMember
     #[Column(
         enumType: InstallationFunctions::class,
     )]
-    private InstallationFunctions $function;
+    public InstallationFunctions $function;
 
     /**
      * Reappointment subdecisions if this installation was prolonged (can be done multiple times).
@@ -72,7 +72,7 @@ class Installation extends FoundationReference implements NamesMember
         targetEntity: Discharge::class,
         mappedBy: 'installation',
     )]
-    private ?Discharge $discharge = null;
+    public private(set) ?Discharge $discharge = null;
 
     public function __construct()
     {
@@ -98,22 +98,6 @@ class Installation extends FoundationReference implements NamesMember
     }
 
     /**
-     * Get the function.
-     */
-    public function getFunction(): InstallationFunctions
-    {
-        return $this->function;
-    }
-
-    /**
-     * Set the function.
-     */
-    public function setFunction(InstallationFunctions $function): void
-    {
-        $this->function = $function;
-    }
-
-    /**
      * Get the reappointments, if they exist.
      *
      * @return Collection<array-key, Reappointment>
@@ -121,14 +105,6 @@ class Installation extends FoundationReference implements NamesMember
     public function getReappointments(): Collection
     {
         return $this->reappointments;
-    }
-
-    /**
-     * Get the discharge, if it exists
-     */
-    public function getDischarge(): ?Discharge
-    {
-        return $this->discharge;
     }
 
     #[Override]
@@ -149,11 +125,11 @@ class Installation extends FoundationReference implements NamesMember
     ): string {
         $replacements = [
             '%MEMBER%' => $this->getMember()->getFullName(),
-            '%FUNCTION%' => $this->getFunction()->trans(
+            '%FUNCTION%' => $this->function->trans(
                 $translator,
                 $language->getLangParam(),
             ),
-            '%ORGAN_ABBR%' => $this->getFoundation()->getAbbr(),
+            '%ORGAN_ABBR%' => $this->foundation->abbr,
         ];
 
         return $this->replaceContentPlaceholders(

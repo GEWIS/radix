@@ -21,17 +21,7 @@ class AuditNote extends AuditEntry
      * The note itself
      */
     #[Column(type: 'string')]
-    private string $note;
-
-    public function getNote(): string
-    {
-        return $this->note;
-    }
-
-    public function setNote(string $note): void
-    {
-        $this->note = $note;
-    }
+    public string $note;
 
     /**
      * Get a textual representation of this audit entry
@@ -49,8 +39,8 @@ class AuditNote extends AuditEntry
     protected function getStringArguments(): array
     {
         return [
-            $this->getMember()->getFullName(),
-            $this->getNote(),
+            $this->member->getFullName(),
+            $this->note,
         ];
     }
 }

@@ -30,13 +30,13 @@ class RenewalLink extends ActionLink
         referencedColumnName: 'lidnr',
         onDelete: 'cascade',
     )]
-    private Member $member;
+    public private(set) Member $member;
 
     /**
      * Current expiration
      */
     #[Column(type: 'date')]
-    private DateTime $currentExpiration;
+    public private(set) DateTime $currentExpiration;
 
     /**
      * New expiration
@@ -44,7 +44,7 @@ class RenewalLink extends ActionLink
      * will be until the end of next association year.
      */
     #[Column(type: 'date')]
-    private DateTime $newExpiration;
+    public private(set) DateTime $newExpiration;
 
     public function __construct(
         Member $member,
@@ -59,21 +59,6 @@ class RenewalLink extends ActionLink
         if ($this->currentExpiration >= $this->newExpiration) {
             throw new InvalidArgumentException('New expiration must be strictly later than current expiration');
         }
-    }
-
-    public function getMember(): Member
-    {
-        return $this->member;
-    }
-
-    public function getCurrentExpiration(): DateTime
-    {
-        return $this->currentExpiration;
-    }
-
-    public function getNewExpiration(): DateTime
-    {
-        return $this->newExpiration;
     }
 
     /**

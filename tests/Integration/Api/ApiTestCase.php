@@ -47,7 +47,7 @@ abstract class ApiTestCase extends DatabaseTestCase
     protected function principalWith(array $permissions): string
     {
         $principal = new ApiPrincipal();
-        $principal->setDescription('Test principal for ' . static::class);
+        $principal->description = 'Test principal for ' . static::class;
         $principal->setPermissions($permissions);
         $token = $principal->generateToken();
 

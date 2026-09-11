@@ -48,45 +48,13 @@ class Withdrawal extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Granting $granting;
+    public Granting $granting;
 
     /**
      * When the granted keycode is prematurely revoked.
      */
     #[Column(type: 'date')]
-    private DateTime $withdrawnOn;
-
-    /**
-     * Get the granting of the keycode.
-     */
-    public function getGranting(): Granting
-    {
-        return $this->granting;
-    }
-
-    /**
-     * Set the granting of the keycode.
-     */
-    public function setGranting(Granting $granting): void
-    {
-        $this->granting = $granting;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getWithdrawnOn(): DateTime
-    {
-        return $this->withdrawnOn;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setWithdrawnOn(DateTime $withdrawnOn): void
-    {
-        $this->withdrawnOn = $withdrawnOn;
-    }
+    public DateTime $withdrawnOn;
 
     #[Override]
     protected function getTranslatedTemplate(
@@ -105,9 +73,9 @@ class Withdrawal extends SubDecision
         AppLanguages $language,
     ): string {
         $replacements = [
-            '%GRANTEE%' => $this->getGranting()->getMember()->getFullName(),
+            '%GRANTEE%' => $this->granting->getMember()->getFullName(),
             '%WITHDRAWAL%' => $this->formatDate(
-                $this->getWithdrawnOn(),
+                $this->withdrawnOn,
                 $language,
             ),
         ];

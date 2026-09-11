@@ -72,7 +72,7 @@ class AnnulledSubDecisionFilter
 
                 // if they are valid, add all the affected subdecisions
                 // and add them to the array
-                foreach ($del->getTarget()->getSubdecisions() as $subDecision) {
+                foreach ($del->target->getSubdecisions() as $subDecision) {
                     $deleted[spl_object_id($subDecision)] = $subDecision;
                 }
             }
@@ -93,9 +93,9 @@ class AnnulledSubDecisionFilter
     private function isValid(Annulment $d): bool
     {
         // Get the decision
-        $decision = $d->getDecision();
+        $decision = $d->decision;
 
-        $annulment = $decision->getAnnulledBy();
+        $annulment = $decision->annulledBy;
 
         // if this decision was not annulled, it is certainly valid
         if (null === $annulment) {

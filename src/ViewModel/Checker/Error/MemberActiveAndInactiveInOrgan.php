@@ -44,7 +44,7 @@ class MemberActiveAndInactiveInOrgan extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -53,8 +53,8 @@ class MemberActiveAndInactiveInOrgan extends Error
         return sprintf(
             'Member %s (%d) is marked as "Inactief Lid" of %s but is still a "Lid".',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
-            $this->getOrgan()->getName(),
+            $this->getMember()->lidnr,
+            $this->getOrgan()->name,
         );
     }
 }

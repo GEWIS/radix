@@ -53,8 +53,8 @@ final readonly class DecisionLookupTransformer implements DataTransformerInterfa
         return [
             'meeting_type' => $value->getMeetingType(),
             'meeting_number' => (string) $value->getMeetingNumber(),
-            'point' => (string) $value->getPoint(),
-            'number' => (string) $value->getNumber(),
+            'point' => (string) $value->point,
+            'number' => (string) $value->number,
         ];
     }
 

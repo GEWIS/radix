@@ -106,7 +106,7 @@
 
                     {% if form is null %}
                         <p class="mb-0">{{ 'This prospective member cannot be approved.'|trans }}</p>
-                    {% elseif member.hasPaid %}
+                    {% elseif member.isPaymentSettled %}
                         {{ _self.approval(form, member) }}
                     {% else %}
                         {# Approving someone who has not paid through the checkout means the fee was settled in cash,
@@ -138,7 +138,7 @@
                         <span class="flex-grow-1">
                             <span class="d-block fw-semibold">{{ 'Destructive actions'|trans }}</span>
                             <span class="text-secondary small">
-                                {% if member.hasPaid %}
+                                {% if member.isPaymentSettled %}
                                     {{ 'Because they have already paid, a refund is requested first. If the refund fails, the application is not removed.'|trans }}
                                 {% else %}
                                     {{ 'Removes the application and everything the applicant entered.'|trans }}
@@ -153,7 +153,7 @@
                 </div>
 
                 {% set removal_body %}
-                    {% if member.hasPaid %}
+                    {% if member.isPaymentSettled %}
                         {{ 'Are you sure that you want to remove %name%? Because they have already paid a refund will be requested. If this fails, the prospective member will NOT be removed.'|trans({
                             '%name%': member.fullName,
                         }) }}

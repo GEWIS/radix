@@ -47,14 +47,14 @@ class OrganRegulationMapper extends AbstractDecisionMapper
         }
 
         $subdecision = new OrganRegulation();
-        $subdecision->setSequence(1);
-        $subdecision->setOrganType($organType);
-        $subdecision->setDate($date);
-        $subdecision->setAbbr($abbr);
+        $subdecision->sequence = 1;
+        $subdecision->organType = $organType;
+        $subdecision->date = $date;
+        $subdecision->abbr = $abbr;
         $subdecision->setMember($author);
-        $subdecision->setVersion($version);
-        $subdecision->setApproval((bool) $forms['approve']->getData());
-        $subdecision->setChanges((bool) $forms['changes']->getData());
+        $subdecision->version = $version;
+        $subdecision->approval = (bool) $forms['approve']->getData();
+        $subdecision->changes = (bool) $forms['changes']->getData();
         $subdecision->setDecision($decision);
     }
 }

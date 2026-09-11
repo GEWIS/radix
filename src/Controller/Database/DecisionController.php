@@ -333,7 +333,7 @@ final class DecisionController extends AbstractController
             $subdecision->getMeetingNumber(),
             $subdecision->getDecisionPoint(),
             $subdecision->getDecisionNumber(),
-            $subdecision->getSequence(),
+            $subdecision->sequence,
             $page,
             $pageSize,
         );
@@ -346,7 +346,7 @@ final class DecisionController extends AbstractController
             /** @var array{contentEN: string} $data */
             $data = $form->getData();
 
-            $subdecision->setContentEN($data['contentEN']);
+            $subdecision->contentEN = $data['contentEN'];
             $this->meetingService->translateDecision($subdecision);
 
             $this->addFlash(
@@ -427,7 +427,7 @@ final class DecisionController extends AbstractController
                 $subdecision->getMeetingNumber(),
                 $subdecision->getDecisionPoint(),
                 $subdecision->getDecisionNumber(),
-                $subdecision->getSequence(),
+                $subdecision->sequence,
             );
             $rows[] = UntranslatedDecision::fromSubDecision(
                 $subdecision,
@@ -442,7 +442,7 @@ final class DecisionController extends AbstractController
                         $subdecision->getMeetingNumber(),
                         $subdecision->getDecisionPoint(),
                         $subdecision->getDecisionNumber(),
-                        $subdecision->getSequence(),
+                        $subdecision->sequence,
                         $page,
                         $pageSize,
                     )

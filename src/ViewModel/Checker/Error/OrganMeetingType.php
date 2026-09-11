@@ -25,7 +25,7 @@ class OrganMeetingType extends Error
     public function __construct(FoundationModel $foundation)
     {
         parent::__construct(
-            $foundation->getDecision()->getMeeting(),
+            $foundation->decision->meeting,
             $foundation,
         );
     }
@@ -43,7 +43,7 @@ class OrganMeetingType extends Error
      */
     public function getOrganType(): OrganTypes
     {
-        return $this->getSubDecision()->getOrganType();
+        return $this->getSubDecision()->organType;
     }
 
     /**
@@ -51,7 +51,7 @@ class OrganMeetingType extends Error
      */
     public function getMeetingType(): MeetingTypes
     {
-        return $this->getSubDecision()->getDecision()->getMeeting()->getType();
+        return $this->getSubDecision()->decision->meeting->type;
     }
 
     #[Override]
@@ -59,7 +59,7 @@ class OrganMeetingType extends Error
     {
         return sprintf(
             'Organ %s of type %s cannot be founded during a meeting of type %s.',
-            $this->getOrgan()->getName(),
+            $this->getOrgan()->name,
             $this->getOrganType()->value,
             $this->getMeetingType()->value,
         );

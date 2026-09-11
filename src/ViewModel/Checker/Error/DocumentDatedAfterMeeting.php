@@ -29,7 +29,7 @@ class DocumentDatedAfterMeeting extends Error
     public function __construct(private readonly BudgetModel|OrganRegulationModel $document)
     {
         parent::__construct(
-            $document->getDecision()->getMeeting(),
+            $document->decision->meeting,
             $document,
         );
     }
@@ -41,9 +41,9 @@ class DocumentDatedAfterMeeting extends Error
             '%s %s, version %s, is dated %s, this is after %s.',
             $this->kind(),
             $this->name(),
-            $this->document->getVersion(),
-            $this->document->getDate()->format('Y-m-d'),
-            $this->getMeeting()->getDate()->format('Y-m-d'),
+            $this->document->version,
+            $this->document->date->format('Y-m-d'),
+            $this->getMeeting()->date->format('Y-m-d'),
         );
     }
 
@@ -62,7 +62,7 @@ class DocumentDatedAfterMeeting extends Error
     private function name(): string
     {
         return $this->document instanceof BudgetModel
-            ? $this->document->getName()
-            : $this->document->getAbbr();
+            ? $this->document->name
+            : $this->document->abbr;
     }
 }

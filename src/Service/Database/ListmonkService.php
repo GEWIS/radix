@@ -229,7 +229,7 @@ class ListmonkService
         $lists = $this->mailingListRepository->findAll();
 
         foreach ($lists as $list) {
-            if (!$list->hasListmonkList()) {
+            if (!$list->isOnListmonk()) {
                 continue;
             }
 
@@ -263,15 +263,15 @@ class ListmonkService
         $output->writeln(
             sprintf(
                 '-> Syncing membership changes for <info>%s</info> (%s)',
-                $dbList->getName(),
-                $dbList->getListmonkList()->getName(),
+                $dbList->name,
+                $dbList->listmonkList->name,
             ),
             OutputInterface::VERBOSITY_VERBOSE,
         );
 
         $verifyTime = new DateTime()->sub(new DateInterval('P1D'));
 
-        $listId = $dbList->getListmonkList()->getListmonkId();
+        $listId = $dbList->listmonkList->listmonkId;
         $knownMembers = $this->getListmonkListSubscriberEmails($listId);
 
         // Phase 1: Sync all pending changes from DB side
@@ -279,21 +279,21 @@ class ListmonkService
         // (e.g. when changing email addresses twice)
         foreach ($dbMemberships as $mailingListMember) {
             if (
-                $mailingListMember->isToBeDeleted()
-                || null === $mailingListMember->getMember()
+                $mailingListMember->toBeDeleted
+                || null === $mailingListMember->member
             ) {
                 $this->unsubscribeMemberFromMailingList(
                     mailingListMember: $mailingListMember,
                     output: $output,
                     dryRun: $dryRun,
                 );
-            } elseif ($mailingListMember->isToBeCreated()) {
+            } elseif ($mailingListMember->toBeCreated) {
                 $this->subscribeMemberToMailingList(
                     mailingListMember: $mailingListMember,
                     output: $output,
                     dryRun: $dryRun,
                 );
-            } elseif ($mailingListMember->getLastSyncOn() < $verifyTime) {
+            } elseif ($mailingListMember->lastSyncOn < $verifyTime) {
                 $this->verifyMemberOnMailingList(
                     mailingListMember: $mailingListMember,
                     output: $output,
@@ -304,7 +304,7 @@ class ListmonkService
         }
 
         // Phase 2: once per 24 hours
-        if ($dbList->getListmonkList()->getLastCheck() > $verifyTime) {
+        if ($dbList->listmonkList->lastCheck > $verifyTime) {
             return;
         }
 
@@ -395,8 +395,8 @@ class ListmonkService
                 $l = new ListmonkMailingList();
             }
 
-            $l->setName($list['name']);
-            $l->setListmonkId($list['id']);
+            $l->name = $list['name'];
+            $l->listmonkId = $list['id'];
             $l->setLastSeen();
 
             $this->listmonkMailingListRepository->persist($l);
@@ -454,13 +454,13 @@ class ListmonkService
         OutputInterface $output,
         bool $dryRun,
     ): void {
-        $member = $mailingListMember->getMember();
-        $listId = $mailingListMember->getMailingList()->getListmonkList()->getListmonkId();
-        $listName = $mailingListMember->getMailingList()->getListmonkList()->getName();
+        $member = $mailingListMember->member;
+        $listId = $mailingListMember->mailingList->listmonkList->listmonkId;
+        $listName = $mailingListMember->mailingList->listmonkList->name;
 
         // First, check if subscriber exists
         $subscriberData = [
-            'email' => $mailingListMember->getEmail(),
+            'email' => $mailingListMember->email,
         ];
 
         $existingSubscribers = $this->performListmonkRequest(
@@ -478,7 +478,7 @@ class ListmonkService
         // If subscriber doesn't exist, create them
         if (null === $subscriberId) {
             $newSubscriber = [
-                'email' => $mailingListMember->getEmail(),
+                'email' => $mailingListMember->email,
                 'name' => $member->getFullName(),
                 'preconfirm_subscriptions' => true,
                 'lists' => [$listId],
@@ -530,8 +530,8 @@ class ListmonkService
         }
 
         $mailingListMember->setLastSyncOn();
-        $mailingListMember->setLastSyncSuccess(true);
-        $mailingListMember->setToBeCreated(false);
+        $mailingListMember->lastSyncSuccess = true;
+        $mailingListMember->toBeCreated = false;
         $this->mailingListMemberRepository->persist($mailingListMember);
     }
 
@@ -540,9 +540,9 @@ class ListmonkService
         OutputInterface $output,
         bool $dryRun,
     ): void {
-        $listId = $mailingListMember->getMailingList()->getListmonkList()->getListmonkId();
-        $listName = $mailingListMember->getMailingList()->getListmonkList()->getName();
-        $email = $mailingListMember->getEmail();
+        $listId = $mailingListMember->mailingList->listmonkList->listmonkId;
+        $listName = $mailingListMember->mailingList->listmonkList->name;
+        $email = $mailingListMember->email;
 
         $output->writeln(
             sprintf(
@@ -557,19 +557,19 @@ class ListmonkService
             return;
         }
 
-        $member = $mailingListMember->getMember();
+        $member = $mailingListMember->member;
 
         if (
             null !== $member
-            && false === $mailingListMember->isToBeDeleted()
+            && false === $mailingListMember->toBeDeleted
         ) {
             $this->auditService->persist(
                 AuditMailingListMembership::create(
                     MailingListMemberAction::Remove,
                     MailingListMemberOrigin::SyncListmonk,
                     $member,
-                    $mailingListMember->getMailingList(),
-                    $mailingListMember->getEmail(),
+                    $mailingListMember->mailingList,
+                    $mailingListMember->email,
                 ),
             );
         }
@@ -632,16 +632,16 @@ class ListmonkService
         array $knownMembers,
     ): void {
         // If there is no associated listmonk list, assume this is right
-        if (!$mailingListMember->getMailingList()->hasListmonkList()) {
+        if (!$mailingListMember->mailingList->isOnListmonk()) {
             throw new LogicException('Cannot verify mailing list subscription for non-listmonk list');
         }
 
-        $listId = $mailingListMember->getMailingList()->getListmonkList()->getListmonkId();
-        $listName = $mailingListMember->getMailingList()->getListmonkList()->getName();
+        $listId = $mailingListMember->mailingList->listmonkList->listmonkId;
+        $listName = $mailingListMember->mailingList->listmonkList->name;
 
         if (
             in_array(
-                $mailingListMember->getEmail(),
+                $mailingListMember->email,
                 $knownMembers,
             )
         ) {
@@ -654,7 +654,7 @@ class ListmonkService
         $output->writeln(
             sprintf(
                 '--> %s is not in the list of known members of %s, verifying in listmonk',
-                $mailingListMember->getEmail(),
+                $mailingListMember->email,
                 $listName,
             ),
             OutputInterface::VERBOSITY_VERY_VERBOSE,
@@ -664,7 +664,7 @@ class ListmonkService
         $subscribers = $this->performListmonkRequest(
             'subscribers',
             data: [
-                'query' => $this->buildListmonkEmailQuery($mailingListMember->getEmail()),
+                'query' => $this->buildListmonkEmailQuery($mailingListMember->email),
                 'list_id' => $listId,
             ],
         );
@@ -679,7 +679,7 @@ class ListmonkService
         $output->writeln(
             sprintf(
                 '--> %s has disappeared from %s, removing db entry',
-                $mailingListMember->getEmail(),
+                $mailingListMember->email,
                 $listName,
             ),
             OutputInterface::VERBOSITY_VERY_VERBOSE,
@@ -689,19 +689,19 @@ class ListmonkService
             return;
         }
 
-        $member = $mailingListMember->getMember();
+        $member = $mailingListMember->member;
 
         if (
             null !== $member
-            && false === $mailingListMember->isToBeDeleted()
+            && false === $mailingListMember->toBeDeleted
         ) {
             $this->auditService->persist(
                 AuditMailingListMembership::create(
                     MailingListMemberAction::Remove,
                     MailingListMemberOrigin::SyncListmonk,
                     $member,
-                    $mailingListMember->getMailingList(),
-                    $mailingListMember->getEmail(),
+                    $mailingListMember->mailingList,
+                    $mailingListMember->email,
                 ),
             );
         }
@@ -718,12 +718,12 @@ class ListmonkService
         OutputInterface $output,
         bool $dryRun,
     ): void {
-        $lmList = $mailingList->getListmonkList();
+        $lmList = $mailingList->listmonkList;
         $membersDB = $mailingList->getMailingListMemberships();
-        $listId = $mailingList->getListmonkList()->getListmonkId();
-        $listName = $mailingList->getListmonkList()->getName();
+        $listId = $mailingList->listmonkList->listmonkId;
+        $listName = $mailingList->listmonkList->name;
         $memberEmails = array_flip(array_map(
-            static fn (MailingListMember $member): string => $member->getEmail(),
+            static fn (MailingListMember $member): string => $member->email,
             $membersDB->toArray(),
         ));
 
@@ -789,10 +789,10 @@ class ListmonkService
                         );
 
                         $newMailingListMember = new MailingListMember();
-                        $newMailingListMember->setMailingList($mailingList);
+                        $newMailingListMember->mailingList = $mailingList;
                         $newMailingListMember->setMember($foundMember);
-                        $newMailingListMember->setEmail($subscriber['email']);
-                        $newMailingListMember->setToBeCreated(false);
+                        $newMailingListMember->email = $subscriber['email'];
+                        $newMailingListMember->toBeCreated = false;
                         $this->mailingListMemberRepository->persist($newMailingListMember);
                     }
                 }

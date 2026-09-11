@@ -53,10 +53,10 @@ class OrganTooSmall extends Error
     {
         return sprintf(
             '%s has %d active member(s), while a %s needs at least %d.',
-            $this->getOrgan()->getAbbr(),
+            $this->getOrgan()->abbr,
             $this->getMembers(),
-            $this->getOrgan()->getOrganType()->getName()->getMessage(),
-            $this->getOrgan()->getOrganType()->getMinimumMembers(),
+            $this->getOrgan()->organType->getName()->getMessage(),
+            $this->getOrgan()->organType->getMinimumMembers(),
         );
     }
 }

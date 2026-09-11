@@ -121,12 +121,12 @@ class RegistrationService
 
         if (
             null === $paymentLink
-            || $paymentLink->isUsed()
+            || $paymentLink->used
         ) {
             return CheckoutRestartFailure::LinkUnusable;
         }
 
-        return $this->stripeService->restartCheckoutLink($paymentLink->getProspectiveMember())
+        return $this->stripeService->restartCheckoutLink($paymentLink->prospectiveMember)
             ?? CheckoutRestartFailure::CheckoutUnavailable;
     }
 
@@ -139,7 +139,7 @@ class RegistrationService
             return ProspectiveMemberRemoval::NotRemovable;
         }
 
-        if ($prospectiveMember->hasPaid()) {
+        if ($prospectiveMember->isPaymentSettled()) {
             $hasRefund = $this->stripeService->hasRefund($prospectiveMember);
 
             if (null === $hasRefund) {

@@ -43,7 +43,7 @@ class MemberInNonExistingOrgan extends Error
      */
     public function getOrgan(): FoundationModel
     {
-        return $this->getSubDecision()->getFoundation();
+        return $this->getSubDecision()->foundation;
     }
 
     #[Override]
@@ -52,9 +52,9 @@ class MemberInNonExistingOrgan extends Error
         return sprintf(
             'Member %s (%d) is installed as "%s" in %s, which does not exist.',
             $this->getMember()->getFullName(),
-            $this->getMember()->getLidnr(),
-            $this->getSubDecision()->getFunction()->getName()->getMessage(),
-            $this->getOrgan()->getName(),
+            $this->getMember()->lidnr,
+            $this->getSubDecision()->function->getName()->getMessage(),
+            $this->getOrgan()->name,
         );
     }
 }

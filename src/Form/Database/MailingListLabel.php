@@ -42,7 +42,7 @@ final readonly class MailingListLabel implements TranslatableInterface
         return sprintf(
             '<span class="d-block fw-semibold">%s</span><span class="d-block small text-body-secondary">%s</span>',
             htmlspecialchars(
-                $this->list->getName(),
+                $this->list->name,
                 ENT_QUOTES | ENT_SUBSTITUTE,
             ),
             htmlspecialchars(

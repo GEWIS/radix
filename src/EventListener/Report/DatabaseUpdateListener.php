@@ -90,7 +90,7 @@ final class DatabaseUpdateListener
                 $this->emReport->persist($subDecision);
                 // Reached before or after the decision itself when one is recorded; either order ends up with the
                 // same text.
-                $this->meetingService->refreshDecisionContent($entity->getDecision());
+                $this->meetingService->refreshDecisionContent($entity->decision);
                 break;
 
             case $entity instanceof MailingList:
@@ -99,7 +99,7 @@ final class DatabaseUpdateListener
 
             case $entity instanceof MailingListMember:
                 // A subscription that is on its way out is removed from the projection rather than written to it.
-                if ($entity->isToBeDeleted()) {
+                if ($entity->toBeDeleted) {
                     $this->miscService->deleteListMembership($entity);
                 } else {
                     $this->miscService->generateListMembership($entity);

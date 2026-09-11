@@ -47,13 +47,13 @@ class ApiPrincipal
     #[Id]
     #[Column(type: 'integer')]
     #[GeneratedValue(strategy: 'AUTO')]
-    protected ?int $id = null;
+    public protected(set) ?int $id = null;
 
     #[Column(
         type: 'string',
         length: 64,
     )]
-    protected string $tokenHash;
+    public protected(set) string $tokenHash;
 
     #[Column(
         type: 'string',
@@ -69,7 +69,7 @@ class ApiPrincipal
         min: 8,
         max: 255,
     )]
-    protected ?string $description = null;
+    public ?string $description = null;
 
     /**
      * Column type is necessary here.
@@ -87,27 +87,19 @@ class ApiPrincipal
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    protected ?DateTime $lastUsedAt = null;
+    public protected(set) ?DateTime $lastUsedAt = null;
 
     #[Column(
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    protected ?DateTime $expiresAt = null;
+    public ?DateTime $expiresAt = null;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    protected ?DateTime $revokedAt = null;
-
-    /**
-     * @psalm-ignore-nullable-return
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public protected(set) ?DateTime $revokedAt = null;
 
     public static function hash(
         #[SensitiveParameter]
@@ -117,11 +109,6 @@ class ApiPrincipal
             'sha256',
             $token,
         );
-    }
-
-    public function getTokenHash(): string
-    {
-        return $this->tokenHash;
     }
 
     public function getToken(): string
@@ -143,16 +130,6 @@ class ApiPrincipal
         );
 
         return $token;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): void
-    {
-        $this->description = $description;
     }
 
     /**
@@ -180,29 +157,9 @@ class ApiPrincipal
         );
     }
 
-    public function getLastUsedAt(): ?DateTime
-    {
-        return $this->lastUsedAt;
-    }
-
     public function markUsedOn(DateTime $day): void
     {
         $this->lastUsedAt = $day;
-    }
-
-    public function getExpiresAt(): ?DateTime
-    {
-        return $this->expiresAt;
-    }
-
-    public function setExpiresAt(?DateTime $expiresAt): void
-    {
-        $this->expiresAt = $expiresAt;
-    }
-
-    public function getRevokedAt(): ?DateTime
-    {
-        return $this->revokedAt;
     }
 
     public function revoke(): void

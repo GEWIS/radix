@@ -35,10 +35,10 @@ class SuspensionMapper extends AbstractDecisionMapper
         }
 
         $suspension = new Suspension();
-        $suspension->setSequence(1);
+        $suspension->sequence = 1;
         $suspension->setMember($member);
-        $suspension->setSince($since);
-        $suspension->setUntil($until);
+        $suspension->since = $since;
+        $suspension->until = $until;
         $suspension->setDecision($decision);
     }
 }

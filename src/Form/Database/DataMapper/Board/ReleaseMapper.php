@@ -33,9 +33,9 @@ class ReleaseMapper extends AbstractDecisionMapper
         }
 
         $release = new Release();
-        $release->setSequence(1);
-        $release->setInstallation($installation);
-        $release->setDate($date);
+        $release->sequence = 1;
+        $release->installation = $installation;
+        $release->date = $date;
         $release->setDecision($decision);
     }
 }

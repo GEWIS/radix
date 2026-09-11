@@ -40,7 +40,7 @@ class Membership
         referencedColumnName: 'lidnr',
         onDelete: 'cascade',
     )]
-    private Member $member;
+    public private(set) Member $member;
 
     /**
      * The start date of the membership.
@@ -53,13 +53,13 @@ class Membership
      * The end date of the membership.
      */
     #[Column(type: 'date')]
-    private DateTime $endDate;
+    public private(set) DateTime $endDate;
 
     /**
      * How much the member has paid for membership. 0 by default.
      */
     #[Column(type: 'integer')]
-    private int $paid = 0;
+    public private(set) int $paid = 0;
 
     /**
      * 'Member' type.
@@ -78,7 +78,7 @@ class Membership
     #[Column(
         enumType: MembershipTypes::class,
     )]
-    private MembershipTypes $type;
+    public MembershipTypes $type;
 
     public function __construct(
         Member $member,
@@ -116,31 +116,11 @@ class Membership
     }
 
     /**
-     * Member associated with this membership (immutable).
-     */
-    public function getMember(): Member
-    {
-        return $this->member;
-    }
-
-    // member should be immutable, so no setter for it
-
-    /**
      * Start date of this membership (immutable).
      */
     public function getStartDate(): DateTime
     {
         return $this->startDate->toDateTime();
-    }
-
-    // startDate should be immutable, so no setter for it
-
-    /**
-     * End date of this membership.
-     */
-    public function getEndDate(): DateTime
-    {
-        return $this->endDate;
     }
 
     public function setEndDate(DateTime $endDate): void
@@ -158,27 +138,6 @@ class Membership
             0,
         );
         $this->endDate = $endDate;
-    }
-
-    /**
-     * Type of this membership, see MembershipTypes enum for possible values.
-     */
-    public function getType(): MembershipTypes
-    {
-        return $this->type;
-    }
-
-    public function setType(MembershipTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * How much the member has paid for membership.
-     */
-    public function getPaid(): int
-    {
-        return $this->paid;
     }
 
     public function setPaid(int $paid): void

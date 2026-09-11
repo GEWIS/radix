@@ -30,7 +30,7 @@ class MailingList
         type: 'string',
         length: 255,
     )]
-    private string $name;
+    public string $name;
 
     /**
      * Dutch description of the mailing list.
@@ -48,7 +48,7 @@ class MailingList
      * If the mailing list should be on the form.
      */
     #[Column(type: 'boolean')]
-    private bool $onForm;
+    public bool $onForm;
 
     /**
      * If members should be subscribed by default.
@@ -56,7 +56,7 @@ class MailingList
      * (when it is on the form, that means that the checkbox is checked by default)
      */
     #[Column(type: 'boolean')]
-    private bool $defaultSub;
+    public bool $defaultSub;
 
     /**
      * The corresponding mailman mailing list
@@ -69,7 +69,7 @@ class MailingList
         name: 'mailmanId',
         referencedColumnName: 'id',
     )]
-    private ?MailmanMailingList $mailmanList = null;
+    public ?MailmanMailingList $mailmanList = null;
 
     /**
      * The corresponding listmonk mailing list
@@ -82,7 +82,7 @@ class MailingList
         name: 'listmonkId',
         referencedColumnName: 'id',
     )]
-    private ?ListmonkMailingList $listmonkList = null;
+    public ?ListmonkMailingList $listmonkList = null;
 
     /**
      * Mailing list members.
@@ -110,22 +110,6 @@ class MailingList
     {
         $this->mailingListMemberships = new ArrayCollection();
         $this->auditEntries = new ArrayCollection();
-    }
-
-    /**
-     * Get the name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     /**
@@ -161,83 +145,19 @@ class MailingList
     }
 
     /**
-     * Get if it should be on the join form.
-     */
-    public function getOnForm(): bool
-    {
-        return $this->onForm;
-    }
-
-    /**
-     * Set if it should be on the join form.
-     */
-    public function setOnForm(bool $onForm): void
-    {
-        $this->onForm = $onForm;
-    }
-
-    /**
-     * Get if it is a default list.
-     */
-    public function getDefaultSub(): bool
-    {
-        return $this->defaultSub;
-    }
-
-    /**
-     * Set if it is a default list.
-     */
-    public function setDefaultSub(bool $default): void
-    {
-        $this->defaultSub = $default;
-    }
-
-    /**
-     * Get the matching mailman list, or null if none
-     */
-    public function getMailmanList(): ?MailmanMailingList
-    {
-        return $this->mailmanList;
-    }
-
-    /**
      * Check if this has a mailman mailing list
      */
-    public function hasMailmanList(): bool
+    public function isOnMailman(): bool
     {
         return null !== $this->mailmanList;
     }
 
     /**
-     * Set the corresponding mailman list
-     */
-    public function setMailmanList(?MailmanMailingList $mailmanList): void
-    {
-        $this->mailmanList = $mailmanList;
-    }
-
-    /**
-     * Get the matching listmonk list, or null if none
-     */
-    public function getListmonkList(): ?ListmonkMailingList
-    {
-        return $this->listmonkList;
-    }
-
-    /**
      * Check if this has a listmonk mailing list
      */
-    public function hasListmonkList(): bool
+    public function isOnListmonk(): bool
     {
         return null !== $this->listmonkList;
-    }
-
-    /**
-     * Set the corresponding listmonk list
-     */
-    public function setListmonkList(?ListmonkMailingList $listmonkList): void
-    {
-        $this->listmonkList = $listmonkList;
     }
 
     /**
@@ -274,13 +194,13 @@ class MailingList
     public function toArray(): array
     {
         return [
-            'name' => $this->getName(),
+            'name' => $this->name,
             'nl_description' => $this->getNlDescription(),
             'en_description' => $this->getEnDescription(),
-            'defaultSub' => $this->getDefaultSub(),
-            'onForm' => $this->getOnForm(),
-            'mailmanList' => $this->getMailmanList()?->getMailmanId(),
-            'listmonkList' => $this->getListmonkList()?->getListmonkId(),
+            'defaultSub' => $this->defaultSub,
+            'onForm' => $this->onForm,
+            'mailmanList' => $this->mailmanList?->mailmanId,
+            'listmonkList' => $this->listmonkList?->listmonkId,
         ];
     }
 }

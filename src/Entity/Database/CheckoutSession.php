@@ -29,7 +29,7 @@ class CheckoutSession
     #[Id]
     #[Column(type: 'integer')]
     #[GeneratedValue(strategy: 'AUTO')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     /**
      * Identifier of the checkout session, Stripe uses case SENSITIVE identifiers, with PostgreSQL this is not a problem
@@ -41,7 +41,7 @@ class CheckoutSession
         type: 'string',
         unique: true,
     )]
-    private string $checkoutId;
+    public string $checkoutId;
 
     #[ManyToOne(
         targetEntity: ProspectiveMember::class,
@@ -51,13 +51,13 @@ class CheckoutSession
         name: 'prospective_member',
         referencedColumnName: 'lidnr',
     )]
-    private ProspectiveMember $prospectiveMember;
+    public ProspectiveMember $prospectiveMember;
 
     /**
      * Creation of the checkout session.
      */
     #[Column(type: 'datetime')]
-    private DateTime $created;
+    public DateTime $created;
 
     /**
      * Expiration of the checkout session.
@@ -65,7 +65,7 @@ class CheckoutSession
      * If $state == CheckoutSessionStates::Expired, then this is the last date this checkout session can be recovered.
      */
     #[Column(type: 'datetime')]
-    private DateTime $expiration;
+    public DateTime $expiration;
 
     /**
      * The identifier of the PaymentIntent associated with this Checkout Session when the state is 'PAID'.
@@ -74,7 +74,7 @@ class CheckoutSession
         type: 'string',
         nullable: true,
     )]
-    private ?string $paymentIntentId = null;
+    public ?string $paymentIntentId = null;
 
     /**
      * Recovery URL for the Checkout Session when the state is 'EXPIRED'.
@@ -114,71 +114,11 @@ class CheckoutSession
     #[Column(
         enumType: CheckoutSessionStates::class,
     )]
-    private CheckoutSessionStates $state = CheckoutSessionStates::Created;
+    public CheckoutSessionStates $state = CheckoutSessionStates::Created;
 
     public function __construct()
     {
         $this->recoveredBy = new ArrayCollection();
-    }
-
-    /**
-     * Get the ID.
-     *
-     * @psalm-ignore-nullable-return
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getCheckoutId(): string
-    {
-        return $this->checkoutId;
-    }
-
-    public function setCheckoutId(string $checkoutId): void
-    {
-        $this->checkoutId = $checkoutId;
-    }
-
-    public function getProspectiveMember(): ProspectiveMember
-    {
-        return $this->prospectiveMember;
-    }
-
-    public function setProspectiveMember(ProspectiveMember $prospectiveMember): void
-    {
-        $this->prospectiveMember = $prospectiveMember;
-    }
-
-    public function getCreated(): DateTime
-    {
-        return $this->created;
-    }
-
-    public function setCreated(DateTime $created): void
-    {
-        $this->created = $created;
-    }
-
-    public function getExpiration(): DateTime
-    {
-        return $this->expiration;
-    }
-
-    public function setExpiration(DateTime $expiration): void
-    {
-        $this->expiration = $expiration;
-    }
-
-    public function getPaymentIntentId(): ?string
-    {
-        return $this->paymentIntentId;
-    }
-
-    public function setPaymentIntentId(?string $paymentIntentId): void
-    {
-        $this->paymentIntentId = $paymentIntentId;
     }
 
     public function getRecoveryUrl(): ?string
@@ -207,15 +147,5 @@ class CheckoutSession
     public function setRecoveredFrom(CheckoutSession $recoveredFrom): void
     {
         $this->recoveredFrom = $recoveredFrom;
-    }
-
-    public function getState(): CheckoutSessionStates
-    {
-        return $this->state;
-    }
-
-    public function setState(CheckoutSessionStates $state): void
-    {
-        $this->state = $state;
     }
 }

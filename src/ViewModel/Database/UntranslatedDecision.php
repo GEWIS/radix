@@ -29,8 +29,8 @@ final readonly class UntranslatedDecision
             $other->getMeetingNumber(),
             $other->getDecisionPoint(),
             $other->getDecisionNumber(),
-            $other->getSequence(),
-            $other->getContentNL(),
+            $other->sequence,
+            $other->contentNL,
         );
     }
 }

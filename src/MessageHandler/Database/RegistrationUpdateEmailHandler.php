@@ -44,7 +44,7 @@ class RegistrationUpdateEmailHandler
             return;
         }
 
-        $recipientEmail = $member->getEmail();
+        $recipientEmail = $member->email;
 
         if (null === $recipientEmail) {
             return;
@@ -58,15 +58,15 @@ class RegistrationUpdateEmailHandler
             : null;
         $context = [
             'member' => $member,
-            'firstName' => $member->getFirstName(),
-            'lidnr' => $member->getLidnr(),
+            'firstName' => $member->firstName,
+            'lidnr' => $member->lidnr,
             'restartUrl' => null === $paymentLink
                 ? null
                 : $this->urlGenerator->generate(
                     'join_checkout_restart',
                     [
                         '_locale' => Languages::English->getLangParam(),
-                        'token' => $paymentLink->getToken(),
+                        'token' => $paymentLink->token,
                     ],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),

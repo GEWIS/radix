@@ -28,7 +28,7 @@ class Granting extends SubDecision implements NamesMember
      * Till when the keycode is granted.
      */
     #[Column(type: 'date')]
-    private DateTime $until;
+    public DateTime $until;
 
     /**
      * Discharges.
@@ -47,22 +47,6 @@ class Granting extends SubDecision implements NamesMember
     public function getMember(): Member
     {
         return $this->member;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getUntil(): DateTime
-    {
-        return $this->until;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setUntil(DateTime $until): void
-    {
-        $this->until = $until;
     }
 
     #[Override]
@@ -84,7 +68,7 @@ class Granting extends SubDecision implements NamesMember
         $replacements = [
             '%GRANTEE%' => $this->getMember()->getFullName(),
             '%UNTIL%' => $this->formatDate(
-                $this->getUntil(),
+                $this->until,
                 $language,
             ),
         ];

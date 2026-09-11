@@ -158,7 +158,7 @@ final class ProspectiveMemberController extends AbstractController
             return $this->render('database/join/renew-unavailable.html.twig');
         }
 
-        $member = $renewalLink->getMember();
+        $member = $renewalLink->member;
         $form = $this->createForm(
             MemberRenewalType::class,
             $member,
@@ -182,7 +182,7 @@ final class ProspectiveMemberController extends AbstractController
                 $this->memberService->renewMember(
                     $member,
                     $renewalLink,
-                    $renewalLink->getNewExpiration(),
+                    $renewalLink->newExpiration,
                 );
 
                 return $this->render(
@@ -277,7 +277,7 @@ final class ProspectiveMemberController extends AbstractController
 
                 return $this->redirectToRoute(
                     'member_show',
-                    ['lidnr' => $member->getLidnr()],
+                    ['lidnr' => $member->lidnr],
                 );
             }
         }

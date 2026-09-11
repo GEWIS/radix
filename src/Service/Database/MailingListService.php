@@ -67,12 +67,12 @@ class MailingListService
 
         if (
             (
-                $list->hasMailmanList()
-                && $list->getMailmanList() !== ($original['mailmanList'] ?? null)
+                $list->isOnMailman()
+                && $list->mailmanList !== ($original['mailmanList'] ?? null)
             )
             || (
-                $list->hasListmonkList()
-                && $list->getListmonkList() !== ($original['listmonkList'] ?? null)
+                $list->isOnListmonk()
+                && $list->listmonkList !== ($original['listmonkList'] ?? null)
             )
         ) {
             $this->markAllMembersForCreation($list);
@@ -103,7 +103,7 @@ class MailingListService
             $this->mailmanService->getMailingLists(),
             static function (MailmanMailingList $mailmanList) use ($list): bool {
                 return !$mailmanList->isManaged()
-                    || $mailmanList->getMailingList()?->getName() === $list?->getName();
+                    || $mailmanList->mailingList?->name === $list?->name;
             },
         ));
     }
@@ -119,7 +119,7 @@ class MailingListService
             $this->listmonkService->getMailingLists(),
             static function (ListmonkMailingList $listmonkList) use ($list): bool {
                 return !$listmonkList->isManaged()
-                    || $listmonkList->getMailingList()?->getName() === $list?->getName();
+                    || $listmonkList->mailingList?->name === $list?->name;
             },
         ));
     }
@@ -152,11 +152,11 @@ class MailingListService
         $expiredMemberships = $this->mailingListMemberRepository->findAllExpiredOrHidden();
 
         foreach ($expiredMemberships as $expiredMembership) {
-            $member = $expiredMembership->getMember();
+            $member = $expiredMembership->member;
 
             // If the member still is able to renew, do not delete memberships yet
             if (
-                !$member->getHidden()
+                !$member->hidden
                 && $member->hasActiveRenewalLink()
             ) {
                 continue;
@@ -165,8 +165,8 @@ class MailingListService
             $output->writeln(
                 sprintf(
                     '-> Scheduling deletion of mailing list membership for %s on %s',
-                    $expiredMembership->getEmail(),
-                    $expiredMembership->getMailingList()->getName(),
+                    $expiredMembership->email,
+                    $expiredMembership->mailingList->name,
                 ),
                 OutputInterface::VERBOSITY_VERBOSE,
             );
@@ -176,7 +176,7 @@ class MailingListService
             }
 
             // Else, schedule deletion
-            $expiredMembership->setToBeDeleted(true);
+            $expiredMembership->toBeDeleted = true;
             $this->mailingListMemberRepository->persist($expiredMembership);
         }
     }
@@ -196,10 +196,10 @@ class MailingListService
         $memberships = $this->mailingListMemberRepository->findAllPendingLocalOnly();
 
         foreach ($memberships as $mailingListMember) {
-            $listName = $mailingListMember->getMailingList()->getName();
-            $email = $mailingListMember->getEmail();
+            $listName = $mailingListMember->mailingList->name;
+            $email = $mailingListMember->email;
 
-            if ($mailingListMember->isToBeDeleted()) {
+            if ($mailingListMember->toBeDeleted) {
                 $output->writeln(
                     sprintf(
                         '-> Removing local-only mailing list membership for %s on %s',
@@ -214,7 +214,7 @@ class MailingListService
                 }
             }
 
-            if ($mailingListMember->isToBeCreated()) {
+            if ($mailingListMember->toBeCreated) {
                 $output->writeln(
                     sprintf(
                         '-> Clearing pending creation for local-only mailing list membership %s on %s',
@@ -225,7 +225,7 @@ class MailingListService
                 );
 
                 if (!$dryRun) {
-                    $mailingListMember->setToBeCreated(false);
+                    $mailingListMember->toBeCreated = false;
                     $this->mailingListMemberRepository->persist($mailingListMember);
                 }
             }
@@ -235,7 +235,7 @@ class MailingListService
             }
 
             $mailingListMember->setLastSyncOn();
-            $mailingListMember->setLastSyncSuccess(true);
+            $mailingListMember->lastSyncSuccess = true;
         }
     }
 

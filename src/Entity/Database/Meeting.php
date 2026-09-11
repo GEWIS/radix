@@ -37,7 +37,7 @@ class Meeting
         length: 255,
         enumType: MeetingTypes::class,
     )]
-    private MeetingTypes $type;
+    public MeetingTypes $type;
 
     /**
      * Meeting number.
@@ -57,7 +57,7 @@ class Meeting
      * Meeting date.
      */
     #[Column(type: 'date')]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * Decisions.
@@ -91,22 +91,6 @@ class Meeting
     }
 
     /**
-     * Get the meeting type.
-     */
-    public function getType(): MeetingTypes
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set the meeting type.
-     */
-    public function setType(MeetingTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
      * Get the meeting number.
      *
      * In practice, unsigned is not possible in PostgreSQL:
@@ -137,22 +121,6 @@ class Meeting
         }
 
         $this->number = $number;
-    }
-
-    /**
-     * Get the meeting date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the meeting date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
     }
 
     /**
@@ -207,7 +175,7 @@ class Meeting
     public function toArray(): array
     {
         return [
-            'meeting_type' => $this->getType(),
+            'meeting_type' => $this->type,
             'meeting_number' => $this->getNumber(),
         ];
     }

@@ -47,7 +47,7 @@ class OrganRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'meeting_date',
-                $meeting->getDate()->format('Y-m-d'),
+                $meeting->date->format('Y-m-d'),
             );
 
         /** @var Foundation[] $result */
@@ -82,7 +82,7 @@ class OrganRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'meeting_date',
-                $meeting->getDate()->format('Y-m-d'),
+                $meeting->date->format('Y-m-d'),
             );
 
         /** @var Abrogation[] $result */
@@ -118,7 +118,7 @@ class OrganRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'meeting_type',
-                $meeting->getType(),
+                $meeting->type,
             );
 
         /** @var Foundation[] $result */

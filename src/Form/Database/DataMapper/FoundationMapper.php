@@ -44,26 +44,26 @@ class FoundationMapper extends AbstractDecisionMapper
         }
 
         $foundation = new Foundation();
-        $foundation->setSequence(1);
-        $foundation->setOrganType($organType);
+        $foundation->sequence = 1;
+        $foundation->organType = $organType;
         // The name of a voting committee below is derived from the meeting it is founded in, which the sub-decision
         // only learns about from its decision.
         $foundation->setDecision($decision);
 
         if (OrganTypes::SC !== $organType) {
-            $foundation->setName($name);
-            $foundation->setAbbr($abbr);
+            $foundation->name = $name;
+            $foundation->abbr = $abbr;
         } else {
-            $foundation->setName(sprintf(
+            $foundation->name = sprintf(
                 'Stemcommissie voor %s van de %de ALV',
                 $name,
                 $foundation->getMeetingNumber(),
-            ));
-            $foundation->setAbbr(sprintf(
+            );
+            $foundation->abbr = sprintf(
                 'SC%d-%s',
                 $foundation->getMeetingNumber(),
                 $abbr,
-            ));
+            );
             $foundation->setPurpose($name);
         }
 
@@ -91,25 +91,25 @@ class FoundationMapper extends AbstractDecisionMapper
                 InstallationFunctions::Member !== $function
                 && InstallationFunctions::InactiveMember !== $function
                 && !in_array(
-                    $member->getLidnr(),
+                    $member->lidnr,
                     $installedMembers,
                     true,
                 )
             ) {
                 $installation = new Installation();
-                $installation->setSequence($sequence++);
-                $installation->setFoundation($foundation);
-                $installation->setFunction(InstallationFunctions::Member);
+                $installation->sequence = $sequence++;
+                $installation->foundation = $foundation;
+                $installation->function = InstallationFunctions::Member;
                 $installation->setMember($member);
                 $installation->setDecision($decision);
 
-                $installedMembers[] = $member->getLidnr();
+                $installedMembers[] = $member->lidnr;
             }
 
             $installation = new Installation();
-            $installation->setSequence($sequence++);
-            $installation->setFoundation($foundation);
-            $installation->setFunction($function);
+            $installation->sequence = $sequence++;
+            $installation->foundation = $foundation;
+            $installation->function = $function;
             $installation->setMember($member);
             $installation->setDecision($decision);
         }

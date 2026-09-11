@@ -32,12 +32,12 @@ final readonly class MemberSearchResult
         string $url,
     ): self {
         return new self(
-            $member->getLidnr(),
+            $member->lidnr,
             $member->getFullName(),
-            $member->getEmail(),
+            $member->email,
             $member->getGeneration(),
             $member->getExpiration()->format(DateTimeInterface::ATOM),
-            $member->getDeleted(),
+            $member->deleted,
             $url,
         );
     }

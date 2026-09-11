@@ -48,23 +48,7 @@ class Reappointment extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Installation $installation;
-
-    /**
-     * Get the original installation for this reappointment.
-     */
-    public function getInstallation(): Installation
-    {
-        return $this->installation;
-    }
-
-    /**
-     * Set the original installation for this reappointment.
-     */
-    public function setInstallation(Installation $installation): void
-    {
-        $this->installation = $installation;
-    }
+    public Installation $installation;
 
     #[Override]
     protected function getTranslatedTemplate(
@@ -82,15 +66,15 @@ class Reappointment extends SubDecision
         TranslatorInterface $translator,
         AppLanguages $language,
     ): string {
-        $installation = $this->getInstallation();
+        $installation = $this->installation;
 
         $replacements = [
             '%MEMBER%' => $installation->getMember()->getFullName(),
-            '%FUNCTION%' => $installation->getFunction()->trans(
+            '%FUNCTION%' => $installation->function->trans(
                 $translator,
                 $language->getLangParam(),
             ),
-            '%ORGAN_ABBR%' => $installation->getFoundation()->getAbbr(),
+            '%ORGAN_ABBR%' => $installation->foundation->abbr,
         ];
 
         return $this->replaceContentPlaceholders(

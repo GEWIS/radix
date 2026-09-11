@@ -23,7 +23,7 @@ class AuditMailingListMembership extends AuditEntry
         type: 'string',
         enumType: MailingListMemberAction::class,
     )]
-    private MailingListMemberAction $action;
+    public MailingListMemberAction $action;
 
     #[ManyToOne(
         targetEntity: MailingList::class,
@@ -35,16 +35,16 @@ class AuditMailingListMembership extends AuditEntry
         onDelete: 'cascade',
         nullable: true,
     )]
-    private MailingList $mailingList;
+    public MailingList $mailingList;
 
     #[Column(type: 'string')]
-    private string $email;
+    public string $email;
 
     #[Column(
         type: 'string',
         enumType: MailingListMemberOrigin::class,
     )]
-    private MailingListMemberOrigin $origin;
+    public MailingListMemberOrigin $origin;
 
     public static function create(
         MailingListMemberAction $action,
@@ -55,54 +55,14 @@ class AuditMailingListMembership extends AuditEntry
         ?Member $user = null,
     ): self {
         $audit = new self();
-        $audit->setAction($action);
-        $audit->setOrigin($origin);
+        $audit->action = $action;
+        $audit->origin = $origin;
         $audit->setMember($member);
-        $audit->setMailingList($mailingList);
-        $audit->setEmail($email);
-        $audit->setUser($user);
+        $audit->mailingList = $mailingList;
+        $audit->email = $email;
+        $audit->user = $user;
 
         return $audit;
-    }
-
-    public function getAction(): MailingListMemberAction
-    {
-        return $this->action;
-    }
-
-    public function setAction(MailingListMemberAction $action): void
-    {
-        $this->action = $action;
-    }
-
-    public function getMailingList(): MailingList
-    {
-        return $this->mailingList;
-    }
-
-    public function setMailingList(MailingList $mailingList): void
-    {
-        $this->mailingList = $mailingList;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    public function getOrigin(): MailingListMemberOrigin
-    {
-        return $this->origin;
-    }
-
-    public function setOrigin(MailingListMemberOrigin $origin): void
-    {
-        $this->origin = $origin;
     }
 
     #[Override]
@@ -121,7 +81,7 @@ class AuditMailingListMembership extends AuditEntry
         return [
             $this->action->getName()->getMessage(),
             $this->email,
-            $this->mailingList->getName(),
+            $this->mailingList->name,
             $this->origin->getName()->getMessage(),
         ];
     }

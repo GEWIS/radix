@@ -52,7 +52,7 @@ class ListmonkMailingListRepository extends ServiceEntityRepository
             ['lastSeen' => 'DESC'],
         );
 
-        return $list?->getLastSeen();
+        return $list?->lastSeen;
     }
 
     /**
