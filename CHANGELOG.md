@@ -8,6 +8,13 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.5.1](https://github.com/GEWIS/radix/tree/v5.5.1) (2026-09-11)
+
+* Changed the migrations of both databases into a single base each. Both production databases have to be rolled up before this release migrates them.
+* Changed the calls that Doctrine, Twig and Symfony deprecate, none of which behaves differently.
+* Fixed an issue where a placeholder in the message to the sign-ups of an activity was sent as written, because the composer escapes the underscore in its name.
+* Fixed an issue where the decision export and the query export contained HTML entities, as a macro does not inherit the escaping of the block it is written in.
+
 ### [v5.5.0](https://github.com/GEWIS/radix/tree/v5.5.0) (2026-09-10)
 
 * Added a security log, which records sign-ins, terminated sessions, password changes and second-factor changes, since the application log discards everything below `warning` unless the request failed. It omits user agents, tokens and session identifiers, and an event is deleted after 180 days.
