@@ -13,8 +13,13 @@ table_storage:
     executed_at_column_name: executed_at
     execution_time_column_name: execution_time
 
-all_or_nothing: true
-transactional: true
+# MariaDB commits DDL implicitly, so the transaction a migration is wrapped in is already gone by the time the set
+# tries to commit it, and doctrine/migrations deprecates leaning on that commit being silenced. `transactional: false`
+# is what puts the `isTransactional()` override into what the generator writes, so a new migration says outright that
+# it holds no transaction. `all_or_nothing` has to follow: the migrator refuses a plan that holds a non-transactional
+# migration, so the two cannot both stand. It bought nothing here anyway, for the same reason.
+all_or_nothing: false
+transactional: false
 check_database_platform: true
 
 custom_template: 'migrations/template.tpl'

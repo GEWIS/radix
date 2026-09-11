@@ -102,7 +102,11 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		touch "$MIGRATIONS_SKIPPED_MARKER"
 		clear_marker_when_nothing_to_migrate &
 	elif [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then
-		# One set per database, each naming its own connection; a command given no configuration finds none.
+		# One set per database, each naming its own connection; a command given no configuration finds none. Whether a
+		# set is wrapped in a single transaction is left to that configuration: --all-or-nothing overrides both sets, and
+		# the web set cannot take it. MariaDB commits DDL implicitly, so its migrations declare themselves
+		# non-transactional, and the migrator refuses a plan that holds one of those. The wrapping transaction it would
+		# have opened there was destroyed by the first DDL statement in any case.
 		for set in database web; do
 			if find "./migrations/$set" -iname '*.php' -print -quit | grep --quiet .; then
 				case "$set" in
@@ -112,7 +116,6 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 
 				php bin/console doctrine:migrations:migrate \
 					--no-interaction \
-					--all-or-nothing \
 					--configuration="$configuration"
 			fi
 		done
