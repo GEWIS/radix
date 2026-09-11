@@ -51,8 +51,8 @@ final class SignupManagerTest extends DatabaseTestCase
         );
 
         self::assertSame(
-            $member->getLidnr(),
-            $signup->user->getLidnr(),
+            $member->lidnr,
+            $signup->user->lidnr,
         );
         // The list is limited, so the member starts on the waiting list until the organiser draws.
         self::assertFalse($signup->drawn);

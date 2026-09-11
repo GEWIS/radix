@@ -33,7 +33,7 @@ final class OrganRepositoryTest extends DatabaseTestCase
         );
 
         $years = array_map(
-            static fn (Organ $organ): int => (int) $organ->getFoundationDate()->format('Y'),
+            static fn (Organ $organ): int => (int) $organ->foundationDate->format('Y'),
             $iterations,
         );
 

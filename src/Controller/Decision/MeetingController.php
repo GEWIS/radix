@@ -154,11 +154,11 @@ class MeetingController extends AbstractController
     public function downloadDocument(MeetingDocumentVersion $version): Response
     {
         return $this->fileDownloadHelper->download(
-            $version->getPath(),
+            $version->path,
             sprintf(
                 '%s (%s).pdf',
-                $version->getDocument()->getName(),
-                $version->getVersionLabel(),
+                $version->document->name,
+                $version->versionLabel,
             ),
             'application/pdf',
         );
@@ -172,15 +172,15 @@ class MeetingController extends AbstractController
     )]
     public function downloadMinutes(MeetingMinutesVersion $version): Response
     {
-        $meeting = $version->getMinutes()->getMeeting();
+        $meeting = $version->minutes->meeting;
 
         return $this->fileDownloadHelper->download(
-            $version->getPath(),
+            $version->path,
             sprintf(
                 '%s %d minutes (%s).pdf',
-                $meeting->getType()->value,
-                $meeting->getNumber(),
-                $version->getVersionLabel(),
+                $meeting->type->value,
+                $meeting->number,
+                $version->versionLabel,
             ),
             'application/pdf',
         );
@@ -195,11 +195,11 @@ class MeetingController extends AbstractController
     public function downloadReference(ReferenceDocumentVersion $version): Response
     {
         return $this->fileDownloadHelper->download(
-            $version->getPath(),
+            $version->path,
             sprintf(
                 '%s (%s).pdf',
-                $version->getReferenceDocument()->getName(),
-                $version->getVersionLabel(),
+                $version->referenceDocument->name,
+                $version->versionLabel,
             ),
             'application/pdf',
         );

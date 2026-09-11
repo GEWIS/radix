@@ -79,7 +79,7 @@ final class AlbumVoter extends Voter
         }
 
         $member = $user->member;
-        if (MembershipTypes::Graduate === $member->getType()) {
+        if (MembershipTypes::Graduate === $member->type) {
             return $this->graduateMayView(
                 $album,
                 $member,
@@ -97,7 +97,7 @@ final class AlbumVoter extends Voter
         Album $album,
         Member $member,
     ): bool {
-        $endsOn = $member->getMembershipEndsOn();
+        $endsOn = $member->membershipEndsOn;
         $startedOn = $album->startDateTime;
         if (
             null !== $endsOn
@@ -114,7 +114,7 @@ final class AlbumVoter extends Voter
 
         return $this->memberTagRepository->isTaggedInAlbumTree(
             $albumId,
-            $member->getLidnr(),
+            $member->lidnr,
         );
     }
 }

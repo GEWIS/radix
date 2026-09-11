@@ -34,7 +34,7 @@ final class MemberDirectorySearchTest extends DatabaseTestCase
         self::assertNotNull($member);
 
         $results = $this->repository->searchDirectory(mb_strtolower(mb_substr(
-            $member->getLastName(),
+            $member->lastName,
             0,
             4,
         )));

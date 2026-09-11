@@ -32,13 +32,13 @@ class Suspension extends SubDecision
      * would have to be quoted everywhere it is read.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $since;
+    public DateTime $since;
 
     /**
      * The last day of the suspension, which is part of it.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $until;
+    public DateTime $until;
 
     /**
      * Get the member who is suspended.
@@ -50,37 +50,5 @@ class Suspension extends SubDecision
         assert(null !== $this->member);
 
         return $this->member;
-    }
-
-    /**
-     * Get the first day of the suspension.
-     */
-    public function getSince(): DateTime
-    {
-        return $this->since;
-    }
-
-    /**
-     * Set the first day of the suspension.
-     */
-    public function setSince(DateTime $since): void
-    {
-        $this->since = $since;
-    }
-
-    /**
-     * Get the last day of the suspension.
-     */
-    public function getUntil(): DateTime
-    {
-        return $this->until;
-    }
-
-    /**
-     * Set the last day of the suspension.
-     */
-    public function setUntil(DateTime $until): void
-    {
-        $this->until = $until;
     }
 }

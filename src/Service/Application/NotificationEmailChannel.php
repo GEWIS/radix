@@ -41,9 +41,9 @@ final readonly class NotificationEmailChannel implements NotificationChannelInte
         foreach ($this->subscriptions->findSubscribedUsers($notification->getType()) as $user) {
             $member = $user->member;
             if (
-                null === $member->getEmail()
-                || $member->getDeleted()
-                || $member->getHidden()
+                null === $member->email
+                || $member->deleted
+                || $member->hidden
                 || $member->isExpired()
             ) {
                 continue;

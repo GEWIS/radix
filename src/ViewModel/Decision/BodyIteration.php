@@ -46,17 +46,17 @@ final readonly class BodyIteration
 
         $perYear = [];
         foreach ($iterations as $organ) {
-            $year = $organ->getFoundationDate()->format('Y');
+            $year = $organ->foundationDate->format('Y');
             $perYear[$year] = ($perYear[$year] ?? 0) + 1;
         }
 
         $rows = [];
 
         foreach ($iterations as $organ) {
-            $founded = $organ->getFoundationDate();
+            $founded = $organ->foundationDate;
             $year = $founded->format('Y');
             $shared = ($perYear[$year] ?? 0) > 1;
-            $abrogation = $organ->getAbrogationDate();
+            $abrogation = $organ->abrogationDate;
 
             $rows[] = new self(
                 $shared ? $founded->format('Y-m-d') : $year,

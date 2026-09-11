@@ -59,13 +59,13 @@ final readonly class OrganMemberService
 
         foreach ($organ->getMembers() as $installation) {
             // An installation that has not taken effect yet says nothing about who is in the body today.
-            if ($installation->getInstallDate() > $today) {
+            if ($installation->installDate > $today) {
                 continue;
             }
 
-            $member = $installation->getMember();
-            $lidnr = $member->getLidnr();
-            $discharge = $installation->getDischargeDate();
+            $member = $installation->member;
+            $lidnr = $member->lidnr;
+            $discharge = $installation->dischargeDate;
 
             if (
                 null !== $discharge
@@ -76,7 +76,7 @@ final readonly class OrganMemberService
                 continue;
             }
 
-            if (InstallationFunctions::InactiveMember === $installation->getFunction()) {
+            if (InstallationFunctions::InactiveMember === $installation->function) {
                 $inactive[$lidnr] ??= $member;
 
                 continue;
@@ -85,7 +85,7 @@ final readonly class OrganMemberService
             $membership = $active[$lidnr] ??= new OrganMembership($member);
 
             // Being a member is what everybody here is; only a function beyond that is worth naming.
-            $function = $installation->getFunction();
+            $function = $installation->function;
             if ($function->isAdministrative()) {
                 continue;
             }

@@ -45,14 +45,14 @@ final readonly class MeetingMinutesService
 
         $version = new MeetingMinutesVersion();
         $version->setMinutes($minutes);
-        $version->setVersionLabel($versionLabel);
-        $version->setPath($this->fileStorage->store(
+        $version->versionLabel = $versionLabel;
+        $version->path = $this->fileStorage->store(
             StorageNamespace::MeetingMinutes,
             $file->getPathname(),
             $meeting->getStorageScope(),
-        )->path);
-        $version->setUploadedBy($actor);
-        $version->setUploadedAt(new DateTime());
+        )->path;
+        $version->uploadedBy = $actor;
+        $version->uploadedAt = new DateTime();
 
         $this->entityManager->persist($version);
         $this->activityLogger->log(
@@ -81,7 +81,7 @@ final readonly class MeetingMinutesService
 
         $paths = [];
         foreach ($minutes->getVersions() as $version) {
-            $paths[] = $version->getPath();
+            $paths[] = $version->path;
             $this->entityManager->remove($version);
         }
 

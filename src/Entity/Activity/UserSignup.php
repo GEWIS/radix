@@ -46,12 +46,12 @@ class UserSignup extends Signup
     #[Override]
     public function getEmail(): ?string
     {
-        return $this->user->getEmail();
+        return $this->user->email;
     }
 
     #[Override]
     public function personKey(): string
     {
-        return 'member:' . $this->user->getLidnr();
+        return 'member:' . $this->user->lidnr;
     }
 }

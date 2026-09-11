@@ -93,15 +93,15 @@ final readonly class BoardMemberProvider implements ProviderInterface
 
     private function resource(ProjectedBoardMember $installation): BoardMemberResource
     {
-        $member = $installation->getMember();
+        $member = $installation->member;
 
         return new BoardMemberResource(
-            lidnr: $member->getLidnr(),
+            lidnr: $member->lidnr,
             fullName: $member->getFullName(),
-            function: $installation->getFunction()->value,
-            installDate: $installation->getInstallDate()->format(DateTimeInterface::ATOM),
-            releaseDate: $installation->getReleaseDate()?->format(DateTimeInterface::ATOM),
-            dischargeDate: $installation->getDischargeDate()?->format(DateTimeInterface::ATOM),
+            function: $installation->function->value,
+            installDate: $installation->installDate->format(DateTimeInterface::ATOM),
+            releaseDate: $installation->releaseDate?->format(DateTimeInterface::ATOM),
+            dischargeDate: $installation->dischargeDate?->format(DateTimeInterface::ATOM),
             current: $member->isCurrentBoard($installation),
         );
     }

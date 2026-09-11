@@ -237,7 +237,7 @@ class MemberController extends AbstractController
             null !== $request->attributes->get('member')
             && (
                 null === $member
-                || true === $member->getDeleted()
+                || true === $member->deleted
             )
         ) {
             throw $this->createNotFoundException();
@@ -257,7 +257,7 @@ class MemberController extends AbstractController
             }
         }
 
-        $profilePhoto = $this->profilePhotoRepository->getProfilePhotoByLidnr($member->getLidnr());
+        $profilePhoto = $this->profilePhotoRepository->getProfilePhotoByLidnr($member->lidnr);
 
         return $this->render(
             'decision/member.html.twig',

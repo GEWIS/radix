@@ -80,10 +80,10 @@ class PhotoInteractionController extends AbstractController
         $memberTags = [];
         $taggedSelf = false;
         foreach ($this->memberTagRepository->findByPhotoWithMember($photo) as $tag) {
-            $taggedSelf = $taggedSelf || $tag->member->getLidnr() === $member->getLidnr();
+            $taggedSelf = $taggedSelf || $tag->member->lidnr === $member->lidnr;
             $memberTags[] = [
                 'id' => $tag->getId(),
-                'lidnr' => $tag->member->getLidnr(),
+                'lidnr' => $tag->member->lidnr,
                 'fullName' => $tag->member->getFullName(),
                 'x' => $tag->positionX,
                 'y' => $tag->positionY,
@@ -99,8 +99,8 @@ class PhotoInteractionController extends AbstractController
             $organTags[] = [
                 'id' => $tag->getId(),
                 'organId' => $tag->organ->getId(),
-                'name' => $tag->organ->getName(),
-                'abbr' => $tag->organ->getAbbr(),
+                'name' => $tag->organ->name,
+                'abbr' => $tag->organ->abbr,
                 'x' => $tag->positionX,
                 'y' => $tag->positionY,
                 'canRemove' => $this->isGranted(
@@ -123,10 +123,10 @@ class PhotoInteractionController extends AbstractController
             ),
             'voted' => null !== $this->voteRepository->findVote(
                 $photo,
-                $member->getLidnr(),
+                $member->lidnr,
             ),
             // The pulsing-dot nudge shows only when the member has not voted recently.
-            'recentVote' => $this->voteRepository->hasRecentVote($member->getLidnr()),
+            'recentVote' => $this->voteRepository->hasRecentVote($member->lidnr),
             'taggedSelf' => $taggedSelf,
             // The week this photo was photo of the week, if ever, so the viewer can badge it.
             'photoOfTheWeek' => $photoEntity->weeklyPhoto?->week->format('Y-m-d'),
@@ -300,8 +300,8 @@ class PhotoInteractionController extends AbstractController
         return new JsonResponse(array_map(
             static fn (Organ $organ): array => [
                 'id' => $organ->getId(),
-                'abbr' => $organ->getAbbr(),
-                'name' => $organ->getName(),
+                'abbr' => $organ->abbr,
+                'name' => $organ->name,
             ],
             $this->organRepository->findActive(),
         ));

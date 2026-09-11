@@ -50,7 +50,7 @@ final readonly class ReferenceDocumentService
         User $actor,
     ): ReferenceDocument {
         $document = new ReferenceDocument();
-        $document->setName($name);
+        $document->name = $name;
 
         $this->entityManager->persist($document);
         $this->entityManager->persist($this->createVersion(
@@ -95,7 +95,7 @@ final readonly class ReferenceDocumentService
             MeetingActivityVerbs::DocumentVersionUploaded,
             sprintf(
                 '%s (%s)',
-                $document->getName(),
+                $document->name,
                 $versionLabel,
             ),
         );
@@ -109,11 +109,11 @@ final readonly class ReferenceDocumentService
         string $name,
         User $actor,
     ): void {
-        if ($document->getName() === $name) {
+        if ($document->name === $name) {
             return;
         }
 
-        $document->setName($name);
+        $document->name = $name;
         $this->activityLogger->log(
             $actor,
             null,
@@ -143,7 +143,7 @@ final readonly class ReferenceDocumentService
 
         $paths = [];
         foreach ($document->getVersions() as $version) {
-            $paths[] = $version->getPath();
+            $paths[] = $version->path;
             $this->entityManager->remove($version);
         }
 
@@ -152,7 +152,7 @@ final readonly class ReferenceDocumentService
             $actor,
             null,
             MeetingActivityVerbs::ReferenceDocumentDeleted,
-            $document->getName(),
+            $document->name,
         );
         $this->entityManager->flush();
 
@@ -181,16 +181,16 @@ final readonly class ReferenceDocumentService
             }
 
             $selection = new MeetingReferenceSelection();
-            $selection->setMeeting($meeting);
-            $selection->setReferenceDocument($document);
-            $selection->setPinnedVersion($latest);
+            $selection->meeting = $meeting;
+            $selection->referenceDocument = $document;
+            $selection->pinnedVersion = $latest;
 
             $this->entityManager->persist($selection);
             $this->activityLogger->log(
                 $actor,
                 $meeting,
                 MeetingActivityVerbs::ReferenceSelected,
-                $document->getName(),
+                $document->name,
             );
         } else {
             $this->entityManager->remove($selection);
@@ -198,7 +198,7 @@ final readonly class ReferenceDocumentService
                 $actor,
                 $meeting,
                 MeetingActivityVerbs::ReferenceDeselected,
-                $document->getName(),
+                $document->name,
             );
         }
 
@@ -221,20 +221,20 @@ final readonly class ReferenceDocumentService
 
         if (
             null === $selection
-            || $version->getReferenceDocument() !== $document
+            || $version->referenceDocument !== $document
         ) {
             return;
         }
 
-        $selection->setPinnedVersion($version);
+        $selection->pinnedVersion = $version;
         $this->activityLogger->log(
             $actor,
             $meeting,
             MeetingActivityVerbs::ReferencePinned,
             sprintf(
                 '%s (%s)',
-                $document->getName(),
-                $version->getVersionLabel(),
+                $document->name,
+                $version->versionLabel,
             ),
         );
         $this->entityManager->flush();
@@ -259,19 +259,19 @@ final readonly class ReferenceDocumentService
 
         $existing = [];
         foreach ($this->selectionRepository->findForMeeting($meeting) as $selection) {
-            $existing[(int) $selection->getReferenceDocument()->getId()] = true;
+            $existing[(int) $selection->referenceDocument->getId()] = true;
         }
 
         $copied = 0;
         foreach ($this->selectionRepository->findForMeeting($previous[0]) as $selection) {
-            if (isset($existing[(int) $selection->getReferenceDocument()->getId()])) {
+            if (isset($existing[(int) $selection->referenceDocument->getId()])) {
                 continue;
             }
 
             $copy = new MeetingReferenceSelection();
-            $copy->setMeeting($meeting);
-            $copy->setReferenceDocument($selection->getReferenceDocument());
-            $copy->setPinnedVersion($selection->getPinnedVersion());
+            $copy->meeting = $meeting;
+            $copy->referenceDocument = $selection->referenceDocument;
+            $copy->pinnedVersion = $selection->pinnedVersion;
 
             $this->entityManager->persist($copy);
             $copied++;
@@ -287,8 +287,8 @@ final readonly class ReferenceDocumentService
             MeetingActivityVerbs::ReferenceCarriedOver,
             sprintf(
                 '%s %d',
-                $previous[0]->getType()->value,
-                $previous[0]->getNumber(),
+                $previous[0]->type->value,
+                $previous[0]->number,
             ),
         );
         $this->entityManager->flush();
@@ -304,13 +304,13 @@ final readonly class ReferenceDocumentService
     ): ReferenceDocumentVersion {
         $version = new ReferenceDocumentVersion();
         $version->setReferenceDocument($document);
-        $version->setVersionLabel($versionLabel);
-        $version->setPath($this->fileStorage->store(
+        $version->versionLabel = $versionLabel;
+        $version->path = $this->fileStorage->store(
             StorageNamespace::ReferenceDocument,
             $file->getPathname(),
-        )->path);
-        $version->setUploadedBy($actor);
-        $version->setUploadedAt(new DateTime());
+        )->path;
+        $version->uploadedBy = $actor;
+        $version->uploadedAt = new DateTime();
 
         return $version;
     }

@@ -39,7 +39,7 @@ class HiddenPhotoRepository extends ServiceEntityRepository
                 ->where('h.member = :member')
                 ->setParameter(
                     'member',
-                    $member->getLidnr(),
+                    $member->lidnr,
                 )
                 ->getQuery()
                 ->getScalarResult() as $row
@@ -83,7 +83,7 @@ class HiddenPhotoRepository extends ServiceEntityRepository
             ->andWhere('h.photo IN (:photos)')
             ->setParameter(
                 'member',
-                $member->getLidnr(),
+                $member->lidnr,
             )
             ->setParameter(
                 'photos',

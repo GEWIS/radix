@@ -247,12 +247,12 @@ final readonly class SignupAdminListView
                 $member = $signup->user;
                 $membershipTypeLabel = $translator->trans(
                     'User (%type%)',
-                    ['%type%' => $member->getType()->trans($translator)],
+                    ['%type%' => $member->type->trans($translator)],
                 );
-                $generation = $member->getGeneration();
+                $generation = $member->generation;
                 $external = false;
                 $organisingBody = array_key_exists(
-                    $member->getLidnr(),
+                    $member->lidnr,
                     $committee,
                 );
             } else {

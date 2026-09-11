@@ -185,7 +185,7 @@ class GeneralStepType extends AbstractType
         $choices = ['none' => ActivityData::NONE];
 
         foreach ($organs as $organ) {
-            $choices[$organ->getAbbr()] = (string) intval($organ->getId());
+            $choices[$organ->abbr] = (string) intval($organ->getId());
         }
 
         return $choices;
@@ -209,7 +209,7 @@ class GeneralStepType extends AbstractType
         $organs = [];
 
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
-            $organ = $installation->getOrgan();
+            $organ = $installation->organ;
             $organs[intval($organ->getId())] = $organ;
         }
 

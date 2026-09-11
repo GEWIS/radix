@@ -78,9 +78,9 @@ class MeetingPointFixture extends Fixture implements DependentFixtureInterface, 
             foreach ($points as $position => [$number, $title]) {
                 $point = new MeetingPoint();
                 $point->setMeeting($meeting);
-                $point->setNumber($number);
-                $point->setTitle($title);
-                $point->setDisplayPosition($position);
+                $point->number = $number;
+                $point->title = $title;
+                $point->displayPosition = $position;
 
                 $manager->persist($point);
                 $this->addReference(

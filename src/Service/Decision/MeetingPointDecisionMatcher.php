@@ -36,7 +36,7 @@ final class MeetingPointDecisionMatcher
             if (
                 1 !== preg_match(
                     '/^\s*(\d+)/',
-                    $point->getNumber(),
+                    $point->number,
                     $matches,
                 )
             ) {
@@ -44,7 +44,7 @@ final class MeetingPointDecisionMatcher
             }
 
             $integer = (int) $matches[1];
-            $exact = trim($point->getNumber()) === strval($integer);
+            $exact = trim($point->number) === strval($integer);
 
             if (
                 isset($pointsByLeadingInteger[$integer])
@@ -65,7 +65,7 @@ final class MeetingPointDecisionMatcher
         $byPointId = [];
         $unmatched = [];
         foreach ($decisions as $decision) {
-            $point = $pointsByLeadingInteger[$decision->getPoint()]['point'] ?? null;
+            $point = $pointsByLeadingInteger[$decision->point]['point'] ?? null;
 
             if (null === $point) {
                 $unmatched[] = $decision;

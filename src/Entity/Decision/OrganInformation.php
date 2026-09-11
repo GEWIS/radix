@@ -53,7 +53,7 @@ class OrganInformation implements RevisableInterface
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Organ $organ;
+    public Organ $organ;
 
     /**
      * The full chain of revisions, newest first.
@@ -87,16 +87,6 @@ class OrganInformation implements RevisableInterface
         $this->revisions = new ArrayCollection();
     }
 
-    public function getOrgan(): Organ
-    {
-        return $this->organ;
-    }
-
-    public function setOrgan(Organ $organ): void
-    {
-        $this->organ = $organ;
-    }
-
     /**
      * @return Collection<array-key, OrganInformationRevision>
      */
@@ -113,7 +103,7 @@ class OrganInformation implements RevisableInterface
         }
 
         $this->revisions->add($revision);
-        $revision->setOrganInformation($this);
+        $revision->organInformation = $this;
     }
 
     #[Override]
@@ -216,7 +206,7 @@ class OrganInformation implements RevisableInterface
      */
     public function getEmail(): ?string
     {
-        return $this->liveRevision?->getEmail();
+        return $this->liveRevision?->email;
     }
 
     /**
@@ -224,7 +214,7 @@ class OrganInformation implements RevisableInterface
      */
     public function getWebsite(): ?string
     {
-        return $this->liveRevision?->getWebsite();
+        return $this->liveRevision?->website;
     }
 
     /**
@@ -232,7 +222,7 @@ class OrganInformation implements RevisableInterface
      */
     public function getShortDescription(): ?DecisionLocalisedText
     {
-        return $this->liveRevision?->getShortDescription();
+        return $this->liveRevision?->shortDescription;
     }
 
     /**
@@ -240,7 +230,7 @@ class OrganInformation implements RevisableInterface
      */
     public function getDescription(): ?DecisionLocalisedText
     {
-        return $this->liveRevision?->getDescription();
+        return $this->liveRevision?->description;
     }
 
     /**
@@ -248,7 +238,7 @@ class OrganInformation implements RevisableInterface
      */
     public function getBannerPath(): ?string
     {
-        return $this->liveRevision?->getBannerPath();
+        return $this->liveRevision?->bannerPath;
     }
 
     /**
@@ -256,7 +246,7 @@ class OrganInformation implements RevisableInterface
      */
     public function getLogoPath(): ?string
     {
-        return $this->liveRevision?->getLogoPath();
+        return $this->liveRevision?->logoPath;
     }
 
     /**

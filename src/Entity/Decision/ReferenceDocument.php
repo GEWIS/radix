@@ -33,7 +33,7 @@ class ReferenceDocument
      * Name of the document.
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * The versions of this document, in upload order.
@@ -50,16 +50,6 @@ class ReferenceDocument
     public function __construct()
     {
         $this->versions = new ArrayCollection();
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     /**

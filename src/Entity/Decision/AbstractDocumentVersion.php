@@ -31,13 +31,13 @@ abstract class AbstractDocumentVersion
         type: Types::STRING,
         length: 32,
     )]
-    private string $versionLabel;
+    public string $versionLabel;
 
     /**
      * Path of the file, relative to the storage directory.
      */
     #[Column(type: Types::STRING)]
-    private string $path;
+    public string $path;
 
     /**
      * The account that uploaded this version. `null` for versions carried over from the legacy flat documents.
@@ -49,7 +49,7 @@ abstract class AbstractDocumentVersion
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?User $uploadedBy = null;
+    public ?User $uploadedBy = null;
 
     /**
      * When this version was uploaded. `null` when unknown, which is the case for most versions carried over from the
@@ -59,45 +59,5 @@ abstract class AbstractDocumentVersion
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $uploadedAt = null;
-
-    public function getVersionLabel(): string
-    {
-        return $this->versionLabel;
-    }
-
-    public function setVersionLabel(string $versionLabel): void
-    {
-        $this->versionLabel = $versionLabel;
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    public function getUploadedBy(): ?User
-    {
-        return $this->uploadedBy;
-    }
-
-    public function setUploadedBy(?User $uploadedBy): void
-    {
-        $this->uploadedBy = $uploadedBy;
-    }
-
-    public function getUploadedAt(): ?DateTime
-    {
-        return $this->uploadedAt;
-    }
-
-    public function setUploadedAt(?DateTime $uploadedAt): void
-    {
-        $this->uploadedAt = $uploadedAt;
-    }
+    public ?DateTime $uploadedAt = null;
 }

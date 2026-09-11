@@ -59,7 +59,7 @@ final readonly class MemberBodyProvider implements ProviderInterface
         if (
             null === $member
             || (
-                $member->getDeleted()
+                $member->deleted
                 && !$this->authorizationChecker->isGranted(ApiPermissions::MembersDeleted->value)
             )
         ) {
@@ -76,7 +76,7 @@ final readonly class MemberBodyProvider implements ProviderInterface
         $request = $context['request'] ?? null;
 
         $paginator = $this->organMemberRepository->paginateByMember(
-            $member->getLidnr(),
+            $member->lidnr,
             QueryValue::isSet(
                 $request instanceof Request ? $request : null,
                 'includeDischarged',
@@ -108,20 +108,20 @@ final readonly class MemberBodyProvider implements ProviderInterface
         $resources = [];
 
         foreach ($installations as $installation) {
-            $body = $installation->getOrgan();
+            $body = $installation->organ;
             $id = $body->getId();
             assert(null !== $id);
 
             $resources[] = new MemberBodyResource(
                 body: new BodySummary(
                     id: $id,
-                    abbreviation: $body->getAbbr(),
-                    name: $body->getName(),
-                    type: $body->getType()->value,
+                    abbreviation: $body->abbr,
+                    name: $body->name,
+                    type: $body->type->value,
                 ),
-                function: $installation->getFunction()->value,
-                installDate: $installation->getInstallDate()->format(DateTimeInterface::ATOM),
-                dischargeDate: $installation->getDischargeDate()?->format(DateTimeInterface::ATOM),
+                function: $installation->function->value,
+                installDate: $installation->installDate->format(DateTimeInterface::ATOM),
+                dischargeDate: $installation->dischargeDate?->format(DateTimeInterface::ATOM),
                 current: $installation->isCurrent(),
             );
         }

@@ -359,10 +359,10 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             OrganInformationRevision::class,
             $draft,
         );
-        $draft->setBannerSource($paths[0]);
-        $draft->setBannerPath($paths[1]);
-        $draft->setLogoSource($paths[2]);
-        $draft->setLogoPath($paths[3]);
+        $draft->bannerSource = $paths[0];
+        $draft->bannerPath = $paths[1];
+        $draft->logoSource = $paths[2];
+        $draft->logoPath = $paths[3];
         $this->entityManager->flush();
         $draftId = (int) $draft->getId();
         $this->backdate(

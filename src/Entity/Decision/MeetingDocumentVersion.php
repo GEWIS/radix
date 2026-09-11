@@ -24,12 +24,7 @@ class MeetingDocumentVersion extends AbstractDocumentVersion
         name: 'document_id',
         nullable: false,
     )]
-    private MeetingDocument $document;
-
-    public function getDocument(): MeetingDocument
-    {
-        return $this->document;
-    }
+    public private(set) MeetingDocument $document;
 
     public function setDocument(MeetingDocument $document): void
     {

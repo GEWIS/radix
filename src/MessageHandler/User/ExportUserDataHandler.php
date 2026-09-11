@@ -57,16 +57,16 @@ class ExportUserDataHandler
         }
 
         $this->fileStorage->write(
-            self::exportPath($member->getLidnr()),
+            self::exportPath($member->lidnr),
             json_encode(
                 $this->gdprService->collectMemberData($member),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
             ),
         );
 
-        $this->announce($member->getLidnr());
+        $this->announce($member->lidnr);
 
-        $email = $member->getEmail();
+        $email = $member->email;
         if (null === $email) {
             return;
         }

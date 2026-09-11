@@ -230,7 +230,7 @@ class MemberTagRepository extends ServiceEntityRepository
         // Two photos can share a timestamp; a member still gets at most one tag.
         $tags = [];
         foreach ($candidates as $candidate) {
-            $lidnr = $candidate->member->getLidnr();
+            $lidnr = $candidate->member->lidnr;
             if (isset($tags[$lidnr])) {
                 continue;
             }

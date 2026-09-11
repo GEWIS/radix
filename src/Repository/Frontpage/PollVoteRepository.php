@@ -66,7 +66,7 @@ class PollVoteRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'member',
-                $member->getLidnr(),
+                $member->lidnr,
             )
             ->getQuery()
             ->getScalarResult();
@@ -142,7 +142,7 @@ class PollVoteRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'member',
-                $member->getLidnr(),
+                $member->lidnr,
             );
 
         return $qb->getQuery()->getResult();

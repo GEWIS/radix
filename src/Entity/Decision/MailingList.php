@@ -40,7 +40,7 @@ class MailingList
         type: Types::STRING,
         length: 255,
     )]
-    private string $name;
+    public string $name;
 
     /**
      * Dutch description of the mailing list.
@@ -68,22 +68,6 @@ class MailingList
     public function __construct()
     {
         $this->mailingListMemberships = new ArrayCollection();
-    }
-
-    /**
-     * Get the name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     /**
@@ -134,7 +118,7 @@ class MailingList
     public function toGdprArray(): array
     {
         return [
-            'name' => $this->getName(),
+            'name' => $this->name,
             'description_en' => $this->getEnDescription(),
             'description_nl' => $this->getNlDescription(),
         ];

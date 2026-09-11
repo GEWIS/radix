@@ -48,7 +48,7 @@ class Authorization
         referencedColumnName: 'lidnr',
         onDelete: 'CASCADE',
     )]
-    private Member $authorizer;
+    public Member $authorizer;
 
     /**
      * Member receiving this authorization.
@@ -59,19 +59,19 @@ class Authorization
         referencedColumnName: 'lidnr',
         onDelete: 'CASCADE',
     )]
-    private Member $recipient;
+    public Member $recipient;
 
     /**
      * Meeting number.
      */
     #[Column(type: Types::INTEGER)]
-    private int $meetingNumber;
+    public int $meetingNumber;
 
     /**
      * When the authorization was made.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $createdAt;
+    public DateTime $createdAt;
 
     /**
      * When the authorization was revoked.
@@ -80,57 +80,7 @@ class Authorization
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $revokedAt = null;
-
-    public function getAuthorizer(): Member
-    {
-        return $this->authorizer;
-    }
-
-    public function setAuthorizer(Member $authorizer): void
-    {
-        $this->authorizer = $authorizer;
-    }
-
-    public function getRecipient(): Member
-    {
-        return $this->recipient;
-    }
-
-    public function setRecipient(Member $recipient): void
-    {
-        $this->recipient = $recipient;
-    }
-
-    public function getMeetingNumber(): int
-    {
-        return $this->meetingNumber;
-    }
-
-    public function setMeetingNumber(int $meetingNumber): void
-    {
-        $this->meetingNumber = $meetingNumber;
-    }
-
-    public function getCreatedAt(): DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getRevokedAt(): ?DateTime
-    {
-        return $this->revokedAt;
-    }
-
-    public function setRevokedAt(?DateTime $revokedAt): void
-    {
-        $this->revokedAt = $revokedAt;
-    }
+    public ?DateTime $revokedAt = null;
 
     /**
      * @return AuthorizationGdprArrayType
@@ -138,9 +88,9 @@ class Authorization
     public function toGdprArray(): array
     {
         return [
-            'meeting_number' => $this->getMeetingNumber(),
-            'createdAt' => $this->getCreatedAt()->format(DateTimeInterface::ATOM),
-            'revokedAt' => $this->getRevokedAt()?->format(DateTimeInterface::ATOM),
+            'meeting_number' => $this->meetingNumber,
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
+            'revokedAt' => $this->revokedAt?->format(DateTimeInterface::ATOM),
         ];
     }
 }

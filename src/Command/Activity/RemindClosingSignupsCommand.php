@@ -145,7 +145,7 @@ final class RemindClosingSignupsCommand extends Command
                 continue;
             }
 
-            $user = $this->userRepository->find($signup->user->getLidnr());
+            $user = $this->userRepository->find($signup->user->lidnr);
             if (null === $user) {
                 continue;
             }

@@ -29,15 +29,15 @@ enum JWTClaims: string implements TranslatableInterface
     public function getValue(MemberModel $member): bool|int|string|null
     {
         return match ($this) {
-            self::Email => $member->getEmail(),
-            self::EmailVerified => null !== $member->getEmail(),
-            self::FamilyName => $member->getLastName(),
-            self::GivenName => $member->getFirstName(),
+            self::Email => $member->email,
+            self::EmailVerified => null !== $member->email,
+            self::FamilyName => $member->lastName,
+            self::GivenName => $member->firstName,
             self::Is18Plus => $member->hasReached18(),
-            self::IsMember => $member->getType()->isFormalMember() && !$member->isExpired(),
-            self::Lidnr => $member->getLidnr(),
-            self::MembershipType => $member->getType()->value,
-            self::MiddleName => $member->getMiddleName(),
+            self::IsMember => $member->type->isFormalMember() && !$member->isExpired(),
+            self::Lidnr => $member->lidnr,
+            self::MembershipType => $member->type->value,
+            self::MiddleName => $member->middleName,
             self::Name => $member->getFullName(),
         };
     }

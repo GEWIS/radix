@@ -1354,12 +1354,6 @@ parameters:
 			path: src/Service/Report/MemberService.php
 
 		-
-			message: '#^Parameter \#1 \$email of method App\\Entity\\Decision\\MailingListMember\:\:setEmail\(\) expects string, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Service/Report/MemberService.php
-
-		-
 			message: '#^Cannot call method getLidnr\(\) on App\\Entity\\Database\\Member\|null\.$#'
 			identifier: method.nonObject
 			count: 1

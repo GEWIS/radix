@@ -49,7 +49,7 @@ class MeetingDocument
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public private(set) Meeting $meeting;
 
     /**
      * The agenda point this document is filed under. The database falls back to `SET NULL` when a point is removed;
@@ -64,13 +64,13 @@ class MeetingDocument
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?MeetingPoint $point = null;
+    public ?MeetingPoint $point = null;
 
     /**
      * Name of the document.
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * Determines the order in which to display the document within its agenda point or the meeting-level group.
@@ -79,7 +79,7 @@ class MeetingDocument
         type: Types::INTEGER,
         options: ['default' => 0],
     )]
-    private int $displayPosition = 0;
+    public int $displayPosition = 0;
 
     /**
      * The versions of this document, in upload order; members see the last one.
@@ -98,51 +98,10 @@ class MeetingDocument
         $this->versions = new ArrayCollection();
     }
 
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
     public function setMeeting(Meeting $meeting): void
     {
         $meeting->addDocument($this);
         $this->meeting = $meeting;
-    }
-
-    public function getPoint(): ?MeetingPoint
-    {
-        return $this->point;
-    }
-
-    public function setPoint(?MeetingPoint $point): void
-    {
-        $this->point = $point;
-    }
-
-    /**
-     * Get the name of the document.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name of the document.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getDisplayPosition(): int
-    {
-        return $this->displayPosition;
-    }
-
-    public function setDisplayPosition(int $position): void
-    {
-        $this->displayPosition = $position;
     }
 
     /**

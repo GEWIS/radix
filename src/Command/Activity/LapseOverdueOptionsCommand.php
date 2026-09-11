@@ -118,7 +118,7 @@ final class LapseOverdueOptionsCommand extends Command
             $ui->text(sprintf(
                 '%s (%s) on %s',
                 $proposal->name,
-                $proposal->organ?->getAbbr() ?? 'the board',
+                $proposal->organ->abbr ?? 'the board',
                 $proposal->chosenOption?->beginsAt->format('Y-m-d') ?? '?',
             ));
 
@@ -201,7 +201,7 @@ final class LapseOverdueOptionsCommand extends Command
         $creator = $proposal->getCreatedBy();
         $user = null === $creator
             ? null
-            : $this->userRepository->find($creator->getLidnr());
+            : $this->userRepository->find($creator->lidnr);
 
         if (null === $user) {
             return;

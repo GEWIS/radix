@@ -218,7 +218,7 @@ class ActivityRepository extends ServiceEntityRepository
         if (!$all) {
             $qb->setParameter(
                 'creatorLidnr',
-                $member->getLidnr(),
+                $member->lidnr,
             );
 
             if ([] === $organIds) {
@@ -309,7 +309,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->andWhere('a.unpublishedAt IS NULL')
             ->setParameter(
                 'subscriber',
-                $member->getLidnr(),
+                $member->lidnr,
                 Types::INTEGER,
             )
             ->setParameter(
@@ -536,7 +536,7 @@ class ActivityRepository extends ServiceEntityRepository
             $qb->andWhere($qb->expr()->exists($subscriberSubquery->getDQL()))
                 ->setParameter(
                     'subscriber',
-                    $subscribedBy->getLidnr(),
+                    $subscribedBy->lidnr,
                     Types::INTEGER,
                 );
         }

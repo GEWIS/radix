@@ -221,11 +221,11 @@ class DecisionRepository extends ServiceEntityRepository
                 )
                 ->setParameter(
                     'point' . $index,
-                    $decision->getPoint(),
+                    $decision->point,
                 )
                 ->setParameter(
                     'number' . $index,
-                    $decision->getNumber(),
+                    $decision->number,
                 );
         }
 
@@ -249,7 +249,7 @@ class DecisionRepository extends ServiceEntityRepository
         $counterparts = [];
         foreach ($qb->getQuery()->getResult() as $virtual) {
             assert($virtual instanceof Decision);
-            $counterpart = $virtual->getCounterpart();
+            $counterpart = $virtual->counterpart;
 
             if (null === $counterpart) {
                 continue;
@@ -270,8 +270,8 @@ class DecisionRepository extends ServiceEntityRepository
             '%s %d.%d.%d',
             $decision->getMeetingType()->value,
             $decision->getMeetingNumber(),
-            $decision->getPoint(),
-            $decision->getNumber(),
+            $decision->point,
+            $decision->number,
         );
     }
 

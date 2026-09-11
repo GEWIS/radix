@@ -52,7 +52,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             ->groupBy('app.appId')
             ->setParameter(
                 'user_id',
-                $member->getLidnr(),
+                $member->lidnr,
             );
 
         return $qb->getQuery()->getResult();
@@ -97,7 +97,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'user_id',
-                $member->getLidnr(),
+                $member->lidnr,
             );
 
         return $qb->getQuery()->getResult();

@@ -41,7 +41,7 @@ final class OrganNotificationSubjectNamer extends AbstractNotificationSubjectNam
                 continue;
             }
 
-            $abbr = $revision->getOrgan()->getAbbr();
+            $abbr = $revision->getOrgan()->abbr;
             $names[$id] = [
                 'en' => $abbr,
                 'nl' => $abbr,

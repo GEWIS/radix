@@ -163,12 +163,12 @@ final class RunNotificationDigestsCommand extends Command
             }
 
             $member = $user->member;
-            $email = $member->getEmail();
+            $email = $member->email;
             if (
                 [] !== $entries
                 && null !== $email
-                && !$member->getDeleted()
-                && !$member->getHidden()
+                && !$member->deleted
+                && !$member->hidden
                 && !$member->isExpired()
             ) {
                 $this->messageBus->dispatch(new SendNotificationDigestMessage(

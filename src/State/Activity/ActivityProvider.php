@@ -229,8 +229,8 @@ final readonly class ActivityProvider implements ProviderInterface
 
         return [
             'id' => $id,
-            'abbreviation' => $organ->getAbbr(),
-            'name' => $organ->getName(),
+            'abbreviation' => $organ->abbr,
+            'name' => $organ->name,
         ];
     }
 

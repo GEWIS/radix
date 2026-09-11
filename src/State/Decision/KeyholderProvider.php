@@ -93,13 +93,13 @@ final readonly class KeyholderProvider implements ProviderInterface
 
     private function resource(ProjectedKeyholder $keyholder): KeyholderResource
     {
-        $member = $keyholder->getMember();
+        $member = $keyholder->member;
 
         return new KeyholderResource(
-            lidnr: $member->getLidnr(),
+            lidnr: $member->lidnr,
             fullName: $member->getFullName(),
-            expirationDate: $keyholder->getExpirationDate()->format(DateTimeInterface::ATOM),
-            withdrawnDate: $keyholder->getWithdrawnDate()?->format(DateTimeInterface::ATOM),
+            expirationDate: $keyholder->expirationDate->format(DateTimeInterface::ATOM),
+            withdrawnDate: $keyholder->withdrawnDate?->format(DateTimeInterface::ATOM),
             current: $keyholder->isCurrent(),
         );
     }

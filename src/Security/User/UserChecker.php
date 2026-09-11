@@ -62,10 +62,10 @@ readonly class UserChecker implements UserCheckerInterface
         }
 
         if (
-            $user->member->getDeleted()
-            || $user->member->getHidden()
+            $user->member->deleted
+            || $user->member->hidden
             || $user->member->isExpired()
-            || null === $user->member->getEmail()
+            || null === $user->member->email
         ) {
             // Blanket denial for login if state of membership/graduate status does not allow this.
             throw new CustomUserMessageAccountStatusException(

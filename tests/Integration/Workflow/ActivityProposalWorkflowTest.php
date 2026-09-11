@@ -140,7 +140,7 @@ final class ActivityProposalWorkflowTest extends DatabaseTestCase
         $createdBy = $proposal->getCreatedBy();
         self::assertNotNull($createdBy);
         $this->authenticateAs(
-            $createdBy->getLidnr(),
+            $createdBy->lidnr,
             ['ROLE_ACTIVE_MEMBER'],
         );
 

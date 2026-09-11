@@ -151,13 +151,13 @@ final readonly class AlbumPhotoProvider implements ProviderInterface
             // Naming a deleted member is what `members_deleted` gates everywhere else the API names one.
             if (
                 !$includeDeleted
-                && $tag->member->getDeleted()
+                && $tag->member->deleted
             ) {
                 return null;
             }
 
             return [
-                'lidnr' => $tag->member->getLidnr(),
+                'lidnr' => $tag->member->lidnr,
                 'full_name' => $tag->member->getFullName(),
             ];
         }
@@ -165,7 +165,7 @@ final readonly class AlbumPhotoProvider implements ProviderInterface
         if ($tag instanceof OrganTag) {
             return [
                 'organId' => (int) $tag->organ->getId(),
-                'abbreviation' => $tag->organ->getAbbr(),
+                'abbreviation' => $tag->organ->abbr,
             ];
         }
 

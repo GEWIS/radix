@@ -24,12 +24,7 @@ class ReferenceDocumentVersion extends AbstractDocumentVersion
         name: 'referenceDocument_id',
         nullable: false,
     )]
-    private ReferenceDocument $referenceDocument;
-
-    public function getReferenceDocument(): ReferenceDocument
-    {
-        return $this->referenceDocument;
-    }
+    public private(set) ReferenceDocument $referenceDocument;
 
     public function setReferenceDocument(ReferenceDocument $referenceDocument): void
     {

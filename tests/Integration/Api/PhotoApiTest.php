@@ -906,10 +906,10 @@ final class PhotoApiTest extends ApiTestCase
             $tag,
         );
 
-        $tag->member->setDeleted(true);
+        $tag->member->deleted = true;
         $this->entityManager->flush();
 
-        return $tag->member->getLidnr();
+        return $tag->member->lidnr;
     }
 
     private function aPublishedAlbumWithSeveralPhotos(): int

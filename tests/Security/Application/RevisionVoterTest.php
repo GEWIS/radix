@@ -292,7 +292,7 @@ final class RevisionVoterTest extends TestCase
         array $organInstallations = [],
     ): Member {
         $member = self::createStub(Member::class);
-        $member->method('getLidnr')->willReturn($lidnr);
+        $member->lidnr = $lidnr;
         $member->method('getCurrentOrganInstallations')->willReturn(new ArrayCollection($organInstallations));
 
         return $member;
@@ -317,7 +317,7 @@ final class RevisionVoterTest extends TestCase
     private function organMemberOf(Organ $organ): OrganMember
     {
         $organMember = self::createStub(OrganMember::class);
-        $organMember->method('getOrgan')->willReturn($organ);
+        $organMember->organ = $organ;
 
         return $organMember;
     }

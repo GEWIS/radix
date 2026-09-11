@@ -99,10 +99,10 @@ final class FileReferenceProviderTest extends DatabaseTestCase
             OrganInformationRevision::class,
             $revision,
         );
-        $revision->setBannerSource('organs/images/cover-source-reference-test.png');
-        $revision->setBannerPath('organs/images/cover-reference-test.png');
-        $revision->setLogoSource('organs/images/thumbnail-source-reference-test.png');
-        $revision->setLogoPath('organs/images/thumbnail-reference-test.png');
+        $revision->bannerSource = 'organs/images/cover-source-reference-test.png';
+        $revision->bannerPath = 'organs/images/cover-reference-test.png';
+        $revision->logoSource = 'organs/images/thumbnail-source-reference-test.png';
+        $revision->logoPath = 'organs/images/thumbnail-reference-test.png';
         $this->entityManager->flush();
 
         $provider = new OrganImageReferenceProvider($this->entityManager);

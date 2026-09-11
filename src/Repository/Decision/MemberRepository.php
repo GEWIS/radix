@@ -321,7 +321,7 @@ class MemberRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'lidnr',
-            $member->getLidnr(),
+            $member->lidnr,
         )
             ->setParameter(
                 'now',
@@ -361,7 +361,7 @@ class MemberRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'member',
-            $member->getLidnr(),
+            $member->lidnr,
         )
             ->setParameter(
                 'now',
@@ -400,7 +400,7 @@ class MemberRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'member',
-            $member->getLidnr(),
+            $member->lidnr,
         )
             ->setParameter(
                 'now',
@@ -653,7 +653,7 @@ class MemberRepository extends ServiceEntityRepository
         }
 
         $lidnrs = array_map(
-            static fn (Member $member): int => $member->getLidnr(),
+            static fn (Member $member): int => $member->lidnr,
             $members,
         );
 

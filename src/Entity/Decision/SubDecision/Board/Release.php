@@ -51,43 +51,11 @@ class Release extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Installation $installation;
+    public Installation $installation;
 
     /**
      * Date of the discharge.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $date;
-
-    /**
-     * Get installation.
-     */
-    public function getInstallation(): Installation
-    {
-        return $this->installation;
-    }
-
-    /**
-     * Set the installation.
-     */
-    public function setInstallation(Installation $installation): void
-    {
-        $this->installation = $installation;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
+    public DateTime $date;
 }

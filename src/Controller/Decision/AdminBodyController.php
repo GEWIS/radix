@@ -89,7 +89,7 @@ class AdminBodyController extends AbstractRevisionController
     )]
     public function view(Organ $organ): Response
     {
-        $page = $organ->getOrganInformation();
+        $page = $organ->organInformation;
         // Whoever administers the register comes here for the body's composition rather than for its page, so the
         // page's own permissions decide what they are shown of it rather than whether they are let in at all.
         $register = $this->isGranted(UserRoles::DatabaseReadOnly->value);
@@ -132,11 +132,11 @@ class AdminBodyController extends AbstractRevisionController
                     ),
                 ...($register
                     ? [
-                        'foundation' => $organ->getFoundation(),
+                        'foundation' => $organ->foundation,
                         // A foundation is referenced by discharges and abrogations as well; only installations say
                         // who is in it.
                         'installations' => array_filter(
-                            $organ->getFoundation()->getReferences()->toArray(),
+                            $organ->foundation->getReferences()->toArray(),
                             static fn (FoundationReference $reference): bool => $reference instanceof Installation,
                         ),
                     ]
@@ -227,8 +227,8 @@ class AdminBodyController extends AbstractRevisionController
                     'revision' => $draft,
                     // The picker holds the frame to a minimum width of the original, which it cannot read off the
                     // rendition it draws on.
-                    'bannerSourceWidth' => $this->imageUploadService->sourceWidth($draft->getBannerSource()),
-                    'logoSourceWidth' => $this->imageUploadService->sourceWidth($draft->getLogoSource()),
+                    'bannerSourceWidth' => $this->imageUploadService->sourceWidth($draft->bannerSource),
+                    'logoSourceWidth' => $this->imageUploadService->sourceWidth($draft->logoSource),
                 ],
             );
         }
@@ -293,7 +293,7 @@ class AdminBodyController extends AbstractRevisionController
         #[CurrentUser]
         User $user,
     ): JsonResponse {
-        $page = $organ->getOrganInformation();
+        $page = $organ->organInformation;
         if (null === $page) {
             throw $this->createNotFoundException();
         }
@@ -319,7 +319,7 @@ class AdminBodyController extends AbstractRevisionController
         #[CurrentUser]
         User $user,
     ): JsonResponse {
-        $page = $organ->getOrganInformation();
+        $page = $organ->organInformation;
         if (null === $page) {
             throw $this->createNotFoundException();
         }
@@ -417,7 +417,7 @@ class AdminBodyController extends AbstractRevisionController
         Organ $organ,
         User $user,
     ): OrganInformation {
-        $page = $organ->getOrganInformation();
+        $page = $organ->organInformation;
 
         if (null !== $page) {
             $this->denyAccessUnlessGranted(
@@ -461,7 +461,7 @@ class AdminBodyController extends AbstractRevisionController
         }
 
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
-            if ($installation->getOrgan()->getId() === $organ->getId()) {
+            if ($installation->organ->getId() === $organ->getId()) {
                 return true;
             }
         }

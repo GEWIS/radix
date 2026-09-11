@@ -224,7 +224,7 @@ final readonly class MemberProvider implements ProviderInterface
         if (
             null === $member
             || (
-                $member->getDeleted()
+                $member->deleted
                 && !$this->allowsDeletedMembers()
             )
         ) {
@@ -267,24 +267,24 @@ final readonly class MemberProvider implements ProviderInterface
         array $groups,
     ): MemberResource {
         return new MemberResource(
-            lidnr: $member->getLidnr(),
+            lidnr: $member->lidnr,
             fullName: $member->getFullName(),
-            familyName: $member->getLastName(),
-            middleName: $member->getMiddleName(),
-            initials: $member->getInitials(),
-            givenName: $member->getFirstName(),
-            generation: $member->getGeneration(),
-            hidden: $member->getHidden(),
-            deleted: $member->getDeleted(),
-            expiration: $member->getExpiration()->format(DateTimeInterface::ATOM),
+            familyName: $member->lastName,
+            middleName: $member->middleName,
+            initials: $member->initials,
+            givenName: $member->firstName,
+            generation: $member->generation,
+            hidden: $member->hidden,
+            deleted: $member->deleted,
+            expiration: $member->expiration->format(DateTimeInterface::ATOM),
             organs: $this->groups->has(
                 $groups,
                 MemberResource::GROUP_ORGANS,
             )
                 ? $this->organs($member)
                 : [],
-            email: $member->getEmail(),
-            birthdate: $member->getBirth()->format(DateTimeInterface::ATOM),
+            email: $member->email,
+            birthdate: $member->birth->format(DateTimeInterface::ATOM),
             is16Plus: $member->hasReached16(),
             is18Plus: $member->hasReached18(),
             is21Plus: $member->hasReached21(),
@@ -294,7 +294,7 @@ final readonly class MemberProvider implements ProviderInterface
             )
                 ? $member->isKeyholder()
                 : null,
-            membershipType: $member->getType()->value,
+            membershipType: $member->type->value,
         );
     }
 

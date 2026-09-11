@@ -43,14 +43,14 @@ class MeetingReferenceSelection
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public Meeting $meeting;
 
     #[ManyToOne(targetEntity: ReferenceDocument::class)]
     #[JoinColumn(
         name: 'referenceDocument_id',
         nullable: false,
     )]
-    private ReferenceDocument $referenceDocument;
+    public ReferenceDocument $referenceDocument;
 
     /**
      * The version members see for this meeting.
@@ -60,35 +60,5 @@ class MeetingReferenceSelection
         name: 'pinnedVersion_id',
         nullable: false,
     )]
-    private ReferenceDocumentVersion $pinnedVersion;
-
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
-    public function setMeeting(Meeting $meeting): void
-    {
-        $this->meeting = $meeting;
-    }
-
-    public function getReferenceDocument(): ReferenceDocument
-    {
-        return $this->referenceDocument;
-    }
-
-    public function setReferenceDocument(ReferenceDocument $referenceDocument): void
-    {
-        $this->referenceDocument = $referenceDocument;
-    }
-
-    public function getPinnedVersion(): ReferenceDocumentVersion
-    {
-        return $this->pinnedVersion;
-    }
-
-    public function setPinnedVersion(ReferenceDocumentVersion $pinnedVersion): void
-    {
-        $this->pinnedVersion = $pinnedVersion;
-    }
+    public ReferenceDocumentVersion $pinnedVersion;
 }

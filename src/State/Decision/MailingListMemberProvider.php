@@ -50,7 +50,7 @@ final readonly class MailingListMemberProvider implements ProviderInterface
         }
 
         // The collation is case-insensitive; the identifier is not. See MailingListProvider::one().
-        if ($this->mailingListRepository->find($name)?->getName() !== $name) {
+        if ($this->mailingListRepository->find($name)?->name !== $name) {
             return null;
         }
 
@@ -91,12 +91,12 @@ final readonly class MailingListMemberProvider implements ProviderInterface
         $resources = [];
 
         foreach ($subscriptions as $subscription) {
-            $member = $subscription->getMember();
+            $member = $subscription->member;
 
             $resources[] = new MailingListMemberResource(
-                lidnr: $member->getLidnr(),
+                lidnr: $member->lidnr,
                 fullName: $member->getFullName(),
-                email: $subscription->getEmail(),
+                email: $subscription->email,
             );
         }
 

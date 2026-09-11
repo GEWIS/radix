@@ -46,14 +46,14 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                 [
                     $this->localisedField(
                         t('Short description'),
-                        $previous?->getShortDescription(),
-                        $revision->getShortDescription(),
+                        $previous?->shortDescription,
+                        $revision->shortDescription,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Description'),
-                        $previous?->getDescription(),
-                        $revision->getDescription(),
+                        $previous?->description,
+                        $revision->description,
                         $comparable,
                         RevisionFieldKind::LongText,
                     ),
@@ -66,16 +66,16 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Email address'),
                         RevisionFieldKind::Text,
-                        $previous?->getEmail(),
-                        $revision->getEmail(),
+                        $previous?->email,
+                        $revision->email,
                         $comparable,
                         ['width' => 'half'],
                     ),
                     $this->field(
                         t('Website'),
                         RevisionFieldKind::Text,
-                        $previous?->getWebsite(),
-                        $revision->getWebsite(),
+                        $previous?->website,
+                        $revision->website,
                         $comparable,
                         ['width' => 'half'],
                     ),
@@ -97,8 +97,8 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Logo'),
                         RevisionFieldKind::Image,
-                        $previous?->getLogoPath(),
-                        $revision->getLogoPath(),
+                        $previous?->logoPath,
+                        $revision->logoPath,
                         $comparable,
                         [
                             'variant' => 'w320',
@@ -109,8 +109,8 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Page banner'),
                         RevisionFieldKind::Image,
-                        $previous?->getBannerPath(),
-                        $revision->getBannerPath(),
+                        $previous?->bannerPath,
+                        $revision->bannerPath,
                         $comparable,
                         [
                             'variant' => 'w640',

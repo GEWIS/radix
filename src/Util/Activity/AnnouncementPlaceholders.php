@@ -244,8 +244,8 @@ final class AnnouncementPlaceholders
             AnnouncementPlaceholder::SignupListName => $signupList?->name->getText($language) ?? '',
             // An activity without a body of its own is the board's, which is what the option calendar's own email
             // states for a proposal without one. There is nothing to abbreviate, so both use the same text.
-            AnnouncementPlaceholder::OrganName => $activity->getOrgan()?->getName() ?? 'the board',
-            AnnouncementPlaceholder::OrganAbbr => $activity->getOrgan()?->getAbbr() ?? 'the board',
+            AnnouncementPlaceholder::OrganName => $activity->getOrgan()->name ?? 'the board',
+            AnnouncementPlaceholder::OrganAbbr => $activity->getOrgan()->abbr ?? 'the board',
             AnnouncementPlaceholder::CompanyName => $activity->getCompany()->name ?? '',
             AnnouncementPlaceholder::Location => $activity->getLocation()->getText($language) ?? '',
             AnnouncementPlaceholder::Costs => $activity->getCosts()->getText($language) ?? '',

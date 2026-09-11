@@ -61,7 +61,7 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
         $agenda = $view->points[0]->documents[0];
         self::assertSame(
             'Agenda',
-            $agenda->getName(),
+            $agenda->name,
         );
         self::assertCount(
             2,
@@ -69,11 +69,11 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
         );
         self::assertSame(
             'v1.1',
-            $agenda->getLatestVersion()?->getVersionLabel(),
+            $agenda->getLatestVersion()?->versionLabel,
         );
 
         $meetingLevelNames = array_map(
-            static fn (MeetingDocument $document) => $document->getName(),
+            static fn (MeetingDocument $document) => $document->name,
             $view->meetingLevelDocuments,
         );
         self::assertSame(
@@ -88,12 +88,12 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
         $reference = $view->references[0];
         self::assertSame(
             'v3.0',
-            $reference->getPinnedVersion()->getVersionLabel(),
+            $reference->pinnedVersion->versionLabel,
         );
 
         self::assertSame(
             'v1.1',
-            $view->minutes?->getLatestVersion()?->getVersionLabel(),
+            $view->minutes?->getLatestVersion()?->versionLabel,
         );
 
         // Four documents plus one reference selection.
@@ -115,7 +115,7 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
         $reference = $view->references[0];
         self::assertSame(
             'v3.1',
-            $reference->getPinnedVersion()->getVersionLabel(),
+            $reference->pinnedVersion->versionLabel,
         );
     }
 
@@ -165,7 +165,7 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
         );
         self::assertSame(
             'Auditorium 4',
-            $view->localDetails?->getLocation(),
+            $view->localDetails?->location,
         );
 
         $nearby = array_map(
@@ -228,6 +228,6 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
             $minutes,
         );
 
-        return $minutes[0]->getMeeting()->getNumber();
+        return $minutes[0]->meeting->number;
     }
 }

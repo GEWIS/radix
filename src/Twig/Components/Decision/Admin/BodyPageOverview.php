@@ -104,7 +104,7 @@ final class BodyPageOverview extends AbstractPaginatedOverview
 
         $organs = [];
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
-            $organs[$installation->getOrgan()->getAbbr()] = $installation->getOrgan();
+            $organs[$installation->organ->abbr] = $installation->organ;
         }
 
         ksort($organs);

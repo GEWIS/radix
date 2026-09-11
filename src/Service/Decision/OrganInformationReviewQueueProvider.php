@@ -47,7 +47,7 @@ final readonly class OrganInformationReviewQueueProvider implements ReviewQueueP
                 static function (RevisionInterface $revision): string {
                     assert($revision instanceof OrganInformationRevision);
 
-                    return $revision->getOrgan()->getAbbr();
+                    return $revision->getOrgan()->abbr;
                 },
                 'admin/bodies/approvals/review',
             ),

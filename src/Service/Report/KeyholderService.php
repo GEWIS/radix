@@ -25,12 +25,12 @@ class KeyholderService
 
         if (null === $keyholder) {
             $keyholder = new Keyholder();
-            $keyholder->setGrantingDec($granting);
-            $granting->setKeyholder($keyholder);
+            $keyholder->grantingDec = $granting;
+            $granting->keyholder = $keyholder;
         }
 
-        $keyholder->setMember($granting->getMember());
-        $keyholder->setExpirationDate($granting->getUntil());
+        $keyholder->member = $granting->getMember();
+        $keyholder->expirationDate = $granting->until;
 
         $this->emReport->persist($keyholder);
 
@@ -39,7 +39,7 @@ class KeyholderService
 
     public function generateWithdrawal(ReportKeyWithdrawal $withdrawal): void
     {
-        $keyholder = $this->findKeyholder($withdrawal->getGranting());
+        $keyholder = $this->findKeyholder($withdrawal->granting);
 
         if (null === $keyholder) {
             // The granting this withdrawal takes back never took effect, so there is no key to withdraw. That is
@@ -47,7 +47,7 @@ class KeyholderService
             return;
         }
 
-        $keyholder->setWithdrawnDate($withdrawal->getWithdrawnOn());
+        $keyholder->withdrawnDate = $withdrawal->withdrawnOn;
 
         $this->emReport->persist($keyholder);
     }
@@ -67,7 +67,7 @@ class KeyholderService
         );
 
         if ($rp->isInitialized($granting)) {
-            return $granting->getKeyholder();
+            return $granting->keyholder;
         }
 
         return $this->emReport->getRepository(Keyholder::class)

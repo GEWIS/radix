@@ -22,21 +22,5 @@ class Candidacy extends SubDecision
      * The first calendar year of the association year the candidates stand for.
      */
     #[Column(type: Types::INTEGER)]
-    private int $boardYear;
-
-    /**
-     * Get the first calendar year of the association year.
-     */
-    public function getBoardYear(): int
-    {
-        return $this->boardYear;
-    }
-
-    /**
-     * Set the first calendar year of the association year.
-     */
-    public function setBoardYear(int $boardYear): void
-    {
-        $this->boardYear = $boardYear;
-    }
+    public int $boardYear;
 }

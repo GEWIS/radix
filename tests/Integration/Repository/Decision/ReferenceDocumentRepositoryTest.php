@@ -33,7 +33,7 @@ final class ReferenceDocumentRepositoryTest extends DatabaseTestCase
                 'Scenarios and Procedures',
             ],
             array_map(
-                static fn (array $row) => $row[0]->getName(),
+                static fn (array $row) => $row[0]->name,
                 $rows,
             ),
         );

@@ -61,7 +61,7 @@ final readonly class PhotoPrivacyService
             ];
         }
 
-        $level = $this->settingsRepository->find($member->getLidnr())->photoVisibility
+        $level = $this->settingsRepository->find($member->lidnr)->photoVisibility
             ?? PhotoVisibility::HideSelected;
 
         // Others never learn which photos are hidden, so the hidden ids are dropped from the result. HideSelected with
@@ -115,7 +115,7 @@ final readonly class PhotoPrivacyService
             $photos,
         );
         $tagged = $this->memberTagRepository->findTaggedPhotoIds(
-            $member->getLidnr(),
+            $member->lidnr,
             $photoIds,
         );
         $alreadyHidden = $this->hiddenPhotoRepository->getHiddenPhotoIds($member);
@@ -164,7 +164,7 @@ final readonly class PhotoPrivacyService
 
     private function clearProfilePhotoIfHidden(Member $member): void
     {
-        $profilePhoto = $this->profilePhotoRepository->getProfilePhotoByLidnr($member->getLidnr());
+        $profilePhoto = $this->profilePhotoRepository->getProfilePhotoByLidnr($member->lidnr);
         if (null === $profilePhoto) {
             return;
         }
@@ -186,6 +186,6 @@ final readonly class PhotoPrivacyService
         $viewer = $this->security->getUser();
 
         return $viewer instanceof User
-            && $viewer->member->getLidnr() === $member->getLidnr();
+            && $viewer->member->lidnr === $member->lidnr;
     }
 }

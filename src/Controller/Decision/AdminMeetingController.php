@@ -139,7 +139,7 @@ class AdminMeetingController extends AbstractController
                 $item[1],
                 $item[2] > 0,
                 MeetingStatus::derive(
-                    $item[0]->getDate(),
+                    $item[0]->date,
                     $item[1] > 0,
                     $item[2] > 0,
                 ),
@@ -182,7 +182,7 @@ class AdminMeetingController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $number ??= $meetings[0]->getNumber();
+        $number ??= $meetings[0]->number;
 
         return $this->render(
             'decision/admin/meetings/authorizations.html.twig',
@@ -269,7 +269,7 @@ class AdminMeetingController extends AbstractController
         if ($pointId > 0) {
             $point = $this->meetingPointRepository->find($pointId);
 
-            if ($point?->getMeeting() !== $meeting) {
+            if ($point?->meeting !== $meeting) {
                 return $this->uploadError(
                     $this->translator->trans('The agenda point does not belong to this meeting.'),
                 );

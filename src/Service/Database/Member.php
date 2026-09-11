@@ -1464,6 +1464,6 @@ class Member
             return null;
         }
 
-        return $this->memberRepository->find($user->member->getLidnr());
+        return $this->memberRepository->find($user->member->lidnr);
     }
 }

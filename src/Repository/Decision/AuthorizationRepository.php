@@ -64,7 +64,7 @@ class AuthorizationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'authorizer',
-                $authorizer->getLidnr(),
+                $authorizer->lidnr,
             );
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -89,7 +89,7 @@ class AuthorizationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'recipient',
-                $recipient->getLidnr(),
+                $recipient->lidnr,
             );
 
         return $qb->getQuery()->getResult();
@@ -110,13 +110,13 @@ class AuthorizationRepository extends ServiceEntityRepository
             $qb->where('a.authorizer = :authorizer')
                 ->setParameter(
                     'authorizer',
-                    $member->getLidnr(),
+                    $member->lidnr,
                 );
         } else {
             $qb->where('a.recipient = :recipient')
                 ->setParameter(
                     'recipient',
-                    $member->getLidnr(),
+                    $member->lidnr,
                 );
         }
 

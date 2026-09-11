@@ -53,20 +53,20 @@ class MeetingActivityLogFixture extends Fixture implements DependentFixtureInter
 
         foreach ($entries as [$verb, $subject, $moment]) {
             $entry = new MeetingActivityLog();
-            $entry->setActor($actor);
-            $entry->setMeeting($meeting);
-            $entry->setVerb($verb);
-            $entry->setSubject($subject);
-            $entry->setCreatedAt(new DateTime($moment));
+            $entry->actor = $actor;
+            $entry->meeting = $meeting;
+            $entry->verb = $verb;
+            $entry->subject = $subject;
+            $entry->createdAt = new DateTime($moment);
 
             $manager->persist($entry);
         }
 
         $libraryEntry = new MeetingActivityLog();
-        $libraryEntry->setActor($actor);
-        $libraryEntry->setVerb(MeetingActivityVerbs::ReferenceDocumentCreated);
-        $libraryEntry->setSubject('Scenarios and Procedures');
-        $libraryEntry->setCreatedAt(new DateTime('-4 weeks'));
+        $libraryEntry->actor = $actor;
+        $libraryEntry->verb = MeetingActivityVerbs::ReferenceDocumentCreated;
+        $libraryEntry->subject = 'Scenarios and Procedures';
+        $libraryEntry->createdAt = new DateTime('-4 weeks');
 
         $manager->persist($libraryEntry);
         $manager->flush();

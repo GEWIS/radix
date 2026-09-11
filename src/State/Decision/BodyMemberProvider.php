@@ -101,14 +101,14 @@ final readonly class BodyMemberProvider implements ProviderInterface
         $resources = [];
 
         foreach ($installations as $installation) {
-            $member = $installation->getMember();
+            $member = $installation->member;
 
             $resources[] = new BodyMemberResource(
-                lidnr: $member->getLidnr(),
+                lidnr: $member->lidnr,
                 fullName: $member->getFullName(),
-                function: $installation->getFunction()->value,
-                installDate: $installation->getInstallDate()->format(DateTimeInterface::ATOM),
-                dischargeDate: $installation->getDischargeDate()?->format(DateTimeInterface::ATOM),
+                function: $installation->function->value,
+                installDate: $installation->installDate->format(DateTimeInterface::ATOM),
+                dischargeDate: $installation->dischargeDate?->format(DateTimeInterface::ATOM),
                 current: $installation->isCurrent(),
             );
         }

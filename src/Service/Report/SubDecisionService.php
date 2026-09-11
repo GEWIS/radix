@@ -114,14 +114,22 @@ class SubDecisionService
 
             case $subDecision instanceof BoardRelease:
                 if ($this->stillReferences($subDecision)) {
-                    $this->findBoardMember($subDecision->getInstallation())?->setReleaseDate(null);
+                    $released = $this->findBoardMember($subDecision->installation);
+
+                    if (null !== $released) {
+                        $released->releaseDate = null;
+                    }
                 }
 
                 break;
 
             case $subDecision instanceof BoardDischarge:
                 if ($this->stillReferences($subDecision)) {
-                    $this->findBoardMember($subDecision->getInstallation())?->setDischargeDate(null);
+                    $discharged = $this->findBoardMember($subDecision->installation);
+
+                    if (null !== $discharged) {
+                        $discharged->dischargeDate = null;
+                    }
                 }
 
                 break;
@@ -139,7 +147,11 @@ class SubDecisionService
 
             case $subDecision instanceof KeyWithdrawal:
                 if ($this->stillReferences($subDecision)) {
-                    $this->findKeyholder($subDecision->getGranting())?->setWithdrawnDate(null);
+                    $withdrawn = $this->findKeyholder($subDecision->granting);
+
+                    if (null !== $withdrawn) {
+                        $withdrawn->withdrawnDate = null;
+                    }
                 }
 
                 break;
@@ -162,11 +174,11 @@ class SubDecisionService
                 if (null !== $organ) {
                     // Abolishing the organ discharged whoever was still in it, so those discharges go as well.
                     foreach ($organ->getMembers() as $organMember) {
-                        $discharge = $organMember->getInstallation()->getDischarge();
-                        $organMember->setDischargeDate($discharge?->getDecision()->getMeeting()->getDate());
+                        $discharge = $organMember->installation->discharge;
+                        $organMember->dischargeDate = $discharge?->decision->meeting->date;
                     }
 
-                    $organ->setAbrogationDate(null);
+                    $organ->abrogationDate = null;
                 }
 
                 break;
@@ -189,18 +201,23 @@ class SubDecisionService
                     break;
                 }
 
-                $installation = $subDecision->getInstallation();
+                $installation = $subDecision->installation;
                 $organ = $this->findFoundedOrgan($installation);
                 $organ?->removeSubdecision($subDecision);
 
                 // An abolished organ discharges whoever is left in it, so that date must survive the revert.
-                $this->findOrganMember($installation)?->setDischargeDate($organ?->getAbrogationDate());
+                $organMember = $this->findOrganMember($installation);
+
+                if (null !== $organMember) {
+                    $organMember->dischargeDate = $organ?->abrogationDate;
+                }
+
                 break;
 
             case $subDecision instanceof Reappointment:
                 // Reappointments do not produce related entities, they only extend an installation.
                 if ($this->stillReferences($subDecision)) {
-                    $subDecision->getInstallation()->removeReappointment($subDecision);
+                    $subDecision->installation->removeReappointment($subDecision);
                 }
 
                 break;
@@ -301,7 +318,7 @@ class SubDecisionService
             )
             ->setParameter(
                 'sequence',
-                $subDecision->getSequence(),
+                $subDecision->sequence,
             )
             ->getQuery()
             ->getResult();
@@ -321,7 +338,7 @@ class SubDecisionService
             return null;
         }
 
-        return $this->findOrgan($subDecision->getFoundation());
+        return $this->findOrgan($subDecision->foundation);
     }
 
     private function findOrgan(Foundation $foundation): ?Organ

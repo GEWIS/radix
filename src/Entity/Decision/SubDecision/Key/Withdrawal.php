@@ -45,43 +45,11 @@ class Withdrawal extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Granting $granting;
+    public Granting $granting;
 
     /**
      * When the granted keycode is prematurely revoked.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $withdrawnOn;
-
-    /**
-     * Get the granting of the keycode.
-     */
-    public function getGranting(): Granting
-    {
-        return $this->granting;
-    }
-
-    /**
-     * Set the granting of the keycode.
-     */
-    public function setGranting(Granting $granting): void
-    {
-        $this->granting = $granting;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getWithdrawnOn(): DateTime
-    {
-        return $this->withdrawnOn;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setWithdrawnOn(DateTime $withdrawnOn): void
-    {
-        $this->withdrawnOn = $withdrawnOn;
-    }
+    public DateTime $withdrawnOn;
 }

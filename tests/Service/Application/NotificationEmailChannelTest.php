@@ -67,9 +67,9 @@ final class NotificationEmailChannelTest extends TestCase
     private function subscriber(string $email): User
     {
         $member = self::createStub(Member::class);
-        $member->method('getEmail')->willReturn($email);
-        $member->method('getDeleted')->willReturn(false);
-        $member->method('getHidden')->willReturn(false);
+        $member->email = $email;
+        $member->deleted = false;
+        $member->hidden = false;
         $member->method('isExpired')->willReturn(false);
 
         $user = self::createStub(User::class);

@@ -51,7 +51,7 @@ class OrganMember
         targetEntity: Organ::class,
         inversedBy: 'members',
     )]
-    private Organ $organ;
+    public Organ $organ;
 
     /**
      * Member. Deliberately without an `onDelete`: this is who an installation decision put in the body, so the
@@ -65,7 +65,7 @@ class OrganMember
         name: 'lidnr',
         referencedColumnName: 'lidnr',
     )]
-    private Member $member;
+    public Member $member;
 
     /**
      * Function given.
@@ -74,13 +74,13 @@ class OrganMember
         type: Types::STRING,
         enumType: InstallationFunctions::class,
     )]
-    private InstallationFunctions $function;
+    public InstallationFunctions $function;
 
     /**
      * Installation date.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $installDate;
+    public DateTime $installDate;
 
     /**
      * Installation.
@@ -109,7 +109,7 @@ class OrganMember
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Installation $installation;
+    public Installation $installation;
 
     /**
      * Discharge date.
@@ -118,103 +118,7 @@ class OrganMember
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $dischargeDate = null;
-
-    /**
-     * Set the organ.
-     */
-    public function setOrgan(Organ $organ): void
-    {
-        $this->organ = $organ;
-    }
-
-    /**
-     * Get the organ.
-     */
-    public function getOrgan(): Organ
-    {
-        return $this->organ;
-    }
-
-    /**
-     * Set the member.
-     */
-    public function setMember(Member $member): void
-    {
-        $this->member = $member;
-    }
-
-    /**
-     * Get the member.
-     */
-    public function getMember(): Member
-    {
-        return $this->member;
-    }
-
-    /**
-     * Set the function.
-     */
-    public function setFunction(InstallationFunctions $function): void
-    {
-        $this->function = $function;
-    }
-
-    /**
-     * Get the function.
-     */
-    public function getFunction(): InstallationFunctions
-    {
-        return $this->function;
-    }
-
-    /**
-     * Set the installation date.
-     */
-    public function setInstallDate(DateTime $installDate): void
-    {
-        $this->installDate = $installDate;
-    }
-
-    /**
-     * Get the installation date.
-     */
-    public function getInstallDate(): DateTime
-    {
-        return $this->installDate;
-    }
-
-    /**
-     * Set the installation.
-     */
-    public function setInstallation(Installation $installation): void
-    {
-        $this->installation = $installation;
-    }
-
-    /**
-     * Get the installation.
-     */
-    public function getInstallation(): Installation
-    {
-        return $this->installation;
-    }
-
-    /**
-     * Set the discharge date.
-     */
-    public function setDischargeDate(?DateTime $dischargeDate): void
-    {
-        $this->dischargeDate = $dischargeDate;
-    }
-
-    /**
-     * Get the discharge date.
-     */
-    public function getDischargeDate(): ?DateTime
-    {
-        return $this->dischargeDate;
-    }
+    public ?DateTime $dischargeDate = null;
 
     /**
      * Get whether the organ membership has ended or was annulled
@@ -223,10 +127,10 @@ class OrganMember
     {
         $now = new DateTime();
 
-        return $this->getInstallDate() <= $now
+        return $this->installDate <= $now
             && (
-                null === $this->getDischargeDate()
-                || $this->getDischargeDate() >= $now
+                null === $this->dischargeDate
+                || $this->dischargeDate >= $now
             );
     }
 
@@ -248,12 +152,12 @@ class OrganMember
     {
         return [
             'organ' => [
-                'id' => $this->getOrgan()->getId(),
-                'abbreviation' => $this->getOrgan()->getAbbr(),
+                'id' => $this->organ->getId(),
+                'abbreviation' => $this->organ->abbr,
             ],
-            'function' => $this->getFunction()->value,
-            'installDate' => $this->getInstallDate()->format(DateTimeInterface::ATOM),
-            'dischargeDate' => $this->getDischargeDate()?->format(DateTimeInterface::ATOM),
+            'function' => $this->function->value,
+            'installDate' => $this->installDate->format(DateTimeInterface::ATOM),
+            'dischargeDate' => $this->dischargeDate?->format(DateTimeInterface::ATOM),
             'current' => $this->isCurrent(),
         ];
     }

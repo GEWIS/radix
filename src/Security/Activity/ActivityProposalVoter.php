@@ -109,7 +109,7 @@ final class ActivityProposalVoter extends Voter
 
         $member = $user->member;
 
-        if ($proposal->getCreatedBy()?->getLidnr() === $member->getLidnr()) {
+        if ($proposal->getCreatedBy()?->lidnr === $member->lidnr) {
             return true;
         }
 
@@ -128,7 +128,7 @@ final class ActivityProposalVoter extends Voter
         }
 
         foreach ($member->getCurrentOrganInstallations() as $installation) {
-            if ($installation->getOrgan()->getId() === $organ->getId()) {
+            if ($installation->organ->getId() === $organ->getId()) {
                 return true;
             }
         }

@@ -311,7 +311,7 @@ final readonly class CalendarMonthBuilder
                 ? CalendarEntryKind::ReservedDay
                 : CalendarEntryKind::RequestedDay,
             $proposal->name,
-            $proposal->organ?->getAbbr() ?? '',
+            $proposal->organ->abbr ?? '',
             $option->timeOfDay->value,
             $proposal->getId(),
             $rank,
@@ -328,7 +328,7 @@ final readonly class CalendarMonthBuilder
         return new CalendarEntry(
             CalendarEntryKind::FixedActivity,
             $activity->getName()->getText(Languages::current()) ?? '',
-            $activity->getOrgan()?->getAbbr() ?? '',
+            $activity->getOrgan()->abbr ?? '',
             null,
             null,
             null,

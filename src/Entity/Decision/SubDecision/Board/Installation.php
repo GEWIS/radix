@@ -35,13 +35,13 @@ class Installation extends SubDecision
         type: Types::STRING,
         enumType: BoardFunctions::class,
     )]
-    private BoardFunctions $function;
+    public BoardFunctions $function;
 
     /**
      * The date at which the installation is in effect.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * Discharge.
@@ -50,7 +50,7 @@ class Installation extends SubDecision
         targetEntity: Discharge::class,
         mappedBy: 'installation',
     )]
-    private ?Discharge $discharge = null;
+    public private(set) ?Discharge $discharge = null;
 
     /**
      * Release.
@@ -59,7 +59,7 @@ class Installation extends SubDecision
         targetEntity: Release::class,
         mappedBy: 'installation',
     )]
-    private ?Release $release = null;
+    public private(set) ?Release $release = null;
 
     /**
      * Board member reference.
@@ -68,23 +68,7 @@ class Installation extends SubDecision
         targetEntity: BoardMember::class,
         mappedBy: 'installationDec',
     )]
-    private BoardMember $boardMember;
-
-    /**
-     * Get the function.
-     */
-    public function getFunction(): BoardFunctions
-    {
-        return $this->function;
-    }
-
-    /**
-     * Set the function.
-     */
-    public function setFunction(BoardFunctions $function): void
-    {
-        $this->function = $function;
-    }
+    final public BoardMember $boardMember;
 
     /**
      * Get the member.
@@ -98,30 +82,6 @@ class Installation extends SubDecision
     }
 
     /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * Get the discharge.
-     */
-    public function getDischarge(): ?Discharge
-    {
-        return $this->discharge;
-    }
-
-    /**
      * Clears the discharge, if it exists.
      */
     public function clearDischarge(): void
@@ -130,38 +90,11 @@ class Installation extends SubDecision
     }
 
     /**
-     * Get the release.
-     */
-    public function getRelease(): ?Release
-    {
-        return $this->release;
-    }
-
-    /**
      * Clears the release, if it exists.
      */
     public function clearRelease(): void
     {
         $this->release = null;
-    }
-
-    /**
-     * Get the board member decision.
-     */
-    public function getBoardMember(): BoardMember
-    {
-        return $this->boardMember;
-    }
-
-    /**
-     * Set the board member decision.
-     *
-     * Kept in step with the owning side, so that a board member only just derived from this installation can be found
-     * right away, without having to go through the database for it.
-     */
-    public function setBoardMember(BoardMember $boardMember): void
-    {
-        $this->boardMember = $boardMember;
     }
 
     /**

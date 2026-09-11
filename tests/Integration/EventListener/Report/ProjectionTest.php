@@ -59,11 +59,11 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($projected);
         self::assertSame(
             $member->getLastName(),
-            $projected->getLastName(),
+            $projected->lastName,
         );
         self::assertSame(
             $member->getEmail(),
-            $projected->getEmail(),
+            $projected->email,
         );
     }
 
@@ -82,7 +82,7 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($projected);
         self::assertSame(
             Studies::MCSE,
-            $projected->getStudy(),
+            $projected->study,
         );
     }
 
@@ -98,7 +98,7 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($projected);
         self::assertEquals(
             $meeting->getDate(),
-            $projected->getDate(),
+            $projected->date,
         );
     }
 
@@ -119,9 +119,9 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($organ);
         self::assertSame(
             'Testtaartcommissie',
-            $organ->getName(),
+            $organ->name,
         );
-        self::assertNull($organ->getAbrogationDate());
+        self::assertNull($organ->abrogationDate);
     }
 
     public function testAbrogatingAnOrganDatesItRatherThanRemovingIt(): void
@@ -141,7 +141,7 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($organ);
         self::assertSame(
             '2027-08-20',
-            $organ->getAbrogationDate()?->format('Y-m-d'),
+            $organ->abrogationDate?->format('Y-m-d'),
         );
     }
 
@@ -168,13 +168,13 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($organMember);
         self::assertSame(
             $member->getLidnr(),
-            $organMember->getMember()->getLidnr(),
+            $organMember->member->lidnr,
         );
         self::assertSame(
             InstallationFunctions::Member,
-            $organMember->getFunction(),
+            $organMember->function,
         );
-        self::assertNull($organMember->getDischargeDate());
+        self::assertNull($organMember->dischargeDate);
     }
 
     public function testDischargingSomeoneEndsTheOrganMembershipInPlace(): void
@@ -200,7 +200,7 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($organMember);
         self::assertSame(
             '2027-02-01',
-            $organMember->getDischargeDate()?->format('Y-m-d'),
+            $organMember->dischargeDate?->format('Y-m-d'),
         );
     }
 
@@ -234,11 +234,11 @@ class ProjectionTest extends KernelTestCase
         self::assertNotNull($projected);
         self::assertSame(
             'Er wordt een taart gekocht.',
-            $projected->getContentNL(),
+            $projected->contentNL,
         );
         self::assertSame(
             'If you are reading this, the secretary has not done their job.',
-            $projected->getContentEN(),
+            $projected->contentEN,
         );
 
         $other->setContentEN('A cake is bought.');
@@ -246,11 +246,11 @@ class ProjectionTest extends KernelTestCase
 
         self::assertSame(
             'A cake is bought.',
-            $projected->getContentEN(),
+            $projected->contentEN,
         );
         self::assertSame(
             'Er wordt een taart gekocht.',
-            $projected->getContentNL(),
+            $projected->contentNL,
         );
     }
 

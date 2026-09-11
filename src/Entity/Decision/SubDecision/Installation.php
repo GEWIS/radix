@@ -59,7 +59,7 @@ class Installation extends FoundationReference
         type: Types::STRING,
         enumType: InstallationFunctions::class,
     )]
-    private InstallationFunctions $function;
+    public InstallationFunctions $function;
 
     /**
      * Reappointment subdecisions if this installation was prolonged (can be done multiple times).
@@ -79,7 +79,7 @@ class Installation extends FoundationReference
         targetEntity: Discharge::class,
         mappedBy: 'installation',
     )]
-    private ?Discharge $discharge = null;
+    public private(set) ?Discharge $discharge = null;
 
     /**
      * The organmember reference.
@@ -88,27 +88,11 @@ class Installation extends FoundationReference
         targetEntity: OrganMember::class,
         mappedBy: 'installation',
     )]
-    private OrganMember $organMember;
+    final public OrganMember $organMember;
 
     public function __construct()
     {
         $this->reappointments = new ArrayCollection();
-    }
-
-    /**
-     * Get the function.
-     */
-    public function getFunction(): InstallationFunctions
-    {
-        return $this->function;
-    }
-
-    /**
-     * Set the function.
-     */
-    public function setFunction(InstallationFunctions $function): void
-    {
-        $this->function = $function;
     }
 
     /**
@@ -153,38 +137,11 @@ class Installation extends FoundationReference
     }
 
     /**
-     * Get the discharge, if it exists.
-     */
-    public function getDischarge(): ?Discharge
-    {
-        return $this->discharge;
-    }
-
-    /**
      * Clears the discharge, if it exists.
      */
     public function clearDischarge(): void
     {
         $this->discharge = null;
-    }
-
-    /**
-     * Get the organ member reference.
-     */
-    public function getOrganMember(): OrganMember
-    {
-        return $this->organMember;
-    }
-
-    /**
-     * Set the organ member reference.
-     *
-     * Kept in step with the owning side, so that a member only just derived from this installation can be found right
-     * away, without having to go through the database for it.
-     */
-    public function setOrganMember(OrganMember $organMember): void
-    {
-        $this->organMember = $organMember;
     }
 
     /**

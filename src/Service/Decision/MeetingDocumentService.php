@@ -47,9 +47,9 @@ final readonly class MeetingDocumentService
     ): MeetingPoint {
         $point = new MeetingPoint();
         $point->setMeeting($meeting);
-        $point->setNumber($number);
-        $point->setTitle($title);
-        $point->setDisplayPosition(count($meeting->getPoints()));
+        $point->number = $number;
+        $point->title = $title;
+        $point->displayPosition = count($meeting->getPoints());
 
         $this->entityManager->persist($point);
         $this->activityLogger->log(
@@ -74,18 +74,18 @@ final readonly class MeetingDocumentService
         User $actor,
     ): void {
         if (
-            $point->getNumber() === $number
-            && $point->getTitle() === $title
+            $point->number === $number
+            && $point->title === $title
         ) {
             return;
         }
 
-        $point->setNumber($number);
-        $point->setTitle($title);
+        $point->number = $number;
+        $point->title = $title;
 
         $this->activityLogger->log(
             $actor,
-            $point->getMeeting(),
+            $point->meeting,
             MeetingActivityVerbs::PointUpdated,
             sprintf(
                 '%s %s',
@@ -103,11 +103,11 @@ final readonly class MeetingDocumentService
         MeetingPoint $point,
         User $actor,
     ): void {
-        $meeting = $point->getMeeting();
+        $meeting = $point->meeting;
 
         $position = 0;
         foreach ($meeting->getDocuments() as $document) {
-            if (null !== $document->getPoint()) {
+            if (null !== $document->point) {
                 continue;
             }
 
@@ -115,8 +115,8 @@ final readonly class MeetingDocumentService
         }
 
         foreach ($point->getDocuments() as $document) {
-            $document->setPoint(null);
-            $document->setDisplayPosition($position);
+            $document->point = null;
+            $document->displayPosition = $position;
             $position++;
         }
 
@@ -127,8 +127,8 @@ final readonly class MeetingDocumentService
             MeetingActivityVerbs::PointDeleted,
             sprintf(
                 '%s %s',
-                $point->getNumber(),
-                $point->getTitle(),
+                $point->number,
+                $point->title,
             ),
         );
         $this->entityManager->flush();
@@ -151,7 +151,7 @@ final readonly class MeetingDocumentService
                 continue;
             }
 
-            $point->setDisplayPosition($position);
+            $point->displayPosition = $position;
         }
 
         $this->activityLogger->log(
@@ -173,13 +173,11 @@ final readonly class MeetingDocumentService
     ): MeetingDocument {
         $document = new MeetingDocument();
         $document->setMeeting($meeting);
-        $document->setPoint($point);
-        $document->setName($name);
-        $document->setDisplayPosition(
-            null === $point
-                ? $this->nextMeetingLevelPosition($meeting)
-                : count($point->getDocuments()),
-        );
+        $document->point = $point;
+        $document->name = $name;
+        $document->displayPosition = null === $point
+            ? $this->nextMeetingLevelPosition($meeting)
+            : count($point->getDocuments());
 
         $this->entityManager->persist($document);
         $this->entityManager->persist($this->createVersion(
@@ -220,11 +218,11 @@ final readonly class MeetingDocumentService
         $this->entityManager->persist($version);
         $this->activityLogger->log(
             $actor,
-            $document->getMeeting(),
+            $document->meeting,
             MeetingActivityVerbs::DocumentVersionUploaded,
             sprintf(
                 '%s (%s)',
-                $document->getName(),
+                $document->name,
                 $versionLabel,
             ),
         );
@@ -238,14 +236,14 @@ final readonly class MeetingDocumentService
         string $name,
         User $actor,
     ): void {
-        if ($document->getName() === $name) {
+        if ($document->name === $name) {
             return;
         }
 
-        $document->setName($name);
+        $document->name = $name;
         $this->activityLogger->log(
             $actor,
-            $document->getMeeting(),
+            $document->meeting,
             MeetingActivityVerbs::DocumentRenamed,
             $name,
         );
@@ -261,16 +259,16 @@ final readonly class MeetingDocumentService
     ): void {
         $paths = [];
         foreach ($document->getVersions() as $version) {
-            $paths[] = $version->getPath();
+            $paths[] = $version->path;
             $this->entityManager->remove($version);
         }
 
         $this->entityManager->remove($document);
         $this->activityLogger->log(
             $actor,
-            $document->getMeeting(),
+            $document->meeting,
             MeetingActivityVerbs::DocumentDeleted,
-            $document->getName(),
+            $document->name,
         );
         $this->entityManager->flush();
 
@@ -298,7 +296,7 @@ final readonly class MeetingDocumentService
         foreach ($documents as $document) {
             if (
                 null === $point
-                && null !== $document->getPoint()
+                && null !== $document->point
             ) {
                 continue;
             }
@@ -309,7 +307,7 @@ final readonly class MeetingDocumentService
                 continue;
             }
 
-            $document->setDisplayPosition($position);
+            $document->displayPosition = $position;
         }
 
         $this->activityLogger->log(
@@ -329,14 +327,14 @@ final readonly class MeetingDocumentService
     ): MeetingDocumentVersion {
         $version = new MeetingDocumentVersion();
         $version->setDocument($document);
-        $version->setVersionLabel($versionLabel);
-        $version->setPath($this->fileStorage->store(
+        $version->versionLabel = $versionLabel;
+        $version->path = $this->fileStorage->store(
             StorageNamespace::MeetingDocument,
             $file->getPathname(),
-            $document->getMeeting()->getStorageScope(),
-        )->path);
-        $version->setUploadedBy($actor);
-        $version->setUploadedAt(new DateTime());
+            $document->meeting->getStorageScope(),
+        )->path;
+        $version->uploadedBy = $actor;
+        $version->uploadedAt = new DateTime();
 
         return $version;
     }
@@ -345,11 +343,11 @@ final readonly class MeetingDocumentService
     {
         $positions = [];
         foreach ($meeting->getDocuments() as $document) {
-            if (null !== $document->getPoint()) {
+            if (null !== $document->point) {
                 continue;
             }
 
-            $positions[] = $document->getDisplayPosition();
+            $positions[] = $document->displayPosition;
         }
 
         if ([] === $positions) {

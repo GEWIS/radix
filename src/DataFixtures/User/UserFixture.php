@@ -22,7 +22,7 @@ class UserFixture extends Fixture implements DependentFixtureInterface, FixtureG
         // Every member the replay produced gets an account, rather than a fixed run of numbers: the population is
         // numbered in blocks with gaps between them, and a gap is not somebody to make an account for.
         foreach ($manager->getRepository(Member::class)->findAll() as $member) {
-            $lidnr = $member->getLidnr();
+            $lidnr = $member->lidnr;
 
             $user = new User();
             $user->lidnr = $lidnr;

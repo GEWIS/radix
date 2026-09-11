@@ -29,10 +29,10 @@ final readonly class MeetingActivityLogger
         string $subject,
     ): void {
         $entry = new MeetingActivityLog();
-        $entry->setActor($actor);
-        $entry->setMeeting($meeting);
-        $entry->setVerb($verb);
-        $entry->setSubject($subject);
+        $entry->actor = $actor;
+        $entry->meeting = $meeting;
+        $entry->verb = $verb;
+        $entry->subject = $subject;
 
         $this->entityManager->persist($entry);
     }

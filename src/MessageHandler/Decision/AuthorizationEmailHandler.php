@@ -42,21 +42,21 @@ class AuthorizationEmailHandler
 
         $context = $this->context($authorization);
 
-        $granteeEmail = $authorization->getRecipient()->getEmail();
+        $granteeEmail = $authorization->recipient->email;
         if (null !== $granteeEmail) {
             $this->mailer->send(
                 new TemplatedEmail()
                 ->to($granteeEmail)
                 ->subject(sprintf(
                     'GMM authorisation from %s',
-                    $authorization->getAuthorizer()->getFullName(),
+                    $authorization->authorizer->getFullName(),
                 ))
                 ->htmlTemplate('emails/decision/authorisation-grantee.html.twig')
                 ->context($context),
             );
         }
 
-        $grantorEmail = $authorization->getAuthorizer()->getEmail();
+        $grantorEmail = $authorization->authorizer->email;
         if (null === $grantorEmail) {
             return;
         }
@@ -66,7 +66,7 @@ class AuthorizationEmailHandler
             ->to($grantorEmail)
             ->subject(sprintf(
                 'GMM authorisation for %s',
-                $authorization->getRecipient()->getFullName(),
+                $authorization->recipient->getFullName(),
             ))
             ->htmlTemplate('emails/decision/authorisation-grantor.html.twig')
             ->context($context),
@@ -82,7 +82,7 @@ class AuthorizationEmailHandler
             return;
         }
 
-        $granteeEmail = $authorization->getRecipient()->getEmail();
+        $granteeEmail = $authorization->recipient->email;
         if (null === $granteeEmail) {
             return;
         }
@@ -92,7 +92,7 @@ class AuthorizationEmailHandler
             ->to($granteeEmail)
             ->subject(sprintf(
                 'GMM authorisation from %s revoked',
-                $authorization->getAuthorizer()->getFullName(),
+                $authorization->authorizer->getFullName(),
             ))
             ->htmlTemplate('emails/decision/authorisation-revoked.html.twig')
             ->context($this->context($authorization)),
@@ -106,7 +106,7 @@ class AuthorizationEmailHandler
     {
         $meeting = $this->meetingRepository->findMeeting(
             MeetingTypes::ALV,
-            $authorization->getMeetingNumber(),
+            $authorization->meetingNumber,
         );
 
         $formatter = new NumberFormatter(
@@ -116,13 +116,13 @@ class AuthorizationEmailHandler
 
         $meetingDate = '';
         if (null !== $meeting) {
-            $meetingDate = $meeting->getDate()->format('F j, Y');
+            $meetingDate = $meeting->date->format('F j, Y');
         }
 
         return [
-            'grantor' => $authorization->getAuthorizer(),
-            'grantee' => $authorization->getRecipient(),
-            'meetingNumber' => (string) $formatter->format($authorization->getMeetingNumber()),
+            'grantor' => $authorization->authorizer,
+            'grantee' => $authorization->recipient,
+            'meetingNumber' => (string) $formatter->format($authorization->meetingNumber),
             'meetingDate' => $meetingDate,
         ];
     }

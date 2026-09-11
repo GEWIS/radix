@@ -209,7 +209,7 @@ final readonly class AdmissionOrder
                 static function (Signup $signup) use ($committee): bool {
                     return $signup instanceof UserSignup
                         && array_key_exists(
-                            $signup->user->getLidnr(),
+                            $signup->user->lidnr,
                             $committee,
                         );
                 },

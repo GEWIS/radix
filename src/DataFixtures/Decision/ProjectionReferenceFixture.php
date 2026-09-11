@@ -67,7 +67,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
             $this->addReference(
                 sprintf(
                     'member-%d',
-                    $member->getLidnr(),
+                    $member->lidnr,
                 ),
                 $member,
             );
@@ -107,7 +107,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
             $abrogated = null;
 
             foreach ($repository->findBy(['abbr' => $abbreviation]) as $organ) {
-                if (null === $organ->getAbrogationDate()) {
+                if (null === $organ->abrogationDate) {
                     $standing = $organ;
                 } else {
                     $abrogated = $organ;
@@ -150,8 +150,8 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
             $this->addReference(
                 sprintf(
                     'meeting-%s-%d',
-                    $meeting->getType()->value,
-                    $meeting->getNumber(),
+                    $meeting->type->value,
+                    $meeting->number,
                 ),
                 $meeting,
             );
@@ -181,7 +181,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
             ] = $this->split(
                 array_filter(
                     $repository->findBy(['type' => $type]),
-                    static fn (Meeting $meeting): bool => $meeting->getNumber() >= $firstOfCalendar,
+                    static fn (Meeting $meeting): bool => $meeting->number >= $firstOfCalendar,
                 ),
                 $today,
             );
@@ -242,14 +242,14 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
     ): array {
         usort(
             $meetings,
-            static fn (Meeting $a, Meeting $b): int => $a->getDate() <=> $b->getDate(),
+            static fn (Meeting $a, Meeting $b): int => $a->date <=> $b->date,
         );
 
         $past = [];
         $upcoming = [];
 
         foreach ($meetings as $meeting) {
-            if ($meeting->getDate() < $today) {
+            if ($meeting->date < $today) {
                 $past[] = $meeting;
             } else {
                 $upcoming[] = $meeting;

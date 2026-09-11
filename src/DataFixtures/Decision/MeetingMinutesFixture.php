@@ -56,13 +56,13 @@ class MeetingMinutesFixture extends Fixture implements DependentFixtureInterface
         foreach (['v1.0', 'v1.1'] as $revision => $label) {
             $version = new MeetingMinutesVersion();
             $version->setMinutes($minutes);
-            $version->setVersionLabel($label);
-            $version->setPath($this->storePdf(
+            $version->versionLabel = $label;
+            $version->path = $this->storePdf(
                 'Minutes GMM ' . $label,
                 $meeting,
-            ));
-            $version->setUploadedBy($uploader);
-            $version->setUploadedAt(new DateTime('-' . (2 - $revision) . ' days'));
+            );
+            $version->uploadedBy = $uploader;
+            $version->uploadedAt = new DateTime('-' . (2 - $revision) . ' days');
 
             $manager->persist($version);
             $manager->flush();

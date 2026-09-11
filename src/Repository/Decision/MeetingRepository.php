@@ -257,11 +257,11 @@ class MeetingRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             ':type',
-            $meeting->getType(),
+            $meeting->type,
         );
         $qb->setParameter(
             ':number',
-            $meeting->getNumber(),
+            $meeting->number,
         );
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -476,11 +476,11 @@ class MeetingRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             ':type',
-            $meeting->getType(),
+            $meeting->type,
         );
         $qb->setParameter(
             ':number',
-            $meeting->getNumber(),
+            $meeting->number,
         );
 
         /** @var list<Meeting> $meetings */
@@ -560,11 +560,11 @@ class MeetingRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             ':type',
-            $meeting->getType()->value,
+            $meeting->type->value,
         );
         $qb->setParameter(
             ':number',
-            $meeting->getNumber(),
+            $meeting->number,
         );
 
         /** @var list<array{type: MeetingTypes, number: int, date: DateTime}> $rows */

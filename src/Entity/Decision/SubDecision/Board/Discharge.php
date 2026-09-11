@@ -48,21 +48,5 @@ class Discharge extends SubDecision
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Installation $installation;
-
-    /**
-     * Get installation.
-     */
-    public function getInstallation(): Installation
-    {
-        return $this->installation;
-    }
-
-    /**
-     * Set the installation.
-     */
-    public function setInstallation(Installation $installation): void
-    {
-        $this->installation = $installation;
-    }
+    public Installation $installation;
 }

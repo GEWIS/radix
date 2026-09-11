@@ -71,7 +71,7 @@ final class PollServiceTest extends DatabaseTestCase
         // Only whoever asked gets to ask again, so the workflow guards read that member behind the request.
         $creator = $rejected->getCreator();
         self::assertNotNull($creator);
-        $this->authenticate($creator->getLidnr());
+        $this->authenticate($creator->lidnr);
 
         $poll = $this->service()->requestPoll(
             $this->revision(

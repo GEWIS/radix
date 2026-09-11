@@ -60,11 +60,11 @@ final readonly class MeetingQueryService
         usort(
             $points,
             static fn (MeetingPoint $a, MeetingPoint $b): int => [
-                $a->getDisplayPosition(),
+                $a->displayPosition,
                 $a->getId(),
             ]
                 <=> [
-                    $b->getDisplayPosition(),
+                    $b->displayPosition,
                     $b->getId(),
                 ],
         );
@@ -77,7 +77,7 @@ final readonly class MeetingQueryService
         $documentCount = count($references);
         foreach ($this->meetingDocumentRepository->findForMeeting($meeting) as $document) {
             $documentCount++;
-            $point = $document->getPoint();
+            $point = $document->point;
 
             if (null === $point) {
                 $meetingLevelDocuments[] = $document;
@@ -126,7 +126,7 @@ final readonly class MeetingQueryService
             $match->unmatched,
             $references,
             $meeting->getMinutes(),
-            $meeting->getLocalDetails(),
+            $meeting->localDetails,
             $documentCount,
         );
     }
@@ -138,7 +138,7 @@ final readonly class MeetingQueryService
     public function getStatus(Meeting $meeting): MeetingStatus
     {
         return MeetingStatus::derive(
-            $meeting->getDate(),
+            $meeting->date,
             !$meeting->getDecisions()->isEmpty(),
             null !== $meeting->getMinutes()?->getLatestVersion(),
         );
@@ -147,7 +147,7 @@ final readonly class MeetingQueryService
     public function getReadiness(MeetingView $view): MeetingReadiness
     {
         $numbers = array_map(
-            static fn (MeetingPointView $pointView): string => trim($pointView->point->getNumber()),
+            static fn (MeetingPointView $pointView): string => trim($pointView->point->number),
             $view->points,
         );
         $duplicates = array_keys(array_filter(
@@ -162,7 +162,7 @@ final readonly class MeetingQueryService
             $view->documentCount - count($view->references),
             count($view->references),
             null !== $view->minutes?->getLatestVersion(),
-            null !== $details && (null !== $details->getStartTime() || null !== $details->getLocation()),
+            null !== $details && (null !== $details->startTime || null !== $details->location),
             $duplicates,
             count($view->unmatchedDecisions),
         );

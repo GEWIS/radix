@@ -49,8 +49,8 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Organising organ'),
                         RevisionFieldKind::Reference,
-                        $previous?->organ?->getAbbr(),
-                        $revision->organ?->getAbbr(),
+                        $previous?->organ?->abbr,
+                        $revision->organ?->abbr,
                         $comparable,
                         ['width' => 'half'],
                         emptyLabel: t('None'),

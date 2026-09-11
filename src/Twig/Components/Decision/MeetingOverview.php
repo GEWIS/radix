@@ -79,7 +79,7 @@ final class MeetingOverview extends AbstractPaginatedOverview
                 $item[1],
                 $item[2] > 0,
                 MeetingStatus::derive(
-                    $item[0]->getDate(),
+                    $item[0]->date,
                     $item[1] > 0,
                     $item[2] > 0,
                 ),

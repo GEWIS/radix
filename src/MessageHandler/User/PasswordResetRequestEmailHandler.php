@@ -107,7 +107,7 @@ class PasswordResetRequestEmailHandler
         $this->securityEvents->record(
             SecurityEventType::PasswordResetRequested,
             $member instanceof Member
-                ? (string) $member->getLidnr()
+                ? (string) $member->lidnr
                 : $companyUser->getUserIdentifier(),
             $member instanceof Member ? 'main' : 'company',
         );
@@ -143,7 +143,7 @@ class PasswordResetRequestEmailHandler
         );
 
         if ($member instanceof Member) {
-            $recipientEmail = $member->getEmail();
+            $recipientEmail = $member->email;
             $fullName = $member->getFullName();
         } else {
             $recipientEmail = $companyUser->email;

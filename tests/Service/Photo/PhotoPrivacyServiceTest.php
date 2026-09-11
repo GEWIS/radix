@@ -180,7 +180,7 @@ final class PhotoPrivacyServiceTest extends TestCase
     private function member(int $lidnr): Member
     {
         $member = self::createStub(Member::class);
-        $member->method('getLidnr')->willReturn($lidnr);
+        $member->lidnr = $lidnr;
 
         return $member;
     }

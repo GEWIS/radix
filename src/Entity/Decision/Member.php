@@ -69,7 +69,7 @@ class Member
         name: 'lidnr',
         referencedColumnName: 'lidnr',
     )]
-    private int $lidnr;
+    public int $lidnr;
 
     /**
      * Member's email address.
@@ -78,31 +78,31 @@ class Member
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $email = null;
+    public ?string $email = null;
 
     /**
      * Member's last name.
      */
     #[Column(type: Types::STRING)]
-    private string $lastName;
+    public string $lastName;
 
     /**
      * Middle name.
      */
     #[Column(type: Types::STRING)]
-    private string $middleName;
+    public string $middleName;
 
     /**
      * Initials.
      */
     #[Column(type: Types::STRING)]
-    private string $initials;
+    public string $initials;
 
     /**
      * First name.
      */
     #[Column(type: Types::STRING)]
-    private string $firstName;
+    public string $firstName;
 
     /**
      * Generation.
@@ -111,7 +111,7 @@ class Member
      * a academic year, but rather a calendar year.
      */
     #[Column(type: Types::INTEGER)]
-    private int $generation;
+    public int $generation;
 
     /**
      * Member type.
@@ -131,7 +131,7 @@ class Member
         type: Types::STRING,
         enumType: MembershipTypes::class,
     )]
-    private MembershipTypes $type;
+    public MembershipTypes $type;
 
     /**
      * The program the member is enrolled in.
@@ -143,13 +143,13 @@ class Member
         type: Types::STRING,
         enumType: Studies::class,
     )]
-    private Studies $study = Studies::Unknown;
+    public Studies $study = Studies::Unknown;
 
     /**
      * Last changed date of membership.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $changedOn;
+    public DateTime $changedOn;
 
     /**
      * Date when the real membership ("ordinary" or "external") of the member will have ended, in other words, from this
@@ -160,20 +160,20 @@ class Member
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $membershipEndsOn = null;
+    public ?DateTime $membershipEndsOn = null;
 
     /**
      * Member birth date.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $birth;
+    public DateTime $birth;
 
     /**
      * The date on which the membership of the member is set to expire and will therefore have to be renewed, which
      * happens either automatically or has to be done manually, as set forth in the bylaws and internal regulations.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $expiration;
+    public DateTime $expiration;
 
     /**
      * If the member receives a 'supremum'.
@@ -182,7 +182,7 @@ class Member
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $supremum = null;
+    public ?string $supremum = null;
 
     /**
      * Stores whether a member should be 'hidden'.
@@ -194,7 +194,7 @@ class Member
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $hidden = false;
+    public bool $hidden = false;
 
     /**
      * Addresses of this member.
@@ -276,7 +276,7 @@ class Member
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $deleted = false;
+    public bool $deleted = false;
 
     /**
      * Member tags (photos this member appears in).
@@ -302,263 +302,18 @@ class Member
     }
 
     /**
-     * Get the membership number.
-     */
-    public function getLidnr(): int
-    {
-        return $this->lidnr;
-    }
-
-    /**
-     * Get the member's email address.
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Get the member's last name.
-     */
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * Get the member's middle name.
-     */
-    public function getMiddleName(): string
-    {
-        return $this->middleName;
-    }
-
-    /**
-     * Get the member's initials.
-     */
-    public function getInitials(): string
-    {
-        return $this->initials;
-    }
-
-    /**
-     * Get the member's first name.
-     */
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * Set the lidnr.
-     */
-    public function setLidnr(int $lidnr): void
-    {
-        $this->lidnr = $lidnr;
-    }
-
-    /**
-     * Set the member's email address.
-     */
-    public function setEmail(?string $email): void
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Set the member's last name.
-     */
-    public function setLastName(string $lastName): void
-    {
-        $this->lastName = $lastName;
-    }
-
-    /**
-     * Set the member's middle name.
-     */
-    public function setMiddleName(string $middleName): void
-    {
-        $this->middleName = $middleName;
-    }
-
-    /**
-     * Set the member's initials.
-     */
-    public function setInitials(string $initials): void
-    {
-        $this->initials = $initials;
-    }
-
-    /**
-     * Set the member's first name.
-     */
-    public function setFirstName(string $firstName): void
-    {
-        $this->firstName = $firstName;
-    }
-
-    /**
      * Assemble the member's full name.
      */
     public function getFullName(): string
     {
-        $name = $this->getFirstName() . ' ';
+        $name = $this->firstName . ' ';
 
-        $middle = $this->getMiddleName();
+        $middle = $this->middleName;
         if ('' !== $middle) {
             $name .= $middle . ' ';
         }
 
-        return $name . $this->getLastName();
-    }
-
-    /**
-     * Get the generation.
-     */
-    public function getGeneration(): int
-    {
-        return $this->generation;
-    }
-
-    /**
-     * Set the generation.
-     */
-    public function setGeneration(int $generation): void
-    {
-        $this->generation = $generation;
-    }
-
-    /**
-     * Get the current member type.
-     *
-     * It is possible that the member will have a different type in the future.
-     */
-    public function getType(): MembershipTypes
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set the member type.
-     */
-    public function setType(MembershipTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * Get the study.
-     */
-    public function getStudy(): Studies
-    {
-        return $this->study;
-    }
-
-    /**
-     * Set the study.
-     */
-    public function setStudy(Studies $study): void
-    {
-        $this->study = $study;
-    }
-
-    /**
-     * Get the expiration date.
-     */
-    public function getExpiration(): DateTime
-    {
-        return $this->expiration;
-    }
-
-    /**
-     * Set the expiration date.
-     */
-    public function setExpiration(DateTime $expiration): void
-    {
-        $this->expiration = $expiration;
-    }
-
-    /**
-     * Get the birth date.
-     */
-    public function getBirth(): DateTime
-    {
-        return $this->birth;
-    }
-
-    /**
-     * Set the birthdate.
-     */
-    public function setBirth(DateTime $birth): void
-    {
-        $this->birth = $birth;
-    }
-
-    /**
-     * Get the date of the last membership change.
-     */
-    public function getChangedOn(): DateTime
-    {
-        return $this->changedOn;
-    }
-
-    /**
-     * Set the date of the last membership change.
-     */
-    public function setChangedOn(DateTime $changedOn): void
-    {
-        $this->changedOn = $changedOn;
-    }
-
-    /**
-     * Get the date on which the membership of the member will have ended (i.e., they have become "graduate").
-     *
-     * It is possible that for an ordinary member that will become external in the future, this date is the end date of
-     * their external membership, not of their current 'ordinary' membership.
-     */
-    public function getMembershipEndsOn(): ?DateTime
-    {
-        return $this->membershipEndsOn;
-    }
-
-    /**
-     * Set the date on which the membership of the member will have ended (i.e., they have become "graduate").
-     */
-    public function setMembershipEndsOn(?DateTime $membershipEndsOn): void
-    {
-        $this->membershipEndsOn = $membershipEndsOn;
-    }
-
-    /**
-     * Get if the member wants a supremum.
-     */
-    public function getSupremum(): ?string
-    {
-        return $this->supremum;
-    }
-
-    /**
-     * Set if the member wants a supremum.
-     */
-    public function setSupremum(?string $supremum): void
-    {
-        $this->supremum = $supremum;
-    }
-
-    /**
-     * Get if the member is hidden.
-     */
-    public function getHidden(): bool
-    {
-        return $this->hidden;
-    }
-
-    /**
-     * Set if the member is hidden.
-     */
-    public function setHidden(bool $hidden): void
-    {
-        $this->hidden = $hidden;
+        return $name . $this->lastName;
     }
 
     /**
@@ -618,23 +373,7 @@ class Member
         DateTime $onDate,
         int $years,
     ): bool {
-        return $onDate->diff($this->getBirth())->y >= $years;
-    }
-
-    /**
-     * Get if the member is deleted.
-     */
-    public function getDeleted(): bool
-    {
-        return $this->deleted;
-    }
-
-    /**
-     * Set if the member is deleted.
-     */
-    public function setDeleted(bool $deleted): void
-    {
-        $this->deleted = $deleted;
+        return $onDate->diff($this->birth)->y >= $years;
     }
 
     /**
@@ -662,22 +401,22 @@ class Member
     public function toArray(): array
     {
         return [
-            'lidnr' => $this->getLidnr(),
-            'email' => $this->getEmail(),
+            'lidnr' => $this->lidnr,
+            'email' => $this->email,
             'fullName' => $this->getFullName(),
-            'lastName' => $this->getLastName(),
-            'middleName' => $this->getMiddleName(),
-            'initials' => $this->getInitials(),
-            'firstName' => $this->getFirstName(),
-            'generation' => $this->getGeneration(),
-            'hidden' => $this->getHidden(),
-            'deleted' => $this->getDeleted(),
-            'birthdate' => $this->getBirth()->format(DateTimeInterface::ATOM),
+            'lastName' => $this->lastName,
+            'middleName' => $this->middleName,
+            'initials' => $this->initials,
+            'firstName' => $this->firstName,
+            'generation' => $this->generation,
+            'hidden' => $this->hidden,
+            'deleted' => $this->deleted,
+            'birthdate' => $this->birth->format(DateTimeInterface::ATOM),
             'is_16_plus' => $this->hasReached16(),
             'is_18_plus' => $this->hasReached18(),
             'is_21_plus' => $this->hasReached21(),
-            'membershipEndsOn' => $this->getMembershipEndsOn()?->format(DateTimeInterface::ATOM) ?? null,
-            'expiration' => $this->getExpiration()->format(DateTimeInterface::ATOM),
+            'membershipEndsOn' => $this->membershipEndsOn?->format(DateTimeInterface::ATOM) ?? null,
+            'expiration' => $this->expiration->format(DateTimeInterface::ATOM),
         ];
     }
 
@@ -716,7 +455,7 @@ class Member
      */
     public function addAddress(Address $address): void
     {
-        $address->setMember($this);
+        $address->member = $this;
         $this->addresses[] = $address;
     }
 
@@ -753,7 +492,7 @@ class Member
             return;
         }
 
-        $list->setMember($this);
+        $list->member = $this;
         $this->mailingListMemberships->add($list);
     }
 
@@ -786,10 +525,10 @@ class Member
 
         return $this->getOrganInstallations()->filter(
             static function (OrganMember $organMember) use ($today, $includeInactive) {
-                $dischargeDate = $organMember->getDischargeDate();
+                $dischargeDate = $organMember->dischargeDate;
 
                 // Keep installation iff installation is in the past, not discharged or discharged in the future.
-                $isCurrentlyInstalled = $organMember->getInstallDate() <= $today
+                $isCurrentlyInstalled = $organMember->installDate <= $today
                     && (
                         null === $dischargeDate
                         || $dischargeDate > $today
@@ -801,7 +540,7 @@ class Member
 
                 // Keep installation iff when inactive should be included or when not inactive.
                 return $includeInactive
-                    || InstallationFunctions::InactiveMember !== $organMember->getFunction();
+                    || InstallationFunctions::InactiveMember !== $organMember->function;
             },
         );
     }
@@ -844,7 +583,7 @@ class Member
 
         $boards = $this->getBoardInstallations()->filter(
             static function (BoardMember $boardMember) use ($today) {
-                $dischargeDate = $boardMember->getDischargeDate();
+                $dischargeDate = $boardMember->dischargeDate;
 
                 // Keep installation if not discharged or discharged in the future
                 return null === $dischargeDate || $dischargeDate > $today;
@@ -865,23 +604,23 @@ class Member
     public function toGdprArray(): array
     {
         return [
-            'lidnr' => $this->getLidnr(),
-            'email' => $this->getEmail(),
+            'lidnr' => $this->lidnr,
+            'email' => $this->email,
             'fullName' => $this->getFullName(),
-            'lastName' => $this->getLastName(),
-            'middleName' => $this->getMiddleName(),
-            'initials' => $this->getInitials(),
-            'firstName' => $this->getFirstName(),
-            'birth' => $this->getBirth()->format(DateTimeInterface::ATOM),
-            'generation' => $this->getGeneration(),
-            'type' => $this->getType()->value,
-            'study' => $this->getStudy()->value,
-            'changedOn' => $this->getChangedOn()->format(DateTimeInterface::ATOM),
-            'membershipEndsOn' => $this->getMembershipEndsOn()?->format(DateTimeInterface::ATOM),
-            'expiration' => $this->getExpiration()->format(DateTimeInterface::ATOM),
-            'supremum' => $this->getSupremum(),
-            'hidden' => $this->getHidden(),
-            'deleted' => $this->getDeleted(),
+            'lastName' => $this->lastName,
+            'middleName' => $this->middleName,
+            'initials' => $this->initials,
+            'firstName' => $this->firstName,
+            'birth' => $this->birth->format(DateTimeInterface::ATOM),
+            'generation' => $this->generation,
+            'type' => $this->type->value,
+            'study' => $this->study->value,
+            'changedOn' => $this->changedOn->format(DateTimeInterface::ATOM),
+            'membershipEndsOn' => $this->membershipEndsOn?->format(DateTimeInterface::ATOM),
+            'expiration' => $this->expiration->format(DateTimeInterface::ATOM),
+            'supremum' => $this->supremum,
+            'hidden' => $this->hidden,
+            'deleted' => $this->deleted,
         ];
     }
 
@@ -938,8 +677,8 @@ class Member
         $now = new DateTime();
 
         foreach ($this->secretaryInstallations() as $boardMember) {
-            $released = $boardMember->getReleaseDate();
-            $discharged = $boardMember->getDischargeDate();
+            $released = $boardMember->releaseDate;
+            $discharged = $boardMember->dischargeDate;
 
             if (
                 null === $released
@@ -971,7 +710,7 @@ class Member
         $installations = [];
 
         foreach ($this->getBoardInstallations() as $boardMember) {
-            if (BoardFunctions::Secretary !== $boardMember->getFunction()) {
+            if (BoardFunctions::Secretary !== $boardMember->function) {
                 continue;
             }
 
@@ -987,9 +726,9 @@ class Member
     public function isCurrentBoard(BoardMember $boardMember): bool
     {
         $now = new DateTime();
-        $installDate = $boardMember->getInstallDate();
-        $releaseDate = $boardMember->getReleaseDate();
-        $dischargeDate = $boardMember->getDischargeDate();
+        $installDate = $boardMember->installDate;
+        $releaseDate = $boardMember->releaseDate;
+        $dischargeDate = $boardMember->dischargeDate;
 
         if ($installDate <= $now) {
             // Installation was (before) today.
@@ -1013,7 +752,7 @@ class Member
 
     public function isExpired(): bool
     {
-        return $this->getExpiration() < new DateTime();
+        return $this->expiration < new DateTime();
     }
 
     public function getSelfRole(): string

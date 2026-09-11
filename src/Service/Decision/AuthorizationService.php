@@ -57,7 +57,7 @@ final readonly class AuthorizationService
         Meeting $meeting,
     ): ?Authorization {
         return $this->authorizationRepository->findUserAuthorization(
-            $meeting->getNumber(),
+            $meeting->number,
             $authorizer,
         );
     }
@@ -83,23 +83,23 @@ final readonly class AuthorizationService
 
         if (
             null === $recipient
-            || true === $recipient->getDeleted()
+            || true === $recipient->deleted
             || $recipient->isExpired()
-            || MembershipTypes::Graduate === $recipient->getType()
+            || MembershipTypes::Graduate === $recipient->type
         ) {
             throw new RuntimeException(
                 $this->translator->trans('This member cannot receive authorizations.'),
             );
         }
 
-        if ($recipient->getLidnr() === $authorizer->getLidnr()) {
+        if ($recipient->lidnr === $authorizer->lidnr) {
             throw new RuntimeException(
                 $this->translator->trans('You cannot authorize yourself.'),
             );
         }
 
         $received = count($this->authorizationRepository->findRecipientAuthorization(
-            $meeting->getNumber(),
+            $meeting->number,
             $recipient,
         ));
 
@@ -110,10 +110,10 @@ final readonly class AuthorizationService
         }
 
         $authorization = new Authorization();
-        $authorization->setAuthorizer($authorizer);
-        $authorization->setRecipient($recipient);
-        $authorization->setMeetingNumber($meeting->getNumber());
-        $authorization->setCreatedAt(new DateTime());
+        $authorization->authorizer = $authorizer;
+        $authorization->recipient = $recipient;
+        $authorization->meetingNumber = $meeting->number;
+        $authorization->createdAt = new DateTime();
 
         $this->entityManager->persist($authorization);
         $this->entityManager->flush();
@@ -128,13 +128,13 @@ final readonly class AuthorizationService
         Member $authorizer,
     ): void {
         if (
-            $authorization->getAuthorizer()->getLidnr() !== $authorizer->getLidnr()
-            || null !== $authorization->getRevokedAt()
+            $authorization->authorizer->lidnr !== $authorizer->lidnr
+            || null !== $authorization->revokedAt
         ) {
             return;
         }
 
-        $authorization->setRevokedAt(new DateTime());
+        $authorization->revokedAt = new DateTime();
         $this->entityManager->flush();
 
         $this->messageBus->dispatch(new AuthorizationRevokedEmail((int) $authorization->getId()));

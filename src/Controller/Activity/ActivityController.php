@@ -133,7 +133,7 @@ class ActivityController extends AbstractController
         $canViewDetails = $this->isGranted(UserRoles::User->value);
         $user = $this->getUser();
         $viewerLidnr = $user instanceof User
-            ? $user->member->getLidnr()
+            ? $user->member->lidnr
             : null;
 
         $signupListViews = [];

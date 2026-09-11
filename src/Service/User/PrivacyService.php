@@ -39,7 +39,7 @@ final readonly class PrivacyService
     public function yearOfBirthVisibilityFor(array $targets): array
     {
         $lidnrs = array_map(
-            static fn (Member $member): int => $member->getLidnr(),
+            static fn (Member $member): int => $member->lidnr,
             $targets,
         );
 
@@ -65,7 +65,7 @@ final readonly class PrivacyService
 
         $visibility = [];
         foreach ($targets as $target) {
-            $lidnr = $target->getLidnr();
+            $lidnr = $target->lidnr;
             $visibility[$lidnr] = !(($settings[$lidnr] ?? null)->hideYearOfBirth ?? false);
         }
 

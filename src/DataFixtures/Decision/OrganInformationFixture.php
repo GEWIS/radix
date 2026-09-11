@@ -101,41 +101,41 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
         ?string $website,
         array $social,
     ): void {
-        $abbr = $organ->getAbbr();
+        $abbr = $organ->abbr;
 
         $information = new OrganInformation();
-        $information->setOrgan($organ);
-        $organ->setOrganInformation($information);
+        $information->organ = $organ;
+        $organ->organInformation = $information;
 
         $revision = new OrganInformationRevision();
         $revision->setStatus(RevisionStatus::Approved);
         $revision->setRevisionNumber(1);
         $revision->setAuthor($reviewer);
         $revision->setReviewer($reviewer);
-        $revision->setShortDescription(new DecisionLocalisedText(
+        $revision->shortDescription = new DecisionLocalisedText(
             $shortDescriptionEn,
             $shortDescriptionNl,
-        ));
-        $revision->setDescription(new DecisionLocalisedText(
+        );
+        $revision->description = new DecisionLocalisedText(
             $descriptionEn,
             $descriptionNl,
-        ));
+        );
         // An abbreviation is a name, not an address: GETÉST carries an accent that the validator rejects in a local
         // part, which would make the seeded page unsaveable until somebody edited the field.
-        $revision->setEmail($this->slugger->slug($abbr)->lower() . '@gewis.nl');
-        $revision->setWebsite($website);
+        $revision->email = $this->slugger->slug($abbr)->lower() . '@gewis.nl';
+        $revision->website = $website;
         $revision->updateSocialLinks($social);
 
         // The fixture artwork is drawn at the shape it is shown in, so the whole of it is the crop.
         $cover = $this->imageGenerator->storeBanner($abbr);
-        $revision->setBannerSource($cover);
-        $revision->setBannerPath($cover);
-        $revision->setBannerCrop($this->wholeFrame());
+        $revision->bannerSource = $cover;
+        $revision->bannerPath = $cover;
+        $revision->bannerCrop = $this->wholeFrame();
 
         $thumbnail = $this->imageGenerator->storeLogo($abbr);
-        $revision->setLogoSource($thumbnail);
-        $revision->setLogoPath($thumbnail);
-        $revision->setLogoCrop($this->wholeFrame());
+        $revision->logoSource = $thumbnail;
+        $revision->logoPath = $thumbnail;
+        $revision->logoCrop = $this->wholeFrame();
 
         $information->addRevision($revision);
         $information->setCurrentRevision($revision);

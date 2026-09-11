@@ -62,7 +62,7 @@ class ExternalAppService
 
         // The standard `sub` subject claim always identifies the member; the opt-in `lidnr` claim is deprecated and
         // will be removed before the end of 2026.
-        $claims['sub'] = strval($member->getLidnr());
+        $claims['sub'] = strval($member->lidnr);
 
         foreach ($app->getClaims() as $claim) {
             $claims[$claim->value] = $claim->getValue($member);

@@ -47,7 +47,7 @@ class MeetingPoint
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public private(set) Meeting $meeting;
 
     /**
      * Free-form agenda point number, e.g. "7" or "7a". Gaps and duplicates are allowed; duplicates surface as a
@@ -57,10 +57,10 @@ class MeetingPoint
         type: Types::STRING,
         length: 16,
     )]
-    private string $number;
+    public string $number;
 
     #[Column(type: Types::STRING)]
-    private string $title = '';
+    public string $title = '';
 
     /**
      * Determines the order in which to display the agenda point.
@@ -69,7 +69,7 @@ class MeetingPoint
         type: Types::INTEGER,
         options: ['default' => 0],
     )]
-    private int $displayPosition = 0;
+    public int $displayPosition = 0;
 
     /**
      * Documents filed under this agenda point.
@@ -88,45 +88,10 @@ class MeetingPoint
         $this->documents = new ArrayCollection();
     }
 
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
     public function setMeeting(Meeting $meeting): void
     {
         $meeting->addPoint($this);
         $this->meeting = $meeting;
-    }
-
-    public function getNumber(): string
-    {
-        return $this->number;
-    }
-
-    public function setNumber(string $number): void
-    {
-        $this->number = $number;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getDisplayPosition(): int
-    {
-        return $this->displayPosition;
-    }
-
-    public function setDisplayPosition(int $position): void
-    {
-        $this->displayPosition = $position;
     }
 
     /**

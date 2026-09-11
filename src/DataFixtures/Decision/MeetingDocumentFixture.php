@@ -158,14 +158,14 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
         ));
 
         if (null !== $pointReference) {
-            $document->setPoint($this->getReference(
+            $document->point = $this->getReference(
                 $pointReference,
                 MeetingPoint::class,
-            ));
+            );
         }
 
-        $document->setName($name);
-        $document->setDisplayPosition($position);
+        $document->name = $name;
+        $document->displayPosition = $position;
 
         $manager->persist($document);
 
@@ -181,17 +181,17 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
     ): void {
         $version = new MeetingDocumentVersion();
         $version->setDocument($document);
-        $version->setVersionLabel($label);
-        $version->setPath($this->storePdf(
+        $version->versionLabel = $label;
+        $version->path = $this->storePdf(
             sprintf(
                 '%s %s',
-                $document->getName(),
+                $document->name,
                 $label,
             ),
-            $document->getMeeting(),
-        ));
-        $version->setUploadedBy($uploader);
-        $version->setUploadedAt($uploadedAt);
+            $document->meeting,
+        );
+        $version->uploadedBy = $uploader;
+        $version->uploadedAt = $uploadedAt;
 
         $manager->persist($version);
         $manager->flush();

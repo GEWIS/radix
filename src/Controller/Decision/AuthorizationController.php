@@ -77,7 +77,7 @@ class AuthorizationController extends AbstractController
                 $selected,
             );
             $received = count($this->authorizationRepository->findRecipientAuthorization(
-                $selected->getNumber(),
+                $selected->number,
                 $member,
             ));
 
@@ -106,7 +106,7 @@ class AuthorizationController extends AbstractController
 
                 return $this->redirectToRoute(
                     'members/authorizations/index',
-                    ['meeting' => $selected->getNumber()],
+                    ['meeting' => $selected->number],
                 );
             }
         }
@@ -160,7 +160,7 @@ class AuthorizationController extends AbstractController
 
         return $this->redirectToRoute(
             'members/authorizations/index',
-            null === $meeting ? [] : ['meeting' => $meeting->getNumber()],
+            null === $meeting ? [] : ['meeting' => $meeting->number],
         );
     }
 
@@ -172,7 +172,7 @@ class AuthorizationController extends AbstractController
         ?int $number,
     ): ?Meeting {
         foreach ($meetings as $candidate) {
-            if ($candidate->getNumber() === $number) {
+            if ($candidate->number === $number) {
                 return $candidate;
             }
         }

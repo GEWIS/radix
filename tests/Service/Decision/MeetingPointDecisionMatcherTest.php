@@ -155,7 +155,7 @@ final class MeetingPointDecisionMatcherTest extends TestCase
     ): MeetingPoint {
         $point = new MeetingPoint();
         $point->setId($id);
-        $point->setNumber($number);
+        $point->number = $number;
 
         return $point;
     }
@@ -163,7 +163,7 @@ final class MeetingPointDecisionMatcherTest extends TestCase
     private function decision(int $point): Decision
     {
         $decision = new Decision();
-        $decision->setPoint($point);
+        $decision->point = $point;
 
         return $decision;
     }

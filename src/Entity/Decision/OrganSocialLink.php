@@ -20,15 +20,5 @@ class OrganSocialLink extends AbstractSocialLink
         inversedBy: 'socialLinks',
     )]
     #[JoinColumn(nullable: false)]
-    private OrganInformationRevision $revision;
-
-    public function getRevision(): OrganInformationRevision
-    {
-        return $this->revision;
-    }
-
-    public function setRevision(OrganInformationRevision $revision): void
-    {
-        $this->revision = $revision;
-    }
+    public OrganInformationRevision $revision;
 }

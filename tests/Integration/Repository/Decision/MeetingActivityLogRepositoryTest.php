@@ -37,7 +37,7 @@ final class MeetingActivityLogRepositoryTest extends DatabaseTestCase
             Meeting::class,
             [
                 'type' => MeetingTypes::ALV,
-                'number' => $minutes[0]->getMeeting()->getNumber() + 2,
+                'number' => $minutes[0]->meeting->number + 2,
             ],
         );
         self::assertNotNull($meeting);
@@ -51,7 +51,7 @@ final class MeetingActivityLogRepositoryTest extends DatabaseTestCase
                 '7a Budget',
             ],
             array_map(
-                static fn (MeetingActivityLog $entry) => $entry->getSubject(),
+                static fn (MeetingActivityLog $entry) => $entry->subject,
                 $entries,
             ),
         );
@@ -63,7 +63,7 @@ final class MeetingActivityLogRepositoryTest extends DatabaseTestCase
 
         self::assertNotEmpty($entries);
         foreach ($entries as $entry) {
-            self::assertNull($entry->getMeeting());
+            self::assertNull($entry->meeting);
         }
     }
 }

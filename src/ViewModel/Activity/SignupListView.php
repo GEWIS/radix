@@ -93,7 +93,7 @@ final readonly class SignupListView
             foreach ($visibleSignups as $signup) {
                 $isOwn = $signup instanceof UserSignup
                     && null !== $viewerLidnr
-                    && $viewerLidnr === $signup->user->getLidnr();
+                    && $viewerLidnr === $signup->user->lidnr;
 
                 if ($isOwn) {
                     $viewerHasSignup = true;

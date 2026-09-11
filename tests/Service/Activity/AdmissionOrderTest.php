@@ -513,9 +513,9 @@ final class AdmissionOrderTest extends TestCase
         ?SignupRole $role = null,
     ): UserSignup {
         $member = new Member();
-        $member->setType($type);
-        $member->setStudy($study);
-        $member->setGeneration($generation);
+        $member->type = $type;
+        $member->study = $study;
+        $member->generation = $generation;
 
         $signup = new UserSignup();
         $signup->user = $member;

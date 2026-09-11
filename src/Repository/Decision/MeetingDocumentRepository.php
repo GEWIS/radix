@@ -56,11 +56,11 @@ class MeetingDocumentRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             ':type',
-            $meeting->getType(),
+            $meeting->type,
         );
         $qb->setParameter(
             ':number',
-            $meeting->getNumber(),
+            $meeting->number,
         );
 
         /** @var list<MeetingDocument> $documents */

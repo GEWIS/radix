@@ -49,7 +49,7 @@ class MiscService
 
         if (null === $reportList) {
             $reportList = new ReportMailingList();
-            $reportList->setName($list->getName());
+            $reportList->name = $list->getName();
         }
 
         $reportList->setEnDescription($list->getEnDescription());
@@ -100,9 +100,9 @@ class MiscService
             }
 
             $reportListMembership = new ReportMailingListMember();
-            $reportListMembership->setMailingList($reportList);
-            $reportListMembership->setMember($reportMember);
-            $reportListMembership->setEmail($mailingListMember->getEmail());
+            $reportListMembership->mailingList = $reportList;
+            $reportListMembership->member = $reportMember;
+            $reportListMembership->email = $mailingListMember->getEmail();
         }
 
         // There is no possibility of updating an entry, all values are a key

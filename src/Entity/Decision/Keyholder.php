@@ -55,13 +55,13 @@ class Keyholder
         referencedColumnName: 'lidnr',
         nullable: false,
     )]
-    private Member $member;
+    public Member $member;
 
     /**
      * Expiration date.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $expirationDate;
+    public DateTime $expirationDate;
 
     /**
      * Installation.
@@ -90,7 +90,7 @@ class Keyholder
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private KeyGranting $grantingDec;
+    public KeyGranting $grantingDec;
 
     /**
      * Release date.
@@ -99,71 +99,7 @@ class Keyholder
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $withdrawnDate = null;
-
-    /**
-     * Get the member.
-     */
-    public function getMember(): Member
-    {
-        return $this->member;
-    }
-
-    /**
-     * Set the member.
-     */
-    public function setMember(Member $member): void
-    {
-        $this->member = $member;
-    }
-
-    /**
-     * Get the expiration date.
-     */
-    public function getExpirationDate(): DateTime
-    {
-        return $this->expirationDate;
-    }
-
-    /**
-     * Set the expiration date.
-     */
-    public function setExpirationDate(DateTime $expirationDate): void
-    {
-        $this->expirationDate = $expirationDate;
-    }
-
-    /**
-     * Get the granting decision.
-     */
-    public function getGrantingDec(): KeyGranting
-    {
-        return $this->grantingDec;
-    }
-
-    /**
-     * Set the granting decision.
-     */
-    public function setGrantingDec(KeyGranting $grantingDec): void
-    {
-        $this->grantingDec = $grantingDec;
-    }
-
-    /**
-     * Get the withdrawn date.
-     */
-    public function getWithdrawnDate(): ?DateTime
-    {
-        return $this->withdrawnDate;
-    }
-
-    /**
-     * Set the withdrawn date.
-     */
-    public function setWithdrawnDate(?DateTime $withdrawnDate): void
-    {
-        $this->withdrawnDate = $withdrawnDate;
-    }
+    public ?DateTime $withdrawnDate = null;
 
     /**
      * Get whether the key decision is still valid
@@ -172,10 +108,10 @@ class Keyholder
     {
         $now = new DateTime('today');
 
-        return $this->getExpirationDate() >= $now
+        return $this->expirationDate >= $now
             && (
-                null === $this->getWithdrawnDate()
-                || $this->getWithdrawnDate() >= $now
+                null === $this->withdrawnDate
+                || $this->withdrawnDate >= $now
             );
     }
 }

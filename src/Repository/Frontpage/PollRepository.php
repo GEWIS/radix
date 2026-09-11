@@ -263,7 +263,7 @@ class PollRepository extends ServiceEntityRepository
                 : 'NOT ' . $exists)
                 ->setParameter(
                     'member',
-                    $member->getLidnr(),
+                    $member->lidnr,
                 );
         }
 
@@ -365,7 +365,7 @@ class PollRepository extends ServiceEntityRepository
             ->where('p.creator = :member')
             ->setParameter(
                 'member',
-                $member->getLidnr(),
+                $member->lidnr,
             )
             ->getQuery()
             ->getResult();

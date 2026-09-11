@@ -45,7 +45,7 @@ class Decision
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public private(set) Meeting $meeting;
 
     /**
      * Meeting type.
@@ -70,14 +70,14 @@ class Decision
      */
     #[Id]
     #[Column(type: Types::INTEGER)]
-    private int $point;
+    public int $point;
 
     /**
      * Decision number.
      */
     #[Id]
     #[Column(type: Types::INTEGER)]
-    private int $number;
+    public int $number;
 
     /**
      * Content in Dutch.
@@ -85,7 +85,7 @@ class Decision
      * Generated from subdecisions.
      */
     #[Column(type: Types::TEXT)]
-    private string $contentNL;
+    public string $contentNL;
 
     /**
      * Content in English.
@@ -93,7 +93,7 @@ class Decision
      * Generated from subdecisions.
      */
     #[Column(type: Types::TEXT)]
-    private string $contentEN;
+    public string $contentEN;
 
     /**
      * Subdecisions.
@@ -143,7 +143,7 @@ class Decision
         name: 'c_number',
         referencedColumnName: 'number',
     )]
-    private ?Decision $counterpart = null;
+    public ?Decision $counterpart = null;
 
     /**
      * The virtual decisions that are this one's counterpart.
@@ -167,7 +167,7 @@ class Decision
         targetEntity: Annulment::class,
         mappedBy: 'target',
     )]
-    private ?Annulment $annulledBy = null;
+    public private(set) ?Annulment $annulledBy = null;
 
     /**
      * A decision that was just made has no counterpart either way; Doctrine fills both in for one that was loaded.
@@ -187,8 +187,8 @@ class Decision
         $this->subdecisions = new ArrayCollection();
 
         $meeting->addDecision($this);
-        $this->meeting_type = $meeting->getType();
-        $this->meeting_number = $meeting->getNumber();
+        $this->meeting_type = $meeting->type;
+        $this->meeting_number = $meeting->number;
         $this->meeting = $meeting;
     }
 
@@ -209,62 +209,6 @@ class Decision
     }
 
     /**
-     * Get the meeting.
-     */
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
-    /**
-     * Set the point number.
-     */
-    public function setPoint(int $point): void
-    {
-        $this->point = $point;
-    }
-
-    /**
-     * Get the point number.
-     */
-    public function getPoint(): int
-    {
-        return $this->point;
-    }
-
-    /**
-     * Set the decision number.
-     */
-    public function setNumber(int $number): void
-    {
-        $this->number = $number;
-    }
-
-    /**
-     * Get the decision number.
-     */
-    public function getNumber(): int
-    {
-        return $this->number;
-    }
-
-    /**
-     * Get decision content in Dutch.
-     */
-    public function getContentNL(): string
-    {
-        return $this->contentNL;
-    }
-
-    /**
-     * Set decision content in Dutch.
-     */
-    public function setContentNL(string $content): void
-    {
-        $this->contentNL = $content;
-    }
-
-    /**
      * The decision text for a locale. English content has only been recorded for recent decisions, so older ones
      * fall back to the Dutch text.
      */
@@ -278,22 +222,6 @@ class Decision
         }
 
         return $this->contentNL;
-    }
-
-    /**
-     * Get decision content in English.
-     */
-    public function getContentEN(): string
-    {
-        return $this->contentEN;
-    }
-
-    /**
-     * Set decision content in English.
-     */
-    public function setContentEN(string $content): void
-    {
-        $this->contentEN = $content;
     }
 
     /**
@@ -334,32 +262,6 @@ class Decision
     public function getVirtualCounterparts(): Collection
     {
         return $this->virtualCounterparts;
-    }
-
-    /**
-     * Get the decision this one is the counterpart of, if it is one.
-     */
-    public function getCounterpart(): ?Decision
-    {
-        return $this->counterpart;
-    }
-
-    /**
-     * Set the decision this one is the counterpart of.
-     */
-    public function setCounterpart(?Decision $counterpart): void
-    {
-        $this->counterpart = $counterpart;
-    }
-
-    /**
-     * Get the subdecision by which this decision is annulled.
-     *
-     * Or null, if it was not annulled.
-     */
-    public function getAnnulledBy(): ?Annulment
-    {
-        return $this->annulledBy;
     }
 
     /**

@@ -42,19 +42,19 @@ class Minutes extends SubDecision
         name: 'r_meeting_number',
         referencedColumnName: 'number',
     )]
-    private Meeting $meeting;
+    public Meeting $meeting;
 
     /**
      * If the minutes were approved.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $approval;
+    public bool $approval;
 
     /**
      * If there were changes made.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $changes;
+    public bool $changes;
 
     /**
      * Get the member.
@@ -65,53 +65,5 @@ class Minutes extends SubDecision
         assert(null !== $this->member);
 
         return $this->member;
-    }
-
-    /**
-     * Get the target.
-     */
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
-    /**
-     * Set the target.
-     */
-    public function setMeeting(Meeting $meeting): void
-    {
-        $this->meeting = $meeting;
-    }
-
-    /**
-     * Get approval status.
-     */
-    public function getApproval(): bool
-    {
-        return $this->approval;
-    }
-
-    /**
-     * Set approval status.
-     */
-    public function setApproval(bool $approval): void
-    {
-        $this->approval = $approval;
-    }
-
-    /**
-     * Get if changes were made.
-     */
-    public function getChanges(): bool
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Set if changes were made.
-     */
-    public function setChanges(bool $changes): void
-    {
-        $this->changes = $changes;
     }
 }

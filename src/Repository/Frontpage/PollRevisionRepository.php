@@ -79,7 +79,7 @@ class PollRevisionRepository extends ServiceEntityRepository
             ->andWhere('r.status IN (:decidedStatuses)')
             ->setParameter(
                 'member',
-                $member->getLidnr(),
+                $member->lidnr,
             )
             ->setParameter(
                 'decidedStatuses',

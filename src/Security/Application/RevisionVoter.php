@@ -142,13 +142,13 @@ final class RevisionVoter extends Voter
         if ($user instanceof User) {
             $member = $user->member;
 
-            if ($revisable->getResourceCreator()?->getLidnr() === $member->getLidnr()) {
+            if ($revisable->getResourceCreator()?->lidnr === $member->lidnr) {
                 return true;
             }
 
             if (
                 null !== $revision
-                && $revision->getAuthor()?->getLidnr() === $member->getLidnr()
+                && $revision->getAuthor()?->lidnr === $member->lidnr
             ) {
                 return true;
             }
@@ -179,7 +179,7 @@ final class RevisionVoter extends Voter
         }
 
         foreach ($member->getCurrentOrganInstallations() as $installation) {
-            if ($installation->getOrgan()->getId() === $organ->getId()) {
+            if ($installation->organ->getId() === $organ->getId()) {
                 return true;
             }
         }

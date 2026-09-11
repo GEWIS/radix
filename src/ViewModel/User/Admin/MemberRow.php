@@ -70,18 +70,18 @@ final readonly class MemberRow
             }
         }
 
-        $membershipEndsOn = $member->getMembershipEndsOn();
+        $membershipEndsOn = $member->membershipEndsOn;
 
         return new self(
-            lidnr: $member->getLidnr(),
+            lidnr: $member->lidnr,
             fullName: $member->getFullName(),
-            type: $member->getType(),
+            type: $member->type,
             membershipEndsOn: null === $membershipEndsOn
                 ? null
                 : DateTimeImmutable::createFromMutable($membershipEndsOn),
             isActivated: null !== $user,
-            hidden: $member->getHidden(),
-            deleted: $member->getDeleted(),
+            hidden: $member->hidden,
+            deleted: $member->deleted,
             expired: $member->isExpired(),
             mfaEnabled: null !== $user && $user->isTotpAuthenticationEnabled(),
             roleBadges: $roleBadges,

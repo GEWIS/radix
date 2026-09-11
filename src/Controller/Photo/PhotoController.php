@@ -318,7 +318,7 @@ class PhotoController extends AbstractController
             'photo/album',
             [
                 'type' => AlbumType::Member->value,
-                'album' => $member->getLidnr(),
+                'album' => $member->lidnr,
             ],
         );
     }

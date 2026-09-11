@@ -34,20 +34,20 @@ class Meeting
      */
     #[Id]
     #[Column(type: Types::ENUM)]
-    private MeetingTypes $type;
+    public MeetingTypes $type;
 
     /**
      * Meeting number.
      */
     #[Id]
     #[Column(type: Types::INTEGER)]
-    private int $number;
+    public int $number;
 
     /**
      * Meeting date.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * Decisions.
@@ -114,45 +114,13 @@ class Meeting
         targetEntity: MeetingLocalDetails::class,
         mappedBy: 'meeting',
     )]
-    private ?MeetingLocalDetails $localDetails = null;
+    public ?MeetingLocalDetails $localDetails = null;
 
     public function __construct()
     {
         $this->decisions = new ArrayCollection();
         $this->points = new ArrayCollection();
         $this->documents = new ArrayCollection();
-    }
-
-    /**
-     * Get the meeting type.
-     */
-    public function getType(): MeetingTypes
-    {
-        return $this->type;
-    }
-
-    /**
-     * Get the meeting number.
-     */
-    public function getNumber(): int
-    {
-        return $this->number;
-    }
-
-    /**
-     * Set the meeting type.
-     */
-    public function setType(MeetingTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * Set the meeting number.
-     */
-    public function setNumber(int $number): void
-    {
-        $this->number = $number;
     }
 
     /**
@@ -165,22 +133,6 @@ class Meeting
             $this->type->value,
             $this->number,
         );
-    }
-
-    /**
-     * Get the meeting date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the meeting date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
     }
 
     /**
@@ -273,19 +225,5 @@ class Meeting
     public function setMeetingMinutes(?MeetingMinutes $meetingMinutes): void
     {
         $this->meetingMinutes = $meetingMinutes;
-    }
-
-    public function getLocalDetails(): ?MeetingLocalDetails
-    {
-        return $this->localDetails;
-    }
-
-    /**
-     * Keeps the inverse side in sync, so a change is visible within the same request (a live component re-renders
-     * without a fresh entity load).
-     */
-    public function setLocalDetails(?MeetingLocalDetails $localDetails): void
-    {
-        $this->localDetails = $localDetails;
     }
 }

@@ -643,7 +643,7 @@ final class SignupOverview
      */
     private function replyTo(): string
     {
-        $organEmail = $this->activity->getOrgan()?->getOrganInformation()?->getEmail();
+        $organEmail = $this->activity->getOrgan()?->organInformation?->getEmail();
 
         return null !== $organEmail && '' !== $organEmail
             ? $organEmail
@@ -1373,7 +1373,7 @@ final class SignupOverview
         }
 
         $member = $this->currentMember();
-        $email = $member->getEmail();
+        $email = $member->email;
         if (
             null === $email
             || '' === $email

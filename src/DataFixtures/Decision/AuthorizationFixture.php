@@ -26,34 +26,34 @@ class AuthorizationFixture extends Fixture implements DependentFixtureInterface,
         $gmmNumber = $this->getReference(
             'meeting-gmm-upcoming-2',
             Meeting::class,
-        )->getNumber();
+        )->number;
 
         $valid = new Authorization();
-        $valid->setAuthorizer($this->getReference(
+        $valid->authorizer = $this->getReference(
             'member-8010',
             Member::class,
-        ));
-        $valid->setRecipient($this->getReference(
+        );
+        $valid->recipient = $this->getReference(
             'member-8005',
             Member::class,
-        ));
-        $valid->setMeetingNumber($gmmNumber);
-        $valid->setCreatedAt(new DateTime('-3 days'));
+        );
+        $valid->meetingNumber = $gmmNumber;
+        $valid->createdAt = new DateTime('-3 days');
 
         $manager->persist($valid);
 
         $revoked = new Authorization();
-        $revoked->setAuthorizer($this->getReference(
+        $revoked->authorizer = $this->getReference(
             'member-8011',
             Member::class,
-        ));
-        $revoked->setRecipient($this->getReference(
+        );
+        $revoked->recipient = $this->getReference(
             'member-8005',
             Member::class,
-        ));
-        $revoked->setMeetingNumber($gmmNumber);
-        $revoked->setCreatedAt(new DateTime('-2 days'));
-        $revoked->setRevokedAt(new DateTime('-1 day'));
+        );
+        $revoked->meetingNumber = $gmmNumber;
+        $revoked->createdAt = new DateTime('-2 days');
+        $revoked->revokedAt = new DateTime('-1 day');
 
         $manager->persist($revoked);
         $manager->flush();

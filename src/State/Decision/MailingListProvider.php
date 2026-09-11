@@ -96,7 +96,7 @@ final readonly class MailingListProvider implements ProviderInterface
         // it is case-sensitive: one resource under an unbounded number of addresses is not that.
         if (
             null === $list
-            || $list->getName() !== $name
+            || $list->name !== $name
         ) {
             return null;
         }
@@ -123,7 +123,7 @@ final readonly class MailingListProvider implements ProviderInterface
     private function resource(ProjectedMailingList $list): MailingListResource
     {
         return new MailingListResource(
-            name: $list->getName(),
+            name: $list->name,
             description: [
                 'en' => $list->getEnDescription(),
                 'nl' => $list->getNlDescription(),

@@ -31,7 +31,7 @@ final readonly class OrganInformationRevisionCloner extends AbstractRevisionClon
     {
         assert($source instanceof OrganInformationRevision);
 
-        $information = $source->getOrganInformation();
+        $information = $source->organInformation;
 
         $draft = new OrganInformationRevision();
         $draft->setPreviousRevision($source);
@@ -49,20 +49,20 @@ final readonly class OrganInformationRevisionCloner extends AbstractRevisionClon
         assert($source instanceof OrganInformationRevision);
         assert($draft instanceof OrganInformationRevision);
 
-        $draft->setShortDescription($source->getShortDescription()->copy());
-        $draft->setDescription($source->getDescription()->copy());
-        $draft->setEmail($source->getEmail());
-        $draft->setWebsite($source->getWebsite());
-        $draft->setBannerSource($source->getBannerSource());
-        $draft->setBannerCrop($source->getBannerCrop());
-        $draft->setBannerPath($source->getBannerPath());
-        $draft->setLogoSource($source->getLogoSource());
-        $draft->setLogoCrop($source->getLogoCrop());
-        $draft->setLogoPath($source->getLogoPath());
+        $draft->shortDescription = $source->shortDescription->copy();
+        $draft->description = $source->description->copy();
+        $draft->email = $source->email;
+        $draft->website = $source->website;
+        $draft->bannerSource = $source->bannerSource;
+        $draft->bannerCrop = $source->bannerCrop;
+        $draft->bannerPath = $source->bannerPath;
+        $draft->logoSource = $source->logoSource;
+        $draft->logoCrop = $source->logoCrop;
+        $draft->logoPath = $source->logoPath;
 
         foreach ($source->getSocialLinks() as $link) {
             $copy = $link->copy();
-            $copy->setRevision($draft);
+            $copy->revision = $draft;
             $draft->getSocialLinks()->add($copy);
         }
     }

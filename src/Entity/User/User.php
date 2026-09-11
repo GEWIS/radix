@@ -200,7 +200,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getRoles(): array
     {
         $member = $this->member;
-        if (MembershipTypes::Graduate === $member->getType()) {
+        if (MembershipTypes::Graduate === $member->type) {
             $baseRole = UserRoles::Graduate->value;
         } elseif ($member->isActive()) {
             $baseRole = UserRoles::ActiveMember->value;

@@ -152,7 +152,7 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
                 !$member->isBoardMember()
                 || null === $this->entityManager->find(
                     User::class,
-                    $member->getLidnr(),
+                    $member->lidnr,
                 )
             ) {
                 continue;
@@ -176,7 +176,7 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
 
         $user = $this->entityManager->find(
             User::class,
-            $author->getLidnr(),
+            $author->lidnr,
         );
         self::assertInstanceOf(
             User::class,

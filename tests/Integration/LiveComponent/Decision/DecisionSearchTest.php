@@ -29,11 +29,11 @@ final class DecisionSearchTest extends DatabaseTestCase
         );
         self::assertSame(
             MeetingTypes::BV,
-            $groups[0]['meeting']->getType(),
+            $groups[0]['meeting']->type,
         );
         self::assertSame(
             1815,
-            $groups[0]['meeting']->getNumber(),
+            $groups[0]['meeting']->number,
         );
         self::assertEmpty($groups[0]['decisions']);
     }
@@ -48,7 +48,7 @@ final class DecisionSearchTest extends DatabaseTestCase
         );
         self::assertSame(
             1815,
-            $groups[0]['meeting']->getNumber(),
+            $groups[0]['meeting']->number,
         );
     }
 
@@ -66,7 +66,7 @@ final class DecisionSearchTest extends DatabaseTestCase
                 MeetingTypes::BV,
             ],
             array_map(
-                static fn (array $group): MeetingTypes => $group['meeting']->getType(),
+                static fn (array $group): MeetingTypes => $group['meeting']->type,
                 $groups,
             ),
         );
@@ -85,7 +85,7 @@ final class DecisionSearchTest extends DatabaseTestCase
         );
         self::assertSame(
             1801,
-            $groups[0]['meeting']->getNumber(),
+            $groups[0]['meeting']->number,
         );
         self::assertCount(
             1,
@@ -93,7 +93,7 @@ final class DecisionSearchTest extends DatabaseTestCase
         );
         self::assertSame(
             1804,
-            $groups[1]['meeting']->getNumber(),
+            $groups[1]['meeting']->number,
         );
     }
 

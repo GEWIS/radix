@@ -28,10 +28,10 @@ final class MeetingDocumentZipBuilderTest extends DatabaseTestCase
         foreach (self::getContainer()->get(MeetingDocumentRepository::class)->findForMeeting($meeting) as $document) {
             foreach ($document->getVersions() as $version) {
                 $storage->write(
-                    $version->getPath(),
+                    $version->path,
                     sprintf(
                         "%%PDF-1.4\n%% %s\n%%%%EOF\n",
-                        $version->getVersionLabel(),
+                        $version->versionLabel,
                     ),
                 );
             }
@@ -90,6 +90,6 @@ final class MeetingDocumentZipBuilderTest extends DatabaseTestCase
             $minutes,
         );
 
-        return $minutes[0]->getMeeting();
+        return $minutes[0]->meeting;
     }
 }

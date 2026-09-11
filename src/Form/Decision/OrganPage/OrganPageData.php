@@ -76,12 +76,12 @@ final class OrganPageData
     public static function fromRevision(OrganInformationRevision $revision): self
     {
         $data = new self();
-        $data->shortDescriptionNL = $revision->getShortDescription()->getValueNL();
-        $data->shortDescriptionEN = $revision->getShortDescription()->getValueEN();
-        $data->descriptionNL = $revision->getDescription()->getValueNL();
-        $data->descriptionEN = $revision->getDescription()->getValueEN();
-        $data->email = $revision->getEmail();
-        $data->website = $revision->getWebsite();
+        $data->shortDescriptionNL = $revision->shortDescription->getValueNL();
+        $data->shortDescriptionEN = $revision->shortDescription->getValueEN();
+        $data->descriptionNL = $revision->description->getValueNL();
+        $data->descriptionEN = $revision->description->getValueEN();
+        $data->email = $revision->email;
+        $data->website = $revision->website;
         $data->socialLinks = $revision->getSocialHandles();
 
         // A body that already wrote something in a language keeps that language on, or opening the form would
@@ -97,16 +97,16 @@ final class OrganPageData
 
     public function applyTo(OrganInformationRevision $revision): void
     {
-        $revision->getShortDescription()->updateValues(
-            $this->languageEnglish ? $this->shortDescriptionEN : $revision->getShortDescription()->getValueEN(),
-            $this->languageDutch ? $this->shortDescriptionNL : $revision->getShortDescription()->getValueNL(),
+        $revision->shortDescription->updateValues(
+            $this->languageEnglish ? $this->shortDescriptionEN : $revision->shortDescription->getValueEN(),
+            $this->languageDutch ? $this->shortDescriptionNL : $revision->shortDescription->getValueNL(),
         );
-        $revision->getDescription()->updateValues(
-            $this->languageEnglish ? $this->descriptionEN : $revision->getDescription()->getValueEN(),
-            $this->languageDutch ? $this->descriptionNL : $revision->getDescription()->getValueNL(),
+        $revision->description->updateValues(
+            $this->languageEnglish ? $this->descriptionEN : $revision->description->getValueEN(),
+            $this->languageDutch ? $this->descriptionNL : $revision->description->getValueNL(),
         );
-        $revision->setEmail($this->email);
-        $revision->setWebsite($this->website);
+        $revision->email = $this->email;
+        $revision->website = $this->website;
         $revision->updateSocialLinks($this->socialLinks);
     }
 

@@ -104,7 +104,7 @@ final class SignupTiers
                 continue;
             }
 
-            $members[$organMember->getMember()->getLidnr()] = true;
+            $members[$organMember->member->lidnr] = true;
         }
 
         return $members;
@@ -116,7 +116,7 @@ final class SignupTiers
             return MembershipTier::NonMember;
         }
 
-        return MembershipTier::of($signup->user->getType());
+        return MembershipTier::of($signup->user->type);
     }
 
     public static function cohort(Signup $signup): CohortTier
@@ -125,7 +125,7 @@ final class SignupTiers
             return CohortTier::Unknown;
         }
 
-        $generation = $signup->user->getGeneration();
+        $generation = $signup->user->generation;
         if ($generation < 1) {
             return CohortTier::Unknown;
         }
@@ -143,6 +143,6 @@ final class SignupTiers
             return ProgramType::Other;
         }
 
-        return $signup->user->getStudy()->getProgramType();
+        return $signup->user->study->getProgramType();
     }
 }

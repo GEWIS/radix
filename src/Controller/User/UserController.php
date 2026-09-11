@@ -240,10 +240,10 @@ class UserController extends AbstractSecurityController
 
         // Instantiate a User on first activation (the Member is projected from the ledger, no User row yet). The new
         // row is only persisted by the abstract base after a successful, validated password submission.
-        $user = $this->userRepository->find($member->getLidnr());
+        $user = $this->userRepository->find($member->lidnr);
         if (null === $user) {
             $user = new User();
-            $user->lidnr = $member->getLidnr();
+            $user->lidnr = $member->lidnr;
             $user->member = $member;
         }
 

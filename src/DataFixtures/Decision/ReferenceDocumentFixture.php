@@ -45,17 +45,17 @@ class ReferenceDocumentFixture extends Fixture implements DependentFixtureInterf
         );
 
         $scenarios = new ReferenceDocument();
-        $scenarios->setName('Scenarios and Procedures');
+        $scenarios->name = 'Scenarios and Procedures';
         $manager->persist($scenarios);
 
         $scenariosVersions = [];
         foreach (['v3.0', 'v3.1'] as $revision => $label) {
             $version = new ReferenceDocumentVersion();
             $version->setReferenceDocument($scenarios);
-            $version->setVersionLabel($label);
-            $version->setPath($this->storePdf('Scenarios and Procedures ' . $label));
-            $version->setUploadedBy($uploader);
-            $version->setUploadedAt(new DateTime('-' . (4 - $revision) . ' weeks'));
+            $version->versionLabel = $label;
+            $version->path = $this->storePdf('Scenarios and Procedures ' . $label);
+            $version->uploadedBy = $uploader;
+            $version->uploadedAt = new DateTime('-' . (4 - $revision) . ' weeks');
 
             $manager->persist($version);
             $manager->flush();
@@ -69,15 +69,15 @@ class ReferenceDocumentFixture extends Fixture implements DependentFixtureInterf
         );
 
         $definitions = new ReferenceDocument();
-        $definitions->setName('Financial Definition List');
+        $definitions->name = 'Financial Definition List';
         $manager->persist($definitions);
 
         $definitionsVersion = new ReferenceDocumentVersion();
         $definitionsVersion->setReferenceDocument($definitions);
-        $definitionsVersion->setVersionLabel('v1.0');
-        $definitionsVersion->setPath($this->storePdf('Financial Definition List v1.0'));
-        $definitionsVersion->setUploadedBy($uploader);
-        $definitionsVersion->setUploadedAt(new DateTime('-8 weeks'));
+        $definitionsVersion->versionLabel = 'v1.0';
+        $definitionsVersion->path = $this->storePdf('Financial Definition List v1.0');
+        $definitionsVersion->uploadedBy = $uploader;
+        $definitionsVersion->uploadedAt = new DateTime('-8 weeks');
 
         $manager->persist($definitionsVersion);
         $manager->flush();
@@ -135,12 +135,12 @@ class ReferenceDocumentFixture extends Fixture implements DependentFixtureInterf
         ReferenceDocumentVersion $pinnedVersion,
     ): void {
         $selection = new MeetingReferenceSelection();
-        $selection->setMeeting($this->getReference(
+        $selection->meeting = $this->getReference(
             $meetingReference,
             Meeting::class,
-        ));
-        $selection->setReferenceDocument($document);
-        $selection->setPinnedVersion($pinnedVersion);
+        );
+        $selection->referenceDocument = $document;
+        $selection->pinnedVersion = $pinnedVersion;
 
         $manager->persist($selection);
     }

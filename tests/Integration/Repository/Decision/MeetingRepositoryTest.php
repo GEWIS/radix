@@ -41,7 +41,7 @@ final class MeetingRepositoryTest extends DatabaseTestCase
 
         $byMeeting = [];
         foreach ($result['items'] as [$meeting, $decisionCount, $minutesVersionCount]) {
-            $byMeeting[$meeting->getType()->value . ' ' . $meeting->getNumber()] = [
+            $byMeeting[$meeting->type->value . ' ' . $meeting->number] = [
                 $decisionCount,
                 $minutesVersionCount,
             ];
@@ -79,7 +79,7 @@ final class MeetingRepositoryTest extends DatabaseTestCase
         );
         self::assertSame(
             $completeNumber,
-            $result['items'][0][0]->getNumber(),
+            $result['items'][0][0]->number,
         );
     }
 
@@ -95,17 +95,17 @@ final class MeetingRepositoryTest extends DatabaseTestCase
         foreach ($meetings as $meeting) {
             self::assertSame(
                 MeetingTypes::ALV,
-                $meeting->getType(),
+                $meeting->type,
             );
 
             if (null !== $previousDate) {
                 self::assertGreaterThan(
                     $previousDate,
-                    $meeting->getDate(),
+                    $meeting->date,
                 );
             }
 
-            $previousDate = $meeting->getDate();
+            $previousDate = $meeting->date;
         }
     }
 
@@ -136,6 +136,6 @@ final class MeetingRepositoryTest extends DatabaseTestCase
             $minutes,
         );
 
-        return $minutes[0]->getMeeting()->getNumber();
+        return $minutes[0]->meeting->number;
     }
 }

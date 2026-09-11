@@ -73,7 +73,7 @@ final class RevisionSubmissionStampTest extends DatabaseTestCase
 
         $user = $this->entityManager->find(
             User::class,
-            $author->getLidnr(),
+            $author->lidnr,
         );
         self::assertInstanceOf(
             User::class,

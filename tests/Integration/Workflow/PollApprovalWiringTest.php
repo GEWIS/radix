@@ -153,7 +153,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
 
         $creator = $poll->getCreator();
         self::assertNotNull($creator);
-        $this->authenticate($creator->getLidnr());
+        $this->authenticate($creator->lidnr);
 
         $second = new PollRevision();
         $second->question = new FrontpageLocalisedText('And another thing?');

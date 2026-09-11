@@ -26,13 +26,13 @@ class BoardService
 
         if (null === $boardMember) {
             $boardMember = new BoardMember();
-            $boardMember->setInstallationDec($installation);
-            $installation->setBoardMember($boardMember);
+            $boardMember->installationDec = $installation;
+            $installation->boardMember = $boardMember;
         }
 
-        $boardMember->setMember($installation->getMember());
-        $boardMember->setFunction($installation->getFunction());
-        $boardMember->setInstallDate($installation->getDate());
+        $boardMember->member = $installation->getMember();
+        $boardMember->function = $installation->function;
+        $boardMember->installDate = $installation->date;
 
         $this->emReport->persist($boardMember);
 
@@ -41,7 +41,7 @@ class BoardService
 
     public function generateDischarge(ReportBoardDischarge $discharge): void
     {
-        $boardMember = $this->findBoardMember($discharge->getInstallation());
+        $boardMember = $this->findBoardMember($discharge->installation);
 
         if (null === $boardMember) {
             // The installation this discharge undoes never took effect, so there is nobody on the board to discharge.
@@ -50,21 +50,21 @@ class BoardService
             return;
         }
 
-        $boardMember->setDischargeDate($discharge->getDecision()->getMeeting()->getDate());
+        $boardMember->dischargeDate = $discharge->decision->meeting->date;
 
         $this->emReport->persist($boardMember);
     }
 
     public function generateRelease(ReportBoardRelease $release): void
     {
-        $boardMember = $this->findBoardMember($release->getInstallation());
+        $boardMember = $this->findBoardMember($release->installation);
 
         if (null === $boardMember) {
             // See generateDischarge(): there is nothing to release somebody from.
             return;
         }
 
-        $boardMember->setReleaseDate($release->getDate());
+        $boardMember->releaseDate = $release->date;
 
         $this->emReport->persist($boardMember);
     }
@@ -84,7 +84,7 @@ class BoardService
         );
 
         if ($rp->isInitialized($installation)) {
-            return $installation->getBoardMember();
+            return $installation->boardMember;
         }
 
         return $this->emReport->getRepository(BoardMember::class)

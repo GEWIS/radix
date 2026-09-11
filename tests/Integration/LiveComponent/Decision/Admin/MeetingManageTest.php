@@ -46,7 +46,7 @@ final class MeetingManageTest extends DatabaseTestCase
         $added = $points[count($before)]->point;
         self::assertSame(
             '',
-            $added->getNumber(),
+            $added->number,
         );
         self::assertNotNull($component->savedAt);
     }
@@ -72,15 +72,15 @@ final class MeetingManageTest extends DatabaseTestCase
 
         self::assertSame(
             '9',
-            $point->getNumber(),
+            $point->number,
         );
         self::assertSame(
             'Renumbered',
-            $point->getTitle(),
+            $point->title,
         );
         self::assertSame(
             'Agenda (final)',
-            $document->getName(),
+            $document->name,
         );
         self::assertSame(
             [],
@@ -99,7 +99,7 @@ final class MeetingManageTest extends DatabaseTestCase
 
         $view = $component->getView();
         $names = array_map(
-            static fn (MeetingDocument $document) => $document->getName(),
+            static fn (MeetingDocument $document) => $document->name,
             $view->meetingLevelDocuments,
         );
         self::assertContains(
@@ -177,13 +177,13 @@ final class MeetingManageTest extends DatabaseTestCase
 
         // A fresh selection pins the latest version explicitly; nothing ever follows the library implicitly.
         foreach ($references as $selection) {
-            if ($selection->getReferenceDocument() !== $definitions) {
+            if ($selection->referenceDocument !== $definitions) {
                 continue;
             }
 
             self::assertSame(
                 $definitions->getLatestVersion(),
-                $selection->getPinnedVersion(),
+                $selection->pinnedVersion,
             );
         }
 
@@ -212,7 +212,7 @@ final class MeetingManageTest extends DatabaseTestCase
             $references,
         );
         $names = array_map(
-            static fn ($selection) => $selection->getReferenceDocument()->getName(),
+            static fn ($selection) => $selection->referenceDocument->name,
             $references,
         );
         self::assertContains(
@@ -240,7 +240,7 @@ final class MeetingManageTest extends DatabaseTestCase
         $selection = $component->getView()->references[0];
         self::assertSame(
             'v3.0',
-            $selection->getPinnedVersion()->getVersionLabel(),
+            $selection->pinnedVersion->versionLabel,
         );
     }
 
@@ -261,11 +261,11 @@ final class MeetingManageTest extends DatabaseTestCase
         self::assertNotNull($details);
         self::assertSame(
             '20:00',
-            $details->getStartTime()?->format('H:i'),
+            $details->startTime?->format('H:i'),
         );
         self::assertSame(
             'Auditorium 4',
-            $details->getLocation(),
+            $details->location,
         );
         self::assertNotNull($component->savedAt);
     }
@@ -435,7 +435,7 @@ final class MeetingManageTest extends DatabaseTestCase
             $minutes,
         );
 
-        return $minutes[0]->getMeeting()->getNumber();
+        return $minutes[0]->meeting->number;
     }
 
     private function referenceDocument(string $name): ReferenceDocument

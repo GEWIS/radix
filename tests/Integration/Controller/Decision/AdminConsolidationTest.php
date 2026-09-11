@@ -185,9 +185,9 @@ final class AdminConsolidationTest extends DatabaseTestCase
         // The list the board is shown is the bodies whose page they may write, which is the active ones. A register
         // administrator reads the same page as the list of bodies there have ever been.
         self::assertContains(
-            $abrogated[0]->getAbbr(),
+            $abrogated[0]->abbr,
             array_map(
-                static fn (BodyPageRow $row): string => $row->organ->getAbbr(),
+                static fn (BodyPageRow $row): string => $row->organ->abbr,
                 $overview->getBodies(),
             ),
             'A body that has been abrogated is still a body the register knows about.',
@@ -209,7 +209,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
             'The seed is expected to contain a general members\' meeting.',
         );
 
-        return $meetings[0]->getNumber();
+        return $meetings[0]->number;
     }
 
     private function render(Response $response): string
@@ -274,7 +274,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
                     continue;
                 }
 
-                return $meeting->getNumber();
+                return $meeting->number;
             }
         }
 

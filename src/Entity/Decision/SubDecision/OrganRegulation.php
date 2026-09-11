@@ -27,7 +27,7 @@ class OrganRegulation extends SubDecision
      * Abbreviation of the organ.
      */
     #[Column(type: Types::STRING)]
-    private string $abbr;
+    public string $abbr;
 
     /**
      * Type of the organ.
@@ -45,25 +45,25 @@ class OrganRegulation extends SubDecision
         type: Types::STRING,
         length: 32,
     )]
-    private string $version;
+    public string $version;
 
     /**
      * Date of the regulation.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * If the regulation was approved.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $approval;
+    public bool $approval;
 
     /**
      * If there were changes made.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $changes;
+    public bool $changes;
 
     /**
      * Get the member.
@@ -82,85 +82,5 @@ class OrganRegulation extends SubDecision
     public function setOrganType(OrganTypes $organType): void
     {
         $this->organType = $organType;
-    }
-
-    /**
-     * Get the abbreviation.
-     */
-    public function getAbbr(): string
-    {
-        return $this->abbr;
-    }
-
-    /**
-     * Set the abbreviation.
-     */
-    public function setAbbr(string $abbr): void
-    {
-        $this->abbr = $abbr;
-    }
-
-    /**
-     * Get the version.
-     */
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
-
-    /**
-     * Set the version.
-     */
-    public function setVersion(string $version): void
-    {
-        $this->version = $version;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set the date.
-     */
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * Get approval status.
-     */
-    public function getApproval(): bool
-    {
-        return $this->approval;
-    }
-
-    /**
-     * Set approval status.
-     */
-    public function setApproval(bool $approval): void
-    {
-        $this->approval = $approval;
-    }
-
-    /**
-     * Get if changes were made.
-     */
-    public function getChanges(): bool
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Set if changes were made.
-     */
-    public function setChanges(bool $changes): void
-    {
-        $this->changes = $changes;
     }
 }

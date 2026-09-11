@@ -86,7 +86,7 @@ final readonly class NotifyOnProposalDecisionListener
         $creator = $proposal->getCreatedBy();
         $user = null === $creator
             ? null
-            : $this->userRepository->find($creator->getLidnr());
+            : $this->userRepository->find($creator->lidnr);
 
         if (null === $user) {
             return;

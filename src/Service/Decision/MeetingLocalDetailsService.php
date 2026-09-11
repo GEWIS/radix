@@ -36,7 +36,7 @@ final readonly class MeetingLocalDetailsService
         ?string $location,
         User $actor,
     ): void {
-        $details = $meeting->getLocalDetails();
+        $details = $meeting->localDetails;
         $isNew = null === $details;
 
         if (null === $details) {
@@ -62,14 +62,14 @@ final readonly class MeetingLocalDetailsService
 
         if (
             !$isNew
-            && $time?->format('H:i') === $details->getStartTime()?->format('H:i')
-            && $location === $details->getLocation()
+            && $time?->format('H:i') === $details->startTime?->format('H:i')
+            && $location === $details->location
         ) {
             return;
         }
 
-        $details->setStartTime($time);
-        $details->setLocation($location);
+        $details->startTime = $time;
+        $details->location = $location;
 
         $this->activityLogger->log(
             $actor,

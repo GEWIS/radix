@@ -71,15 +71,15 @@ final readonly class MeetingDocumentZipBuilder
         foreach ($entries as [$document, $version]) {
             $name = sprintf(
                 '%s (%s)',
-                $document->getName(),
-                $version->getVersionLabel(),
+                $document->name,
+                $version->versionLabel,
             );
 
-            $point = $document->getPoint();
+            $point = $document->point;
             if (null !== $point) {
                 $name = sprintf(
                     '%s. %s',
-                    $point->getNumber(),
+                    $point->number,
                     $name,
                 );
             }
@@ -108,7 +108,7 @@ final readonly class MeetingDocumentZipBuilder
             $used[$entryName] = true;
             $zip->addFromString(
                 $entryName,
-                $this->fileStorage->read($version->getPath()),
+                $this->fileStorage->read($version->path),
             );
         }
 

@@ -55,7 +55,7 @@ final readonly class OrganRevisionNotification implements RevisionNotificationIn
 
         return sprintf(
             'Body page submitted for review: %s',
-            $revision->getOrgan()->getAbbr(),
+            $revision->getOrgan()->abbr,
         );
     }
 }

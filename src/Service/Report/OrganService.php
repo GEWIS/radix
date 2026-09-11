@@ -31,21 +31,21 @@ class OrganService
             'organ',
         );
         if ($rp->isInitialized($foundation)) {
-            $repOrgan = $foundation->getOrgan();
+            $repOrgan = $foundation->organ;
         } else {
             $repOrgan = null;
         }
 
         if (null === $repOrgan) {
             $repOrgan = new ReportOrgan();
-            $repOrgan->setFoundation($foundation);
-            $foundation->setOrgan($repOrgan);
+            $repOrgan->foundation = $foundation;
+            $foundation->organ = $repOrgan;
         }
 
-        $repOrgan->setAbbr($foundation->getAbbr());
-        $repOrgan->setName($foundation->getName());
-        $repOrgan->setType($foundation->getOrganType());
-        $repOrgan->setFoundationDate($foundation->getDecision()->getMeeting()->getDate());
+        $repOrgan->abbr = $foundation->abbr;
+        $repOrgan->name = $foundation->name;
+        $repOrgan->type = $foundation->organType;
+        $repOrgan->foundationDate = $foundation->decision->meeting->date;
 
         // To ensure that the subdecision is correctly linked to the organ.
         $repOrgan->addSubdecision($foundation);
@@ -61,8 +61,8 @@ class OrganService
             ReportFoundation::class,
             'organ',
         );
-        if ($rp->isInitialized($ref->getFoundation())) {
-            $repOrgan = $ref->getFoundation()->getOrgan();
+        if ($rp->isInitialized($ref->foundation)) {
+            $repOrgan = $ref->foundation->organ;
         } else {
             $repOrgan = null;
         }
@@ -71,7 +71,7 @@ class OrganService
             // Grabbing the organ from the foundation doesn't work when it has not been saved yet
             $repo = $this->emReport->getRepository(ReportOrgan::class);
             $repOrgan = $repo->findOneBy([
-                'foundation' => $ref->getFoundation(),
+                'foundation' => $ref->foundation,
             ]);
 
             if (null === $repOrgan) {
@@ -79,16 +79,16 @@ class OrganService
             }
         }
 
-        $abrogationDate = $ref->getDecision()->getMeeting()->getDate();
-        $repOrgan->setAbrogationDate($abrogationDate);
+        $abrogationDate = $ref->decision->meeting->date;
+        $repOrgan->abrogationDate = $abrogationDate;
 
         // Abolishing an organ discharges whoever is still in it; there is no separate decision for that.
         foreach ($repOrgan->getMembers() as $organMember) {
-            if (null !== $organMember->getDischargeDate()) {
+            if (null !== $organMember->dischargeDate) {
                 continue;
             }
 
-            $organMember->setDischargeDate($abrogationDate);
+            $organMember->dischargeDate = $abrogationDate;
             $this->emReport->persist($organMember);
         }
 
@@ -107,7 +107,7 @@ class OrganService
             'organMember',
         );
         if ($rp->isInitialized($ref)) {
-            $organMember = $ref->getOrganMember();
+            $organMember = $ref->organMember;
         } else {
             $organMember = null;
         }
@@ -116,8 +116,8 @@ class OrganService
             ReportFoundation::class,
             'organ',
         );
-        if ($rp->isInitialized($ref->getFoundation())) {
-            $repOrgan = $ref->getFoundation()->getOrgan();
+        if ($rp->isInitialized($ref->foundation)) {
+            $repOrgan = $ref->foundation->organ;
         } else {
             $repOrgan = null;
         }
@@ -125,7 +125,7 @@ class OrganService
         if (null === $repOrgan) {
             // Grabbing the organ from the foundation doesn't work when it has not been saved yet
             $repOrgan = $repo->findOneBy([
-                'foundation' => $ref->getFoundation(),
+                'foundation' => $ref->foundation,
             ]);
 
             if (null === $repOrgan) {
@@ -136,31 +136,31 @@ class OrganService
         if (null === $organMember) {
             $organMember = new ReportOrganMember();
             // set the ID stuff
-            $organMember->setOrgan($repOrgan);
-            $organMember->setMember($ref->getMember());
-            $function = $ref->getFunction();
+            $organMember->organ = $repOrgan;
+            $organMember->member = $ref->getMember();
+            $function = $ref->function;
 
-            $organMember->setFunction($function);
-            $organMember->setInstallDate($ref->getDecision()->getMeeting()->getDate());
+            $organMember->function = $function;
+            $organMember->installDate = $ref->decision->meeting->date;
         }
 
-        $organMember->setInstallation($ref);
-        $ref->setOrganMember($organMember);
+        $organMember->installation = $ref;
+        $ref->organMember = $organMember;
         $repOrgan->addMember($organMember);
-        $discharge = $ref->getDischarge();
+        $discharge = $ref->discharge;
 
         if (null !== $discharge) {
-            $organMember->setDischargeDate($discharge->getDecision()->getMeeting()->getDate());
+            $organMember->dischargeDate = $discharge->decision->meeting->date;
 
             // also add discharge as related
             $repOrgan->addSubdecision($discharge);
         }
 
         if (
-            null !== $repOrgan->getAbrogationDate()
-            && null === $organMember->getDischargeDate()
+            null !== $repOrgan->abrogationDate
+            && null === $organMember->dischargeDate
         ) {
-            $organMember->setDischargeDate($repOrgan->getAbrogationDate());
+            $organMember->dischargeDate = $repOrgan->abrogationDate;
         }
 
         // To ensure that the subdecision is correctly linked to the organ.
@@ -178,11 +178,11 @@ class OrganService
             ReportInstallation::class,
             'organMember',
         );
-        if ($rp->isInitialized($ref->getInstallation())) {
-            $organMember = $ref->getInstallation()->getOrganMember();
+        if ($rp->isInitialized($ref->installation)) {
+            $organMember = $ref->installation->organMember;
         } else {
             $organMember = $this->emReport->getRepository(ReportOrganMember::class)
-                ->findOneBy(['installation' => $ref->getInstallation()]);
+                ->findOneBy(['installation' => $ref->installation]);
         }
 
         if (null === $organMember) {
@@ -195,8 +195,8 @@ class OrganService
             ReportFoundation::class,
             'organ',
         );
-        if ($rp->isInitialized($organMember->getInstallation()->getFoundation())) {
-            $repOrgan = $organMember->getInstallation()->getFoundation()->getOrgan();
+        if ($rp->isInitialized($organMember->installation->foundation)) {
+            $repOrgan = $organMember->installation->foundation->organ;
         } else {
             $repOrgan = null;
         }
@@ -204,7 +204,7 @@ class OrganService
         if (null === $repOrgan) {
             // Grabbing the organ from the foundation doesn't work when it has not been saved yet
             $repOrgan = $this->emReport->getRepository(ReportOrgan::class)->findOneBy([
-                'foundation' => $organMember->getInstallation()->getFoundation(),
+                'foundation' => $organMember->installation->foundation,
             ]);
 
             if (null === $repOrgan) {
@@ -212,7 +212,7 @@ class OrganService
             }
         }
 
-        $organMember->setDischargeDate($ref->getDecision()->getMeeting()->getDate());
+        $organMember->dischargeDate = $ref->decision->meeting->date;
 
         // To ensure that the subdecision is correctly linked to the organ.
         $repOrgan->addSubdecision($ref);

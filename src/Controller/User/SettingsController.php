@@ -111,7 +111,7 @@ class SettingsController extends AbstractController
 
         $hasDataExport = ExportUserDataHandler::isAvailable(
             $fileStorage,
-            $user->member->getLidnr(),
+            $user->member->lidnr,
         );
         // "Being prepared" only while there is no downloadable file yet and a request was made within the window.
         $latestRequest = $this->dataExportRequestRepository->findLatestForUser($user);
@@ -330,7 +330,7 @@ class SettingsController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $lidnr = $user->member->getLidnr();
+        $lidnr = $user->member->lidnr;
 
         // Do not queue another job while the member still has a downloadable export, or one is already being prepared.
         if (
@@ -396,7 +396,7 @@ class SettingsController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $lidnr = $user->member->getLidnr();
+        $lidnr = $user->member->lidnr;
         if (
             !ExportUserDataHandler::isAvailable(
                 $fileStorage,

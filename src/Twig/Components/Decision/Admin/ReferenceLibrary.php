@@ -79,7 +79,7 @@ final class ReferenceLibrary
         // renamed and again after syncEdits() clears it, the first keystroke fails with "Invalid model name".
         // Only missing keys are filled: on a re-render the array comes back carrying what the reader typed.
         foreach ($rows as [$document]) {
-            $this->nameEdits[(string) $document->getId()]['name'] ??= $document->getName();
+            $this->nameEdits[(string) $document->getId()]['name'] ??= $document->name;
         }
 
         return $rows;
@@ -113,7 +113,7 @@ final class ReferenceLibrary
             if (
                 null === $document
                 || '' === $name
-                || $name === $document->getName()
+                || $name === $document->name
             ) {
                 continue;
             }

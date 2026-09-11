@@ -53,7 +53,7 @@ class MeetingLocalDetails
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public private(set) Meeting $meeting;
 
     /**
      * The time the meeting starts. Meetings have no end time; they run until closed.
@@ -62,44 +62,19 @@ class MeetingLocalDetails
         type: Types::TIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $startTime = null;
+    public ?DateTime $startTime = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $location = null;
-
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
+    public ?string $location = null;
 
     public function setMeeting(Meeting $meeting): void
     {
-        $meeting->setLocalDetails($this);
+        $meeting->localDetails = $this;
         $this->meeting = $meeting;
-        $this->meeting_type = $meeting->getType();
-        $this->meeting_number = $meeting->getNumber();
-    }
-
-    public function getStartTime(): ?DateTime
-    {
-        return $this->startTime;
-    }
-
-    public function setStartTime(?DateTime $startTime): void
-    {
-        $this->startTime = $startTime;
-    }
-
-    public function getLocation(): ?string
-    {
-        return $this->location;
-    }
-
-    public function setLocation(?string $location): void
-    {
-        $this->location = $location;
+        $this->meeting_type = $meeting->type;
+        $this->meeting_number = $meeting->number;
     }
 }

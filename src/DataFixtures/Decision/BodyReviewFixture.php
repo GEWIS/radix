@@ -57,27 +57,27 @@ class BodyReviewFixture extends Fixture implements DependentFixtureInterface, Fi
         $draft->setRevisionNumber(2);
         $draft->setPreviousRevision($live);
         $draft->setAuthor($author);
-        $draft->setShortDescription(new DecisionLocalisedText(
+        $draft->shortDescription = new DecisionLocalisedText(
             'Three members who decide what is good enough, and say why.',
             'Drie leden die bepalen wat goed genoeg is, en uitleggen waarom.',
-        ));
-        $draft->setDescription(new DecisionLocalisedText(
+        );
+        $draft->description = new DecisionLocalisedText(
             'KEUR looks at what the association produces and says whether it passes. We publish our findings after '
             . 'every round, together with the reasoning behind them.',
             'KEUR bekijkt wat de vereniging maakt en zegt of het door de keuring komt. Na elke ronde publiceren we '
             . 'onze bevindingen, samen met de onderbouwing.',
-        ));
-        $draft->setEmail($live->getEmail());
-        $draft->setWebsite('https://keur.gewis.nl');
-        $draft->setBannerSource($live->getBannerSource());
-        $draft->setBannerCrop($live->getBannerCrop());
-        $draft->setBannerPath($live->getBannerPath());
+        );
+        $draft->email = $live->email;
+        $draft->website = 'https://keur.gewis.nl';
+        $draft->bannerSource = $live->bannerSource;
+        $draft->bannerCrop = $live->bannerCrop;
+        $draft->bannerPath = $live->bannerPath;
 
         // A different card image, so the board has two of them to look at side by side.
         $thumbnail = $this->imageGenerator->storeLogo('KEUR 2');
-        $draft->setLogoSource($thumbnail);
-        $draft->setLogoPath($thumbnail);
-        $draft->setLogoCrop($live->getLogoCrop());
+        $draft->logoSource = $thumbnail;
+        $draft->logoPath = $thumbnail;
+        $draft->logoCrop = $live->logoCrop;
 
         // The invite code is gone and an Instagram account has appeared, which is the kind of change the section exists
         // to show.

@@ -111,7 +111,7 @@ abstract class SubDecision
         name: 'decision_number',
         referencedColumnName: 'number',
     )]
-    private Decision $decision;
+    public private(set) Decision $decision;
 
     /**
      * Meeting type.
@@ -154,27 +154,19 @@ abstract class SubDecision
      */
     #[Id]
     #[Column(type: Types::INTEGER)]
-    private int $sequence;
+    public int $sequence;
 
     /**
      * Content in Dutch.
      */
     #[Column(type: Types::TEXT)]
-    private string $contentNL;
+    public string $contentNL;
 
     /**
      * Content in English.
      */
     #[Column(type: Types::TEXT)]
-    private string $contentEN;
-
-    /**
-     * Get the decision.
-     */
-    public function getDecision(): Decision
-    {
-        return $this->decision;
-    }
+    public string $contentEN;
 
     /**
      * Set the decision.
@@ -184,8 +176,8 @@ abstract class SubDecision
         $decision->addSubdecision($this);
         $this->meeting_type = $decision->getMeetingType();
         $this->meeting_number = $decision->getMeetingNumber();
-        $this->decision_point = $decision->getPoint();
-        $this->decision_number = $decision->getNumber();
+        $this->decision_point = $decision->point;
+        $this->decision_number = $decision->number;
         $this->decision = $decision;
     }
 
@@ -222,54 +214,6 @@ abstract class SubDecision
     }
 
     /**
-     * Get the sequence number.
-     */
-    public function getSequence(): int
-    {
-        return $this->sequence;
-    }
-
-    /**
-     * Set the sequence number.
-     */
-    public function setSequence(int $sequence): void
-    {
-        $this->sequence = $sequence;
-    }
-
-    /**
-     * Get the content in Dutch.
-     */
-    public function getContentNL(): string
-    {
-        return $this->contentNL;
-    }
-
-    /**
-     * Set the content in Dutch.
-     */
-    public function setContentNL(string $content): void
-    {
-        $this->contentNL = $content;
-    }
-
-    /**
-     * Get the content in English.
-     */
-    public function getContentEN(): string
-    {
-        return $this->contentEN;
-    }
-
-    /**
-     * Set the content in English.
-     */
-    public function setContentEN(string $content): void
-    {
-        $this->contentEN = $content;
-    }
-
-    /**
      * @return SubDecisionGdprArrayType
      */
     public function toGdprArray(): array
@@ -279,9 +223,9 @@ abstract class SubDecision
             'meeting_number' => $this->getMeetingNumber(),
             'decision_point' => $this->getDecisionPoint(),
             'decision_number' => $this->getDecisionNumber(),
-            'subdecision_sequence' => $this->getSequence(),
-            'contentNL' => $this->getContentNL(),
-            'contentEN' => $this->getContentEN(),
+            'subdecision_sequence' => $this->sequence,
+            'contentNL' => $this->contentNL,
+            'contentEN' => $this->contentEN,
         ];
     }
 }

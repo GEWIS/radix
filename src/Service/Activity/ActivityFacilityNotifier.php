@@ -145,18 +145,18 @@ final readonly class ActivityFacilityNotifier
             )
             : sprintf(
                 '%s: %s on %s',
-                $organ->getAbbr(),
+                $organ->abbr,
                 $this->title($revision),
                 $this->when($revision),
             );
 
         $author = $revision->getAuthor();
-        $organEmail = $organ?->getOrganInformation()?->getEmail();
-        $memberEmail = $author?->getEmail();
+        $organEmail = $organ?->organInformation?->getEmail();
+        $memberEmail = $author?->email;
         $replyTo = match (true) {
             null !== $organEmail => new Address(
                 $organEmail,
-                $organ?->getAbbr() ?? '',
+                $organ->abbr ?? '',
             ),
             null !== $memberEmail => new Address(
                 $memberEmail,
@@ -186,7 +186,7 @@ final readonly class ActivityFacilityNotifier
 
     private function requester(ActivityRevision $revision): string
     {
-        return $revision->organ?->getName()
+        return $revision->organ->name
             ?? $revision->getAuthorDisplayName();
     }
 

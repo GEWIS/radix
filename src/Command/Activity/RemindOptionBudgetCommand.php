@@ -109,7 +109,7 @@ final class RemindOptionBudgetCommand extends Command
             $ui->text(sprintf(
                 '%s (%s) on %s',
                 $proposal->name,
-                $proposal->organ?->getAbbr() ?? 'the board',
+                $proposal->organ->abbr ?? 'the board',
                 $proposal->chosenOption?->beginsAt->format('Y-m-d') ?? '?',
             ));
 
@@ -154,7 +154,7 @@ final class RemindOptionBudgetCommand extends Command
         $creator = $proposal->getCreatedBy();
         $user = null === $creator
             ? null
-            : $this->userRepository->find($creator->getLidnr());
+            : $this->userRepository->find($creator->lidnr);
 
         // A body whose member no longer has an account still gets its day released on time; there is simply nobody to
         // warn first, so the stamp is set anyway rather than looking again every night.

@@ -61,7 +61,7 @@ class GdprService
      */
     public function collectMemberData(Member $member): array
     {
-        $lidnr = $member->getLidnr();
+        $lidnr = $member->lidnr;
         $user = $this->userRepository->find($lidnr);
         $profilePhoto = $this->profilePhotoRepository->getProfilePhotoByLidnr($lidnr);
 

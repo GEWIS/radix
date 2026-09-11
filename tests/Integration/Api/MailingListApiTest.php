@@ -623,7 +623,7 @@ final class MailingListApiTest extends ApiTestCase
             $member,
         );
 
-        $member->setDeleted(true);
+        $member->deleted = true;
         $this->entityManager->flush();
     }
 

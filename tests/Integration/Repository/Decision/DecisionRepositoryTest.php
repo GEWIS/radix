@@ -47,11 +47,11 @@ final class DecisionRepositoryTest extends DatabaseTestCase
         foreach ($results as $decision) {
             self::assertSame(
                 MeetingTypes::BV,
-                $decision->getMeeting()->getType(),
+                $decision->meeting->type,
             );
             self::assertSame(
                 1800,
-                $decision->getMeeting()->getNumber(),
+                $decision->meeting->number,
             );
         }
     }
@@ -64,7 +64,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
         foreach ($results as $decision) {
             self::assertSame(
                 2,
-                $decision->getPoint(),
+                $decision->point,
             );
         }
     }
@@ -80,7 +80,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
         self::assertNotEmpty($results);
         foreach ($results as $decision) {
             self::assertNull(
-                $decision->getCounterpart(),
+                $decision->counterpart,
                 'A decision that repeats another should not answer a search the one it repeats answers.',
             );
         }
@@ -105,11 +105,11 @@ final class DecisionRepositoryTest extends DatabaseTestCase
 
         foreach ($repeats as $key => $decisions) {
             foreach ($decisions as $decision) {
-                $counterpart = $decision->getCounterpart();
+                $counterpart = $decision->counterpart;
 
                 self::assertSame(
                     MeetingTypes::VIRT,
-                    $decision->getMeeting()->getType(),
+                    $decision->meeting->type,
                 );
                 self::assertNotNull($counterpart);
                 self::assertSame(
@@ -131,7 +131,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
             1,
             $results,
         );
-        self::assertNotNull($results[0]->getCounterpart());
+        self::assertNotNull($results[0]->counterpart);
     }
 
     public function testExcludedTermsDropMatches(): void
@@ -149,7 +149,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
         foreach ($narrowed as $decision) {
             self::assertStringNotContainsString(
                 'opgericht',
-                $decision->getContentNL(),
+                $decision->contentNL,
             );
         }
     }
@@ -168,7 +168,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
         foreach ($results as $decision) {
             self::assertSame(
                 MeetingTypes::BV,
-                $decision->getMeeting()->getType(),
+                $decision->meeting->type,
             );
         }
 
@@ -258,7 +258,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
         foreach ($this->search('type:bm 1') as $decision) {
             self::assertSame(
                 MeetingTypes::BV,
-                $decision->getMeeting()->getType(),
+                $decision->meeting->type,
             );
         }
     }
@@ -289,7 +289,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
             1,
             $results,
         );
-        self::assertNotNull($results[0]->getCounterpart());
+        self::assertNotNull($results[0]->counterpart);
     }
 
     /**

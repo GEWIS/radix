@@ -62,7 +62,7 @@ class MemberInfoService
         $installations = $member->getBoardInstallations()->toArray();
         usort(
             $installations,
-            static fn (BoardMember $a, BoardMember $b): int => $b->getInstallDate() <=> $a->getInstallDate(),
+            static fn (BoardMember $a, BoardMember $b): int => $b->installDate <=> $a->installDate,
         );
 
         $current = [];
@@ -70,9 +70,9 @@ class MemberInfoService
 
         foreach ($installations as $installation) {
             $entry = [
-                'function' => $installation->getFunction()->trans($this->translator),
-                'installDate' => $installation->getInstallDate(),
-                'releaseDate' => $installation->getReleaseDate(),
+                'function' => $installation->function->trans($this->translator),
+                'installDate' => $installation->installDate,
+                'releaseDate' => $installation->releaseDate,
             ];
 
             if ($member->isCurrentBoard($installation)) {
@@ -98,8 +98,8 @@ class MemberInfoService
         $organs = [];
 
         foreach ($installations as $installation) {
-            $organ = $installation->getOrgan();
-            $abbreviation = $organ->getAbbr();
+            $organ = $installation->organ;
+            $abbreviation = $organ->abbr;
 
             if (!isset($organs[$abbreviation])) {
                 $organs[$abbreviation] = [
@@ -108,7 +108,7 @@ class MemberInfoService
                 ];
             }
 
-            $function = $installation->getFunction();
+            $function = $installation->function;
             if ($function->isAdministrative()) {
                 continue;
             }

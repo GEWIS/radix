@@ -42,7 +42,7 @@ class OrganInformationRevision extends AbstractRevision
         inversedBy: 'revisions',
     )]
     #[JoinColumn(nullable: false)]
-    private OrganInformation $organInformation;
+    public OrganInformation $organInformation;
 
     /**
      * The revision this one supersedes (null for the first revision in the chain).
@@ -67,7 +67,7 @@ class OrganInformationRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private DecisionLocalisedText $shortDescription;
+    public DecisionLocalisedText $shortDescription;
 
     /**
      * What the body has to say about itself on its own page, as markdown.
@@ -85,19 +85,19 @@ class OrganInformationRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private DecisionLocalisedText $description;
+    public DecisionLocalisedText $description;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $email = null;
+    public ?string $email = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $website = null;
+    public ?string $website = null;
 
     /**
      * The image as it was uploaded, kept so the crop can be adjusted later.
@@ -106,7 +106,7 @@ class OrganInformationRevision extends AbstractRevision
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $bannerSource = null;
+    public ?string $bannerSource = null;
 
     /**
      * The part of the source the cover shows, as fractions of the source.
@@ -117,7 +117,7 @@ class OrganInformationRevision extends AbstractRevision
         type: Types::JSON,
         nullable: true,
     )]
-    private ?array $bannerCrop = null;
+    public ?array $bannerCrop = null;
 
     /**
      * The cropped cover, which is what the page is served.
@@ -126,13 +126,13 @@ class OrganInformationRevision extends AbstractRevision
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $bannerPath = null;
+    public ?string $bannerPath = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $logoSource = null;
+    public ?string $logoSource = null;
 
     /**
      * The part of the source the thumbnail shows, as fractions of the source.
@@ -143,13 +143,13 @@ class OrganInformationRevision extends AbstractRevision
         type: Types::JSON,
         nullable: true,
     )]
-    private ?array $logoCrop = null;
+    public ?array $logoCrop = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $logoPath = null;
+    public ?string $logoPath = null;
 
     /** @var Collection<array-key, OrganSocialLink> */
     #[OneToMany(
@@ -194,22 +194,12 @@ class OrganInformationRevision extends AbstractRevision
         return OrganInformationRevisionComment::class;
     }
 
-    public function getOrganInformation(): OrganInformation
-    {
-        return $this->organInformation;
-    }
-
-    public function setOrganInformation(OrganInformation $organInformation): void
-    {
-        $this->organInformation = $organInformation;
-    }
-
     /**
      * The body this revision describes, which the aggregate holds because it never changes.
      */
     public function getOrgan(): Organ
     {
-        return $this->organInformation->getOrgan();
+        return $this->organInformation->organ;
     }
 
     #[Override]
@@ -229,118 +219,6 @@ class OrganInformationRevision extends AbstractRevision
         $this->previousRevision = null;
     }
 
-    public function getShortDescription(): DecisionLocalisedText
-    {
-        return $this->shortDescription;
-    }
-
-    public function setShortDescription(DecisionLocalisedText $shortDescription): void
-    {
-        $this->shortDescription = $shortDescription;
-    }
-
-    public function getDescription(): DecisionLocalisedText
-    {
-        return $this->description;
-    }
-
-    public function setDescription(DecisionLocalisedText $description): void
-    {
-        $this->description = $description;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(?string $email): void
-    {
-        $this->email = $email;
-    }
-
-    public function getWebsite(): ?string
-    {
-        return $this->website;
-    }
-
-    public function setWebsite(?string $website): void
-    {
-        $this->website = $website;
-    }
-
-    public function getBannerSource(): ?string
-    {
-        return $this->bannerSource;
-    }
-
-    public function setBannerSource(?string $bannerSource): void
-    {
-        $this->bannerSource = $bannerSource;
-    }
-
-    /**
-     * @return array<string, float>|null
-     */
-    public function getBannerCrop(): ?array
-    {
-        return $this->bannerCrop;
-    }
-
-    /**
-     * @param array<string, float>|null $bannerCrop
-     */
-    public function setBannerCrop(?array $bannerCrop): void
-    {
-        $this->bannerCrop = $bannerCrop;
-    }
-
-    public function getBannerPath(): ?string
-    {
-        return $this->bannerPath;
-    }
-
-    public function setBannerPath(?string $bannerPath): void
-    {
-        $this->bannerPath = $bannerPath;
-    }
-
-    public function getLogoSource(): ?string
-    {
-        return $this->logoSource;
-    }
-
-    public function setLogoSource(?string $logoSource): void
-    {
-        $this->logoSource = $logoSource;
-    }
-
-    /**
-     * @return array<string, float>|null
-     */
-    public function getLogoCrop(): ?array
-    {
-        return $this->logoCrop;
-    }
-
-    /**
-     * @param array<string, float>|null $logoCrop
-     */
-    public function setLogoCrop(?array $logoCrop): void
-    {
-        $this->logoCrop = $logoCrop;
-    }
-
-    public function getLogoPath(): ?string
-    {
-        return $this->logoPath;
-    }
-
-    public function setLogoPath(?string $logoPath): void
-    {
-        $this->logoPath = $logoPath;
-    }
-
     /**
      * @return Collection<array-key, OrganSocialLink>
      */
@@ -354,7 +232,7 @@ class OrganInformationRevision extends AbstractRevision
     protected function newSocialLink(SocialPlatform $platform): OrganSocialLink
     {
         $link = new OrganSocialLink($platform);
-        $link->setRevision($this);
+        $link->revision = $this;
 
         return $link;
     }

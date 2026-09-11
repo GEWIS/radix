@@ -54,9 +54,9 @@ final readonly class OrganPageService
             if (null === $stored) {
                 $uploaded = false;
             } else {
-                $revision->setBannerSource($stored);
-                $revision->setBannerCrop(null);
-                $revision->setBannerPath($stored);
+                $revision->bannerSource = $stored;
+                $revision->bannerCrop = null;
+                $revision->bannerPath = $stored;
             }
         }
 
@@ -66,25 +66,33 @@ final readonly class OrganPageService
             if (null === $stored) {
                 $uploaded = false;
             } else {
-                $revision->setLogoSource($stored);
-                $revision->setLogoCrop(null);
-                $revision->setLogoPath($stored);
+                $revision->logoSource = $stored;
+                $revision->logoCrop = null;
+                $revision->logoPath = $stored;
             }
         }
 
         $bannerCropped = $this->applyCrop(
             $bannerCrop,
-            $revision->getBannerSource(),
+            $revision->bannerSource,
             ImagesStepType::BANNER_MINIMUM_WIDTH,
-            $revision->setBannerCrop(...),
-            $revision->setBannerPath(...),
+            static function (array $crop) use ($revision): void {
+                $revision->bannerCrop = $crop;
+            },
+            static function (string $path) use ($revision): void {
+                $revision->bannerPath = $path;
+            },
         );
         $logoCropped = $this->applyCrop(
             $logoCrop,
-            $revision->getLogoSource(),
+            $revision->logoSource,
             ImagesStepType::LOGO_MINIMUM_WIDTH,
-            $revision->setLogoCrop(...),
-            $revision->setLogoPath(...),
+            static function (array $crop) use ($revision): void {
+                $revision->logoCrop = $crop;
+            },
+            static function (string $path) use ($revision): void {
+                $revision->logoPath = $path;
+            },
         );
 
         return $uploaded
@@ -116,8 +124,8 @@ final readonly class OrganPageService
         User $user,
     ): OrganInformation {
         $page = new OrganInformation();
-        $page->setOrgan($organ);
-        $organ->setOrganInformation($page);
+        $page->organ = $organ;
+        $organ->organInformation = $page;
 
         $this->entityManager->persist($page);
 

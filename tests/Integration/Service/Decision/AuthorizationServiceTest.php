@@ -47,7 +47,7 @@ final class AuthorizationServiceTest extends DatabaseTestCase
 
         self::assertSame(
             8006,
-            $authorization->getRecipient()->getLidnr(),
+            $authorization->recipient->lidnr,
         );
         self::assertContains(
             AuthorizationCreatedEmail::class,
@@ -112,7 +112,7 @@ final class AuthorizationServiceTest extends DatabaseTestCase
             $authorizer,
         );
 
-        self::assertNotNull($authorization->getRevokedAt());
+        self::assertNotNull($authorization->revokedAt);
         self::assertContains(
             AuthorizationRevokedEmail::class,
             $this->dispatchedMessageClasses(),
@@ -128,7 +128,7 @@ final class AuthorizationServiceTest extends DatabaseTestCase
             $other,
             $authorizer,
         );
-        self::assertNull($other->getRevokedAt());
+        self::assertNull($other->revokedAt);
     }
 
     /**

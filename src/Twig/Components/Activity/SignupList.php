@@ -126,7 +126,7 @@ final class SignupList
         return SignupListView::fromSignupList(
             $this->signupList,
             true,
-            $this->currentMember()->getLidnr(),
+            $this->currentMember()->lidnr,
             $this->translator,
         );
     }

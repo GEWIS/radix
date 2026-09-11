@@ -169,7 +169,7 @@ class MeetingService
                 continue;
             }
 
-            $reportDecision->setCounterpart($this->findReportDecision($counterpart));
+            $reportDecision->counterpart = $this->findReportDecision($counterpart);
         }
     }
 
@@ -179,15 +179,15 @@ class MeetingService
 
         if (null === $reportMeeting) {
             $reportMeeting = new ReportMeeting();
-            $reportMeeting->setType($meeting->getType());
-            $reportMeeting->setNumber($meeting->getNumber());
-            $reportMeeting->setDate($meeting->getDate());
-        } elseif ($reportMeeting->getDate()->format('Y-m-d') !== $meeting->getDate()->format('Y-m-d')) {
+            $reportMeeting->type = $meeting->getType();
+            $reportMeeting->number = $meeting->getNumber();
+            $reportMeeting->date = $meeting->getDate();
+        } elseif ($reportMeeting->date->format('Y-m-d') !== $meeting->getDate()->format('Y-m-d')) {
             // The type and number identify the meeting and can therefore never change, but the date can be corrected
             // after the fact, so it must be kept in sync. Only assign it when the stored date actually differs:
             // Doctrine detects changes by identity, so handing it an equal but distinct DateTime would mark the
             // meeting as dirty and rewrite the row on every single projection.
-            $reportMeeting->setDate($meeting->getDate());
+            $reportMeeting->date = $meeting->getDate();
         }
 
         foreach ($meeting->getDecisions() as $decision) {
@@ -227,8 +227,8 @@ class MeetingService
         if (null === $reportDecision) {
             $reportDecision = new ReportDecision();
             $reportDecision->setMeeting($reportMeeting);
-            $reportDecision->setPoint($decision->getPoint());
-            $reportDecision->setNumber($decision->getNumber());
+            $reportDecision->point = $decision->getPoint();
+            $reportDecision->number = $decision->getNumber();
         }
 
         // The decision a virtual one repeats, as far as it can be told from here: a decision the projection does not
@@ -242,7 +242,7 @@ class MeetingService
             null === $counterpart
             || null !== $projectedCounterpart
         ) {
-            $reportDecision->setCounterpart($projectedCounterpart);
+            $reportDecision->counterpart = $projectedCounterpart;
         }
 
         $contentNL = [];
@@ -270,8 +270,14 @@ class MeetingService
             $contentEN[] = '';
         }
 
-        $reportDecision->setContentNL(implode(' ', $contentNL));
-        $reportDecision->setContentEN(implode(' ', $contentEN));
+        $reportDecision->contentNL = implode(
+            ' ',
+            $contentNL,
+        );
+        $reportDecision->contentEN = implode(
+            ' ',
+            $contentEN,
+        );
 
         $this->emReport->persist($reportDecision);
     }
@@ -303,8 +309,14 @@ class MeetingService
             );
         }
 
-        $reportDecision->setContentNL(implode(' ', $contentNL));
-        $reportDecision->setContentEN(implode(' ', $contentEN));
+        $reportDecision->contentNL = implode(
+            ' ',
+            $contentNL,
+        );
+        $reportDecision->contentEN = implode(
+            ' ',
+            $contentEN,
+        );
 
         $this->emReport->persist($reportDecision);
     }
@@ -368,7 +380,7 @@ class MeetingService
         if (null === $reportSubDecision) {
             $reportSubDecision = new $class();
             $reportSubDecision->setDecision($reportDecision);
-            $reportSubDecision->setSequence($subdecision->getSequence());
+            $reportSubDecision->sequence = $subdecision->getSequence();
         }
 
         if ($subdecision instanceof DatabaseSubDecision\FoundationReference) {
@@ -380,14 +392,14 @@ class MeetingService
             $foundation = $this->findReportSubDecision($ref);
             assert($foundation instanceof ReportSubDecision\Foundation);
 
-            $reportSubDecision->setFoundation($foundation);
+            $reportSubDecision->foundation = $foundation;
         }
 
         // transfer specific data
         if ($subdecision instanceof DatabaseSubDecision\Installation) {
             assert($reportSubDecision instanceof ReportSubDecision\Installation);
 
-            $reportSubDecision->setFunction($subdecision->getFunction());
+            $reportSubDecision->function = $subdecision->getFunction();
             $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
         } elseif (
             $subdecision instanceof DatabaseSubDecision\Reappointment
@@ -402,14 +414,14 @@ class MeetingService
             $installation = $this->findReportSubDecision($ref);
             assert($installation instanceof ReportSubDecision\Installation);
 
-            $reportSubDecision->setInstallation($installation);
+            $reportSubDecision->installation = $installation;
         } elseif ($subdecision instanceof DatabaseSubDecision\Foundation) {
             assert($reportSubDecision instanceof ReportSubDecision\Foundation);
 
-            $reportSubDecision->setName($subdecision->getName());
-            $reportSubDecision->setAbbr($subdecision->getAbbr());
-            $reportSubDecision->setPurpose($subdecision->getPurpose());
-            $reportSubDecision->setOrganType($subdecision->getOrganType());
+            $reportSubDecision->name = $subdecision->getName();
+            $reportSubDecision->abbr = $subdecision->getAbbr();
+            $reportSubDecision->purpose = $subdecision->getPurpose();
+            $reportSubDecision->organType = $subdecision->getOrganType();
         } elseif (
             $subdecision instanceof DatabaseSubDecision\Financial\Statement
             || $subdecision instanceof DatabaseSubDecision\Financial\Budget
@@ -431,34 +443,34 @@ class MeetingService
             if ($subdecision instanceof DatabaseSubDecision\OrganRegulation) {
                 assert($reportSubDecision instanceof ReportSubDecision\OrganRegulation);
 
-                $reportSubDecision->setAbbr($subdecision->getAbbr());
+                $reportSubDecision->abbr = $subdecision->getAbbr();
                 $reportSubDecision->setOrganType($subdecision->getOrganType());
             } else {
                 assert($reportSubDecision instanceof ReportSubDecision\Financial\Budget);
 
-                $reportSubDecision->setName($subdecision->getName());
+                $reportSubDecision->name = $subdecision->getName();
             }
 
-            $reportSubDecision->setVersion($subdecision->getVersion());
-            $reportSubDecision->setDate($subdecision->getDate());
-            $reportSubDecision->setApproval($subdecision->getApproval());
-            $reportSubDecision->setChanges($subdecision->getChanges());
+            $reportSubDecision->version = $subdecision->getVersion();
+            $reportSubDecision->date = $subdecision->getDate();
+            $reportSubDecision->approval = $subdecision->getApproval();
+            $reportSubDecision->changes = $subdecision->getChanges();
         } elseif ($subdecision instanceof DatabaseSubDecision\Minutes) {
             assert($reportSubDecision instanceof ReportSubDecision\Minutes);
 
             $meeting = $this->findReportMeeting($subdecision->getTarget());
             assert($meeting instanceof ReportMeeting);
 
-            $reportSubDecision->setMeeting($meeting);
+            $reportSubDecision->meeting = $meeting;
             $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
-            $reportSubDecision->setApproval($subdecision->getApproval());
-            $reportSubDecision->setChanges($subdecision->getChanges());
+            $reportSubDecision->approval = $subdecision->getApproval();
+            $reportSubDecision->changes = $subdecision->getChanges();
         } elseif ($subdecision instanceof DatabaseSubDecision\Board\Installation) {
             assert($reportSubDecision instanceof ReportSubDecision\Board\Installation);
 
-            $reportSubDecision->setFunction($subdecision->getFunction());
+            $reportSubDecision->function = $subdecision->getFunction();
             $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
-            $reportSubDecision->setDate($subdecision->getDate());
+            $reportSubDecision->date = $subdecision->getDate();
         } elseif ($subdecision instanceof DatabaseSubDecision\Board\Release) {
             assert($reportSubDecision instanceof ReportSubDecision\Board\Release);
 
@@ -466,8 +478,8 @@ class MeetingService
             $installation = $this->findReportSubDecision($ref);
             assert($installation instanceof ReportSubDecision\Board\Installation);
 
-            $reportSubDecision->setInstallation($installation);
-            $reportSubDecision->setDate($subdecision->getDate());
+            $reportSubDecision->installation = $installation;
+            $reportSubDecision->date = $subdecision->getDate();
         } elseif ($subdecision instanceof DatabaseSubDecision\Board\Discharge) {
             assert($reportSubDecision instanceof ReportSubDecision\Board\Discharge);
 
@@ -475,11 +487,11 @@ class MeetingService
             $installation = $this->findReportSubDecision($ref);
             assert($installation instanceof ReportSubDecision\Board\Installation);
 
-            $reportSubDecision->setInstallation($installation);
+            $reportSubDecision->installation = $installation;
         } elseif ($subdecision instanceof DatabaseSubDecision\Board\Candidacy) {
             assert($reportSubDecision instanceof ReportSubDecision\Board\Candidacy);
 
-            $reportSubDecision->setBoardYear($subdecision->getBoardYear());
+            $reportSubDecision->boardYear = $subdecision->getBoardYear();
         } elseif ($subdecision instanceof DatabaseSubDecision\Board\Candidate) {
             assert($reportSubDecision instanceof ReportSubDecision\Board\Candidate);
 
@@ -488,7 +500,7 @@ class MeetingService
             assert($reportSubDecision instanceof ReportSubDecision\Key\Granting);
 
             $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
-            $reportSubDecision->setUntil($subdecision->getUntil());
+            $reportSubDecision->until = $subdecision->getUntil();
         } elseif ($subdecision instanceof DatabaseSubDecision\Key\Withdrawal) {
             assert($reportSubDecision instanceof ReportSubDecision\Key\Withdrawal);
 
@@ -496,8 +508,8 @@ class MeetingService
             $granting = $this->findReportSubDecision($ref);
             assert($granting instanceof ReportSubDecision\Key\Granting);
 
-            $reportSubDecision->setGranting($granting);
-            $reportSubDecision->setWithdrawnOn($subdecision->getWithdrawnOn());
+            $reportSubDecision->granting = $granting;
+            $reportSubDecision->withdrawnOn = $subdecision->getWithdrawnOn();
         } elseif ($subdecision instanceof DatabaseSubDecision\Member\Warning) {
             assert($reportSubDecision instanceof ReportSubDecision\Member\Warning);
 
@@ -506,15 +518,15 @@ class MeetingService
             assert($reportSubDecision instanceof ReportSubDecision\Member\Suspension);
 
             $reportSubDecision->setMember($this->findMember($subdecision->getMember()));
-            $reportSubDecision->setSince($subdecision->getSince());
-            $reportSubDecision->setUntil($subdecision->getUntil());
+            $reportSubDecision->since = $subdecision->getSince();
+            $reportSubDecision->until = $subdecision->getUntil();
         } elseif ($subdecision instanceof DatabaseSubDecision\Annulment) {
             assert($reportSubDecision instanceof ReportSubDecision\Annulment);
 
             $target = $this->findReportDecision($subdecision->getTarget());
             assert($target instanceof ReportDecision);
 
-            $reportSubDecision->setTarget($target);
+            $reportSubDecision->target = $target;
 
             // Annulment must be handled here, because it cannot be part of the process{X}Updates because the
             // subdecision is the annulment, not the target subdecision(s).
@@ -525,8 +537,14 @@ class MeetingService
         // Other decisions don't need special handling
 
         // for any decision, make sure the content is filled for Dutch and English
-        $reportSubDecision->setContentNL($subdecision->getTranslatedContent($this->translator, AppLanguages::Dutch));
-        $reportSubDecision->setContentEN($subdecision->getTranslatedContent($this->translator, AppLanguages::English));
+        $reportSubDecision->contentNL = $subdecision->getTranslatedContent(
+            $this->translator,
+            AppLanguages::Dutch,
+        );
+        $reportSubDecision->contentEN = $subdecision->getTranslatedContent(
+            $this->translator,
+            AppLanguages::English,
+        );
         $this->emReport->persist($reportSubDecision);
 
         return $reportSubDecision;
@@ -581,7 +599,7 @@ class MeetingService
     {
         if ($subDecision instanceof ReportSubDecision\Annulment) {
             if ($this->subDecisionService->stillReferences($subDecision)) {
-                $this->unannulDecision($subDecision->getTarget());
+                $this->unannulDecision($subDecision->target);
             }
         } else {
             // Deleting a subdecision undoes its effects in exactly the same way that annulling it does.
@@ -593,19 +611,19 @@ class MeetingService
             if ($this->subDecisionService->stillReferences($subDecision)) {
                 switch (true) {
                     case $subDecision instanceof ReportSubDecision\Discharge:
-                        $subDecision->getInstallation()->clearDischarge();
+                        $subDecision->installation->clearDischarge();
                         break;
 
                     case $subDecision instanceof ReportSubDecision\Board\Release:
-                        $subDecision->getInstallation()->clearRelease();
+                        $subDecision->installation->clearRelease();
                         break;
 
                     case $subDecision instanceof ReportSubDecision\Board\Discharge:
-                        $subDecision->getInstallation()->clearDischarge();
+                        $subDecision->installation->clearDischarge();
                         break;
 
                     case $subDecision instanceof ReportSubDecision\Key\Withdrawal:
-                        $subDecision->getGranting()->clearWithdrawal();
+                        $subDecision->granting->clearWithdrawal();
                         break;
                 }
             }

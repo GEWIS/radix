@@ -26,8 +26,8 @@ class MeetingLocalDetailsFixture extends Fixture implements DependentFixtureInte
             'meeting-gmm-upcoming',
             Meeting::class,
         ));
-        $details->setStartTime(new DateTime('20:00'));
-        $details->setLocation('Auditorium 4');
+        $details->startTime = new DateTime('20:00');
+        $details->location = 'Auditorium 4';
 
         $manager->persist($details);
         $manager->flush();

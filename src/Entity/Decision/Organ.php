@@ -54,13 +54,13 @@ class Organ
      * Abbreviation (only for when organs are created).
      */
     #[Column(type: Types::STRING)]
-    private string $abbr;
+    public string $abbr;
 
     /**
      * Name (only for when organs are created).
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * Type of the organ.
@@ -69,7 +69,7 @@ class Organ
         type: Types::STRING,
         enumType: OrganTypes::class,
     )]
-    private OrganTypes $type;
+    public OrganTypes $type;
 
     /**
      * Reference to foundation of organ.
@@ -98,13 +98,13 @@ class Organ
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private Foundation $foundation;
+    public Foundation $foundation;
 
     /**
      * Foundation date.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $foundationDate;
+    public DateTime $foundationDate;
 
     /**
      * Abrogation date.
@@ -113,7 +113,7 @@ class Organ
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $abrogationDate = null;
+    public ?DateTime $abrogationDate = null;
 
     /**
      * Reference to members.
@@ -179,108 +179,12 @@ class Organ
             'remove',
         ],
     )]
-    private ?OrganInformation $organInformation = null;
+    public ?OrganInformation $organInformation = null;
 
     public function __construct()
     {
         $this->members = new ArrayCollection();
         $this->subdecisions = new ArrayCollection();
-    }
-
-    /**
-     * Get the abbreviation.
-     */
-    public function getAbbr(): string
-    {
-        return $this->abbr;
-    }
-
-    /**
-     * Set the abbreviation.
-     */
-    public function setAbbr(string $abbr): void
-    {
-        $this->abbr = $abbr;
-    }
-
-    /**
-     * Get the name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Get the type.
-     */
-    public function getType(): OrganTypes
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set the type.
-     */
-    public function setType(OrganTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * Get the foundation.
-     */
-    public function getFoundation(): Foundation
-    {
-        return $this->foundation;
-    }
-
-    /**
-     * Set the foundation.
-     */
-    public function setFoundation(Foundation $foundation): void
-    {
-        $this->foundation = $foundation;
-    }
-
-    /**
-     * Get the foundation date.
-     */
-    public function getFoundationDate(): DateTime
-    {
-        return $this->foundationDate;
-    }
-
-    /**
-     * Set the foundation date.
-     */
-    public function setFoundationDate(DateTime $foundationDate): void
-    {
-        $this->foundationDate = $foundationDate;
-    }
-
-    /**
-     * Get the abrogation date.
-     */
-    public function getAbrogationDate(): ?DateTime
-    {
-        return $this->abrogationDate;
-    }
-
-    /**
-     * Set the abrogation date.
-     */
-    public function setAbrogationDate(?DateTime $abrogationDate): void
-    {
-        $this->abrogationDate = $abrogationDate;
     }
 
     /**
@@ -356,12 +260,12 @@ class Organ
             $array,
             static function (SubDecision $dA, SubDecision $dB) {
                 // Compare the meeting dates first (note that we compare B against A).
-                $dateComparison = $dB->getDecision()->getMeeting()->getDate()
-                    <=> $dA->getDecision()->getMeeting()->getDate();
+                $dateComparison = $dB->decision->meeting->date
+                    <=> $dA->decision->meeting->date;
 
                 if (0 === $dateComparison) {
                     // If the meeting dates are equal, compare the sequence numbers (note that we compare B against A).
-                    return $dB->getSequence() <=> $dA->getSequence();
+                    return $dB->sequence <=> $dA->sequence;
                 }
 
                 return $dateComparison;
@@ -369,19 +273,6 @@ class Organ
         );
 
         return $array;
-    }
-
-    /**
-     * The body's page, whatever state it is in, or null while nobody has started one.
-     */
-    public function getOrganInformation(): ?OrganInformation
-    {
-        return $this->organInformation;
-    }
-
-    public function setOrganInformation(?OrganInformation $organInformation): void
-    {
-        $this->organInformation = $organInformation;
     }
 
     public function isAbrogated(): bool

@@ -38,7 +38,7 @@ class MeetingActivityLog
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?User $actor = null;
+    public ?User $actor = null;
 
     #[ManyToOne(targetEntity: Meeting::class)]
     #[JoinColumn(
@@ -49,72 +49,22 @@ class MeetingActivityLog
         name: 'meeting_number',
         referencedColumnName: 'number',
     )]
-    private ?Meeting $meeting = null;
+    public ?Meeting $meeting = null;
 
     #[Column(type: Types::ENUM)]
-    private MeetingActivityVerbs $verb;
+    public MeetingActivityVerbs $verb;
 
     /**
      * What the action applied to, e.g. the document name with its version label.
      */
     #[Column(type: Types::STRING)]
-    private string $subject;
+    public string $subject;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $createdAt;
+    public DateTime $createdAt;
 
     public function __construct()
     {
         $this->createdAt = new DateTime();
-    }
-
-    public function getActor(): ?User
-    {
-        return $this->actor;
-    }
-
-    public function setActor(?User $actor): void
-    {
-        $this->actor = $actor;
-    }
-
-    public function getMeeting(): ?Meeting
-    {
-        return $this->meeting;
-    }
-
-    public function setMeeting(?Meeting $meeting): void
-    {
-        $this->meeting = $meeting;
-    }
-
-    public function getVerb(): MeetingActivityVerbs
-    {
-        return $this->verb;
-    }
-
-    public function setVerb(MeetingActivityVerbs $verb): void
-    {
-        $this->verb = $verb;
-    }
-
-    public function getSubject(): string
-    {
-        return $this->subject;
-    }
-
-    public function setSubject(string $subject): void
-    {
-        $this->subject = $subject;
-    }
-
-    public function getCreatedAt(): DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
     }
 }

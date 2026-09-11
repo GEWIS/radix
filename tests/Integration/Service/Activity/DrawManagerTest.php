@@ -49,8 +49,8 @@ final class DrawManagerTest extends DatabaseTestCase
 
         self::assertNotNull($list->drawnAt);
         self::assertSame(
-            $board->getLidnr(),
-            $list->drawnBy?->getLidnr(),
+            $board->lidnr,
+            $list->drawnBy?->lidnr,
         );
         self::assertSame(
             2,

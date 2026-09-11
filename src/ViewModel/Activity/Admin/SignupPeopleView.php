@@ -232,9 +232,9 @@ final readonly class SignupPeopleView
             $member = $first->user;
             $membershipTypeLabel = $translator->trans(
                 'User (%type%)',
-                ['%type%' => $member->getType()->trans($translator)],
+                ['%type%' => $member->type->trans($translator)],
             );
-            $generation = $member->getGeneration();
+            $generation = $member->generation;
             $external = false;
         } else {
             $membershipTypeLabel = $translator->trans('External');
@@ -253,7 +253,7 @@ final readonly class SignupPeopleView
             if (
                 $signup instanceof UserSignup
                 && array_key_exists(
-                    $signup->user->getLidnr(),
+                    $signup->user->lidnr,
                     $membership['committee'],
                 )
             ) {

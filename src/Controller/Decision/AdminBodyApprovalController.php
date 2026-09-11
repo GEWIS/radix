@@ -188,8 +188,8 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
 
         return [
             'organ' => $revision->getOrgan(),
-            'subjectName' => $revision->getOrgan()->getAbbr(),
-            'comments' => $this->commentRepository->findThreadForOrganInformation($revision->getOrganInformation()),
+            'subjectName' => $revision->getOrgan()->abbr,
+            'comments' => $this->commentRepository->findThreadForOrganInformation($revision->organInformation),
         ];
     }
 

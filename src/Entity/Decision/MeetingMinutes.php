@@ -61,7 +61,7 @@ class MeetingMinutes
         referencedColumnName: 'number',
         nullable: false,
     )]
-    private Meeting $meeting;
+    public private(set) Meeting $meeting;
 
     /**
      * The versions of the minutes, in upload order; members see the last one.
@@ -80,17 +80,12 @@ class MeetingMinutes
         $this->versions = new ArrayCollection();
     }
 
-    public function getMeeting(): Meeting
-    {
-        return $this->meeting;
-    }
-
     public function setMeeting(Meeting $meeting): void
     {
         $meeting->setMeetingMinutes($this);
         $this->meeting = $meeting;
-        $this->meeting_type = $meeting->getType();
-        $this->meeting_number = $meeting->getNumber();
+        $this->meeting_type = $meeting->type;
+        $this->meeting_number = $meeting->number;
     }
 
     /**

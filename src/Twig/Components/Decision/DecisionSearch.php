@@ -92,7 +92,7 @@ final class DecisionSearch
         }
 
         foreach ($this->getResults() as $decision) {
-            $meeting = $decision->getMeeting();
+            $meeting = $decision->meeting;
             $key = spl_object_id($meeting);
 
             $groups[$key] ??= [

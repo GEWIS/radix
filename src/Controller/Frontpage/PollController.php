@@ -218,7 +218,7 @@ class PollController extends AbstractController
         Poll $poll,
         User $user,
     ): ?Poll {
-        if ($poll->getCreator()?->getLidnr() !== $user->lidnr) {
+        if ($poll->getCreator()?->lidnr !== $user->lidnr) {
             return null;
         }
 

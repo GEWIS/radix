@@ -27,7 +27,7 @@ final readonly class MemberTagPurgeService
      */
     public function purgeTagsOf(Member $member): void
     {
-        foreach ($this->memberTagRepository->getTagsByLidnr($member->getLidnr()) as $tag) {
+        foreach ($this->memberTagRepository->getTagsByLidnr($member->lidnr) as $tag) {
             $this->tagService->removeTag($tag);
         }
 

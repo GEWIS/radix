@@ -101,7 +101,7 @@ final readonly class MailReviewersOnRevisionSubmissionListener
             return false;
         }
 
-        $user = $this->userRepository->find($author->getLidnr());
+        $user = $this->userRepository->find($author->lidnr);
         if (null === $user) {
             return false;
         }

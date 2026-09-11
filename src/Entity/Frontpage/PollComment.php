@@ -194,7 +194,7 @@ class PollComment
     public function getReactionOf(MemberModel $member): ?PollCommentReactionType
     {
         foreach ($this->reactions as $reaction) {
-            if ($reaction->member?->getLidnr() !== $member->getLidnr()) {
+            if ($reaction->member?->lidnr !== $member->lidnr) {
                 continue;
             }
 

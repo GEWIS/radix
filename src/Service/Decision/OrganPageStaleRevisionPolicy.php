@@ -53,10 +53,10 @@ final readonly class OrganPageStaleRevisionPolicy implements StaleRevisionPolicy
 
         return array_values(array_filter(
             [
-                $revision->getBannerSource(),
-                $revision->getBannerPath(),
-                $revision->getLogoSource(),
-                $revision->getLogoPath(),
+                $revision->bannerSource,
+                $revision->bannerPath,
+                $revision->logoSource,
+                $revision->logoPath,
             ],
             static fn (?string $path): bool => null !== $path,
         ));

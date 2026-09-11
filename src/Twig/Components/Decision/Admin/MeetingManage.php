@@ -145,7 +145,7 @@ final class MeetingManage
     {
         $selectionsByDocumentId = [];
         foreach ($this->getView()->references as $selection) {
-            $selectionsByDocumentId[(int) $selection->getReferenceDocument()->getId()] = $selection;
+            $selectionsByDocumentId[(int) $selection->referenceDocument->getId()] = $selection;
         }
 
         $options = [];
@@ -213,30 +213,30 @@ final class MeetingManage
     {
         foreach ($view->points as $pointView) {
             $id = (string) $pointView->point->getId();
-            $this->pointEdits[$id]['number'] ??= $pointView->point->getNumber();
-            $this->pointEdits[$id]['title'] ??= $pointView->point->getTitle();
+            $this->pointEdits[$id]['number'] ??= $pointView->point->number;
+            $this->pointEdits[$id]['title'] ??= $pointView->point->title;
 
             foreach ($pointView->documents as $document) {
-                $this->documentEdits[(string) $document->getId()]['name'] ??= $document->getName();
+                $this->documentEdits[(string) $document->getId()]['name'] ??= $document->name;
             }
         }
 
         foreach ($view->meetingLevelDocuments as $document) {
-            $this->documentEdits[(string) $document->getId()]['name'] ??= $document->getName();
+            $this->documentEdits[(string) $document->getId()]['name'] ??= $document->name;
         }
 
         foreach ($view->references as $selection) {
-            $version = $selection->getPinnedVersion();
+            $version = $selection->pinnedVersion;
 
             if (null === $version) {
                 continue;
             }
 
-            $this->pins[(string) $selection->getReferenceDocument()->getId()] ??= (string) $version->getId();
+            $this->pins[(string) $selection->referenceDocument->getId()] ??= (string) $version->getId();
         }
 
-        $this->details['startTime'] ??= $view->localDetails?->getStartTime()?->format('H:i') ?? '';
-        $this->details['location'] ??= $view->localDetails?->getLocation() ?? '';
+        $this->details['startTime'] ??= $view->localDetails?->startTime?->format('H:i') ?? '';
+        $this->details['location'] ??= $view->localDetails->location ?? '';
     }
 
     public function getReadiness(): MeetingReadiness
@@ -274,14 +274,14 @@ final class MeetingManage
                 continue;
             }
 
-            $number = trim(strval($fields['number'] ?? $point->getNumber()));
-            $title = trim(strval($fields['title'] ?? $point->getTitle()));
+            $number = trim(strval($fields['number'] ?? $point->number));
+            $title = trim(strval($fields['title'] ?? $point->title));
 
             // These arrays are seeded with what is on screen so the inputs have a model path to bind to, so most of
             // what is in them on any given save is not an edit at all.
             if (
-                $number === $point->getNumber()
-                && $title === $point->getTitle()
+                $number === $point->number
+                && $title === $point->title
             ) {
                 continue;
             }
@@ -302,7 +302,7 @@ final class MeetingManage
             if (
                 null === $document
                 || '' === $name
-                || $name === $document->getName()
+                || $name === $document->name
             ) {
                 continue;
             }
@@ -332,7 +332,7 @@ final class MeetingManage
 
             if (
                 null === $version
-                || $version === $this->selectionFor($document)?->getPinnedVersion()
+                || $version === $this->selectionFor($document)?->pinnedVersion
             ) {
                 continue;
             }
@@ -347,13 +347,13 @@ final class MeetingManage
         }
 
         if ([] !== $this->details) {
-            $existing = $this->meeting()->getLocalDetails();
-            $startTime = strval($this->details['startTime'] ?? $existing?->getStartTime()?->format('H:i') ?? '');
-            $location = strval($this->details['location'] ?? $existing?->getLocation() ?? '');
+            $existing = $this->meeting()->localDetails;
+            $startTime = strval($this->details['startTime'] ?? $existing?->startTime?->format('H:i') ?? '');
+            $location = strval($this->details['location'] ?? $existing->location ?? '');
 
             if (
-                $startTime !== ($existing?->getStartTime()?->format('H:i') ?? '')
-                || $location !== ($existing?->getLocation() ?? '')
+                $startTime !== ($existing?->startTime?->format('H:i') ?? '')
+                || $location !== ($existing->location ?? '')
             ) {
                 $this->meetingLocalDetailsService->updateDetails(
                     $this->meeting(),
@@ -657,7 +657,7 @@ final class MeetingManage
     private function selectionFor(ReferenceDocument $document): ?MeetingReferenceSelection
     {
         foreach ($this->getView()->references as $selection) {
-            if ($selection->getReferenceDocument()->getId() === $document->getId()) {
+            if ($selection->referenceDocument->getId() === $document->getId()) {
                 return $selection;
             }
         }
@@ -669,7 +669,7 @@ final class MeetingManage
     {
         $point = $this->meetingPointRepository->find($id);
 
-        if ($point?->getMeeting() !== $this->meeting()) {
+        if ($point?->meeting !== $this->meeting()) {
             return null;
         }
 
@@ -680,7 +680,7 @@ final class MeetingManage
     {
         $document = $this->meetingDocumentRepository->find($id);
 
-        if ($document?->getMeeting() !== $this->meeting()) {
+        if ($document?->meeting !== $this->meeting()) {
             return null;
         }
 

@@ -48,7 +48,7 @@ class MailingListMember
         name: 'mailingList',
         referencedColumnName: 'name',
     )]
-    private MailingList $mailingList;
+    public MailingList $mailingList;
 
     /**
      * Member. A subscription is nobody's once the member is gone, and unsubscribing them is already the first thing
@@ -65,65 +65,17 @@ class MailingListMember
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private Member $member;
+    public Member $member;
 
     /**
      * Email address on the list
      */
     #[Id]
     #[Column(type: Types::STRING)]
-    private string $email;
+    public string $email;
 
     public function __construct()
     {
-    }
-
-    /**
-     * Get the mailing list.
-     */
-    public function getMailingList(): MailingList
-    {
-        return $this->mailingList;
-    }
-
-    /**
-     * Set the mailing list.
-     */
-    public function setMailingList(MailingList $mailingList): void
-    {
-        $this->mailingList = $mailingList;
-    }
-
-    /**
-     * Get the member.
-     */
-    public function getMember(): Member
-    {
-        return $this->member;
-    }
-
-    /**
-     * Set the member.
-     */
-    public function setMember(Member $member): void
-    {
-        $this->member = $member;
-    }
-
-    /**
-     * Get the email address of this subscription
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Set the email address of this subscription
-     */
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
     }
 
     /**
@@ -133,7 +85,7 @@ class MailingListMember
     {
         return [
             'list' => $this->mailingList->toGdprArray(),
-            'email' => $this->getEmail(),
+            'email' => $this->email,
         ];
     }
 }

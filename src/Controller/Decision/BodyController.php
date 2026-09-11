@@ -152,7 +152,7 @@ class BodyController extends AbstractController
             'decision/bodies/body.html.twig',
             [
                 'organ' => $organ,
-                'information' => $organ->getOrganInformation(),
+                'information' => $organ->organInformation,
                 'members' => $this->organMembers->membersOf($organ),
                 'activities' => $organ->isAbrogated()
                     ? []
@@ -247,7 +247,7 @@ class BodyController extends AbstractController
         }
 
         foreach ($iterations as $organ) {
-            $date = $organ->getFoundationDate();
+            $date = $organ->foundationDate;
             $matches = 4 === strlen($founded)
                 ? $date->format('Y') === $founded
                 : $date->format('Y-m-d') === $founded;

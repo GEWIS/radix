@@ -51,21 +51,5 @@ class Annulment extends SubDecision
         name: 'r_decision_number',
         referencedColumnName: 'number',
     )]
-    private Decision $target;
-
-    /**
-     * Get the target.
-     */
-    public function getTarget(): Decision
-    {
-        return $this->target;
-    }
-
-    /**
-     * Set the target.
-     */
-    public function setTarget(Decision $target): void
-    {
-        $this->target = $target;
-    }
+    public Decision $target;
 }

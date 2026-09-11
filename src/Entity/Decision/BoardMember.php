@@ -56,7 +56,7 @@ class BoardMember
         referencedColumnName: 'lidnr',
         nullable: false,
     )]
-    private Member $member;
+    public Member $member;
 
     /**
      * Function given.
@@ -65,13 +65,13 @@ class BoardMember
         type: Types::STRING,
         enumType: BoardFunctions::class,
     )]
-    private BoardFunctions $function;
+    public BoardFunctions $function;
 
     /**
      * Installation date.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $installDate;
+    public DateTime $installDate;
 
     /**
      * Installation.
@@ -100,7 +100,7 @@ class BoardMember
         name: 'r_sequence',
         referencedColumnName: 'sequence',
     )]
-    private BoardInstallation $installationDec;
+    public BoardInstallation $installationDec;
 
     /**
      * Release date.
@@ -109,7 +109,7 @@ class BoardMember
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $releaseDate = null;
+    public ?DateTime $releaseDate = null;
 
     /**
      * Discharge date.
@@ -118,101 +118,5 @@ class BoardMember
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $dischargeDate = null;
-
-    /**
-     * Get the member.
-     */
-    public function getMember(): Member
-    {
-        return $this->member;
-    }
-
-    /**
-     * Set the member.
-     */
-    public function setMember(Member $member): void
-    {
-        $this->member = $member;
-    }
-
-    /**
-     * Get the function.
-     */
-    public function getFunction(): BoardFunctions
-    {
-        return $this->function;
-    }
-
-    /**
-     * Set the function.
-     */
-    public function setFunction(BoardFunctions $function): void
-    {
-        $this->function = $function;
-    }
-
-    /**
-     * Get the installation date.
-     */
-    public function getInstallDate(): DateTime
-    {
-        return $this->installDate;
-    }
-
-    /**
-     * Set the installation date.
-     */
-    public function setInstallDate(DateTime $installDate): void
-    {
-        $this->installDate = $installDate;
-    }
-
-    /**
-     * Get the installation decision.
-     */
-    public function getInstallationDec(): BoardInstallation
-    {
-        return $this->installationDec;
-    }
-
-    /**
-     * Set the installation decision.
-     */
-    public function setInstallationDec(BoardInstallation $installationDec): void
-    {
-        $this->installationDec = $installationDec;
-    }
-
-    /**
-     * Get the release date.
-     */
-    public function getReleaseDate(): ?DateTime
-    {
-        return $this->releaseDate;
-    }
-
-    /**
-     * Set the release date.
-     */
-    public function setReleaseDate(?DateTime $releaseDate): void
-    {
-        $this->releaseDate = $releaseDate;
-    }
-
-    /**
-     * Get the discharge date.
-     */
-    public function getDischargeDate(): ?DateTime
-    {
-        return $this->dischargeDate;
-    }
-
-    /**
-     * Set the discharge date.
-     */
-    public function setDischargeDate(?DateTime $dischargeDate): void
-    {
-        $this->dischargeDate = $dischargeDate;
-    }
+    public ?DateTime $dischargeDate = null;
 }

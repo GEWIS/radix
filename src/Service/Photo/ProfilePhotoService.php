@@ -42,7 +42,7 @@ final readonly class ProfilePhotoService
         if (
             null === $this->memberTagRepository->findTag(
                 (int) $photo->getId(),
-                $member->getLidnr(),
+                $member->lidnr,
             )
             || null !== $this->hiddenPhotoRepository->findByMemberAndPhoto(
                 $member,
@@ -68,7 +68,7 @@ final readonly class ProfilePhotoService
 
     public function removeProfilePhoto(Member $member): void
     {
-        $existing = $this->profilePhotoRepository->getProfilePhotoByLidnr($member->getLidnr());
+        $existing = $this->profilePhotoRepository->getProfilePhotoByLidnr($member->lidnr);
         if (null === $existing) {
             return;
         }

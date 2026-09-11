@@ -289,7 +289,7 @@ class AdminActivityCalendarController extends AbstractController
 
         $organs = [];
         foreach ($user->member->getCurrentOrganInstallations() as $installation) {
-            $organ = $installation->getOrgan();
+            $organ = $installation->organ;
             $organs[intval($organ->getId())] = $organ;
         }
 

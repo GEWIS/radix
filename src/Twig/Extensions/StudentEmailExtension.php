@@ -53,7 +53,7 @@ class StudentEmailExtension extends AbstractExtension
             return false;
         }
 
-        $email = $user->member->getEmail();
+        $email = $user->member->email;
         if (null === $email) {
             return false;
         }

@@ -73,13 +73,13 @@ final class OrganMemberServiceTest extends DatabaseTestCase
         $members = $this->service()->membersOf($this->organ('GETÉST'));
 
         $current = array_map(
-            static fn (OrganMembership $membership): int => $membership->member->getLidnr(),
+            static fn (OrganMembership $membership): int => $membership->member->lidnr,
             $members->active,
         );
 
         foreach ($members->former as $member) {
             self::assertNotContains(
-                $member->getLidnr(),
+                $member->lidnr,
                 $current,
             );
         }

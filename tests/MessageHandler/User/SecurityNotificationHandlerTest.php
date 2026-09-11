@@ -328,7 +328,7 @@ final class SecurityNotificationHandlerTest extends TestCase
     private function users(): UserRepository
     {
         $member = self::createStub(Member::class);
-        $member->method('getEmail')->willReturn('ada@example.com');
+        $member->email = 'ada@example.com';
         $member->method('getFullName')->willReturn('Ada Lovelace');
 
         $user = self::createStub(User::class);

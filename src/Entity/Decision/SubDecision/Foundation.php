@@ -31,13 +31,13 @@ class Foundation extends SubDecision
      * Abbreviation (only for when organs are created).
      */
     #[Column(type: Types::STRING)]
-    private string $abbr;
+    public string $abbr;
 
     /**
      * Name (only for when organs are created).
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * Purpose (only for when organs are created).
@@ -46,7 +46,7 @@ class Foundation extends SubDecision
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $purpose = null;
+    public ?string $purpose = null;
 
     /**
      * Type of the organ.
@@ -55,7 +55,7 @@ class Foundation extends SubDecision
         type: Types::STRING,
         enumType: OrganTypes::class,
     )]
-    private OrganTypes $organType;
+    public OrganTypes $organType;
 
     /**
      * References from other subdecisions to this organ.
@@ -75,75 +75,11 @@ class Foundation extends SubDecision
         targetEntity: Organ::class,
         mappedBy: 'foundation',
     )]
-    private Organ $organ;
+    final public Organ $organ;
 
     public function __construct()
     {
         $this->references = new ArrayCollection();
-    }
-
-    /**
-     * Get the abbreviation.
-     */
-    public function getAbbr(): string
-    {
-        return $this->abbr;
-    }
-
-    /**
-     * Set the abbreviation.
-     */
-    public function setAbbr(string $abbr): void
-    {
-        $this->abbr = $abbr;
-    }
-
-    /**
-     * Get the name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Get the purpose.
-     */
-    public function getPurpose(): ?string
-    {
-        return $this->purpose;
-    }
-
-    /**
-     * Set the purpose.
-     */
-    public function setPurpose(?string $purpose): void
-    {
-        $this->purpose = $purpose;
-    }
-
-    /**
-     * Get the type.
-     */
-    public function getOrganType(): OrganTypes
-    {
-        return $this->organType;
-    }
-
-    /**
-     * Set the type.
-     */
-    public function setOrganType(OrganTypes $organType): void
-    {
-        $this->organType = $organType;
     }
 
     /**
@@ -154,25 +90,6 @@ class Foundation extends SubDecision
     public function getReferences(): Collection
     {
         return $this->references;
-    }
-
-    /**
-     * Get the referenced organ.
-     */
-    public function getOrgan(): Organ
-    {
-        return $this->organ;
-    }
-
-    /**
-     * Set the referenced organ.
-     *
-     * Kept in step with the owning side, so that an organ only just derived from this foundation can be found right
-     * away, without having to go through the database for it.
-     */
-    public function setOrgan(Organ $organ): void
-    {
-        $this->organ = $organ;
     }
 
     /**
@@ -197,7 +114,7 @@ class Foundation extends SubDecision
             $this->getMeetingNumber(),
             $this->getDecisionPoint(),
             $this->getDecisionNumber(),
-            $this->getSequence(),
+            $this->sequence,
         );
     }
 
@@ -219,17 +136,17 @@ class Foundation extends SubDecision
      */
     public function toArray(): array
     {
-        $decision = $this->getDecision();
+        $decision = $this->decision;
 
         return [
-            'meeting_type' => $decision->getMeeting()->getType(),
-            'meeting_number' => $decision->getMeeting()->getNumber(),
-            'decision_point' => $decision->getPoint(),
-            'decision_number' => $decision->getNumber(),
-            'subdecision_sequence' => $this->getSequence(),
-            'abbr' => $this->getAbbr(),
-            'name' => $this->getName(),
-            'organtype' => $this->getOrganType(),
+            'meeting_type' => $decision->meeting->type,
+            'meeting_number' => $decision->meeting->number,
+            'decision_point' => $decision->point,
+            'decision_number' => $decision->number,
+            'subdecision_sequence' => $this->sequence,
+            'abbr' => $this->abbr,
+            'name' => $this->name,
+            'organtype' => $this->organType,
         ];
     }
 }

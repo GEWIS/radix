@@ -87,7 +87,7 @@ final readonly class ActivityAdminRow
             revisionId: $revisionId,
             // Organ/company now live on the revision; the overview shows the working revision's values (not the
             // activity proxy, which would resolve to the live revision and hide a pending organ/company change).
-            organAbbr: $revision->organ?->getAbbr(),
+            organAbbr: $revision->organ?->abbr,
             nameNL: $revision->name->getValueNL(),
             nameEN: $revision->name->getValueEN(),
             companyName: $revision->company?->name,

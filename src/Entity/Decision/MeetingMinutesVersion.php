@@ -30,12 +30,7 @@ class MeetingMinutesVersion extends AbstractDocumentVersion
         referencedColumnName: 'meeting_number',
         nullable: false,
     )]
-    private MeetingMinutes $minutes;
-
-    public function getMinutes(): MeetingMinutes
-    {
-        return $this->minutes;
-    }
+    public private(set) MeetingMinutes $minutes;
 
     public function setMinutes(MeetingMinutes $minutes): void
     {
