@@ -1,12 +1,16 @@
 {# Nothing here is HTML, so escaping is off: `content` arrives already escaped for LaTeX
-   (`Decision::getContent()` with character escaping on) and everything else is a hash or a date. #}
-{% autoescape false %}
+   (`Decision::getContent()` with character escaping on) and everything else is a hash or a date.
+   The macro repeats the tag because macros compile at the root of the template, outside the block
+   below, so the escaping strategy of the surrounding block does not apply to them. #}
 {%- macro besluiten(decisions) -%}
+{%- autoescape false -%}
 {% for decision in decisions %}
 \besluit{ {{- decision.hash -}} }{ {{- decision.date|date('d-m-Y') -}} }{ {{- decision.content -}} }
 {% endfor %}
+{%- endautoescape -%}
 {%- endmacro -%}
 {%- import _self as tex -%}
+{% autoescape false %}
 \documentclass[a4paper, twoside, 11pt]{article}
 \usepackage[dutch]{babel}
 \usepackage{a4wide}
