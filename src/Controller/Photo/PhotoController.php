@@ -297,7 +297,7 @@ class PhotoController extends AbstractController
         User $user,
         bool $unhide,
     ): Response {
-        $member = $user->getMember();
+        $member = $user->member;
         $photos = $this->selectedPhotos($request);
 
         if ([] !== $photos) {

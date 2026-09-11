@@ -143,14 +143,14 @@ final class PhotoPrivacyServiceTest extends TestCase
         array $hidden,
     ): PhotoPrivacyService {
         $viewer = self::createStub(User::class);
-        $viewer->method('getMember')->willReturn($this->member($viewerLidnr));
+        $viewer->member = $this->member($viewerLidnr);
 
         $security = self::createStub(Security::class);
         $security->method('isGranted')->willReturn(false);
         $security->method('getUser')->willReturn($viewer);
 
         $settings = self::createStub(UserSettings::class);
-        $settings->method('getPhotoVisibility')->willReturn($level);
+        $settings->photoVisibility = $level;
         $settingsRepository = self::createStub(UserSettingsRepository::class);
         $settingsRepository->method('find')->willReturn($settings);
 

@@ -43,9 +43,9 @@ final readonly class PasswordResetService
     {
         $tempHash = bin2hex(random_bytes(32));
 
-        $passwordReset->setTempHash($tempHash);
-        $passwordReset->setTempHashExpiresAt(
-            new DateTimeImmutable('now')->add(new DateInterval(self::TEMP_HASH_LIFETIME)),
+        $passwordReset->tempHash = $tempHash;
+        $passwordReset->tempHashExpiresAt = new DateTimeImmutable('now')->add(
+            new DateInterval(self::TEMP_HASH_LIFETIME),
         );
 
         $this->entityManager->flush();
@@ -59,8 +59,8 @@ final readonly class PasswordResetService
      */
     public function consumeTempHash(PasswordReset $passwordReset): void
     {
-        $passwordReset->setTempHash(null);
-        $passwordReset->setTempHashExpiresAt(null);
+        $passwordReset->tempHash = null;
+        $passwordReset->tempHashExpiresAt = null;
 
         $this->entityManager->flush();
     }
@@ -87,14 +87,14 @@ final readonly class PasswordResetService
      */
     private function deleteAllForTarget(PasswordReset $passwordReset): void
     {
-        $member = $passwordReset->getMember();
+        $member = $passwordReset->member;
         if (null !== $member) {
             $this->passwordResetRepository->deleteAllForMember($member);
 
             return;
         }
 
-        $companyUser = $passwordReset->getCompanyUser();
+        $companyUser = $passwordReset->companyUser;
         if (null === $companyUser) {
             return;
         }

@@ -51,8 +51,8 @@ class CompanyHighlightController extends AbstractController
         #[CurrentUser]
         CompanyUser $companyUser,
     ): Response {
-        $company = $companyUser->getCompany();
-        $package = $companyUser->getCompany()->getActivePackage(CompanyHighlightPackage::class);
+        $company = $companyUser->company;
+        $package = $companyUser->company->getActivePackage(CompanyHighlightPackage::class);
 
         if (null === $package) {
             return $this->render(

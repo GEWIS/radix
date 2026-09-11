@@ -185,6 +185,6 @@ class AuthorizationController extends AbstractController
         $user = $this->getUser();
         assert($user instanceof User);
 
-        return $user->getMember();
+        return $user->member;
     }
 }

@@ -47,7 +47,7 @@ final readonly class UserSettingsService
             $user,
             $frequencies,
         );
-        $settings->setNotificationsPaused($paused);
+        $settings->notificationsPaused = $paused;
 
         $this->entityManager->flush();
     }
@@ -56,7 +56,7 @@ final readonly class UserSettingsService
         UserSettings $settings,
         bool $disabled,
     ): void {
-        $settings->setDisableCosmetics($disabled);
+        $settings->disableCosmetics = $disabled;
 
         $this->entityManager->flush();
     }
@@ -67,8 +67,8 @@ final readonly class UserSettingsService
     public function requestDataExport(User $user): void
     {
         $export = new DataExportRequest();
-        $export->setUser($user);
-        $export->setRequestedAt(new DateTimeImmutable());
+        $export->user = $user;
+        $export->requestedAt = new DateTimeImmutable();
 
         $this->entityManager->persist($export);
         $this->entityManager->flush();

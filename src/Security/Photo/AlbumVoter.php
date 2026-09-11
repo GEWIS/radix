@@ -78,7 +78,7 @@ final class AlbumVoter extends Voter
             return false;
         }
 
-        $member = $user->getMember();
+        $member = $user->member;
         if (MembershipTypes::Graduate === $member->getType()) {
             return $this->graduateMayView(
                 $album,

@@ -92,7 +92,7 @@ final class SecurityLogRepositoryTest extends DatabaseTestCase
         );
         self::assertSame(
             SecurityEventType::PasswordChanged,
-            $found[0]->getEvent(),
+            $found[0]->event,
         );
     }
 
@@ -117,7 +117,7 @@ final class SecurityLogRepositoryTest extends DatabaseTestCase
 
         self::assertSame(
             SecurityEventType::SignedOut,
-            $entries[0]->getEvent(),
+            $entries[0]->event,
         );
     }
 
@@ -194,12 +194,12 @@ final class SecurityLogRepositoryTest extends DatabaseTestCase
         ?DateTimeImmutable $occurredAt = null,
     ): void {
         $log = new SecurityLog();
-        $log->setOccurredAt($occurredAt ?? new DateTimeImmutable());
-        $log->setEvent($event);
-        $log->setUserIdentifier($userIdentifier);
-        $log->setFirewallName('main');
-        $log->setActorIdentifier($actor);
-        $log->setIpAddress(self::ADDRESS);
+        $log->occurredAt = $occurredAt ?? new DateTimeImmutable();
+        $log->event = $event;
+        $log->userIdentifier = $userIdentifier;
+        $log->firewallName = 'main';
+        $log->actorIdentifier = $actor;
+        $log->ipAddress = self::ADDRESS;
 
         $repository->append($log);
     }

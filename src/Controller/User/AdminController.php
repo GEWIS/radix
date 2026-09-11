@@ -90,7 +90,7 @@ class AdminController extends AbstractController
             [
                 'subjectLabel' => sprintf(
                     '%d',
-                    $user->getLidnr(),
+                    $user->lidnr,
                 ),
                 'sessions' => $this->sessionManager->getActiveSessions(
                     $user,
@@ -99,7 +99,7 @@ class AdminController extends AbstractController
                 'backRoute' => 'admin/users/index',
                 'terminateRoute' => 'admin/users/sessions/terminate',
                 'terminateAllRoute' => 'admin/users/sessions/terminate-all',
-                'routeParams' => ['lidnr' => $user->getLidnr()],
+                'routeParams' => ['lidnr' => $user->lidnr],
                 'mfaEnabled' => $user->isTotpAuthenticationEnabled(),
             ],
         );
@@ -189,7 +189,7 @@ class AdminController extends AbstractController
         return $this->render(
             'user/admin/sessions.html.twig',
             [
-                'subjectLabel' => $companyUser->getCompany()->name,
+                'subjectLabel' => $companyUser->company->name,
                 'sessions' => $this->sessionManager->getActiveSessions(
                     $companyUser,
                     'company',

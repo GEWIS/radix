@@ -113,6 +113,6 @@ class ActivityRevisionEdit
      */
     public function getEditorDisplayName(): ?string
     {
-        return $this->editor?->getMember()->getFullName();
+        return $this->editor?->member->getFullName();
     }
 }

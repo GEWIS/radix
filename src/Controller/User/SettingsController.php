@@ -111,13 +111,13 @@ class SettingsController extends AbstractController
 
         $hasDataExport = ExportUserDataHandler::isAvailable(
             $fileStorage,
-            $user->getMember()->getLidnr(),
+            $user->member->getLidnr(),
         );
         // "Being prepared" only while there is no downloadable file yet and a request was made within the window.
         $latestRequest = $this->dataExportRequestRepository->findLatestForUser($user);
         $dataExportPending = !$hasDataExport
             && null !== $latestRequest
-            && $latestRequest->getRequestedAt() > new DateTimeImmutable(self::EXPORT_PENDING_WINDOW);
+            && $latestRequest->requestedAt > new DateTimeImmutable(self::EXPORT_PENDING_WINDOW);
 
         return $this->render(
             'user/settings/privacy.html.twig',
@@ -230,7 +230,7 @@ class SettingsController extends AbstractController
 
         $subscriptions = [];
         foreach ($this->notificationSubscriptions->findForUser($user) as $subscription) {
-            $subscriptions[$subscription->getCategory()->value] = $subscription->getFrequency();
+            $subscriptions[$subscription->category->value] = $subscription->frequency;
         }
 
         return $this->render(
@@ -240,7 +240,7 @@ class SettingsController extends AbstractController
                 'alwaysOn' => $this->alwaysOnCategories(),
                 'frequencyOptions' => NotificationEmailFrequency::cases(),
                 'subscriptions' => $subscriptions,
-                'paused' => $settings->getNotificationsPaused(),
+                'paused' => $settings->notificationsPaused,
             ],
         );
     }
@@ -301,7 +301,7 @@ class SettingsController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $purgeService->purgeTagsOf($user->getMember());
+        $purgeService->purgeTagsOf($user->member);
 
         $this->addFlash(
             AlertTypes::Success->value,
@@ -330,7 +330,7 @@ class SettingsController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $lidnr = $user->getMember()->getLidnr();
+        $lidnr = $user->member->getLidnr();
 
         // Do not queue another job while the member still has a downloadable export, or one is already being prepared.
         if (
@@ -350,7 +350,7 @@ class SettingsController extends AbstractController
         $latestRequest = $this->dataExportRequestRepository->findLatestForUser($user);
         if (
             null !== $latestRequest
-            && $latestRequest->getRequestedAt() > new DateTimeImmutable(self::EXPORT_PENDING_WINDOW)
+            && $latestRequest->requestedAt > new DateTimeImmutable(self::EXPORT_PENDING_WINDOW)
         ) {
             $this->addFlash(
                 AlertTypes::Info->value,
@@ -396,7 +396,7 @@ class SettingsController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $lidnr = $user->getMember()->getLidnr();
+        $lidnr = $user->member->getLidnr();
         if (
             !ExportUserDataHandler::isAvailable(
                 $fileStorage,

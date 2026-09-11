@@ -74,7 +74,7 @@ final class CompanyHighlightControllerTest extends DatabaseTestCase
             $package,
             [
                 'csrf_protection' => false,
-                'company' => $companyUser->getCompany(),
+                'company' => $companyUser->company,
             ],
         );
         $form->submit(['vacancies' => [(string) $this->vacancy('data-science-internship')->getId()]]);
@@ -92,7 +92,7 @@ final class CompanyHighlightControllerTest extends DatabaseTestCase
             $package,
             [
                 'csrf_protection' => false,
-                'company' => $companyUser->getCompany(),
+                'company' => $companyUser->company,
             ],
         );
         $form->submit(['vacancies' => [(string) $this->vacancy('backend-engineer')->getId()]]);

@@ -35,11 +35,11 @@ final class NotificationEmailSubscriptionRepositoryTest extends DatabaseTestCase
         );
         self::assertSame(
             NotificationType::AlbumPublished,
-            $subscriptions[0]->getCategory(),
+            $subscriptions[0]->category,
         );
         self::assertSame(
             NotificationEmailFrequency::Weekly,
-            $subscriptions[0]->getFrequency(),
+            $subscriptions[0]->frequency,
         );
 
         // Re-saving the same category with a different frequency updates the existing row instead of duplicating it.
@@ -56,7 +56,7 @@ final class NotificationEmailSubscriptionRepositoryTest extends DatabaseTestCase
         );
         self::assertSame(
             NotificationEmailFrequency::Daily,
-            $subscriptions[0]->getFrequency(),
+            $subscriptions[0]->frequency,
         );
 
         // Switching the selection removes the old opt-in and adds the new one.
@@ -73,7 +73,7 @@ final class NotificationEmailSubscriptionRepositoryTest extends DatabaseTestCase
         );
         self::assertSame(
             NotificationType::ActivityPublished,
-            $subscriptions[0]->getCategory(),
+            $subscriptions[0]->category,
         );
     }
 

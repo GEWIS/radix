@@ -56,7 +56,7 @@ final class TagServiceOptOutTest extends DatabaseTestCase
         self::assertNotNull($user);
 
         $settings = new UserSettings($user);
-        $settings->setPhotoTaggingOptOut(true);
+        $settings->photoTaggingOptOut = true;
         $this->entityManager->persist($settings);
         $this->entityManager->flush();
     }

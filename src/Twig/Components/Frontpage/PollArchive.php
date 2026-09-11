@@ -139,7 +139,7 @@ final class PollArchive extends AbstractDoctrinePaginatedOverview
         $user = $this->security->getUser();
 
         return $user instanceof User
-            ? $user->getMember()
+            ? $user->member
             : null;
     }
 }

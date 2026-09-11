@@ -97,7 +97,7 @@ final readonly class OrganPageService
         OrganInformationRevision $draft,
         User $user,
     ): void {
-        $draft->setAuthor($user->getMember());
+        $draft->setAuthor($user->member);
         $draft->setLastEditedBy($user);
 
         $this->entityManager->flush();
@@ -134,7 +134,7 @@ final readonly class OrganPageService
         User $user,
     ): void {
         $draft = new OrganInformationRevision();
-        $draft->setAuthor($user->getMember());
+        $draft->setAuthor($user->member);
         $page->addRevision($draft);
         $page->setCurrentRevision($draft);
 

@@ -110,7 +110,7 @@ class PollController extends AbstractController
         ) {
             $poll = $this->pollService->requestPoll(
                 $revision,
-                $user->getMember(),
+                $user->member,
                 $previous,
             );
 
@@ -218,7 +218,7 @@ class PollController extends AbstractController
         Poll $poll,
         User $user,
     ): ?Poll {
-        if ($poll->getCreator()?->getLidnr() !== $user->getLidnr()) {
+        if ($poll->getCreator()?->getLidnr() !== $user->lidnr) {
             return null;
         }
 

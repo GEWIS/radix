@@ -38,7 +38,7 @@ class ExternalAppAuthentication
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private User $user;
+    public User $user;
 
     /**
      * The application that got the authentication.
@@ -49,43 +49,13 @@ class ExternalAppAuthentication
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private ExternalApp $externalApp;
+    public ExternalApp $externalApp;
 
     /**
      * Time of authentication.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $time;
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
-    }
-
-    public function getExternalApp(): ExternalApp
-    {
-        return $this->externalApp;
-    }
-
-    public function setExternalApp(ExternalApp $externalApp): void
-    {
-        $this->externalApp = $externalApp;
-    }
-
-    public function getTime(): DateTime
-    {
-        return $this->time;
-    }
-
-    public function setTime(DateTime $time): void
-    {
-        $this->time = $time;
-    }
+    public DateTime $time;
 
     /**
      * @return ExternalAppAuthenticationGdprArrayType
@@ -94,8 +64,8 @@ class ExternalAppAuthentication
     {
         return [
             'id' => $this->getId(),
-            'app_id' => $this->getExternalApp()->getAppId(),
-            'time' => $this->getTime()->format(DateTimeInterface::ATOM),
+            'app_id' => $this->externalApp->appId,
+            'time' => $this->time->format(DateTimeInterface::ATOM),
         ];
     }
 }

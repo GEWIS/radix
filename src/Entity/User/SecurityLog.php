@@ -68,10 +68,10 @@ class SecurityLog
     use IdentifiableTrait;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $occurredAt;
+    public DateTimeImmutable $occurredAt;
 
     #[Column(enumType: SecurityEventType::class)]
-    private SecurityEventType $event;
+    public SecurityEventType $event;
 
     /**
      * The account the event is about. Null for an event that belongs to no account at all, such as a token refused
@@ -83,13 +83,13 @@ class SecurityLog
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $userIdentifier = null;
+    public ?string $userIdentifier = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $firewallName = null;
+    public ?string $firewallName = null;
 
     /**
      * Who did it, when that is somebody other than the account it was done to: the administrator who ended a session
@@ -102,26 +102,26 @@ class SecurityLog
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $actorIdentifier = null;
+    public ?string $actorIdentifier = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $ipAddress = null;
+    public ?string $ipAddress = null;
 
     /** As {@see Session::$browser}: the name and major version, never the user agent it was read from. */
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $browser = null;
+    public ?string $browser = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $operatingSystem = null;
+    public ?string $operatingSystem = null;
 
     /**
      * Ties the row to the lines the same request wrote in the log file. Only useful together with the file, which is
@@ -131,7 +131,7 @@ class SecurityLog
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $requestId = null;
+    public ?string $requestId = null;
 
     /**
      * What this event needs beyond the columns above: the series of the session that ended, the route that refused,
@@ -144,113 +144,7 @@ class SecurityLog
         type: Types::JSON,
         nullable: false,
     )]
-    private array $detail = [];
-
-    public function getOccurredAt(): DateTimeImmutable
-    {
-        return $this->occurredAt;
-    }
-
-    public function setOccurredAt(DateTimeImmutable $occurredAt): void
-    {
-        $this->occurredAt = $occurredAt;
-    }
-
-    public function getEvent(): SecurityEventType
-    {
-        return $this->event;
-    }
-
-    public function setEvent(SecurityEventType $event): void
-    {
-        $this->event = $event;
-    }
-
-    public function getUserIdentifier(): ?string
-    {
-        return $this->userIdentifier;
-    }
-
-    public function setUserIdentifier(?string $userIdentifier): void
-    {
-        $this->userIdentifier = $userIdentifier;
-    }
-
-    public function getFirewallName(): ?string
-    {
-        return $this->firewallName;
-    }
-
-    public function setFirewallName(?string $firewallName): void
-    {
-        $this->firewallName = $firewallName;
-    }
-
-    public function getActorIdentifier(): ?string
-    {
-        return $this->actorIdentifier;
-    }
-
-    public function setActorIdentifier(?string $actorIdentifier): void
-    {
-        $this->actorIdentifier = $actorIdentifier;
-    }
-
-    public function getIpAddress(): ?string
-    {
-        return $this->ipAddress;
-    }
-
-    public function setIpAddress(?string $ipAddress): void
-    {
-        $this->ipAddress = $ipAddress;
-    }
-
-    public function getBrowser(): ?string
-    {
-        return $this->browser;
-    }
-
-    public function setBrowser(?string $browser): void
-    {
-        $this->browser = $browser;
-    }
-
-    public function getOperatingSystem(): ?string
-    {
-        return $this->operatingSystem;
-    }
-
-    public function setOperatingSystem(?string $operatingSystem): void
-    {
-        $this->operatingSystem = $operatingSystem;
-    }
-
-    public function getRequestId(): ?string
-    {
-        return $this->requestId;
-    }
-
-    public function setRequestId(?string $requestId): void
-    {
-        $this->requestId = $requestId;
-    }
-
-    /**
-     * @return array<string, scalar|null>
-     */
-    public function getDetail(): array
-    {
-        return $this->detail;
-    }
-
-    /**
-     * @param array<string, scalar|null> $detail
-     */
-    public function setDetail(array $detail): void
-    {
-        $this->detail = $detail;
-    }
+    public array $detail = [];
 
     /**
      * @return SecurityLogGdprArrayType
@@ -258,15 +152,15 @@ class SecurityLog
     public function toGdprArray(): array
     {
         return [
-            'occurredAt' => $this->getOccurredAt()->format(DateTimeInterface::ATOM),
-            'event' => $this->getEvent()->value,
-            'category' => $this->getEvent()->category()->value,
-            'firewall' => $this->getFirewallName(),
-            'actor' => $this->getActorIdentifier(),
-            'ipAddress' => $this->getIpAddress(),
-            'browser' => $this->getBrowser(),
-            'operatingSystem' => $this->getOperatingSystem(),
-            'detail' => $this->getDetail(),
+            'occurredAt' => $this->occurredAt->format(DateTimeInterface::ATOM),
+            'event' => $this->event->value,
+            'category' => $this->event->category()->value,
+            'firewall' => $this->firewallName,
+            'actor' => $this->actorIdentifier,
+            'ipAddress' => $this->ipAddress,
+            'browser' => $this->browser,
+            'operatingSystem' => $this->operatingSystem,
+            'detail' => $this->detail,
         ];
     }
 }

@@ -90,8 +90,8 @@ final class SessionManager
 
         if (
             null === $session
-            || $session->getUserIdentifier() !== $user->getUserIdentifier()
-            || $session->getFirewallName() !== $firewallName
+            || $session->userIdentifier !== $user->getUserIdentifier()
+            || $session->firewallName !== $firewallName
         ) {
             return null;
         }
@@ -126,12 +126,12 @@ final class SessionManager
             $firewallName,
             [
                 'series' => $series,
-                'own' => $session->getPhpSessionId() === $request->getSession()->getId(),
+                'own' => $session->phpSessionId === $request->getSession()->getId(),
             ],
             $request,
         );
 
-        if ($session->getPhpSessionId() === $request->getSession()->getId()) {
+        if ($session->phpSessionId === $request->getSession()->getId()) {
             $this->em->remove($session);
             $this->em->flush();
 
@@ -184,8 +184,8 @@ final class SessionManager
                 $user->getUserIdentifier(),
                 $firewallName,
             ),
-            static fn (Session $s): bool => $s->getSeries() !== $currentSeries
-                && $s->getPhpSessionId() !== $currentPhpSessionId,
+            static fn (Session $s): bool => $s->series !== $currentSeries
+                && $s->phpSessionId !== $currentPhpSessionId,
         ));
 
         foreach ($sessions as $session) {
@@ -195,7 +195,7 @@ final class SessionManager
         $this->dispatchRevocation(
             $firewallName,
             array_map(
-                static fn (Session $s): string => $s->getSeries(),
+                static fn (Session $s): string => $s->series,
                 $sessions,
             ),
         );
@@ -236,7 +236,7 @@ final class SessionManager
         $this->dispatchRevocation(
             $firewallName,
             array_map(
-                static fn (Session $s): string => $s->getSeries(),
+                static fn (Session $s): string => $s->series,
                 $sessions,
             ),
         );
@@ -282,8 +282,8 @@ final class SessionManager
             return;
         }
 
-        $session->setSignaturePropertiesHash($this->credentials->hash($user));
-        $session->setSignature($this->rowSignature->forRow($session));
+        $session->signaturePropertiesHash = $this->credentials->hash($user);
+        $session->signature = $this->rowSignature->forRow($session);
 
         $this->em->flush();
     }
@@ -303,14 +303,14 @@ final class SessionManager
      */
     private function destroyAndRemove(Session $session): void
     {
-        $phpSessionId = $session->getPhpSessionId();
+        $phpSessionId = $session->phpSessionId;
 
         if ('' !== $phpSessionId) {
             $this->redis->del($this->sessionPrefix . $phpSessionId);
 
             // The grant is keyed by session ID rather than held on the session, so destroying the session no longer
             // takes it with it.
-            $firewall = Firewall::tryFrom($session->getFirewallName());
+            $firewall = Firewall::tryFrom($session->firewallName);
             if (null !== $firewall) {
                 $this->sudoMode->revokeSession(
                     $firewall,

@@ -332,7 +332,7 @@ final class SecurityNotificationHandlerTest extends TestCase
         $member->method('getFullName')->willReturn('Ada Lovelace');
 
         $user = self::createStub(User::class);
-        $user->method('getMember')->willReturn($member);
+        $user->member = $member;
 
         $users = self::createStub(UserRepository::class);
         $users->method('find')->willReturnCallback(
@@ -345,9 +345,9 @@ final class SecurityNotificationHandlerTest extends TestCase
     private function companyUsers(): CompanyUserRepository
     {
         $companyUser = self::createStub(CompanyUser::class);
-        $companyUser->method('getCompany')->willReturn(self::createStub(Company::class));
-        $companyUser->method('getEmail')->willReturn('rep@example.com');
-        $companyUser->method('getName')->willReturn('Grace Hopper');
+        $companyUser->company = self::createStub(Company::class);
+        $companyUser->email = 'rep@example.com';
+        $companyUser->name = 'Grace Hopper';
 
         $companyUsers = self::createStub(CompanyUserRepository::class);
         $companyUsers->method('loadUserByIdentifier')->willReturnCallback(

@@ -24,7 +24,7 @@ class DataExportRequest
     #[Id]
     #[GeneratedValue]
     #[Column(type: Types::INTEGER)]
-    private int $id;
+    public private(set) int $id;
 
     /**
      * Whose export this was. The request exists only to rate-limit that account, so it is pointless once the account
@@ -37,33 +37,8 @@ class DataExportRequest
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private User $user;
+    public User $user;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $requestedAt;
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
-    }
-
-    public function getRequestedAt(): DateTimeImmutable
-    {
-        return $this->requestedAt;
-    }
-
-    public function setRequestedAt(DateTimeImmutable $requestedAt): void
-    {
-        $this->requestedAt = $requestedAt;
-    }
+    public DateTimeImmutable $requestedAt;
 }

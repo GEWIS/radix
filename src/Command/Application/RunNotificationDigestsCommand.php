@@ -99,7 +99,7 @@ final class RunNotificationDigestsCommand extends Command
         $digests = 0;
 
         foreach ($this->pendingRepository->findUsersWithPending() as $user) {
-            if ($this->settingsRepository->getOrCreateForUser($user)->getNotificationsPaused()) {
+            if ($this->settingsRepository->getOrCreateForUser($user)->notificationsPaused) {
                 $this->pendingRepository->deleteForUser($user);
 
                 continue;
@@ -108,15 +108,15 @@ final class RunNotificationDigestsCommand extends Command
             $dueSubscriptions = [];
             foreach ($this->subscriptionRepository->findForUser($user) as $subscription) {
                 if (
-                    !$subscription->getFrequency()->isDue(
-                        $subscription->getLastSentAt(),
+                    !$subscription->frequency->isDue(
+                        $subscription->lastSentAt,
                         $now,
                     )
                 ) {
                     continue;
                 }
 
-                $dueSubscriptions[$subscription->getCategory()->value] = $subscription;
+                $dueSubscriptions[$subscription->category->value] = $subscription;
             }
 
             if ([] === $dueSubscriptions) {
@@ -126,7 +126,7 @@ final class RunNotificationDigestsCommand extends Command
             $entries = [];
             $sentCategories = [];
             foreach ($this->pendingRepository->findForUser($user) as $queued) {
-                $notification = $queued->getNotification();
+                $notification = $queued->notification;
                 $category = $notification->getType()->value;
                 if (!isset($dueSubscriptions[$category])) {
                     continue;
@@ -162,7 +162,7 @@ final class RunNotificationDigestsCommand extends Command
                 $this->entityManager->remove($queued);
             }
 
-            $member = $user->getMember();
+            $member = $user->member;
             $email = $member->getEmail();
             if (
                 [] !== $entries
@@ -184,7 +184,7 @@ final class RunNotificationDigestsCommand extends Command
                     continue;
                 }
 
-                $subscription->setLastSentAt($now);
+                $subscription->lastSentAt = $now;
             }
         }
 

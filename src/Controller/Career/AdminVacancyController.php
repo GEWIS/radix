@@ -95,7 +95,7 @@ class AdminVacancyController extends AbstractController
         $vacancy->published = true;
 
         $revision = new VacancyRevision();
-        $revision->setAuthor($user->getMember());
+        $revision->setAuthor($user->member);
         $vacancy->addRevision($revision);
         $vacancy->setCurrentRevision($revision);
 

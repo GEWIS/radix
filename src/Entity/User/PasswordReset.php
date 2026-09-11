@@ -35,13 +35,13 @@ class PasswordReset
     #[Id]
     #[GeneratedValue]
     #[Column]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[Column(
         type: Types::STRING,
         enumType: UserTypes::class,
     )]
-    private UserTypes $userType;
+    public private(set) UserTypes $userType;
 
     #[ManyToOne(targetEntity: Member::class)]
     #[JoinColumn(
@@ -50,14 +50,14 @@ class PasswordReset
         nullable: true,
         onDelete: 'CASCADE',
     )]
-    private ?Member $member = null;
+    public private(set) ?Member $member = null;
 
     #[ManyToOne(targetEntity: CompanyUser::class)]
     #[JoinColumn(
         nullable: true,
         onDelete: 'CASCADE',
     )]
-    private ?CompanyUser $companyUser = null;
+    public private(set) ?CompanyUser $companyUser = null;
 
     /**
      * Ephemeral hash linking the email-link click (stage 1) to the form-render request (stage 2). Cleared on first
@@ -67,13 +67,13 @@ class PasswordReset
         type: Types::STRING,
         nullable: true,
     )]
-    protected ?string $tempHash = null;
+    public ?string $tempHash = null;
 
     #[Column(
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    protected ?DateTimeImmutable $tempHashExpiresAt = null;
+    public ?DateTimeImmutable $tempHashExpiresAt = null;
 
     public function __construct(
         DateTimeImmutable $expiresAt,
@@ -104,46 +104,6 @@ class PasswordReset
         $this->userType = null !== $member
             ? UserTypes::User
             : UserTypes::CompanyUser;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getUserType(): UserTypes
-    {
-        return $this->userType;
-    }
-
-    public function getMember(): ?Member
-    {
-        return $this->member;
-    }
-
-    public function getCompanyUser(): ?CompanyUser
-    {
-        return $this->companyUser;
-    }
-
-    public function getTempHash(): ?string
-    {
-        return $this->tempHash;
-    }
-
-    public function setTempHash(?string $tempHash): void
-    {
-        $this->tempHash = $tempHash;
-    }
-
-    public function getTempHashExpiresAt(): ?DateTimeImmutable
-    {
-        return $this->tempHashExpiresAt;
-    }
-
-    public function setTempHashExpiresAt(?DateTimeImmutable $tempHashExpiresAt): void
-    {
-        $this->tempHashExpiresAt = $tempHashExpiresAt;
     }
 
     public function isTempHashExpired(): bool

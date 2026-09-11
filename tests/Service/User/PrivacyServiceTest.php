@@ -146,7 +146,7 @@ final class PrivacyServiceTest extends TestCase
     private function settings(bool $hidden): UserSettings
     {
         $settings = self::createStub(UserSettings::class);
-        $settings->method('getHideYearOfBirth')->willReturn($hidden);
+        $settings->hideYearOfBirth = $hidden;
 
         return $settings;
     }

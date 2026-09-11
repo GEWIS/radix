@@ -41,7 +41,7 @@ class NotificationInteraction
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private User $user;
+    public private(set) User $user;
 
     #[ManyToOne(targetEntity: Notification::class)]
     #[JoinColumn(
@@ -49,7 +49,7 @@ class NotificationInteraction
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private Notification $notification;
+    public private(set) Notification $notification;
 
     /**
      * When this member read this one notification, as opposed to marking the whole centre read.
@@ -58,7 +58,7 @@ class NotificationInteraction
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $readAt = null;
+    public ?DateTimeImmutable $readAt = null;
 
     /**
      * When this member cleared it away. The notification itself stays; it is only hidden from them.
@@ -67,7 +67,7 @@ class NotificationInteraction
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $dismissedAt = null;
+    public ?DateTimeImmutable $dismissedAt = null;
 
     public function __construct(
         User $user,
@@ -75,35 +75,5 @@ class NotificationInteraction
     ) {
         $this->user = $user;
         $this->notification = $notification;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function getNotification(): Notification
-    {
-        return $this->notification;
-    }
-
-    public function getReadAt(): ?DateTimeImmutable
-    {
-        return $this->readAt;
-    }
-
-    public function setReadAt(?DateTimeImmutable $readAt): void
-    {
-        $this->readAt = $readAt;
-    }
-
-    public function getDismissedAt(): ?DateTimeImmutable
-    {
-        return $this->dismissedAt;
-    }
-
-    public function setDismissedAt(?DateTimeImmutable $dismissedAt): void
-    {
-        $this->dismissedAt = $dismissedAt;
     }
 }

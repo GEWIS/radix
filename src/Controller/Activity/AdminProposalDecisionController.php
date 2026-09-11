@@ -107,13 +107,13 @@ class AdminProposalDecisionController extends AbstractController
             return $this->redirectToRoute('admin/activities/calendar/decisions/index');
         }
 
-        $option->setDecidedBy($user->getMember());
+        $option->setDecidedBy($user->member);
         $option->setDecidedAt(new DateTime());
 
         $this->proposalManager->schedule(
             $proposal,
             $option,
-            $user->getMember(),
+            $user->member,
         );
 
         $this->addFlash(
@@ -155,7 +155,7 @@ class AdminProposalDecisionController extends AbstractController
 
         $this->proposalManager->decline(
             $proposal,
-            $user->getMember(),
+            $user->member,
         );
 
         $this->addFlash(
@@ -204,7 +204,7 @@ class AdminProposalDecisionController extends AbstractController
         $this->proposalManager->clearBudget(
             $proposal,
             $outcome,
-            $user->getMember(),
+            $user->member,
         );
 
         $this->addFlash(

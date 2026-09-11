@@ -98,6 +98,6 @@ class CompanyUserController extends AbstractSecurityController
     protected function resolvePasswordResetTarget(
         PasswordReset $passwordReset,
     ): User|CompanyUser|null {
-        return $passwordReset->getCompanyUser();
+        return $passwordReset->companyUser;
     }
 }

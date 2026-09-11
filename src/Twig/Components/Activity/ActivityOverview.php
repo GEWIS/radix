@@ -346,7 +346,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
             $this->memberResolved = true;
             $user = $this->security->getUser();
             $this->member = $user instanceof User
-                ? $user->getMember()
+                ? $user->member
                 : null;
         }
 

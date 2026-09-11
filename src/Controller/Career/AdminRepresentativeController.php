@@ -385,7 +385,7 @@ class AdminRepresentativeController extends AbstractController
         $representative = $this->companyUserRepository->find($representativeId);
         if (
             null === $representative
-            || $representative->getCompany() !== $company
+            || $representative->company !== $company
         ) {
             throw new NotFoundHttpException();
         }
@@ -400,7 +400,7 @@ class AdminRepresentativeController extends AbstractController
         $invite = $this->inviteRepository->find($inviteId);
         if (
             null === $invite
-            || $invite->getCompany() !== $company
+            || $invite->company !== $company
         ) {
             throw new NotFoundHttpException();
         }

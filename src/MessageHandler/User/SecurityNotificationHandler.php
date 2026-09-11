@@ -185,11 +185,11 @@ class SecurityNotificationHandler
     private static function mailbox(User|CompanyUser $account): ?array
     {
         if ($account instanceof User) {
-            $email = $account->getMember()->getEmail();
-            $name = $account->getMember()->getFullName();
+            $email = $account->member->getEmail();
+            $name = $account->member->getFullName();
         } else {
-            $email = $account->getEmail();
-            $name = $account->getName();
+            $email = $account->email;
+            $name = $account->name;
         }
 
         if (null === $email) {

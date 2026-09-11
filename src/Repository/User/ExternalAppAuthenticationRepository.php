@@ -76,7 +76,7 @@ class ExternalAppAuthenticationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'user_id',
-                $user->getLidnr(),
+                $user->lidnr,
             );
 
         return $qb->getQuery()->getOneOrNullResult();

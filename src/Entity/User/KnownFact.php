@@ -21,55 +21,15 @@ abstract class KnownFact
     use IdentifiableTrait;
 
     #[Column(type: Types::STRING)]
-    private string $userIdentifier;
+    public string $userIdentifier;
 
     /** Scoped per firewall for the reason sessions are: the two account spaces are unrelated. */
     #[Column(type: Types::STRING)]
-    private string $firewallName;
+    public string $firewallName;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $firstSeenAt;
+    public DateTimeImmutable $firstSeenAt;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $lastSeenAt;
-
-    public function getUserIdentifier(): string
-    {
-        return $this->userIdentifier;
-    }
-
-    public function setUserIdentifier(string $userIdentifier): void
-    {
-        $this->userIdentifier = $userIdentifier;
-    }
-
-    public function getFirewallName(): string
-    {
-        return $this->firewallName;
-    }
-
-    public function setFirewallName(string $firewallName): void
-    {
-        $this->firewallName = $firewallName;
-    }
-
-    public function getFirstSeenAt(): DateTimeImmutable
-    {
-        return $this->firstSeenAt;
-    }
-
-    public function setFirstSeenAt(DateTimeImmutable $firstSeenAt): void
-    {
-        $this->firstSeenAt = $firstSeenAt;
-    }
-
-    public function getLastSeenAt(): DateTimeImmutable
-    {
-        return $this->lastSeenAt;
-    }
-
-    public function setLastSeenAt(DateTimeImmutable $lastSeenAt): void
-    {
-        $this->lastSeenAt = $lastSeenAt;
-    }
+    public DateTimeImmutable $lastSeenAt;
 }

@@ -27,7 +27,7 @@ class PendingNotificationEmail
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private User $user;
+    public private(set) User $user;
 
     #[ManyToOne(targetEntity: Notification::class)]
     #[JoinColumn(
@@ -36,7 +36,7 @@ class PendingNotificationEmail
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private Notification $notification;
+    public private(set) Notification $notification;
 
     public function __construct(
         User $user,
@@ -44,15 +44,5 @@ class PendingNotificationEmail
     ) {
         $this->user = $user;
         $this->notification = $notification;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function getNotification(): Notification
-    {
-        return $this->notification;
     }
 }

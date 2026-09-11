@@ -65,7 +65,7 @@ class MemberController extends AbstractController
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        $member = $user->getMember();
+        $member = $user->member;
 
         $recentMeetings = [];
         foreach (
@@ -247,7 +247,7 @@ class MemberController extends AbstractController
             $user = $this->getUser();
             assert($user instanceof User);
 
-            $member = $user->getMember();
+            $member = $user->member;
         } else {
             if (
                 $member->isExpired()

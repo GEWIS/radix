@@ -67,7 +67,7 @@ final readonly class CompanyUserInviteService
 
         $existing = $this->inviteRepository->findByEmail($email);
         if (null !== $existing) {
-            if ($existing->getCompany() !== $company) {
+            if ($existing->company !== $company) {
                 throw new RuntimeException('That email address is already invited by another company.');
             }
 
@@ -118,10 +118,10 @@ final readonly class CompanyUserInviteService
         );
 
         $this->auditLogger->log(
-            $invite->getCompany(),
+            $invite->company,
             $this->actor(),
             CompanyAuditVerbs::InviteResent,
-            $invite->getEmail(),
+            $invite->email,
         );
         $this->entityManager->flush();
 
@@ -134,10 +134,10 @@ final readonly class CompanyUserInviteService
     public function revoke(CompanyUserInvite $invite): void
     {
         $this->auditLogger->log(
-            $invite->getCompany(),
+            $invite->company,
             $this->actor(),
             CompanyAuditVerbs::InviteRevoked,
-            $invite->getEmail(),
+            $invite->email,
         );
 
         $this->entityManager->remove($invite);
@@ -153,9 +153,9 @@ final readonly class CompanyUserInviteService
         string $plainPassword,
     ): CompanyUser {
         $companyUser = new CompanyUser();
-        $companyUser->setCompany($invite->getCompany());
-        $companyUser->setEmail($invite->getEmail());
-        $companyUser->setName($invite->getName());
+        $companyUser->company = $invite->company;
+        $companyUser->email = $invite->email;
+        $companyUser->name = $invite->name;
         $companyUser->setPassword($this->passwordHasher->hashPassword(
             $companyUser,
             $plainPassword,
@@ -165,10 +165,10 @@ final readonly class CompanyUserInviteService
         $this->entityManager->persist($companyUser);
         $this->entityManager->remove($invite);
         $this->auditLogger->log(
-            $invite->getCompany(),
+            $invite->company,
             $companyUser,
             CompanyAuditVerbs::RepresentativeJoined,
-            $companyUser->getName(),
+            $companyUser->name,
         );
         $this->entityManager->flush();
 

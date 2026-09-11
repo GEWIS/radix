@@ -187,7 +187,7 @@ final class BellTest extends DatabaseTestCase
 
         $this->bellMidTwoFactorFor(8025)->markAllRead();
 
-        self::assertNull($this->member(8025)->getSettings()?->getNotificationsReadAt());
+        self::assertNull($this->member(8025)->settings?->notificationsReadAt);
     }
 
     /**

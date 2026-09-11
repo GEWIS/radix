@@ -111,7 +111,7 @@ class AdminActivityCalendarController extends AbstractController
         User $user,
     ): Response {
         $proposal = new ActivityProposal();
-        $proposal->setCreatedBy($user->getMember());
+        $proposal->setCreatedBy($user->member);
         $proposal->addDateOption(new ActivityDateOption());
 
         $form = $this->createForm(
@@ -288,7 +288,7 @@ class AdminActivityCalendarController extends AbstractController
         }
 
         $organs = [];
-        foreach ($user->getMember()->getCurrentOrganInstallations() as $installation) {
+        foreach ($user->member->getCurrentOrganInstallations() as $installation) {
             $organ = $installation->getOrgan();
             $organs[intval($organ->getId())] = $organ;
         }

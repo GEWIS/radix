@@ -31,50 +31,20 @@ class KnownDevice extends KnownFact
 {
     /** Keyed HMAC, so this table is not a record of what every member reads with. */
     #[Column(type: Types::STRING)]
-    private string $fingerprint;
+    public string $fingerprint;
 
     /** Display only; a version inside the fingerprint would make every browser update a new device. */
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $browser = null;
+    public ?string $browser = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $operatingSystem = null;
-
-    public function getFingerprint(): string
-    {
-        return $this->fingerprint;
-    }
-
-    public function setFingerprint(string $fingerprint): void
-    {
-        $this->fingerprint = $fingerprint;
-    }
-
-    public function getBrowser(): ?string
-    {
-        return $this->browser;
-    }
-
-    public function setBrowser(?string $browser): void
-    {
-        $this->browser = $browser;
-    }
-
-    public function getOperatingSystem(): ?string
-    {
-        return $this->operatingSystem;
-    }
-
-    public function setOperatingSystem(?string $operatingSystem): void
-    {
-        $this->operatingSystem = $operatingSystem;
-    }
+    public ?string $operatingSystem = null;
 
     /**
      * @return KnownDeviceGdprArrayType
@@ -82,11 +52,11 @@ class KnownDevice extends KnownFact
     public function toGdprArray(): array
     {
         return [
-            'firewall' => $this->getFirewallName(),
-            'browser' => $this->getBrowser(),
-            'operatingSystem' => $this->getOperatingSystem(),
-            'firstSeenAt' => $this->getFirstSeenAt()->format(DateTimeInterface::ATOM),
-            'lastSeenAt' => $this->getLastSeenAt()->format(DateTimeInterface::ATOM),
+            'firewall' => $this->firewallName,
+            'browser' => $this->browser,
+            'operatingSystem' => $this->operatingSystem,
+            'firstSeenAt' => $this->firstSeenAt->format(DateTimeInterface::ATOM),
+            'lastSeenAt' => $this->lastSeenAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

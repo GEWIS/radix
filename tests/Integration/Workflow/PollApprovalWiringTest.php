@@ -186,7 +186,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
 
         return self::getContainer()->get(PollService::class)->requestPoll(
             $revision,
-            $this->user(8005)->getMember(),
+            $this->user(8005)->member,
         );
     }
 

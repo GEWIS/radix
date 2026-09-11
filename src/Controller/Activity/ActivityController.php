@@ -54,7 +54,7 @@ class ActivityController extends AbstractController
     ): Response {
         return $this->render(
             'activity/my.html.twig',
-            ['years' => $this->activityRepository->getSubscribedAssociationYears($user->getMember())],
+            ['years' => $this->activityRepository->getSubscribedAssociationYears($user->member)],
         );
     }
 
@@ -98,7 +98,7 @@ class ActivityController extends AbstractController
             'activity/archive-my.html.twig',
             [
                 'year' => $year,
-                'years' => $this->activityRepository->getSubscribedAssociationYears($user->getMember()),
+                'years' => $this->activityRepository->getSubscribedAssociationYears($user->member),
             ],
         );
     }
@@ -133,7 +133,7 @@ class ActivityController extends AbstractController
         $canViewDetails = $this->isGranted(UserRoles::User->value);
         $user = $this->getUser();
         $viewerLidnr = $user instanceof User
-            ? $user->getMember()->getLidnr()
+            ? $user->member->getLidnr()
             : null;
 
         $signupListViews = [];

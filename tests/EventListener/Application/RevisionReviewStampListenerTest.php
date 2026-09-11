@@ -32,7 +32,7 @@ final class RevisionReviewStampListenerTest extends TestCase
         ) {
             $member = self::createStub(Member::class);
             $user = self::createStub(User::class);
-            $user->method('getMember')->willReturn($member);
+            $user->member = $member;
             $security = self::createStub(Security::class);
             $security->method('getUser')->willReturn($user);
 
@@ -60,7 +60,7 @@ final class RevisionReviewStampListenerTest extends TestCase
         ) {
             $member = self::createStub(Member::class);
             $user = self::createStub(User::class);
-            $user->method('getMember')->willReturn($member);
+            $user->member = $member;
             $security = self::createStub(Security::class);
             $security->method('getUser')->willReturn($user);
 

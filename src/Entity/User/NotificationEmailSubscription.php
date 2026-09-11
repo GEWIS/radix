@@ -37,14 +37,14 @@ class NotificationEmailSubscription
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private User $user;
+    public private(set) User $user;
 
     #[Column(
         type: Types::STRING,
         length: 64,
         enumType: NotificationType::class,
     )]
-    private NotificationType $category;
+    public private(set) NotificationType $category;
 
     #[Column(
         type: Types::STRING,
@@ -52,7 +52,7 @@ class NotificationEmailSubscription
         enumType: NotificationEmailFrequency::class,
         options: ['default' => 'immediately'],
     )]
-    private NotificationEmailFrequency $frequency;
+    public NotificationEmailFrequency $frequency;
 
     /**
      * When this category's digest was last mailed to the member. Null means it never has been, so the next run is due.
@@ -62,7 +62,7 @@ class NotificationEmailSubscription
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $lastSentAt = null;
+    public ?DateTimeImmutable $lastSentAt = null;
 
     public function __construct(
         User $user,
@@ -72,35 +72,5 @@ class NotificationEmailSubscription
         $this->user = $user;
         $this->category = $category;
         $this->frequency = $frequency;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function getCategory(): NotificationType
-    {
-        return $this->category;
-    }
-
-    public function getFrequency(): NotificationEmailFrequency
-    {
-        return $this->frequency;
-    }
-
-    public function setFrequency(NotificationEmailFrequency $frequency): void
-    {
-        $this->frequency = $frequency;
-    }
-
-    public function getLastSentAt(): ?DateTimeImmutable
-    {
-        return $this->lastSentAt;
-    }
-
-    public function setLastSentAt(?DateTimeImmutable $lastSentAt): void
-    {
-        $this->lastSentAt = $lastSentAt;
     }
 }

@@ -146,8 +146,8 @@ class PasswordResetRequestEmailHandler
             $recipientEmail = $member->getEmail();
             $fullName = $member->getFullName();
         } else {
-            $recipientEmail = $companyUser->getEmail();
-            $fullName = $companyUser->getName();
+            $recipientEmail = $companyUser->email;
+            $fullName = $companyUser->name;
         }
 
         assert(null !== $recipientEmail);

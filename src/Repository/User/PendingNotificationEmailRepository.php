@@ -35,8 +35,8 @@ class PendingNotificationEmailRepository extends ServiceEntityRepository
     {
         $users = [];
         foreach ($this->findAll() as $pending) {
-            $user = $pending->getUser();
-            $users[$user->getLidnr()] = $user;
+            $user = $pending->user;
+            $users[$user->lidnr] = $user;
         }
 
         return array_values($users);
@@ -57,7 +57,7 @@ class PendingNotificationEmailRepository extends ServiceEntityRepository
             ->where('p.user = :user')
             ->setParameter(
                 'user',
-                $user->getLidnr(),
+                $user->lidnr,
             )
             ->orderBy(
                 'n.createdAt',
@@ -74,7 +74,7 @@ class PendingNotificationEmailRepository extends ServiceEntityRepository
             ->where('p.user = :user')
             ->setParameter(
                 'user',
-                $user->getLidnr(),
+                $user->lidnr,
             )
             ->getQuery()
             ->execute();

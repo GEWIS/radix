@@ -25,7 +25,7 @@ class ExternalApp
      * Application ID.
      */
     #[Column(type: Types::STRING)]
-    private string $appId;
+    public string $appId;
 
     /**
      * Signing algorithm. Modern applications sign with one of the association's keys, published through the JWKS
@@ -36,7 +36,7 @@ class ExternalApp
         enumType: ExternalAppSignature::class,
         options: ['default' => ExternalAppSignature::EdDSA->value],
     )]
-    private ExternalAppSignature $signature = ExternalAppSignature::EdDSA;
+    public ExternalAppSignature $signature = ExternalAppSignature::EdDSA;
 
     /**
      * How the token is returned to the application.
@@ -46,7 +46,7 @@ class ExternalApp
         enumType: ExternalAppTokenDelivery::class,
         options: ['default' => ExternalAppTokenDelivery::Fragment->value],
     )]
-    private ExternalAppTokenDelivery $tokenDelivery = ExternalAppTokenDelivery::Fragment;
+    public ExternalAppTokenDelivery $tokenDelivery = ExternalAppTokenDelivery::Fragment;
 
     /**
      * Shared secret, used only by applications signed with HS512.
@@ -55,19 +55,19 @@ class ExternalApp
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $secret = null;
+    public ?string $secret = null;
 
     /**
      * Callback URL.
      */
     #[Column(type: Types::STRING)]
-    private string $callback;
+    public string $callback;
 
     /**
      * URL for the application when the user does not authorise access.
      */
     #[Column(type: Types::STRING)]
-    private string $url;
+    public string $url;
 
     /**
      * The claims that will be present in the JWT. If `null` only the member's id will be passed along.
@@ -88,7 +88,7 @@ class ExternalApp
         type: Types::BOOLEAN,
         options: ['default' => true],
     )]
-    private bool $enabled = true;
+    public bool $enabled = true;
 
     /**
      * The moment after which the application may no longer be used to authenticate, if any.
@@ -97,67 +97,7 @@ class ExternalApp
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $expiresAt = null;
-
-    public function getAppId(): string
-    {
-        return $this->appId;
-    }
-
-    public function setAppId(string $appId): void
-    {
-        $this->appId = $appId;
-    }
-
-    public function getSecret(): ?string
-    {
-        return $this->secret;
-    }
-
-    public function setSecret(?string $secret): void
-    {
-        $this->secret = $secret;
-    }
-
-    public function getSignature(): ExternalAppSignature
-    {
-        return $this->signature;
-    }
-
-    public function setSignature(ExternalAppSignature $signature): void
-    {
-        $this->signature = $signature;
-    }
-
-    public function getTokenDelivery(): ExternalAppTokenDelivery
-    {
-        return $this->tokenDelivery;
-    }
-
-    public function setTokenDelivery(ExternalAppTokenDelivery $tokenDelivery): void
-    {
-        $this->tokenDelivery = $tokenDelivery;
-    }
-
-    public function getCallback(): string
-    {
-        return $this->callback;
-    }
-
-    public function setCallback(string $callback): void
-    {
-        $this->callback = $callback;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(string $url): void
-    {
-        $this->url = $url;
-    }
+    public ?DateTime $expiresAt = null;
 
     /**
      * @return JWTClaims[]
@@ -177,26 +117,6 @@ class ExternalApp
     public function setClaims(array $claims): void
     {
         $this->claims = $claims;
-    }
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
-    public function setEnabled(bool $enabled): void
-    {
-        $this->enabled = $enabled;
-    }
-
-    public function getExpiresAt(): ?DateTime
-    {
-        return $this->expiresAt;
-    }
-
-    public function setExpiresAt(?DateTime $expiresAt): void
-    {
-        $this->expiresAt = $expiresAt;
     }
 
     /**

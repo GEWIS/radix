@@ -99,7 +99,7 @@ final class CourseDocumentDownloadTest extends TestCase
     private function user(int $lidnr): User
     {
         $user = new User();
-        $user->setLidnr($lidnr);
+        $user->lidnr = $lidnr;
 
         return $user;
     }

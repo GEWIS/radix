@@ -32,49 +32,19 @@ class KnownDeviceToken extends KnownFact
 {
     /** Keyed HMAC, so reading this table yields no cookie that would quiet somebody's notices. */
     #[Column(type: Types::STRING)]
-    private string $tokenHash;
+    public string $tokenHash;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $browser = null;
+    public ?string $browser = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $operatingSystem = null;
-
-    public function getTokenHash(): string
-    {
-        return $this->tokenHash;
-    }
-
-    public function setTokenHash(string $tokenHash): void
-    {
-        $this->tokenHash = $tokenHash;
-    }
-
-    public function getBrowser(): ?string
-    {
-        return $this->browser;
-    }
-
-    public function setBrowser(?string $browser): void
-    {
-        $this->browser = $browser;
-    }
-
-    public function getOperatingSystem(): ?string
-    {
-        return $this->operatingSystem;
-    }
-
-    public function setOperatingSystem(?string $operatingSystem): void
-    {
-        $this->operatingSystem = $operatingSystem;
-    }
+    public ?string $operatingSystem = null;
 
     /**
      * @return KnownDeviceTokenGdprArrayType
@@ -82,11 +52,11 @@ class KnownDeviceToken extends KnownFact
     public function toGdprArray(): array
     {
         return [
-            'firewall' => $this->getFirewallName(),
-            'browser' => $this->getBrowser(),
-            'operatingSystem' => $this->getOperatingSystem(),
-            'firstSeenAt' => $this->getFirstSeenAt()->format(DateTimeInterface::ATOM),
-            'lastSeenAt' => $this->getLastSeenAt()->format(DateTimeInterface::ATOM),
+            'firewall' => $this->firewallName,
+            'browser' => $this->browser,
+            'operatingSystem' => $this->operatingSystem,
+            'firstSeenAt' => $this->firstSeenAt->format(DateTimeInterface::ATOM),
+            'lastSeenAt' => $this->lastSeenAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

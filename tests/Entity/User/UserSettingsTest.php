@@ -17,8 +17,8 @@ final class UserSettingsTest extends TestCase
     public function testGdprArrayExportsEverySetting(): void
     {
         $settings = new UserSettings(self::createStub(User::class));
-        $settings->setPhotoTaggingOptOut(true);
-        $settings->setHideYearOfBirth(true);
+        $settings->photoTaggingOptOut = true;
+        $settings->hideYearOfBirth = true;
 
         self::assertSame(
             [

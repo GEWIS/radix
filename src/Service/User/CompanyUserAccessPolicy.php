@@ -30,7 +30,7 @@ final readonly class CompanyUserAccessPolicy
         }
 
         return $this->companyPackageRepository->hasNonExpiredPackage(
-            $companyUser->getCompany(),
+            $companyUser->company,
             $now,
         );
     }

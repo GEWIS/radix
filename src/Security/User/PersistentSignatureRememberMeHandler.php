@@ -159,14 +159,14 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         }
 
         // Ensure we only process remember-me requests for the correct firewall.
-        if ($session->getFirewallName() !== $this->firewallName) {
+        if ($session->firewallName !== $this->firewallName) {
             $this->securityEvents->record(
                 SecurityEventType::CrossFirewallTokenRejected,
-                $session->getUserIdentifier(),
+                $session->userIdentifier,
                 $this->firewallName,
                 [
                     'series' => $series,
-                    'storedFirewall' => $session->getFirewallName(),
+                    'storedFirewall' => $session->firewallName,
                 ],
             );
 
@@ -177,7 +177,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         if ($session->isExpired()) {
             $this->securityEvents->record(
                 SecurityEventType::SessionExpired,
-                $session->getUserIdentifier(),
+                $session->userIdentifier,
                 $this->firewallName,
                 ['series' => $series],
             );
@@ -191,7 +191,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         if (!$this->rowSignature->verify($session)) {
             $this->securityEvents->record(
                 SecurityEventType::SessionSignatureRejected,
-                $session->getUserIdentifier(),
+                $session->userIdentifier,
                 $this->firewallName,
                 ['series' => $series],
             );
@@ -207,7 +207,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         );
 
         $raced = !hash_equals(
-            $session->getHashedToken(),
+            $session->hashedToken,
             $presentedToken,
         );
 
@@ -216,13 +216,13 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             // who learns a series sign the account out of every device by presenting rubbish alongside it.
             if (
                 !hash_equals(
-                    $session->getPreviousHashedToken() ?? '',
+                    $session->previousHashedToken ?? '',
                     $presentedToken,
                 )
             ) {
                 $this->securityEvents->record(
                     SecurityEventType::RememberMeTokenUnrecognised,
-                    $session->getUserIdentifier(),
+                    $session->userIdentifier,
                     $this->firewallName,
                     ['series' => $series],
                 );
@@ -231,7 +231,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             }
 
             // The token this row just replaced, presented past the window a second tab could still be holding it in.
-            if (!$this->withinGracePeriod($session->getPreviousTokenValidUntil())) {
+            if (!$this->withinGracePeriod($session->previousTokenValidUntil)) {
                 $this->reportTheft($session);
             }
         }
@@ -239,13 +239,13 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         // If any of the properties in the signature changed, detect that and force log out.
         if (
             !$this->credentials->matches(
-                $session->getSignaturePropertiesHash(),
+                $session->signaturePropertiesHash,
                 $user,
             )
         ) {
             $this->securityEvents->record(
                 SecurityEventType::SessionEndedCredentialsChanged,
-                $session->getUserIdentifier(),
+                $session->userIdentifier,
                 $this->firewallName,
                 ['series' => $series],
             );
@@ -264,7 +264,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                 'Remember-me token was rotated by a concurrent request; accepted within the grace period.',
                 [
                     'series' => $series,
-                    'user' => $session->getUserIdentifier(),
+                    'user' => $session->userIdentifier,
                     'firewall' => $this->firewallName,
                 ],
             );
@@ -284,8 +284,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         $validUntil = $now->modify('+' . self::TOKEN_GRACE_SECONDS . ' seconds');
 
         $rotated = $this->repository->rotateToken(
-            $session->getSeries(),
-            $session->getHashedToken(),
+            $session->series,
+            $session->hashedToken,
             $newHashedToken,
             $this->rowSignature->forRotation(
                 $session,
@@ -298,7 +298,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 
         // Lost the write, so what this request holds has just become the previous token.
         if (!$rotated) {
-            $grace = $this->repository->findRotationGrace($session->getSeries());
+            $grace = $this->repository->findRotationGrace($session->series);
 
             if (
                 !hash_equals(
@@ -315,14 +315,14 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 
         $this->securityEvents->record(
             SecurityEventType::SessionResumed,
-            $session->getUserIdentifier(),
+            $session->userIdentifier,
             $this->firewallName,
             ['series' => $series],
         );
 
         $this->createCookie(new RememberMeDetails(
             $user->getUserIdentifier(),
-            $session->getExpiresAt()->getTimestamp(),
+            $session->expiresAt->getTimestamp(),
             $series . self::COOKIE_DELIMITER . $newRawToken,
         ));
     }
@@ -338,15 +338,15 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
     {
         $this->securityEvents->record(
             SecurityEventType::RememberMeTokenReplayed,
-            $session->getUserIdentifier(),
+            $session->userIdentifier,
             $this->firewallName,
             [
-                'series' => $session->getSeries(),
+                'series' => $session->series,
                 'consequence' => 'all_sessions_invalidated',
             ],
         );
         $this->repository->deleteAllForUserOnFirewall(
-            $session->getUserIdentifier(),
+            $session->userIdentifier,
             $this->firewallName,
         );
         $this->entityManager->flush();
@@ -369,7 +369,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
 
                 if (
                     null !== $session
-                    && $session->getFirewallName() === $this->firewallName
+                    && $session->firewallName === $this->firewallName
                 ) {
                     $this->entityManager->remove($session);
                     $this->entityManager->flush();
@@ -437,22 +437,22 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         $meta = $this->userAgentParser->parseRequest($request);
 
         $session = new Session();
-        $session->setSeries($series);
-        $session->setHashedToken($hashedToken);
-        $session->setSignaturePropertiesHash($this->credentials->hash($user));
-        $session->setFirewallName($this->firewallName);
-        $session->setUserIdentifier($user->getUserIdentifier());
-        $session->setCreatedAt($now);
-        $session->setExpiresAt($expiresAt);
-        $session->setLastUsedAt($now);
-        $session->setUserAgent($userAgent);
-        $session->setIpAddress($request->getClientIp() ?? '');
-        $session->setPhpSessionId($request->getSession()->getId());
-        $session->setDeviceType($meta['type']);
-        $session->setBrowser($meta['browser']);
-        $session->setOperatingSystem($meta['operatingSystem']);
+        $session->series = $series;
+        $session->hashedToken = $hashedToken;
+        $session->signaturePropertiesHash = $this->credentials->hash($user);
+        $session->firewallName = $this->firewallName;
+        $session->userIdentifier = $user->getUserIdentifier();
+        $session->createdAt = $now;
+        $session->expiresAt = $expiresAt;
+        $session->lastUsedAt = $now;
+        $session->userAgent = $userAgent;
+        $session->ipAddress = $request->getClientIp() ?? '';
+        $session->phpSessionId = $request->getSession()->getId();
+        $session->deviceType = $meta['type'];
+        $session->browser = $meta['browser'];
+        $session->operatingSystem = $meta['operatingSystem'];
         // Last: the signature covers every field above.
-        $session->setSignature($this->rowSignature->forRow($session));
+        $session->signature = $this->rowSignature->forRow($session);
 
         $this->entityManager->persist($session);
         $this->entityManager->flush();

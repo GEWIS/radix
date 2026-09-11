@@ -40,21 +40,21 @@ final class SecurityEventLoggerTest extends DatabaseTestCase
         );
         self::assertSame(
             SecurityEventType::SessionEndedDeviceChanged,
-            $entries[0]->getEvent(),
+            $entries[0]->event,
         );
         self::assertSame(
             self::ADDRESS,
-            $entries[0]->getIpAddress(),
+            $entries[0]->ipAddress,
         );
         self::assertSame(
             'Firefox 143',
-            $entries[0]->getBrowser(),
+            $entries[0]->browser,
         );
         self::assertSame(
             ['series' => 'abc'],
-            $entries[0]->getDetail(),
+            $entries[0]->detail,
         );
-        self::assertNotNull($entries[0]->getRequestId());
+        self::assertNotNull($entries[0]->requestId);
     }
 
     /**
@@ -84,11 +84,11 @@ final class SecurityEventLoggerTest extends DatabaseTestCase
     public function testRecordingDoesNotWriteOutTheCallersPendingWork(): void
     {
         $device = new KnownDevice();
-        $device->setUserIdentifier(self::USER);
-        $device->setFirewallName(self::FIREWALL);
-        $device->setFingerprint('unflushed-fingerprint');
-        $device->setFirstSeenAt(new DateTimeImmutable());
-        $device->setLastSeenAt(new DateTimeImmutable());
+        $device->userIdentifier = self::USER;
+        $device->firewallName = self::FIREWALL;
+        $device->fingerprint = 'unflushed-fingerprint';
+        $device->firstSeenAt = new DateTimeImmutable();
+        $device->lastSeenAt = new DateTimeImmutable();
 
         $this->entityManager->persist($device);
 
@@ -135,7 +135,7 @@ final class SecurityEventLoggerTest extends DatabaseTestCase
 
         $entries = $this->repository()->findAllByUser(self::USER);
 
-        self::assertNull($entries[0]->getActorIdentifier());
+        self::assertNull($entries[0]->actorIdentifier);
     }
 
     private function logger(): SecurityEventLogger

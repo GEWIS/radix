@@ -49,7 +49,7 @@ class ExternalAppService
         User $user,
         ?string $nonce = null,
     ): string {
-        $member = $user->getMember();
+        $member = $user->member;
         $issuedAt = new DateTimeImmutable();
 
         // A nonce supplied by the application is echoed back so it can bind the token to its request.
@@ -77,10 +77,10 @@ class ExternalAppService
             SecurityEventType::ExternalAppAuthorised,
             $user->getUserIdentifier(),
             'main',
-            ['application' => $app->getAppId()],
+            ['application' => $app->appId],
         );
 
-        return $app->getCallback() . $app->getTokenDelivery()->separator() . $this->sign(
+        return $app->callback . $app->tokenDelivery->separator() . $this->sign(
             $app,
             $claims,
         );
@@ -115,10 +115,10 @@ class ExternalAppService
         ExternalApp $app,
         array $claims,
     ): string {
-        $signature = $app->getSignature();
+        $signature = $app->signature;
 
         if ($signature->usesSharedSecret()) {
-            $key = JWKFactory::createFromSecret($app->getSecret() ?? '');
+            $key = JWKFactory::createFromSecret($app->secret ?? '');
             $header = ['alg' => $signature->value];
         } else {
             $key = $this->signingKey($signature);
@@ -179,9 +179,9 @@ class ExternalAppService
         User $user,
     ): void {
         $authentication = new ExternalAppAuthentication();
-        $authentication->setUser($user);
-        $authentication->setExternalApp($app);
-        $authentication->setTime(new DateTime());
+        $authentication->user = $user;
+        $authentication->externalApp = $app;
+        $authentication->time = new DateTime();
 
         $this->entityManager->persist($authentication);
         $this->entityManager->flush();

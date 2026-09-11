@@ -60,16 +60,16 @@ final class ExternalAppData
     public static function fromEntity(ExternalApp $app): self
     {
         $data = new self();
-        $data->appId = $app->getAppId();
-        $data->callback = $app->getCallback();
-        $data->url = $app->getUrl();
-        $data->signature = $app->getSignature();
-        $data->tokenDelivery = $app->getTokenDelivery();
-        $data->secret = $app->getSecret();
+        $data->appId = $app->appId;
+        $data->callback = $app->callback;
+        $data->url = $app->url;
+        $data->signature = $app->signature;
+        $data->tokenDelivery = $app->tokenDelivery;
+        $data->secret = $app->secret;
         $data->claims = $app->getClaims();
-        $data->enabled = $app->isEnabled();
-        $data->expiresAt = null !== $app->getExpiresAt()
-            ? DateTimeImmutable::createFromInterface($app->getExpiresAt())
+        $data->enabled = $app->enabled;
+        $data->expiresAt = null !== $app->expiresAt
+            ? DateTimeImmutable::createFromInterface($app->expiresAt)
             : null;
 
         return $data;
@@ -77,18 +77,16 @@ final class ExternalAppData
 
     public function applyTo(ExternalApp $app): void
     {
-        $app->setAppId((string) $this->appId);
-        $app->setCallback((string) $this->callback);
-        $app->setUrl((string) $this->url);
-        $app->setSignature($this->signature ?? ExternalAppSignature::EdDSA);
-        $app->setTokenDelivery($this->tokenDelivery ?? ExternalAppTokenDelivery::Fragment);
-        $app->setSecret($this->secret);
+        $app->appId = (string) $this->appId;
+        $app->callback = (string) $this->callback;
+        $app->url = (string) $this->url;
+        $app->signature = $this->signature ?? ExternalAppSignature::EdDSA;
+        $app->tokenDelivery = $this->tokenDelivery ?? ExternalAppTokenDelivery::Fragment;
+        $app->secret = $this->secret;
         $app->setClaims($this->claims);
-        $app->setEnabled($this->enabled);
-        $app->setExpiresAt(
-            null !== $this->expiresAt
-                ? DateTime::createFromInterface($this->expiresAt)
-                : null,
-        );
+        $app->enabled = $this->enabled;
+        $app->expiresAt = null !== $this->expiresAt
+            ? DateTime::createFromInterface($this->expiresAt)
+            : null;
     }
 }

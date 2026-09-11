@@ -225,7 +225,7 @@ class Company implements RevisableInterface
     {
         if (
             null === $this->primaryContact
-            || $this->primaryContact->getCompany() === $this
+            || $this->primaryContact->company === $this
         ) {
             return;
         }

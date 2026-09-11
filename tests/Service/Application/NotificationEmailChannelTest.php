@@ -73,7 +73,7 @@ final class NotificationEmailChannelTest extends TestCase
         $member->method('isExpired')->willReturn(false);
 
         $user = self::createStub(User::class);
-        $user->method('getMember')->willReturn($member);
+        $user->member = $member;
 
         return $user;
     }

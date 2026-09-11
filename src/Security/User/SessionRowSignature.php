@@ -31,9 +31,9 @@ final class SessionRowSignature
     {
         return $this->compute(
             $session,
-            $session->getHashedToken(),
-            $session->getPreviousHashedToken(),
-            $session->getPreviousTokenValidUntil(),
+            $session->hashedToken,
+            $session->previousHashedToken,
+            $session->previousTokenValidUntil,
         );
     }
 
@@ -45,7 +45,7 @@ final class SessionRowSignature
         return $this->compute(
             $session,
             $newHashedToken,
-            $session->getHashedToken(),
+            $session->hashedToken,
             $validUntil,
         );
     }
@@ -59,10 +59,10 @@ final class SessionRowSignature
     {
         return hash_equals(
             $this->forRow($session),
-            $session->getSignature(),
+            $session->signature,
         ) || hash_equals(
             $this->legacyForRow($session),
-            $session->getSignature(),
+            $session->signature,
         );
     }
 
@@ -76,14 +76,14 @@ final class SessionRowSignature
             self::ALGO,
             json_encode(
                 [
-                    'series' => $session->getSeries(),
+                    'series' => $session->series,
                     'hashedToken' => $hashedToken,
                     'previousHashedToken' => $previousHashedToken,
                     'previousTokenValidUntil' => $previousTokenValidUntil?->getTimestamp(),
-                    'userIdentifier' => $session->getUserIdentifier(),
-                    'firewallName' => $session->getFirewallName(),
-                    'credentials' => $session->getSignaturePropertiesHash(),
-                    'expiresAt' => $session->getExpiresAt()->getTimestamp(),
+                    'userIdentifier' => $session->userIdentifier,
+                    'firewallName' => $session->firewallName,
+                    'credentials' => $session->signaturePropertiesHash,
+                    'expiresAt' => $session->expiresAt->getTimestamp(),
                 ],
                 JSON_THROW_ON_ERROR,
             ),
@@ -94,14 +94,14 @@ final class SessionRowSignature
     private function legacyForRow(Session $session): string
     {
         $fields = [
-            $session->getSeries(),
-            $session->getHashedToken(),
-            $session->getUserIdentifier(),
-            $session->getExpiresAt()->getTimestamp(),
+            $session->series,
+            $session->hashedToken,
+            $session->userIdentifier,
+            $session->expiresAt->getTimestamp(),
         ];
 
-        $previousHashedToken = $session->getPreviousHashedToken();
-        $previousTokenValidUntil = $session->getPreviousTokenValidUntil();
+        $previousHashedToken = $session->previousHashedToken;
+        $previousTokenValidUntil = $session->previousTokenValidUntil;
 
         if (
             null !== $previousHashedToken

@@ -40,7 +40,7 @@ class Session
     #[Id]
     #[GeneratedValue]
     #[Column(type: Types::INTEGER)]
-    private int $id;
+    public private(set) int $id;
 
     /**
      * The public series identifier, persisted across token rotations.
@@ -50,70 +50,70 @@ class Session
         type: Types::STRING,
         unique: true,
     )]
-    private string $series;
+    public string $series;
 
     /**
      * SHA-256(rawToken). Raw token is never stored.
      */
     #[Column(type: Types::STRING)]
-    private string $hashedToken;
+    public string $hashedToken;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $previousHashedToken = null;
+    public ?string $previousHashedToken = null;
 
     #[Column(
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $previousTokenValidUntil = null;
+    public ?DateTimeImmutable $previousTokenValidUntil = null;
 
     /**
      * HMAC of the immutable row fields. Detects DB tampering.
      */
     #[Column(type: Types::STRING)]
-    private string $signature;
+    public string $signature;
 
     /**
      * SHA-256 hash of the user's signature_properties values at session creation.
      */
     #[Column(type: Types::STRING)]
-    private string $signaturePropertiesHash;
+    public string $signaturePropertiesHash;
 
     /**
      * Which Symfony firewall this session belongs to.
      */
     #[Column(type: Types::STRING)]
-    private string $firewallName;
+    public string $firewallName;
 
     /**
      * The user this session belongs to (e.g. email or UUID).
      */
     #[Column(type: Types::STRING)]
-    private string $userIdentifier;
+    public string $userIdentifier;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $createdAt;
+    public DateTimeImmutable $createdAt;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $expiresAt;
+    public DateTimeImmutable $expiresAt;
 
     #[Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $lastUsedAt;
+    public DateTimeImmutable $lastUsedAt;
 
     #[Column(type: Types::TEXT)]
-    private string $userAgent;
+    public string $userAgent;
 
     #[Column(type: Types::STRING)]
-    private string $ipAddress;
+    public string $ipAddress;
 
     /**
      * Semantic device class; resolved to an icon glyph at render time via {@see DeviceTypes::icon()}.
      */
     #[Column(enumType: DeviceTypes::class)]
-    private DeviceTypes $deviceType;
+    public DeviceTypes $deviceType;
 
     /**
      * Parsed from userAgent (e.g. "Chrome 124"); for bots holds the bot name on its own. Nullable when the User Agent
@@ -123,7 +123,7 @@ class Session
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $browser = null;
+    public ?string $browser = null;
 
     /**
      * Parsed from userAgent (e.g. "Android 14"). Nullable for bots / empty UAs / OS-less environments.
@@ -132,189 +132,14 @@ class Session
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $operatingSystem = null;
+    public ?string $operatingSystem = null;
 
     /**
      * The PHP session ID this row is bound to. Allows for direct destruction of the device's session via the Redis
      * session handler.
      */
     #[Column(type: Types::STRING)]
-    private string $phpSessionId;
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getSeries(): string
-    {
-        return $this->series;
-    }
-
-    public function setSeries(string $series): void
-    {
-        $this->series = $series;
-    }
-
-    public function getHashedToken(): string
-    {
-        return $this->hashedToken;
-    }
-
-    public function setHashedToken(string $hashedToken): void
-    {
-        $this->hashedToken = $hashedToken;
-    }
-
-    public function getPreviousHashedToken(): ?string
-    {
-        return $this->previousHashedToken;
-    }
-
-    public function setPreviousHashedToken(?string $previousHashedToken): void
-    {
-        $this->previousHashedToken = $previousHashedToken;
-    }
-
-    public function getPreviousTokenValidUntil(): ?DateTimeImmutable
-    {
-        return $this->previousTokenValidUntil;
-    }
-
-    public function setPreviousTokenValidUntil(?DateTimeImmutable $previousTokenValidUntil): void
-    {
-        $this->previousTokenValidUntil = $previousTokenValidUntil;
-    }
-
-    public function getSignature(): string
-    {
-        return $this->signature;
-    }
-
-    public function setSignature(string $signature): void
-    {
-        $this->signature = $signature;
-    }
-
-    public function getSignaturePropertiesHash(): string
-    {
-        return $this->signaturePropertiesHash;
-    }
-
-    public function setSignaturePropertiesHash(string $hash): void
-    {
-        $this->signaturePropertiesHash = $hash;
-    }
-
-    public function getFirewallName(): string
-    {
-        return $this->firewallName;
-    }
-
-    public function setFirewallName(string $firewallName): void
-    {
-        $this->firewallName = $firewallName;
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->userIdentifier;
-    }
-
-    public function setUserIdentifier(string $userIdentifier): void
-    {
-        $this->userIdentifier = $userIdentifier;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getExpiresAt(): DateTimeImmutable
-    {
-        return $this->expiresAt;
-    }
-
-    public function setExpiresAt(DateTimeImmutable $expiresAt): void
-    {
-        $this->expiresAt = $expiresAt;
-    }
-
-    public function getLastUsedAt(): DateTimeImmutable
-    {
-        return $this->lastUsedAt;
-    }
-
-    public function setLastUsedAt(DateTimeImmutable $lastUsedAt): void
-    {
-        $this->lastUsedAt = $lastUsedAt;
-    }
-
-    public function getUserAgent(): string
-    {
-        return $this->userAgent;
-    }
-
-    public function setUserAgent(string $userAgent): void
-    {
-        $this->userAgent = $userAgent;
-    }
-
-    public function getIpAddress(): string
-    {
-        return $this->ipAddress;
-    }
-
-    public function setIpAddress(string $ipAddress): void
-    {
-        $this->ipAddress = $ipAddress;
-    }
-
-    public function getDeviceType(): DeviceTypes
-    {
-        return $this->deviceType;
-    }
-
-    public function setDeviceType(DeviceTypes $deviceType): void
-    {
-        $this->deviceType = $deviceType;
-    }
-
-    public function getBrowser(): ?string
-    {
-        return $this->browser;
-    }
-
-    public function setBrowser(?string $browser): void
-    {
-        $this->browser = $browser;
-    }
-
-    public function getOperatingSystem(): ?string
-    {
-        return $this->operatingSystem;
-    }
-
-    public function setOperatingSystem(?string $operatingSystem): void
-    {
-        $this->operatingSystem = $operatingSystem;
-    }
-
-    public function getPhpSessionId(): string
-    {
-        return $this->phpSessionId;
-    }
-
-    public function setPhpSessionId(string $phpSessionId): void
-    {
-        $this->phpSessionId = $phpSessionId;
-    }
+    public string $phpSessionId;
 
     public function isExpired(): bool
     {
@@ -330,16 +155,16 @@ class Session
     public function toGdprArray(): array
     {
         return [
-            'series' => $this->getSeries(),
-            'firewall' => $this->getFirewallName(),
-            'deviceType' => $this->getDeviceType()->value,
-            'browser' => $this->getBrowser(),
-            'operatingSystem' => $this->getOperatingSystem(),
-            'ipAddress' => $this->getIpAddress(),
-            'userAgent' => $this->getUserAgent(),
-            'createdAt' => $this->getCreatedAt()->format(DateTimeInterface::ATOM),
-            'lastUsedAt' => $this->getLastUsedAt()->format(DateTimeInterface::ATOM),
-            'expiresAt' => $this->getExpiresAt()->format(DateTimeInterface::ATOM),
+            'series' => $this->series,
+            'firewall' => $this->firewallName,
+            'deviceType' => $this->deviceType->value,
+            'browser' => $this->browser,
+            'operatingSystem' => $this->operatingSystem,
+            'ipAddress' => $this->ipAddress,
+            'userAgent' => $this->userAgent,
+            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
+            'lastUsedAt' => $this->lastUsedAt->format(DateTimeInterface::ATOM),
+            'expiresAt' => $this->expiresAt->format(DateTimeInterface::ATOM),
             'expired' => $this->isExpired(),
         ];
     }

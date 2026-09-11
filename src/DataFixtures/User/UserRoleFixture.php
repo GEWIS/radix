@@ -38,9 +38,12 @@ class UserRoleFixture extends Fixture implements DependentFixtureInterface, Fixt
         ) {
             foreach ($roles as $role) {
                 $userRole = new UserRole();
-                $userRole->setRole($role);
+                $userRole->role = $role;
                 $userRole->setExpiration(new DateTime()->add(new DateInterval('P10Y')));
-                $userRole->setLidnr($this->getReference('user-' . $lidnr, User::class));
+                $userRole->lidnr = $this->getReference(
+                    'user-' . $lidnr,
+                    User::class,
+                );
 
                 $manager->persist($userRole);
             }
@@ -54,9 +57,12 @@ class UserRoleFixture extends Fixture implements DependentFixtureInterface, Fixt
             ) as $lidnr
         ) {
             $companyAdminRole = new UserRole();
-            $companyAdminRole->setRole(UserRoles::CompanyAdmin);
+            $companyAdminRole->role = UserRoles::CompanyAdmin;
             $companyAdminRole->setExpiration(new DateTime()->add(new DateInterval('P10Y')));
-            $companyAdminRole->setLidnr($this->getReference('user-' . $lidnr, User::class));
+            $companyAdminRole->lidnr = $this->getReference(
+                'user-' . $lidnr,
+                User::class,
+            );
 
             $manager->persist($companyAdminRole);
         }

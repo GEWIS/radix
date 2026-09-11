@@ -35,7 +35,7 @@ class NotificationEmailSubscriptionRepository extends ServiceEntityRepository
     public function findSubscribedUsers(NotificationType $category): array
     {
         return array_map(
-            static fn (NotificationEmailSubscription $subscription): User => $subscription->getUser(),
+            static fn (NotificationEmailSubscription $subscription): User => $subscription->user,
             $this->findBy(['category' => $category]),
         );
     }
@@ -66,9 +66,9 @@ class NotificationEmailSubscriptionRepository extends ServiceEntityRepository
 
         $seen = [];
         foreach ($this->findBy(['user' => $user]) as $subscription) {
-            $value = $subscription->getCategory()->value;
+            $value = $subscription->category->value;
             if (isset($frequencies[$value])) {
-                $subscription->setFrequency($frequencies[$value]);
+                $subscription->frequency = $frequencies[$value];
                 $seen[$value] = true;
             } else {
                 $entityManager->remove($subscription);
@@ -85,7 +85,7 @@ class NotificationEmailSubscriptionRepository extends ServiceEntityRepository
                 NotificationType::from($value),
                 $frequency,
             );
-            $subscription->setLastSentAt(new DateTimeImmutable());
+            $subscription->lastSentAt = new DateTimeImmutable();
             $entityManager->persist($subscription);
         }
     }

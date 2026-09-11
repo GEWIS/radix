@@ -47,10 +47,10 @@ final class SessionRepositoryTest extends DatabaseTestCase
             $remaining,
         );
         self::assertSame(
-            $inUse->getSeries(),
-            $remaining[0]->getSeries(),
+            $inUse->series,
+            $remaining[0]->series,
         );
-        self::assertNull($this->repository()->findOneBySeries($abandoned->getSeries()));
+        self::assertNull($this->repository()->findOneBySeries($abandoned->series));
     }
 
     /**
@@ -77,19 +77,19 @@ final class SessionRepositoryTest extends DatabaseTestCase
         DateTimeImmutable $expiresAt,
     ): Session {
         $session = new Session();
-        $session->setSeries($series);
-        $session->setHashedToken('hashed-' . $series);
-        $session->setSignature('signature-' . $series);
-        $session->setSignaturePropertiesHash('properties-' . $series);
-        $session->setFirewallName('main');
-        $session->setUserIdentifier(self::USER);
-        $session->setCreatedAt(new DateTimeImmutable('-60 days'));
-        $session->setExpiresAt($expiresAt);
-        $session->setLastUsedAt($lastUsedAt);
-        $session->setUserAgent('a user agent');
-        $session->setIpAddress('192.0.2.10');
-        $session->setDeviceType(DeviceTypes::Pc);
-        $session->setPhpSessionId('php-' . $series);
+        $session->series = $series;
+        $session->hashedToken = 'hashed-' . $series;
+        $session->signature = 'signature-' . $series;
+        $session->signaturePropertiesHash = 'properties-' . $series;
+        $session->firewallName = 'main';
+        $session->userIdentifier = self::USER;
+        $session->createdAt = new DateTimeImmutable('-60 days');
+        $session->expiresAt = $expiresAt;
+        $session->lastUsedAt = $lastUsedAt;
+        $session->userAgent = 'a user agent';
+        $session->ipAddress = '192.0.2.10';
+        $session->deviceType = DeviceTypes::Pc;
+        $session->phpSessionId = 'php-' . $series;
 
         $this->entityManager->persist($session);
 

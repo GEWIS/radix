@@ -19,8 +19,9 @@ use Doctrine\ORM\Mapping\OneToOne;
  *
  * These live on the `User` side (keyed by `lidnr`, via a derived/shared identity to {@see User}) and never on
  * `Member`, because the `Member` table is projected from the ledger and read-only here. A member has at most one
- * row; a missing row means "all defaults" (see the null-safe accessors on {@see User}), so rows are only created the
- * first time a member touches their settings.
+ * row; a missing row means "all defaults", which is what {@see User::hasDisabledCosmetics()} and the reads beside it
+ * apply by answering from the property of a row that may not be there, so rows are only created the first time a
+ * member touches their settings.
  *
  * @phpstan-type UserSettingsGdprArrayType = array{
  *     disableCosmetics: bool,
@@ -48,7 +49,7 @@ class UserSettings
         referencedColumnName: 'lidnr',
         onDelete: 'CASCADE',
     )]
-    private User $user;
+    public private(set) User $user;
 
     /**
      * Whether to hide the festive cosmetics (balloons, snow, fireworks) for this member.
@@ -57,7 +58,7 @@ class UserSettings
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $disableCosmetics = false;
+    public bool $disableCosmetics = false;
 
     /**
      * Whether this member has opted out of being tagged in photos.
@@ -66,7 +67,7 @@ class UserSettings
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $photoTaggingOptOut = false;
+    public bool $photoTaggingOptOut = false;
 
     /**
      * How much of this member's tagged-photo collection is hidden from other members on their photo page.
@@ -76,7 +77,7 @@ class UserSettings
         enumType: PhotoVisibility::class,
         options: ['default' => PhotoVisibility::HideSelected->value],
     )]
-    private PhotoVisibility $photoVisibility = PhotoVisibility::HideSelected;
+    public PhotoVisibility $photoVisibility = PhotoVisibility::HideSelected;
 
     /**
      * Whether this member's year of birth (and thus age) is hidden from other members. Reciprocal: a member who hides
@@ -86,7 +87,7 @@ class UserSettings
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $hideYearOfBirth = false;
+    public bool $hideYearOfBirth = false;
 
     /**
      * Whether this member is excluded from the birthday panel on the home page.
@@ -95,7 +96,7 @@ class UserSettings
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $hideBirthdayOnFrontpage = false;
+    public bool $hideBirthdayOnFrontpage = false;
 
     /**
      * When this member last marked the notification centre read. Null means they have never opened it, so everything
@@ -105,7 +106,7 @@ class UserSettings
         type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTimeImmutable $notificationsReadAt = null;
+    public ?DateTimeImmutable $notificationsReadAt = null;
 
     /**
      * Whether the member has paused all outgoing notification email. Website notifications keep working; nothing is
@@ -115,87 +116,12 @@ class UserSettings
         type: Types::BOOLEAN,
         options: ['default' => false],
     )]
-    private bool $notificationsPaused = false;
+    public bool $notificationsPaused = false;
 
     public function __construct(User $user)
     {
         $this->user = $user;
-        $user->setSettings($this);
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function getDisableCosmetics(): bool
-    {
-        return $this->disableCosmetics;
-    }
-
-    public function setDisableCosmetics(bool $disableCosmetics): void
-    {
-        $this->disableCosmetics = $disableCosmetics;
-    }
-
-    public function getPhotoTaggingOptOut(): bool
-    {
-        return $this->photoTaggingOptOut;
-    }
-
-    public function setPhotoTaggingOptOut(bool $photoTaggingOptOut): void
-    {
-        $this->photoTaggingOptOut = $photoTaggingOptOut;
-    }
-
-    public function getPhotoVisibility(): PhotoVisibility
-    {
-        return $this->photoVisibility;
-    }
-
-    public function setPhotoVisibility(PhotoVisibility $photoVisibility): void
-    {
-        $this->photoVisibility = $photoVisibility;
-    }
-
-    public function getHideYearOfBirth(): bool
-    {
-        return $this->hideYearOfBirth;
-    }
-
-    public function setHideYearOfBirth(bool $hideYearOfBirth): void
-    {
-        $this->hideYearOfBirth = $hideYearOfBirth;
-    }
-
-    public function getHideBirthdayOnFrontpage(): bool
-    {
-        return $this->hideBirthdayOnFrontpage;
-    }
-
-    public function setHideBirthdayOnFrontpage(bool $hideBirthdayOnFrontpage): void
-    {
-        $this->hideBirthdayOnFrontpage = $hideBirthdayOnFrontpage;
-    }
-
-    public function getNotificationsReadAt(): ?DateTimeImmutable
-    {
-        return $this->notificationsReadAt;
-    }
-
-    public function setNotificationsReadAt(?DateTimeImmutable $notificationsReadAt): void
-    {
-        $this->notificationsReadAt = $notificationsReadAt;
-    }
-
-    public function getNotificationsPaused(): bool
-    {
-        return $this->notificationsPaused;
-    }
-
-    public function setNotificationsPaused(bool $notificationsPaused): void
-    {
-        $this->notificationsPaused = $notificationsPaused;
+        $user->settings = $this;
     }
 
     /**

@@ -46,8 +46,8 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
             $latest,
         );
         self::assertSame(
-            $editor->getLidnr(),
-            $latest->getEditor()?->getLidnr(),
+            $editor->lidnr,
+            $latest->getEditor()?->lidnr,
         );
         // Both the changed scalar and the edited localised text are recorded; bookkeeping columns are not.
         self::assertContains(

@@ -107,14 +107,14 @@ final readonly class KnownDeviceRegistry
                 $this->hashToken($presented),
             ) : null;
 
-            $recognised = null !== $token && $token->getLastSeenAt() > $freshSince;
+            $recognised = null !== $token && $token->lastSeenAt > $freshSince;
 
             $device = $this->devices->findOneByFingerprint(
                 $userIdentifier,
                 $firewallName,
                 $described['device'],
             );
-            $deviceKnown = null !== $device && $device->getLastSeenAt() > $freshSince;
+            $deviceKnown = null !== $device && $device->lastSeenAt > $freshSince;
 
             if (null === $device) {
                 $this->evictToFit(
@@ -124,18 +124,18 @@ final readonly class KnownDeviceRegistry
                 );
 
                 $device = new KnownDevice();
-                $device->setUserIdentifier($userIdentifier);
-                $device->setFirewallName($firewallName);
-                $device->setFingerprint($described['device']);
-                $device->setFirstSeenAt($now);
+                $device->userIdentifier = $userIdentifier;
+                $device->firewallName = $firewallName;
+                $device->fingerprint = $described['device'];
+                $device->firstSeenAt = $now;
 
                 $this->entityManager->persist($device);
             }
 
             // The versions are display only, so they follow the browser even though they are no part of the key.
-            $device->setBrowser($described['browser']);
-            $device->setOperatingSystem($described['operatingSystem']);
-            $device->setLastSeenAt($now);
+            $device->browser = $described['browser'];
+            $device->operatingSystem = $described['operatingSystem'];
+            $device->lastSeenAt = $now;
 
             if ([] !== $described['networks']) {
                 // Always evaluated: the networks must be learned even on a sign-in something else already vouches
@@ -150,9 +150,9 @@ final readonly class KnownDeviceRegistry
             }
 
             if (null !== $token) {
-                $token->setBrowser($described['browser']);
-                $token->setOperatingSystem($described['operatingSystem']);
-                $token->setLastSeenAt($now);
+                $token->browser = $described['browser'];
+                $token->operatingSystem = $described['operatingSystem'];
+                $token->lastSeenAt = $now;
                 $issue = $presented;
             } elseif (null !== $firewall) {
                 $this->evictToFit(
@@ -164,13 +164,13 @@ final readonly class KnownDeviceRegistry
                 $issue = UrlSafeToken::generate();
 
                 $token = new KnownDeviceToken();
-                $token->setUserIdentifier($userIdentifier);
-                $token->setFirewallName($firewallName);
-                $token->setTokenHash($this->hashToken($issue));
-                $token->setBrowser($described['browser']);
-                $token->setOperatingSystem($described['operatingSystem']);
-                $token->setFirstSeenAt($now);
-                $token->setLastSeenAt($now);
+                $token->userIdentifier = $userIdentifier;
+                $token->firewallName = $firewallName;
+                $token->tokenHash = $this->hashToken($issue);
+                $token->browser = $described['browser'];
+                $token->operatingSystem = $described['operatingSystem'];
+                $token->firstSeenAt = $now;
+                $token->lastSeenAt = $now;
 
                 $this->entityManager->persist($token);
             } else {
@@ -260,7 +260,7 @@ final readonly class KnownDeviceRegistry
                     continue;
                 }
 
-                $lastSeenAt = $fact->getLastSeenAt();
+                $lastSeenAt = $fact->lastSeenAt;
 
                 if (
                     $lastSeenAt <= $now->modify(self::RETENTION)
@@ -269,7 +269,7 @@ final readonly class KnownDeviceRegistry
                     continue;
                 }
 
-                $fact->setLastSeenAt($now);
+                $fact->lastSeenAt = $now;
                 $changed = true;
             }
 
@@ -365,8 +365,8 @@ final readonly class KnownDeviceRegistry
                 continue;
             }
 
-            $known = $known || $network->getLastSeenAt() > $now->modify(self::RETENTION);
-            $network->setLastSeenAt($now);
+            $known = $known || $network->lastSeenAt > $now->modify(self::RETENTION);
+            $network->lastSeenAt = $now;
         }
 
         if ([] !== $missing) {
@@ -379,11 +379,11 @@ final readonly class KnownDeviceRegistry
 
             foreach ($missing as $fingerprint) {
                 $network = new KnownNetwork();
-                $network->setUserIdentifier($userIdentifier);
-                $network->setFirewallName($firewallName);
-                $network->setFingerprint($fingerprint);
-                $network->setFirstSeenAt($now);
-                $network->setLastSeenAt($now);
+                $network->userIdentifier = $userIdentifier;
+                $network->firewallName = $firewallName;
+                $network->fingerprint = $fingerprint;
+                $network->firstSeenAt = $now;
+                $network->lastSeenAt = $now;
 
                 $this->entityManager->persist($network);
             }

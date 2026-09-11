@@ -20,7 +20,7 @@ final class SessionRowSignatureTest extends TestCase
     {
         $signature = new SessionRowSignature(self::SECRET);
         $row = $this->row();
-        $row->setSignature($signature->forRow($row));
+        $row->signature = $signature->forRow($row);
 
         self::assertTrue($signature->verify($row));
     }
@@ -29,9 +29,9 @@ final class SessionRowSignatureTest extends TestCase
     {
         $signature = new SessionRowSignature(self::SECRET);
         $row = $this->row();
-        $row->setSignature($signature->forRow($row));
+        $row->signature = $signature->forRow($row);
 
-        $row->setFirewallName('company');
+        $row->firewallName = 'company';
 
         self::assertFalse($signature->verify($row));
     }
@@ -40,9 +40,9 @@ final class SessionRowSignatureTest extends TestCase
     {
         $signature = new SessionRowSignature(self::SECRET);
         $row = $this->row();
-        $row->setSignature($signature->forRow($row));
+        $row->signature = $signature->forRow($row);
 
-        $row->setSignaturePropertiesHash('the fingerprint the account had two passwords ago');
+        $row->signaturePropertiesHash = 'the fingerprint the account had two passwords ago';
 
         self::assertFalse($signature->verify($row));
     }
@@ -51,9 +51,9 @@ final class SessionRowSignatureTest extends TestCase
     {
         $signature = new SessionRowSignature(self::SECRET);
         $row = $this->row();
-        $row->setSignature($signature->forRow($row));
+        $row->signature = $signature->forRow($row);
 
-        $row->setUserIdentifier('8001');
+        $row->userIdentifier = '8001';
 
         self::assertFalse($signature->verify($row));
     }
@@ -62,9 +62,9 @@ final class SessionRowSignatureTest extends TestCase
     {
         $signature = new SessionRowSignature(self::SECRET);
         $row = $this->row();
-        $row->setSignature($signature->forRow($row));
+        $row->signature = $signature->forRow($row);
 
-        $row->setExpiresAt(new DateTimeImmutable('2027-11-29 12:00:00'));
+        $row->expiresAt = new DateTimeImmutable('2027-11-29 12:00:00');
 
         self::assertFalse($signature->verify($row));
     }
@@ -81,10 +81,10 @@ final class SessionRowSignatureTest extends TestCase
             $validUntil,
         );
 
-        $row->setPreviousHashedToken($row->getHashedToken());
-        $row->setPreviousTokenValidUntil($validUntil);
-        $row->setHashedToken('the hashed token it is about to hold');
-        $row->setSignature($rotated);
+        $row->previousHashedToken = $row->hashedToken;
+        $row->previousTokenValidUntil = $validUntil;
+        $row->hashedToken = 'the hashed token it is about to hold';
+        $row->signature = $rotated;
 
         self::assertTrue($signature->verify($row));
     }
@@ -97,19 +97,19 @@ final class SessionRowSignatureTest extends TestCase
     public function testARowSignedBeforeTheShapeChangedStillVerifies(): void
     {
         $row = $this->row();
-        $row->setSignature(hash_hmac(
+        $row->signature = hash_hmac(
             'sha256',
             implode(
                 ':',
                 [
-                    $row->getSeries(),
-                    $row->getHashedToken(),
-                    $row->getUserIdentifier(),
-                    $row->getExpiresAt()->getTimestamp(),
+                    $row->series,
+                    $row->hashedToken,
+                    $row->userIdentifier,
+                    $row->expiresAt->getTimestamp(),
                 ],
             ),
             self::SECRET,
-        ));
+        );
 
         self::assertTrue(new SessionRowSignature(self::SECRET)->verify($row));
     }
@@ -118,23 +118,23 @@ final class SessionRowSignatureTest extends TestCase
     {
         $validUntil = new DateTimeImmutable('2026-08-31 12:01:00');
         $row = $this->row();
-        $row->setPreviousHashedToken('the hashed token it held before');
-        $row->setPreviousTokenValidUntil($validUntil);
-        $row->setSignature(hash_hmac(
+        $row->previousHashedToken = 'the hashed token it held before';
+        $row->previousTokenValidUntil = $validUntil;
+        $row->signature = hash_hmac(
             'sha256',
             implode(
                 ':',
                 [
-                    $row->getSeries(),
-                    $row->getHashedToken(),
-                    $row->getUserIdentifier(),
-                    $row->getExpiresAt()->getTimestamp(),
+                    $row->series,
+                    $row->hashedToken,
+                    $row->userIdentifier,
+                    $row->expiresAt->getTimestamp(),
                     'the hashed token it held before',
                     $validUntil->getTimestamp(),
                 ],
             ),
             self::SECRET,
-        ));
+        );
 
         self::assertTrue(new SessionRowSignature(self::SECRET)->verify($row));
     }
@@ -142,7 +142,7 @@ final class SessionRowSignatureTest extends TestCase
     public function testARowDoesNotVerifyAgainstAnotherSecret(): void
     {
         $row = $this->row();
-        $row->setSignature(new SessionRowSignature(self::SECRET)->forRow($row));
+        $row->signature = new SessionRowSignature(self::SECRET)->forRow($row);
 
         self::assertFalse(new SessionRowSignature('somebody else\'s secret')->verify($row));
     }
@@ -150,12 +150,12 @@ final class SessionRowSignatureTest extends TestCase
     private function row(): Session
     {
         $session = new Session();
-        $session->setSeries('nu5wKr9Kx1lFhVJPBnIeUJ6NUvJyPXhMkYFXCJt3aVg');
-        $session->setHashedToken('the hashed token it is holding');
-        $session->setUserIdentifier('8025');
-        $session->setFirewallName('main');
-        $session->setSignaturePropertiesHash('the fingerprint the account had when it signed in');
-        $session->setExpiresAt(new DateTimeImmutable('2026-11-29 12:00:00'));
+        $session->series = 'nu5wKr9Kx1lFhVJPBnIeUJ6NUvJyPXhMkYFXCJt3aVg';
+        $session->hashedToken = 'the hashed token it is holding';
+        $session->userIdentifier = '8025';
+        $session->firewallName = 'main';
+        $session->signaturePropertiesHash = 'the fingerprint the account had when it signed in';
+        $session->expiresAt = new DateTimeImmutable('2026-11-29 12:00:00');
 
         return $session;
     }

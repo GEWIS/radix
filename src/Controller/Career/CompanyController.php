@@ -52,7 +52,7 @@ class CompanyController extends AbstractController
         #[CurrentUser]
         CompanyUser $companyUser,
     ): Response {
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
         $vacancies = $this->vacancyRepository->findAllForCompany($company);
 
         return $this->render(
@@ -81,7 +81,7 @@ class CompanyController extends AbstractController
         #[CurrentUser]
         CompanyUser $companyUser,
     ): Response {
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
 
         return $this->render(
             'career/company/representatives.html.twig',

@@ -189,7 +189,7 @@ class Bell
             }
 
             $unread = (null === $readAt || $notification->getCreatedAt() > $readAt)
-                && null === ($interactions[$id] ?? null)?->getReadAt();
+                && null === ($interactions[$id] ?? null)?->readAt;
             $type = $notification->getType();
             $key = $type->groupsAcrossSubjects()
                 ? $type->value
@@ -290,7 +290,7 @@ class Bell
     public function getReadAt(): ?DateTimeImmutable
     {
         if (!$this->readAtLoaded) {
-            $this->readAt = $this->currentUser()?->getSettings()?->getNotificationsReadAt();
+            $this->readAt = $this->currentUser()?->settings?->notificationsReadAt;
             $this->readAtLoaded = true;
         }
 
@@ -307,7 +307,7 @@ class Bell
         $this->interact(
             $notifications,
             static function (NotificationInteraction $interaction): void {
-                $interaction->setReadAt(new DateTimeImmutable());
+                $interaction->readAt = new DateTimeImmutable();
             },
         );
     }
@@ -324,8 +324,8 @@ class Bell
             $notifications,
             static function (NotificationInteraction $interaction): void {
                 $now = new DateTimeImmutable();
-                $interaction->setDismissedAt($now);
-                $interaction->setReadAt($interaction->getReadAt() ?? $now);
+                $interaction->dismissedAt = $now;
+                $interaction->readAt ??= $now;
             },
         );
     }
@@ -338,8 +338,7 @@ class Bell
             return;
         }
 
-        $this->settingsRepository->getOrCreateForUser($user)
-            ->setNotificationsReadAt(new DateTimeImmutable());
+        $this->settingsRepository->getOrCreateForUser($user)->notificationsReadAt = new DateTimeImmutable();
         $this->entityManager->flush();
 
         $this->readAtLoaded = false;

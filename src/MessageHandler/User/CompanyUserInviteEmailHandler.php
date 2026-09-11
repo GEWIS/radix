@@ -44,12 +44,12 @@ class CompanyUserInviteEmailHandler
 
         $this->mailer->send(
             new TemplatedEmail()
-                ->to($invite->getEmail())
+                ->to($invite->email)
                 ->subject('You have been invited to the GEWIS career portal')
                 ->htmlTemplate('emails/career/company-user-invite.html.twig')
                 ->context([
-                    'fullName' => $invite->getName(),
-                    'companyName' => $invite->getCompany()->name,
+                    'fullName' => $invite->name,
+                    'companyName' => $invite->company->name,
                     'inviteUrl' => $url,
                     'expiresAt' => $invite->getExpiresAt(),
                 ]),

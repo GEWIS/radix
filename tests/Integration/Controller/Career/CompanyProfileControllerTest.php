@@ -37,7 +37,7 @@ final class CompanyProfileControllerTest extends DatabaseTestCase
     public function testProposingChangesStartsADraftAuthoredByTheRepresentative(): void
     {
         $companyUser = $this->signIn();
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
         $live = $company->getLiveRevision();
 
         $this->controller()->revise($companyUser);
@@ -67,7 +67,7 @@ final class CompanyProfileControllerTest extends DatabaseTestCase
         $companyUser = $this->signIn();
         $session = $this->pushRequestWithSession();
 
-        $current = $companyUser->getCompany()->getCurrentRevision();
+        $current = $companyUser->company->getCurrentRevision();
         self::assertInstanceOf(
             CompanyRevision::class,
             $current,
@@ -96,17 +96,17 @@ final class CompanyProfileControllerTest extends DatabaseTestCase
         $nexunt = $this->signIn('recruitment@nexunt.example.com');
         $orbit = $this->representative('recruitment@orbit-analytics.example.com');
 
-        $before = $orbit->getCompany()->getCurrentRevision();
+        $before = $orbit->company->getCurrentRevision();
 
         $this->controller()->revise($nexunt);
 
         self::assertSame(
             RevisionStatus::Draft,
-            $nexunt->getCompany()->getCurrentRevision()?->getStatus(),
+            $nexunt->company->getCurrentRevision()?->getStatus(),
         );
         self::assertSame(
             $before,
-            $orbit->getCompany()->getCurrentRevision(),
+            $orbit->company->getCurrentRevision(),
         );
     }
 

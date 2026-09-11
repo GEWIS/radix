@@ -426,7 +426,7 @@ class ActivityProposalType extends AbstractType
         }
 
         $organs = [];
-        foreach ($user->getMember()->getCurrentOrganInstallations() as $installation) {
+        foreach ($user->member->getCurrentOrganInstallations() as $installation) {
             $organ = $installation->getOrgan();
             $organs[intval($organ->getId())] = $organ;
         }

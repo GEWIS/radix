@@ -124,7 +124,7 @@ final class UsersOverview extends AbstractDoctrinePaginatedOverview
         /** @var array<int, User> $usersByLidnr */
         $usersByLidnr = [];
         foreach ($users as $user) {
-            $usersByLidnr[$user->getLidnr()] = $user;
+            $usersByLidnr[$user->lidnr] = $user;
         }
 
         return array_map(

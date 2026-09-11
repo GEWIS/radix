@@ -26,15 +26,15 @@ final class UserSettingsRepositoryTest extends DatabaseTestCase
         self::assertNull($repository->find(self::MEMBER));
 
         $created = $repository->getOrCreateForUser($user);
-        self::assertFalse($created->getPhotoTaggingOptOut());
-        self::assertFalse($created->getHideYearOfBirth());
+        self::assertFalse($created->photoTaggingOptOut);
+        self::assertFalse($created->hideYearOfBirth);
 
         $this->entityManager->flush();
 
         // The primary key is the lidnr, and a second call returns the very same row rather than a duplicate.
         self::assertSame(
             self::MEMBER,
-            $repository->find(self::MEMBER)?->getUser()->getLidnr(),
+            $repository->find(self::MEMBER)?->user->lidnr,
         );
         self::assertSame(
             $created,

@@ -77,7 +77,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         #[CurrentUser]
         CompanyUser $companyUser,
     ): Response {
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
 
         return $this->render(
             'career/company/vacancies.html.twig',
@@ -104,7 +104,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         #[CurrentUser]
         CompanyUser $companyUser,
     ): Response {
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
 
         $vacancy = new Vacancy();
         $vacancy->published = true;
@@ -610,7 +610,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         Vacancy $vacancy,
         CompanyUser $companyUser,
     ): Company {
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
         if ($vacancy->getCompany() !== $company) {
             throw new NotFoundHttpException();
         }

@@ -99,15 +99,15 @@ final class SettingsControllerNotificationsTest extends DatabaseTestCase
         );
         self::assertSame(
             NotificationType::AlbumPublished,
-            $subscriptions[0]->getCategory(),
+            $subscriptions[0]->category,
         );
         self::assertSame(
             NotificationEmailFrequency::Weekly,
-            $subscriptions[0]->getFrequency(),
+            $subscriptions[0]->frequency,
         );
 
         $settings = self::getContainer()->get(UserSettingsRepository::class)->getOrCreateForUser($user);
-        self::assertTrue($settings->getNotificationsPaused());
+        self::assertTrue($settings->notificationsPaused);
     }
 
     private function authenticate(): User

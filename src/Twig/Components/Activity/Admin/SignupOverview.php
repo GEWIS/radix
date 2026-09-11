@@ -1664,7 +1664,7 @@ final class SignupOverview
         $user = $this->security->getUser();
         assert($user instanceof User);
 
-        return $user->getMember();
+        return $user->member;
     }
 
     private function setFeedback(

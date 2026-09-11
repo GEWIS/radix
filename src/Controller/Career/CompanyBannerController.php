@@ -55,7 +55,7 @@ class CompanyBannerController extends AbstractController
         #[CurrentUser]
         CompanyUser $companyUser,
     ): Response {
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
         $package = $company->getActivePackage(CompanyBannerPackage::class);
 
         if (null === $package) {

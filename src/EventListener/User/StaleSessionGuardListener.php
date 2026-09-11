@@ -120,7 +120,7 @@ final class StaleSessionGuardListener
 
             $this->securityEvents->record(
                 SecurityEventType::SessionEndedWithoutCookie,
-                $orphan?->getUserIdentifier() ?? $this->signedInUser()?->getUserIdentifier(),
+                $orphan->userIdentifier ?? $this->signedInUser()?->getUserIdentifier(),
                 $firewall,
                 ['managedSessionFound' => null !== $orphan],
                 $request,
@@ -157,14 +157,14 @@ final class StaleSessionGuardListener
 
         // Cross-firewall token replay attempt (a cookie from one firewall on another firewall's URL). Refuse -> leave
         // the data alone and let the request fall through unauthenticated.
-        if ($managedSession->getFirewallName() !== $firewall) {
+        if ($managedSession->firewallName !== $firewall) {
             $this->securityEvents->record(
                 SecurityEventType::CrossFirewallTokenRejected,
-                $managedSession->getUserIdentifier(),
+                $managedSession->userIdentifier,
                 $firewall,
                 [
                     'series' => $series,
-                    'storedFirewall' => $managedSession->getFirewallName(),
+                    'storedFirewall' => $managedSession->firewallName,
                 ],
                 $request,
             );
@@ -179,13 +179,13 @@ final class StaleSessionGuardListener
         if (
             null !== $user
             && !$this->credentials->matches(
-                $managedSession->getSignaturePropertiesHash(),
+                $managedSession->signaturePropertiesHash,
                 $user,
             )
         ) {
             $this->securityEvents->record(
                 SecurityEventType::SessionEndedCredentialsChanged,
-                $managedSession->getUserIdentifier(),
+                $managedSession->userIdentifier,
                 $firewall,
                 ['series' => $series],
                 $request,
@@ -205,9 +205,9 @@ final class StaleSessionGuardListener
         // gate. A mismatch on either side suggests the cookie pair has been replayed from a different device -> tear
         // down.
         $currentMeta = $this->userAgentParser->parseRequest($request);
-        $storedBrowser = UserAgentParser::family($managedSession->getBrowser());
+        $storedBrowser = UserAgentParser::family($managedSession->browser);
         $currentBrowser = UserAgentParser::family($currentMeta['browser']);
-        $storedOs = UserAgentParser::family($managedSession->getOperatingSystem());
+        $storedOs = UserAgentParser::family($managedSession->operatingSystem);
         $currentOs = UserAgentParser::family($currentMeta['operatingSystem']);
 
         $browserMismatch = null !== $storedBrowser && null !== $currentBrowser && $storedBrowser !== $currentBrowser;
@@ -219,13 +219,13 @@ final class StaleSessionGuardListener
         ) {
             $this->securityEvents->record(
                 SecurityEventType::SessionEndedDeviceChanged,
-                $managedSession->getUserIdentifier(),
+                $managedSession->userIdentifier,
                 $firewall,
                 [
                     'series' => $series,
-                    'storedBrowser' => $managedSession->getBrowser(),
+                    'storedBrowser' => $managedSession->browser,
                     'currentBrowser' => $currentMeta['browser'],
-                    'storedOperatingSystem' => $managedSession->getOperatingSystem(),
+                    'storedOperatingSystem' => $managedSession->operatingSystem,
                     'currentOperatingSystem' => $currentMeta['operatingSystem'],
                 ],
                 $request,
@@ -244,8 +244,8 @@ final class StaleSessionGuardListener
 
         // Rebind phpSessionId if it has drifted (Symfony's session migration on a rememberme-resumed login changes the
         // ID between createSession and the next request).
-        if ($managedSession->getPhpSessionId() !== $phpSessionId) {
-            $managedSession->setPhpSessionId($phpSessionId);
+        if ($managedSession->phpSessionId !== $phpSessionId) {
+            $managedSession->phpSessionId = $phpSessionId;
             $changed = true;
         }
 
@@ -253,9 +253,9 @@ final class StaleSessionGuardListener
         // moments of token rotation.
         $now = new DateTimeImmutable();
         $staleAfter = $now->modify('-' . $this->lastUsedThreshold . ' seconds');
-        $inUse = $managedSession->getLastUsedAt() < $staleAfter;
+        $inUse = $managedSession->lastUsedAt < $staleAfter;
         if ($inUse) {
-            $managedSession->setLastUsedAt($now);
+            $managedSession->lastUsedAt = $now;
             $changed = true;
         }
 
@@ -271,7 +271,7 @@ final class StaleSessionGuardListener
         // signing in from it again would be, and this is the only place that sees them do it. Behind the same throttle
         // as the bump above, so it costs one lookup per window of activity.
         $this->knownDevices->refresh(
-            $managedSession->getUserIdentifier(),
+            $managedSession->userIdentifier,
             $firewall,
             $request,
         );

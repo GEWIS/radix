@@ -58,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     #[Id]
     #[Column(type: Types::INTEGER)]
-    private int $lidnr;
+    public int $lidnr;
 
     /**
      * The user's password.
@@ -81,7 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private MemberModel $member;
+    public MemberModel $member;
 
     /**
      * User roles.
@@ -111,7 +111,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $forceReloginAt = null;
+    public ?DateTime $forceReloginAt = null;
 
     /**
      * Base32-encoded TOTP shared secret. Null when TOTP MFA is disabled. Encrypted at rest via DoctrineEncryptBundle.
@@ -121,7 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         nullable: true,
     )]
     #[Encrypted]
-    private ?string $totpSecret = null;
+    public ?string $totpSecret = null;
 
     /**
      * This member's settings and privacy preferences. NOTE: as the inverse side of a one-to-one, Doctrine always loads
@@ -136,7 +136,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             'remove',
         ],
     )]
-    private ?UserSettings $settings = null;
+    public ?UserSettings $settings = null;
 
     public function __construct()
     {
@@ -148,20 +148,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     public function getId(): int
     {
-        return $this->getLidnr();
-    }
-
-    /**
-     * Get the membership number.
-     */
-    public function getLidnr(): int
-    {
         return $this->lidnr;
-    }
-
-    public function setLidnr(int $lidnr): void
-    {
-        $this->lidnr = $lidnr;
     }
 
     /**
@@ -212,7 +199,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[Override]
     public function getRoles(): array
     {
-        $member = $this->getMember();
+        $member = $this->member;
         if (MembershipTypes::Graduate === $member->getType()) {
             $baseRole = UserRoles::Graduate->value;
         } elseif ($member->isActive()) {
@@ -222,7 +209,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         }
 
         $explicitRoles = array_map(
-            static fn (UserRole $role) => $role->getRole()->value,
+            static fn (UserRole $role) => $role->role->value,
             $this->roles->filter(static fn (UserRole $role): bool => $role->isActive())->getValues(),
         );
 
@@ -318,24 +305,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
     /**
-     * Get the member information of this user.
-     */
-    public function getMember(): MemberModel
-    {
-        return $this->member;
-    }
-
-    public function setMember(MemberModel $member): void
-    {
-        $this->member = $member;
-    }
-
-    /**
      * A human-readable name for this account, for display alongside a {@see CompanyUser}.
      */
     public function getDisplayName(): string
     {
-        return $this->getMember()->getFullName();
+        return $this->member->getFullName();
     }
 
     public function getPasswordChangedOn(): ?DateTime
@@ -348,29 +322,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->passwordChangedOn = $passwordChangedOn;
     }
 
-    public function getForceReloginAt(): ?DateTime
-    {
-        return $this->forceReloginAt;
-    }
-
-    public function setForceReloginAt(?DateTime $forceReloginAt): void
-    {
-        $this->forceReloginAt = $forceReloginAt;
-    }
-
     public function getUserType(): UserTypes
     {
         return UserTypes::User;
-    }
-
-    public function getTotpSecret(): ?string
-    {
-        return $this->totpSecret;
-    }
-
-    public function setTotpSecret(?string $totpSecret): void
-    {
-        $this->totpSecret = $totpSecret;
     }
 
     #[Override]
@@ -400,22 +354,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         );
     }
 
-    public function getSettings(): ?UserSettings
-    {
-        return $this->settings;
-    }
-
-    public function setSettings(?UserSettings $settings): void
-    {
-        $this->settings = $settings;
-    }
-
     /**
      * Whether this member has turned off the festive cosmetics. Defaults to false when no settings row exists yet.
      */
     public function hasDisabledCosmetics(): bool
     {
-        return $this->settings?->getDisableCosmetics() ?? false;
+        return $this->settings->disableCosmetics ?? false;
     }
 
     /**
@@ -423,7 +367,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     public function hasHiddenYearOfBirth(): bool
     {
-        return $this->settings?->getHideYearOfBirth() ?? false;
+        return $this->settings->hideYearOfBirth ?? false;
     }
 
     /**
@@ -432,7 +376,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     public function getPhotoVisibility(): PhotoVisibility
     {
-        return $this->settings?->getPhotoVisibility() ?? PhotoVisibility::HideSelected;
+        return $this->settings->photoVisibility ?? PhotoVisibility::HideSelected;
     }
 
     /**
@@ -445,7 +389,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
                 static fn (UserRole $role): array => $role->toGdprArray(),
                 $this->roles->getValues(),
             ),
-            'settings' => $this->getSettings()?->toGdprArray(),
+            'settings' => $this->settings?->toGdprArray(),
             'passwordChangedOn' => $this->getPasswordChangedOn()?->format(DateTimeInterface::ATOM),
         ];
     }

@@ -103,7 +103,7 @@ final class PollWidget
         $ordered = array_values($this->polls);
         $answered = $this->pollVoteRepository->answeredOf(
             $ordered,
-            $user->getMember(),
+            $user->member,
         );
 
         foreach ($ordered as $at => $poll) {
@@ -166,7 +166,7 @@ final class PollWidget
             $this->pollService->submitVote(
                 $poll,
                 $chosen,
-                $this->member()->getMember(),
+                $this->member()->member,
             );
         } catch (UniqueConstraintViolationException) {
             // A second tab answered while this one was deciding and the unique index caught it. The entity manager is
@@ -203,7 +203,7 @@ final class PollWidget
         return $this->chosen[$id] = $user instanceof User
             ? $this->pollService->votedOption(
                 $this->poll(),
-                $user->getMember(),
+                $user->member,
             )
             : null;
     }

@@ -460,7 +460,7 @@ class AdminBodyController extends AbstractRevisionController
             return false;
         }
 
-        foreach ($user->getMember()->getCurrentOrganInstallations() as $installation) {
+        foreach ($user->member->getCurrentOrganInstallations() as $installation) {
             if ($installation->getOrgan()->getId() === $organ->getId()) {
                 return true;
             }

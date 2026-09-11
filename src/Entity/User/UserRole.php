@@ -42,7 +42,7 @@ class UserRole
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private User $lidnr;
+    public User $lidnr;
 
     /**
      * The user's role.
@@ -51,7 +51,7 @@ class UserRole
         type: Types::STRING,
         enumType: UserRoles::class,
     )]
-    private UserRoles $role;
+    public UserRoles $role;
 
     /**
      * Date after which this role has expired.
@@ -61,38 +61,6 @@ class UserRole
         nullable: true,
     )]
     private ?DateTime $expiration = null;
-
-    /**
-     * Get the membership number.
-     */
-    public function getLidnr(): User
-    {
-        return $this->lidnr;
-    }
-
-    /**
-     * Set the membership number.
-     */
-    public function setLidnr(User $lidnr): void
-    {
-        $this->lidnr = $lidnr;
-    }
-
-    /**
-     * Get the role.
-     */
-    public function getRole(): UserRoles
-    {
-        return $this->role;
-    }
-
-    /**
-     * Set the role.
-     */
-    public function setRole(UserRoles $role): void
-    {
-        $this->role = $role;
-    }
 
     /**
      * Get the expiration, `null` means invalid (and thus inactive).
@@ -125,7 +93,7 @@ class UserRole
     public function toGdprArray(): array
     {
         return [
-            'role' => $this->getRole()->value,
+            'role' => $this->role->value,
             'expiration' => $this->getExpiration()?->format(DateTimeInterface::ATOM),
         ];
     }

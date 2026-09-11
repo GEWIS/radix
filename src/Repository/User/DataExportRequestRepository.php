@@ -29,7 +29,7 @@ class DataExportRequestRepository extends ServiceEntityRepository
             ->where('r.user = :user')
             ->setParameter(
                 'user',
-                $user->getLidnr(),
+                $user->lidnr,
             )
             ->orderBy(
                 'r.requestedAt',

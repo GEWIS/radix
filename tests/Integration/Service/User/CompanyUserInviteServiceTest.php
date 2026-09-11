@@ -31,7 +31,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
 
         self::assertSame(
             'new-rep@nexunt.example.com',
-            $invite->getEmail(),
+            $invite->email,
         );
         self::assertFalse($invite->isExpired());
         self::assertCount(
@@ -137,7 +137,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
         );
         self::assertSame(
             'Nexunt Systems',
-            $companyUser->getCompany()->name,
+            $companyUser->company->name,
         );
         self::assertNotNull($companyUser->getPassword());
         self::assertNotSame(

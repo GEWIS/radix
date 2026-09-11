@@ -39,7 +39,7 @@ final class CompanyControllerTest extends DatabaseTestCase
     public function testAProfileThatCameBackWithChangesRequestedIsCalledOut(): void
     {
         $companyUser = $this->representative('recruitment@nexunt.example.com');
-        $company = $companyUser->getCompany();
+        $company = $companyUser->company;
         $current = $company->getCurrentRevision();
         self::assertInstanceOf(
             CompanyRevision::class,
@@ -62,7 +62,7 @@ final class CompanyControllerTest extends DatabaseTestCase
     public function testACompanyThatHasNeverBeenApprovedIsToldSo(): void
     {
         $companyUser = $this->representative('recruitment@nexunt.example.com');
-        $companyUser->getCompany()->setLiveRevision(null);
+        $companyUser->company->setLiveRevision(null);
         $this->entityManager->flush();
 
         self::assertStringContainsString(

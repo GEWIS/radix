@@ -66,7 +66,7 @@ final readonly class PrivacyService
         $visibility = [];
         foreach ($targets as $target) {
             $lidnr = $target->getLidnr();
-            $visibility[$lidnr] = !(($settings[$lidnr] ?? null)?->getHideYearOfBirth() ?? false);
+            $visibility[$lidnr] = !(($settings[$lidnr] ?? null)->hideYearOfBirth ?? false);
         }
 
         return $visibility;

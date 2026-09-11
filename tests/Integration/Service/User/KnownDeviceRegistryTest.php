@@ -206,7 +206,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         ));
 
         $device = $this->onlyDevice();
-        $device->setLastSeenAt(new DateTimeImmutable('-121 days'));
+        $device->lastSeenAt = new DateTimeImmutable('-121 days');
         $this->entityManager->flush();
 
         self::assertFalse($this->recognise(
@@ -238,7 +238,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         );
         self::assertSame(
             'Chrome 140',
-            $this->onlyDevice()->getBrowser(),
+            $this->onlyDevice()->browser,
         );
 
         $updated = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -250,7 +250,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         ));
         self::assertSame(
             'Chrome 141',
-            $this->onlyDevice()->getBrowser(),
+            $this->onlyDevice()->browser,
         );
     }
 
@@ -324,9 +324,9 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
         );
 
         $oldest = $this->devices()[0];
-        $oldest->setLastSeenAt(new DateTimeImmutable('-30 days'));
+        $oldest->lastSeenAt = new DateTimeImmutable('-30 days');
         $this->entityManager->flush();
-        $fingerprint = $oldest->getFingerprint();
+        $fingerprint = $oldest->fingerprint;
 
         $registry->recognise(
             self::USER,
@@ -363,7 +363,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
 
             // Each sign-in a day apart, so the least-recently-seen order is well defined.
             foreach ($this->tokens() as $token) {
-                $token->setLastSeenAt($token->getLastSeenAt()->modify('-1 day'));
+                $token->lastSeenAt = $token->lastSeenAt->modify('-1 day');
             }
 
             $this->entityManager->flush();

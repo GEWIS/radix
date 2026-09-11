@@ -6,6 +6,7 @@ namespace App\Tests\Security\User;
 
 use App\Entity\Application\Enums\MaintenanceStatus;
 use App\Entity\Application\MaintenanceWindow;
+use App\Entity\Career\Company;
 use App\Entity\User\CompanyUser;
 use App\Repository\Application\MaintenanceWindowRepository;
 use App\Repository\Career\CompanyPackageRepository;
@@ -76,7 +77,7 @@ final class UserCheckerTest extends TestCase
             null,
             ['ROLE_COMPANY_USER'],
             allowed: true,
-        )->checkPreAuth(self::createStub(CompanyUser::class));
+        )->checkPreAuth($this->companyUser());
     }
 
     public function testARepresentativeWithoutAccessIsRefusedTheSameWayAnyoneElseIs(): void
@@ -87,7 +88,18 @@ final class UserCheckerTest extends TestCase
             null,
             ['ROLE_COMPANY_USER'],
             allowed: false,
-        )->checkPreAuth(self::createStub(CompanyUser::class));
+        )->checkPreAuth($this->companyUser());
+    }
+
+    /**
+     * The access policy reads the company off the user, and a stub never runs the constructor that would have set it.
+     */
+    private function companyUser(): CompanyUser
+    {
+        $companyUser = self::createStub(CompanyUser::class);
+        $companyUser->company = self::createStub(Company::class);
+
+        return $companyUser;
     }
 
     private function window(MaintenanceStatus $status): MaintenanceWindow

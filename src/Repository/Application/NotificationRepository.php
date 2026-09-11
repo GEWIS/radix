@@ -70,7 +70,7 @@ class NotificationRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'viewer',
-                $viewer->getLidnr(),
+                $viewer->lidnr,
             )
             ->setParameter(
                 'roles',

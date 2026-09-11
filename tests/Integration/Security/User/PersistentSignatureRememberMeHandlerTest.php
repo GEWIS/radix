@@ -206,7 +206,7 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
         self::assertNotNull($row);
 
         self::assertTrue(new CredentialsSignature(self::SECRET)->matches(
-            $row->getSignaturePropertiesHash(),
+            $row->signaturePropertiesHash,
             $this->userProvider()->loadUserByIdentifier(self::USER),
         ));
     }
@@ -228,7 +228,7 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
         self::assertNotNull($row);
 
         self::assertFalse(new CredentialsSignature(self::SECRET)->matches(
-            $row->getSignaturePropertiesHash(),
+            $row->signaturePropertiesHash,
             $this->userProvider()->loadUserByIdentifier(self::USER),
         ));
     }

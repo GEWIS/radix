@@ -58,7 +58,7 @@ final readonly class RevisionReviewStampListener
 
         $user = $this->security->getUser();
         if ($user instanceof User) {
-            $revision->setReviewer($user->getMember());
+            $revision->setReviewer($user->member);
         }
 
         $revision->setReviewedAt(new DateTime());

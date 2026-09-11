@@ -25,9 +25,9 @@ final readonly class CompanyUserRow
     {
         return new self(
             id: (int) $companyUser->getId(),
-            companyName: $companyUser->getCompany()->name,
-            representativeName: $companyUser->getName(),
-            representativeEmail: $companyUser->getEmail(),
+            companyName: $companyUser->company->name,
+            representativeName: $companyUser->name,
+            representativeEmail: $companyUser->email,
             mfaEnabled: $companyUser->isTotpAuthenticationEnabled(),
             disabled: $companyUser->isDisabled(),
         );

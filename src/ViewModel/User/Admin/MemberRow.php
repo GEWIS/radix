@@ -62,7 +62,7 @@ final readonly class MemberRow
 
                 $expiration = $userRole->getExpiration();
                 $roleBadges[] = [
-                    'label' => $userRole->getRole()->value,
+                    'label' => $userRole->role->value,
                     'expiresAt' => null === $expiration
                         ? null
                         : DateTimeImmutable::createFromMutable($expiration),

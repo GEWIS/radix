@@ -28,7 +28,7 @@ class UserSettingsRepository extends ServiceEntityRepository
      */
     public function getOrCreateForUser(User $user): UserSettings
     {
-        $settings = $this->find($user->getLidnr());
+        $settings = $this->find($user->lidnr);
         if (null === $settings) {
             $settings = new UserSettings($user);
             $this->getEntityManager()->persist($settings);
@@ -63,7 +63,7 @@ class UserSettingsRepository extends ServiceEntityRepository
 
         $byLidnr = [];
         foreach ($rows as $row) {
-            $byLidnr[$row->getUser()->getLidnr()] = $row;
+            $byLidnr[$row->user->lidnr] = $row;
         }
 
         return $byLidnr;

@@ -182,7 +182,7 @@ final class KnownDeviceRegistryTest extends TestCase
                 $value,
                 self::SECRET,
             ),
-            array_values($tokens)[0]->getTokenHash(),
+            array_values($tokens)[0]->tokenHash,
         );
     }
 
@@ -246,15 +246,15 @@ final class KnownDeviceRegistryTest extends TestCase
         $now = new MockClock(self::NOW)->now();
         self::assertEquals(
             $now,
-            $device->getLastSeenAt(),
+            $device->lastSeenAt,
         );
         self::assertEquals(
             $now,
-            $network->getLastSeenAt(),
+            $network->lastSeenAt,
         );
         self::assertEquals(
             $now,
-            $token->getLastSeenAt(),
+            $token->lastSeenAt,
         );
     }
 
@@ -264,7 +264,7 @@ final class KnownDeviceRegistryTest extends TestCase
     public function testADeviceSeenWithinTheDayIsLeftAlone(): void
     {
         $device = $this->device('-2 hours');
-        $lastSeenAt = $device->getLastSeenAt();
+        $lastSeenAt = $device->lastSeenAt;
 
         $this->registry(device: $device)->refresh(
             'somebody',
@@ -274,7 +274,7 @@ final class KnownDeviceRegistryTest extends TestCase
 
         self::assertSame(
             $lastSeenAt,
-            $device->getLastSeenAt(),
+            $device->lastSeenAt,
         );
     }
 
@@ -284,7 +284,7 @@ final class KnownDeviceRegistryTest extends TestCase
     public function testALapsedDeviceIsNotRevivedByUsingIt(): void
     {
         $device = $this->device('-121 days');
-        $lastSeenAt = $device->getLastSeenAt();
+        $lastSeenAt = $device->lastSeenAt;
 
         $this->registry(device: $device)->refresh(
             'somebody',
@@ -294,7 +294,7 @@ final class KnownDeviceRegistryTest extends TestCase
 
         self::assertSame(
             $lastSeenAt,
-            $device->getLastSeenAt(),
+            $device->lastSeenAt,
         );
     }
 
@@ -345,7 +345,7 @@ final class KnownDeviceRegistryTest extends TestCase
     private function device(string $lastSeen): KnownDevice
     {
         $device = new KnownDevice();
-        $device->setFingerprint('a fingerprint');
+        $device->fingerprint = 'a fingerprint';
 
         return $this->seen(
             $device,
@@ -356,7 +356,7 @@ final class KnownDeviceRegistryTest extends TestCase
     private function network(string $lastSeen): KnownNetwork
     {
         $network = new KnownNetwork();
-        $network->setFingerprint('a fingerprint');
+        $network->fingerprint = 'a fingerprint';
 
         return $this->seen(
             $network,
@@ -367,11 +367,11 @@ final class KnownDeviceRegistryTest extends TestCase
     private function token(string $lastSeen): KnownDeviceToken
     {
         $token = new KnownDeviceToken();
-        $token->setTokenHash(hash_hmac(
+        $token->tokenHash = hash_hmac(
             'sha256',
             'the-raw-token',
             self::SECRET,
-        ));
+        );
 
         return $this->seen(
             $token,
@@ -390,10 +390,10 @@ final class KnownDeviceRegistryTest extends TestCase
         object $fact,
         string $lastSeen,
     ): object {
-        $fact->setUserIdentifier('somebody');
-        $fact->setFirewallName('main');
-        $fact->setFirstSeenAt(new MockClock(self::NOW)->now()->modify('-1 year'));
-        $fact->setLastSeenAt(new MockClock(self::NOW)->now()->modify($lastSeen));
+        $fact->userIdentifier = 'somebody';
+        $fact->firewallName = 'main';
+        $fact->firstSeenAt = new MockClock(self::NOW)->now()->modify('-1 year');
+        $fact->lastSeenAt = new MockClock(self::NOW)->now()->modify($lastSeen);
 
         return $fact;
     }

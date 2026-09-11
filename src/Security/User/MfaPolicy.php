@@ -30,13 +30,13 @@ final class MfaPolicy
             return false;
         }
 
-        if ($user->getMember()->isBoardMember()) {
+        if ($user->member->isBoardMember()) {
             return true;
         }
 
         foreach ($user->getRoleEntities() as $userRole) {
             if (
-                UserRoles::Admin === $userRole->getRole()
+                UserRoles::Admin === $userRole->role
                 && $userRole->isActive()
             ) {
                 return true;
@@ -48,6 +48,6 @@ final class MfaPolicy
 
     public function hasEnrolled(User $user): bool
     {
-        return null !== $user->getTotpSecret();
+        return null !== $user->totpSecret;
     }
 }

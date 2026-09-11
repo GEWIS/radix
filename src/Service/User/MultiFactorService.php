@@ -36,8 +36,8 @@ final readonly class MultiFactorService
         User|CompanyUser $account,
         string $secret,
     ): void {
-        $account->setTotpSecret($secret);
-        $account->setForceReloginAt(new DateTime());
+        $account->totpSecret = $secret;
+        $account->forceReloginAt = new DateTime();
 
         $this->entityManager->flush();
     }
@@ -47,7 +47,7 @@ final readonly class MultiFactorService
      */
     public function disable(User|CompanyUser $account): void
     {
-        $account->setTotpSecret(null);
+        $account->totpSecret = null;
         $account->setBackupCodeSlots(null);
 
         $this->entityManager->flush();
@@ -59,16 +59,16 @@ final readonly class MultiFactorService
      */
     public function forceRelogin(User|CompanyUser $account): void
     {
-        $account->setForceReloginAt(new DateTime());
+        $account->forceReloginAt = new DateTime();
 
         $this->entityManager->flush();
     }
 
     public function reset(User|CompanyUser $account): void
     {
-        $account->setTotpSecret(null);
+        $account->totpSecret = null;
         $account->setBackupCodeSlots(null);
-        $account->setForceReloginAt(new DateTime());
+        $account->forceReloginAt = new DateTime();
 
         $this->entityManager->flush();
 

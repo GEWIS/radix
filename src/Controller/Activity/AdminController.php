@@ -93,7 +93,7 @@ class AdminController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $activity = $this->activityDraftFactory->newActivity($user->getMember());
+        $activity = $this->activityDraftFactory->newActivity($user->member);
 
         $revision = $activity->getCurrentRevision();
         assert($revision instanceof ActivityRevision);
@@ -766,7 +766,7 @@ class AdminController extends AbstractController
 
         $this->activityAdminService->cancel(
             $activity,
-            $user->getMember(),
+            $user->member,
         );
 
         $this->addFlash(
@@ -846,7 +846,7 @@ class AdminController extends AbstractController
 
         $this->activityAdminService->unpublish(
             $activity,
-            $user->getMember(),
+            $user->member,
         );
 
         $this->addFlash(

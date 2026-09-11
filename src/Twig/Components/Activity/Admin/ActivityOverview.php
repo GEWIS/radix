@@ -148,7 +148,7 @@ final class ActivityOverview extends AbstractDoctrinePaginatedOverview
         $user = $this->security->getUser();
         assert($user instanceof User);
 
-        return $user->getMember();
+        return $user->member;
     }
 
     /**

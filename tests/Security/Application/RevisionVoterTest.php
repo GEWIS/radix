@@ -301,7 +301,7 @@ final class RevisionVoterTest extends TestCase
     private function userFor(Member $member): User
     {
         $user = self::createStub(User::class);
-        $user->method('getMember')->willReturn($member);
+        $user->member = $member;
 
         return $user;
     }
@@ -309,7 +309,7 @@ final class RevisionVoterTest extends TestCase
     private function companyUserOf(Company $company): CompanyUser
     {
         $companyUser = self::createStub(CompanyUser::class);
-        $companyUser->method('getCompany')->willReturn($company);
+        $companyUser->company = $company;
 
         return $companyUser;
     }

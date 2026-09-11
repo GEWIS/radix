@@ -38,7 +38,7 @@ final class CompanyUserAccessPolicyTest extends DatabaseTestCase
         $companyUser = $this->companyUser('recruitment@halcyon-mobility.example.com');
 
         $package = new CompanyJobPackage();
-        $package->company = $companyUser->getCompany();
+        $package->company = $companyUser->company;
         $package->setStartingDate(new DateTime('+1 month'));
         $package->setExpirationDate(new DateTime('+1 year'));
         $package->published = false;

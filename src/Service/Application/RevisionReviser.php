@@ -33,7 +33,7 @@ final readonly class RevisionReviser
         $draft = $this->clonerRegistry->cloneAsDraft($revision);
 
         if ($author instanceof User) {
-            $draft->setAuthor($author->getMember());
+            $draft->setAuthor($author->member);
         } else {
             $draft->setAuthorCompanyUser($author);
         }

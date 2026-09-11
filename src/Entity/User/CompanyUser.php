@@ -53,13 +53,13 @@ class CompanyUser implements
      * The address this representative signs in with, and where their mail is sent.
      */
     #[Column(type: Types::STRING)]
-    private string $email;
+    public string $email;
 
     /**
      * The representative's own name.
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * The representative's password.
@@ -78,7 +78,7 @@ class CompanyUser implements
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private CompanyModel $company;
+    public CompanyModel $company;
 
     /**
      * When this representative was shut out, or null while they still act for the company. Someone who has moved on
@@ -89,7 +89,7 @@ class CompanyUser implements
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $disabledAt = null;
+    public ?DateTime $disabledAt = null;
 
     /**
      * Timestamp when the password was last changed.
@@ -107,7 +107,7 @@ class CompanyUser implements
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $forceReloginAt = null;
+    public ?DateTime $forceReloginAt = null;
 
     /**
      * Base32-encoded TOTP shared secret. Null when TOTP MFA is disabled. Encrypted at rest via DoctrineEncryptBundle.
@@ -117,7 +117,7 @@ class CompanyUser implements
         nullable: true,
     )]
     #[Encrypted]
-    private ?string $totpSecret = null;
+    public ?string $totpSecret = null;
 
     /**
      * A visual identifier that represents this user.
@@ -159,39 +159,6 @@ class CompanyUser implements
         return $this;
     }
 
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Get the company.
-     */
-    public function getCompany(): CompanyModel
-    {
-        return $this->company;
-    }
-
-    public function setCompany(CompanyModel $company): void
-    {
-        $this->company = $company;
-    }
-
     /**
      * A human-readable name for this account, for display alongside a {@see User}: the representative's name with the
      * company they act for in parentheses.
@@ -200,19 +167,9 @@ class CompanyUser implements
     {
         return sprintf(
             '%s (%s)',
-            $this->getName(),
-            $this->getCompany()->name,
+            $this->name,
+            $this->company->name,
         );
-    }
-
-    public function getDisabledAt(): ?DateTime
-    {
-        return $this->disabledAt;
-    }
-
-    public function setDisabledAt(?DateTime $disabledAt): void
-    {
-        $this->disabledAt = $disabledAt;
     }
 
     public function isDisabled(): bool
@@ -230,29 +187,9 @@ class CompanyUser implements
         $this->passwordChangedOn = $passwordChangedOn;
     }
 
-    public function getForceReloginAt(): ?DateTime
-    {
-        return $this->forceReloginAt;
-    }
-
-    public function setForceReloginAt(?DateTime $forceReloginAt): void
-    {
-        $this->forceReloginAt = $forceReloginAt;
-    }
-
     public function getUserType(): UserTypes
     {
         return UserTypes::CompanyUser;
-    }
-
-    public function getTotpSecret(): ?string
-    {
-        return $this->totpSecret;
-    }
-
-    public function setTotpSecret(?string $totpSecret): void
-    {
-        $this->totpSecret = $totpSecret;
     }
 
     #[Override]

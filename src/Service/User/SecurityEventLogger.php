@@ -109,16 +109,16 @@ final readonly class SecurityEventLogger
 
         try {
             $log = new SecurityLog();
-            $log->setOccurredAt($this->clock->now());
-            $log->setEvent($event);
-            $log->setUserIdentifier($userIdentifier);
-            $log->setFirewallName($firewallName);
-            $log->setActorIdentifier($actor);
-            $log->setIpAddress($address);
-            $log->setBrowser($browser);
-            $log->setOperatingSystem($operatingSystem);
-            $log->setRequestId($requestId);
-            $log->setDetail($detail);
+            $log->occurredAt = $this->clock->now();
+            $log->event = $event;
+            $log->userIdentifier = $userIdentifier;
+            $log->firewallName = $firewallName;
+            $log->actorIdentifier = $actor;
+            $log->ipAddress = $address;
+            $log->browser = $browser;
+            $log->operatingSystem = $operatingSystem;
+            $log->requestId = $requestId;
+            $log->detail = $detail;
 
             $this->repository->append($log);
         } catch (Throwable $e) {

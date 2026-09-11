@@ -29,17 +29,7 @@ class KnownNetwork extends KnownFact
 {
     /** Keyed HMAC, so this table is not a record of where every member has been. */
     #[Column(type: Types::STRING)]
-    private string $fingerprint;
-
-    public function getFingerprint(): string
-    {
-        return $this->fingerprint;
-    }
-
-    public function setFingerprint(string $fingerprint): void
-    {
-        $this->fingerprint = $fingerprint;
-    }
+    public string $fingerprint;
 
     /**
      * @return KnownNetworkGdprArrayType
@@ -47,9 +37,9 @@ class KnownNetwork extends KnownFact
     public function toGdprArray(): array
     {
         return [
-            'firewall' => $this->getFirewallName(),
-            'firstSeenAt' => $this->getFirstSeenAt()->format(DateTimeInterface::ATOM),
-            'lastSeenAt' => $this->getLastSeenAt()->format(DateTimeInterface::ATOM),
+            'firewall' => $this->firewallName,
+            'firstSeenAt' => $this->firstSeenAt->format(DateTimeInterface::ATOM),
+            'lastSeenAt' => $this->lastSeenAt->format(DateTimeInterface::ATOM),
         ];
     }
 }

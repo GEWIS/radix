@@ -257,7 +257,7 @@ final readonly class EditLockService
             $holder = $lock->getLockedBy();
 
             return null !== $holder
-                && $holder->getLidnr() === $principal->getLidnr();
+                && $holder->lidnr === $principal->lidnr;
         }
 
         $holder = $lock->getLockedByCompanyUser();

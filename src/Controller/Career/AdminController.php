@@ -95,7 +95,7 @@ class AdminController extends AbstractController
         $company->published = false;
 
         $revision = new CompanyRevision();
-        $revision->setAuthor($user->getMember());
+        $revision->setAuthor($user->member);
         $company->addRevision($revision);
         $company->setCurrentRevision($revision);
 

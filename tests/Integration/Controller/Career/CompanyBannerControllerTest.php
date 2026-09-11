@@ -138,7 +138,7 @@ final class CompanyBannerControllerTest extends DatabaseTestCase
             $companyUser,
         );
 
-        foreach ($companyUser->getCompany()->getPackages() as $package) {
+        foreach ($companyUser->company->getPackages() as $package) {
             if (!$package instanceof CompanyBannerPackage) {
                 continue;
             }

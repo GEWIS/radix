@@ -52,7 +52,7 @@ final readonly class TagService
                 (int) $photo->getId(),
                 $lidnr,
             )
-            || ($this->userSettingsRepository->find($lidnr)?->getPhotoTaggingOptOut() ?? false)
+            || ($this->userSettingsRepository->find($lidnr)->photoTaggingOptOut ?? false)
         ) {
             return null;
         }

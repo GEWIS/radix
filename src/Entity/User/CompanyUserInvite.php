@@ -47,17 +47,17 @@ class CompanyUserInvite
      * Who was invited, and the address the account will sign in with once they accept.
      */
     #[Column(type: Types::STRING)]
-    private string $email;
+    public private(set) string $email;
 
     #[Column(type: Types::STRING)]
-    private string $name;
+    public private(set) string $name;
 
     #[ManyToOne(targetEntity: CompanyModel::class)]
     #[JoinColumn(
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private CompanyModel $company;
+    public private(set) CompanyModel $company;
 
     /**
      * The board or C4 member who sent the invitation, or null once their account is gone.
@@ -69,7 +69,7 @@ class CompanyUserInvite
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?User $invitedBy = null;
+    public private(set) ?User $invitedBy = null;
 
     public function __construct(
         CompanyModel $company,
@@ -87,26 +87,6 @@ class CompanyUserInvite
         $this->selector = $selector;
         $this->hashedToken = $hashedToken;
         $this->expiresAt = $expiresAt;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getCompany(): CompanyModel
-    {
-        return $this->company;
-    }
-
-    public function getInvitedBy(): ?User
-    {
-        return $this->invitedBy;
     }
 
     /**

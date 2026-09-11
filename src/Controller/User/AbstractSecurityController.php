@@ -220,7 +220,7 @@ abstract class AbstractSecurityController extends AbstractController
         // Any validation failure must result in a 404 (never leak which check failed - though timing can be an issue).
         if (
             null === $passwordReset
-            || $this->userType !== $passwordReset->getUserType()
+            || $this->userType !== $passwordReset->userType
             || $passwordReset->isExpired()
             || !SplitToken::matches(
                 $passwordReset->getHashedToken(),
@@ -278,7 +278,7 @@ abstract class AbstractSecurityController extends AbstractController
 
                 if (
                     null === $passwordReset
-                    || $this->userType !== $passwordReset->getUserType()
+                    || $this->userType !== $passwordReset->userType
                     || $passwordReset->isTempHashExpired()
                 ) {
                     return $this->staleLinkRedirect();
@@ -289,7 +289,7 @@ abstract class AbstractSecurityController extends AbstractController
 
                 $session->set(
                     $sessionKey,
-                    $passwordReset->getId(),
+                    $passwordReset->id,
                 );
 
                 return $this->withNoLeakHeaders($this->renderPasswordResetForm());
@@ -312,7 +312,7 @@ abstract class AbstractSecurityController extends AbstractController
         // Defence in depth: even with a valid session id, re-validate the underlying state.
         if (
             null === $passwordReset
-            || $this->userType !== $passwordReset->getUserType()
+            || $this->userType !== $passwordReset->userType
             || $passwordReset->isExpired()
         ) {
             $session->remove($sessionKey);
@@ -391,7 +391,7 @@ abstract class AbstractSecurityController extends AbstractController
 
         // External applications only authenticate members, so company users never have any.
         $externalApps = $user instanceof User
-            ? $externalAppAuthenticationRepository->getFirstAndLastAuthenticationPerExternalApp($user->getMember())
+            ? $externalAppAuthenticationRepository->getFirstAndLastAuthenticationPerExternalApp($user->member)
             : [];
 
         $form = $this->createForm(

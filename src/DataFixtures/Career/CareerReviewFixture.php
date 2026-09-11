@@ -132,7 +132,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $draft = $this->nextProfileDraft($company);
         $draft->setStatus(RevisionStatus::Rejected);
         $draft->setAuthorCompanyUser($author);
-        $draft->setReviewer($reviewer->getMember());
+        $draft->setReviewer($reviewer->member);
         $draft->setReviewedAt(new DateTime('-3 days'));
         $draft->description = new CareerLocalisedText(
             'Delta Robotics builds cobots. Contact us at info@example.com for a quote.',
@@ -175,7 +175,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         );
         $reviewed->setStatus(RevisionStatus::ChangesRequested);
         $reviewed->setAuthorCompanyUser($author);
-        $reviewed->setReviewer($reviewer->getMember());
+        $reviewed->setReviewer($reviewer->member);
         $reviewed->setReviewedAt(new DateTime('-5 days'));
 
         $feedback = new VacancyRevisionComment();

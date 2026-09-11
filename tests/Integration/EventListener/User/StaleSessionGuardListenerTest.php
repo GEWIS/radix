@@ -136,25 +136,25 @@ final class StaleSessionGuardListenerTest extends DatabaseTestCase
         $series = UrlSafeToken::generate(44);
 
         $session = new Session();
-        $session->setSeries($series);
-        $session->setHashedToken(hash(
+        $session->series = $series;
+        $session->hashedToken = hash(
             'sha256',
             UrlSafeToken::generate(),
-        ));
-        $session->setSignaturePropertiesHash($credentials->hash($user));
-        $session->setFirewallName('main');
-        $session->setUserIdentifier($user->getUserIdentifier());
-        $session->setCreatedAt($now);
-        $session->setExpiresAt($now->modify('+30 days'));
+        );
+        $session->signaturePropertiesHash = $credentials->hash($user);
+        $session->firewallName = 'main';
+        $session->userIdentifier = $user->getUserIdentifier();
+        $session->createdAt = $now;
+        $session->expiresAt = $now->modify('+30 days');
         // Inside the throttle, so the guard neither writes nor refreshes device recognition.
-        $session->setLastUsedAt($now);
-        $session->setUserAgent('');
-        $session->setIpAddress('127.0.0.1');
-        $session->setPhpSessionId('a-php-session-id');
-        $session->setDeviceType(DeviceTypes::Unknown);
-        $session->setBrowser(null);
-        $session->setOperatingSystem(null);
-        $session->setSignature($rowSignature->forRow($session));
+        $session->lastUsedAt = $now;
+        $session->userAgent = '';
+        $session->ipAddress = '127.0.0.1';
+        $session->phpSessionId = 'a-php-session-id';
+        $session->deviceType = DeviceTypes::Unknown;
+        $session->browser = null;
+        $session->operatingSystem = null;
+        $session->signature = $rowSignature->forRow($session);
 
         $this->entityManager->persist($session);
         $this->entityManager->flush();

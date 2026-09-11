@@ -140,7 +140,7 @@ final class RevisionVoter extends Voter
         ?RevisionInterface $revision,
     ): bool {
         if ($user instanceof User) {
-            $member = $user->getMember();
+            $member = $user->member;
 
             if ($revisable->getResourceCreator()?->getLidnr() === $member->getLidnr()) {
                 return true;
@@ -164,7 +164,7 @@ final class RevisionVoter extends Voter
 
             return null !== $company
                 && null !== $company->getId()
-                && $company->getId() === $user->getCompany()->getId();
+                && $company->getId() === $user->company->getId();
         }
 
         return false;

@@ -107,7 +107,7 @@ final class ActivityProposalVoter extends Voter
             return false;
         }
 
-        $member = $user->getMember();
+        $member = $user->member;
 
         if ($proposal->getCreatedBy()?->getLidnr() === $member->getLidnr()) {
             return true;
