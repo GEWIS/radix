@@ -30,7 +30,7 @@
     <ul class="sidebar-list">
         {{ sidebar.link(path('user_login'), 'fa-right-to-bracket', 'Login'|trans, false) }}
     </ul>
-{% elseif enum('App\\Entity\\User\\Enums\\UserTypes').User == app.user.getUserType %}
+{% elseif enum('App\\Entity\\User\\Enums\\UserTypes').User == app.user.userType %}
     <ul class="sidebar-list">
         {{ sidebar.link(path('admin/index'), 'fa-gauge', 'Dashboard'|trans, route starts with 'admin/index') }}
     </ul>

@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}{{ organ.getName|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ organ.name|page_title }}{{ parent() }}{% endblock %}
 
 {% block breadcrumbs %}
     {% set overview = {
@@ -11,25 +11,25 @@
         'kcc': 'association/gmm-bodies/financial-audit-committees',
         'rva': 'association/gmm-bodies/advisory-boards',
         'sc': 'association/gmm-bodies/voting-committees',
-    }[organ.getType.value] %}
+    }[organ.type.value] %}
     <li class="breadcrumb-item">
         <a href="{{ page_path(category: 'vereniging', categoryEn: 'association') }}">{{ 'Association'|trans }}</a>
     </li>
-    <li class="breadcrumb-item"><a href="{{ path(overview) }}">{{ organ.getType.pluralLabel|trans }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ organ.getAbbr }}</li>
+    <li class="breadcrumb-item"><a href="{{ path(overview) }}">{{ organ.type.pluralLabel|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ organ.abbr }}</li>
 {% endblock %}
 
 {% block pre_body %}
     {% embed 'partials/application/page-header.html.twig' %}
         {% block header_top %}
-            {% if information is not null and information.getBannerPath is not null %}
-                <img class="organ-banner mb-3" src="{{ image_url(information.getBannerPath, 'w1280') }}" alt="">
+            {% if information is not null and information.bannerPath is not null %}
+                <img class="organ-banner mb-3" src="{{ image_url(information.bannerPath, 'w1280') }}" alt="">
             {% endif %}
         {% endblock %}
 
         {% block header_status %}
             <div class="page-header-meta d-flex flex-wrap align-items-center gap-2">
-                <span>{{ organ.getType.getName|trans }}</span>
+                <span>{{ organ.type.getName|trans }}</span>
                 {% if organ.isAbrogated %}
                     <span class="badge badge-secondary">{{ 'Abrogated'|trans }}</span>
                 {% else %}
@@ -38,27 +38,27 @@
             </div>
         {% endblock %}
 
-        {% block header_title %}{{ organ.getName }}{% endblock %}
+        {% block header_title %}{{ organ.name }}{% endblock %}
 
         {% block header_subtitle %}
             <p class="page-header-meta mb-0">
-                {{ organ.getAbbr }} &middot;
+                {{ organ.abbr }} &middot;
                 {% if organ.isAbrogated %}
-                    {{ organ.getFoundationDate|date('Y') }}&ndash;{{ organ.getAbrogationDate|date('Y') }}
+                    {{ organ.foundationDate|date('Y') }}&ndash;{{ organ.abrogationDate|date('Y') }}
                 {% else %}
-                    {{ 'Active since %year%'|trans({'%year%': organ.getFoundationDate|date('Y')}) }}
+                    {{ 'Active since %year%'|trans({'%year%': organ.foundationDate|date('Y')}) }}
                 {% endif %}
             </p>
         {% endblock %}
 
         {% block header_actions %}
             {% if is_granted('ROLE_USER') %}
-                {% if information is not null and information.getEmail is not null %}
-                    <a href="mailto:{{ information.getEmail }}" class="btn btn-outline-gewis-primary">
+                {% if information is not null and information.email is not null %}
+                    <a href="mailto:{{ information.email }}" class="btn btn-outline-gewis-primary">
                         <span class="fas fa-envelope" aria-hidden="true"></span> {{ 'Email us'|trans }}
                     </a>
                 {% endif %}
-                <a href="{{ path('photo/album', {'type': 'body', 'album': organ.getId}) }}"
+                <a href="{{ path('photo/album', {'type': 'body', 'album': organ.id}) }}"
                    class="btn btn-outline-gewis-primary">
                     <span class="fas fa-images" aria-hidden="true"></span> {{ 'Photos'|trans }}
                 </a>
@@ -68,7 +68,7 @@
 {% endblock %}
 
 {% block contents %}
-    {% set email = information ? information.getEmail : null %}
+    {% set email = information ? information.email : null %}
     {% set isMember = is_granted('ROLE_USER') %}
 
     {% if iterations is not empty %}
@@ -83,8 +83,8 @@
                 {% else %}
                     <a class="badge badge-tag"
                        href="{{ path('association/body', {
-                           'type': organ.getType.value,
-                           'abbr': organ.getAbbr,
+                           'type': organ.type.value,
+                           'abbr': organ.abbr,
                            'founded': iteration.key,
                        }) }}">{{ label }}</a>
                 {% endif %}
@@ -99,8 +99,8 @@
                     <h3>{{ 'What we do'|trans }}</h3>
                 </div>
                 <div class="panel-body markdown">
-                    {% if information is not null and information.getDescription is not null %}
-                        {{ information.getDescription|localise_text|markdown }}
+                    {% if information is not null and information.description is not null %}
+                        {{ information.description|localise_text|markdown }}
                     {% else %}
                         <p class="text-muted mb-0">
                             {{ 'This body has not written an introduction. What is below is what the association archive knows about it.'|trans }}
@@ -133,7 +133,7 @@
         <div class="col-lg-4">
             {% set hasContact = information is not null and (
                 (isMember and email is not null)
-                or information.getWebsite is not null
+                or information.website is not null
                 or information.getSocialLinks|length > 0
             ) %}
             {% if hasContact %}
@@ -152,13 +152,13 @@
                                     </span>
                                 </li>
                             {% endif %}
-                            {% if information.getWebsite is not null %}
+                            {% if information.website is not null %}
                                 <li>
                                     <span class="fas fa-globe" aria-hidden="true"></span>
                                     <span>
                                         <span class="organ-contact-label">{{ 'Website'|trans }}</span>
-                                        <a href="{{ information.getWebsite }}" target="_blank" rel="noopener noreferrer">
-                                            {{ information.getWebsite }}
+                                        <a href="{{ information.website }}" target="_blank" rel="noopener noreferrer">
+                                            {{ information.website }}
                                         </a>
                                     </span>
                                 </li>
@@ -168,7 +168,7 @@
                                     <span class="{{ link.getPlatform.icon }}" aria-hidden="true"></span>
                                     <span>
                                         <span class="organ-contact-label">{{ link.getPlatform.name }}</span>
-                                        <a href="{{ link.getUrl }}" target="_blank" rel="noopener noreferrer">
+                                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
                                             {{ link.getDisplayHandle }}
                                         </a>
                                     </span>
@@ -201,7 +201,7 @@
                 {# The cross-year search rather than a year's archive: it is the only view that reaches every
                    association year at once, which is what a body that ended years ago needs. #}
                 <div class="panel-footer">
-                    <a href="{{ path('activity/search', {'organ': organ.getId}) }}" class="panel-footer-link">
+                    <a href="{{ path('activity/search', {'organ': organ.id}) }}" class="panel-footer-link">
                         {{ 'Organised previously'|trans }}
                     </a>
                 </div>

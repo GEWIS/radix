@@ -73,7 +73,7 @@
 
             <div class="mb-4">
                 {% for document in recentDocuments %}
-                    {% set type = document.getType %}
+                    {% set type = document.type %}
                     <div class="panel panel-surface {{ loop.first ? 'mt-0' : '' }}">
                         <div class="panel-body d-flex align-items-center gap-3">
                             <span class="education-doc-icon {{ type.iconClass }}" aria-hidden="true">
@@ -82,23 +82,23 @@
                             <div class="flex-grow-1 overflow-hidden">
                                 <h5 class="mb-0">
                                     <a class="stretched-link"
-                                       href="{{ path('education/course', {code: document.getCourse.getCode}) }}">
-                                        {{ document.getCourse.getCode }} &middot; {{ document.getCourse.getName }}
+                                       href="{{ path('education/course', {code: document.course.code}) }}">
+                                        {{ document.course.code }} &middot; {{ document.course.name }}
                                     </a>
                                 </h5>
                                 <span class="d-block small text-body-secondary">
-                                    {{ 'summary' == type.value ? type.label|trans : document.getExamType.label|trans }}
+                                    {{ 'summary' == type.value ? type.label|trans : document.examType.label|trans }}
                                     {# Do not disclose the author to viewers who may not download the summary. #}
                                     {% if 'summary' == type.value
-                                        and document.getAuthor is not null
+                                        and document.author is not null
                                         and is_granted('COURSE_DOCUMENT_DOWNLOAD', document)
                                     %}
-                                        {{ 'by %author%'|trans({'%author%': document.getAuthor}) }}
+                                        {{ 'by %author%'|trans({'%author%': document.author}) }}
                                     {% endif %}
                                 </span>
                             </div>
                             <div class="flex-shrink-0 text-end small text-body-secondary">
-                                {{ document.getDate|date('j M Y') }}
+                                {{ document.date|date('j M Y') }}
                             </div>
                         </div>
                     </div>

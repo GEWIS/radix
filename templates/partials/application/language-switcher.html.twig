@@ -4,7 +4,7 @@
 #}
 {# The register signs its own accounts in, on their own firewall, so `app.user` on a register page is
    neither a member nor a company user. The type is asked for rather than assumed. #}
-{% set user_type = null !== app.user and app.user.getUserType is defined ? app.user.getUserType : null %}
+{% set user_type = null !== app.user and app.user.userType is defined ? app.user.userType : null %}
 <li class="nav-item dropdown">
     <button class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside"
             role="button" aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Settings'|trans }}"

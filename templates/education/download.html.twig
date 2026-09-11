@@ -1,13 +1,13 @@
 {% extends 'layout.html.twig' %}
 
-{% set document = download.getDocument %}
-{% set course = document.getCourse %}
+{% set document = download.document %}
+{% set course = document.course %}
 
 {% block page_title %}{{ 'Preparing your download'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('education/index') }}">{{ 'Education'|trans }}</a></li>
-    <li class="breadcrumb-item"><a href="{{ path('education/course', {code: course.getCode}) }}">{{ course.getCode }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('education/course', {code: course.code}) }}">{{ course.code }}</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{ 'Download'|trans }}</li>
 {% endblock %}
 
@@ -16,7 +16,7 @@
         <div class="col-lg-6">
             <div class="panel mt-0"
                  data-controller="education--download-poll"
-                 data-education--download-poll-url-value="{{ path('education/download_status', {token: download.getToken}) }}">
+                 data-education--download-poll-url-value="{{ path('education/download_status', {token: download.token}) }}">
                 <div class="panel-body text-center py-5">
                     <div data-education--download-poll-target="pending">
                         <div class="spinner-border text-body-secondary mb-3" role="status">
@@ -24,7 +24,7 @@
                         </div>
                         <h2 class="h4">{{ 'Preparing your download'|trans }}</h2>
                         <p class="text-body-secondary mb-0">
-                            {{ 'Your copy of %code% is being watermarked. This usually takes a moment.'|trans({'%code%': course.getCode}) }}
+                            {{ 'Your copy of %code% is being watermarked. This usually takes a moment.'|trans({'%code%': course.code}) }}
                         </p>
                     </div>
 
@@ -46,7 +46,7 @@
                             {{ 'Something went wrong while watermarking this document. Try again, and let the education officer know if it keeps happening.'|trans }}
                         </p>
                         <a class="btn btn-outline-secondary"
-                           href="{{ path('education/course', {code: course.getCode}) }}">{{ 'Back to %code%'|trans({'%code%': course.getCode}) }}</a>
+                           href="{{ path('education/course', {code: course.code}) }}">{{ 'Back to %code%'|trans({'%code%': course.code}) }}</a>
                     </div>
                 </div>
             </div>

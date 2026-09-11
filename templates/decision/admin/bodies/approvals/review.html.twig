@@ -19,7 +19,7 @@
 
 {% block contents %}
     {% embed 'partials/application/review-screen.html.twig' with {
-        'subjectName': organ.getName ~ ' (' ~ organ.getAbbr ~ ')',
+        'subjectName': organ.name ~ ' (' ~ organ.abbr ~ ')',
         'revision': revision,
         'previous': previous,
         'baseline': baseline,
@@ -33,17 +33,17 @@
         'showAuthor': true,
         'firstRevisionNote': 'This is the first revision; nothing to compare against.'|trans,
         'actionsHeading': 'Actions'|trans,
-        'decideAction': path('admin/bodies/approvals/decide', {'revision': revision.getId}),
-        'commentAction': path('admin/bodies/approvals/comment', {'revision': revision.getId}),
-        'commentToken': csrf_token('body_review_comment-' ~ revision.getId),
+        'decideAction': path('admin/bodies/approvals/decide', {'revision': revision.id}),
+        'commentAction': path('admin/bodies/approvals/comment', {'revision': revision.id}),
+        'commentToken': csrf_token('body_review_comment-' ~ revision.id),
         'commentAudienceNote': 'Visible to the body and the board. Use it to ask a question or leave a note.'|trans,
-        'discardAction': path('admin/bodies/approvals/discard', {'revision': revision.getId}),
-        'discardToken': csrf_token('body_discard-' ~ revision.getId),
+        'discardAction': path('admin/bodies/approvals/discard', {'revision': revision.id}),
+        'discardToken': csrf_token('body_discard-' ~ revision.id),
         'discardBody': 'The changes in this draft will be lost and the live version restored.'|trans,
         'organ': organ,
     } only %}
         {% block review_header_actions %}
-            <a href="{{ path('admin/bodies/view', {'organ': organ.getId}) }}"
+            <a href="{{ path('admin/bodies/view', {'organ': organ.id}) }}"
                class="btn btn-sm btn-outline-secondary">
                 <span class="fas fa-sitemap" aria-hidden="true"></span> {{ 'Go to the body'|trans }}
             </a>

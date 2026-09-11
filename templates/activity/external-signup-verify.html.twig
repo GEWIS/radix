@@ -7,9 +7,9 @@
         <div class="col col-sm-10 col-lg-6 col-xl-4">
             <h3 class="mb-1">{{ 'Confirm your sign-up'|trans }}</h3>
             <p class="text-muted">
-                <a href="{{ path('activity/view', {'activity': activity.getId}) }}">{{ activity_title(activity) }}</a>
+                <a href="{{ path('activity/view', {'activity': activity.id}) }}">{{ activity_title(activity) }}</a>
                 &middot;
-                {{ signupList.getName|localise_text }}
+                {{ signupList.name|localise_text }}
             </p>
 
             <div class="panel">

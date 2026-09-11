@@ -39,19 +39,19 @@
                     </thead>
                     <tbody>
                         {% for course in this.courses %}
-                            {% set counts = this.counts[course.getCode]|default(null) %}
+                            {% set counts = this.counts[course.code]|default(null) %}
                             <tr>
-                                <td><span class="education-code education-code-sm">{{ course.getCode }}</span></td>
-                                <td>{{ course.getName }}</td>
+                                <td><span class="education-code education-code-sm">{{ course.code }}</span></td>
+                                <td>{{ course.name }}</td>
                                 <td class="text-end">{{ counts ? counts.summaryCount : 0 }}</td>
                                 <td class="text-end">{{ counts ? counts.examCount : 0 }}</td>
                                 <td class="text-muted small">
                                     {{ counts and counts.lastAddedAt ? counts.lastAddedAt|date('j M Y') : 'Never'|trans }}
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ path('admin/education/courses/documents', {code: course.getCode}) }}"
+                                    <a href="{{ path('admin/education/courses/documents', {code: course.code}) }}"
                                        class="btn btn-sm btn-outline-secondary">{{ 'Manage'|trans }}</a>
-                                    <a href="{{ path('education/course', {code: course.getCode}) }}"
+                                    <a href="{{ path('education/course', {code: course.code}) }}"
                                        class="btn btn-sm btn-outline-secondary"
                                        title="{{ 'View on the site'|trans }}">
                                         <span class="fas fa-arrow-up-right-from-square" aria-hidden="true"></span>

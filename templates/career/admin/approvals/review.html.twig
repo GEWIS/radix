@@ -33,12 +33,12 @@
         'showAuthor': true,
         'firstRevisionNote': 'This is the first revision; nothing to compare against.'|trans,
         'actionsHeading': 'Actions'|trans,
-        'decideAction': path(decideRoute, {'revision': revision.getId}),
-        'commentAction': path(commentRoute, {'revision': revision.getId}),
-        'commentToken': csrf_token('career_review_comment-' ~ revision.getId),
+        'decideAction': path(decideRoute, {'revision': revision.id}),
+        'commentAction': path(commentRoute, {'revision': revision.id}),
+        'commentToken': csrf_token('career_review_comment-' ~ revision.id),
         'commentAudienceNote': 'Visible to the company and the committee. Use it to ask a question or leave a note.'|trans,
-        'discardAction': path(discardRoute, {'revision': revision.getId}),
-        'discardToken': csrf_token('career_discard-' ~ revision.getId),
+        'discardAction': path(discardRoute, {'revision': revision.id}),
+        'discardToken': csrf_token('career_discard-' ~ revision.id),
         'discardBody': 'The changes in this draft will be lost and the live version restored.'|trans,
     } only %}
 {% endblock %}

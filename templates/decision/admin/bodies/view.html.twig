@@ -1,12 +1,12 @@
 {% extends 'layout-admin.html.twig' %}
 
-{% block page_title %}{{ organ.getAbbr|page_title }}{{ 'Bodies'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ organ.abbr|page_title }}{{ 'Bodies'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item">
         <a href="{{ path('admin/bodies/index') }}">{{ 'Bodies'|trans }}</a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">{{ organ.getAbbr }}</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ organ.abbr }}</li>
 {% endblock %}
 
 {% block contents %}
@@ -15,33 +15,33 @@
     <div class="row mb-3">
         <div class="col-md-12 d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
-                <h2 class="mb-1">{{ organ.getName }} <small class="text-muted">({{ organ.getAbbr }})</small></h2>
+                <h2 class="mb-1">{{ organ.name }} <small class="text-muted">({{ organ.abbr }})</small></h2>
                 <p class="text-muted mb-0">
                     {% if revision is null %}
                         {{ 'This body has no page yet.'|trans }}
                     {% else %}
                         {{ 'Revision #%number%'|trans({'%number%': revision.getRevisionNumber}) }}
                         {% include 'partials/application/revision-status-badge.html.twig' with {
-                            'status': revision.getStatus,
+                            'status': revision.status,
                             'live': live ? live.getRevisionNumber : null,
                         } only %}
                     {% endif %}
                 </p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                {% if revision is null or revision.getStatus.isEditableByAuthor %}
-                    <a href="{{ path('admin/bodies/edit', {'organ': organ.getId}) }}"
+                {% if revision is null or revision.status.isEditableByAuthor %}
+                    <a href="{{ path('admin/bodies/edit', {'organ': organ.id}) }}"
                        class="btn btn-gewis-primary">
                         {{ revision is null ? 'Start a page'|trans : 'Edit the draft'|trans }}
                     </a>
                 {% else %}
-                    <form method="post" action="{{ path('admin/bodies/revise', {'organ': organ.getId}) }}">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('body_revise-' ~ organ.getId) }}">
+                    <form method="post" action="{{ path('admin/bodies/revise', {'organ': organ.id}) }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('body_revise-' ~ organ.id) }}">
                         <button type="submit" class="btn btn-gewis-primary">{{ 'Revise the page'|trans }}</button>
                     </form>
                 {% endif %}
                 {% if revision is not null %}
-                    <a href="{{ path('admin/bodies/approvals/review', {'revision': revision.getId}) }}"
+                    <a href="{{ path('admin/bodies/approvals/review', {'revision': revision.id}) }}"
                        class="btn btn-outline-secondary">{{ 'Open the review'|trans }}</a>
                 {% endif %}
             </div>
@@ -87,28 +87,28 @@
                                 </p>
                             {% endif %}
 
-                            {% if revision.getBannerPath is not null %}
-                                <img class="organ-banner mb-3" src="{{ image_url(revision.getBannerPath, 'w960') }}" alt="">
+                            {% if revision.bannerPath is not null %}
+                                <img class="organ-banner mb-3" src="{{ image_url(revision.bannerPath, 'w960') }}" alt="">
                             {% endif %}
                             <dl class="row mb-0">
-                                {% if revision.getLogoPath is not null %}
+                                {% if revision.logoPath is not null %}
                                     <dt class="col-sm-3">{{ 'Logo'|trans }}</dt>
                                     <dd class="col-sm-9">
                                         <img class="organ-logo organ-image-current organ-image-current-logo"
-                                             src="{{ image_url(revision.getLogoPath, 'w320') }}" alt="">
+                                             src="{{ image_url(revision.logoPath, 'w320') }}" alt="">
                                     </dd>
                                 {% endif %}
                                 <dt class="col-sm-3">{{ 'Short description'|trans }}</dt>
-                                <dd class="col-sm-9">{{ revision.getShortDescription|localise_text }}</dd>
+                                <dd class="col-sm-9">{{ revision.shortDescription|localise_text }}</dd>
                                 <dt class="col-sm-3">{{ 'Description'|trans }}</dt>
-                                <dd class="col-sm-9 markdown">{{ revision.getDescription|localise_text|markdown }}</dd>
-                                {% if revision.getEmail is not null %}
+                                <dd class="col-sm-9 markdown">{{ revision.description|localise_text|markdown }}</dd>
+                                {% if revision.email is not null %}
                                     <dt class="col-sm-3">{{ 'Email address'|trans }}</dt>
-                                    <dd class="col-sm-9">{{ revision.getEmail }}</dd>
+                                    <dd class="col-sm-9">{{ revision.email }}</dd>
                                 {% endif %}
-                                {% if revision.getWebsite is not null %}
+                                {% if revision.website is not null %}
                                     <dt class="col-sm-3">{{ 'Website'|trans }}</dt>
-                                    <dd class="col-sm-9">{{ revision.getWebsite }}</dd>
+                                    <dd class="col-sm-9">{{ revision.website }}</dd>
                                 {% endif %}
                                 {% if revision.getSocialLinks|length > 0 %}
                                     <dt class="col-sm-3">{{ 'Social media'|trans }}</dt>
@@ -126,8 +126,8 @@
                 <aside class="col-md-3">
                     {% include 'partials/application/revision-comments.html.twig' with {
                         'comments': comments,
-                        'commentAction': path('admin/bodies/approvals/comment', {'revision': revision.getId}),
-                        'csrfToken': csrf_token('body_review_comment-' ~ revision.getId),
+                        'commentAction': path('admin/bodies/approvals/comment', {'revision': revision.id}),
+                        'csrfToken': csrf_token('body_review_comment-' ~ revision.id),
                         'audienceNote': 'Visible to the body and the board. Use it to ask a question or leave a note.'|trans,
                     } only %}
                 </aside>

@@ -2,13 +2,13 @@
 
 {% set editing = course is not null %}
 
-{% block page_title %}{{ (editing ? course.getCode : 'Add a course'|trans)|page_title }}{{ 'Education'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ (editing ? course.code : 'Add a course'|trans)|page_title }}{{ 'Education'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('admin/education/index') }}">{{ 'Education'|trans }}</a></li>
     {% if editing %}
         <li class="breadcrumb-item">
-            <a href="{{ path('admin/education/courses/documents', {code: course.getCode}) }}">{{ course.getCode }}</a>
+            <a href="{{ path('admin/education/courses/documents', {code: course.code}) }}">{{ course.code }}</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">{{ 'Edit'|trans }}</li>
     {% else %}
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block contents %}
-    <h2>{{ editing ? 'Edit %code%'|trans({'%code%': course.getCode}) : 'Add a course'|trans }}</h2>
+    <h2>{{ editing ? 'Edit %code%'|trans({'%code%': course.code}) : 'Add a course'|trans }}</h2>
 
     <div class="row">
         <div class="col-lg-7">

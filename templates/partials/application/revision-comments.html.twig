@@ -3,8 +3,8 @@
 
     {% include 'partials/application/revision-comments.html.twig' with {
         'comments': comments,
-        'commentAction': path('admin/activities/approvals/comment', {'revision': revision.getId}),
-        'csrfToken': csrf_token('activity_review_comment-' ~ revision.getId),
+        'commentAction': path('admin/activities/approvals/comment', {'revision': revision.id}),
+        'csrfToken': csrf_token('activity_review_comment-' ~ revision.id),
         'audienceNote': 'Visible to the organisers and the board. Use it to ask a question or leave a note.'|trans,
     } only %}
 #}
@@ -20,7 +20,7 @@
                     <div class="d-flex justify-content-between">
                         <strong>{{ comment.authorDisplayName ?: 'Removed account'|trans }}</strong>
                         <span class="text-muted small">
-                            {{ comment.getCreatedAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) }}
+                            {{ comment.createdAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) }}
                             · {{ 'rev. #%n%'|trans({'%n%': comment.revision.revisionNumber}) }}
                         </span>
                     </div>

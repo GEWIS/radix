@@ -3,12 +3,12 @@
 
     {% include 'partials/career/vacancy-card.html.twig' with {'vacancy': vacancy, 'highlighted': true} only %}
 #}
-{% set company = vacancy.getCompany %}
+{% set company = vacancy.company %}
 {% set highlighted = highlighted|default(false) %}
 {% set vacancyUrl = path('career/vacancy', {
-    companySlug: company.getSlugName,
-    category: vacancy.getCategory.value,
-    vacancySlug: vacancy.getSlugName,
+    companySlug: company.slugName,
+    category: vacancy.category.value,
+    vacancySlug: vacancy.slugName,
 }) %}
 <div class="col">
     {# The title's stretched-link makes the whole card open the vacancy, so the company link needs
@@ -22,18 +22,18 @@
             {% endif %}
             <div class="d-flex align-items-center gap-2">
                 {% include 'partials/career/logo.html.twig' with {
-                    'logo': company.getSquareLogo,
-                    'name': company.getName,
+                    'logo': company.squareLogo,
+                    'name': company.name,
                     'class': 'career-logo-sm',
                 } only %}
                 <div>
                     <h6 class="card-title mb-0">
-                        <a href="{{ vacancyUrl }}" class="stretched-link">{{ vacancy.getName|localise_text }}</a>
+                        <a href="{{ vacancyUrl }}" class="stretched-link">{{ vacancy.name|localise_text }}</a>
                     </h6>
                     <div class="text-muted small">
-                        <a href="{{ path('career/company', {slug: company.getSlugName}) }}"
-                           class="link-secondary position-relative z-2">{{ company.getName }}</a>
-                        {% set location = vacancy.getLocation|localise_text %}
+                        <a href="{{ path('career/company', {slug: company.slugName}) }}"
+                           class="link-secondary position-relative z-2">{{ company.name }}</a>
+                        {% set location = vacancy.location|localise_text %}
                         {% if location is not empty %}
                             &middot; {{ location }}
                         {% endif %}
@@ -41,17 +41,17 @@
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-1">
-                <span class="badge {{ vacancy.getCategory.badgeClass }}">{{ vacancy.getCategory.label|trans }}</span>
+                <span class="badge {{ vacancy.category.badgeClass }}">{{ vacancy.category.label|trans }}</span>
                 {% for label in vacancy.getLabels %}
-                    <span class="badge badge-tag">{{ label.getName|localise_text }}</span>
+                    <span class="badge badge-tag">{{ label.name|localise_text }}</span>
                 {% endfor %}
             </div>
             <div class="vacancy-card-excerpt markdown small text-body-secondary">
-                {{ vacancy.getDescription|localise_text|markdown(['p']) }}
+                {{ vacancy.description|localise_text|markdown(['p']) }}
             </div>
-            {% if vacancy.getEndDate is not null %}
+            {% if vacancy.endDate is not null %}
                 <div class="text-body-secondary small mt-auto">
-                    {{ 'Open until %date%'|trans({'%date%': vacancy.getEndDate|date('j F Y')}) }}
+                    {{ 'Open until %date%'|trans({'%date%': vacancy.endDate|date('j F Y')}) }}
                 </div>
             {% endif %}
         </div>

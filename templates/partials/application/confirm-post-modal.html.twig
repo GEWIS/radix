@@ -6,8 +6,8 @@
 
     {{ modals.confirm_modal(
         'modal-discard-draft',
-        path('admin/career/approvals/company/discard', {'revision': revision.getId}),
-        csrf_token('career_discard-' ~ revision.getId),
+        path('admin/career/approvals/company/discard', {'revision': revision.id}),
+        csrf_token('career_discard-' ~ revision.id),
         'Discard draft?'|trans,
         'The changes in this draft will be lost and the live version restored.'|trans,
         'Discard draft'|trans,

@@ -7,7 +7,7 @@
         <a href="{{ path('admin/activities/index') }}">{{ 'Activities'|trans }}</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{{ path('admin/activities/signups', {'activity': activity.getId}) }}">{{ activity.getName|localise_text }}</a>
+        <a href="{{ path('admin/activities/signups', {'activity': activity.id}) }}">{{ activity.name|localise_text }}</a>
     </li>
     <li class="breadcrumb-item active" aria-current="page">{{ 'Add external subscriber'|trans }}</li>
 {% endblock %}
@@ -18,9 +18,9 @@
             <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                 <div>
                     <h3 class="mb-1">{{ 'Add external subscriber'|trans }}</h3>
-                    <p class="text-muted mb-0">{{ signupList.getName|localise_text }}</p>
+                    <p class="text-muted mb-0">{{ signupList.name|localise_text }}</p>
                 </div>
-                <a href="{{ path('admin/activities/signups', {'activity': activity.getId}) }}" class="btn btn-outline-secondary">
+                <a href="{{ path('admin/activities/signups', {'activity': activity.id}) }}" class="btn btn-outline-secondary">
                     <span class="fas fa-arrow-left"></span> {{ 'Back'|trans }}
                 </a>
             </div>

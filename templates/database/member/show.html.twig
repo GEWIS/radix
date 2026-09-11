@@ -212,7 +212,7 @@
                 <div class="panel-heading"><h3>{{ 'Mailing List Subscriptions'|trans }}</h3></div>
                 <div class="panel-body">
                     <ul class="list-unstyled mb-3">
-                        {% for subscription in member.mailingListMemberships|filter(s => not s.isToBeDeleted) %}
+                        {% for subscription in member.mailingListMemberships|filter(s => not s.toBeDeleted) %}
                             <li class="d-flex align-items-center gap-2">
                                 <span class="fas fa-circle-check text-success" aria-hidden="true"></span>
                                 {{ subscription.mailingList.name }}

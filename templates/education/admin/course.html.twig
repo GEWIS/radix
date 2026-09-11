@@ -4,33 +4,33 @@
 
 {% set documents = course.getDocuments %}
 
-{% block page_title %}{{ course.getCode|page_title }}{{ 'Education'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ course.code|page_title }}{{ 'Education'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('admin/education/index') }}">{{ 'Education'|trans }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ course.getCode }}</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ course.code }}</li>
 {% endblock %}
 
 {% block contents %}
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
         <div>
-            <h2 class="mb-1">{{ course.getCode }} &middot; {{ course.getName }}</h2>
+            <h2 class="mb-1">{{ course.code }} &middot; {{ course.name }}</h2>
             <p class="text-body-secondary mb-0">
                 {{ '%count% document|%count% documents'|trans({'%count%': documents|length}) }}
                 {% if course.getSimilarCourses is not empty %}
                     &middot;
                     {{ 'similar to'|trans }}
                     {% for similar in course.getSimilarCourses %}
-                        <a href="{{ path('admin/education/courses/documents', {code: similar.getCode}) }}">{{ similar.getCode }}</a>{{ not loop.last ? ',' }}
+                        <a href="{{ path('admin/education/courses/documents', {code: similar.code}) }}">{{ similar.code }}</a>{{ not loop.last ? ',' }}
                     {% endfor %}
                 {% endif %}
             </p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ path('education/course', {code: course.getCode}) }}" class="btn btn-outline-secondary">
+            <a href="{{ path('education/course', {code: course.code}) }}" class="btn btn-outline-secondary">
                 <span class="fas fa-arrow-up-right-from-square" aria-hidden="true"></span> {{ 'View on the site'|trans }}
             </a>
-            <a href="{{ path('admin/education/courses/edit', {code: course.getCode}) }}" class="btn btn-outline-secondary">
+            <a href="{{ path('admin/education/courses/edit', {code: course.code}) }}" class="btn btn-outline-secondary">
                 {{ 'Edit course'|trans }}
             </a>
             <button type="button" class="btn btn-outline-danger"
@@ -56,38 +56,38 @@
                     </thead>
                     <tbody>
                         {% for document in documents %}
-                            {% set type = document.getType %}
+                            {% set type = document.type %}
                             <tr>
                                 <td>
-                                    {{ 'summary' == type.value ? type.label|trans : document.getExamType.label|trans }}
-                                    {% if 'summary' == type.value and document.getAuthor is not null %}
-                                        <div class="text-muted small">{{ document.getAuthor }}</div>
+                                    {{ 'summary' == type.value ? type.label|trans : document.examType.label|trans }}
+                                    {% if 'summary' == type.value and document.author is not null %}
+                                        <div class="text-muted small">{{ document.author }}</div>
                                     {% endif %}
-                                    {% if document.getScanned %}
+                                    {% if document.scanned %}
                                         <span class="badge badge-tag">{{ 'Scanned'|trans }}</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ document.getDate|date('j M Y') }}</td>
-                                <td>{{ document.getLanguage.label|trans }}</td>
+                                <td>{{ document.date|date('j M Y') }}</td>
+                                <td>{{ document.language.label|trans }}</td>
                                 <td>{{ document.getPageCount }}</td>
                                 <td>
-                                    <span class="badge {{ document.getFlattenStatus.badgeClass }}">
-                                        {{ document.getFlattenStatus.label|trans }}
+                                    <span class="badge {{ document.flattenStatus.badgeClass }}">
+                                        {{ document.flattenStatus.label|trans }}
                                     </span>
-                                    {% if document.getFlattenError is not null %}
-                                        <div class="text-muted small">{{ document.getFlattenError }}</div>
+                                    {% if document.flattenError is not null %}
+                                        <div class="text-muted small">{{ document.flattenError }}</div>
                                     {% endif %}
                                 </td>
                                 <td class="text-end">
                                     <form method="post" class="d-inline"
-                                          action="{{ path('admin/education/documents/reprocess', {document: document.getId}) }}">
+                                          action="{{ path('admin/education/documents/reprocess', {document: document.id}) }}">
                                         <input type="hidden" name="_csrf_token"
-                                               value="{{ csrf_token('education_document_reprocess-' ~ document.getId) }}">
+                                               value="{{ csrf_token('education_document_reprocess-' ~ document.id) }}">
                                         <button type="submit" class="btn btn-sm btn-outline-secondary">{{ 'Process again'|trans }}</button>
                                     </form>
                                     <button type="button" class="btn btn-sm btn-outline-danger"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#modal-delete-document-{{ document.getId }}">
+                                            data-bs-target="#modal-delete-document-{{ document.id }}">
                                         {{ 'Remove'|trans }}
                                     </button>
                                 </td>
@@ -107,21 +107,21 @@
 
     {{ modals.confirm_modal(
         'modal-delete-course',
-        path('admin/education/courses/delete', {code: course.getCode}),
-        csrf_token('education_course_delete-' ~ course.getCode),
+        path('admin/education/courses/delete', {code: course.code}),
+        csrf_token('education_course_delete-' ~ course.code),
         'Remove this course?'|trans,
-        '%code% and every document filed under it are removed, along with the files behind them. This cannot be undone.'|trans({'%code%': course.getCode}),
+        '%code% and every document filed under it are removed, along with the files behind them. This cannot be undone.'|trans({'%code%': course.code}),
         'Remove'|trans,
         'danger',
     ) }}
 
     {% for document in documents %}
         {{ modals.confirm_modal(
-            'modal-delete-document-' ~ document.getId,
-            path('admin/education/documents/delete', {document: document.getId}),
-            csrf_token('education_document_delete-' ~ document.getId),
+            'modal-delete-document-' ~ document.id,
+            path('admin/education/documents/delete', {document: document.id}),
+            csrf_token('education_document_delete-' ~ document.id),
             'Remove this document?'|trans,
-            'It disappears from %code% and the files behind it are removed. This cannot be undone.'|trans({'%code%': course.getCode}),
+            'It disappears from %code% and the files behind it are removed. This cannot be undone.'|trans({'%code%': course.code}),
             'Remove'|trans,
             'danger',
         ) }}

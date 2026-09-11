@@ -37,7 +37,7 @@
 {% import _self as menu %}
 
 {# Asked for rather than assumed, so an account class that answers to neither accessor cannot fatal the navigation. #}
-{% set user_type = null !== app.user and app.user.getUserType is defined ? app.user.getUserType : null %}
+{% set user_type = null !== app.user and app.user.userType is defined ? app.user.userType : null %}
 
 <nav class="navbar navbar-expand navbar-gewis{{ is_granted('ROLE_BOARD') and not cosmetics_disabled() ? ' navbar-rainbow' : '' }}">
     <div class="container">
@@ -225,12 +225,12 @@
                                     </h6>
                                 </li>
                                 <li>
-                                    <a href="{{ path('career/company', {slug: featuredPackage.getCompany.getSlugName}) }}"
+                                    <a href="{{ path('career/company', {slug: featuredPackage.company.slugName}) }}"
                                        class="dropdown-item">
                                         <span class="career-logo career-logo-monogram nav-menu-monogram" aria-hidden="true">
-                                            {{ featuredPackage.getCompany.getName|slice(0, 1)|upper }}
+                                            {{ featuredPackage.company.name|slice(0, 1)|upper }}
                                         </span>
-                                        <span class="nav-menu-label">{{ featuredPackage.getCompany.getName }}</span>
+                                        <span class="nav-menu-label">{{ featuredPackage.company.name }}</span>
                                     </a>
                                 </li>
                             {% endif %}
@@ -315,7 +315,7 @@
                                         <h6 class="dropdown-header">{{ 'Yours'|trans }}</h6>
                                     </li>
                                     {{ menu.item(
-                                        path('photo/album', {album: app.user.getLidnr, type: 'member'}),
+                                        path('photo/album', {album: app.user.lidnr, type: 'member'}),
                                         'fa-user',
                                         'My Photos'|trans,
                                     ) }}
@@ -364,20 +364,20 @@
                             ) }}
                         </ul>
                     {% elseif enum('App\\Entity\\User\\Enums\\UserTypes').CompanyUser === user_type %}
-                        {% set company = app.user.getCompany %}
+                        {% set company = app.user.company %}
                         <button id="gws-company" type="button" aria-expanded="false" data-bs-toggle="dropdown"
                                 class="nav-link dropdown-toggle"
                                 aria-label="{{ 'Toggle company menu'|trans }}"
                         >
-                            <span id="gws-company-text">{{ company.getName }}</span>
+                            <span id="gws-company-text">{{ company.name }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-company-text">
                             <li>
                                 <div class="nav-menu-identity">
-                                    <span class="nav-menu-avatar" aria-hidden="true">{{ company.getName|slice(0, 1) }}</span>
+                                    <span class="nav-menu-avatar" aria-hidden="true">{{ company.name|slice(0, 1) }}</span>
                                     <span class="nav-menu-identity-text">
-                                        <span class="nav-menu-identity-name">{{ company.getName }}</span>
-                                        <span class="nav-menu-identity-meta">{{ app.user.getEmail }}</span>
+                                        <span class="nav-menu-identity-name">{{ company.name }}</span>
+                                        <span class="nav-menu-identity-meta">{{ app.user.email }}</span>
                                     </span>
                                 </div>
                             </li>
@@ -387,23 +387,23 @@
                             {{ menu.item(path('company_user_logout'), 'fa-arrow-right-from-bracket', 'Logout'|trans) }}
                         </ul>
                     {% elseif enum('App\\Entity\\User\\Enums\\UserTypes').User === user_type %}
-                        {% set member = app.user.getMember %}
+                        {% set member = app.user.member %}
                         <button id="gws-member" type="button" aria-expanded="false" data-bs-toggle="dropdown"
                                 class="nav-link dropdown-toggle"
                                 aria-label="{{ 'Toggle member menu'|trans }}"
                         >
-                            <span id="gws-member-text">{{ member.getFirstName }}</span>
+                            <span id="gws-member-text">{{ member.firstName }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-member-text">
                             <li>
                                 <div class="nav-menu-identity">
                                     <span class="nav-menu-avatar" aria-hidden="true">
-                                        {{ member.getFirstName|slice(0, 1) }}{{ member.getLastName|slice(0, 1) }}
+                                        {{ member.firstName|slice(0, 1) }}{{ member.lastName|slice(0, 1) }}
                                     </span>
                                     <span class="nav-menu-identity-text">
                                         <span class="nav-menu-identity-name">{{ member.getFullName }}</span>
                                         <span class="nav-menu-identity-meta">
-                                            {{ 'Generation %year%'|trans({'%year%': member.getGeneration}) }} &middot; {{ member.getLidnr }}
+                                            {{ 'Generation %year%'|trans({'%year%': member.generation}) }} &middot; {{ member.lidnr }}
                                         </span>
                                     </span>
                                 </div>
@@ -466,7 +466,7 @@
         <div class="special-notice impersonator-notice sticky-top">
             <p class="text-center">
                 <strong>
-                    {{ 'You are currently impersonating %name% (%lidnr%)!'|trans({'%name%': app.user.getMember.getFullName, '%lidnr%': app.user.getMember.getLidnr}) }}
+                    {{ 'You are currently impersonating %name% (%lidnr%)!'|trans({'%name%': app.user.member.getFullName, '%lidnr%': app.user.member.lidnr}) }}
                     <a href="{{ impersonation_exit_path(path('frontpage/index')) }}">
                         {{ 'Exit impersonation'|trans }}
                     </a>

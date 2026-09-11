@@ -100,9 +100,9 @@
                     {% set today_yd = 'now'|date('j n') %}
                     {# A company user is signed in but is not a member, so the type is asked for rather than
                        assumed. #}
-                    {% set userBirthdayMd = app.user.getUserType is defined
-                        and enum('App\\Entity\\User\\Enums\\UserTypes').User === app.user.getUserType
-                        ? app.user.getMember.getBirth|date('m-d')
+                    {% set userBirthdayMd = app.user.userType is defined
+                        and enum('App\\Entity\\User\\Enums\\UserTypes').User === app.user.userType
+                        ? app.user.member.birth|date('m-d')
                         : null
                     %}
                     {% if ('28 6' === today_yd) or (null !== userBirthdayMd and userBirthdayMd === today_md) %}

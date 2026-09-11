@@ -209,7 +209,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex flex-wrap align-items-center gap-2">
-                                    <code>{{ entity ? entity.getAppId : '?' }}</code>
+                                    <code>{{ entity ? entity.appId : '?' }}</code>
                                     {% if entity and entity.getClaims is not empty %}
                                         <button type="button" class="btn btn-sm btn-outline-secondary ms-auto"
                                                 data-bs-toggle="collapse" data-bs-target="#app-claims-{{ loop.index }}">

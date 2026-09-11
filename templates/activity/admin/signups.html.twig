@@ -29,9 +29,9 @@
                 <p class="text-muted mb-0">
                     {{ activity_title(activity) }}
                     &middot;
-                    {{ activity.getBeginTime|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
-                    {% if activity.getOrgan is not null %}
-                        &middot; {{ activity.getOrgan.getAbbr }}
+                    {{ activity.beginTime|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
+                    {% if activity.organ is not null %}
+                        &middot; {{ activity.organ.abbr }}
                     {% endif %}
                     &middot;
                     {{ '%count% sign-up list|%count% sign-up lists'|trans({'%count%': activity.getLiveSignupLists|length}) }}
@@ -41,7 +41,7 @@
                 <a href="{{ path('admin/activities/index') }}" class="btn btn-outline-secondary">
                     <span class="fas fa-arrow-left"></span> {{ 'Back to overview'|trans }}
                 </a>
-                <a href="{{ path('admin/activities/edit', {'activity': activity.getId}) }}" class="btn btn-outline-secondary">
+                <a href="{{ path('admin/activities/edit', {'activity': activity.id}) }}" class="btn btn-outline-secondary">
                     <span class="fas fa-pen"></span> {{ 'Edit activity'|trans }}
                 </a>
             </span>

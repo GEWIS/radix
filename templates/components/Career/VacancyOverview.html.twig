@@ -27,8 +27,8 @@
                         <select class="form-select" id="vacancy-overview-company" data-model="companyFilter">
                             <option value="">{{ 'Any company'|trans }}</option>
                             {% for company in this.companies %}
-                                <option value="{{ company.getSlugName }}" {% if this.companyFilter == company.getSlugName %}selected{% endif %}>
-                                    {{ company.getName }}
+                                <option value="{{ company.slugName }}" {% if this.companyFilter == company.slugName %}selected{% endif %}>
+                                    {{ company.name }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -43,7 +43,7 @@
                                     data-placeholder="{{ 'Search labels...'|trans }}">
                                 {% for label in this.labels %}
                                     <option value="{{ label.id }}" {% if label.id in this.labelFilters %}selected{% endif %}>
-                                        {{ label.getName|localise_text }}
+                                        {{ label.name|localise_text }}
                                     </option>
                                 {% endfor %}
                             </select>
@@ -81,7 +81,7 @@
             {% for vacancy in this.vacancies %}
                 {% include 'partials/career/vacancy-card.html.twig' with {
                     'vacancy': vacancy,
-                    'highlighted': vacancy.getId in highlightedIds,
+                    'highlighted': vacancy.id in highlightedIds,
                 } only %}
             {% endfor %}
         </div>

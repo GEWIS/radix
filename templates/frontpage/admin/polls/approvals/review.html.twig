@@ -33,9 +33,9 @@
         'showAuthor': true,
         'firstRevisionNote': 'This is the first time this question is asked; nothing to compare against.'|trans,
         'actionsHeading': 'Actions'|trans,
-        'decideAction': path('admin/frontpage/polls/approvals/decide', {'revision': revision.getId}),
-        'commentAction': path('admin/frontpage/polls/approvals/comment', {'revision': revision.getId}),
-        'commentToken': csrf_token('poll_review_comment-' ~ revision.getId),
+        'decideAction': path('admin/frontpage/polls/approvals/decide', {'revision': revision.id}),
+        'commentAction': path('admin/frontpage/polls/approvals/comment', {'revision': revision.id}),
+        'commentToken': csrf_token('poll_review_comment-' ~ revision.id),
         'commentAudienceNote': 'Visible to whoever asked and to the board. Use it to explain a decision.'|trans,
     } only %}
         {% block review_notices %}

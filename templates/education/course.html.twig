@@ -1,31 +1,31 @@
 {% extends 'layout.html.twig' %}
 
 {% set documents = course.getDocuments %}
-{% set summaries = documents|filter(d => 'summary' == d.getType.value) %}
-{% set exams = documents|filter(d => 'exam' == d.getType.value) %}
+{% set summaries = documents|filter(d => 'summary' == d.type.value) %}
+{% set exams = documents|filter(d => 'exam' == d.type.value) %}
 {% set similar = course.getSimilarCourses %}
 
-{% block page_title %}{{ ('%code% - %name%'|trans({'%code%': course.getCode, '%name%': course.getName}))|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ ('%code% - %name%'|trans({'%code%': course.code, '%name%': course.name}))|page_title }}{{ parent() }}{% endblock %}
 
 {% block special_notices %}{% include 'partials/education/access-notice.html.twig' %}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('education/index') }}">{{ 'Education'|trans }}</a></li>
     <li class="breadcrumb-item"><a href="{{ path('education/courses') }}">{{ 'Courses'|trans }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ course.getCode }}</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ course.code }}</li>
 {% endblock %}
 
 {% block contents %}
     <h2 class="d-flex flex-wrap align-items-center gap-2">
-        <span class="education-code">{{ course.getCode }}</span>
-        {{ course.getName }}
+        <span class="education-code">{{ course.code }}</span>
+        {{ course.name }}
     </h2>
 
     <div class="row g-4">
         <div class="col-lg-8">
             {% if documents is empty %}
                 <div class="education-empty">
-                    <h4 class="mb-2">{{ 'Nothing has been shared for %code% yet'|trans({'%code%': course.getCode}) }}</h4>
+                    <h4 class="mb-2">{{ 'Nothing has been shared for %code% yet'|trans({'%code%': course.code}) }}</h4>
                     <p class="text-body-secondary mb-3">
                         {{ 'This course is listed but empty. If you kept your notes, sending them in takes a minute and saves the next cohort a weekend.'|trans }}
                     </p>
@@ -73,7 +73,7 @@
                 <div class="panel-body">
                     <dl class="row mb-0 small">
                         <dt class="col-6 fw-normal text-body-secondary">{{ 'Course code'|trans }}</dt>
-                        <dd class="col-6 text-end mb-1">{{ course.getCode }}</dd>
+                        <dd class="col-6 text-end mb-1">{{ course.code }}</dd>
                         <dt class="col-6 fw-normal text-body-secondary">{{ 'Summaries'|trans }}</dt>
                         <dd class="col-6 text-end mb-1">{{ summaries|length }}</dd>
                         <dt class="col-6 fw-normal text-body-secondary">{{ 'Exams and answers'|trans }}</dt>
@@ -92,10 +92,10 @@
                         <ul class="list-unstyled mb-0">
                             {% for other in similar %}
                                 <li class="d-flex align-items-center gap-3 {{ loop.last ? '' : 'mb-2' }}">
-                                    <span class="education-code education-code-sm" aria-hidden="true">{{ other.getCode }}</span>
+                                    <span class="education-code education-code-sm" aria-hidden="true">{{ other.code }}</span>
                                     <span class="education-course-name">
-                                        <a class="text-body" href="{{ path('education/course', {code: other.getCode}) }}">
-                                            {{ other.getName }}
+                                        <a class="text-body" href="{{ path('education/course', {code: other.code}) }}">
+                                            {{ other.name }}
                                         </a>
                                     </span>
                                 </li>
@@ -111,7 +111,7 @@
                 </div>
                 <div class="panel-body">
                     <p class="text-body-secondary mb-0">
-                        {{ 'Send your summary or old exam for %code% to the education officer and it is added here.'|trans({'%code%': course.getCode}) }}
+                        {{ 'Send your summary or old exam for %code% to the education officer and it is added here.'|trans({'%code%': course.code}) }}
                     </p>
                 </div>
                 <div class="panel-footer">

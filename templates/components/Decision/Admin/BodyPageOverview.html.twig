@@ -17,11 +17,11 @@
                         </thead>
                         <tbody>
                             {% for row in this.bodies %}
-                                {% set url = path('admin/bodies/view', {'organ': row.organ.getId}) %}
+                                {% set url = path('admin/bodies/view', {'organ': row.organ.id}) %}
                                 <tr>
-                                    <td><a href="{{ url }}"><strong>{{ row.organ.getAbbr }}</strong></a></td>
-                                    <td><a href="{{ url }}">{{ row.organ.getName }}</a></td>
-                                    <td class="text-muted small">{{ row.organ.getType.getName|trans }}</td>
+                                    <td><a href="{{ url }}"><strong>{{ row.organ.abbr }}</strong></a></td>
+                                    <td><a href="{{ url }}">{{ row.organ.name }}</a></td>
+                                    <td class="text-muted small">{{ row.organ.type.getName|trans }}</td>
                                     <td>
                                         {% if row.status is null %}
                                             <span class="badge badge-secondary">{{ 'Not started'|trans }}</span>

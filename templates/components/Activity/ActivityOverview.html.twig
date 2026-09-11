@@ -62,7 +62,7 @@
                                 data-placeholder="{{ 'Search labels...'|trans }}">
                             {% for label in this.labels %}
                                 <option value="{{ label.id }}" {% if label.id in this.labelFilters %}selected{% endif %}>
-                                    {{ label.getName|localise_text }}
+                                    {{ label.name|localise_text }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -78,7 +78,7 @@
             {% for activities in this.activitiesByAssociationYear %}
                 {% set currentMonth = null %}
                 {% for activity in activities %}
-                    {% set month = activity.getBeginTime|format_datetime(pattern: 'MMMM yyyy', locale: app.request.locale) %}
+                    {% set month = activity.beginTime|format_datetime(pattern: 'MMMM yyyy', locale: app.request.locale) %}
                     {% if month != currentMonth %}
                         <div class="month-divider">{{ month }}</div>
                         {% set currentMonth = month %}
@@ -93,7 +93,7 @@
         <div class="mb-2">
             {% set currentMonth = null %}
             {% for activity in this.activities %}
-                {% set month = activity.getBeginTime|format_datetime(pattern: 'MMMM yyyy', locale: app.request.locale) %}
+                {% set month = activity.beginTime|format_datetime(pattern: 'MMMM yyyy', locale: app.request.locale) %}
                 {% if month != currentMonth %}
                     <div class="month-divider">{{ month }}</div>
                     {% set currentMonth = month %}

@@ -233,7 +233,7 @@
                             {% endif %}
                             {% if list.isOpen and not list.frozen %}
                                 <a class="btn btn-sm btn-outline-success"
-                                   href="{{ path('admin/activities/add_external_signup', {'activity': this.activity.getId, 'signupList': list.listId}) }}">
+                                   href="{{ path('admin/activities/add_external_signup', {'activity': this.activity.id, 'signupList': list.listId}) }}">
                                     <span class="fas fa-user-plus"></span> {{ 'Add external subscriber'|trans }}
                                 </a>
                             {% endif %}

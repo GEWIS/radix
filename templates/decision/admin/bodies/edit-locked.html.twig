@@ -1,13 +1,13 @@
 {% extends 'layout-admin.html.twig' %}
 
-{% block page_title %}{{ 'Already being edited'|trans|page_title }}{{ organ.getAbbr|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ 'Already being edited'|trans|page_title }}{{ organ.abbr|page_title }}{{ parent() }}{% endblock %}
 
 {% block admin_breadcrumbs %}
     <li class="breadcrumb-item">
         <a href="{{ path('admin/bodies/index') }}">{{ 'Bodies'|trans }}</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{{ path('admin/bodies/view', {'organ': organ.getId}) }}">{{ organ.getAbbr }}</a>
+        <a href="{{ path('admin/bodies/view', {'organ': organ.id}) }}">{{ organ.abbr }}</a>
     </li>
     <li class="breadcrumb-item active" aria-current="page">{{ 'Already being edited'|trans }}</li>
 {% endblock %}
@@ -19,7 +19,7 @@
             {% include 'partials/application/edit-lock-notice.html.twig' with {
                 'lock': lock,
                 'subject': 'this page'|trans,
-                'backUrl': path('admin/bodies/view', {'organ': organ.getId}),
+                'backUrl': path('admin/bodies/view', {'organ': organ.id}),
                 'backLabel': 'Go back'|trans,
             } only %}
         </div>

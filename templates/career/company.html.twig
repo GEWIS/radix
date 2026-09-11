@@ -1,49 +1,49 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}{{ company.getName|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ company.name|page_title }}{{ parent() }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">
         <a href="{{ path('career/companies') }}">{{ 'Companies'|trans }}</a>
     </li>
-    <li class="breadcrumb-item active">{{ company.getName }}</li>
+    <li class="breadcrumb-item active">{{ company.name }}</li>
 {% endblock %}
 
 {% block contents %}
-    {% set website = company.getWebsite|localise_text %}
+    {% set website = company.website|localise_text %}
     <div class="row g-4">
         <div class="col-lg-4 col-xl-3">
             <div class="card company-card mb-4">
                 {% include 'partials/career/logo.html.twig' with {
-                    'logo': company.getBannerLogo,
-                    'name': company.getName,
+                    'logo': company.bannerLogo,
+                    'name': company.name,
                     'class': 'career-logo-plate',
-                    'alt': company.getName,
+                    'alt': company.name,
                 } only %}
                 {% if
-                    company.getContactName is not null
-                    or company.getContactAddress is not null
-                    or company.getContactPhone is not null
-                    or company.getContactEmail is not null
+                    company.contactName is not null
+                    or company.contactAddress is not null
+                    or company.contactPhone is not null
+                    or company.contactEmail is not null
                     or website is not empty
                     or company.getSocialLinks|length > 0
                 %}
                     <div class="card-body">
                         <h6 class="text-uppercase text-body-secondary">{{ 'Contact'|trans }}</h6>
-                        {% if company.getContactName is not null %}
-                            <p class="mb-1"><strong>{{ company.getContactName }}</strong></p>
+                        {% if company.contactName is not null %}
+                            <p class="mb-1"><strong>{{ company.contactName }}</strong></p>
                         {% endif %}
-                        {% if company.getContactAddress is not null %}
-                            <p class="mb-1 text-body-secondary small">{{ company.getContactAddress|nl2br }}</p>
+                        {% if company.contactAddress is not null %}
+                            <p class="mb-1 text-body-secondary small">{{ company.contactAddress|nl2br }}</p>
                         {% endif %}
-                        {% if company.getContactPhone is not null %}
+                        {% if company.contactPhone is not null %}
                             <p class="mb-1">
-                                <a href="tel:{{ company.getContactPhone }}">{{ company.getContactPhone }}</a>
+                                <a href="tel:{{ company.contactPhone }}">{{ company.contactPhone }}</a>
                             </p>
                         {% endif %}
-                        {% if company.getContactEmail is not null %}
+                        {% if company.contactEmail is not null %}
                             <p class="mb-1">
-                                <a href="mailto:{{ company.getContactEmail }}">{{ company.getContactEmail }}</a>
+                                <a href="mailto:{{ company.contactEmail }}">{{ company.contactEmail }}</a>
                             </p>
                         {% endif %}
                         {% if website is not empty %}
@@ -71,11 +71,11 @@
                             {% if vacancies is not empty %}
                                 {% set vacancy = vacancies|first %}
                                 <a class="link-row" href="{{ path('career/vacancy', {
-                                    companySlug: company.getSlugName,
-                                    category: vacancy.getCategory.value,
-                                    vacancySlug: vacancy.getSlugName,
+                                    companySlug: company.slugName,
+                                    category: vacancy.category.value,
+                                    vacancySlug: vacancy.slugName,
                                 }) }}">
-                                    <span class="d-block fw-semibold">{{ vacancy.getName|localise_text }}</span>
+                                    <span class="d-block fw-semibold">{{ vacancy.name|localise_text }}</span>
                                     <span class="d-block small text-body-secondary">{{ category.pluralLabel|trans }}</span>
                                 </a>
                             {% endif %}
@@ -93,12 +93,12 @@
                         {% for activity in activities %}
                             <div class="list-group-item">
                                 <h6 class="mb-1">
-                                    <a href="{{ path('activity/view', {activity: activity.getId}) }}">
-                                        {{ activity.getName|localise_text }}
+                                    <a href="{{ path('activity/view', {activity: activity.id}) }}">
+                                        {{ activity.name|localise_text }}
                                     </a>
                                 </h6>
                                 <p class="text-muted small mb-0">
-                                    {{ activity.getBeginTime|format_datetime(
+                                    {{ activity.beginTime|format_datetime(
                                         pattern: 'EEE d MMM yyyy, HH:mm',
                                         locale: app.request.locale,
                                     ) }}
@@ -111,8 +111,8 @@
         </div>
 
         <div class="col-lg-8 col-xl-9">
-            <h3 class="mb-1">{{ company.getName }}</h3>
-            {% set slogan = company.getSlogan|localise_text %}
+            <h3 class="mb-1">{{ company.name }}</h3>
+            {% set slogan = company.slogan|localise_text %}
             {% if slogan is not empty %}
                 <p class="text-body-secondary fs-5">{{ slogan }}</p>
             {% endif %}
@@ -125,7 +125,7 @@
                         <h3><span class="fas fa-star" aria-hidden="true"></span> {{ 'Featured this month'|trans }}</h3>
                     </div>
                     <div class="panel-body markdown">
-                        {{ featuredPackage.getArticle|localise_text|markdown }}
+                        {{ featuredPackage.article|localise_text|markdown }}
                     </div>
                 </div>
             {% endif %}
@@ -135,7 +135,7 @@
                     <h3>{{ 'Description'|trans }}</h3>
                 </div>
                 <div class="panel-body markdown">
-                    {{ company.getDescription|localise_text|markdown }}
+                    {{ company.description|localise_text|markdown }}
                 </div>
             </div>
         </div>

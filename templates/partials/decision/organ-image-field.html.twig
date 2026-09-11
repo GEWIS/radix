@@ -2,9 +2,9 @@
     {% include 'partials/decision/organ-image-field.html.twig' with {
         'fileField': revisionForm.bannerFile,
         'cropField': revisionForm.bannerCropData,
-        'source': revision.getBannerSource,
-        'crop': revision.getBannerCrop,
-        'live': live ? live.getBannerPath : null,
+        'source': revision.bannerSource,
+        'crop': revision.bannerCrop,
+        'live': live ? live.bannerPath : null,
         'sourceWidth': bannerSourceWidth,
         'ratio': 4,
         'shape': 'banner',

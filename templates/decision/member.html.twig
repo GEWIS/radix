@@ -27,14 +27,14 @@
         <div class="profile-header mb-0">
             <h2>{{ member.getFullName }}</h2>
             <div class="profile-badges">
-                <span class="badge {{ member.getType.badgeClass }}">{{ member.getType.getName|trans }}</span>
-                <span class="badge badge-tag">{{ 'Member'|trans }} #{{ member.getLidnr }}</span>
-                <span class="badge badge-tag">{{ 'Generation'|trans }} {{ member.getGeneration }}</span>
+                <span class="badge {{ member.type.badgeClass }}">{{ member.type.getName|trans }}</span>
+                <span class="badge badge-tag">{{ 'Member'|trans }} #{{ member.lidnr }}</span>
+                <span class="badge badge-tag">{{ 'Generation'|trans }} {{ member.generation }}</span>
                 {% if showPrivateDetails %}
-                    {% if member.getType.isFormalMember %}
-                        <span class="badge badge-tag">{{ 'Member until %date%'|trans({'%date%': (member.getMembershipEndsOn ?? member.getExpiration)|date('j F Y')}) }}</span>
+                    {% if member.type.isFormalMember %}
+                        <span class="badge badge-tag">{{ 'Member until %date%'|trans({'%date%': (member.membershipEndsOn ?? member.expiration)|date('j F Y')}) }}</span>
                     {% else %}
-                        <span class="badge badge-tag">{{ 'Graduate until %date%'|trans({'%date%': member.getExpiration|date('j F Y')}) }}</span>
+                        <span class="badge badge-tag">{{ 'Graduate until %date%'|trans({'%date%': member.expiration|date('j F Y')}) }}</span>
                     {% endif %}
                     {% if member.isKeyholder %}
                         <span class="badge badge-success"><span class="fas fa-lock"></span> {{ 'Keycode active'|trans }}</span>
@@ -54,20 +54,20 @@
                         </div>
                         <div class="panel-body">
                             <dl class="profile-details">
-                                {{ _self.detail('Initials'|trans, member.getInitials) }}
-                                {{ _self.detail('First name'|trans, member.getFirstName) }}
-                                {{ _self.detail('Last name'|trans, member.getLastName) }}
+                                {{ _self.detail('Initials'|trans, member.initials) }}
+                                {{ _self.detail('First name'|trans, member.firstName) }}
+                                {{ _self.detail('Last name'|trans, member.lastName) }}
                                 <div class="profile-detail">
                                     <dt>{{ 'Email'|trans }}</dt>
                                     <dd>
-                                        {% if member.getEmail %}
-                                            <a href="mailto:{{ member.getEmail }}">{{ member.getEmail }}</a>
+                                        {% if member.email %}
+                                            <a href="mailto:{{ member.email }}">{{ member.email }}</a>
                                         {% else %}
                                             {{ 'Unknown'|trans }}
                                         {% endif %}
                                     </dd>
                                 </div>
-                                {{ _self.detail('Birth date'|trans, member.getBirth|date('l j F Y')) }}
+                                {{ _self.detail('Birth date'|trans, member.birth|date('l j F Y')) }}
                             </dl>
                             {% if isSelf %}
                                 {% set secretary %}<a href="mailto:secretary@gewis.nl">{{ 'the secretary of GEWIS'|trans }}</a>{% endset %}
@@ -88,7 +88,7 @@
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link {{ loop.first ? 'active' }}" type="button" role="tab"
                                                 data-bs-toggle="pill" data-bs-target="#address-{{ loop.index }}">
-                                            {{ address.getType.getName|trans }}
+                                            {{ address.type.getName|trans }}
                                         </button>
                                     </li>
                                 {% endfor %}
@@ -99,11 +99,11 @@
                                 {% for address in member.getAddresses %}
                                     <div class="tab-pane {{ loop.first ? 'show active' }}" id="address-{{ loop.index }}" role="tabpanel">
                                         <dl class="profile-details">
-                                            {{ _self.detail('Street and number'|trans, address.getStreet ~ ' ' ~ address.getNumber) }}
-                                            {{ _self.detail('City and postal code'|trans, address.getPostalCode ~ ' ' ~ address.getCity) }}
-                                            {{ _self.detail('Country'|trans, address.getCountry.value|lower|title) }}
-                                            {% if address.getPhone %}
-                                                {{ _self.detail('Phone number'|trans, address.getPhone) }}
+                                            {{ _self.detail('Street and number'|trans, address.street ~ ' ' ~ address.number) }}
+                                            {{ _self.detail('City and postal code'|trans, address.postalCode ~ ' ' ~ address.city) }}
+                                            {{ _self.detail('Country'|trans, address.country.value|lower|title) }}
+                                            {% if address.phone %}
+                                                {{ _self.detail('Phone number'|trans, address.phone) }}
                                             {% endif %}
                                         </dl>
                                     </div>
@@ -170,7 +170,7 @@
                                 {% if isSelf %}
                                     {{ 'You have not been a member of a committee or fraternity.'|trans }}
                                 {% else %}
-                                    {{ '%name% has never been part of a committee or fraternity.'|trans({'%name%': member.getFirstName}) }}
+                                    {{ '%name% has never been part of a committee or fraternity.'|trans({'%name%': member.firstName}) }}
                                 {% endif %}
                             </p>
                         {% endif %}
@@ -179,7 +179,7 @@
                                 <div class="profile-membership-label">{{ 'Currently a member of'|trans }}</div>
                                 {% for committee in committees.current %}
                                     <div class="profile-membership">
-                                        <span class="profile-membership-name" title="{{ committee.organ.getName }}">{{ committee.organ.getAbbr }}</span>
+                                        <span class="profile-membership-name" title="{{ committee.organ.name }}">{{ committee.organ.abbr }}</span>
                                         {% if committee.functions is not empty %}
                                             <span class="text-muted">{{ committee.functions|join(', ') }}</span>
                                         {% endif %}
@@ -192,7 +192,7 @@
                                 <div class="profile-membership-label">{{ 'Previously a member of'|trans }}</div>
                                 {% for committee in committees.historical %}
                                     <div class="profile-membership">
-                                        <span class="profile-membership-name profile-membership-past" title="{{ committee.organ.getName }}">{{ committee.organ.getAbbr }}</span>
+                                        <span class="profile-membership-name profile-membership-past" title="{{ committee.organ.name }}">{{ committee.organ.abbr }}</span>
                                         {% if committee.functions is not empty %}
                                             <span class="text-muted">{{ committee.functions|join(', ') }}</span>
                                         {% endif %}
@@ -207,16 +207,16 @@
             <div class="col-lg-4">
                 <div class="panel profile-photo-panel">
                     {% if profilePhoto is not null %}
-                        {% set boxRatio = max(0.6, min(1.5, (1 / (profilePhoto.getAspectRatio ?? 0.75))|round(3))) %}
+                        {% set boxRatio = max(0.6, min(1.5, (1 / (profilePhoto.aspectRatio ?? 0.75))|round(3))) %}
                         <div class="profile-photo-thumb" style="aspect-ratio: {{ boxRatio }};">
-                            <img src="{{ image_url(profilePhoto.getPath, 'w640') }}" alt="{{ member.getFullName }}">
+                            <img src="{{ image_url(profilePhoto.path, 'w640') }}" alt="{{ member.getFullName }}">
                         </div>
                     {% else %}
                         <div class="profile-photo-thumb">
                             <span class="fas fa-user"></span>
                         </div>
                     {% endif %}
-                    <a class="profile-photo-link" href="{{ path('photo/album', {'type': 'member', 'album': member.getLidnr}) }}">
+                    <a class="profile-photo-link" href="{{ path('photo/album', {'type': 'member', 'album': member.lidnr}) }}">
                         <span class="fas fa-image"></span>
                         {{ isSelf ? 'More of my photos'|trans : 'More of their photos'|trans }}
                     </a>

@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}{{ page.getTitle|localise_text|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ page.title|localise_text|page_title }}{{ parent() }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">
@@ -14,28 +14,28 @@
         {% else %}
             <li class="breadcrumb-item">
                 <a href="{{ page_path(
-                    category: parent.getCategory.getValueNL,
-                    categoryEn: parent.getCategory.getValueEN,
-                    subCategory: parent.getSubCategory.getValueNL,
-                    subCategoryEn: parent.getSubCategory.getValueEN,
-                    name: parent.getName.getValueNL,
-                    nameEn: parent.getName.getValueEN,
+                    category: parent.category.getValueNL,
+                    categoryEn: parent.category.getValueEN,
+                    subCategory: parent.subCategory.getValueNL,
+                    subCategoryEn: parent.subCategory.getValueEN,
+                    name: parent.name.getValueNL,
+                    nameEn: parent.name.getValueEN,
                 ) }}">
-                    {{ parent.getTitle|localise_text }}
+                    {{ parent.title|localise_text }}
                 </a>
             </li>
         {% endif %}
     {% endfor %}
     <li class="breadcrumb-item active">
-        {{ page.getTitle|localise_text }}
+        {{ page.title|localise_text }}
     </li>
 {% endblock %}
 
 {% block contents %}
     <div class="row">
         <div class="col-md-12">
-            <h2>{{ page.getTitle|localise_text }}</h2>
+            <h2>{{ page.title|localise_text }}</h2>
         </div>
     </div>
-    {{ page.getContent|localise_text|raw }}
+    {{ page.content|localise_text|raw }}
 {% endblock %}

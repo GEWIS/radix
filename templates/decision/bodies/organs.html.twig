@@ -42,14 +42,14 @@
                         </thead>
                         <tbody>
                             {% for organ in organs %}
-                                {% set url = path('organs/view', {'organ': organ.getId}) %}
+                                {% set url = path('organs/view', {'organ': organ.id}) %}
                                 <tr>
-                                    <td><a href="{{ url }}"><strong>{{ organ.getAbbr }}</strong></a></td>
-                                    <td><a href="{{ url }}">{{ organ.getName }}</a></td>
-                                    <td class="text-muted small">{{ organ.getType.getName|trans }}</td>
+                                    <td><a href="{{ url }}"><strong>{{ organ.abbr }}</strong></a></td>
+                                    <td><a href="{{ url }}">{{ organ.name }}</a></td>
+                                    <td class="text-muted small">{{ organ.type.getName|trans }}</td>
                                     {% if historical %}
                                         <td class="text-muted small">
-                                            {{ organ.getAbrogationDate|date('Y-m-d') }}
+                                            {{ organ.abrogationDate|date('Y-m-d') }}
                                         </td>
                                     {% endif %}
                                 </tr>

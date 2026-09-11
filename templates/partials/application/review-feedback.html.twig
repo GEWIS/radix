@@ -19,7 +19,7 @@
                         </span>
                     </div>
                     <div class="text-muted small">
-                        {{ comment.getCreatedAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) }}
+                        {{ comment.createdAt|format_datetime(pattern: 'd MMM yyyy HH:mm', locale: app.request.locale) }}
                     </div>
                     <div class="mt-1">{{ comment.body|nl2br }}</div>
                 </li>

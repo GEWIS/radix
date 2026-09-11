@@ -65,7 +65,7 @@
                     <div class="panel-body">
                         <ul class="list-group">
                             {% for vacancy in package.displayableVacancies %}
-                                <li class="list-group-item">{{ vacancy.getName|localise_text }}</li>
+                                <li class="list-group-item">{{ vacancy.name|localise_text }}</li>
                             {% else %}
                                 <li class="list-group-item text-muted">{{ 'Nothing is highlighted right now.'|trans }}</li>
                             {% endfor %}

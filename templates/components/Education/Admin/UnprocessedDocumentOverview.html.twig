@@ -19,28 +19,28 @@
                             {% for document in this.documents %}
                                 <tr>
                                     <td>
-                                        <a href="{{ path('admin/education/courses/documents', {code: document.getCourse.getCode}) }}">
-                                            {{ document.getCourse.getCode }}
+                                        <a href="{{ path('admin/education/courses/documents', {code: document.course.code}) }}">
+                                            {{ document.course.code }}
                                         </a>
-                                        <div class="text-muted small">{{ document.getCourse.getName }}</div>
+                                        <div class="text-muted small">{{ document.course.name }}</div>
                                     </td>
                                     <td>
-                                        {{ document.getType.label|trans }}
-                                        <div class="text-muted small">{{ document.getDate|date('j M Y') }}</div>
+                                        {{ document.type.label|trans }}
+                                        <div class="text-muted small">{{ document.date|date('j M Y') }}</div>
                                     </td>
                                     <td>
-                                        <span class="badge {{ document.getFlattenStatus.badgeClass }}">
-                                            {{ document.getFlattenStatus.label|trans }}
+                                        <span class="badge {{ document.flattenStatus.badgeClass }}">
+                                            {{ document.flattenStatus.label|trans }}
                                         </span>
-                                        {% if document.getFlattenError is not null %}
-                                            <div class="text-muted small">{{ document.getFlattenError }}</div>
+                                        {% if document.flattenError is not null %}
+                                            <div class="text-muted small">{{ document.flattenError }}</div>
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
                                         <form method="post" class="d-inline"
-                                              action="{{ path('admin/education/documents/reprocess', {document: document.getId}) }}">
+                                              action="{{ path('admin/education/documents/reprocess', {document: document.id}) }}">
                                             <input type="hidden" name="_csrf_token"
-                                                   value="{{ csrf_token('education_document_reprocess-' ~ document.getId) }}">
+                                                   value="{{ csrf_token('education_document_reprocess-' ~ document.id) }}">
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">{{ 'Process again'|trans }}</button>
                                         </form>
                                     </td>

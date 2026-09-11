@@ -7,7 +7,7 @@
     {% if inline|default(false) %}
         <span class="social-links social-links-inline">
             {% for link in links %}
-                <a href="{{ link.getUrl }}" target="_blank" rel="noopener noreferrer"
+                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
                    title="{{ link.getPlatform.name }}">
                     <span class="{{ link.getPlatform.icon }}" aria-hidden="true"></span>
                     <span class="visually-hidden">{{ link.getPlatform.name }}</span>
@@ -19,7 +19,7 @@
             {% for link in links %}
                 <li>
                     <span class="{{ link.getPlatform.icon }} social-links-icon" aria-hidden="true"></span>
-                    <a href="{{ link.getUrl }}" target="_blank" rel="noopener noreferrer">{{ link.getDisplayHandle }}</a>
+                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.getDisplayHandle }}</a>
                 </li>
             {% endfor %}
         </ul>

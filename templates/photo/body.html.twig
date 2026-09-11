@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}{{ 'Photos'|trans|page_title }}{{ organ.getName|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ 'Photos'|trans|page_title }}{{ organ.name|page_title }}{{ parent() }}{% endblock %}
 
 {% block container_class %}container-fluid{% endblock %}
 
@@ -11,18 +11,18 @@
 
 {% block contents %}
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
-        <h2 class="mb-0">{{ organ.getName }}</h2>
+        <h2 class="mb-0">{{ organ.name }}</h2>
         <a class="btn btn-outline-secondary btn-sm" href="{{ path('association/body', {
-            'type': organ.getType.value,
-            'abbr': organ.getAbbr,
-            'founded': organ.getFoundationDate|date('Y-m-d'),
+            'type': organ.type.value,
+            'abbr': organ.abbr,
+            'founded': organ.foundationDate|date('Y-m-d'),
         }) }}">
             <span class="fa-solid fa-arrow-left me-1"></span>{{ 'Back to the body'|trans }}
         </a>
     </div>
 
     {% import 'partials/photo/gallery.html.twig' as gallery %}
-    <div {{ gallery.attributes(path('photo/body_manifest', { organ: organ.getId }), false) }}>
-        {{ gallery.grid('%name% has not been tagged in any photos yet.'|trans({ '%name%': organ.getName })) }}
+    <div {{ gallery.attributes(path('photo/body_manifest', { organ: organ.id }), false) }}>
+        {{ gallery.grid('%name% has not been tagged in any photos yet.'|trans({ '%name%': organ.name })) }}
     </div>
 {% endblock %}

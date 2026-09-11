@@ -33,22 +33,22 @@
                         <tbody>
                             {% for app in apps %}
                                 <tr>
-                                    <td><code>{{ app.getAppId }}</code></td>
-                                    <td class="text-break"><small class="text-muted">{{ app.getCallback }}</small></td>
+                                    <td><code>{{ app.appId }}</code></td>
+                                    <td class="text-break"><small class="text-muted">{{ app.callback }}</small></td>
                                     <td>
                                         {% if app.isActive %}
                                             <span class="badge badge-success">{{ 'Active'|trans }}</span>
-                                        {% elseif not app.isEnabled %}
+                                        {% elseif not app.enabled %}
                                             <span class="badge badge-secondary">{{ 'Disabled'|trans }}</span>
                                         {% else %}
                                             <span class="badge badge-warning">{{ 'Expired'|trans }}</span>
                                         {% endif %}
-                                        {% if app.getExpiresAt %}
-                                            <small class="text-muted d-block">{{ 'Until %date%'|trans({'%date%': app.getExpiresAt|date('Y-m-d')}) }}</small>
+                                        {% if app.expiresAt %}
+                                            <small class="text-muted d-block">{{ 'Until %date%'|trans({'%date%': app.expiresAt|date('Y-m-d')}) }}</small>
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
-                                        <a href="{{ path('admin/users/apps/edit', {externalApp: app.getId}) }}"
+                                        <a href="{{ path('admin/users/apps/edit', {externalApp: app.id}) }}"
                                            class="btn btn-sm btn-outline-secondary">
                                             <span class="fas fa-pen"></span> {{ 'Edit'|trans }}
                                         </a>

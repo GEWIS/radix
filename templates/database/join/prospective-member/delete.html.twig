@@ -23,7 +23,7 @@
             {% include 'partials/application/empty-state.html.twig' with {
                 icon: 'fa-ban',
                 title: reason.getName|trans,
-                body: reason.getDescription|trans,
+                body: reason.description|trans,
             } only %}
         </div>
     </div>

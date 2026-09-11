@@ -2,7 +2,7 @@
 
 {% import 'partials/application/form-flow.html.twig' as flow %}
 
-{% block page_title %}{{ 'Edit'|trans|page_title }}{{ organ.getAbbr|page_title }}{{ 'Bodies'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block page_title %}{{ 'Edit'|trans|page_title }}{{ organ.abbr|page_title }}{{ 'Bodies'|trans|page_title }}{{ parent() }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -14,7 +14,7 @@
         <a href="{{ path('admin/bodies/index') }}">{{ 'Bodies'|trans }}</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{{ path('admin/bodies/view', {'organ': organ.getId}) }}">{{ organ.getAbbr }}</a>
+        <a href="{{ path('admin/bodies/view', {'organ': organ.id}) }}">{{ organ.abbr }}</a>
     </li>
     <li class="breadcrumb-item active" aria-current="page">{{ 'Edit'|trans }}</li>
 {% endblock %}
@@ -25,7 +25,7 @@
 
     <div class="row mb-3">
         <div class="col-md-12">
-            <h2 class="mb-1">{{ organ.getName }} <small class="text-muted">({{ organ.getAbbr }})</small></h2>
+            <h2 class="mb-1">{{ organ.name }} <small class="text-muted">({{ organ.abbr }})</small></h2>
             <p class="text-muted mb-0">
                 {{ 'Saving keeps this as a draft. It only reaches the website once the board approves it.'|trans }}
             </p>
@@ -35,8 +35,8 @@
     <div class="row">
         <div class="col-md-12">
             <div data-controller="edit-lock"
-                 data-edit-lock-ping-url-value="{{ path('admin/bodies/edit_ping', {'organ': organ.getId}) }}"
-                 data-edit-lock-release-url-value="{{ path('admin/bodies/edit_release', {'organ': organ.getId}) }}"
+                 data-edit-lock-ping-url-value="{{ path('admin/bodies/edit_ping', {'organ': organ.id}) }}"
+                 data-edit-lock-release-url-value="{{ path('admin/bodies/edit_release', {'organ': organ.id}) }}"
                  data-edit-lock-csrf-token-value="{{ csrf_token('body_edit_lock') }}"
                  data-edit-lock-lost-message-value="{{ 'You no longer hold the edit lock; it was taken over or expired. Reload the page to continue editing.'|trans }}">
                 {{ form_start(form) }}
@@ -133,9 +133,9 @@
                                     {% include 'partials/decision/organ-image-field.html.twig' with {
                                         'fileField': fields.logoFile,
                                         'cropField': fields.logoCropData,
-                                        'source': revision.getLogoSource,
-                                        'crop': revision.getLogoCrop,
-                                        'live': live ? live.getLogoPath : null,
+                                        'source': revision.logoSource,
+                                        'crop': revision.logoCrop,
+                                        'live': live ? live.logoPath : null,
                                         'sourceWidth': logoSourceWidth,
                                         'ratio': constant('App\\Form\\Decision\\OrganPage\\ImagesStepType::LOGO_RATIO'),
                                         'shape': 'logo',
@@ -155,9 +155,9 @@
                                     {% include 'partials/decision/organ-image-field.html.twig' with {
                                         'fileField': fields.bannerFile,
                                         'cropField': fields.bannerCropData,
-                                        'source': revision.getBannerSource,
-                                        'crop': revision.getBannerCrop,
-                                        'live': live ? live.getBannerPath : null,
+                                        'source': revision.bannerSource,
+                                        'crop': revision.bannerCrop,
+                                        'live': live ? live.bannerPath : null,
                                         'sourceWidth': bannerSourceWidth,
                                         'ratio': constant('App\\Form\\Decision\\OrganPage\\ImagesStepType::BANNER_RATIO'),
                                         'shape': 'banner',
@@ -168,7 +168,7 @@
                     </div>
                 {% endif %}
 
-                {{ flow.navigation(form, path('admin/bodies/view', {'organ': organ.getId})) }}
+                {{ flow.navigation(form, path('admin/bodies/view', {'organ': organ.id})) }}
                 {{ form_end(form) }}
             </div>
         </div>
