@@ -42,7 +42,7 @@ class PollVote
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Poll $poll;
+    public Poll $poll;
 
     /**
      * The option which was chosen.
@@ -56,7 +56,7 @@ class PollVote
         name: 'option_id',
         referencedColumnName: 'id',
     )]
-    private PollOption $pollOption;
+    public PollOption $pollOption;
 
     /**
      * The member who submitted this vote. It identifies the row, so there is nothing to null out: a vote that can no
@@ -76,26 +76,6 @@ class PollVote
     )]
     private MemberModel $respondent;
 
-    public function getPoll(): Poll
-    {
-        return $this->poll;
-    }
-
-    public function getPollOption(): PollOption
-    {
-        return $this->pollOption;
-    }
-
-    public function setPoll(Poll $poll): void
-    {
-        $this->poll = $poll;
-    }
-
-    public function setPollOption(PollOption $pollOption): void
-    {
-        $this->pollOption = $pollOption;
-    }
-
     public function setRespondent(MemberModel $respondent): void
     {
         $this->respondent = $respondent;
@@ -107,8 +87,8 @@ class PollVote
     public function toGdprArray(): array
     {
         return [
-            'poll_id' => $this->getPoll()->getId(),
-            'option' => $this->getPollOption()->getText()->toGdprArray(),
+            'poll_id' => $this->poll->getId(),
+            'option' => $this->pollOption->text->toGdprArray(),
         ];
     }
 }

@@ -33,7 +33,7 @@ final class PollRepositoryTest extends DatabaseTestCase
         $previous = null;
 
         foreach ($this->repository()->findActivePolls() as $poll) {
-            $expiryDate = $poll->getExpiryDate();
+            $expiryDate = $poll->expiryDate;
             self::assertInstanceOf(
                 DateTime::class,
                 $expiryDate,
@@ -60,7 +60,7 @@ final class PollRepositoryTest extends DatabaseTestCase
         );
         self::assertFalse($last->isActive());
 
-        $expiryDate = $last->getExpiryDate();
+        $expiryDate = $last->expiryDate;
         self::assertInstanceOf(
             DateTime::class,
             $expiryDate,
@@ -76,7 +76,7 @@ final class PollRepositoryTest extends DatabaseTestCase
 
             self::assertLessThanOrEqual(
                 $expiryDate,
-                $poll->getExpiryDate(),
+                $poll->expiryDate,
             );
         }
     }

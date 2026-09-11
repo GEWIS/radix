@@ -30,7 +30,7 @@ final readonly class PageAdminService
         Page $page,
         ?string $flowRun = null,
     ): void {
-        $content = $page->getContent();
+        $content = $page->content;
         $content->updateValues(
             $this->sanitizer->sanitize($content->getValueEN()),
             $this->sanitizer->sanitize($content->getValueNL()),

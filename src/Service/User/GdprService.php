@@ -162,7 +162,7 @@ class GdprService
                     $this->pollRepository->findPollsCreatedByMember($member),
                 ),
                 'reviewed' => array_map(
-                    static fn ($revision) => $revision->getPoll()->toGdprArray(),
+                    static fn ($revision) => $revision->poll->toGdprArray(),
                     $this->pollRevisionRepository->findReviewedByMember($member),
                 ),
             ],

@@ -59,8 +59,8 @@ final class PollRevisionDescriber extends AbstractRevisionDescriber
                     'Answer %number%',
                     ['%number%' => $index + 1],
                 ),
-                ($previousOptions[$index] ?? null)?->getText(),
-                ($options[$index] ?? null)?->getText() ?? new FrontpageLocalisedText(),
+                ($previousOptions[$index] ?? null)?->text,
+                ($options[$index] ?? null)->text ?? new FrontpageLocalisedText(),
                 $comparable,
             );
         }
@@ -72,8 +72,8 @@ final class PollRevisionDescriber extends AbstractRevisionDescriber
                 [
                     $this->localisedField(
                         t('Question'),
-                        $previous?->getQuestion(),
-                        $revision->getQuestion(),
+                        $previous?->question,
+                        $revision->question,
                         $comparable,
                     ),
                 ],

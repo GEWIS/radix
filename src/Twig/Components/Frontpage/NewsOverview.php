@@ -73,7 +73,7 @@ final class NewsOverview extends AbstractInfiniteScrollOverview
     {
         $grouped = [];
         foreach ($this->getItems() as $item) {
-            $grouped[$item->getDate()->format('Y-m')][] = $item;
+            $grouped[$item->date->format('Y-m')][] = $item;
         }
 
         return $grouped;

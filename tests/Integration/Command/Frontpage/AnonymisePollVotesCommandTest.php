@@ -61,7 +61,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
         );
 
         foreach ($after as $reaction) {
-            self::assertNull($reaction->getMember());
+            self::assertNull($reaction->member);
         }
     }
 
@@ -70,7 +70,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
         $poll = $this->aClosedPoll();
 
         $this->anonymise();
-        $stamped = $this->reread($poll)->getVotesAnonymisedAt();
+        $stamped = $this->reread($poll)->votesAnonymisedAt;
         self::assertNotNull($stamped);
         $total = $this->reread($poll)->getTotalVotesCount();
 
@@ -82,7 +82,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
         );
         self::assertEquals(
             $stamped,
-            $this->reread($poll)->getVotesAnonymisedAt(),
+            $this->reread($poll)->votesAnonymisedAt,
         );
         self::assertSame(
             $total,
@@ -105,7 +105,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
 
         $this->anonymise();
 
-        self::assertNull($this->reread($running)->getVotesAnonymisedAt());
+        self::assertNull($this->reread($running)->votesAnonymisedAt);
         self::assertSame(
             $before,
             $this->voteRowsFor($running),
@@ -126,7 +126,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
             if (
                 null === $poll->getLiveRevision()
                 || $poll->isActive()
-                || null !== $poll->getVotesAnonymisedAt()
+                || null !== $poll->votesAnonymisedAt
             ) {
                 continue;
             }

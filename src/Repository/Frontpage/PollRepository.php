@@ -294,7 +294,7 @@ class PollRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'expiryDate',
-                $poll->getExpiryDate(),
+                $poll->expiryDate,
                 Types::DATE_MUTABLE,
             )
             ->orderBy(

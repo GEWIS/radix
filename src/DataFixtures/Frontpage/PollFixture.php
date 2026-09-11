@@ -105,8 +105,8 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
 
         foreach ($tallies as $lidnr => $index) {
             $vote = new PollVote();
-            $vote->setPoll($poll);
-            $vote->setPollOption($options[$index]);
+            $vote->poll = $poll;
+            $vote->pollOption = $options[$index];
             $vote->setRespondent($this->member($lidnr));
             $manager->persist($vote);
         }
@@ -148,8 +148,8 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
 
         foreach ($reactions as $lidnr => $type) {
             $reaction = new PollCommentReaction();
-            $reaction->setMember($this->member($lidnr));
-            $reaction->setType($type);
+            $reaction->member = $this->member($lidnr);
+            $reaction->type = $type;
             $comment->addReaction($reaction);
             $manager->persist($reaction);
         }
@@ -194,8 +194,8 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
 
         foreach ($tallies as $lidnr => $index) {
             $vote = new PollVote();
-            $vote->setPoll($poll);
-            $vote->setPollOption($options[$index]);
+            $vote->poll = $poll;
+            $vote->pollOption = $options[$index];
             $vote->setRespondent($this->member($lidnr));
             $manager->persist($vote);
         }
@@ -234,8 +234,8 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
 
         // Most of it was answered long enough ago to have been anonymised already; the rest is still attributable,
         // which is what the anonymisation run has to turn into more of the former without changing either tally.
-        $options[0]->setAnonymousVotes(14);
-        $options[1]->setAnonymousVotes(23);
+        $options[0]->anonymousVotes = 14;
+        $options[1]->anonymousVotes = 23;
 
         $tallies = [
             8014 => 0,
@@ -245,8 +245,8 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
 
         foreach ($tallies as $lidnr => $index) {
             $vote = new PollVote();
-            $vote->setPoll($poll);
-            $vote->setPollOption($options[$index]);
+            $vote->poll = $poll;
+            $vote->pollOption = $options[$index];
             $vote->setRespondent($this->member($lidnr));
             $manager->persist($vote);
         }
@@ -261,8 +261,8 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
         );
 
         $reaction = new PollCommentReaction();
-        $reaction->setMember($this->member(8018));
-        $reaction->setType(PollCommentReactionType::Like);
+        $reaction->member = $this->member(8018);
+        $reaction->type = PollCommentReactionType::Like;
         $comment->addReaction($reaction);
         $manager->persist($reaction);
     }
@@ -352,7 +352,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
     ): Poll {
         $poll = new Poll();
         $poll->setCreator($this->member($creator));
-        $poll->setExpiryDate($expiryDate);
+        $poll->expiryDate = $expiryDate;
 
         $revision = new PollRevision();
         $revision->setStatus($status);
@@ -367,17 +367,17 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             $revision->setSubmittedAt(new DateTime('-2 days'));
         }
 
-        $revision->setQuestion(new FrontpageLocalisedText(
+        $revision->question = new FrontpageLocalisedText(
             $questionEN,
             $questionNL,
-        ));
+        );
 
         foreach ($answers as [$answerEN, $answerNL]) {
             $option = new PollOption();
-            $option->setText(new FrontpageLocalisedText(
+            $option->text = new FrontpageLocalisedText(
                 $answerEN,
                 $answerNL,
-            ));
+            );
             $revision->addOption($option);
         }
 
@@ -407,9 +407,9 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
     ): PollComment {
         $comment = new PollComment();
         $comment->setUser($this->member($lidnr));
-        $comment->setAuthor($author);
-        $comment->setContent($content);
-        $comment->setCreatedOn($createdOn);
+        $comment->author = $author;
+        $comment->content = $content;
+        $comment->createdOn = $createdOn;
         $comment->setParent($parent);
         $poll->addComment($comment);
 

@@ -45,7 +45,7 @@ class PageController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $this->denyAccessUnlessGranted($page->getRequiredRole()->value);
+        $this->denyAccessUnlessGranted($page->requiredRole->value);
 
         return $this->render(
             'frontpage/page.html.twig',

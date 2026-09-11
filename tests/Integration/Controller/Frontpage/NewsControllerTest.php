@@ -59,11 +59,11 @@ final class NewsControllerTest extends DatabaseTestCase
         $career = $this->anItemIn(NewsCategory::Career);
 
         self::assertStringContainsString(
-            $education->getTitle()->getValueEN() ?? '',
+            $education->title->getValueEN() ?? '',
             $content,
         );
         self::assertStringNotContainsString(
-            $career->getTitle()->getValueEN() ?? '',
+            $career->title->getValueEN() ?? '',
             $content,
         );
     }
@@ -79,7 +79,7 @@ final class NewsControllerTest extends DatabaseTestCase
         $content = strval($this->controller()->index(category: 'gossip')->getContent());
 
         self::assertStringContainsString(
-            $this->anItemIn(NewsCategory::Career)->getTitle()->getValueEN() ?? '',
+            $this->anItemIn(NewsCategory::Career)->title->getValueEN() ?? '',
             $content,
         );
     }
@@ -95,7 +95,7 @@ final class NewsControllerTest extends DatabaseTestCase
         $content = strval($this->controller()->index(year: 1899)->getContent());
 
         self::assertStringContainsString(
-            $this->anItemIn(NewsCategory::Career)->getTitle()->getValueEN() ?? '',
+            $this->anItemIn(NewsCategory::Career)->title->getValueEN() ?? '',
             $content,
         );
     }
@@ -108,7 +108,7 @@ final class NewsControllerTest extends DatabaseTestCase
         $content = strval($this->controller()->view($item)->getContent());
 
         self::assertStringContainsString(
-            $item->getTitle()->getValueEN() ?? '',
+            $item->title->getValueEN() ?? '',
             $content,
         );
     }

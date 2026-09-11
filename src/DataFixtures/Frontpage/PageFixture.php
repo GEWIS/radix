@@ -155,12 +155,27 @@ class PageFixture extends Fixture implements FixtureGroupInterface
 
         foreach ($pages as $data) {
             $page = new Page();
-            $page->setCategory(new FrontpageLocalisedText($data['category']['en'], $data['category']['nl']));
-            $page->setSubCategory(new FrontpageLocalisedText($data['subCategory']['en'], $data['subCategory']['nl']));
-            $page->setName(new FrontpageLocalisedText($data['name']['en'], $data['name']['nl']));
-            $page->setTitle(new FrontpageLocalisedText($data['title']['en'], $data['title']['nl']));
-            $page->setContent(new FrontpageLocalisedText($data['content']['en'], $data['content']['nl']));
-            $page->setRequiredRole(UserRoles::Guest);
+            $page->category = new FrontpageLocalisedText(
+                $data['category']['en'],
+                $data['category']['nl'],
+            );
+            $page->subCategory = new FrontpageLocalisedText(
+                $data['subCategory']['en'],
+                $data['subCategory']['nl'],
+            );
+            $page->name = new FrontpageLocalisedText(
+                $data['name']['en'],
+                $data['name']['nl'],
+            );
+            $page->title = new FrontpageLocalisedText(
+                $data['title']['en'],
+                $data['title']['nl'],
+            );
+            $page->content = new FrontpageLocalisedText(
+                $data['content']['en'],
+                $data['content']['nl'],
+            );
+            $page->requiredRole = UserRoles::Guest;
 
             $manager->persist($page);
         }

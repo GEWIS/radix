@@ -40,7 +40,7 @@ final class PollNotificationSubjectNamer extends AbstractNotificationSubjectName
                 continue;
             }
 
-            $names[$id] = $this->localised($revision->getQuestion());
+            $names[$id] = $this->localised($revision->question);
         }
 
         return $names;

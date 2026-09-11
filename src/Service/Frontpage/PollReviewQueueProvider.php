@@ -48,7 +48,7 @@ final readonly class PollReviewQueueProvider implements ReviewQueueProviderInter
                 static function (RevisionInterface $revision): string {
                     assert($revision instanceof PollRevision);
 
-                    return $revision->getQuestion()->getText(Languages::current()) ?? '';
+                    return $revision->question->getText(Languages::current()) ?? '';
                 },
                 'admin/frontpage/polls/approvals/review',
             ),

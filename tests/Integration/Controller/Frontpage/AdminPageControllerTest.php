@@ -61,7 +61,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
         $page = $this->written();
         self::assertSame(
             UserRoles::User,
-            $page->getRequiredRole(),
+            $page->requiredRole,
         );
 
         $this->revise(
@@ -70,7 +70,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             'A changed page',
-            $page->getTitle()->getValueEN(),
+            $page->title->getValueEN(),
         );
 
         $this->controller()->delete($page);
@@ -88,7 +88,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
     {
         $this->write(['content' => '<p onclick="alert(1)">Hello</p><script>alert(2)</script>']);
 
-        $stored = strval($this->written()->getContent()->getValueEN());
+        $stored = strval($this->written()->content->getValueEN());
 
         self::assertStringNotContainsString(
             'script',
@@ -136,7 +136,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
 
         self::assertSame(
             'Still here',
-            $page->getTitle()->getValueEN(),
+            $page->title->getValueEN(),
         );
     }
 
@@ -219,11 +219,11 @@ final class AdminPageControllerTest extends DatabaseTestCase
         $stored = 'pages/images/' . $page->getId() . '/';
         self::assertStringContainsString(
             $stored,
-            strval($page->getContent()->getValueEN()),
+            strval($page->content->getValueEN()),
         );
         self::assertStringNotContainsString(
             'pending',
-            strval($page->getContent()->getValueEN()),
+            strval($page->content->getValueEN()),
         );
 
         $images = self::getContainer()->get(PageImageStore::class)->list(strval($page->getId()));

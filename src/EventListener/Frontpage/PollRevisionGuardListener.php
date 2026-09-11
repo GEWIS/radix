@@ -49,7 +49,7 @@ final readonly class PollRevisionGuardListener
             return;
         }
 
-        if (null === $revision->getPoll()->getLiveRevision()) {
+        if (null === $revision->poll->getLiveRevision()) {
             return;
         }
 

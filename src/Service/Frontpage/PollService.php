@@ -98,7 +98,7 @@ final readonly class PollService
             throw new RuntimeException('This poll is closed.');
         }
 
-        if ($option->getRevision() !== $poll->getLiveRevision()) {
+        if ($option->revision !== $poll->getLiveRevision()) {
             throw new RuntimeException('That answer does not belong to this poll.');
         }
 
@@ -112,8 +112,8 @@ final readonly class PollService
         }
 
         $vote = new PollVote();
-        $vote->setPoll($poll);
-        $vote->setPollOption($option);
+        $vote->poll = $poll;
+        $vote->pollOption = $option;
         $vote->setRespondent($member);
 
         $this->entityManager->persist($vote);
@@ -137,7 +137,7 @@ final readonly class PollService
         return $this->pollVoteRepository->findVote(
             (int) $poll->getId(),
             $member->getLidnr(),
-        )?->getPollOption();
+        )?->pollOption;
     }
 
     /**
@@ -156,16 +156,16 @@ final readonly class PollService
 
         if (
             null !== $parent
-            && $parent->getPoll() !== $poll
+            && $parent->poll !== $poll
         ) {
             throw new RuntimeException('That comment belongs to another poll.');
         }
 
         $comment = new PollComment();
         $comment->setUser($member);
-        $comment->setAuthor($author);
-        $comment->setContent($content);
-        $comment->setCreatedOn(new DateTime());
+        $comment->author = $author;
+        $comment->content = $content;
+        $comment->createdOn = new DateTime();
         $comment->setParent($parent);
         $poll->addComment($comment);
 
@@ -186,7 +186,7 @@ final readonly class PollService
         Member $member,
         PollCommentReactionType $type,
     ): void {
-        if (!$comment->getPoll()->isActive()) {
+        if (!$comment->poll->isActive()) {
             throw new RuntimeException('This poll is closed.');
         }
 
@@ -197,8 +197,8 @@ final readonly class PollService
 
         if (null === $existing) {
             $reaction = new PollCommentReaction();
-            $reaction->setMember($member);
-            $reaction->setType($type);
+            $reaction->member = $member;
+            $reaction->type = $type;
             $comment->addReaction($reaction);
 
             $this->entityManager->persist($reaction);
@@ -207,11 +207,11 @@ final readonly class PollService
             return;
         }
 
-        if ($existing->getType() === $type) {
+        if ($existing->type === $type) {
             $comment->removeReaction($existing);
             $this->entityManager->remove($existing);
         } else {
-            $existing->setType($type);
+            $existing->type = $type;
         }
 
         $this->entityManager->flush();
@@ -223,7 +223,7 @@ final readonly class PollService
      */
     public function softExpire(Poll $poll): void
     {
-        $poll->setExpiryDate(new DateTime('today'));
+        $poll->expiryDate = new DateTime('today');
         $this->entityManager->flush();
     }
 }

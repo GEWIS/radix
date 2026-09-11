@@ -62,7 +62,7 @@ final class FrontpageControllerTest extends DatabaseTestCase
     public function testWithNothingRunningThePollPanelFallsBackToTheLastQuestion(): void
     {
         foreach (self::getContainer()->get(PollRepository::class)->findActivePolls() as $poll) {
-            $poll->setExpiryDate(new DateTime('-1 day'));
+            $poll->expiryDate = new DateTime('-1 day');
         }
 
         $this->entityManager->flush();

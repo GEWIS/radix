@@ -41,8 +41,8 @@ class PageService
         Languages $language,
     ): array {
         $parents = [];
-        $category = $page->getCategory()->getExactText($language);
-        $subCategory = $page->getSubCategory()->getExactText($language);
+        $category = $page->category->getExactText($language);
+        $subCategory = $page->subCategory->getExactText($language);
 
         if (
             null !== $category
@@ -53,7 +53,7 @@ class PageService
                 $category,
             );
 
-            if (null !== $page->getName()->getExactText($language)) {
+            if (null !== $page->name->getExactText($language)) {
                 $parents[] = $this->pageRepository->findPage(
                     $language,
                     $category,

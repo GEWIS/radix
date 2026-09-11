@@ -37,7 +37,7 @@ final readonly class PollStaleRevisionPolicy implements StaleRevisionPolicyInter
             return null;
         }
 
-        $expiryDate = $poll->getExpiryDate();
+        $expiryDate = $poll->expiryDate;
         if (null === $expiryDate) {
             return null;
         }

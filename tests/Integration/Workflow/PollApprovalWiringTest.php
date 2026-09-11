@@ -63,7 +63,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
         }
 
         // Approving is also scheduling, which is why the date is filled in here rather than by whoever asked.
-        $poll->setExpiryDate(new DateTime('+2 weeks'));
+        $poll->expiryDate = new DateTime('+2 weeks');
         $this->entityManager->flush();
 
         self::assertSame(
@@ -156,7 +156,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
         $this->authenticate($creator->getLidnr());
 
         $second = new PollRevision();
-        $second->setQuestion(new FrontpageLocalisedText('And another thing?'));
+        $second->question = new FrontpageLocalisedText('And another thing?');
         $poll->addRevision($second);
 
         self::assertFalse($this->workflow($second)->can(
@@ -171,7 +171,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
     private function request(): Poll
     {
         $revision = new PollRevision();
-        $revision->setQuestion(new FrontpageLocalisedText('Should the coffee be free?'));
+        $revision->question = new FrontpageLocalisedText('Should the coffee be free?');
 
         foreach (
             [
@@ -180,7 +180,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
             ] as $answer
         ) {
             $option = new PollOption();
-            $option->setText(new FrontpageLocalisedText($answer));
+            $option->text = new FrontpageLocalisedText($answer);
             $revision->addOption($option);
         }
 

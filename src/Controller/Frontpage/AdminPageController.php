@@ -81,12 +81,12 @@ class AdminPageController extends AbstractController
     public function create(Request $request): Response
     {
         $page = new Page();
-        $page->setCategory(new FrontpageLocalisedText());
-        $page->setSubCategory(new FrontpageLocalisedText());
-        $page->setName(new FrontpageLocalisedText());
-        $page->setTitle(new FrontpageLocalisedText());
-        $page->setContent(new FrontpageLocalisedText());
-        $page->setRequiredRole(UserRoles::Guest);
+        $page->category = new FrontpageLocalisedText();
+        $page->subCategory = new FrontpageLocalisedText();
+        $page->name = new FrontpageLocalisedText();
+        $page->title = new FrontpageLocalisedText();
+        $page->content = new FrontpageLocalisedText();
+        $page->requiredRole = UserRoles::Guest;
 
         $run = $this->flowRun($request);
 
@@ -161,7 +161,7 @@ class AdminPageController extends AbstractController
             PageData::fromEntity($page),
             [
                 'flow_key' => $run,
-                'role_editable' => UserRoles::ApiUser !== $page->getRequiredRole(),
+                'role_editable' => UserRoles::ApiUser !== $page->requiredRole,
             ],
         );
         $flow->handleRequest($request);
@@ -325,13 +325,13 @@ class AdminPageController extends AbstractController
                 Page $b,
             ) use ($language): int {
                 return [
-                    strval($a->getCategory()->getText($language)),
-                    strval($a->getSubCategory()->getText($language)),
-                    strval($a->getName()->getText($language)),
+                    strval($a->category->getText($language)),
+                    strval($a->subCategory->getText($language)),
+                    strval($a->name->getText($language)),
                 ] <=> [
-                    strval($b->getCategory()->getText($language)),
-                    strval($b->getSubCategory()->getText($language)),
-                    strval($b->getName()->getText($language)),
+                    strval($b->category->getText($language)),
+                    strval($b->subCategory->getText($language)),
+                    strval($b->name->getText($language)),
                 ];
             },
         );

@@ -46,7 +46,7 @@ class PollRevision extends AbstractRevision
         inversedBy: 'revisions',
     )]
     #[JoinColumn(nullable: false)]
-    private Poll $poll;
+    public Poll $poll;
 
     #[ManyToOne(targetEntity: self::class)]
     #[JoinColumn(nullable: true)]
@@ -65,7 +65,7 @@ class PollRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $question;
+    public FrontpageLocalisedText $question;
 
     /** @var Collection<array-key, PollOption> */
     #[OneToMany(
@@ -107,16 +107,6 @@ class PollRevision extends AbstractRevision
         return PollRevisionComment::class;
     }
 
-    public function getPoll(): Poll
-    {
-        return $this->poll;
-    }
-
-    public function setPoll(Poll $poll): void
-    {
-        $this->poll = $poll;
-    }
-
     #[Override]
     public function getPreviousRevision(): ?PollRevision
     {
@@ -134,16 +124,6 @@ class PollRevision extends AbstractRevision
         $this->previousRevision = null;
     }
 
-    public function getQuestion(): FrontpageLocalisedText
-    {
-        return $this->question;
-    }
-
-    public function setQuestion(FrontpageLocalisedText $question): void
-    {
-        $this->question = $question;
-    }
-
     /**
      * @return Collection<array-key, PollOption>
      */
@@ -159,7 +139,7 @@ class PollRevision extends AbstractRevision
         }
 
         $this->options->add($option);
-        $option->setRevision($this);
+        $option->revision = $this;
     }
 
     public function removeOption(PollOption $option): void

@@ -246,11 +246,11 @@ class PollController extends AbstractController
             return;
         }
 
-        $revision->setQuestion($head->getQuestion()->copy());
+        $revision->question = $head->question->copy();
 
         foreach ($head->getOptions() as $option) {
             $copy = new PollOption();
-            $copy->setText($option->getText()->copy());
+            $copy->text = $option->text->copy();
             $revision->addOption($copy);
         }
     }

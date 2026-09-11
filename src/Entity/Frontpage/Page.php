@@ -46,7 +46,7 @@ class Page
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $category;
+    public FrontpageLocalisedText $category;
 
     /**
      * Sub-category of the page.
@@ -65,7 +65,7 @@ class Page
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $subCategory;
+    public FrontpageLocalisedText $subCategory;
 
     /**
      * Name of the page.
@@ -84,7 +84,7 @@ class Page
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $name;
+    public FrontpageLocalisedText $name;
 
     /**
      * Title of the page.
@@ -103,7 +103,7 @@ class Page
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $title;
+    public FrontpageLocalisedText $title;
 
     /**
      * The HTML content of the page.
@@ -122,7 +122,7 @@ class Page
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $content;
+    public FrontpageLocalisedText $content;
 
     /**
      * The minimal role required to view a page.
@@ -131,67 +131,7 @@ class Page
         type: Types::STRING,
         enumType: UserRoles::class,
     )]
-    private UserRoles $requiredRole;
-
-    public function getCategory(): FrontpageLocalisedText
-    {
-        return $this->category;
-    }
-
-    public function setCategory(FrontpageLocalisedText $category): void
-    {
-        $this->category = $category;
-    }
-
-    public function getSubCategory(): FrontpageLocalisedText
-    {
-        return $this->subCategory;
-    }
-
-    public function setSubCategory(FrontpageLocalisedText $subCategory): void
-    {
-        $this->subCategory = $subCategory;
-    }
-
-    public function getName(): FrontpageLocalisedText
-    {
-        return $this->name;
-    }
-
-    public function setName(FrontpageLocalisedText $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getTitle(): FrontpageLocalisedText
-    {
-        return $this->title;
-    }
-
-    public function setTitle(FrontpageLocalisedText $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getContent(): FrontpageLocalisedText
-    {
-        return $this->content;
-    }
-
-    public function setContent(FrontpageLocalisedText $content): void
-    {
-        $this->content = $content;
-    }
-
-    public function getRequiredRole(): UserRoles
-    {
-        return $this->requiredRole;
-    }
-
-    public function setRequiredRole(UserRoles $requiredRole): void
-    {
-        $this->requiredRole = $requiredRole;
-    }
+    public UserRoles $requiredRole;
 
     /**
      * @return array{
@@ -211,17 +151,17 @@ class Page
     public function toArray(): array
     {
         return [
-            'categoryEn' => $this->getCategory()->getValueEN(),
-            'category' => $this->getCategory()->getValueNL(),
-            'subCategoryEn' => $this->getSubCategory()->getValueEN(),
-            'subCategory' => $this->getSubCategory()->getValueNL(),
-            'nameEn' => $this->getName()->getValueEN(),
-            'name' => $this->getName()->getValueNL(),
-            'titleEn' => $this->getTitle()->getValueEN(),
-            'title' => $this->getTitle()->getValueNL(),
-            'contentEn' => $this->getContent()->getValueEN(),
-            'content' => $this->getContent()->getValueNL(),
-            'requiredRole' => $this->getRequiredRole()->value,
+            'categoryEn' => $this->category->getValueEN(),
+            'category' => $this->category->getValueNL(),
+            'subCategoryEn' => $this->subCategory->getValueEN(),
+            'subCategory' => $this->subCategory->getValueNL(),
+            'nameEn' => $this->name->getValueEN(),
+            'name' => $this->name->getValueNL(),
+            'titleEn' => $this->title->getValueEN(),
+            'title' => $this->title->getValueNL(),
+            'contentEn' => $this->content->getValueEN(),
+            'content' => $this->content->getValueNL(),
+            'requiredRole' => $this->requiredRole->value,
         ];
     }
 }

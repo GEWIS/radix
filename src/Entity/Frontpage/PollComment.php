@@ -51,7 +51,7 @@ class PollComment
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Poll $poll;
+    public Poll $poll;
 
     #[ManyToOne(
         targetEntity: self::class,
@@ -62,7 +62,7 @@ class PollComment
         referencedColumnName: 'id',
         nullable: true,
     )]
-    private ?PollComment $parent = null;
+    public private(set) ?PollComment $parent = null;
 
     /** @var Collection<array-key, PollComment> */
     #[OneToMany(
@@ -106,45 +106,24 @@ class PollComment
      * Author of the comment.
      */
     #[Column(type: Types::STRING)]
-    private string $author;
+    public string $author;
 
     /**
      * Comment content.
      */
     #[Column(type: Types::TEXT)]
-    private string $content;
+    public string $content;
 
     /**
      * Comment date.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $createdOn;
+    public DateTime $createdOn;
 
     public function __construct()
     {
         $this->replies = new ArrayCollection();
         $this->reactions = new ArrayCollection();
-    }
-
-    /**
-     * Get the poll.
-     */
-    public function getPoll(): Poll
-    {
-        return $this->poll;
-    }
-
-    /**
-     * Set the poll.
-     */
-    public function setPoll(Poll $poll): void
-    {
-        $this->poll = $poll;
-    }
-
-    public function getParent(): ?PollComment
-    {
-        return $this->parent;
     }
 
     public function setParent(?PollComment $parent): void
@@ -189,7 +168,7 @@ class PollComment
         }
 
         $this->reactions->add($reaction);
-        $reaction->setComment($this);
+        $reaction->comment = $this;
     }
 
     public function removeReaction(PollCommentReaction $reaction): void
@@ -205,7 +184,7 @@ class PollComment
         $counts = [];
 
         foreach ($this->reactions as $reaction) {
-            $type = $reaction->getType()->value;
+            $type = $reaction->type->value;
             $counts[$type] = ($counts[$type] ?? 0) + 1;
         }
 
@@ -215,11 +194,11 @@ class PollComment
     public function getReactionOf(MemberModel $member): ?PollCommentReactionType
     {
         foreach ($this->reactions as $reaction) {
-            if ($reaction->getMember()?->getLidnr() !== $member->getLidnr()) {
+            if ($reaction->member?->getLidnr() !== $member->getLidnr()) {
                 continue;
             }
 
-            return $reaction->getType();
+            return $reaction->type;
         }
 
         return null;
@@ -242,63 +221,15 @@ class PollComment
     }
 
     /**
-     * Get the author.
-     */
-    public function getAuthor(): string
-    {
-        return $this->author;
-    }
-
-    /**
-     * Set the author.
-     */
-    public function setAuthor(string $author): void
-    {
-        $this->author = $author;
-    }
-
-    /**
-     * Get the content.
-     */
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    /**
-     * Set the content.
-     */
-    public function setContent(string $content): void
-    {
-        $this->content = $content;
-    }
-
-    /**
-     * Get the creation date.
-     */
-    public function getCreatedOn(): DateTime
-    {
-        return $this->createdOn;
-    }
-
-    /**
-     * Set the creation date.
-     */
-    public function setCreatedOn(DateTime $createdOn): void
-    {
-        $this->createdOn = $createdOn;
-    }
-
-    /**
      * @return PollCommentGdprArrayType
      */
     public function toGdprArray(): array
     {
         return [
             'id' => $this->getId(),
-            'createdOn' => $this->getCreatedOn()->format(DateTimeInterface::ATOM),
-            'author' => $this->getAuthor(),
-            'content' => $this->getContent(),
+            'createdOn' => $this->createdOn->format(DateTimeInterface::ATOM),
+            'author' => $this->author,
+            'content' => $this->content,
         ];
     }
 }

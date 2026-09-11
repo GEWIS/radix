@@ -45,13 +45,13 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             $revision,
-            $revision->getPoll()->getLiveRevision(),
+            $revision->poll->getLiveRevision(),
         );
         self::assertSame(
             $closesOn->format('Y-m-d'),
-            $revision->getPoll()->getExpiryDate()?->format('Y-m-d'),
+            $revision->poll->expiryDate?->format('Y-m-d'),
         );
-        self::assertTrue($revision->getPoll()->isActive());
+        self::assertTrue($revision->poll->isActive());
     }
 
     public function testApprovingWithoutADateIsRefused(): void
@@ -126,7 +126,7 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
             RevisionStatus::Rejected,
             $revision->getStatus(),
         );
-        self::assertNull($revision->getPoll()->getLiveRevision());
+        self::assertNull($revision->poll->getLiveRevision());
     }
 
     /**
@@ -149,8 +149,8 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
             RevisionStatus::InReview,
             $revision->getStatus(),
         );
-        self::assertNull($revision->getPoll()->getLiveRevision());
-        self::assertNull($revision->getPoll()->getExpiryDate());
+        self::assertNull($revision->poll->getLiveRevision());
+        self::assertNull($revision->poll->expiryDate);
         self::assertStringContainsString(
             $refusal,
             strval($response->getContent()),

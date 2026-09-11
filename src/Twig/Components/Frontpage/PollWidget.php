@@ -221,7 +221,7 @@ final class PollWidget
     public function daysLeft(): ?int
     {
         $poll = $this->poll();
-        $expiryDate = $poll->getExpiryDate();
+        $expiryDate = $poll->expiryDate;
 
         if (
             null === $expiryDate

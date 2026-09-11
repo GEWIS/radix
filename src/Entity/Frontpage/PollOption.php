@@ -35,7 +35,7 @@ class PollOption
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private PollRevision $revision;
+    public PollRevision $revision;
 
     /**
      * The localised text for this option.
@@ -53,7 +53,7 @@ class PollOption
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $text;
+    public FrontpageLocalisedText $text;
 
     /**
      * Votes for this option.
@@ -79,7 +79,7 @@ class PollOption
         type: Types::INTEGER,
         options: ['default' => 0],
     )]
-    private int $anonymousVotes = 0;
+    public int $anonymousVotes = 0;
 
     /**
      * How many votes this option was given, counted for it by the poll repository while it primed the results. That
@@ -97,16 +97,6 @@ class PollOption
         );
     }
 
-    public function getRevision(): PollRevision
-    {
-        return $this->revision;
-    }
-
-    public function setRevision(PollRevision $revision): void
-    {
-        $this->revision = $revision;
-    }
-
     /**
      * @return Collection<array-key, PollVote>
      */
@@ -115,36 +105,16 @@ class PollOption
         return $this->votes;
     }
 
-    public function getText(): FrontpageLocalisedText
-    {
-        return $this->text;
-    }
-
-    public function setText(FrontpageLocalisedText $text): void
-    {
-        $this->text = $text;
-    }
-
     /**
      * Get the number of votes for this poll option.
      */
     public function getVotesCount(): int
     {
-        return ($this->countedVotes ?? $this->votes->count()) + $this->getAnonymousVotes();
+        return ($this->countedVotes ?? $this->votes->count()) + $this->anonymousVotes;
     }
 
     public function setCountedVotes(int $countedVotes): void
     {
         $this->countedVotes = $countedVotes;
-    }
-
-    public function getAnonymousVotes(): int
-    {
-        return $this->anonymousVotes;
-    }
-
-    public function setAnonymousVotes(int $anonymousVotes): void
-    {
-        $this->anonymousVotes = $anonymousVotes;
     }
 }

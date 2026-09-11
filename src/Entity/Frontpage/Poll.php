@@ -56,7 +56,7 @@ class Poll implements RevisableInterface
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $expiryDate = null;
+    public ?DateTime $expiryDate = null;
 
     /** @var Collection<array-key, PollRevision> */
     #[OneToMany(
@@ -79,7 +79,7 @@ class Poll implements RevisableInterface
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $votesAnonymisedAt = null;
+    public ?DateTime $votesAnonymisedAt = null;
 
     /** @var Collection<array-key, PollComment> */
     #[OneToMany(
@@ -112,26 +112,6 @@ class Poll implements RevisableInterface
         $this->comments = new ArrayCollection();
     }
 
-    public function getExpiryDate(): ?DateTime
-    {
-        return $this->expiryDate;
-    }
-
-    public function setExpiryDate(?DateTime $expiryDate): void
-    {
-        $this->expiryDate = $expiryDate;
-    }
-
-    public function getVotesAnonymisedAt(): ?DateTime
-    {
-        return $this->votesAnonymisedAt;
-    }
-
-    public function setVotesAnonymisedAt(?DateTime $votesAnonymisedAt): void
-    {
-        $this->votesAnonymisedAt = $votesAnonymisedAt;
-    }
-
     /**
      * @return Collection<array-key, PollRevision>
      */
@@ -148,7 +128,7 @@ class Poll implements RevisableInterface
         }
 
         $this->revisions->add($revision);
-        $revision->setPoll($this);
+        $revision->poll = $this;
     }
 
     #[Override]
@@ -260,7 +240,7 @@ class Poll implements RevisableInterface
         $comments = [];
 
         foreach ($this->comments as $comment) {
-            if (null !== $comment->getParent()) {
+            if (null !== $comment->parent) {
                 continue;
             }
 
@@ -277,12 +257,12 @@ class Poll implements RevisableInterface
         }
 
         $this->comments->add($comment);
-        $comment->setPoll($this);
+        $comment->poll = $this;
     }
 
     public function getQuestion(): ?FrontpageLocalisedText
     {
-        return $this->liveRevision?->getQuestion();
+        return $this->liveRevision?->question;
     }
 
     /**
@@ -354,7 +334,7 @@ class Poll implements RevisableInterface
             foreach ($revision->getOptions() as $option) {
                 $options[] = [
                     'id' => $option->getId(),
-                    'value' => $option->getText()->toGdprArray(),
+                    'value' => $option->text->toGdprArray(),
                 ];
             }
         }
@@ -362,7 +342,7 @@ class Poll implements RevisableInterface
         return [
             'id' => $this->getId(),
             'expiryDate' => $this->expiryDate?->format(DateTimeInterface::ATOM),
-            'question' => $revision?->getQuestion()->toGdprArray(),
+            'question' => $revision?->question->toGdprArray(),
             'options' => $options,
         ];
     }

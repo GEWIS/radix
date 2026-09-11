@@ -145,7 +145,7 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
             $expiryDate = $form->get('expiryDate')->getData();
             assert($expiryDate instanceof DateTime);
 
-            $revision->getPoll()->setExpiryDate($expiryDate);
+            $revision->poll->expiryDate = $expiryDate;
         }
 
         return parent::applyDecision(
@@ -199,9 +199,9 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
         assert($revision instanceof PollRevision);
 
         return [
-            'poll' => $revision->getPoll(),
-            'subjectName' => $revision->getQuestion()->getText(Languages::current()) ?? '',
-            'comments' => $this->commentRepository->findThreadForPoll($revision->getPoll()),
+            'poll' => $revision->poll,
+            'subjectName' => $revision->question->getText(Languages::current()) ?? '',
+            'comments' => $this->commentRepository->findThreadForPoll($revision->poll),
         ];
     }
 

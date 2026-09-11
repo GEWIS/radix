@@ -95,17 +95,17 @@ class NewsItemFixture extends Fixture implements FixtureGroupInterface
 
         foreach ($items as $item) {
             $news = new NewsItem();
-            $news->setDate(new DateTime('-' . $item['days'] . ' days'));
-            $news->setCategory($item['category']);
-            $news->setPinned($item['pinned']);
-            $news->setTitle(new FrontpageLocalisedText(
+            $news->date = new DateTime('-' . $item['days'] . ' days');
+            $news->category = $item['category'];
+            $news->pinned = $item['pinned'];
+            $news->title = new FrontpageLocalisedText(
                 $item['titleEN'],
                 $item['titleNL'],
-            ));
-            $news->setContent(new FrontpageLocalisedText(
+            );
+            $news->content = new FrontpageLocalisedText(
                 $item['contentEN'],
                 $item['contentNL'],
-            ));
+            );
 
             $manager->persist($news);
         }

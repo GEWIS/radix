@@ -65,7 +65,7 @@ final class SanitisePagesCommand extends Command
         $changed = 0;
 
         foreach ($this->pageRepository->findAll() as $page) {
-            $content = $page->getContent();
+            $content = $page->content;
             $english = $this->sanitizer->sanitize($content->getValueEN());
             $dutch = $this->sanitizer->sanitize($content->getValueNL());
 

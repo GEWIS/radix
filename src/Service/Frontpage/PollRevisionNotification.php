@@ -56,7 +56,7 @@ final readonly class PollRevisionNotification implements RevisionNotificationInt
 
         return sprintf(
             'Poll requested: %s',
-            $revision->getQuestion()->getText(Languages::English) ?? '',
+            $revision->question->getText(Languages::English) ?? '',
         );
     }
 }

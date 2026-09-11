@@ -27,7 +27,7 @@ class NewsItem
      * The date the news item was written.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $date;
+    public DateTime $date;
 
     /**
      * Title of the news item.
@@ -46,7 +46,7 @@ class NewsItem
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $title;
+    public FrontpageLocalisedText $title;
 
     /**
      * The body of the news item, as markdown.
@@ -65,7 +65,7 @@ class NewsItem
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private FrontpageLocalisedText $content;
+    public FrontpageLocalisedText $content;
 
     /**
      * What the item is about, which is what the feed's filter narrows by.
@@ -74,61 +74,11 @@ class NewsItem
         type: Types::STRING,
         enumType: NewsCategory::class,
     )]
-    private NewsCategory $category = NewsCategory::Association;
+    public NewsCategory $category = NewsCategory::Association;
 
     /**
      * Whether this news item is pinned to the top of the news section or not.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $pinned;
-
-    public function getCategory(): NewsCategory
-    {
-        return $this->category;
-    }
-
-    public function setCategory(NewsCategory $category): void
-    {
-        $this->category = $category;
-    }
-
-    public function getPinned(): bool
-    {
-        return $this->pinned;
-    }
-
-    public function setPinned(bool $pinned): void
-    {
-        $this->pinned = $pinned;
-    }
-
-    public function getDate(): DateTime
-    {
-        return $this->date;
-    }
-
-    public function getTitle(): FrontpageLocalisedText
-    {
-        return $this->title;
-    }
-
-    public function setTitle(FrontpageLocalisedText $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getContent(): FrontpageLocalisedText
-    {
-        return $this->content;
-    }
-
-    public function setContent(FrontpageLocalisedText $content): void
-    {
-        $this->content = $content;
-    }
-
-    public function setDate(DateTime $date): void
-    {
-        $this->date = $date;
-    }
+    public bool $pinned;
 }

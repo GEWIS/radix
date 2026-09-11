@@ -95,41 +95,41 @@ final class PageData
     {
         $data = new self();
         $data->pageId = $page->getId();
-        $data->requiredRole = $page->getRequiredRole();
-        $data->categoryNL = $page->getCategory()->getValueNL();
-        $data->categoryEN = $page->getCategory()->getValueEN();
-        $data->subCategoryNL = $page->getSubCategory()->getValueNL();
-        $data->subCategoryEN = $page->getSubCategory()->getValueEN();
-        $data->nameNL = $page->getName()->getValueNL();
-        $data->nameEN = $page->getName()->getValueEN();
-        $data->titleNL = $page->getTitle()->getValueNL();
-        $data->titleEN = $page->getTitle()->getValueEN();
-        $data->contentNL = $page->getContent()->getValueNL();
-        $data->contentEN = $page->getContent()->getValueEN();
+        $data->requiredRole = $page->requiredRole;
+        $data->categoryNL = $page->category->getValueNL();
+        $data->categoryEN = $page->category->getValueEN();
+        $data->subCategoryNL = $page->subCategory->getValueNL();
+        $data->subCategoryEN = $page->subCategory->getValueEN();
+        $data->nameNL = $page->name->getValueNL();
+        $data->nameEN = $page->name->getValueEN();
+        $data->titleNL = $page->title->getValueNL();
+        $data->titleEN = $page->title->getValueEN();
+        $data->contentNL = $page->content->getValueNL();
+        $data->contentEN = $page->content->getValueEN();
 
         return $data;
     }
 
     public function applyTo(Page $page): void
     {
-        $page->setRequiredRole($this->requiredRole);
-        $page->getCategory()->updateValues(
+        $page->requiredRole = $this->requiredRole;
+        $page->category->updateValues(
             $this->categoryEN,
             $this->categoryNL,
         );
-        $page->getSubCategory()->updateValues(
+        $page->subCategory->updateValues(
             $this->subCategoryEN,
             $this->subCategoryNL,
         );
-        $page->getName()->updateValues(
+        $page->name->updateValues(
             $this->nameEN,
             $this->nameNL,
         );
-        $page->getTitle()->updateValues(
+        $page->title->updateValues(
             $this->titleEN,
             $this->titleNL,
         );
-        $page->getContent()->updateValues(
+        $page->content->updateValues(
             $this->contentEN,
             $this->contentNL,
         );

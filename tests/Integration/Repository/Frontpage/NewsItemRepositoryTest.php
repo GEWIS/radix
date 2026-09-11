@@ -29,7 +29,7 @@ final class NewsItemRepositoryTest extends DatabaseTestCase
 
         $pinned = 0;
         foreach ($feed as $item) {
-            if (!$item->getPinned()) {
+            if (!$item->pinned) {
                 break;
             }
 
@@ -48,7 +48,7 @@ final class NewsItemRepositoryTest extends DatabaseTestCase
                 $pinned,
             ) as $item
         ) {
-            self::assertFalse($item->getPinned());
+            self::assertFalse($item->pinned);
         }
     }
 
@@ -56,7 +56,7 @@ final class NewsItemRepositoryTest extends DatabaseTestCase
     {
         $unpinned = [];
         foreach ($this->repository()->findFeed(limit: 50) as $item) {
-            if ($item->getPinned()) {
+            if ($item->pinned) {
                 continue;
             }
 
@@ -64,7 +64,7 @@ final class NewsItemRepositoryTest extends DatabaseTestCase
         }
 
         $dates = array_map(
-            static fn (NewsItem $item): int => $item->getDate()->getTimestamp(),
+            static fn (NewsItem $item): int => $item->date->getTimestamp(),
             $unpinned,
         );
 

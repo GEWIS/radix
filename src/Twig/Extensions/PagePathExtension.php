@@ -82,9 +82,9 @@ class PagePathExtension extends AbstractExtension
 
         $params = [
             '_locale' => $locale->getLangParam(),
-            'category' => $page->getCategory()->getExactText($locale),
-            'subCategory' => $page->getSubCategory()->getExactText($locale),
-            'name' => $page->getName()->getExactText($locale),
+            'category' => $page->category->getExactText($locale),
+            'subCategory' => $page->subCategory->getExactText($locale),
+            'name' => $page->name->getExactText($locale),
         ];
 
         return $this->urlGenerator->generate(

@@ -46,7 +46,7 @@ class PollCommentReaction
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private PollComment $comment;
+    public PollComment $comment;
 
     /**
      * The member who reacted, or null once the poll has been anonymised.
@@ -58,41 +58,11 @@ class PollCommentReaction
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?MemberModel $member = null;
+    public ?MemberModel $member = null;
 
     #[Column(
         type: Types::STRING,
         enumType: PollCommentReactionType::class,
     )]
-    private PollCommentReactionType $type;
-
-    public function getComment(): PollComment
-    {
-        return $this->comment;
-    }
-
-    public function setComment(PollComment $comment): void
-    {
-        $this->comment = $comment;
-    }
-
-    public function getMember(): ?MemberModel
-    {
-        return $this->member;
-    }
-
-    public function setMember(?MemberModel $member): void
-    {
-        $this->member = $member;
-    }
-
-    public function getType(): PollCommentReactionType
-    {
-        return $this->type;
-    }
-
-    public function setType(PollCommentReactionType $type): void
-    {
-        $this->type = $type;
-    }
+    public PollCommentReactionType $type;
 }

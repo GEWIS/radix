@@ -53,21 +53,21 @@ final class AdminNewsControllerTest extends DatabaseTestCase
         $written = $this->anItemTitled('Something new');
         self::assertSame(
             NewsCategory::Committees,
-            $written->getCategory(),
+            $written->category,
         );
-        self::assertTrue($written->getPinned());
+        self::assertTrue($written->pinned);
 
         $this->controller()->edit(
             $this->form([
-                'date' => $written->getDate()->format('Y-m-d'),
+                'date' => $written->date->format('Y-m-d'),
                 'category' => NewsCategory::Education->value,
                 'title' => [
-                    'valueNL' => $written->getTitle()->getValueNL(),
+                    'valueNL' => $written->title->getValueNL(),
                     'valueEN' => 'Something changed',
                 ],
                 'content' => [
-                    'valueNL' => $written->getContent()->getValueNL(),
-                    'valueEN' => $written->getContent()->getValueEN(),
+                    'valueNL' => $written->content->getValueNL(),
+                    'valueEN' => $written->content->getValueEN(),
                 ],
             ]),
             $written,
@@ -75,14 +75,14 @@ final class AdminNewsControllerTest extends DatabaseTestCase
 
         self::assertSame(
             'Something changed',
-            $written->getTitle()->getValueEN(),
+            $written->title->getValueEN(),
         );
         self::assertSame(
             NewsCategory::Education,
-            $written->getCategory(),
+            $written->category,
         );
         // The box was left unticked this time, which has to un-pin it rather than leave it as it was.
-        self::assertFalse($written->getPinned());
+        self::assertFalse($written->pinned);
 
         $this->controller()->delete($written);
 

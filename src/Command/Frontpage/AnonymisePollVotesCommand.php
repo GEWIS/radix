@@ -94,7 +94,7 @@ final class AnonymisePollVotesCommand extends Command
                     $votes += $this->anonymiseVotes($poll);
                     $reactions += $this->reactionRepository->anonymiseForPoll($poll);
 
-                    $poll->setVotesAnonymisedAt(new DateTime());
+                    $poll->votesAnonymisedAt = new DateTime();
                     $this->entityManager->flush();
                 },
             );
@@ -122,9 +122,7 @@ final class AnonymisePollVotesCommand extends Command
         $counts = $this->voteRepository->countsForPoll($poll);
 
         foreach ($poll->getOptions() as $option) {
-            $option->setAnonymousVotes(
-                $option->getAnonymousVotes() + ($counts[intval($option->getId())] ?? 0),
-            );
+            $option->anonymousVotes = $option->anonymousVotes + ($counts[intval($option->getId())] ?? 0);
         }
 
         return $this->voteRepository->deleteForPoll($poll);
