@@ -24,7 +24,7 @@ final class CompanyUserRepositoryTest extends DatabaseTestCase
         );
         self::assertSame(
             'Nexunt Systems',
-            $companyUser->getCompany()->getName(),
+            $companyUser->getCompany()->name,
         );
     }
 

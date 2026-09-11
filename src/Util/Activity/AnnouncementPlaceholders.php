@@ -246,7 +246,7 @@ final class AnnouncementPlaceholders
             // states for a proposal without one. There is nothing to abbreviate, so both use the same text.
             AnnouncementPlaceholder::OrganName => $activity->getOrgan()?->getName() ?? 'the board',
             AnnouncementPlaceholder::OrganAbbr => $activity->getOrgan()?->getAbbr() ?? 'the board',
-            AnnouncementPlaceholder::CompanyName => $activity->getCompany()?->getName() ?? '',
+            AnnouncementPlaceholder::CompanyName => $activity->getCompany()->name ?? '',
             AnnouncementPlaceholder::Location => $activity->getLocation()->getText($language) ?? '',
             AnnouncementPlaceholder::Costs => $activity->getCosts()->getText($language) ?? '',
             AnnouncementPlaceholder::BeginTime => $activity->getBeginTime()->format('j F Y, H:i'),

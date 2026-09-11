@@ -23,8 +23,8 @@ final class CompanyAuditLogTest extends TestCase
     public function testRejectsBeingAttributedToBothAMemberAndARepresentative(): void
     {
         $entry = new CompanyAuditLog();
-        $entry->setActor(self::createStub(User::class));
-        $entry->setActorCompanyUser(self::createStub(CompanyUser::class));
+        $entry->actor = self::createStub(User::class);
+        $entry->actorCompanyUser = self::createStub(CompanyUser::class);
 
         $this->expectException(LogicException::class);
         $entry->assertSingleActor();
@@ -36,7 +36,7 @@ final class CompanyAuditLogTest extends TestCase
         $companyUser->method('getDisplayName')->willReturn('Ilse Vermeer (Nexunt Systems)');
 
         $entry = new CompanyAuditLog();
-        $entry->setActorCompanyUser($companyUser);
+        $entry->actorCompanyUser = $companyUser;
 
         self::assertSame(
             'Ilse Vermeer (Nexunt Systems)',

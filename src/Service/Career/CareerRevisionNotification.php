@@ -72,11 +72,11 @@ final readonly class CareerRevisionNotification implements RevisionNotificationI
         return match (true) {
             $revision instanceof CompanyRevision => sprintf(
                 'Company profile submitted for review: %s',
-                $revision->getCompany()->getName(),
+                $revision->company->name,
             ),
             $revision instanceof VacancyRevision => sprintf(
                 'Vacancy submitted for review: %s',
-                $revision->getName()->getText(Languages::English) ?? $revision->getVacancy()->getSlugName(),
+                $revision->name->getText(Languages::English) ?? $revision->vacancy->slugName,
             ),
             default => throw new RuntimeException(sprintf(
                 'A career notification cannot be raised for "%s".',

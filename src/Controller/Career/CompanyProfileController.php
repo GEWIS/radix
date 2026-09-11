@@ -150,8 +150,8 @@ class CompanyProfileController extends AbstractRevisionReviewController
             [
                 'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
-                'has_square_logo' => null !== $current->getSquareLogo(),
-                'has_banner_logo' => null !== $current->getBannerLogo(),
+                'has_square_logo' => null !== $current->squareLogo,
+                'has_banner_logo' => null !== $current->bannerLogo,
             ],
         );
         $flow->handleRequest($request);
@@ -459,7 +459,7 @@ class CompanyProfileController extends AbstractRevisionReviewController
         RevisionActions $actions,
     ): array {
         assert($revision instanceof CompanyRevision);
-        $company = $revision->getCompany();
+        $company = $revision->company;
 
         return [
             'company' => $company,

@@ -90,9 +90,15 @@ final class CompanyOverviewTest extends DatabaseTestCase
     {
         for ($i = 0; $i < $count; $i++) {
             $company = new Company();
-            $company->setName(sprintf('Paging Test %02d', $i));
-            $company->setSlugName(sprintf('paging-test-%02d', $i));
-            $company->setPublished(false);
+            $company->name = sprintf(
+                'Paging Test %02d',
+                $i,
+            );
+            $company->slugName = sprintf(
+                'paging-test-%02d',
+                $i,
+            );
+            $company->published = false;
             $this->entityManager->persist($company);
         }
 
@@ -105,7 +111,7 @@ final class CompanyOverviewTest extends DatabaseTestCase
     private function names(CompanyOverview $component): array
     {
         return array_map(
-            static fn (Company $company): string => $company->getName(),
+            static fn (Company $company): string => $company->name,
             $component->getCompanies(),
         );
     }

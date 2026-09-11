@@ -112,10 +112,10 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $draft->setStatus(RevisionStatus::Submitted);
         $draft->setSubmittedAt(new DateTime('-2 days'));
         $draft->setAuthorCompanyUser($author);
-        $draft->setSlogan(new CareerLocalisedText(
+        $draft->slogan = new CareerLocalisedText(
             self::SUBMITTED_SLOGAN,
             'Sneller van data naar beslissingen',
-        ));
+        );
 
         $manager->persist($draft);
     }
@@ -134,10 +134,10 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $draft->setAuthorCompanyUser($author);
         $draft->setReviewer($reviewer->getMember());
         $draft->setReviewedAt(new DateTime('-3 days'));
-        $draft->setDescription(new CareerLocalisedText(
+        $draft->description = new CareerLocalisedText(
             'Delta Robotics builds cobots. Contact us at info@example.com for a quote.',
             'Delta Robotics bouwt cobots. Neem contact op via info@example.com voor een offerte.',
-        ));
+        );
 
         $comment = new CompanyRevisionComment();
         $comment->setRevision($draft);
@@ -219,7 +219,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
             $package->proposeImage(
                 $this->imageGenerator->storeBanner(
                     $company,
-                    $package->getFormat(),
+                    $package->format,
                     self::SUBMITTED_SLOGAN,
                 ),
                 $author,
@@ -262,15 +262,15 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $draft = new CompanyRevision();
         $draft->setRevisionNumber($source->getRevisionNumber() + 1);
         $draft->setPreviousRevision($source);
-        $draft->setSlogan($source->getSlogan()->copy());
-        $draft->setWebsite($source->getWebsite()->copy());
-        $draft->setDescription($source->getDescription()->copy());
-        $draft->setSquareLogo($source->getSquareLogo());
-        $draft->setBannerLogo($source->getBannerLogo());
-        $draft->setContactName($source->getContactName());
-        $draft->setContactEmail($source->getContactEmail());
-        $draft->setContactPhone($source->getContactPhone());
-        $draft->setContactAddress($source->getContactAddress());
+        $draft->slogan = $source->slogan->copy();
+        $draft->website = $source->website->copy();
+        $draft->description = $source->description->copy();
+        $draft->squareLogo = $source->squareLogo;
+        $draft->bannerLogo = $source->bannerLogo;
+        $draft->contactName = $source->contactName;
+        $draft->contactEmail = $source->contactEmail;
+        $draft->contactPhone = $source->contactPhone;
+        $draft->contactAddress = $source->contactAddress;
 
         $company->addRevision($draft);
         $company->setCurrentRevision($draft);
@@ -285,17 +285,17 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $draft = new VacancyRevision();
         $draft->setRevisionNumber($source->getRevisionNumber() + 1);
         $draft->setPreviousRevision($source);
-        $draft->setName($source->getName()->copy());
-        $draft->setLocation($source->getLocation()->copy());
-        $draft->setWebsite($source->getWebsite()->copy());
-        $draft->setDescription($source->getDescription()->copy());
-        $draft->setAttachment($source->getAttachment()->copy());
-        $draft->setContactName($source->getContactName());
-        $draft->setContactPhone($source->getContactPhone());
-        $draft->setContactEmail($source->getContactEmail());
-        $draft->setCategory($source->getCategory());
-        $draft->setStartDate($source->getStartDate());
-        $draft->setEndDate($source->getEndDate());
+        $draft->name = $source->name->copy();
+        $draft->location = $source->location->copy();
+        $draft->website = $source->website->copy();
+        $draft->description = $source->description->copy();
+        $draft->attachment = $source->attachment->copy();
+        $draft->contactName = $source->contactName;
+        $draft->contactPhone = $source->contactPhone;
+        $draft->contactEmail = $source->contactEmail;
+        $draft->category = $source->category;
+        $draft->startDate = $source->startDate;
+        $draft->endDate = $source->endDate;
         $draft->addLabels($source->getLabels()->toArray());
 
         $vacancy->addRevision($draft);

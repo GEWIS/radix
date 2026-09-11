@@ -198,7 +198,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
     public function testThePackageAVacancyIsAlreadySoldUnderStaysChoosable(): void
     {
         $vacancy = $this->seededVacancy('backend-engineer');
-        $current = (int) $vacancy->getPackage()->getId();
+        $current = (int) $vacancy->package->getId();
 
         $data = new VacancyData();
         $data->step = VacancyData::STEP_GENERAL;

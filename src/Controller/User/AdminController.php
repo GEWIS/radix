@@ -189,7 +189,7 @@ class AdminController extends AbstractController
         return $this->render(
             'user/admin/sessions.html.twig',
             [
-                'subjectLabel' => $companyUser->getCompany()->getName(),
+                'subjectLabel' => $companyUser->getCompany()->name,
                 'sessions' => $this->sessionManager->getActiveSessions(
                     $companyUser,
                     'company',

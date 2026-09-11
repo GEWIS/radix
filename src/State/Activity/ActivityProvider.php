@@ -250,7 +250,7 @@ final readonly class ActivityProvider implements ProviderInterface
 
         return [
             'id' => $id,
-            'name' => $company->getName(),
+            'name' => $company->name,
         ];
     }
 

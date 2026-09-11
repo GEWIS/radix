@@ -47,7 +47,7 @@ final readonly class CompanyReviewQueueProvider implements ReviewQueueProviderIn
                 static function (RevisionInterface $revision): string {
                     assert($revision instanceof CompanyRevision);
 
-                    return $revision->getCompany()->getName();
+                    return $revision->company->name;
                 },
                 'admin/career/approvals/company',
             ),

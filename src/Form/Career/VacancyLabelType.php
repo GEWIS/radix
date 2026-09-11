@@ -65,7 +65,7 @@ class VacancyLabelType extends AbstractType
 
         $this->requireBoth(
             $event->getForm()->get('name'),
-            $label->getName(),
+            $label->name,
             $this->translator->trans('Enter the name in both languages.'),
         );
     }

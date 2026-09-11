@@ -168,7 +168,7 @@ class GeneralStepType extends AbstractType
 
         foreach ($this->applyOrder($qb)->getQuery()->getResult() as $package) {
             assert($package instanceof CompanyJobPackage);
-            $label = $package->getCompany()->getName()
+            $label = $package->company->name
                 . ' (' . $package->getExpirationDate()->format('Y-m-d') . ')';
             $choices[$label] = (int) $package->getId();
         }
@@ -194,7 +194,7 @@ class GeneralStepType extends AbstractType
 
         foreach ($this->vacancyLabelRepository->findAll() as $label) {
             assert($label instanceof VacancyLabel);
-            $choices[$label->getName()->getText($language) ?? ''] = (int) $label->getId();
+            $choices[$label->name->getText($language) ?? ''] = (int) $label->getId();
         }
 
         return $choices;

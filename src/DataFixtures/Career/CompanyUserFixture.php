@@ -85,7 +85,7 @@ class CompanyUserFixture extends Fixture implements DependentFixtureInterface, F
                 }
 
                 if (0 === $index) {
-                    $company->setPrimaryContact($companyUser);
+                    $company->primaryContact = $companyUser;
                 }
 
                 $manager->persist($companyUser);

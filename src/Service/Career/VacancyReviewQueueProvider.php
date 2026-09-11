@@ -47,7 +47,7 @@ final readonly class VacancyReviewQueueProvider implements ReviewQueueProviderIn
                 static function (RevisionInterface $revision): string {
                     assert($revision instanceof VacancyRevision);
 
-                    return $revision->getVacancy()->getSlugName();
+                    return $revision->vacancy->slugName;
                 },
                 'admin/career/approvals/vacancy',
             ),

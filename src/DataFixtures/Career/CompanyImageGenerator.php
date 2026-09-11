@@ -116,7 +116,7 @@ final readonly class CompanyImageGenerator
             $width,
             $height,
         );
-        $background = $this->colorFor($company->getName() . $slogan);
+        $background = $this->colorFor($company->name . $slogan);
         $this->fill(
             $image,
             $background,
@@ -138,7 +138,7 @@ final readonly class CompanyImageGenerator
         );
         $this->drawText(
             $image,
-            $this->monogram($company->getName()),
+            $this->monogram($company->name),
             intdiv(
                 $height,
                 2,
@@ -164,7 +164,7 @@ final readonly class CompanyImageGenerator
         );
         $this->drawText(
             $image,
-            $company->getName(),
+            $company->name,
             $columnCentre,
             intdiv(
                 $height * 2,
@@ -204,7 +204,7 @@ final readonly class CompanyImageGenerator
             $size,
             $size,
         );
-        $background = $this->colorFor($company->getName());
+        $background = $this->colorFor($company->name);
         $this->fill(
             $image,
             $background,
@@ -216,7 +216,7 @@ final readonly class CompanyImageGenerator
 
         $this->drawText(
             $image,
-            $this->monogram($company->getName()),
+            $this->monogram($company->name),
             intdiv(
                 $size,
                 2,
@@ -244,12 +244,12 @@ final readonly class CompanyImageGenerator
     public function storeBannerLogo(Company $company): string
     {
         $height = self::BANNER_LOGO_HEIGHT;
-        $width = $height * (2 + abs(crc32($company->getName())) % 3);
+        $width = $height * (2 + abs(crc32($company->name)) % 3);
         $image = $this->createCanvas(
             $width,
             $height,
         );
-        $background = $this->colorFor($company->getName());
+        $background = $this->colorFor($company->name);
         $this->fill(
             $image,
             $background,
@@ -270,7 +270,7 @@ final readonly class CompanyImageGenerator
         );
         $this->drawText(
             $image,
-            $this->monogram($company->getName()),
+            $this->monogram($company->name),
             intdiv(
                 $height,
                 2,
@@ -292,7 +292,7 @@ final readonly class CompanyImageGenerator
         $columnWidth = $width - $height;
         $this->drawText(
             $image,
-            $company->getName(),
+            $company->name,
             $height + intdiv(
                 $columnWidth,
                 2,

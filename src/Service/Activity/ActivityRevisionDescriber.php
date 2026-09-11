@@ -58,8 +58,8 @@ final class ActivityRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Organising company'),
                         RevisionFieldKind::Reference,
-                        $previous?->getCompany()?->getName(),
-                        $revision->getCompany()?->getName(),
+                        $previous?->getCompany()?->name,
+                        $revision->getCompany()?->name,
                         $comparable,
                         ['width' => 'half'],
                         emptyLabel: t('None'),

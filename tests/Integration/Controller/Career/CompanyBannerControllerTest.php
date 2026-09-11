@@ -29,7 +29,7 @@ final class CompanyBannerControllerTest extends DatabaseTestCase
         $wasLive = $package->getImage();
 
         $this->controller()->index(
-            $this->bannerUploadRequest($package->getFormat()),
+            $this->bannerUploadRequest($package->format),
             $companyUser,
         );
 
@@ -40,7 +40,7 @@ final class CompanyBannerControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             $companyUser,
-            $package->getPendingImageSubmittedBy(),
+            $package->pendingImageSubmittedBy,
         );
 
         $pending = $package->getPendingImage();
@@ -72,7 +72,7 @@ final class CompanyBannerControllerTest extends DatabaseTestCase
         $companyUser = $this->signIn();
         $package = $this->bannerPackage();
         $this->controller()->index(
-            $this->bannerUploadRequest($package->getFormat()),
+            $this->bannerUploadRequest($package->format),
             $companyUser,
         );
         $proposed = $package->getPendingImage();
@@ -98,7 +98,7 @@ final class CompanyBannerControllerTest extends DatabaseTestCase
         $companyUser = $this->signIn();
         $package = $this->bannerPackage();
         $this->controller()->index(
-            $this->bannerUploadRequest($package->getFormat()),
+            $this->bannerUploadRequest($package->format),
             $companyUser,
         );
         $proposed = $package->getPendingImage();

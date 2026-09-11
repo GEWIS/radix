@@ -20,15 +20,5 @@ class CompanySocialLink extends AbstractSocialLink
         inversedBy: 'socialLinks',
     )]
     #[JoinColumn(nullable: false)]
-    private CompanyRevision $revision;
-
-    public function getRevision(): CompanyRevision
-    {
-        return $this->revision;
-    }
-
-    public function setRevision(CompanyRevision $revision): void
-    {
-        $this->revision = $revision;
-    }
+    public CompanyRevision $revision;
 }

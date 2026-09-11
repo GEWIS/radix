@@ -64,13 +64,13 @@ class Company implements RevisableInterface
      * The company's display name.
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * The company's slug version of the name. (username).
      */
     #[Column(type: Types::STRING)]
-    private string $slugName;
+    public string $slugName;
 
     /**
      * The representative the board writes to when it needs one answer from the company. Null when nobody has been
@@ -81,13 +81,13 @@ class Company implements RevisableInterface
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?CompanyUserModel $primaryContact = null;
+    public ?CompanyUserModel $primaryContact = null;
 
     /**
      * Whether the company is published or not.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $published;
+    public bool $published;
 
     /**
      * The full chain of revisions, newest first.
@@ -153,7 +153,7 @@ class Company implements RevisableInterface
         }
 
         $this->revisions->add($revision);
-        $revision->setCompany($this);
+        $revision->company = $this;
     }
 
     #[Override]
@@ -217,52 +217,6 @@ class Company implements RevisableInterface
     }
 
     /**
-     * Get the company's name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the company's name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Gets the company's slug name.
-     *
-     * @return string the company's slug name
-     */
-    public function getSlugName(): string
-    {
-        return $this->slugName;
-    }
-
-    /**
-     * Sets the company's slug name.
-     *
-     * @param string $slugName the new slug name
-     */
-    public function setSlugName(string $slugName): void
-    {
-        $this->slugName = $slugName;
-    }
-
-    public function getPrimaryContact(): ?CompanyUserModel
-    {
-        return $this->primaryContact;
-    }
-
-    public function setPrimaryContact(?CompanyUserModel $primaryContact): void
-    {
-        $this->primaryContact = $primaryContact;
-    }
-
-    /**
      * A company can only be represented towards the board by one of its own people.
      */
     #[PrePersist]
@@ -284,7 +238,7 @@ class Company implements RevisableInterface
      */
     public function getContactName(): ?string
     {
-        return $this->getDisplayRevision()->getContactName();
+        return $this->getDisplayRevision()->contactName;
     }
 
     /**
@@ -292,7 +246,7 @@ class Company implements RevisableInterface
      */
     public function getContactAddress(): ?string
     {
-        return $this->getDisplayRevision()->getContactAddress();
+        return $this->getDisplayRevision()->contactAddress;
     }
 
     /**
@@ -300,7 +254,7 @@ class Company implements RevisableInterface
      */
     public function getContactEmail(): ?string
     {
-        return $this->getDisplayRevision()->getContactEmail();
+        return $this->getDisplayRevision()->contactEmail;
     }
 
     /**
@@ -308,7 +262,7 @@ class Company implements RevisableInterface
      */
     public function getContactPhone(): ?string
     {
-        return $this->getDisplayRevision()->getContactPhone();
+        return $this->getDisplayRevision()->contactPhone;
     }
 
     /**
@@ -316,7 +270,7 @@ class Company implements RevisableInterface
      */
     public function getSlogan(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getSlogan();
+        return $this->getDisplayRevision()->slogan;
     }
 
     /**
@@ -324,7 +278,7 @@ class Company implements RevisableInterface
      */
     public function getSquareLogo(): ?string
     {
-        return $this->getDisplayRevision()->getSquareLogo();
+        return $this->getDisplayRevision()->squareLogo;
     }
 
     /**
@@ -332,7 +286,7 @@ class Company implements RevisableInterface
      */
     public function getBannerLogo(): ?string
     {
-        return $this->getDisplayRevision()->getBannerLogo();
+        return $this->getDisplayRevision()->bannerLogo;
     }
 
     /**
@@ -340,7 +294,7 @@ class Company implements RevisableInterface
      */
     public function getDescription(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getDescription();
+        return $this->getDisplayRevision()->description;
     }
 
     /**
@@ -348,7 +302,7 @@ class Company implements RevisableInterface
      */
     public function getWebsite(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getWebsite();
+        return $this->getDisplayRevision()->website;
     }
 
     /**
@@ -383,23 +337,7 @@ class Company implements RevisableInterface
         }
 
         // Except when it is explicitly marked as hidden.
-        return !$visible || !$this->isPublished();
-    }
-
-    /**
-     * Get the company's hidden status.
-     */
-    public function isPublished(): bool
-    {
-        return $this->published;
-    }
-
-    /**
-     * Set the company's hidden status.
-     */
-    public function setPublished(bool $published): void
-    {
-        $this->published = $published;
+        return !$visible || !$this->published;
     }
 
     /**
@@ -621,8 +559,8 @@ class Company implements RevisableInterface
     {
         $arraycopy = [];
 
-        $arraycopy['name'] = $this->getName();
-        $arraycopy['slugName'] = $this->getSlugName();
+        $arraycopy['name'] = $this->name;
+        $arraycopy['slugName'] = $this->slugName;
 
         $arraycopy['squareLogo'] = $this->getSquareLogo();
         $arraycopy['bannerLogo'] = $this->getBannerLogo();
@@ -630,7 +568,7 @@ class Company implements RevisableInterface
         $arraycopy['contactEmail'] = $this->getContactEmail();
         $arraycopy['contactAddress'] = $this->getContactAddress();
         $arraycopy['contactPhone'] = $this->getContactPhone();
-        $arraycopy['published'] = $this->isPublished();
+        $arraycopy['published'] = $this->published;
 
         // Languages
         $arraycopy['slogan'] = $this->getSlogan()->getValueNL();

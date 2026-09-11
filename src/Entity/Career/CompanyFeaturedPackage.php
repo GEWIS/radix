@@ -43,7 +43,7 @@ class CompanyFeaturedPackage extends CompanyPackage
         name: 'article_id',
         referencedColumnName: 'id',
     )]
-    private CareerLocalisedText $article;
+    public CareerLocalisedText $article;
 
     public function __construct()
     {
@@ -53,22 +53,6 @@ class CompanyFeaturedPackage extends CompanyPackage
             null,
             null,
         );
-    }
-
-    /**
-     * Get the featured package's article text.
-     */
-    public function getArticle(): CareerLocalisedText
-    {
-        return $this->article;
-    }
-
-    /**
-     * Set the featured package's article text.
-     */
-    public function setArticle(CareerLocalisedText $article): void
-    {
-        $this->article = $article;
     }
 
     #[Override]
@@ -84,8 +68,8 @@ class CompanyFeaturedPackage extends CompanyPackage
     public function toArray(): array
     {
         $array = parent::toArray();
-        $array['article'] = $this->getArticle()->getValueNL();
-        $array['articleEn'] = $this->getArticle()->getValueEN();
+        $array['article'] = $this->article->getValueNL();
+        $array['articleEn'] = $this->article->getValueEN();
 
         return $array;
     }
@@ -108,9 +92,9 @@ class CompanyFeaturedPackage extends CompanyPackage
         parent::exchangeArray($data);
 
         // Like the fields the parent exchanges, an absent key leaves the current value in place.
-        $this->getArticle()->updateValues(
-            $data['articleEn'] ?? $this->getArticle()->getValueEN(),
-            $data['article'] ?? $this->getArticle()->getValueNL(),
+        $this->article->updateValues(
+            $data['articleEn'] ?? $this->article->getValueEN(),
+            $data['article'] ?? $this->article->getValueNL(),
         );
     }
 }

@@ -162,10 +162,10 @@ class AdminPackageController extends AbstractController
         $class = CompanyPackageTypes::entityClass($packageType);
 
         $package = new $class();
-        $package->setCompany($company);
+        $package->company = $company;
         $package->setStartingDate(new DateTime('today'));
         $package->setExpirationDate(new DateTime('today +1 year'));
-        $package->setPublished(true);
+        $package->published = true;
 
         $form = $this->createForm(
             CompanyPackageType::class,
@@ -244,7 +244,7 @@ class AdminPackageController extends AbstractController
             $this->translator->trans('The package was saved.'),
         );
 
-        return $this->backToCompany($package->getCompany());
+        return $this->backToCompany($package->company);
     }
 
     #[Route(
@@ -262,7 +262,7 @@ class AdminPackageController extends AbstractController
         #[CurrentUser]
         User $user,
     ): Response {
-        $company = $package->getCompany();
+        $company = $package->company;
 
         $this->packageService->delete(
             $package,
@@ -304,7 +304,7 @@ class AdminPackageController extends AbstractController
 
         $form = $this->createForm(
             BannerImageType::class,
-            options: ['format' => $package->getFormat()],
+            options: ['format' => $package->format],
         )->handleRequest($request);
 
         $file = $form->get('image')->getData();

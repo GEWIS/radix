@@ -372,7 +372,7 @@ final class PregenerateImageVariantsCommand extends Command
     {
         $profiles = [];
         foreach ($this->bannerPackageRepository->findAll() as $package) {
-            $profile = $package->getFormat()->imageProfile();
+            $profile = $package->format->imageProfile();
 
             foreach (
                 [

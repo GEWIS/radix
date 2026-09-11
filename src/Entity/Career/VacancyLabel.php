@@ -43,7 +43,7 @@ class VacancyLabel
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $name;
+    public CareerLocalisedText $name;
 
     /**
      * The vacancy revisions this Label is assigned to (labels live on the revision so their changes are reviewable).
@@ -60,22 +60,6 @@ class VacancyLabel
     public function __construct()
     {
         $this->revisions = new ArrayCollection();
-    }
-
-    /**
-     * Gets the name.
-     */
-    public function getName(): CareerLocalisedText
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the name.
-     */
-    public function setName(CareerLocalisedText $name): void
-    {
-        $this->name = $name;
     }
 
     /**
@@ -113,8 +97,8 @@ class VacancyLabel
     {
         return [
             'id' => $this->getId(),
-            'name' => $this->getName()->getValueNL(),
-            'nameEn' => $this->getName()->getValueEN(),
+            'name' => $this->name->getValueNL(),
+            'nameEn' => $this->name->getValueEN(),
         ];
     }
 }

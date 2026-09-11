@@ -81,7 +81,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         self::assertFalse($banner->hasPendingImage());
         self::assertSame(
             CompanyAuditVerbs::BannerApproved,
-            $this->timeline($banner->getCompany())[0]->getVerb(),
+            $this->timeline($banner->company)[0]->verb,
         );
     }
 
@@ -110,7 +110,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         self::assertFalse($banner->hasPendingImage());
         self::assertSame(
             CompanyAuditVerbs::BannerRejected,
-            $this->timeline($banner->getCompany())[0]->getVerb(),
+            $this->timeline($banner->company)[0]->verb,
         );
     }
 
@@ -125,7 +125,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         $this->pushRequestWithSession();
 
         $package = $this->jobPackage();
-        $company = $package->getCompany();
+        $company = $package->company;
 
         $vacancyIds = [];
         $revisionIds = [];
@@ -149,7 +149,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         self::assertEmpty($this->entityManager->getRepository(VacancyRevision::class)->findBy(['id' => $revisionIds]));
         self::assertSame(
             CompanyAuditVerbs::PackageDeleted,
-            $this->timeline($company)[0]->getVerb(),
+            $this->timeline($company)[0]->verb,
         );
     }
 
@@ -166,7 +166,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         $wasLive = $banner->getImage();
 
         $this->controller()->banner(
-            $this->bannerUploadRequest($banner->getFormat()),
+            $this->bannerUploadRequest($banner->format),
             $banner,
             $this->user(),
         );
@@ -177,7 +177,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             CompanyAuditVerbs::BannerReplaced,
-            $this->timeline($banner->getCompany())[0]->getVerb(),
+            $this->timeline($banner->company)[0]->verb,
         );
     }
 

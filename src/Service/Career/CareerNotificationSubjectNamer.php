@@ -49,7 +49,7 @@ final class CareerNotificationSubjectNamer extends AbstractNotificationSubjectNa
                     continue;
                 }
 
-                $names[$id] = $this->localised($revision->getName());
+                $names[$id] = $this->localised($revision->name);
             }
 
             return $names;
@@ -65,7 +65,7 @@ final class CareerNotificationSubjectNamer extends AbstractNotificationSubjectNa
                 continue;
             }
 
-            $names[$id] = $this->plain($subject->getCompany()->getName());
+            $names[$id] = $this->plain($subject->company->name);
         }
 
         return $names;

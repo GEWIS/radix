@@ -37,7 +37,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
         );
         self::assertNotNull($endDate);
         self::assertSame(
-            $vacancy->getPackage()->getExpirationDate()->format('Y-m-d'),
+            $vacancy->package->getExpirationDate()->format('Y-m-d'),
             $endDate->format('Y-m-d'),
         );
     }
@@ -48,7 +48,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
         $live = $vacancy->getLiveRevision();
         self::assertNotNull($live);
 
-        $live->setStartDate(new DateTime('+1 week'));
+        $live->startDate = new DateTime('+1 week');
         $this->entityManager->flush();
 
         self::assertNotContains(
@@ -63,7 +63,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
 
         $live = $this->vacancy('backend-engineer')->getLiveRevision();
         self::assertNotNull($live);
-        $live->setEndDate(new DateTime('-1 day'));
+        $live->endDate = new DateTime('-1 day');
         $this->entityManager->flush();
 
         self::assertNull($this->publicVacancy('backend-engineer', VacancyCategories::Jobs));
@@ -88,7 +88,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
 
         $slugs = [];
         foreach ($repository->findForOverviewByIds($repository->findActiveIdsForOverview()) as $vacancy) {
-            $slugs[] = $vacancy->getSlugName();
+            $slugs[] = $vacancy->slugName;
         }
 
         return $slugs;

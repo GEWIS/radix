@@ -107,25 +107,25 @@ final class CompanyProfileData
         CompanyRevision $revision,
     ): self {
         $data = new self();
-        $data->name = '' !== $company->getName()
-            ? $company->getName()
+        $data->name = '' !== $company->name
+            ? $company->name
             : null;
-        $data->slugName = '' !== $company->getSlugName()
-            ? $company->getSlugName()
+        $data->slugName = '' !== $company->slugName
+            ? $company->slugName
             : null;
-        $data->published = $company->isPublished();
+        $data->published = $company->published;
 
-        $data->sloganNL = $revision->getSlogan()->getValueNL();
-        $data->sloganEN = $revision->getSlogan()->getValueEN();
-        $data->websiteNL = $revision->getWebsite()->getValueNL();
-        $data->websiteEN = $revision->getWebsite()->getValueEN();
-        $data->descriptionNL = $revision->getDescription()->getValueNL();
-        $data->descriptionEN = $revision->getDescription()->getValueEN();
+        $data->sloganNL = $revision->slogan->getValueNL();
+        $data->sloganEN = $revision->slogan->getValueEN();
+        $data->websiteNL = $revision->website->getValueNL();
+        $data->websiteEN = $revision->website->getValueEN();
+        $data->descriptionNL = $revision->description->getValueNL();
+        $data->descriptionEN = $revision->description->getValueEN();
 
-        $data->contactName = $revision->getContactName();
-        $data->contactEmail = $revision->getContactEmail();
-        $data->contactPhone = $revision->getContactPhone();
-        $data->contactAddress = $revision->getContactAddress();
+        $data->contactName = $revision->contactName;
+        $data->contactEmail = $revision->contactEmail;
+        $data->contactPhone = $revision->contactPhone;
+        $data->contactAddress = $revision->contactAddress;
         $data->socialLinks = $revision->getSocialHandles();
 
         // A brand-new company defaults to English enabled, so the form is immediately usable.
@@ -145,28 +145,28 @@ final class CompanyProfileData
         bool $identity,
     ): void {
         if ($identity) {
-            $company->setName((string) $this->name);
-            $company->setSlugName((string) $this->slugName);
-            $company->setPublished($this->published);
+            $company->name = (string) $this->name;
+            $company->slugName = (string) $this->slugName;
+            $company->published = $this->published;
         }
 
-        $revision->getSlogan()->updateValues(
-            $this->languageEnglish ? $this->sloganEN : $revision->getSlogan()->getValueEN(),
-            $this->languageDutch ? $this->sloganNL : $revision->getSlogan()->getValueNL(),
+        $revision->slogan->updateValues(
+            $this->languageEnglish ? $this->sloganEN : $revision->slogan->getValueEN(),
+            $this->languageDutch ? $this->sloganNL : $revision->slogan->getValueNL(),
         );
-        $revision->getWebsite()->updateValues(
-            $this->languageEnglish ? $this->websiteEN : $revision->getWebsite()->getValueEN(),
-            $this->languageDutch ? $this->websiteNL : $revision->getWebsite()->getValueNL(),
+        $revision->website->updateValues(
+            $this->languageEnglish ? $this->websiteEN : $revision->website->getValueEN(),
+            $this->languageDutch ? $this->websiteNL : $revision->website->getValueNL(),
         );
-        $revision->getDescription()->updateValues(
-            $this->languageEnglish ? $this->descriptionEN : $revision->getDescription()->getValueEN(),
-            $this->languageDutch ? $this->descriptionNL : $revision->getDescription()->getValueNL(),
+        $revision->description->updateValues(
+            $this->languageEnglish ? $this->descriptionEN : $revision->description->getValueEN(),
+            $this->languageDutch ? $this->descriptionNL : $revision->description->getValueNL(),
         );
 
-        $revision->setContactName($this->contactName);
-        $revision->setContactEmail($this->contactEmail);
-        $revision->setContactPhone($this->contactPhone);
-        $revision->setContactAddress($this->contactAddress);
+        $revision->contactName = $this->contactName;
+        $revision->contactEmail = $this->contactEmail;
+        $revision->contactPhone = $this->contactPhone;
+        $revision->contactAddress = $this->contactAddress;
         $revision->updateSocialLinks($this->socialLinks);
     }
 

@@ -42,11 +42,11 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
         $entries = self::getContainer()->get(CompanyAuditLogRepository::class)->findRecentForCompany($company);
         self::assertSame(
             CompanyAuditVerbs::RepresentativeInvited,
-            $entries[0]->getVerb(),
+            $entries[0]->verb,
         );
         self::assertSame(
             'new-rep@nexunt.example.com',
-            $entries[0]->getDetail(),
+            $entries[0]->detail,
         );
     }
 
@@ -137,7 +137,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
         );
         self::assertSame(
             'Nexunt Systems',
-            $companyUser->getCompany()->getName(),
+            $companyUser->getCompany()->name,
         );
         self::assertNotNull($companyUser->getPassword());
         self::assertNotSame(
@@ -166,7 +166,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
         self::assertNull($this->inviteRepository()->findByEmail('revoked@nexunt.example.com'));
         self::assertSame(
             CompanyAuditVerbs::InviteRevoked,
-            self::getContainer()->get(CompanyAuditLogRepository::class)->findRecentForCompany($company)[0]->getVerb(),
+            self::getContainer()->get(CompanyAuditLogRepository::class)->findRecentForCompany($company)[0]->verb,
         );
     }
 

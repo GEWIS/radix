@@ -41,7 +41,7 @@ class VacancyRevision extends AbstractRevision
         inversedBy: 'revisions',
     )]
     #[JoinColumn(nullable: false)]
-    private Vacancy $vacancy;
+    public Vacancy $vacancy;
 
     /**
      * The revision this one supersedes (null for the first revision in the chain).
@@ -63,7 +63,7 @@ class VacancyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $name;
+    public CareerLocalisedText $name;
 
     #[OneToOne(
         targetEntity: CareerLocalisedText::class,
@@ -78,7 +78,7 @@ class VacancyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $location;
+    public CareerLocalisedText $location;
 
     #[OneToOne(
         targetEntity: CareerLocalisedText::class,
@@ -93,7 +93,7 @@ class VacancyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $website;
+    public CareerLocalisedText $website;
 
     #[OneToOne(
         targetEntity: CareerLocalisedText::class,
@@ -108,7 +108,7 @@ class VacancyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $description;
+    public CareerLocalisedText $description;
 
     #[OneToOne(
         targetEntity: CareerLocalisedText::class,
@@ -123,25 +123,25 @@ class VacancyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $attachment;
+    public CareerLocalisedText $attachment;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactName = null;
+    public ?string $contactName = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactPhone = null;
+    public ?string $contactPhone = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactEmail = null;
+    public ?string $contactEmail = null;
 
     /**
      * Which of the four kinds of posting this is. Jobs until somebody says otherwise, so a blank revision is complete
@@ -151,7 +151,7 @@ class VacancyRevision extends AbstractRevision
         type: Types::STRING,
         enumType: VacancyCategories::class,
     )]
-    private VacancyCategories $category = VacancyCategories::Jobs;
+    public VacancyCategories $category = VacancyCategories::Jobs;
 
     /**
      * The day the vacancy starts being shown, or null to show it from the moment it is approved.
@@ -160,7 +160,7 @@ class VacancyRevision extends AbstractRevision
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $startDate = null;
+    public ?DateTime $startDate = null;
 
     /**
      * The last day the vacancy is shown. Required: a company knows when applications close before it knows anything
@@ -173,7 +173,7 @@ class VacancyRevision extends AbstractRevision
      * constraint guarantees a value before persist, so a saved revision always has a closing day.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private ?DateTime $endDate = null;
+    public ?DateTime $endDate = null;
 
     /**
      * The labels of this revision of the vacancy. Each revision owns its own assignments (carried forward when a draft
@@ -230,16 +230,6 @@ class VacancyRevision extends AbstractRevision
     public function getCommentClass(): string
     {
         return VacancyRevisionComment::class;
-    }
-
-    public function getVacancy(): Vacancy
-    {
-        return $this->vacancy;
-    }
-
-    public function setVacancy(Vacancy $vacancy): void
-    {
-        $this->vacancy = $vacancy;
     }
 
     /**
@@ -305,116 +295,6 @@ class VacancyRevision extends AbstractRevision
     public function detachPreviousRevision(): void
     {
         $this->previousRevision = null;
-    }
-
-    public function getName(): CareerLocalisedText
-    {
-        return $this->name;
-    }
-
-    public function setName(CareerLocalisedText $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getLocation(): CareerLocalisedText
-    {
-        return $this->location;
-    }
-
-    public function setLocation(CareerLocalisedText $location): void
-    {
-        $this->location = $location;
-    }
-
-    public function getWebsite(): CareerLocalisedText
-    {
-        return $this->website;
-    }
-
-    public function setWebsite(CareerLocalisedText $website): void
-    {
-        $this->website = $website;
-    }
-
-    public function getDescription(): CareerLocalisedText
-    {
-        return $this->description;
-    }
-
-    public function setDescription(CareerLocalisedText $description): void
-    {
-        $this->description = $description;
-    }
-
-    public function getAttachment(): CareerLocalisedText
-    {
-        return $this->attachment;
-    }
-
-    public function setAttachment(CareerLocalisedText $attachment): void
-    {
-        $this->attachment = $attachment;
-    }
-
-    public function getContactName(): ?string
-    {
-        return $this->contactName;
-    }
-
-    public function setContactName(?string $contactName): void
-    {
-        $this->contactName = $contactName;
-    }
-
-    public function getContactPhone(): ?string
-    {
-        return $this->contactPhone;
-    }
-
-    public function setContactPhone(?string $contactPhone): void
-    {
-        $this->contactPhone = $contactPhone;
-    }
-
-    public function getContactEmail(): ?string
-    {
-        return $this->contactEmail;
-    }
-
-    public function setContactEmail(?string $contactEmail): void
-    {
-        $this->contactEmail = $contactEmail;
-    }
-
-    public function getCategory(): VacancyCategories
-    {
-        return $this->category;
-    }
-
-    public function setCategory(VacancyCategories $category): void
-    {
-        $this->category = $category;
-    }
-
-    public function getStartDate(): ?DateTime
-    {
-        return $this->startDate;
-    }
-
-    public function setStartDate(?DateTime $startDate): void
-    {
-        $this->startDate = $startDate;
-    }
-
-    public function getEndDate(): ?DateTime
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(?DateTime $endDate): void
-    {
-        $this->endDate = $endDate;
     }
 
     /**

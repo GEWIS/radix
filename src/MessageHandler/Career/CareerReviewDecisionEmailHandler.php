@@ -67,7 +67,7 @@ class CareerReviewDecisionEmailHandler
                     ->htmlTemplate('emails/career/review-decision.html.twig')
                     ->context([
                         'fullName' => $companyUser->getName(),
-                        'companyName' => $company->getName(),
+                        'companyName' => $company->name,
                         'subjectName' => $message->getSubjectName(),
                         'isVacancy' => $message->isVacancy(),
                         'outcome' => $outcome->value,

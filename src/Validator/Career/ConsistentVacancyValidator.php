@@ -92,7 +92,7 @@ class ConsistentVacancyValidator extends ConstraintValidator
 
         if (
             $this->vacancyRepository->isSlugNameUnique(
-                $package->getCompany(),
+                $package->company,
                 $value->slugName,
                 $value->category,
                 $vacancy,

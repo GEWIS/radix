@@ -97,7 +97,7 @@ final class VacancyOverviewTest extends DatabaseTestCase
         foreach ($component->getVacancies() as $vacancy) {
             self::assertSame(
                 'Nexunt Systems',
-                $vacancy->getCompany()->getName(),
+                $vacancy->getCompany()->name,
             );
         }
     }
@@ -115,7 +115,7 @@ final class VacancyOverviewTest extends DatabaseTestCase
         foreach ($component->getVacancies() as $vacancy) {
             self::assertSame(
                 'Nexunt Systems',
-                $vacancy->getCompany()->getName(),
+                $vacancy->getCompany()->name,
             );
         }
     }
@@ -126,7 +126,7 @@ final class VacancyOverviewTest extends DatabaseTestCase
     private function titles(VacancyOverview $component): array
     {
         return array_map(
-            static fn (Vacancy $vacancy): string => strval($vacancy->getCurrentRevision()?->getName()->getValueEN()),
+            static fn (Vacancy $vacancy): string => strval($vacancy->getCurrentRevision()?->name->getValueEN()),
             $component->getVacancies(),
         );
     }

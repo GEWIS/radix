@@ -56,7 +56,7 @@ class HighlightSelectionType extends AbstractType
                 'class' => Vacancy::class,
                 'choices' => $eligible,
                 'choice_label' => static function (Vacancy $vacancy) use ($language): string {
-                    return $vacancy->getName()->getText($language) ?? $vacancy->getSlugName();
+                    return $vacancy->getName()->getText($language) ?? $vacancy->slugName;
                 },
                 'multiple' => true,
                 'expanded' => true,

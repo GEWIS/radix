@@ -380,7 +380,10 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
 
         foreach ($definitions as $key => $definition) {
             $label = new VacancyLabel();
-            $label->setName(new CareerLocalisedText($definition['en'], $definition['nl']));
+            $label->name = new CareerLocalisedText(
+                $definition['en'],
+                $definition['nl'],
+            );
             $manager->persist($label);
 
             $this->labels[$key] = $label;
@@ -408,19 +411,28 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
         bool $contractExpired = false,
     ): void {
         $company = new Company();
-        $company->setName($name);
-        $company->setSlugName($slug);
-        $company->setPublished(true);
+        $company->name = $name;
+        $company->slugName = $slug;
+        $company->published = true;
 
         $revision = new CompanyRevision();
         $revision->setStatus(RevisionStatus::Approved);
         $revision->setRevisionNumber(1);
-        $revision->setSlogan(new CareerLocalisedText($sloganEn, $sloganNl));
-        $revision->setDescription(new CareerLocalisedText($descriptionEn, $descriptionNl));
-        $revision->setWebsite(new CareerLocalisedText($websiteEn, $websiteNl));
-        $revision->setContactName('Recruitment Team');
-        $revision->setContactEmail('recruitment@' . $slug . '.example.com');
-        $revision->setContactPhone('+31 40 000 0000');
+        $revision->slogan = new CareerLocalisedText(
+            $sloganEn,
+            $sloganNl,
+        );
+        $revision->description = new CareerLocalisedText(
+            $descriptionEn,
+            $descriptionNl,
+        );
+        $revision->website = new CareerLocalisedText(
+            $websiteEn,
+            $websiteNl,
+        );
+        $revision->contactName = 'Recruitment Team';
+        $revision->contactEmail = 'recruitment@' . $slug . '.example.com';
+        $revision->contactPhone = '+31 40 000 0000';
         $revision->updateSocialLinks([
             SocialPlatform::Instagram->value => $slug,
             SocialPlatform::GitHub->value => $slug,
@@ -467,8 +479,8 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
         $manager->flush();
 
         if ($logos) {
-            $revision->setSquareLogo($this->imageGenerator->storeSquareLogo($company));
-            $revision->setBannerLogo($this->imageGenerator->storeBannerLogo($company));
+            $revision->squareLogo = $this->imageGenerator->storeSquareLogo($company);
+            $revision->bannerLogo = $this->imageGenerator->storeBannerLogo($company);
         }
 
         if (null !== $bannerFormat) {
@@ -477,7 +489,7 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
                 $bannerPackage,
                 $company,
             );
-            $bannerPackage->setFormat($bannerFormat);
+            $bannerPackage->format = $bannerFormat;
             $bannerPackage->setImage($this->imageGenerator->storeBanner(
                 $company,
                 $bannerFormat,
@@ -507,10 +519,10 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
             $featuredPackage,
             $company,
         );
-        $featuredPackage->setArticle(new CareerLocalisedText(
+        $featuredPackage->article = new CareerLocalisedText(
             'We sat down with ' . $name . ' to talk about the projects our members could work on.',
             'We spraken met ' . $name . ' over de projecten waaraan onze leden kunnen werken.',
-        ));
+        );
         $manager->persist($featuredPackage);
     }
 
@@ -523,10 +535,10 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
         Company $company,
         bool $expired = false,
     ): void {
-        $package->setCompany($company);
+        $package->company = $company;
         $package->setStartingDate(new DateTime('2020-01-01'));
         $package->setExpirationDate(new DateTime($expired ? '2021-01-01' : '2100-01-01'));
-        $package->setPublished(true);
+        $package->published = true;
     }
 
     /**
@@ -537,29 +549,40 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
         array $data,
     ): Vacancy {
         $vacancy = new Vacancy();
-        $vacancy->setSlugName($data['slug']);
-        $vacancy->setPublished(true);
-        $vacancy->setPackage($package);
+        $vacancy->slugName = $data['slug'];
+        $vacancy->published = true;
+        $vacancy->package = $package;
         $package->addVacancy($vacancy);
 
         $revision = new VacancyRevision();
         $revision->setStatus(RevisionStatus::Approved);
         $revision->setRevisionNumber(1);
-        $revision->setName(new CareerLocalisedText($data['nameEn'], $data['nameNl']));
-        $revision->setLocation(new CareerLocalisedText('Eindhoven', 'Eindhoven'));
-        $revision->setWebsite(new CareerLocalisedText(
+        $revision->name = new CareerLocalisedText(
+            $data['nameEn'],
+            $data['nameNl'],
+        );
+        $revision->location = new CareerLocalisedText(
+            'Eindhoven',
+            'Eindhoven',
+        );
+        $revision->website = new CareerLocalisedText(
             'https://example.com/' . $data['slug'],
             'https://example.com/' . $data['slug'],
-        ));
-        $revision->setDescription(new CareerLocalisedText(
+        );
+        $revision->description = new CareerLocalisedText(
             $data['descriptionEn'],
             $data['descriptionNl'],
-        ));
-        $revision->setAttachment(new CareerLocalisedText('', ''));
-        $revision->setCategory($data['category']);
-        $revision->setStartDate(isset($data['startDate']) ? new DateTime($data['startDate']) : null);
+        );
+        $revision->attachment = new CareerLocalisedText(
+            '',
+            '',
+        );
+        $revision->category = $data['category'];
+        $revision->startDate = isset($data['startDate'])
+            ? new DateTime($data['startDate'])
+            : null;
         // Without a window of its own a vacancy runs as long as the package it was sold under.
-        $revision->setEndDate(new DateTime($data['endDate'] ?? $package->getExpirationDate()->format('Y-m-d')));
+        $revision->endDate = new DateTime($data['endDate'] ?? $package->getExpirationDate()->format('Y-m-d'));
 
         foreach ($data['labels'] as $labelKey) {
             $revision->addLabel($this->labels[$labelKey]);

@@ -50,13 +50,13 @@ class Vacancy implements RevisableInterface
      * The vacancy's slug name.
      */
     #[Column(type: Types::STRING)]
-    private string $slugName;
+    public string $slugName;
 
     /**
      * The vacancy's status.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $published;
+    public bool $published;
 
     /**
      * The vacancy's package.
@@ -70,7 +70,7 @@ class Vacancy implements RevisableInterface
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CompanyJobPackage $package;
+    public CompanyJobPackage $package;
 
     /**
      * The full chain of revisions, newest first.
@@ -120,7 +120,7 @@ class Vacancy implements RevisableInterface
         }
 
         $this->revisions->add($revision);
-        $revision->setVacancy($this);
+        $revision->vacancy = $this;
     }
 
     #[Override]
@@ -183,62 +183,15 @@ class Vacancy implements RevisableInterface
         return $revision;
     }
 
-    /**
-     * Get the vacancy's slug name.
-     *
-     * @return string the vacancy's slug name
-     */
-    public function getSlugName(): string
-    {
-        return $this->slugName;
-    }
-
-    /**
-     * Set the vacancy's slug name.
-     */
-    public function setSlugName(string $name): void
-    {
-        $this->slugName = $name;
-    }
-
-    /**
-     * Get the vacancy's status.
-     */
-    public function isPublished(): bool
-    {
-        return $this->published;
-    }
-
-    /**
-     * Set the vacancy's status.
-     */
-    public function setPublished(bool $published): void
-    {
-        $this->published = $published;
-    }
-
     public function isActive(): bool
     {
         $live = $this->getLiveRevision();
 
         return null !== $live
             && $live->isWithinPostingWindow()
-            && $this->isPublished()
-            && $this->getPackage()->isActive()
-            && !$this->getPackage()->getCompany()->isHidden();
-    }
-
-    /**
-     * Get the vacancy's package.
-     */
-    public function getPackage(): CompanyJobPackage
-    {
-        return $this->package;
-    }
-
-    public function setPackage(CompanyJobPackage $package): void
-    {
-        $this->package = $package;
+            && $this->published
+            && $this->package->isActive()
+            && !$this->package->company->isHidden();
     }
 
     /**
@@ -246,7 +199,7 @@ class Vacancy implements RevisableInterface
      */
     public function getCompany(): Company
     {
-        return $this->getPackage()->getCompany();
+        return $this->package->company;
     }
 
     /**
@@ -266,7 +219,7 @@ class Vacancy implements RevisableInterface
      */
     public function getName(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getName();
+        return $this->getDisplayRevision()->name;
     }
 
     /**
@@ -278,7 +231,7 @@ class Vacancy implements RevisableInterface
      */
     public function getLocation(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getLocation();
+        return $this->getDisplayRevision()->location;
     }
 
     /**
@@ -286,7 +239,7 @@ class Vacancy implements RevisableInterface
      */
     public function getWebsite(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getWebsite();
+        return $this->getDisplayRevision()->website;
     }
 
     /**
@@ -294,7 +247,7 @@ class Vacancy implements RevisableInterface
      */
     public function getDescription(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getDescription();
+        return $this->getDisplayRevision()->description;
     }
 
     /**
@@ -302,7 +255,7 @@ class Vacancy implements RevisableInterface
      */
     public function getAttachment(): CareerLocalisedText
     {
-        return $this->getDisplayRevision()->getAttachment();
+        return $this->getDisplayRevision()->attachment;
     }
 
     /**
@@ -310,7 +263,7 @@ class Vacancy implements RevisableInterface
      */
     public function getStartDate(): ?DateTime
     {
-        return $this->getDisplayRevision()->getStartDate();
+        return $this->getDisplayRevision()->startDate;
     }
 
     /**
@@ -318,7 +271,7 @@ class Vacancy implements RevisableInterface
      */
     public function getEndDate(): ?DateTime
     {
-        return $this->getDisplayRevision()->getEndDate();
+        return $this->getDisplayRevision()->endDate;
     }
 
     /**
@@ -326,7 +279,7 @@ class Vacancy implements RevisableInterface
      */
     public function getContactName(): ?string
     {
-        return $this->getDisplayRevision()->getContactName();
+        return $this->getDisplayRevision()->contactName;
     }
 
     /**
@@ -334,7 +287,7 @@ class Vacancy implements RevisableInterface
      */
     public function getContactPhone(): ?string
     {
-        return $this->getDisplayRevision()->getContactPhone();
+        return $this->getDisplayRevision()->contactPhone;
     }
 
     /**
@@ -342,7 +295,7 @@ class Vacancy implements RevisableInterface
      */
     public function getContactEmail(): ?string
     {
-        return $this->getDisplayRevision()->getContactEmail();
+        return $this->getDisplayRevision()->contactEmail;
     }
 
     /**
@@ -350,7 +303,7 @@ class Vacancy implements RevisableInterface
      */
     public function getCategory(): VacancyCategories
     {
-        return $this->getDisplayRevision()->getCategory();
+        return $this->getDisplayRevision()->category;
     }
 
     /**
@@ -397,7 +350,7 @@ class Vacancy implements RevisableInterface
     #[Override]
     public function getResourceCompany(): ?Company
     {
-        return $this->getPackage()->getCompany();
+        return $this->package->company;
     }
 
     /**
@@ -429,12 +382,12 @@ class Vacancy implements RevisableInterface
         }
 
         return [
-            'slugName' => $this->getSlugName(),
+            'slugName' => $this->slugName,
             'category' => $this->getCategory()->value,
             'contactName' => $this->getContactName(),
             'contactEmail' => $this->getContactEmail(),
             'contactPhone' => $this->getContactPhone(),
-            'published' => $this->isPublished(),
+            'published' => $this->published,
             'name' => $this->getName()->getValueNL(),
             'nameEn' => $this->getName()->getValueEN(),
             'location' => $this->getLocation()->getValueNL(),

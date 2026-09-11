@@ -98,7 +98,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
     public function testARejectedRevisionStillNamesTheOneThatIsLive(): void
     {
         $revision = $this->aCompanyRevision();
-        $company = $revision->getCompany();
+        $company = $revision->company;
 
         $live = new CompanyRevision();
         $live->setStatus(RevisionStatus::Approved);

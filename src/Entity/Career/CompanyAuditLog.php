@@ -40,7 +40,7 @@ class CompanyAuditLog
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private Company $company;
+    public Company $company;
 
     /**
      * The board or C4 member who acted. Mutually exclusive with {@see $actorCompanyUser}; both are null for something
@@ -53,7 +53,7 @@ class CompanyAuditLog
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?UserModel $actor = null;
+    public ?UserModel $actor = null;
 
     /**
      * The representative who acted. Mutually exclusive with {@see $actor}.
@@ -65,54 +65,24 @@ class CompanyAuditLog
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?CompanyUserModel $actorCompanyUser = null;
+    public ?CompanyUserModel $actorCompanyUser = null;
 
     #[Column(type: Types::ENUM)]
-    private CompanyAuditVerbs $verb;
+    public CompanyAuditVerbs $verb;
 
     /**
      * What the action applied to, e.g. the address invited or the type of package. Empty for verbs that need nothing
      * beyond themselves.
      */
     #[Column(type: Types::STRING)]
-    private string $detail = '';
+    public string $detail = '';
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $createdAt;
+    public private(set) DateTime $createdAt;
 
     public function __construct()
     {
         $this->createdAt = new DateTime();
-    }
-
-    public function getCompany(): Company
-    {
-        return $this->company;
-    }
-
-    public function setCompany(Company $company): void
-    {
-        $this->company = $company;
-    }
-
-    public function getActor(): ?UserModel
-    {
-        return $this->actor;
-    }
-
-    public function setActor(?UserModel $actor): void
-    {
-        $this->actor = $actor;
-    }
-
-    public function getActorCompanyUser(): ?CompanyUserModel
-    {
-        return $this->actorCompanyUser;
-    }
-
-    public function setActorCompanyUser(?CompanyUserModel $actorCompanyUser): void
-    {
-        $this->actorCompanyUser = $actorCompanyUser;
     }
 
     /**
@@ -122,31 +92,6 @@ class CompanyAuditLog
     {
         return $this->actor?->getDisplayName()
             ?? $this->actorCompanyUser?->getDisplayName();
-    }
-
-    public function getVerb(): CompanyAuditVerbs
-    {
-        return $this->verb;
-    }
-
-    public function setVerb(CompanyAuditVerbs $verb): void
-    {
-        $this->verb = $verb;
-    }
-
-    public function getDetail(): string
-    {
-        return $this->detail;
-    }
-
-    public function setDetail(string $detail): void
-    {
-        $this->detail = $detail;
-    }
-
-    public function getCreatedAt(): DateTime
-    {
-        return $this->createdAt;
     }
 
     #[PrePersist]

@@ -32,7 +32,7 @@ final readonly class VacancyStaleRevisionPolicy implements StaleRevisionPolicyIn
             return null;
         }
 
-        $endDate = $revision->getEndDate();
+        $endDate = $revision->endDate;
         if (null === $endDate) {
             return null;
         }

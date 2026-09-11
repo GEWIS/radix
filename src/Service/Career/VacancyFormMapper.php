@@ -38,41 +38,37 @@ class VacancyFormMapper
         bool $admin,
     ): void {
         if ($identityEditable) {
-            $vacancy->setSlugName((string) $data->slugName);
+            $vacancy->slugName = (string) $data->slugName;
 
             $package = null !== $data->packageId
                 ? $this->packageRepository->find($data->packageId)
                 : null;
 
             if (null !== $package) {
-                $vacancy->setPackage($package);
+                $vacancy->package = $package;
             }
         }
 
         if ($admin) {
-            $vacancy->setPublished($data->published);
+            $vacancy->published = $data->published;
         }
 
         if (null !== $data->category) {
-            $revision->setCategory($data->category);
+            $revision->category = $data->category;
         }
 
-        $revision->setStartDate(
-            null !== $data->startDate
-                ? DateTime::createFromInterface($data->startDate)
-                : null,
-        );
-        $revision->setEndDate(
-            null !== $data->endDate
-                ? DateTime::createFromInterface($data->endDate)
-                : null,
-        );
+        $revision->startDate = null !== $data->startDate
+            ? DateTime::createFromInterface($data->startDate)
+            : null;
+        $revision->endDate = null !== $data->endDate
+            ? DateTime::createFromInterface($data->endDate)
+            : null;
 
         $data->applyTexts($revision);
 
-        $revision->setContactName($data->contactName);
-        $revision->setContactEmail($data->contactEmail);
-        $revision->setContactPhone($data->contactPhone);
+        $revision->contactName = $data->contactName;
+        $revision->contactEmail = $data->contactEmail;
+        $revision->contactPhone = $data->contactPhone;
 
         $this->applyLabels(
             $data,

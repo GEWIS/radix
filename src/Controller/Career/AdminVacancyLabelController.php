@@ -53,10 +53,10 @@ class AdminVacancyLabelController extends AbstractController
     public function index(Request $request): Response
     {
         $label = new VacancyLabel();
-        $label->setName(new CareerLocalisedText(
+        $label->name = new CareerLocalisedText(
             null,
             null,
-        ));
+        );
 
         $form = $this->createForm(
             VacancyLabelType::class,

@@ -22,7 +22,7 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
 
         $slugs = [];
         foreach ($this->vacancies()->findHighlightableForCompany($company) as $vacancy) {
-            $slugs[] = $vacancy->getSlugName();
+            $slugs[] = $vacancy->slugName;
             self::assertSame(
                 $company,
                 $vacancy->getCompany(),
@@ -53,10 +53,10 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
         $highlightable = $this->vacancies()->findHighlightableForCompany($company);
 
         $package = new CompanyHighlightPackage();
-        $package->setCompany($company);
+        $package->company = $company;
         $package->setStartingDate(new DateTime('-1 month'));
         $package->setExpirationDate(new DateTime('+1 year'));
-        $package->setPublished(true);
+        $package->published = true;
         $package->setVacancies($highlightable);
         $this->entityManager->persist($package);
         $this->entityManager->flush();
@@ -74,7 +74,7 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
         self::assertNotEmpty($before);
 
         $dropped = $before[0];
-        $dropped->setPublished(false);
+        $dropped->published = false;
         $this->entityManager->flush();
 
         self::assertNotContains(
@@ -102,7 +102,7 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
         $active = $this->highlightPackages()->findActive();
         self::assertNotEmpty($active);
 
-        $active[0]->setPublished(false);
+        $active[0]->published = false;
         $this->entityManager->flush();
 
         self::assertNotContains(
@@ -120,7 +120,7 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
         $expected = [];
         foreach ($this->highlightPackages()->findActive() as $package) {
             foreach ($package->getDisplayableVacancies() as $vacancy) {
-                $expected[$vacancy->getSlugName()] = true;
+                $expected[$vacancy->slugName] = true;
             }
         }
 
@@ -128,7 +128,7 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
 
         $highlighted = [];
         foreach ($this->vacancies()->findHighlighted() as $vacancy) {
-            $highlighted[$vacancy->getSlugName()] = true;
+            $highlighted[$vacancy->slugName] = true;
         }
 
         ksort($expected);

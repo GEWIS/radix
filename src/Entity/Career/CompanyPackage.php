@@ -48,7 +48,7 @@ abstract class CompanyPackage
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contractNumber = null;
+    public ?string $contractNumber = null;
 
     /**
      * The package's starting date.
@@ -66,7 +66,7 @@ abstract class CompanyPackage
      * The package's published state.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $published;
+    public bool $published;
 
     /**
      * The package's company.
@@ -75,20 +75,10 @@ abstract class CompanyPackage
         targetEntity: Company::class,
         inversedBy: 'packages',
     )]
-    private Company $company;
+    public Company $company;
 
     public function __construct()
     {
-    }
-
-    public function getContractNumber(): ?string
-    {
-        return $this->contractNumber;
-    }
-
-    public function setContractNumber(?string $contractNumber): void
-    {
-        $this->contractNumber = $contractNumber;
     }
 
     /**
@@ -124,38 +114,6 @@ abstract class CompanyPackage
     }
 
     /**
-     * Get the package's publish state.
-     */
-    public function isPublished(): bool
-    {
-        return $this->published;
-    }
-
-    /**
-     * Set the package's publish state.
-     */
-    public function setPublished(bool $published): void
-    {
-        $this->published = $published;
-    }
-
-    /**
-     * Get the package's company.
-     */
-    public function getCompany(): Company
-    {
-        return $this->company;
-    }
-
-    /**
-     * Set the package's company.
-     */
-    public function setCompany(Company $company): void
-    {
-        $this->company = $company;
-    }
-
-    /**
      * Gets the type of the package.
      */
     abstract public function getType(): CompanyPackageTypes;
@@ -175,7 +133,7 @@ abstract class CompanyPackage
         }
 
         return new DateTime() >= $this->getStartingDate()
-            && $this->isPublished();
+            && $this->published;
     }
 
     /**
@@ -191,10 +149,10 @@ abstract class CompanyPackage
     public function toArray(): array
     {
         return [
-            'contractNumber' => $this->getContractNumber(),
+            'contractNumber' => $this->contractNumber,
             'startDate' => $this->getStartingDate()->format('Y-m-d'),
             'expirationDate' => $this->getExpirationDate()->format('Y-m-d'),
-            'published' => $this->isPublished(),
+            'published' => $this->published,
         ];
     }
 
@@ -212,13 +170,15 @@ abstract class CompanyPackage
      */
     public function exchangeArray(array $data): void
     {
-        $this->setContractNumber($data['contractNumber']);
+        $this->contractNumber = $data['contractNumber'];
         $this->setStartingDate(
             isset($data['startDate']) ? new DateTime($data['startDate']) : $this->getStartingDate(),
         );
         $this->setExpirationDate(
             isset($data['expirationDate']) ? new DateTime($data['expirationDate']) : $this->getExpirationDate(),
         );
-        $this->setPublished(isset($data['published']) ? boolval($data['published']) : $this->isPublished());
+        $this->published = isset($data['published'])
+            ? boolval($data['published'])
+            : $this->published;
     }
 }

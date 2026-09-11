@@ -81,8 +81,8 @@ final class AdminVacancyControllerTest extends DatabaseTestCase
         );
         // The window is part of the content, so the draft starts from what was agreed.
         self::assertEquals(
-            $live?->getEndDate(),
-            $draft->getEndDate(),
+            $live?->endDate,
+            $draft->endDate,
         );
     }
 
@@ -106,10 +106,10 @@ final class AdminVacancyControllerTest extends DatabaseTestCase
         $this->pushRequestWithSession();
 
         $label = new VacancyLabel();
-        $label->setName(new CareerLocalisedText(
+        $label->name = new CareerLocalisedText(
             'Temporary',
             'Tijdelijk',
-        ));
+        );
         $this->entityManager->persist($label);
         $this->entityManager->flush();
         $labelId = (int) $label->getId();

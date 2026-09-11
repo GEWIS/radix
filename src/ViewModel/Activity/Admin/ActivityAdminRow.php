@@ -90,7 +90,7 @@ final readonly class ActivityAdminRow
             organAbbr: $revision->getOrgan()?->getAbbr(),
             nameNL: $revision->getName()->getValueNL(),
             nameEN: $revision->getName()->getValueEN(),
-            companyName: $revision->getCompany()?->getName(),
+            companyName: $revision->getCompany()?->name,
             submitter: $revision->getAuthorDisplayName(),
             status: $revision->getStatus(),
             beginTime: null === $beginTime

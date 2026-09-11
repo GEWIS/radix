@@ -127,36 +127,36 @@ final class VacancyData
     ): self {
         $data = new self();
         $data->vacancyId = $vacancy->getId();
-        $data->slugName = $vacancy->getSlugName();
-        $data->packageId = $vacancy->getPackage()->getId();
-        $data->published = $vacancy->isPublished();
+        $data->slugName = $vacancy->slugName;
+        $data->packageId = $vacancy->package->getId();
+        $data->published = $vacancy->published;
 
-        $data->category = $revision->getCategory();
+        $data->category = $revision->category;
         $data->labelIds = array_map(
             static fn (VacancyLabel $label): int => (int) $label->getId(),
             $revision->getLabels()->toArray(),
         );
-        $data->startDate = null !== $revision->getStartDate()
-            ? DateTimeImmutable::createFromInterface($revision->getStartDate())
+        $data->startDate = null !== $revision->startDate
+            ? DateTimeImmutable::createFromInterface($revision->startDate)
             : null;
-        $data->endDate = null !== $revision->getEndDate()
-            ? DateTimeImmutable::createFromInterface($revision->getEndDate())
+        $data->endDate = null !== $revision->endDate
+            ? DateTimeImmutable::createFromInterface($revision->endDate)
             : null;
 
-        $data->nameNL = $revision->getName()->getValueNL();
-        $data->nameEN = $revision->getName()->getValueEN();
-        $data->locationNL = $revision->getLocation()->getValueNL();
-        $data->locationEN = $revision->getLocation()->getValueEN();
-        $data->websiteNL = $revision->getWebsite()->getValueNL();
-        $data->websiteEN = $revision->getWebsite()->getValueEN();
-        $data->attachmentNL = $revision->getAttachment()->getValueNL();
-        $data->attachmentEN = $revision->getAttachment()->getValueEN();
-        $data->descriptionNL = $revision->getDescription()->getValueNL();
-        $data->descriptionEN = $revision->getDescription()->getValueEN();
+        $data->nameNL = $revision->name->getValueNL();
+        $data->nameEN = $revision->name->getValueEN();
+        $data->locationNL = $revision->location->getValueNL();
+        $data->locationEN = $revision->location->getValueEN();
+        $data->websiteNL = $revision->website->getValueNL();
+        $data->websiteEN = $revision->website->getValueEN();
+        $data->attachmentNL = $revision->attachment->getValueNL();
+        $data->attachmentEN = $revision->attachment->getValueEN();
+        $data->descriptionNL = $revision->description->getValueNL();
+        $data->descriptionEN = $revision->description->getValueEN();
 
-        $data->contactName = $revision->getContactName();
-        $data->contactEmail = $revision->getContactEmail();
-        $data->contactPhone = $revision->getContactPhone();
+        $data->contactName = $revision->contactName;
+        $data->contactEmail = $revision->contactEmail;
+        $data->contactPhone = $revision->contactPhone;
 
         // A brand-new vacancy defaults to English enabled, so the form is immediately usable.
         $data->languageDutch = $data->hasContent(true);
@@ -172,11 +172,11 @@ final class VacancyData
     {
         foreach (
             [
-                'name' => $revision->getName(),
-                'location' => $revision->getLocation(),
-                'website' => $revision->getWebsite(),
-                'attachment' => $revision->getAttachment(),
-                'description' => $revision->getDescription(),
+                'name' => $revision->name,
+                'location' => $revision->location,
+                'website' => $revision->website,
+                'attachment' => $revision->attachment,
+                'description' => $revision->description,
             ] as $field => $text
         ) {
             $text->updateValues(

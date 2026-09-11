@@ -291,7 +291,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             CompanyRevision::class,
             $live,
         );
-        $live->setSquareLogo($shared);
+        $live->squareLogo = $shared;
         $this->entityManager->flush();
 
         // The clone carries the square logo forward by value; the banner is this draft's alone.
@@ -300,7 +300,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             CompanyRevision::class,
             $draft,
         );
-        $draft->setBannerLogo($abandoned);
+        $draft->bannerLogo = $abandoned;
         $this->entityManager->flush();
         $draftId = (int) $draft->getId();
         $this->backdate(

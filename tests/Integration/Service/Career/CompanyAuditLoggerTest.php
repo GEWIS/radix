@@ -42,7 +42,7 @@ final class CompanyAuditLoggerTest extends DatabaseTestCase
         );
         self::assertSame(
             CompanyAuditVerbs::BannerProposed,
-            $entries[0]->getVerb(),
+            $entries[0]->verb,
         );
         self::assertSame(
             'Ilse Vermeer (Nexunt Systems)',
@@ -50,15 +50,15 @@ final class CompanyAuditLoggerTest extends DatabaseTestCase
         );
         self::assertSame(
             '',
-            $entries[0]->getDetail(),
+            $entries[0]->detail,
         );
         self::assertSame(
             CompanyAuditVerbs::RepresentativeInvited,
-            $entries[1]->getVerb(),
+            $entries[1]->verb,
         );
         self::assertSame(
             'someone@example.com',
-            $entries[1]->getDetail(),
+            $entries[1]->detail,
         );
     }
 

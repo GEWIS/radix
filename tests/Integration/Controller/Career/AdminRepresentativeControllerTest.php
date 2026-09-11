@@ -72,7 +72,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         self::assertTrue($representative->isDisabled());
         self::assertSame(
             CompanyAuditVerbs::RepresentativeDisabled,
-            $this->timeline()[0]->getVerb(),
+            $this->timeline()[0]->verb,
         );
     }
 
@@ -91,7 +91,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         self::assertFalse($representative->isDisabled());
         self::assertSame(
             CompanyAuditVerbs::RepresentativeEnabled,
-            $this->timeline()[0]->getVerb(),
+            $this->timeline()[0]->verb,
         );
     }
 
@@ -104,7 +104,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $session = $this->pushRequestWithSession();
 
         $company = $this->company();
-        $before = $company->getPrimaryContact();
+        $before = $company->primaryContact;
 
         $this->controller()->makePrimaryContact(
             (int) $company->getId(),
@@ -114,7 +114,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
 
         self::assertSame(
             $before,
-            $company->getPrimaryContact(),
+            $company->primaryContact,
         );
         self::assertNotEmpty($session->getFlashBag()->peek('warning'));
     }
@@ -135,11 +135,11 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
 
         self::assertSame(
             $representative,
-            $company->getPrimaryContact(),
+            $company->primaryContact,
         );
         self::assertSame(
             CompanyAuditVerbs::PrimaryContactChanged,
-            $this->timeline()[0]->getVerb(),
+            $this->timeline()[0]->verb,
         );
     }
 
@@ -149,7 +149,7 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $this->pushRequestWithSession();
 
         $company = $this->company();
-        $primary = $company->getPrimaryContact();
+        $primary = $company->primaryContact;
         self::assertInstanceOf(
             CompanyUser::class,
             $primary,
@@ -165,10 +165,10 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
         $this->entityManager->refresh($company);
 
         self::assertNull($this->companyUsers()->find($representativeId));
-        self::assertNull($company->getPrimaryContact());
+        self::assertNull($company->primaryContact);
         self::assertSame(
             CompanyAuditVerbs::RepresentativeRemoved,
-            $this->timeline()[0]->getVerb(),
+            $this->timeline()[0]->verb,
         );
     }
 

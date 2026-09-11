@@ -37,7 +37,7 @@ class CompanyBannerPackage extends CompanyPackage
         type: Types::STRING,
         enumType: CompanyBannerFormats::class,
     )]
-    private CompanyBannerFormats $format = CompanyBannerFormats::Leaderboard;
+    public CompanyBannerFormats $format = CompanyBannerFormats::Leaderboard;
 
     /**
      * The banner's image URL.
@@ -61,7 +61,7 @@ class CompanyBannerPackage extends CompanyPackage
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $pendingImageSubmittedAt = null;
+    public private(set) ?DateTime $pendingImageSubmittedAt = null;
 
     /**
      * Who proposed it, or null once their account is gone.
@@ -71,17 +71,7 @@ class CompanyBannerPackage extends CompanyPackage
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?CompanyUserModel $pendingImageSubmittedBy = null;
-
-    public function getFormat(): CompanyBannerFormats
-    {
-        return $this->format;
-    }
-
-    public function setFormat(CompanyBannerFormats $format): void
-    {
-        $this->format = $format;
-    }
+    public private(set) ?CompanyUserModel $pendingImageSubmittedBy = null;
 
     /**
      * Get the banner's image URL.
@@ -112,16 +102,6 @@ class CompanyBannerPackage extends CompanyPackage
     public function setPendingImage(string $pendingImage): void
     {
         $this->pendingImage = $pendingImage;
-    }
-
-    public function getPendingImageSubmittedAt(): ?DateTime
-    {
-        return $this->pendingImageSubmittedAt;
-    }
-
-    public function getPendingImageSubmittedBy(): ?CompanyUserModel
-    {
-        return $this->pendingImageSubmittedBy;
     }
 
     public function hasPendingImage(): bool

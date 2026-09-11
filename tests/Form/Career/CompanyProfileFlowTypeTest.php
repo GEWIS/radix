@@ -251,12 +251,12 @@ final class CompanyProfileFlowTypeTest extends TypeTestCase
     public function testTheProfileIsBuiltFromTheCompanyAndItsRevision(): void
     {
         $company = new Company();
-        $company->setName('Nexunt');
-        $company->setSlugName('nexunt');
-        $company->setPublished(true);
+        $company->name = 'Nexunt';
+        $company->slugName = 'nexunt';
+        $company->published = true;
 
         $revision = new CompanyRevision();
-        $revision->getSlogan()->updateValues(
+        $revision->slogan->updateValues(
             'We build things',
             null,
         );

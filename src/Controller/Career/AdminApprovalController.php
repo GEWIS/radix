@@ -194,7 +194,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         return $this->discardDraft(
             $revision,
             'admin/career/companies/view',
-            ['company' => $revision->getCompany()->getId()],
+            ['company' => $revision->company->getId()],
         );
     }
 
@@ -276,13 +276,13 @@ class AdminApprovalController extends AbstractRevisionReviewController
         RevisionActions $actions,
     ): array {
         if ($revision instanceof CompanyRevision) {
-            $company = $revision->getCompany();
-            $subjectName = $company->getName();
+            $company = $revision->company;
+            $subjectName = $company->name;
             $comments = $this->companyCommentRepository->findThreadForCompany($company);
         } else {
             assert($revision instanceof VacancyRevision);
-            $vacancy = $revision->getVacancy();
-            $subjectName = $vacancy->getSlugName();
+            $vacancy = $revision->vacancy;
+            $subjectName = $vacancy->slugName;
             $comments = $this->vacancyCommentRepository->findThreadForVacancy($vacancy);
         }
 

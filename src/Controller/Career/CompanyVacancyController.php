@@ -107,7 +107,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         $company = $companyUser->getCompany();
 
         $vacancy = new Vacancy();
-        $vacancy->setPublished(true);
+        $vacancy->published = true;
 
         $revision = new VacancyRevision();
         $revision->setAuthorCompanyUser($companyUser);
@@ -247,7 +247,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
             [
                 'company' => $company,
                 'identity_editable' => $identityEditable,
-                'current_package_id' => $vacancy->getPackage()->getId(),
+                'current_package_id' => $vacancy->package->getId(),
                 'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save draft'),
             ],
@@ -586,7 +586,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
         RevisionActions $actions,
     ): array {
         assert($revision instanceof VacancyRevision);
-        $vacancy = $revision->getVacancy();
+        $vacancy = $revision->vacancy;
 
         return [
             'vacancy' => $vacancy,
@@ -599,7 +599,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
     {
         assert($revision instanceof VacancyRevision);
 
-        return $this->backToStatus($revision->getVacancy());
+        return $this->backToStatus($revision->vacancy);
     }
 
     /**

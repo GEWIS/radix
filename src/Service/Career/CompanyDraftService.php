@@ -65,7 +65,7 @@ final readonly class CompanyDraftService
             $company,
             $actor,
             CompanyAuditVerbs::CompanyCreated,
-            $company->getName(),
+            $company->name,
         );
 
         $this->entityManager->flush();
@@ -132,7 +132,7 @@ final readonly class CompanyDraftService
             if (null === $path) {
                 $stored = false;
             } else {
-                $revision->setSquareLogo($path);
+                $revision->squareLogo = $path;
             }
         }
 
@@ -146,7 +146,7 @@ final readonly class CompanyDraftService
             if (null === $path) {
                 $stored = false;
             } else {
-                $revision->setBannerLogo($path);
+                $revision->bannerLogo = $path;
             }
         }
 

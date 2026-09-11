@@ -49,7 +49,7 @@ class CompanyUserInviteEmailHandler
                 ->htmlTemplate('emails/career/company-user-invite.html.twig')
                 ->context([
                     'fullName' => $invite->getName(),
-                    'companyName' => $invite->getCompany()->getName(),
+                    'companyName' => $invite->getCompany()->name,
                     'inviteUrl' => $url,
                     'expiresAt' => $invite->getExpiresAt(),
                 ]),

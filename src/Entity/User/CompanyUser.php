@@ -201,7 +201,7 @@ class CompanyUser implements
         return sprintf(
             '%s (%s)',
             $this->getName(),
-            $this->getCompany()->getName(),
+            $this->getCompany()->name,
         );
     }
 

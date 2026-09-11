@@ -45,7 +45,7 @@ final readonly class CompanyPackageService
         $this->entityManager->persist($package);
 
         $this->auditLogger->log(
-            $package->getCompany(),
+            $package->company,
             $actor,
             CompanyAuditVerbs::PackageCreated,
             $package->getType()->value,
@@ -59,7 +59,7 @@ final readonly class CompanyPackageService
         User $actor,
     ): void {
         $this->auditLogger->log(
-            $package->getCompany(),
+            $package->company,
             $actor,
             CompanyAuditVerbs::PackageUpdated,
             $package->getType()->value,
@@ -73,7 +73,7 @@ final readonly class CompanyPackageService
         User $actor,
     ): void {
         $this->auditLogger->log(
-            $package->getCompany(),
+            $package->company,
             $actor,
             CompanyAuditVerbs::PackageDeleted,
             $package->getType()->value,
@@ -114,7 +114,7 @@ final readonly class CompanyPackageService
         ?string $discardedImage,
     ): void {
         $this->auditLogger->log(
-            $banner->getCompany(),
+            $banner->company,
             $actor,
             $verb,
         );

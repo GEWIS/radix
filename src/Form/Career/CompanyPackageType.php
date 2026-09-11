@@ -177,7 +177,7 @@ class CompanyPackageType extends AbstractType
             return;
         }
 
-        $article = $package->getArticle();
+        $article = $package->article;
         $hasDutch = '' !== trim(strval($article->getValueNL()));
         $hasEnglish = '' !== trim(strval($article->getValueEN()));
 

@@ -92,7 +92,7 @@ class AdminVacancyController extends AbstractController
         User $user,
     ): Response {
         $vacancy = new Vacancy();
-        $vacancy->setPublished(true);
+        $vacancy->published = true;
 
         $revision = new VacancyRevision();
         $revision->setAuthor($user->getMember());
@@ -263,7 +263,7 @@ class AdminVacancyController extends AbstractController
             [
                 'admin' => true,
                 'company' => $vacancy->getCompany(),
-                'current_package_id' => $vacancy->getPackage()->getId(),
+                'current_package_id' => $vacancy->package->getId(),
                 'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save changes'),
             ],

@@ -41,7 +41,7 @@ class CompanyRevision extends AbstractRevision
         inversedBy: 'revisions',
     )]
     #[JoinColumn(nullable: false)]
-    private Company $company;
+    public Company $company;
 
     /**
      * The revision this one supersedes (null for the first revision in the chain).
@@ -63,7 +63,7 @@ class CompanyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $slogan;
+    public CareerLocalisedText $slogan;
 
     #[OneToOne(
         targetEntity: CareerLocalisedText::class,
@@ -78,7 +78,7 @@ class CompanyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $description;
+    public CareerLocalisedText $description;
 
     #[OneToOne(
         targetEntity: CareerLocalisedText::class,
@@ -93,43 +93,43 @@ class CompanyRevision extends AbstractRevision
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CareerLocalisedText $website;
+    public CareerLocalisedText $website;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $squareLogo = null;
+    public ?string $squareLogo = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $bannerLogo = null;
+    public ?string $bannerLogo = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactName = null;
+    public ?string $contactName = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactAddress = null;
+    public ?string $contactAddress = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactEmail = null;
+    public ?string $contactEmail = null;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $contactPhone = null;
+    public ?string $contactPhone = null;
 
     /**
      * Where else this company can be followed. Owned by the revision, so adding or dropping one is reviewed like
@@ -183,16 +183,6 @@ class CompanyRevision extends AbstractRevision
         return CompanyRevisionComment::class;
     }
 
-    public function getCompany(): Company
-    {
-        return $this->company;
-    }
-
-    public function setCompany(Company $company): void
-    {
-        $this->company = $company;
-    }
-
     #[Override]
     public function getPreviousRevision(): ?CompanyRevision
     {
@@ -210,86 +200,6 @@ class CompanyRevision extends AbstractRevision
         $this->previousRevision = null;
     }
 
-    public function getSlogan(): CareerLocalisedText
-    {
-        return $this->slogan;
-    }
-
-    public function setSlogan(CareerLocalisedText $slogan): void
-    {
-        $this->slogan = $slogan;
-    }
-
-    public function getDescription(): CareerLocalisedText
-    {
-        return $this->description;
-    }
-
-    public function setDescription(CareerLocalisedText $description): void
-    {
-        $this->description = $description;
-    }
-
-    public function getWebsite(): CareerLocalisedText
-    {
-        return $this->website;
-    }
-
-    public function setWebsite(CareerLocalisedText $website): void
-    {
-        $this->website = $website;
-    }
-
-    public function getSquareLogo(): ?string
-    {
-        return $this->squareLogo;
-    }
-
-    public function setSquareLogo(?string $squareLogo): void
-    {
-        $this->squareLogo = $squareLogo;
-    }
-
-    public function getBannerLogo(): ?string
-    {
-        return $this->bannerLogo;
-    }
-
-    public function setBannerLogo(?string $bannerLogo): void
-    {
-        $this->bannerLogo = $bannerLogo;
-    }
-
-    public function getContactName(): ?string
-    {
-        return $this->contactName;
-    }
-
-    public function setContactName(?string $contactName): void
-    {
-        $this->contactName = $contactName;
-    }
-
-    public function getContactAddress(): ?string
-    {
-        return $this->contactAddress;
-    }
-
-    public function setContactAddress(?string $contactAddress): void
-    {
-        $this->contactAddress = $contactAddress;
-    }
-
-    public function getContactEmail(): ?string
-    {
-        return $this->contactEmail;
-    }
-
-    public function setContactEmail(?string $contactEmail): void
-    {
-        $this->contactEmail = $contactEmail;
-    }
-
     /**
      * @return Collection<array-key, CompanySocialLink>
      */
@@ -303,18 +213,8 @@ class CompanyRevision extends AbstractRevision
     protected function newSocialLink(SocialPlatform $platform): CompanySocialLink
     {
         $link = new CompanySocialLink($platform);
-        $link->setRevision($this);
+        $link->revision = $this;
 
         return $link;
-    }
-
-    public function getContactPhone(): ?string
-    {
-        return $this->contactPhone;
-    }
-
-    public function setContactPhone(?string $contactPhone): void
-    {
-        $this->contactPhone = $contactPhone;
     }
 }

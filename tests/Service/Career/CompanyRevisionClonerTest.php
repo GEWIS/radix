@@ -34,7 +34,7 @@ final class CompanyRevisionClonerTest extends TestCase
         $author = self::createStub(Member::class);
         $source = $this->approvedSource($author);
         $source->setRevisionNumber(2);
-        $company = $source->getCompany();
+        $company = $source->company;
 
         $draft = $this->cloner->cloneAsDraft($source);
         self::assertInstanceOf(
@@ -77,41 +77,41 @@ final class CompanyRevisionClonerTest extends TestCase
         );
 
         $this->assertCopiedNotShared(
-            $source->getSlogan(),
-            $draft->getSlogan(),
+            $source->slogan,
+            $draft->slogan,
         );
         $this->assertCopiedNotShared(
-            $source->getDescription(),
-            $draft->getDescription(),
+            $source->description,
+            $draft->description,
         );
         $this->assertCopiedNotShared(
-            $source->getWebsite(),
-            $draft->getWebsite(),
+            $source->website,
+            $draft->website,
         );
 
         self::assertSame(
             'square.png',
-            $draft->getSquareLogo(),
+            $draft->squareLogo,
         );
         self::assertSame(
             'banner.png',
-            $draft->getBannerLogo(),
+            $draft->bannerLogo,
         );
         self::assertSame(
             'Jane Doe',
-            $draft->getContactName(),
+            $draft->contactName,
         );
         self::assertSame(
             'Street 1',
-            $draft->getContactAddress(),
+            $draft->contactAddress,
         );
         self::assertSame(
             'jane@example.com',
-            $draft->getContactEmail(),
+            $draft->contactEmail,
         );
         self::assertSame(
             '+31 600000000',
-            $draft->getContactPhone(),
+            $draft->contactPhone,
         );
     }
 
@@ -145,24 +145,24 @@ final class CompanyRevisionClonerTest extends TestCase
         $source->setStatus(RevisionStatus::Approved);
         $source->setRevisionNumber(1);
         $source->setAuthor($author ?? self::createStub(Member::class));
-        $source->setSlogan($this->text(
+        $source->slogan = $this->text(
             'We build.',
             'Wij bouwen.',
-        ));
-        $source->setDescription($this->text(
+        );
+        $source->description = $this->text(
             'A description.',
             'Een beschrijving.',
-        ));
-        $source->setWebsite($this->text(
+        );
+        $source->website = $this->text(
             'https://example.com/en',
             'https://example.com/nl',
-        ));
-        $source->setSquareLogo('square.png');
-        $source->setBannerLogo('banner.png');
-        $source->setContactName('Jane Doe');
-        $source->setContactAddress('Street 1');
-        $source->setContactEmail('jane@example.com');
-        $source->setContactPhone('+31 600000000');
+        );
+        $source->squareLogo = 'square.png';
+        $source->bannerLogo = 'banner.png';
+        $source->contactName = 'Jane Doe';
+        $source->contactAddress = 'Street 1';
+        $source->contactEmail = 'jane@example.com';
+        $source->contactPhone = '+31 600000000';
 
         return $source;
     }

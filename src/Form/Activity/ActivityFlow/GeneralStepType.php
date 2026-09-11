@@ -225,7 +225,7 @@ class GeneralStepType extends AbstractType
 
         foreach ($this->companyRepository->findAll() as $company) {
             assert($company instanceof Company);
-            $choices[$company->getName()] = (string) intval($company->getId());
+            $choices[$company->name] = (string) intval($company->getId());
         }
 
         return $choices;

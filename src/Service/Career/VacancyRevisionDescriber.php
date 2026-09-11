@@ -49,8 +49,8 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Company'),
                         RevisionFieldKind::Reference,
-                        $previous?->getVacancy()->getCompany()->getName(),
-                        $revision->getVacancy()->getCompany()->getName(),
+                        $previous?->vacancy->getCompany()->name,
+                        $revision->vacancy->getCompany()->name,
                         $comparable,
                         ['width' => 'third'],
                         RevisionAudience::ReviewerOnly,
@@ -58,24 +58,24 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Category'),
                         RevisionFieldKind::Badge,
-                        $previous?->getCategory()->label(),
-                        $revision->getCategory()->label(),
+                        $previous?->category->label(),
+                        $revision->category->label(),
                         $comparable,
                         [
                             'width' => 'third',
-                            'badgeClass' => $revision->getCategory()->badgeClass(),
+                            'badgeClass' => $revision->category->badgeClass(),
                         ],
                     ),
                     $this->field(
                         t('Posting window'),
                         RevisionFieldKind::DateRange,
                         null === $previous ? null : new RevisionDateRange(
-                            $previous->getStartDate(),
-                            $previous->getEndDate(),
+                            $previous->startDate,
+                            $previous->endDate,
                         ),
                         new RevisionDateRange(
-                            $revision->getStartDate(),
-                            $revision->getEndDate(),
+                            $revision->startDate,
+                            $revision->endDate,
                         ),
                         $comparable,
                         ['width' => 'third'],
@@ -96,32 +96,32 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
                 [
                     $this->localisedField(
                         t('Title'),
-                        $previous?->getName(),
-                        $revision->getName(),
+                        $previous?->name,
+                        $revision->name,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Location'),
-                        $previous?->getLocation(),
-                        $revision->getLocation(),
+                        $previous?->location,
+                        $revision->location,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Website'),
-                        $previous?->getWebsite(),
-                        $revision->getWebsite(),
+                        $previous?->website,
+                        $revision->website,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Attachment link'),
-                        $previous?->getAttachment(),
-                        $revision->getAttachment(),
+                        $previous?->attachment,
+                        $revision->attachment,
                         $comparable,
                     ),
                     $this->localisedField(
                         t('Description'),
-                        $previous?->getDescription(),
-                        $revision->getDescription(),
+                        $previous?->description,
+                        $revision->description,
                         $comparable,
                         RevisionFieldKind::LongText,
                     ),
@@ -134,22 +134,22 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
                     $this->field(
                         t('Contact name'),
                         RevisionFieldKind::Text,
-                        $previous?->getContactName(),
-                        $revision->getContactName(),
+                        $previous?->contactName,
+                        $revision->contactName,
                         $comparable,
                     ),
                     $this->field(
                         t('Contact email address'),
                         RevisionFieldKind::Text,
-                        $previous?->getContactEmail(),
-                        $revision->getContactEmail(),
+                        $previous?->contactEmail,
+                        $revision->contactEmail,
                         $comparable,
                     ),
                     $this->field(
                         t('Contact phone number'),
                         RevisionFieldKind::Text,
-                        $previous?->getContactPhone(),
-                        $revision->getContactPhone(),
+                        $previous?->contactPhone,
+                        $revision->contactPhone,
                         $comparable,
                     ),
                 ],
@@ -167,7 +167,7 @@ final class VacancyRevisionDescriber extends AbstractRevisionDescriber
         foreach ($revision?->getLabels() ?? [] as $label) {
             $tags[] = new RevisionTag(
                 $label->getId(),
-                $label->getName(),
+                $label->name,
             );
         }
 

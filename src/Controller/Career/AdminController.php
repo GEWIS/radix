@@ -92,7 +92,7 @@ class AdminController extends AbstractController
         User $user,
     ): Response {
         $company = new Company();
-        $company->setPublished(false);
+        $company->published = false;
 
         $revision = new CompanyRevision();
         $revision->setAuthor($user->getMember());
@@ -256,8 +256,8 @@ class AdminController extends AbstractController
                 'admin' => true,
                 'flow_key' => $run,
                 'finish_label' => $this->translator->trans('Save changes'),
-                'has_square_logo' => null !== $current->getSquareLogo(),
-                'has_banner_logo' => null !== $current->getBannerLogo(),
+                'has_square_logo' => null !== $current->squareLogo,
+                'has_banner_logo' => null !== $current->bannerLogo,
             ],
         );
         $flow->handleRequest($request);

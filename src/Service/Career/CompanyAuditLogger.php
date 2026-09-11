@@ -31,14 +31,14 @@ final readonly class CompanyAuditLogger
         string $detail = '',
     ): void {
         $entry = new CompanyAuditLog();
-        $entry->setCompany($company);
-        $entry->setVerb($verb);
-        $entry->setDetail($detail);
+        $entry->company = $company;
+        $entry->verb = $verb;
+        $entry->detail = $detail;
 
         if ($actor instanceof User) {
-            $entry->setActor($actor);
+            $entry->actor = $actor;
         } elseif ($actor instanceof CompanyUser) {
-            $entry->setActorCompanyUser($actor);
+            $entry->actorCompanyUser = $actor;
         }
 
         $this->entityManager->persist($entry);

@@ -31,7 +31,7 @@ final readonly class VacancyRevisionCloner extends AbstractRevisionCloner
     {
         assert($source instanceof VacancyRevision);
 
-        $vacancy = $source->getVacancy();
+        $vacancy = $source->vacancy;
 
         $draft = new VacancyRevision();
         $draft->setPreviousRevision($source);
@@ -49,17 +49,17 @@ final readonly class VacancyRevisionCloner extends AbstractRevisionCloner
         assert($source instanceof VacancyRevision);
         assert($draft instanceof VacancyRevision);
 
-        $draft->setName($source->getName()->copy());
-        $draft->setLocation($source->getLocation()->copy());
-        $draft->setWebsite($source->getWebsite()->copy());
-        $draft->setDescription($source->getDescription()->copy());
-        $draft->setAttachment($source->getAttachment()->copy());
-        $draft->setContactName($source->getContactName());
-        $draft->setContactPhone($source->getContactPhone());
-        $draft->setContactEmail($source->getContactEmail());
-        $draft->setCategory($source->getCategory());
-        $draft->setStartDate($source->getStartDate());
-        $draft->setEndDate($source->getEndDate());
+        $draft->name = $source->name->copy();
+        $draft->location = $source->location->copy();
+        $draft->website = $source->website->copy();
+        $draft->description = $source->description->copy();
+        $draft->attachment = $source->attachment->copy();
+        $draft->contactName = $source->contactName;
+        $draft->contactPhone = $source->contactPhone;
+        $draft->contactEmail = $source->contactEmail;
+        $draft->category = $source->category;
+        $draft->startDate = $source->startDate;
+        $draft->endDate = $source->endDate;
         // Labels (reference entities) are carried over to the draft; without this, editing would blank them.
         $draft->addLabels($source->getLabels()->toArray());
     }

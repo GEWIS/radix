@@ -50,8 +50,8 @@ final readonly class CompanyRepresentativeService
 
         // Somebody who cannot sign in cannot be the contact either, so the company is left without one and the board
         // is asked to appoint a replacement.
-        if ($company->getPrimaryContact() === $representative) {
-            $company->setPrimaryContact(null);
+        if ($company->primaryContact === $representative) {
+            $company->primaryContact = null;
         }
 
         $this->auditLogger->log(
@@ -124,7 +124,7 @@ final readonly class CompanyRepresentativeService
         CompanyUser $representative,
         User $actor,
     ): void {
-        $company->setPrimaryContact($representative);
+        $company->primaryContact = $representative;
 
         $this->auditLogger->log(
             $company,

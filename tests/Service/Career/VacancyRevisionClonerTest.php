@@ -38,7 +38,7 @@ final class VacancyRevisionClonerTest extends TestCase
         $author = self::createStub(Member::class);
         $source = $this->approvedSource(author: $author);
         $source->setRevisionNumber(5);
-        $vacancy = $source->getVacancy();
+        $vacancy = $source->vacancy;
 
         $draft = $this->cloner->cloneAsDraft($source);
         self::assertInstanceOf(
@@ -86,45 +86,45 @@ final class VacancyRevisionClonerTest extends TestCase
         );
 
         $this->assertCopiedNotShared(
-            $source->getName(),
-            $draft->getName(),
+            $source->name,
+            $draft->name,
         );
         $this->assertCopiedNotShared(
-            $source->getLocation(),
-            $draft->getLocation(),
+            $source->location,
+            $draft->location,
         );
         $this->assertCopiedNotShared(
-            $source->getWebsite(),
-            $draft->getWebsite(),
+            $source->website,
+            $draft->website,
         );
         $this->assertCopiedNotShared(
-            $source->getDescription(),
-            $draft->getDescription(),
+            $source->description,
+            $draft->description,
         );
         $this->assertCopiedNotShared(
-            $source->getAttachment(),
-            $draft->getAttachment(),
+            $source->attachment,
+            $draft->attachment,
         );
 
         // The category (an enum case) and labels are carried over, so the draft points at the very same instances.
         self::assertSame(
             $category,
-            $draft->getCategory(),
+            $draft->category,
         );
         self::assertTrue($draft->getLabels()->contains($label));
 
         // Contact details are scalars copied by value.
         self::assertSame(
             'Jane Doe',
-            $draft->getContactName(),
+            $draft->contactName,
         );
         self::assertSame(
             '+31 600000000',
-            $draft->getContactPhone(),
+            $draft->contactPhone,
         );
         self::assertSame(
             'jane@example.com',
-            $draft->getContactEmail(),
+            $draft->contactEmail,
         );
     }
 
@@ -161,32 +161,32 @@ final class VacancyRevisionClonerTest extends TestCase
         $source->setStatus(RevisionStatus::Approved);
         $source->setRevisionNumber(1);
         $source->setAuthor($author ?? self::createStub(Member::class));
-        $source->setName($this->text(
+        $source->name = $this->text(
             'Engineer',
             'Ingenieur',
-        ));
-        $source->setLocation($this->text(
+        );
+        $source->location = $this->text(
             'Eindhoven',
             'Eindhoven',
-        ));
-        $source->setWebsite($this->text(
+        );
+        $source->website = $this->text(
             'https://example.com/en',
             'https://example.com/nl',
-        ));
-        $source->setDescription($this->text(
+        );
+        $source->description = $this->text(
             'A role.',
             'Een functie.',
-        ));
-        $source->setAttachment($this->text(
+        );
+        $source->attachment = $this->text(
             'brochure-en.pdf',
             'brochure-nl.pdf',
-        ));
-        $source->setContactName('Jane Doe');
-        $source->setContactPhone('+31 600000000');
-        $source->setContactEmail('jane@example.com');
-        $source->setCategory($category ?? VacancyCategories::Jobs);
-        $source->setStartDate(new DateTime('2026-01-01'));
-        $source->setEndDate(new DateTime('2026-12-31'));
+        );
+        $source->contactName = 'Jane Doe';
+        $source->contactPhone = '+31 600000000';
+        $source->contactEmail = 'jane@example.com';
+        $source->category = $category ?? VacancyCategories::Jobs;
+        $source->startDate = new DateTime('2026-01-01');
+        $source->endDate = new DateTime('2026-12-31');
         $source->addLabel($label ?? self::createStub(VacancyLabel::class));
 
         return $source;

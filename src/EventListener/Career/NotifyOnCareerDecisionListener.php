@@ -34,13 +34,13 @@ final readonly class NotifyOnCareerDecisionListener
         $revision = $event->getSubject();
 
         if ($revision instanceof CompanyRevision) {
-            $company = $revision->getCompany();
-            $subjectName = $company->getName();
+            $company = $revision->company;
+            $subjectName = $company->name;
             $isVacancy = false;
         } elseif ($revision instanceof VacancyRevision) {
-            $vacancy = $revision->getVacancy();
+            $vacancy = $revision->vacancy;
             $company = $vacancy->getCompany();
-            $subjectName = $revision->getName()->getText(Languages::English) ?? '';
+            $subjectName = $revision->name->getText(Languages::English) ?? '';
             $isVacancy = true;
         } else {
             return;

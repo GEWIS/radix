@@ -71,8 +71,8 @@ final readonly class CompanyStaleRevisionPolicy implements StaleRevisionPolicyIn
 
         return array_values(array_filter(
             [
-                $revision->getSquareLogo(),
-                $revision->getBannerLogo(),
+                $revision->squareLogo,
+                $revision->bannerLogo,
             ],
             static fn (?string $path): bool => null !== $path,
         ));

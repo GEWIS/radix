@@ -31,7 +31,7 @@ final readonly class CompanyRevisionCloner extends AbstractRevisionCloner
     {
         assert($source instanceof CompanyRevision);
 
-        $company = $source->getCompany();
+        $company = $source->company;
 
         $draft = new CompanyRevision();
         $draft->setPreviousRevision($source);
@@ -51,18 +51,18 @@ final readonly class CompanyRevisionCloner extends AbstractRevisionCloner
 
         foreach ($source->getSocialLinks() as $link) {
             $copy = $link->copy();
-            $copy->setRevision($draft);
+            $copy->revision = $draft;
             $draft->getSocialLinks()->add($copy);
         }
 
-        $draft->setSlogan($source->getSlogan()->copy());
-        $draft->setDescription($source->getDescription()->copy());
-        $draft->setWebsite($source->getWebsite()->copy());
-        $draft->setSquareLogo($source->getSquareLogo());
-        $draft->setBannerLogo($source->getBannerLogo());
-        $draft->setContactName($source->getContactName());
-        $draft->setContactAddress($source->getContactAddress());
-        $draft->setContactEmail($source->getContactEmail());
-        $draft->setContactPhone($source->getContactPhone());
+        $draft->slogan = $source->slogan->copy();
+        $draft->description = $source->description->copy();
+        $draft->website = $source->website->copy();
+        $draft->squareLogo = $source->squareLogo;
+        $draft->bannerLogo = $source->bannerLogo;
+        $draft->contactName = $source->contactName;
+        $draft->contactAddress = $source->contactAddress;
+        $draft->contactEmail = $source->contactEmail;
+        $draft->contactPhone = $source->contactPhone;
     }
 }
