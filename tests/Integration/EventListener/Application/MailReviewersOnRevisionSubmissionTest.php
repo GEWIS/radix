@@ -14,7 +14,6 @@ use App\Security\User\MfaEnforcementSwitch;
 use App\Service\Application\OfficeMailboxes;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTime;
-use Override;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Workflow\Registry;
@@ -27,14 +26,6 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
 {
-    #[Override]
-    protected function tearDown(): void
-    {
-        MfaEnforcementSwitch::setEnabled(true);
-
-        parent::tearDown();
-    }
-
     public function testSubmittingWritesToTheOfficeThatReviewsIt(): void
     {
         $draft = $this->draft();
