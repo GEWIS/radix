@@ -265,7 +265,7 @@ class MemberController extends AbstractController
                 'member' => $member,
                 'committees' => $this->memberInfoService->getOrganMemberships($member),
                 'board' => $this->memberInfoService->getBoardMemberships($member),
-                'profilePhoto' => $profilePhoto?->getPhoto(),
+                'profilePhoto' => $profilePhoto?->photo,
             ],
         );
     }

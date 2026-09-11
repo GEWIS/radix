@@ -105,19 +105,19 @@ final readonly class PhotoMetadata
     {
         // Only override the capture time when EXIF actually carried one; the column is not nullable.
         if (null !== $this->dateTime) {
-            $photo->setDateTime($this->dateTime);
+            $photo->dateTime = $this->dateTime;
         }
 
-        $photo->setArtist($this->artist);
-        $photo->setCamera($this->camera);
-        $photo->setFlash($this->flash);
-        $photo->setFocalLength($this->focalLength);
-        $photo->setExposureTime($this->exposureTime);
-        $photo->setShutterSpeed($this->shutterSpeed);
-        $photo->setAperture($this->aperture);
-        $photo->setIso($this->iso);
-        $photo->setLatitude($this->latitude);
-        $photo->setLongitude($this->longitude);
+        $photo->artist = $this->artist;
+        $photo->camera = $this->camera;
+        $photo->flash = $this->flash;
+        $photo->focalLength = $this->focalLength;
+        $photo->exposureTime = $this->exposureTime;
+        $photo->shutterSpeed = $this->shutterSpeed;
+        $photo->aperture = $this->aperture;
+        $photo->iso = $this->iso;
+        $photo->latitude = $this->latitude;
+        $photo->longitude = $this->longitude;
     }
 
     /**

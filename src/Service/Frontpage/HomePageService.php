@@ -110,7 +110,7 @@ final readonly class HomePageService
      */
     private function publicPathIfAvailable(WeeklyPhoto $weeklyPhoto): ?string
     {
-        $path = $this->weeklyPhotoService->publicPathFor($weeklyPhoto->getPhoto());
+        $path = $this->weeklyPhotoService->publicPathFor($weeklyPhoto->photo);
 
         return $this->fileStorage->exists($path)
             ? $path

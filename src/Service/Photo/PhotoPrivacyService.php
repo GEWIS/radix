@@ -130,8 +130,8 @@ final readonly class PhotoPrivacyService
             }
 
             $hiddenPhoto = new HiddenPhoto();
-            $hiddenPhoto->setMember($member);
-            $hiddenPhoto->setPhoto($photo);
+            $hiddenPhoto->member = $member;
+            $hiddenPhoto->photo = $photo;
             $this->entityManager->persist($hiddenPhoto);
         }
 
@@ -172,7 +172,7 @@ final readonly class PhotoPrivacyService
         if (
             null === $this->hiddenPhotoRepository->findByMemberAndPhoto(
                 $member,
-                $profilePhoto->getPhoto(),
+                $profilePhoto->photo,
             )
         ) {
             return;

@@ -101,7 +101,7 @@ final readonly class WeeklyPhotoService
     {
         $grouped = [];
         foreach ($this->weeklyPhotoRepository->findAllByWeekDesc() as $weeklyPhoto) {
-            $grouped[AssociationYear::fromDate($weeklyPhoto->getWeek())->getYear()][] = $weeklyPhoto;
+            $grouped[AssociationYear::fromDate($weeklyPhoto->week)->getYear()][] = $weeklyPhoto;
         }
 
         krsort($grouped);
@@ -117,7 +117,7 @@ final readonly class WeeklyPhotoService
     public function getPhotosInYear(int $year): array
     {
         return array_map(
-            static fn (WeeklyPhoto $weeklyPhoto): Photo => $weeklyPhoto->getPhoto(),
+            static fn (WeeklyPhoto $weeklyPhoto): Photo => $weeklyPhoto->photo,
             $this->getPhotosByYear()[$year] ?? [],
         );
     }
@@ -129,7 +129,7 @@ final readonly class WeeklyPhotoService
             return;
         }
 
-        $this->fileStorage->remove($this->publicPathFor($current->getPhoto()));
+        $this->fileStorage->remove($this->publicPathFor($current->photo));
     }
 
     private function store(
@@ -137,8 +137,8 @@ final readonly class WeeklyPhotoService
         DateTime $week,
     ): WeeklyPhoto {
         $weeklyPhoto = new WeeklyPhoto();
-        $weeklyPhoto->setWeek($week);
-        $weeklyPhoto->setPhoto($photo);
+        $weeklyPhoto->week = $week;
+        $weeklyPhoto->photo = $photo;
         $this->entityManager->persist($weeklyPhoto);
         $this->entityManager->flush();
 
@@ -153,10 +153,10 @@ final readonly class WeeklyPhotoService
      */
     public function hide(WeeklyPhoto $weeklyPhoto): void
     {
-        $weeklyPhoto->setHidden(true);
+        $weeklyPhoto->hidden = true;
         $this->entityManager->flush();
 
-        $this->fileStorage->remove($this->publicPathFor($weeklyPhoto->getPhoto()));
+        $this->fileStorage->remove($this->publicPathFor($weeklyPhoto->photo));
     }
 
     /**
@@ -169,7 +169,7 @@ final readonly class WeeklyPhotoService
             'photos/weekly/%d.%s',
             $photo->getId(),
             pathinfo(
-                $photo->getPath(),
+                $photo->path,
                 PATHINFO_EXTENSION,
             ),
         );
@@ -180,7 +180,7 @@ final readonly class WeeklyPhotoService
         $publicPath = $this->publicPathFor($photo);
         $this->fileStorage->writeStream(
             $publicPath,
-            $this->fileStorage->readStream($photo->getPath()),
+            $this->fileStorage->readStream($photo->path),
         );
 
         // Pre-generate the frontpage variants; the first visitor would otherwise get a 503.
@@ -236,7 +236,7 @@ final readonly class WeeklyPhotoService
         $ageInDays = max(
             1,
             new DateTime()->diff(
-                $photo->getDateTime(),
+                $photo->dateTime,
                 true,
             )->days,
         );

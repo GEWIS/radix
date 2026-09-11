@@ -202,7 +202,7 @@ final class PhotoControllerTest extends DatabaseTestCase
         $this->pushRequest();
         $weekly = self::getContainer()->get(WeeklyPhotoRepository::class)->getCurrentPhotoOfTheWeek();
         self::assertNotNull($weekly);
-        $year = AssociationYear::fromDate($weekly->getWeek())->getYear();
+        $year = AssociationYear::fromDate($weekly->week)->getYear();
 
         $response = $this->controller()->album(
             AlbumType::Weekly,
@@ -233,7 +233,7 @@ final class PhotoControllerTest extends DatabaseTestCase
         );
         $weekly = self::getContainer()->get(WeeklyPhotoRepository::class)->getCurrentPhotoOfTheWeek();
         self::assertNotNull($weekly);
-        $year = AssociationYear::fromDate($weekly->getWeek())->getYear();
+        $year = AssociationYear::fromDate($weekly->week)->getYear();
 
         $entries = json_decode(
             (string) $this->controller()->weeklyManifest($year)->getContent(),
@@ -379,7 +379,7 @@ final class PhotoControllerTest extends DatabaseTestCase
         $photoId = (int) $photo->getId();
 
         $response = $this->controller()->download(
-            $photo->getAlbum()->getId() ?? 0,
+            $photo->album->getId() ?? 0,
             $photoId,
         );
 
@@ -449,7 +449,7 @@ final class PhotoControllerTest extends DatabaseTestCase
         foreach (self::getContainer()->get(PhotoRepository::class)->getAlbumPhotos($album) as $photo) {
             $tags = $organTagRepository->findByPhotoWithOrgan((int) $photo->getId());
             if ([] !== $tags) {
-                return (int) $tags[0]->getOrgan()->getId();
+                return (int) $tags[0]->organ->getId();
             }
         }
 
@@ -504,10 +504,10 @@ final class PhotoControllerTest extends DatabaseTestCase
         unlink($temporaryFile);
 
         $photo = new Photo();
-        $photo->setAlbum($album);
-        $photo->setPath($stored->path);
-        $photo->setDateTime(new DateTime());
-        $photo->setAspectRatio(1.0);
+        $photo->album = $album;
+        $photo->path = $stored->path;
+        $photo->dateTime = new DateTime();
+        $photo->aspectRatio = 1.0;
         $this->entityManager->persist($photo);
         $this->entityManager->flush();
 

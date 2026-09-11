@@ -38,7 +38,7 @@ class Album
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $startDateTime = null;
+    public ?DateTime $startDateTime = null;
 
     /**
      * End date of photos in album.
@@ -47,13 +47,13 @@ class Album
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $endDateTime = null;
+    public ?DateTime $endDateTime = null;
 
     /**
      * Name of the album.
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * Parent album, null if there is no parent album.
@@ -112,13 +112,13 @@ class Album
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $coverPath = null;
+    public ?string $coverPath = null;
 
     /**
      * Whether the album is published.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $published = false;
+    public bool $published = false;
 
     public function __construct()
     {
@@ -156,56 +156,6 @@ class Album
     }
 
     /**
-     * Get the start date.
-     */
-    public function getStartDateTime(): ?DateTime
-    {
-        return $this->startDateTime;
-    }
-
-    /**
-     * Set the start date.
-     */
-    public function setStartDateTime(?DateTime $startDateTime): void
-    {
-        $this->startDateTime = $startDateTime;
-    }
-
-    /**
-     * Get the end date.
-     */
-    public function getEndDateTime(): ?DateTime
-    {
-        return $this->endDateTime;
-    }
-
-    /**
-     * Set the end date.
-     */
-    public function setEndDateTime(?DateTime $endDateTime): void
-    {
-        $this->endDateTime = $endDateTime;
-    }
-
-    /**
-     * Get the album name.
-     *
-     * @return string $name
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name of the album.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
      * Get the parent album.
      *
      * @return Album|null $parent
@@ -221,38 +171,6 @@ class Album
     public function setParent(?Album $parent): void
     {
         $this->parent = $parent;
-    }
-
-    /**
-     * Get the album cover.
-     */
-    public function getCoverPath(): ?string
-    {
-        return $this->coverPath;
-    }
-
-    /**
-     * Set the cover photo for the album.
-     */
-    public function setCoverPath(?string $photo): void
-    {
-        $this->coverPath = $photo;
-    }
-
-    /**
-     * Whether this album is published.
-     */
-    public function isPublished(): bool
-    {
-        return $this->published;
-    }
-
-    /**
-     * Set the published state.
-     */
-    public function setPublished(bool $published): void
-    {
-        $this->published = $published;
     }
 
     /**

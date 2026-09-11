@@ -240,12 +240,12 @@ final class PhotoMetadataTest extends TestCase
     {
         $photo = new Photo();
         $original = new DateTime('2021-05-05 05:05:05');
-        $photo->setDateTime($original);
+        $photo->dateTime = $original;
 
         PhotoMetadata::empty()->applyTo($photo);
         self::assertSame(
             $original,
-            $photo->getDateTime(),
+            $photo->dateTime,
         );
 
         PhotoMetadata::fromExif([
@@ -257,15 +257,15 @@ final class PhotoMetadataTest extends TestCase
 
         self::assertSame(
             '2019-08-12 18:45:30',
-            $photo->getDateTime()->format('Y-m-d H:i:s'),
+            $photo->dateTime->format('Y-m-d H:i:s'),
         );
         self::assertSame(
             'Canon EOS 60D',
-            $photo->getCamera(),
+            $photo->camera,
         );
         self::assertSame(
             200,
-            $photo->getIso(),
+            $photo->iso,
         );
     }
 }

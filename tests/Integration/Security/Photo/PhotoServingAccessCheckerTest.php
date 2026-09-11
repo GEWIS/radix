@@ -88,7 +88,7 @@ final class PhotoServingAccessCheckerTest extends DatabaseTestCase
             'The graduate is expected to be tagged in the seed.',
         );
 
-        return $tags[0]->getPhoto()->getPath();
+        return $tags[0]->photo->path;
     }
 
     private function pinMembershipEnd(

@@ -53,11 +53,11 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
 
         self::assertSame(
             $gala->getId(),
-            $photoA->getAlbum()->getId(),
+            $photoA->album->getId(),
         );
         self::assertSame(
             $gala->getId(),
-            $photoB->getAlbum()->getId(),
+            $photoB->album->getId(),
         );
         // One cover per distinct affected album (the single source and the destination), not per photo.
         self::assertSame(
@@ -90,7 +90,7 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
 
         self::assertSame(
             $trip->getId(),
-            $photo->getAlbum()->getId(),
+            $photo->album->getId(),
         );
         self::assertSame(
             0,
@@ -102,7 +102,7 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
     {
         $trip = $this->album('Trip 2024');
         $photo = $this->storedPhoto($trip);
-        $path = $photo->getPath();
+        $path = $photo->path;
         $id = (int) $photo->getId();
         self::assertTrue($this->storage()->exists($path));
 
@@ -125,7 +125,7 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         $this->entityManager->flush();
 
         $photo = $this->storedPhoto($child);
-        $path = $photo->getPath();
+        $path = $photo->path;
         $parentId = (int) $parent->getId();
         $childId = (int) $child->getId();
         $photoId = (int) $photo->getId();
@@ -183,8 +183,8 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
     private function newAlbum(string $name): Album
     {
         $album = new Album();
-        $album->setName($name);
-        $album->setPublished(false);
+        $album->name = $name;
+        $album->published = false;
         $this->entityManager->persist($album);
         $this->entityManager->flush();
 
@@ -236,10 +236,10 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         unlink($file);
 
         $photo = new Photo();
-        $photo->setAlbum($album);
-        $photo->setPath($stored->path);
-        $photo->setDateTime(new DateTime());
-        $photo->setAspectRatio(30 / 40);
+        $photo->album = $album;
+        $photo->path = $stored->path;
+        $photo->dateTime = new DateTime();
+        $photo->aspectRatio = 30 / 40;
         $this->entityManager->persist($photo);
         $this->entityManager->flush();
 

@@ -129,7 +129,7 @@ class AdminController extends AbstractController
 
         if (
             null !== $weeklyPhoto
-            && !$weeklyPhoto->isHidden()
+            && !$weeklyPhoto->hidden
             && $this->withinHideWindow()
         ) {
             $this->weeklyPhotoService->hide($weeklyPhoto);
@@ -191,7 +191,7 @@ class AdminController extends AbstractController
 
         $this->albumAdminService->saveAlbum($album);
 
-        if ($album->isPublished()) {
+        if ($album->published) {
             $this->announceAlbumPublished($album);
         }
 
@@ -219,7 +219,7 @@ class AdminController extends AbstractController
         Album $album,
         Request $request,
     ): Response {
-        $wasPublished = $album->isPublished();
+        $wasPublished = $album->published;
         $form = $this->createForm(AlbumType::class, $album)->handleRequest($request);
 
         if (
@@ -239,7 +239,7 @@ class AdminController extends AbstractController
 
         if (
             !$wasPublished
-            && $album->isPublished()
+            && $album->published
         ) {
             $this->announceAlbumPublished($album);
         }
@@ -344,8 +344,8 @@ class AdminController extends AbstractController
                 return [
                     'id' => $album->getId(),
                     'label' => null === $parent
-                        ? $album->getName()
-                        : $parent->getName() . ' / ' . $album->getName(),
+                        ? $album->name
+                        : $parent->name . ' / ' . $album->name,
                 ];
             },
             $this->albumRepository->searchForMove($query),

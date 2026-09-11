@@ -53,7 +53,7 @@ final class AlbumCoverServiceTest extends TestCase
         self::assertNotNull($coverPath);
         self::assertSame(
             $coverPath,
-            $album->getCoverPath(),
+            $album->coverPath,
         );
         // The cover is scoped under the album it belongs to.
         self::assertTrue(str_starts_with($coverPath, 'photos/covers/7/'));
@@ -197,7 +197,7 @@ final class AlbumCoverServiceTest extends TestCase
         )->path;
 
         $photo = new Photo();
-        $photo->setPath($path);
+        $photo->path = $path;
 
         return $photo;
     }

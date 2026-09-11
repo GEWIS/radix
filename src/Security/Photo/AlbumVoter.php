@@ -64,7 +64,7 @@ final class AlbumVoter extends Voter
         Album $album,
         TokenInterface $token,
     ): bool {
-        if (!$album->isPublished()) {
+        if (!$album->published) {
             return false;
         }
 
@@ -98,7 +98,7 @@ final class AlbumVoter extends Voter
         Member $member,
     ): bool {
         $endsOn = $member->getMembershipEndsOn();
-        $startedOn = $album->getStartDateTime();
+        $startedOn = $album->startDateTime;
         if (
             null !== $endsOn
             && null !== $startedOn

@@ -122,7 +122,7 @@ final class GenerateWeeklyPhotoCommand extends Command
 
         $message = sprintf(
             'Photo of the week set to photo %d.',
-            $weeklyPhoto->getPhoto()->getId() ?? 0,
+            $weeklyPhoto->photo->getId() ?? 0,
         );
         $this->logger->info($message);
         $io->success($message);

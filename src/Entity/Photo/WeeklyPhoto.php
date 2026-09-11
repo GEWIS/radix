@@ -24,7 +24,7 @@ class WeeklyPhoto
      * The start date of the week the photo is based on.
      */
     #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $week;
+    public DateTime $week;
 
     /**
      * The photo of the week.
@@ -38,41 +38,11 @@ class WeeklyPhoto
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Photo $photo;
+    public Photo $photo;
 
     /**
      * If a photo of the week is hidden, it is not shown to visitors who are NOT logged in.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $hidden = false;
-
-    public function getWeek(): DateTime
-    {
-        return $this->week;
-    }
-
-    public function getPhoto(): Photo
-    {
-        return $this->photo;
-    }
-
-    public function setWeek(DateTime $week): void
-    {
-        $this->week = $week;
-    }
-
-    public function setPhoto(Photo $photo): void
-    {
-        $this->photo = $photo;
-    }
-
-    public function isHidden(): bool
-    {
-        return $this->hidden;
-    }
-
-    public function setHidden(bool $hidden): void
-    {
-        $this->hidden = $hidden;
-    }
+    public bool $hidden = false;
 }

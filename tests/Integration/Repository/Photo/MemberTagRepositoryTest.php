@@ -31,7 +31,7 @@ final class MemberTagRepositoryTest extends DatabaseTestCase
 
         $tags = $this->repository()->findMostRecentTagPerMember($members);
         $lidnrs = array_map(
-            static fn (MemberTag $tag): int => $tag->getMember()->getLidnr(),
+            static fn (MemberTag $tag): int => $tag->member->getLidnr(),
             $tags,
         );
 
@@ -51,12 +51,12 @@ final class MemberTagRepositoryTest extends DatabaseTestCase
             $tags,
         );
 
-        $newest = $tags[0]->getPhoto()->getDateTime();
+        $newest = $tags[0]->photo->dateTime;
 
         foreach ($this->repository()->getTagsByLidnr($member->getLidnr()) as $tag) {
             self::assertLessThanOrEqual(
                 $newest,
-                $tag->getPhoto()->getDateTime(),
+                $tag->photo->dateTime,
             );
         }
     }
@@ -101,7 +101,7 @@ final class MemberTagRepositoryTest extends DatabaseTestCase
         $members = [];
 
         foreach ($this->repository()->findAll() as $tag) {
-            $members[$tag->getMember()->getLidnr()] = $tag->getMember();
+            $members[$tag->member->getLidnr()] = $tag->member;
         }
 
         return array_values($members);

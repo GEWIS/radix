@@ -302,10 +302,10 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
 
         // A profile photo for member 8030, taken from a photo they are tagged in.
         $profilePhoto = new ProfilePhoto();
-        $profilePhoto->setPhoto($dinnerPhoto);
-        $profilePhoto->setMember($this->member(8030));
-        $profilePhoto->setDateTime(new DateTime());
-        $profilePhoto->setExplicit(false);
+        $profilePhoto->photo = $dinnerPhoto;
+        $profilePhoto->member = $this->member(8030);
+        $profilePhoto->dateTime = new DateTime();
+        $profilePhoto->explicit = false;
         $manager->persist($profilePhoto);
 
         if ('test' !== $this->environment) {
@@ -325,7 +325,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         // has a working example to serve; in production the weekly command writes this copy.
         $this->fileStorage->writeStream(
             $this->weeklyPhotoService->publicPathFor($tripPhoto),
-            $this->fileStorage->readStream($tripPhoto->getPath()),
+            $this->fileStorage->readStream($tripPhoto->path),
         );
     }
 
@@ -474,10 +474,10 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         string $startDateTime,
     ): Album {
         $album = new Album();
-        $album->setName($name);
-        $album->setPublished($published);
-        $album->setStartDateTime(new DateTime($startDateTime));
-        $album->setEndDateTime(new DateTime($startDateTime));
+        $album->name = $name;
+        $album->published = $published;
+        $album->startDateTime = new DateTime($startDateTime);
+        $album->endDateTime = new DateTime($startDateTime);
 
         if (null !== $parent) {
             $album->setParent($parent);
@@ -575,11 +575,11 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         }
 
         $photo = new Photo();
-        $photo->setAlbum($album);
-        $photo->setPath($stored->path);
-        $photo->setDateTime(new DateTime($dateTime));
+        $photo->album = $album;
+        $photo->path = $stored->path;
+        $photo->dateTime = new DateTime($dateTime);
         // Aspect ratio is height / width, matching the pre-migration convention.
-        $photo->setAspectRatio($height / $width);
+        $photo->aspectRatio = $height / $width;
 
         return $photo;
     }
@@ -680,8 +680,8 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         ?float $y,
     ): MemberTag {
         $tag = new MemberTag();
-        $tag->setPhoto($photo);
-        $tag->setMember($this->member($lidnr));
+        $tag->photo = $photo;
+        $tag->member = $this->member($lidnr);
         $tag->setPosition(
             $x,
             $y,
@@ -695,8 +695,11 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         string $organReference,
     ): OrganTag {
         $tag = new OrganTag();
-        $tag->setPhoto($photo);
-        $tag->setOrgan($this->getReference($organReference, Organ::class));
+        $tag->photo = $photo;
+        $tag->organ = $this->getReference(
+            $organReference,
+            Organ::class,
+        );
 
         return $tag;
     }
@@ -707,9 +710,9 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         bool $hidden,
     ): WeeklyPhoto {
         $weeklyPhoto = new WeeklyPhoto();
-        $weeklyPhoto->setPhoto($photo);
-        $weeklyPhoto->setWeek(new DateTime($week));
-        $weeklyPhoto->setHidden($hidden);
+        $weeklyPhoto->photo = $photo;
+        $weeklyPhoto->week = new DateTime($week);
+        $weeklyPhoto->hidden = $hidden;
 
         return $weeklyPhoto;
     }

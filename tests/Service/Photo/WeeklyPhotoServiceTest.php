@@ -79,7 +79,7 @@ final class WeeklyPhotoServiceTest extends TestCase
         self::assertNotNull($weeklyPhoto);
         self::assertSame(
             $recent,
-            $weeklyPhoto->getPhoto(),
+            $weeklyPhoto->photo,
         );
         self::assertTrue($storage->exists($service->publicPathFor($recent)));
     }
@@ -124,7 +124,7 @@ final class WeeklyPhotoServiceTest extends TestCase
         self::assertNotNull($weeklyPhoto);
         self::assertSame(
             $tagged,
-            $weeklyPhoto->getPhoto(),
+            $weeklyPhoto->photo,
         );
     }
 
@@ -167,7 +167,7 @@ final class WeeklyPhotoServiceTest extends TestCase
         self::assertNotNull($weeklyPhoto);
         self::assertSame(
             $fresh,
-            $weeklyPhoto->getPhoto(),
+            $weeklyPhoto->photo,
         );
     }
 
@@ -194,8 +194,8 @@ final class WeeklyPhotoServiceTest extends TestCase
             '-1 week',
         );
         $previous = new WeeklyPhoto();
-        $previous->setPhoto($previousPhoto);
-        $previous->setWeek(new DateTime('-1 week'));
+        $previous->photo = $previousPhoto;
+        $previous->week = new DateTime('-1 week');
 
         $service = $this->service(
             $storage,
@@ -235,7 +235,7 @@ final class WeeklyPhotoServiceTest extends TestCase
 
         self::assertSame(
             $photo,
-            $weeklyPhoto->getPhoto(),
+            $weeklyPhoto->photo,
         );
         self::assertTrue($storage->exists($service->publicPathFor($photo)));
     }
@@ -262,12 +262,12 @@ final class WeeklyPhotoServiceTest extends TestCase
         );
 
         $weeklyPhoto = new WeeklyPhoto();
-        $weeklyPhoto->setPhoto($photo);
-        $weeklyPhoto->setWeek(new DateTime());
+        $weeklyPhoto->photo = $photo;
+        $weeklyPhoto->week = new DateTime();
 
         $service->hide($weeklyPhoto);
 
-        self::assertTrue($weeklyPhoto->isHidden());
+        self::assertTrue($weeklyPhoto->hidden);
         self::assertFalse($storage->exists($publicPath));
     }
 
@@ -375,8 +375,8 @@ final class WeeklyPhotoServiceTest extends TestCase
             $photo,
             $id,
         );
-        $photo->setPath($stored->path);
-        $photo->setDateTime(new DateTime($ageModifier));
+        $photo->path = $stored->path;
+        $photo->dateTime = new DateTime($ageModifier);
         if ($tagged) {
             $photo->addTag(self::createStub(Tag::class));
         }

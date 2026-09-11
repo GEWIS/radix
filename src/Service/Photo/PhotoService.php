@@ -102,7 +102,7 @@ final readonly class PhotoService
             'photo/album',
             [
                 'type' => 'album',
-                'album' => intval($photo->getAlbum()->getId()),
+                'album' => intval($photo->album->getId()),
             ],
         ) . '#pid=' . intval($photo->getId());
     }
@@ -112,9 +112,9 @@ final readonly class PhotoService
         ?string $albumUrl = null,
         bool $hidden = false,
     ): ManifestEntry {
-        $path = $photo->getPath();
+        $path = $photo->path;
         // aspectRatio is height/width; a missing one falls back to square so the viewer still gets usable dimensions.
-        $aspectRatio = $photo->getAspectRatio() ?? 1.0;
+        $aspectRatio = $photo->aspectRatio ?? 1.0;
 
         return new ManifestEntry(
             id: (int) $photo->getId(),
@@ -137,13 +137,13 @@ final readonly class PhotoService
             downloadUrl: $this->urlGenerator->generate(
                 'photo/download',
                 [
-                    'album' => (int) $photo->getAlbum()->getId(),
+                    'album' => (int) $photo->album->getId(),
                     'photo' => (int) $photo->getId(),
                 ],
             ),
             albumUrl: $albumUrl,
             hidden: $hidden,
-            potw: null !== $photo->getWeeklyPhoto(),
+            potw: null !== $photo->weeklyPhoto,
         );
     }
 }

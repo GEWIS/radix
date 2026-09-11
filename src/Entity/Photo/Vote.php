@@ -33,7 +33,7 @@ class Vote
      * Date and time when the photo was voted for.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $dateTime;
+    public private(set) DateTime $dateTime;
 
     /**
      * @param MemberModel $voter The member who voted
@@ -61,11 +61,6 @@ class Vote
         $this->dateTime = new DateTime();
     }
 
-    public function getDateTime(): DateTime
-    {
-        return $this->dateTime;
-    }
-
     public function setPhoto(Photo $photo): void
     {
         $this->photo = $photo;
@@ -83,7 +78,7 @@ class Vote
     {
         return [
             'id' => $this->getId(),
-            'dateTime' => $this->getDateTime()->format(DateTimeInterface::ATOM),
+            'dateTime' => $this->dateTime->format(DateTimeInterface::ATOM),
             'photo' => $this->getPhoto()->toGdprArray(),
         ];
     }

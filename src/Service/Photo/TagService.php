@@ -58,8 +58,8 @@ final readonly class TagService
         }
 
         $tag = new MemberTag();
-        $tag->setPhoto($photo);
-        $tag->setMember($member);
+        $tag->photo = $photo;
+        $tag->member = $member;
         $tag->setPosition(
             $x,
             $y,
@@ -92,8 +92,8 @@ final readonly class TagService
         }
 
         $tag = new OrganTag();
-        $tag->setPhoto($photo);
-        $tag->setOrgan($organ);
+        $tag->photo = $photo;
+        $tag->organ = $organ;
         $tag->setPosition(
             $x,
             $y,

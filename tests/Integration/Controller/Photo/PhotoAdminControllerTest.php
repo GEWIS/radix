@@ -51,7 +51,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
             Album::class,
             $trip,
         );
-        $start = $trip->getStartDateTime();
+        $start = $trip->startDateTime;
         self::assertNotNull($start);
 
         $response = $this->controller()->index(AssociationYear::fromDate($start)->getYear());
@@ -140,7 +140,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         );
         self::assertSame(
             $gala->getId(),
-            $photo->getAlbum()->getId(),
+            $photo->album->getId(),
         );
     }
 
@@ -273,10 +273,10 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         unlink($file);
 
         $photo = new Photo();
-        $photo->setAlbum($album);
-        $photo->setPath($stored->path);
-        $photo->setDateTime(new DateTime());
-        $photo->setAspectRatio(1.0);
+        $photo->album = $album;
+        $photo->path = $stored->path;
+        $photo->dateTime = new DateTime();
+        $photo->aspectRatio = 1.0;
         $this->entityManager->persist($photo);
         $this->entityManager->flush();
 

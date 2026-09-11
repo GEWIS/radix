@@ -56,13 +56,13 @@ final readonly class AlbumAdminService
         $affectedAlbumIds = [];
         $moved = 0;
         foreach ($photos as $photo) {
-            $source = $photo->getAlbum();
+            $source = $photo->album;
             if ($source->getId() === $destination->getId()) {
                 continue;
             }
 
             $affectedAlbumIds[intval($source->getId())] = true;
-            $photo->setAlbum($destination);
+            $photo->album = $destination;
             ++$moved;
         }
 
@@ -90,8 +90,8 @@ final readonly class AlbumAdminService
         $paths = [];
         $albumIds = [];
         foreach ($photos as $photo) {
-            $paths[] = $photo->getPath();
-            $albumIds[intval($photo->getAlbum()->getId())] = true;
+            $paths[] = $photo->path;
+            $albumIds[intval($photo->album->getId())] = true;
             $this->entityManager->remove($photo);
         }
 
@@ -162,10 +162,10 @@ final readonly class AlbumAdminService
         }
 
         foreach ($album->getPhotos() as $photo) {
-            $paths[] = $photo->getPath();
+            $paths[] = $photo->path;
         }
 
-        $coverPath = $album->getCoverPath();
+        $coverPath = $album->coverPath;
         if (null === $coverPath) {
             return;
         }

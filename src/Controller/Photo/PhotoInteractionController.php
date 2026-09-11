@@ -80,13 +80,13 @@ class PhotoInteractionController extends AbstractController
         $memberTags = [];
         $taggedSelf = false;
         foreach ($this->memberTagRepository->findByPhotoWithMember($photo) as $tag) {
-            $taggedSelf = $taggedSelf || $tag->getMember()->getLidnr() === $member->getLidnr();
+            $taggedSelf = $taggedSelf || $tag->member->getLidnr() === $member->getLidnr();
             $memberTags[] = [
                 'id' => $tag->getId(),
-                'lidnr' => $tag->getMember()->getLidnr(),
-                'fullName' => $tag->getMember()->getFullName(),
-                'x' => $tag->getPositionX(),
-                'y' => $tag->getPositionY(),
+                'lidnr' => $tag->member->getLidnr(),
+                'fullName' => $tag->member->getFullName(),
+                'x' => $tag->positionX,
+                'y' => $tag->positionY,
                 'canRemove' => $this->isGranted(
                     TagVoter::REMOVE,
                     $tag,
@@ -98,11 +98,11 @@ class PhotoInteractionController extends AbstractController
         foreach ($this->organTagRepository->findByPhotoWithOrgan($photo) as $tag) {
             $organTags[] = [
                 'id' => $tag->getId(),
-                'organId' => $tag->getOrgan()->getId(),
-                'name' => $tag->getOrgan()->getName(),
-                'abbr' => $tag->getOrgan()->getAbbr(),
-                'x' => $tag->getPositionX(),
-                'y' => $tag->getPositionY(),
+                'organId' => $tag->organ->getId(),
+                'name' => $tag->organ->getName(),
+                'abbr' => $tag->organ->getAbbr(),
+                'x' => $tag->positionX,
+                'y' => $tag->positionY,
                 'canRemove' => $this->isGranted(
                     TagVoter::REMOVE,
                     $tag,
@@ -129,7 +129,7 @@ class PhotoInteractionController extends AbstractController
             'recentVote' => $this->voteRepository->hasRecentVote($member->getLidnr()),
             'taggedSelf' => $taggedSelf,
             // The week this photo was photo of the week, if ever, so the viewer can badge it.
-            'photoOfTheWeek' => $photoEntity->getWeeklyPhoto()?->getWeek()->format('Y-m-d'),
+            'photoOfTheWeek' => $photoEntity->weeklyPhoto?->week->format('Y-m-d'),
             // The camera metadata for the viewer's info panel.
             'exif' => $photoEntity->toExifArray(),
         ]);

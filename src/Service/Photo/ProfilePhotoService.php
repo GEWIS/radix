@@ -55,10 +55,10 @@ final readonly class ProfilePhotoService
         $this->removeProfilePhoto($member);
 
         $profilePhoto = new ProfilePhoto();
-        $profilePhoto->setPhoto($photo);
-        $profilePhoto->setMember($member);
-        $profilePhoto->setDateTime(new DateTime()->add(new DateInterval('P1Y')));
-        $profilePhoto->setExplicit(true);
+        $profilePhoto->photo = $photo;
+        $profilePhoto->member = $member;
+        $profilePhoto->dateTime = new DateTime()->add(new DateInterval('P1Y'));
+        $profilePhoto->explicit = true;
 
         $this->entityManager->persist($profilePhoto);
         $this->entityManager->flush();

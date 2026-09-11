@@ -45,24 +45,24 @@ final readonly class PhotoOfTheWeekProvider implements ProviderInterface
 
         if (
             null === $weeklyPhoto
-            || $weeklyPhoto->isHidden()
+            || $weeklyPhoto->hidden
         ) {
             return null;
         }
 
-        $photo = $weeklyPhoto->getPhoto();
+        $photo = $weeklyPhoto->photo;
 
         return new PhotoOfTheWeekResource(
-            week: $weeklyPhoto->getWeek()->format(DateTimeInterface::ATOM),
+            week: $weeklyPhoto->week->format(DateTimeInterface::ATOM),
             photo: [
                 'id' => (int) $photo->getId(),
-                'dateTime' => $photo->getDateTime()->format(DateTimeInterface::ATOM),
-                'artist' => $photo->getArtist(),
-                'camera' => $photo->getCamera(),
-                'aspectRatio' => $photo->getAspectRatio(),
+                'dateTime' => $photo->dateTime->format(DateTimeInterface::ATOM),
+                'artist' => $photo->artist,
+                'camera' => $photo->camera,
+                'aspectRatio' => $photo->aspectRatio,
                 'album' => [
-                    'id' => (int) $photo->getAlbum()->getId(),
-                    'name' => $photo->getAlbum()->getName(),
+                    'id' => (int) $photo->album->getId(),
+                    'name' => $photo->album->name,
                 ],
             ],
             url: $this->publicUrl($photo),

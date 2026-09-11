@@ -59,7 +59,7 @@ final readonly class AlbumCoverService
         $data = [];
         $portrait = 0;
         foreach ($photos as $photo) {
-            $bytes = $this->fileStorage->read($photo->getPath());
+            $bytes = $this->fileStorage->read($photo->path);
             $data[] = $bytes;
 
             $size = getimagesizefromstring($bytes);
@@ -113,7 +113,7 @@ final readonly class AlbumCoverService
             $path,
             $bytes,
         );
-        $album->setCoverPath($path);
+        $album->coverPath = $path;
 
         return $path;
     }

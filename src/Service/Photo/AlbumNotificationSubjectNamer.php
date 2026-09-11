@@ -36,7 +36,7 @@ final class AlbumNotificationSubjectNamer extends AbstractNotificationSubjectNam
                 continue;
             }
 
-            $names[$id] = $this->plain($album->getName());
+            $names[$id] = $this->plain($album->name);
         }
 
         return $names;

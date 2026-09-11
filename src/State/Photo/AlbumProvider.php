@@ -132,9 +132,9 @@ final readonly class AlbumProvider implements ProviderInterface
     ): AlbumResource {
         return new AlbumResource(
             id: (int) $album->getId(),
-            name: $album->getName(),
-            startDateTime: $album->getStartDateTime()?->format(DateTimeInterface::ATOM),
-            endDateTime: $album->getEndDateTime()?->format(DateTimeInterface::ATOM),
+            name: $album->name,
+            startDateTime: $album->startDateTime?->format(DateTimeInterface::ATOM),
+            endDateTime: $album->endDateTime?->format(DateTimeInterface::ATOM),
             parent: $album->getParent()?->getId(),
             photoCount: $album->getPhotoCount(false),
             albumCount: $album->getPublishedAlbumCount(),
@@ -159,9 +159,9 @@ final readonly class AlbumProvider implements ProviderInterface
     {
         return [
             'id' => (int) $album->getId(),
-            'name' => $album->getName(),
-            'startDateTime' => $album->getStartDateTime()?->format(DateTimeInterface::ATOM),
-            'endDateTime' => $album->getEndDateTime()?->format(DateTimeInterface::ATOM),
+            'name' => $album->name,
+            'startDateTime' => $album->startDateTime?->format(DateTimeInterface::ATOM),
+            'endDateTime' => $album->endDateTime?->format(DateTimeInterface::ATOM),
             'photoCount' => $album->getPhotoCount(false),
             'albumCount' => $album->getPublishedAlbumCount(),
             'coverUrl' => $this->coverUrl($album),
@@ -170,7 +170,7 @@ final readonly class AlbumProvider implements ProviderInterface
 
     private function coverUrl(PhotoAlbum $album): ?string
     {
-        return null === $album->getCoverPath()
+        return null === $album->coverPath
             ? null
             : $this->urlBuilder->albumCoverUrl(
                 (int) $album->getId(),

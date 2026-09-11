@@ -25,11 +25,11 @@ final class TagPositionTest extends TestCase
         self::assertTrue($tag->hasPosition());
         self::assertSame(
             0.25,
-            $tag->getPositionX(),
+            $tag->positionX,
         );
         self::assertSame(
             0.75,
-            $tag->getPositionY(),
+            $tag->positionY,
         );
     }
 
@@ -57,8 +57,8 @@ final class TagPositionTest extends TestCase
         );
 
         self::assertFalse($tag->hasPosition());
-        self::assertNull($tag->getPositionX());
-        self::assertNull($tag->getPositionY());
+        self::assertNull($tag->positionX);
+        self::assertNull($tag->positionY);
     }
 
     public function testRejectsACoordinateAboveTheRange(): void

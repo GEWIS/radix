@@ -39,7 +39,7 @@ class ProfilePhoto
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Photo $photo;
+    public Photo $photo;
 
     /**
      * The member this is the profile photo of. A profile photo is a picture of one person and says nothing without
@@ -52,65 +52,19 @@ class ProfilePhoto
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private MemberModel $member;
+    public MemberModel $member;
 
     /**
      * Date and time when the photo was taken.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $dateTime;
+    public DateTime $dateTime;
 
     /**
      * Date and time when the photo was taken.
      */
     #[Column(type: Types::BOOLEAN)]
-    private bool $explicit;
-
-    public function getPhoto(): Photo
-    {
-        return $this->photo;
-    }
-
-    public function getMember(): MemberModel
-    {
-        return $this->member;
-    }
-
-    /**
-     * Get the date.
-     */
-    public function getDateTime(): DateTime
-    {
-        return $this->dateTime;
-    }
-
-    /**
-     * Get the explicit bool.
-     */
-    public function isExplicit(): bool
-    {
-        return $this->explicit;
-    }
-
-    public function setPhoto(Photo $photo): void
-    {
-        $this->photo = $photo;
-    }
-
-    public function setMember(MemberModel $member): void
-    {
-        $this->member = $member;
-    }
-
-    public function setDateTime(DateTime $dateTime): void
-    {
-        $this->dateTime = $dateTime;
-    }
-
-    public function setExplicit(bool $explicit): void
-    {
-        $this->explicit = $explicit;
-    }
+    public bool $explicit;
 
     /**
      * @return ProfilePhotoGdprArrayType
@@ -118,9 +72,9 @@ class ProfilePhoto
     public function toGdprArray(): array
     {
         return [
-            'dateTime' => $this->getDateTime()->format(DateTimeInterface::ATOM),
-            'explicit' => $this->isExplicit(),
-            'photo' => $this->getPhoto()->toGdprArray(),
+            'dateTime' => $this->dateTime->format(DateTimeInterface::ATOM),
+            'explicit' => $this->explicit,
+            'photo' => $this->photo->toGdprArray(),
         ];
     }
 }

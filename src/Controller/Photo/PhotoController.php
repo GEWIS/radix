@@ -224,7 +224,7 @@ class PhotoController extends AbstractController
 
         if (
             null === $photoEntity
-            || $photoEntity->getAlbum()->getId() !== $albumEntity->getId()
+            || $photoEntity->album->getId() !== $albumEntity->getId()
             || !$this->isGranted(
                 PhotoVoter::DOWNLOAD,
                 $photoEntity,
@@ -235,17 +235,17 @@ class PhotoController extends AbstractController
 
         $filename = sprintf(
             '%s-%s-%d.%s',
-            $this->slugger->slug($albumEntity->getName())->lower(),
-            $albumEntity->getStartDateTime()?->format('Y') ?? 'undated',
+            $this->slugger->slug($albumEntity->name)->lower(),
+            $albumEntity->startDateTime?->format('Y') ?? 'undated',
             $photoEntity->getId(),
             pathinfo(
-                $photoEntity->getPath(),
+                $photoEntity->path,
                 PATHINFO_EXTENSION,
             ),
         );
 
         return $this->fileDownloadHelper->download(
-            $photoEntity->getPath(),
+            $photoEntity->path,
             $filename,
         );
     }
@@ -420,7 +420,7 @@ class PhotoController extends AbstractController
         }
 
         $weeks = array_map(
-            static fn (WeeklyPhoto $weeklyPhoto): DateTime => $weeklyPhoto->getWeek(),
+            static fn (WeeklyPhoto $weeklyPhoto): DateTime => $weeklyPhoto->week,
             $weeklyPhotos,
         );
 

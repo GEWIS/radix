@@ -53,13 +53,13 @@ final class ApiController extends AbstractController
         if (
             null === $photo
             || null === $imageVariant
-            || !$photo->getAlbum()->isPublished()
+            || !$photo->album->published
         ) {
             throw new NotFoundHttpException(self::NOT_FOUND);
         }
 
         return $this->serve(
-            $photo->getPath(),
+            $photo->path,
             $imageVariant,
         );
     }
@@ -78,7 +78,7 @@ final class ApiController extends AbstractController
         int $id,
         string $variant,
     ): Response {
-        $coverPath = $this->albumRepository->findPublished($id)?->getCoverPath();
+        $coverPath = $this->albumRepository->findPublished($id)?->coverPath;
         $imageVariant = ImageVariant::tryFrom($variant);
 
         if (

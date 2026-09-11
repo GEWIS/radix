@@ -69,7 +69,7 @@ abstract class Tag
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Photo $photo;
+    public Photo $photo;
 
     /**
      * Normalized horizontal position of the tag marker within the photo (0 = left edge, 1 = right edge), or null for a
@@ -79,7 +79,7 @@ abstract class Tag
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $positionX = null;
+    public private(set) ?float $positionX = null;
 
     /**
      * Normalized vertical position of the tag marker within the photo (0 = top edge, 1 = bottom edge), or null for a
@@ -89,27 +89,7 @@ abstract class Tag
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $positionY = null;
-
-    public function getPhoto(): Photo
-    {
-        return $this->photo;
-    }
-
-    public function setPhoto(Photo $photo): void
-    {
-        $this->photo = $photo;
-    }
-
-    public function getPositionX(): ?float
-    {
-        return $this->positionX;
-    }
-
-    public function getPositionY(): ?float
-    {
-        return $this->positionY;
-    }
+    public private(set) ?float $positionY = null;
 
     /**
      * Whether this tag is pinned to a specific point in the image (rather than tagging the whole photo).

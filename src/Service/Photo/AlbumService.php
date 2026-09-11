@@ -127,7 +127,7 @@ final readonly class AlbumService
     ): array {
         $grouped = [];
         foreach ($albums as $album) {
-            $start = $album->getStartDateTime();
+            $start = $album->startDateTime;
             if (
                 null === $start
                 || !$this->security->isGranted(
@@ -142,7 +142,7 @@ final readonly class AlbumService
                 null !== $search
                 && '' !== $search
                 && false === stripos(
-                    $album->getName(),
+                    $album->name,
                     $search,
                 )
             ) {
@@ -166,7 +166,7 @@ final readonly class AlbumService
     {
         $grouped = [];
         foreach ($this->albumRepository->findRootAlbums() as $album) {
-            $start = $album->getStartDateTime();
+            $start = $album->startDateTime;
             $year = null === $start
                 ? 0
                 : AssociationYear::fromDate($start)->getYear();

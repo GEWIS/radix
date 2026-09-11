@@ -58,6 +58,6 @@ final class TagVoter extends Voter
         }
 
         return $subject instanceof MemberTag
-            && $subject->getMember()->getLidnr() === $user->getMember()->getLidnr();
+            && $subject->member->getLidnr() === $user->getMember()->getLidnr();
     }
 }

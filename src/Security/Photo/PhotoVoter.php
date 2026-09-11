@@ -64,7 +64,7 @@ final class PhotoVoter extends Voter
     ): bool {
         $viewable = $this->security->isGranted(
             AlbumVoter::VIEW,
-            $subject->getAlbum(),
+            $subject->album,
         );
 
         return match ($attribute) {
@@ -75,7 +75,7 @@ final class PhotoVoter extends Voter
             // Voting adds one rule: a photo that has already been photo of the week may not be voted for again.
             self::VOTE => $viewable
                 && $this->security->isGranted(UserRoles::Member->value)
-                && null === $subject->getWeeklyPhoto(),
+                && null === $subject->weeklyPhoto,
             default => false,
         };
     }

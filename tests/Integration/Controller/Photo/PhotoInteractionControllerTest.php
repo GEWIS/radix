@@ -138,7 +138,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             UserRoles::Graduate,
         );
         $othersTag = $this->tagOf(
-            $this->graduateTag()->getPhoto(),
+            $this->graduateTag()->photo,
             self::MEMBER,
         );
 
@@ -153,7 +153,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             self::BEFORE_ALBUMS,
         );
-        $photoId = (int) $this->graduateTag()->getPhoto()->getId();
+        $photoId = (int) $this->graduateTag()->photo->getId();
         $this->authenticate(
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             UserRoles::Graduate,
@@ -186,7 +186,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             UserRoles::Member,
         );
         // The dinner photo has already been photo of the week in the seed, so it may not be voted for again.
-        $photoId = (int) $this->graduateTag()->getPhoto()->getId();
+        $photoId = (int) $this->graduateTag()->photo->getId();
 
         $this->expectException(AccessDeniedException::class);
         $this->controller()->vote($photoId);
@@ -198,7 +198,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             self::BEFORE_ALBUMS,
         );
-        $photoId = (int) $this->graduateTag()->getPhoto()->getId();
+        $photoId = (int) $this->graduateTag()->photo->getId();
         $this->authenticate(
             PhotoFixture::GRADUATE_TAGGED_IN_SUBTREE,
             UserRoles::Graduate,
@@ -214,7 +214,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
             self::MEMBER,
             UserRoles::Member,
         );
-        $photoId = (int) $this->graduateTag()->getPhoto()->getId();
+        $photoId = (int) $this->graduateTag()->photo->getId();
 
         $details = $this->decode($this->controller()->details($photoId));
 
@@ -259,7 +259,7 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         $album = self::getContainer()->get(AlbumRepository::class)->findOneBy(['name' => 'Trip 2024']);
         self::assertNotNull($album);
         foreach (self::getContainer()->get(PhotoRepository::class)->getAlbumPhotos($album) as $photo) {
-            if (null === $photo->getWeeklyPhoto()) {
+            if (null === $photo->weeklyPhoto) {
                 return (int) $photo->getId();
             }
         }

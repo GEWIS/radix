@@ -156,7 +156,7 @@ final class AlbumVoterTest extends DatabaseTestCase
             'The graduate is expected to be tagged in the seed.',
         );
 
-        return $tags[0]->getPhoto()->getAlbum();
+        return $tags[0]->photo->album;
     }
 
     private function parentOfAlbumTaggingGraduate(int $lidnr): Album

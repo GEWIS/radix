@@ -47,7 +47,7 @@ class Photo
      * Date and time when the photo was taken.
      */
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $dateTime;
+    public DateTime $dateTime;
 
     /**
      * Artist/author.
@@ -56,7 +56,7 @@ class Photo
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $artist = null;
+    public ?string $artist = null;
 
     /**
      * The type of camera used.
@@ -65,7 +65,7 @@ class Photo
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $camera = null;
+    public ?string $camera = null;
 
     /**
      * Whether a flash has been used.
@@ -74,7 +74,7 @@ class Photo
         type: Types::BOOLEAN,
         nullable: true,
     )]
-    private ?bool $flash = null;
+    public ?bool $flash = null;
 
     /**
      * The focal length of the lens, in mm.
@@ -83,7 +83,7 @@ class Photo
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $focalLength = null;
+    public ?float $focalLength = null;
 
     /**
      * The exposure time, in seconds.
@@ -92,7 +92,7 @@ class Photo
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $exposureTime = null;
+    public ?float $exposureTime = null;
 
     /**
      * The shutter speed.
@@ -101,7 +101,7 @@ class Photo
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $shutterSpeed = null;
+    public ?string $shutterSpeed = null;
 
     /**
      * The lens aperture.
@@ -110,7 +110,7 @@ class Photo
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $aperture = null;
+    public ?string $aperture = null;
 
     /**
      * Indicates the ISO Speed and ISO Latitude of the camera.
@@ -119,7 +119,7 @@ class Photo
         type: Types::SMALLINT,
         nullable: true,
     )]
-    private ?int $iso = null;
+    public ?int $iso = null;
 
     /**
      * Album in which the photo is.
@@ -133,13 +133,13 @@ class Photo
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private Album $album;
+    public Album $album;
 
     /**
      * The path where the photo is located relative to the storage directory.
      */
     #[Column(type: Types::STRING)]
-    private string $path;
+    public string $path;
 
     /**
      * The GPS longitude of the location where the photo was taken.
@@ -148,7 +148,7 @@ class Photo
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $longitude = null;
+    public ?float $longitude = null;
 
     /**
      * The GPS latitude of the location where the photo was taken.
@@ -157,7 +157,7 @@ class Photo
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $latitude = null;
+    public ?float $latitude = null;
 
     /**
      * All the votes for this photo.
@@ -232,7 +232,7 @@ class Photo
             'remove',
         ],
     )]
-    private ?WeeklyPhoto $weeklyPhoto = null;
+    public private(set) ?WeeklyPhoto $weeklyPhoto = null;
 
     /**
      * The aspect ratio of the photo width/height.
@@ -241,7 +241,7 @@ class Photo
         type: Types::FLOAT,
         nullable: true,
     )]
-    private ?float $aspectRatio = null;
+    public ?float $aspectRatio = null;
 
     public function __construct()
     {
@@ -252,110 +252,6 @@ class Photo
     }
 
     /**
-     * Get the date.
-     */
-    public function getDateTime(): DateTime
-    {
-        return $this->dateTime;
-    }
-
-    /**
-     * Get the artist.
-     */
-    public function getArtist(): ?string
-    {
-        return $this->artist;
-    }
-
-    /**
-     * Get the camera.
-     */
-    public function getCamera(): ?string
-    {
-        return $this->camera;
-    }
-
-    /**
-     * Get the flash.
-     */
-    public function getFlash(): ?bool
-    {
-        return $this->flash;
-    }
-
-    /**
-     * Get the focal length.
-     */
-    public function getFocalLength(): ?float
-    {
-        return $this->focalLength;
-    }
-
-    /**
-     * Get the exposure time.
-     */
-    public function getExposureTime(): ?float
-    {
-        return $this->exposureTime;
-    }
-
-    /**
-     * Get the shutter speed.
-     */
-    public function getShutterSpeed(): ?string
-    {
-        return $this->shutterSpeed;
-    }
-
-    /**
-     * Get the aperture.
-     */
-    public function getAperture(): ?string
-    {
-        return $this->aperture;
-    }
-
-    /**
-     * Get the ISO.
-     */
-    public function getIso(): ?int
-    {
-        return $this->iso;
-    }
-
-    /**
-     * Get the album.
-     */
-    public function getAlbum(): Album
-    {
-        return $this->album;
-    }
-
-    /**
-     * Get the path where the photo is stored.
-     */
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * Get the GPS longitude of the location where the photo was taken.
-     */
-    public function getLongitude(): ?float
-    {
-        return $this->longitude;
-    }
-
-    /**
-     * Get the GPS latitude of the location where the photo was taken.
-     */
-    public function getLatitude(): ?float
-    {
-        return $this->latitude;
-    }
-
-    /**
      * @return Collection<array-key, Tag>
      */
     public function getTags(): Collection
@@ -363,138 +259,12 @@ class Photo
         return $this->tags;
     }
 
-    public function getWeeklyPhoto(): ?WeeklyPhoto
-    {
-        return $this->weeklyPhoto;
-    }
-
-    /**
-     * The height/width aspect ratio, computed once from the original's dimensions when the photo is uploaded (see
-     * {@see \App\Service\Photo\PhotoUploadService}) and stored. It is never recomputed from the filesystem.
-     */
-    public function getAspectRatio(): ?float
-    {
-        return $this->aspectRatio;
-    }
-
-    /**
-     * Set the dateTime.
-     */
-    public function setDateTime(DateTime $dateTime): void
-    {
-        $this->dateTime = $dateTime;
-    }
-
-    /**
-     * Set the artist.
-     */
-    public function setArtist(?string $artist): void
-    {
-        $this->artist = $artist;
-    }
-
-    /**
-     * Set the camera.
-     */
-    public function setCamera(?string $camera): void
-    {
-        $this->camera = $camera;
-    }
-
-    /**
-     * Set the flash.
-     */
-    public function setFlash(?bool $flash): void
-    {
-        $this->flash = $flash;
-    }
-
-    /**
-     * Set the focal length.
-     */
-    public function setFocalLength(?float $focalLength): void
-    {
-        $this->focalLength = $focalLength;
-    }
-
-    /**
-     * Set the exposure time.
-     */
-    public function setExposureTime(?float $exposureTime): void
-    {
-        $this->exposureTime = $exposureTime;
-    }
-
-    /**
-     * Set the shutter speed.
-     */
-    public function setShutterSpeed(?string $shutterSpeed): void
-    {
-        $this->shutterSpeed = $shutterSpeed;
-    }
-
-    /**
-     * Set the aperture.
-     */
-    public function setAperture(?string $aperture): void
-    {
-        $this->aperture = $aperture;
-    }
-
-    /**
-     * Set the ISO.
-     */
-    public function setIso(?int $iso): void
-    {
-        $this->iso = $iso;
-    }
-
-    /**
-     * Set the album.
-     */
-    public function setAlbum(Album $album): void
-    {
-        $this->album = $album;
-    }
-
-    /**
-     * Set the path where the photo is stored.
-     */
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * Set the GPS longitude of the location where the photo was taken.
-     */
-    public function setLongitude(?float $longitude): void
-    {
-        $this->longitude = $longitude;
-    }
-
-    /**
-     * Set the GPS latitude of the location where the photo was taken.
-     */
-    public function setLatitude(?float $latitude): void
-    {
-        $this->latitude = $latitude;
-    }
-
-    /**
-     * Sets the aspect ratio.
-     */
-    public function setAspectRatio(?float $ratio): void
-    {
-        $this->aspectRatio = $ratio;
-    }
-
     /**
      * Add a tag to a photo.
      */
     public function addTag(Tag $tag): void
     {
-        $tag->setPhoto($this);
+        $tag->photo = $this;
         $this->tags[] = $tag;
     }
 
@@ -513,8 +283,8 @@ class Photo
     {
         return [
             'id' => $this->getId(),
-            'dateTime' => $this->getDateTime()->format(DateTimeInterface::ATOM),
-            'path' => $this->getPath(),
+            'dateTime' => $this->dateTime->format(DateTimeInterface::ATOM),
+            'path' => $this->path,
         ];
     }
 
@@ -526,16 +296,16 @@ class Photo
     public function toExifArray(): array
     {
         return [
-            'artist' => $this->getArtist(),
-            'camera' => $this->getCamera(),
-            'dateTime' => $this->getDateTime()->format('Y-m-d H:i:s'),
-            'flash' => $this->getFlash(),
-            'focalLength' => $this->getFocalLength(),
-            'shutterSpeed' => $this->getShutterSpeed(),
-            'aperture' => $this->getAperture(),
-            'iso' => $this->getIso(),
-            'latitude' => $this->getLatitude(),
-            'longitude' => $this->getLongitude(),
+            'artist' => $this->artist,
+            'camera' => $this->camera,
+            'dateTime' => $this->dateTime->format('Y-m-d H:i:s'),
+            'flash' => $this->flash,
+            'focalLength' => $this->focalLength,
+            'shutterSpeed' => $this->shutterSpeed,
+            'aperture' => $this->aperture,
+            'iso' => $this->iso,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
         ];
     }
 }

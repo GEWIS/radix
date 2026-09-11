@@ -40,7 +40,7 @@ class HiddenPhoto
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private MemberModel $member;
+    public MemberModel $member;
 
     #[ManyToOne(
         targetEntity: Photo::class,
@@ -52,25 +52,5 @@ class HiddenPhoto
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private Photo $photo;
-
-    public function getMember(): MemberModel
-    {
-        return $this->member;
-    }
-
-    public function setMember(MemberModel $member): void
-    {
-        $this->member = $member;
-    }
-
-    public function getPhoto(): Photo
-    {
-        return $this->photo;
-    }
-
-    public function setPhoto(Photo $photo): void
-    {
-        $this->photo = $photo;
-    }
+    public Photo $photo;
 }

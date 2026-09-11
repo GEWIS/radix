@@ -65,12 +65,12 @@ final class TagStiTest extends DatabaseTestCase
         self::assertTrue($tag->hasPosition());
         self::assertEqualsWithDelta(
             0.52,
-            $tag->getPositionX(),
+            $tag->positionX,
             0.0001,
         );
         self::assertEqualsWithDelta(
             0.41,
-            $tag->getPositionY(),
+            $tag->positionY,
             0.0001,
         );
     }
@@ -154,7 +154,7 @@ final class TagStiTest extends DatabaseTestCase
             'The in-subtree graduate is expected to be tagged in the seed.',
         );
 
-        return $tags[0]->getPhoto();
+        return $tags[0]->photo;
     }
 
     private function tagRepository(): TagRepository
