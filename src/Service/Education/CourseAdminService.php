@@ -23,7 +23,7 @@ final readonly class CourseAdminService
 
     public function save(Course $course): void
     {
-        $course->setCode(strtoupper($course->getCode()));
+        $course->code = strtoupper($course->code);
 
         $this->entityManager->persist($course);
         $this->entityManager->flush();
@@ -49,11 +49,11 @@ final readonly class CourseAdminService
     {
         $pagePaths = [];
         foreach ($document->getPages() as $page) {
-            $pagePaths[] = $page->getPath();
+            $pagePaths[] = $page->path;
             $this->entityManager->remove($page);
         }
 
-        $documentPath = $document->getPath();
+        $documentPath = $document->path;
 
         $this->entityManager->remove($document);
         $this->entityManager->flush();

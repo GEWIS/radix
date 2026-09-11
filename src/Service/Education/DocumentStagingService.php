@@ -51,22 +51,22 @@ final readonly class DocumentStagingService
         $guess = $this->guesser->guess($originalName);
 
         $staged = new CourseDocumentStaging();
-        $staged->setOriginalFilename($originalName);
-        $staged->setUploadedBy($user);
-        $staged->setUploadedAt(new DateTime());
-        $staged->setCourseCode($guess->courseCode);
-        $staged->setDate($guess->date);
-        $staged->setLanguage($guess->language);
-        $staged->setType($guess->type);
-        $staged->setExamType($guess->examType);
-        $staged->setAuthor($guess->author);
-        $staged->setPath($this->fileStorage->store(
+        $staged->originalFilename = $originalName;
+        $staged->uploadedBy = $user;
+        $staged->uploadedAt = new DateTime();
+        $staged->courseCode = $guess->courseCode;
+        $staged->date = $guess->date;
+        $staged->language = $guess->language;
+        $staged->type = $guess->type;
+        $staged->examType = $guess->examType;
+        $staged->author = $guess->author;
+        $staged->path = $this->fileStorage->store(
             StorageNamespace::EducationDocument,
             $file->getPathname(),
             // The course is only a guess at this point, so a staged file is filed under a holding scope and moves when
             // it is published and the course is known.
             'staging',
-        )->path);
+        )->path;
 
         $this->entityManager->persist($staged);
         $this->entityManager->flush();
@@ -79,7 +79,7 @@ final readonly class DocumentStagingService
      */
     public function publish(CourseDocumentStaging $staged): void
     {
-        $code = $staged->getCourseCode();
+        $code = $staged->courseCode;
         $course = null !== $code
             ? $this->courseRepository->find($code)
             : null;
@@ -88,39 +88,39 @@ final readonly class DocumentStagingService
             throw new RuntimeException('A staged upload cannot be published without an existing course.');
         }
 
-        if (CourseDocumentTypes::Summary === $staged->getType()) {
+        if (CourseDocumentTypes::Summary === $staged->type) {
             $summary = new Summary();
-            $summary->setAuthor($staged->getAuthor());
+            $summary->author = $staged->author;
             $document = $summary;
         } else {
             $exam = new Exam();
-            $exam->setExamType($staged->getExamType() ?? ExamTypes::Final);
+            $exam->examType = $staged->examType ?? ExamTypes::Final;
             $document = $exam;
         }
 
-        $document->setCourse($course);
-        $document->setDate($staged->getDate() ?? new DateTime());
-        $document->setLanguage($staged->getLanguage());
-        $document->setScanned($staged->getScanned());
+        $document->course = $course;
+        $document->date = $staged->date ?? new DateTime();
+        $document->language = $staged->language;
+        $document->scanned = $staged->scanned;
         // The file is re-filed under the course now that it is known, which also gives it its final content-addressed
         // path; the staged copy is dropped with the row.
-        $document->setPath($this->refile(
-            $staged->getPath(),
-            $course->getCode(),
-        ));
+        $document->path = $this->refile(
+            $staged->path,
+            $course->code,
+        );
 
         $this->entityManager->persist($document);
         $this->entityManager->remove($staged);
         $this->entityManager->flush();
 
-        $this->fileStorage->remove($staged->getPath());
+        $this->fileStorage->remove($staged->path);
 
         $this->messageBus->dispatch(new FlattenCourseDocumentMessage($document->getId() ?? 0));
     }
 
     public function discard(CourseDocumentStaging $staged): void
     {
-        $path = $staged->getPath();
+        $path = $staged->path;
 
         $this->entityManager->remove($staged);
         $this->entityManager->flush();

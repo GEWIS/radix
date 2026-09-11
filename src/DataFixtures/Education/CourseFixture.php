@@ -136,8 +136,8 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         string $name,
     ): Course {
         $course = new Course();
-        $course->setCode($code);
-        $course->setName($name);
+        $course->code = $code;
+        $course->name = $name;
 
         $manager->persist($course);
 
@@ -151,7 +151,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         Languages $language,
     ): void {
         $summary = new Summary();
-        $summary->setAuthor($this->faker->name());
+        $summary->author = $this->faker->name();
 
         $this->finishDocument(
             $manager,
@@ -170,7 +170,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         Languages $language,
     ): void {
         $exam = new Exam();
-        $exam->setExamType($type);
+        $exam->examType = $type;
 
         $this->finishDocument(
             $manager,
@@ -188,26 +188,26 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         DateTime $date,
         Languages $language,
     ): void {
-        $document->setCourse($course);
-        $document->setDate($date);
-        $document->setLanguage($language);
-        $document->setScanned(false);
-        $document->setPath($this->storePdf(
-            $course->getCode(),
+        $document->course = $course;
+        $document->date = $date;
+        $document->language = $language;
+        $document->scanned = false;
+        $document->path = $this->storePdf(
+            $course->code,
             $date,
-        ));
-        $document->setFlattenStatus(DocumentFlattenStatus::Ready);
-        $document->setFlattenedAt(new DateTime());
+        );
+        $document->flattenStatus = DocumentFlattenStatus::Ready;
+        $document->flattenedAt = new DateTime();
 
         // Flushed early because a page is stored under the document's id, the way the flattener files it.
         $manager->persist($document);
         $manager->flush();
 
         $page = new CourseDocumentPage();
-        $page->setPageNumber(1);
-        $page->setPath($this->storePage(strval($document->getId())));
-        $page->setWidth(1240);
-        $page->setHeight(1754);
+        $page->pageNumber = 1;
+        $page->path = $this->storePage(strval($document->getId()));
+        $page->width = 1240;
+        $page->height = 1754;
 
         $document->addPage($page);
 

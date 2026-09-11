@@ -130,7 +130,7 @@ class EducationController extends AbstractController
 
         return $this->redirectToRoute(
             'education/download',
-            ['token' => $download->getToken()->toRfc4122()],
+            ['token' => $download->token->toRfc4122()],
         );
     }
 
@@ -181,11 +181,11 @@ class EducationController extends AbstractController
         );
 
         return $this->json([
-            'status' => $download->getStatus()->value,
-            'url' => DownloadStatus::Ready === $download->getStatus()
+            'status' => $download->status->value,
+            'url' => DownloadStatus::Ready === $download->status
                 ? $this->generateUrl(
                     'education/download_file',
-                    ['token' => $download->getToken()->toRfc4122()],
+                    ['token' => $download->token->toRfc4122()],
                 )
                 : null,
         ]);
@@ -210,9 +210,9 @@ class EducationController extends AbstractController
             $request,
         );
 
-        $path = $download->getPath();
+        $path = $download->path;
         if (
-            DownloadStatus::Ready !== $download->getStatus()
+            DownloadStatus::Ready !== $download->status
             || null === $path
         ) {
             throw $this->createNotFoundException();
@@ -222,7 +222,7 @@ class EducationController extends AbstractController
 
         return $this->fileDownloadHelper->download(
             $path,
-            $this->downloadService->filenameFor($download->getDocument()),
+            $this->downloadService->filenameFor($download->document),
             'application/pdf',
         );
     }
@@ -238,7 +238,7 @@ class EducationController extends AbstractController
     ): void {
         $this->denyAccessUnlessGranted(
             CourseDocumentVoter::DOWNLOAD,
-            $download->getDocument(),
+            $download->document,
         );
 
         if (

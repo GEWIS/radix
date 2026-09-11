@@ -89,9 +89,9 @@ final class CourseDocumentDownloadTest extends TestCase
         string $clientIp = '8.8.8.8',
     ): CourseDocumentDownload {
         $download = new CourseDocumentDownload();
-        $download->setToken(Uuid::v4());
-        $download->setRequestedBy($user);
-        $download->setRequestedFrom($clientIp);
+        $download->token = Uuid::v4();
+        $download->requestedBy = $user;
+        $download->requestedFrom = $clientIp;
 
         return $download;
     }

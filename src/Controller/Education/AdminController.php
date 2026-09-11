@@ -145,7 +145,7 @@ class AdminController extends AbstractController
 
             return $this->redirectToRoute(
                 'admin/education/courses/documents',
-                ['code' => $course->getCode()],
+                ['code' => $course->code],
             );
         }
 
@@ -209,7 +209,7 @@ class AdminController extends AbstractController
     )]
     public function deleteDocument(CourseDocument $document): Response
     {
-        $code = $document->getCourse()->getCode();
+        $code = $document->course->code;
 
         $this->courseAdminService->deleteDocument($document);
 
@@ -249,7 +249,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute(
             'admin/education/courses/documents',
-            ['code' => $document->getCourse()->getCode()],
+            ['code' => $document->course->code],
         );
     }
 

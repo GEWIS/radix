@@ -33,69 +33,19 @@ class CourseDocumentPage
         referencedColumnName: 'id',
         nullable: false,
     )]
-    private CourseDocument $document;
+    public CourseDocument $document;
 
     #[Column(type: Types::INTEGER)]
-    private int $pageNumber;
+    public int $pageNumber;
 
     #[Column(type: Types::STRING)]
-    private string $path;
+    public string $path;
 
     #[Column(type: Types::INTEGER)]
-    private int $width;
+    public int $width;
 
     #[Column(type: Types::INTEGER)]
-    private int $height;
-
-    public function getDocument(): CourseDocument
-    {
-        return $this->document;
-    }
-
-    public function setDocument(CourseDocument $document): void
-    {
-        $this->document = $document;
-    }
-
-    public function getPageNumber(): int
-    {
-        return $this->pageNumber;
-    }
-
-    public function setPageNumber(int $pageNumber): void
-    {
-        $this->pageNumber = $pageNumber;
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    public function getWidth(): int
-    {
-        return $this->width;
-    }
-
-    public function setWidth(int $width): void
-    {
-        $this->width = $width;
-    }
-
-    public function getHeight(): int
-    {
-        return $this->height;
-    }
-
-    public function setHeight(int $height): void
-    {
-        $this->height = $height;
-    }
+    public int $height;
 
     /** Decides the orientation of the rebuilt PDF page. */
     public function isPortrait(): bool

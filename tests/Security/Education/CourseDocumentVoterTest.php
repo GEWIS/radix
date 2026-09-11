@@ -150,10 +150,10 @@ final class CourseDocumentVoterTest extends TestCase
     private function document(bool $downloadable): CourseDocument
     {
         $document = new Exam();
-        $document->setExamType(ExamTypes::Final);
-        $document->setFlattenStatus(
-            $downloadable ? DocumentFlattenStatus::Ready : DocumentFlattenStatus::Pending,
-        );
+        $document->examType = ExamTypes::Final;
+        $document->flattenStatus = $downloadable
+            ? DocumentFlattenStatus::Ready
+            : DocumentFlattenStatus::Pending;
 
         if ($downloadable) {
             $document->addPage(new CourseDocumentPage());

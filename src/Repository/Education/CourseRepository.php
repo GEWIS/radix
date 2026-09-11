@@ -204,7 +204,7 @@ class CourseRepository extends ServiceEntityRepository
                 continue;
             }
 
-            $similar[$course->getCode()] = $related;
+            $similar[$course->code] = $related;
         }
 
         return $similar;

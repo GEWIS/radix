@@ -28,11 +28,11 @@ class CourseDocumentStaging
 
     /** Kept so a row can be recognised when a guess comes out wrong. */
     #[Column(type: Types::STRING)]
-    private string $originalFilename;
+    public string $originalFilename;
 
     /** Carried over to the document on publication rather than copied again. */
     #[Column(type: Types::STRING)]
-    private string $path;
+    public string $path;
 
     #[ManyToOne(targetEntity: User::class)]
     #[JoinColumn(
@@ -41,159 +41,49 @@ class CourseDocumentStaging
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?User $uploadedBy = null;
+    public ?User $uploadedBy = null;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $uploadedAt;
+    public DateTime $uploadedAt;
 
     /** Guessed from the filename, so it may be wrong or missing; checked to exist before anything is published. */
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $courseCode = null;
+    public ?string $courseCode = null;
 
     #[Column(
         type: Types::DATE_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $date = null;
+    public ?DateTime $date = null;
 
     #[Column(
         type: Types::STRING,
         enumType: Languages::class,
     )]
-    private Languages $language = Languages::English;
+    public Languages $language = Languages::English;
 
     #[Column(
         type: Types::STRING,
         enumType: CourseDocumentTypes::class,
     )]
-    private CourseDocumentTypes $type = CourseDocumentTypes::Exam;
+    public CourseDocumentTypes $type = CourseDocumentTypes::Exam;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
         enumType: ExamTypes::class,
     )]
-    private ?ExamTypes $examType = ExamTypes::Final;
+    public ?ExamTypes $examType = ExamTypes::Final;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $author = null;
+    public ?string $author = null;
 
     #[Column(type: Types::BOOLEAN)]
-    private bool $scanned = false;
-
-    public function getOriginalFilename(): string
-    {
-        return $this->originalFilename;
-    }
-
-    public function setOriginalFilename(string $originalFilename): void
-    {
-        $this->originalFilename = $originalFilename;
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    public function getUploadedBy(): ?User
-    {
-        return $this->uploadedBy;
-    }
-
-    public function setUploadedBy(?User $uploadedBy): void
-    {
-        $this->uploadedBy = $uploadedBy;
-    }
-
-    public function getUploadedAt(): DateTime
-    {
-        return $this->uploadedAt;
-    }
-
-    public function setUploadedAt(DateTime $uploadedAt): void
-    {
-        $this->uploadedAt = $uploadedAt;
-    }
-
-    public function getCourseCode(): ?string
-    {
-        return $this->courseCode;
-    }
-
-    public function setCourseCode(?string $courseCode): void
-    {
-        $this->courseCode = $courseCode;
-    }
-
-    public function getDate(): ?DateTime
-    {
-        return $this->date;
-    }
-
-    public function setDate(?DateTime $date): void
-    {
-        $this->date = $date;
-    }
-
-    public function getLanguage(): Languages
-    {
-        return $this->language;
-    }
-
-    public function setLanguage(Languages $language): void
-    {
-        $this->language = $language;
-    }
-
-    public function getType(): CourseDocumentTypes
-    {
-        return $this->type;
-    }
-
-    public function setType(CourseDocumentTypes $type): void
-    {
-        $this->type = $type;
-    }
-
-    public function getExamType(): ?ExamTypes
-    {
-        return $this->examType;
-    }
-
-    public function setExamType(?ExamTypes $examType): void
-    {
-        $this->examType = $examType;
-    }
-
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?string $author): void
-    {
-        $this->author = $author;
-    }
-
-    public function getScanned(): bool
-    {
-        return $this->scanned;
-    }
-
-    public function setScanned(bool $scanned): void
-    {
-        $this->scanned = $scanned;
-    }
+    public bool $scanned = false;
 }

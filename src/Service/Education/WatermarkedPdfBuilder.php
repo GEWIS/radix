@@ -56,7 +56,7 @@ final readonly class WatermarkedPdfBuilder
      */
     public function build(CourseDocumentDownload $download): string
     {
-        $document = $download->getDocument();
+        $document = $download->document;
         $pages = $document->getPages();
 
         if ($pages->isEmpty()) {
@@ -90,7 +90,7 @@ final readonly class WatermarkedPdfBuilder
         string $workspace,
     ): string {
         $text = $this->watermarkTextBuilder->forDownload($download);
-        $dpi = $document->getScanned()
+        $dpi = $document->scanned
             ? PdfRasterizer::DPI_SCANNED
             : PdfRasterizer::DPI_DIGITAL;
 
@@ -113,8 +113,8 @@ final readonly class WatermarkedPdfBuilder
 
             // Lay the page out at the size it was rendered at, so the rebuilt document keeps the original's proportions
             // whatever the rasterization resolution was.
-            $width = $page->getWidth() / $dpi * self::POINTS_PER_INCH;
-            $height = $page->getHeight() / $dpi * self::POINTS_PER_INCH;
+            $width = $page->width / $dpi * self::POINTS_PER_INCH;
+            $height = $page->height / $dpi * self::POINTS_PER_INCH;
 
             $pdf->AddPage(
                 $page->isPortrait() ? 'P' : 'L',
@@ -132,7 +132,7 @@ final readonly class WatermarkedPdfBuilder
                 'JPG',
             );
 
-            if (1 !== $page->getPageNumber()) {
+            if (1 !== $page->pageNumber) {
                 continue;
             }
 
@@ -164,16 +164,16 @@ final readonly class WatermarkedPdfBuilder
         $sourcePath = sprintf(
             '%s/page-%d-source.jpg',
             $workspace,
-            $page->getPageNumber(),
+            $page->pageNumber,
         );
         $stampedPath = sprintf(
             '%s/page-%d.jpg',
             $workspace,
-            $page->getPageNumber(),
+            $page->pageNumber,
         );
 
         $this->copyToWorkspace(
-            $page->getPath(),
+            $page->path,
             $sourcePath,
         );
 

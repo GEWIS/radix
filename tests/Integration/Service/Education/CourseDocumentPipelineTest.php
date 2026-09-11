@@ -62,7 +62,7 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
 
         self::assertSame(
             DocumentFlattenStatus::Ready,
-            $document->getFlattenStatus(),
+            $document->flattenStatus,
         );
         self::assertSame(
             3,
@@ -80,10 +80,10 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
 
         self::assertSame(
             DownloadStatus::Ready,
-            $download->getStatus(),
+            $download->status,
         );
 
-        $path = $download->getPath();
+        $path = $download->path;
         self::assertNotNull($path);
 
         $text = $this->extractText($this->fileStorage->read($path));
@@ -133,16 +133,16 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
         );
 
         $document = new Exam();
-        $document->setCourse($course);
-        $document->setDate(new DateTime('2026-01-15'));
-        $document->setLanguage(Languages::English);
-        $document->setExamType(ExamTypes::Final);
-        $document->setScanned(false);
-        $document->setPath($this->fileStorage->store(
+        $document->course = $course;
+        $document->date = new DateTime('2026-01-15');
+        $document->language = Languages::English;
+        $document->examType = ExamTypes::Final;
+        $document->scanned = false;
+        $document->path = $this->fileStorage->store(
             StorageNamespace::EducationDocument,
             $temporaryFile,
-            $course->getCode(),
-        )->path);
+            $course->code,
+        )->path;
         unlink($temporaryFile);
 
         $this->entityManager->persist($document);
@@ -155,7 +155,7 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
 
         self::assertSame(
             DocumentFlattenStatus::Failed,
-            $document->getFlattenStatus(),
+            $document->flattenStatus,
         );
         self::assertFalse($document->isDownloadable());
     }
@@ -186,16 +186,16 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
         );
 
         $document = new Exam();
-        $document->setCourse($course);
-        $document->setDate(new DateTime('2026-01-15'));
-        $document->setLanguage(Languages::English);
-        $document->setExamType(ExamTypes::Final);
-        $document->setScanned(false);
-        $document->setPath($this->fileStorage->store(
+        $document->course = $course;
+        $document->date = new DateTime('2026-01-15');
+        $document->language = Languages::English;
+        $document->examType = ExamTypes::Final;
+        $document->scanned = false;
+        $document->path = $this->fileStorage->store(
             StorageNamespace::EducationDocument,
             $temporaryFile,
-            $course->getCode(),
-        )->path);
+            $course->code,
+        )->path;
         unlink($temporaryFile);
 
         $this->entityManager->persist($document);
@@ -207,8 +207,8 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
     private function createCourse(): Course
     {
         $course = new Course();
-        $course->setCode('2PIPE0');
-        $course->setName('Document pipeline');
+        $course->code = '2PIPE0';
+        $course->name = 'Document pipeline';
 
         $this->entityManager->persist($course);
         $this->entityManager->flush();

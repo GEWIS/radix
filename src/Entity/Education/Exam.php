@@ -24,27 +24,11 @@ class Exam extends CourseDocument
         type: Types::STRING,
         enumType: ExamTypes::class,
     )]
-    private ExamTypes $examType;
+    public ExamTypes $examType;
 
     #[Override]
     public function getType(): CourseDocumentTypes
     {
         return CourseDocumentTypes::Exam;
-    }
-
-    /**
-     * Get the type.
-     */
-    public function getExamType(): ExamTypes
-    {
-        return $this->examType;
-    }
-
-    /**
-     * Set the type.
-     */
-    public function setExamType(ExamTypes $examType): void
-    {
-        $this->examType = $examType;
     }
 }

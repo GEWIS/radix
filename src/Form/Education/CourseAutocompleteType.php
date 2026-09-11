@@ -35,8 +35,8 @@ final class CourseAutocompleteType extends AbstractType
             ],
             'choice_label' => static fn (Course $course): string => sprintf(
                 '%s - %s',
-                $course->getCode(),
-                $course->getName(),
+                $course->code,
+                $course->name,
             ),
             'placeholder' => t('Search by course code or name'),
             'security' => UserRoles::Board->value,

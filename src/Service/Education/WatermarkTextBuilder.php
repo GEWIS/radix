@@ -22,8 +22,8 @@ final readonly class WatermarkTextBuilder
     {
         return sprintf(
             'This document was downloaded on %s by %s via %s.',
-            $download->getRequestedAt()->format('Y-m-d H:i:s'),
-            $download->getRequestedByName(),
+            $download->requestedAt->format('Y-m-d H:i:s'),
+            $download->requestedByName,
             $this->siteUrl,
         );
     }

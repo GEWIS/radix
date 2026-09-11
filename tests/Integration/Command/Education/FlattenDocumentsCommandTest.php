@@ -40,11 +40,11 @@ final class FlattenDocumentsCommandTest extends DatabaseTestCase
         $this->entityManager->clear();
         self::assertSame(
             DocumentFlattenStatus::Ready,
-            $this->find($readableId)->getFlattenStatus(),
+            $this->find($readableId)->flattenStatus,
         );
         self::assertSame(
             DocumentFlattenStatus::Failed,
-            $this->find($unreadableId)->getFlattenStatus(),
+            $this->find($unreadableId)->flattenStatus,
         );
     }
 
@@ -67,11 +67,11 @@ final class FlattenDocumentsCommandTest extends DatabaseTestCase
         // The walk is ordered by id, so the bounded batch is the first document alone.
         self::assertSame(
             DocumentFlattenStatus::Ready,
-            $this->find($firstId)->getFlattenStatus(),
+            $this->find($firstId)->flattenStatus,
         );
         self::assertSame(
             DocumentFlattenStatus::Pending,
-            $this->find($secondId)->getFlattenStatus(),
+            $this->find($secondId)->flattenStatus,
         );
     }
 
@@ -112,16 +112,16 @@ final class FlattenDocumentsCommandTest extends DatabaseTestCase
         );
 
         $document = new Exam();
-        $document->setCourse($course);
-        $document->setDate(new DateTime('2026-01-15'));
-        $document->setLanguage(Languages::English);
-        $document->setExamType(ExamTypes::Final);
-        $document->setScanned(false);
-        $document->setPath(self::getContainer()->get(FileStorage::class)->store(
+        $document->course = $course;
+        $document->date = new DateTime('2026-01-15');
+        $document->language = Languages::English;
+        $document->examType = ExamTypes::Final;
+        $document->scanned = false;
+        $document->path = self::getContainer()->get(FileStorage::class)->store(
             StorageNamespace::EducationDocument,
             $temporaryFile,
-            $course->getCode(),
-        )->path);
+            $course->code,
+        )->path;
         unlink($temporaryFile);
 
         $this->entityManager->persist($document);

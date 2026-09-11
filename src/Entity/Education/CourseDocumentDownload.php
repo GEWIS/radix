@@ -35,7 +35,7 @@ class CourseDocumentDownload
         type: UuidType::NAME,
         unique: true,
     )]
-    private Uuid $token;
+    public Uuid $token;
 
     #[ManyToOne(targetEntity: CourseDocument::class)]
     #[JoinColumn(
@@ -44,7 +44,7 @@ class CourseDocumentDownload
         nullable: false,
         onDelete: 'CASCADE',
     )]
-    private CourseDocument $document;
+    public CourseDocument $document;
 
     /** Null for an anonymous request from the campus network. */
     #[ManyToOne(targetEntity: User::class)]
@@ -54,132 +54,42 @@ class CourseDocumentDownload
         nullable: true,
         onDelete: 'SET NULL',
     )]
-    private ?User $requestedBy = null;
+    public ?User $requestedBy = null;
 
     /**
      * What the watermark names as the person who downloaded it: the member's full name, or the client address for an
      * anonymous request from the campus network.
      */
     #[Column(type: Types::STRING)]
-    private string $requestedByName;
+    public string $requestedByName;
 
     /**
      * The address the request came from. For an anonymous request from campus this is the only thing tying the built
      * file to whoever asked for it, so it is what the collect routes check.
      */
     #[Column(type: Types::STRING)]
-    private string $requestedFrom;
+    public string $requestedFrom;
 
     #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $requestedAt;
+    public DateTime $requestedAt;
 
     #[Column(
         type: Types::DATETIME_MUTABLE,
         nullable: true,
     )]
-    private ?DateTime $collectedAt = null;
+    public ?DateTime $collectedAt = null;
 
     #[Column(
         type: Types::STRING,
         enumType: DownloadStatus::class,
     )]
-    private DownloadStatus $status = DownloadStatus::Pending;
+    public DownloadStatus $status = DownloadStatus::Pending;
 
     #[Column(
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $path = null;
-
-    public function getToken(): Uuid
-    {
-        return $this->token;
-    }
-
-    public function setToken(Uuid $token): void
-    {
-        $this->token = $token;
-    }
-
-    public function getDocument(): CourseDocument
-    {
-        return $this->document;
-    }
-
-    public function setDocument(CourseDocument $document): void
-    {
-        $this->document = $document;
-    }
-
-    public function getRequestedBy(): ?User
-    {
-        return $this->requestedBy;
-    }
-
-    public function setRequestedBy(?User $requestedBy): void
-    {
-        $this->requestedBy = $requestedBy;
-    }
-
-    public function getRequestedByName(): string
-    {
-        return $this->requestedByName;
-    }
-
-    public function setRequestedByName(string $requestedByName): void
-    {
-        $this->requestedByName = $requestedByName;
-    }
-
-    public function getRequestedFrom(): string
-    {
-        return $this->requestedFrom;
-    }
-
-    public function setRequestedFrom(string $requestedFrom): void
-    {
-        $this->requestedFrom = $requestedFrom;
-    }
-
-    public function getRequestedAt(): DateTime
-    {
-        return $this->requestedAt;
-    }
-
-    public function setRequestedAt(DateTime $requestedAt): void
-    {
-        $this->requestedAt = $requestedAt;
-    }
-
-    public function getCollectedAt(): ?DateTime
-    {
-        return $this->collectedAt;
-    }
-
-    public function setCollectedAt(?DateTime $collectedAt): void
-    {
-        $this->collectedAt = $collectedAt;
-    }
-
-    public function getStatus(): DownloadStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(DownloadStatus $status): void
-    {
-        $this->status = $status;
-    }
-
-    public function getPath(): ?string
-    {
-        return $this->path;
-    }
-
-    public function setPath(?string $path): void
-    {
-        $this->path = $path;
-    }
+    public ?string $path = null;
 
     /**
      * Written into the delivered PDF as machine-readable text, so a copy found elsewhere leads back to this row.

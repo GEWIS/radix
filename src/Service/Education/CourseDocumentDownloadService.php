@@ -55,13 +55,13 @@ final readonly class CourseDocumentDownloadService
         ?string $clientIp,
     ): CourseDocumentDownload {
         $download = new CourseDocumentDownload();
-        $download->setToken(Uuid::v4());
-        $download->setDocument($document);
-        $download->setRequestedBy($user);
+        $download->token = Uuid::v4();
+        $download->document = $document;
+        $download->requestedBy = $user;
         // An anonymous request from campus still has to be attributable, so the watermark names its address.
-        $download->setRequestedByName($user?->getDisplayName() ?? $clientIp ?? 'an anonymous visitor');
-        $download->setRequestedFrom($clientIp ?? '');
-        $download->setRequestedAt(new DateTime());
+        $download->requestedByName = $user?->getDisplayName() ?? $clientIp ?? 'an anonymous visitor';
+        $download->requestedFrom = $clientIp ?? '';
+        $download->requestedAt = new DateTime();
 
         $this->entityManager->persist($download);
         $this->entityManager->flush();
@@ -76,7 +76,7 @@ final readonly class CourseDocumentDownloadService
         $path = sprintf(
             '%s/%s.pdf',
             StorageNamespace::EducationDownload->directory(),
-            $download->getToken()->toRfc4122(),
+            $download->token->toRfc4122(),
         );
 
         $this->fileStorage->write(
@@ -84,20 +84,20 @@ final readonly class CourseDocumentDownloadService
             $this->pdfBuilder->build($download),
         );
 
-        $download->setPath($path);
-        $download->setStatus(DownloadStatus::Ready);
+        $download->path = $path;
+        $download->status = DownloadStatus::Ready;
         $this->entityManager->flush();
     }
 
     public function markFailed(CourseDocumentDownload $download): void
     {
-        $download->setStatus(DownloadStatus::Failed);
+        $download->status = DownloadStatus::Failed;
         $this->entityManager->flush();
     }
 
     public function markCollected(CourseDocumentDownload $download): void
     {
-        $download->setCollectedAt(new DateTime());
+        $download->collectedAt = new DateTime();
         $this->entityManager->flush();
     }
 
@@ -108,7 +108,7 @@ final readonly class CourseDocumentDownloadService
         );
 
         foreach ($expired as $download) {
-            $path = $download->getPath();
+            $path = $download->path;
 
             $this->entityManager->remove($download);
             $this->entityManager->flush();
@@ -128,20 +128,20 @@ final readonly class CourseDocumentDownloadService
      */
     public function filenameFor(CourseDocument $document): string
     {
-        $parts = [$document->getCourse()->getCode()];
+        $parts = [$document->course->code];
 
         if ($document instanceof Summary) {
-            $author = $document->getAuthor();
+            $author = $document->author;
             if (null !== $author) {
                 $parts[] = $this->slugger->slug($author)->toString();
             }
 
             $parts[] = 'summary';
         } elseif ($document instanceof Exam) {
-            $parts[] = $document->getExamType()->value;
+            $parts[] = $document->examType->value;
         }
 
-        $parts[] = $document->getDate()->format('Y-m-d');
+        $parts[] = $document->date->format('Y-m-d');
 
         return implode(
             '-',

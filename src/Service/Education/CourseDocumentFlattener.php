@@ -47,8 +47,8 @@ final readonly class CourseDocumentFlattener
      */
     public function flatten(CourseDocument $document): void
     {
-        $document->setFlattenStatus(DocumentFlattenStatus::Processing);
-        $document->setFlattenError(null);
+        $document->flattenStatus = DocumentFlattenStatus::Processing;
+        $document->flattenError = null;
         $this->entityManager->flush();
 
         $workspace = sprintf(
@@ -60,14 +60,14 @@ final readonly class CourseDocumentFlattener
 
         try {
             $pdfPath = $this->copyToWorkspace(
-                $document->getPath(),
+                $document->path,
                 $workspace,
             );
 
             $renderedPages = $this->rasterizer->rasterize(
                 $pdfPath,
                 $workspace,
-                $document->getScanned() ? PdfRasterizer::DPI_SCANNED : PdfRasterizer::DPI_DIGITAL,
+                $document->scanned ? PdfRasterizer::DPI_SCANNED : PdfRasterizer::DPI_DIGITAL,
             );
 
             $this->replacePages(
@@ -75,8 +75,8 @@ final readonly class CourseDocumentFlattener
                 $renderedPages,
             );
 
-            $document->setFlattenStatus(DocumentFlattenStatus::Ready);
-            $document->setFlattenedAt(new DateTime());
+            $document->flattenStatus = DocumentFlattenStatus::Ready;
+            $document->flattenedAt = new DateTime();
             $this->entityManager->flush();
         } finally {
             $this->filesystem->remove($workspace);
@@ -90,8 +90,8 @@ final readonly class CourseDocumentFlattener
         CourseDocument $document,
         string $reason,
     ): void {
-        $document->setFlattenStatus(DocumentFlattenStatus::Failed);
-        $document->setFlattenError($reason);
+        $document->flattenStatus = DocumentFlattenStatus::Failed;
+        $document->flattenError = $reason;
         $this->entityManager->flush();
     }
 
@@ -124,10 +124,10 @@ final readonly class CourseDocumentFlattener
             );
 
             $page = new CourseDocumentPage();
-            $page->setPageNumber($index + 1);
-            $page->setPath($stored->path);
-            $page->setWidth($dimensions[0]);
-            $page->setHeight($dimensions[1]);
+            $page->pageNumber = $index + 1;
+            $page->path = $stored->path;
+            $page->width = $dimensions[0];
+            $page->height = $dimensions[1];
 
             $document->addPage($page);
             $this->entityManager->persist($page);

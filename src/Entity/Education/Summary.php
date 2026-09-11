@@ -24,27 +24,11 @@ class Summary extends CourseDocument
         type: Types::STRING,
         nullable: true,
     )]
-    private ?string $author = null;
+    public ?string $author = null;
 
     #[Override]
     public function getType(): CourseDocumentTypes
     {
         return CourseDocumentTypes::Summary;
-    }
-
-    /**
-     * Get the author.
-     */
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    /**
-     * Set the author.
-     */
-    public function setAuthor(?string $author): void
-    {
-        $this->author = $author;
     }
 }

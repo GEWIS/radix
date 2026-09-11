@@ -42,13 +42,13 @@ class Course
         type: Types::STRING,
         length: 255,
     )]
-    private string $code;
+    public string $code;
 
     /**
      * Course name.
      */
     #[Column(type: Types::STRING)]
-    private string $name;
+    public string $name;
 
     /**
      * Exams (and summaries) in this course.
@@ -102,22 +102,6 @@ class Course
     }
 
     /**
-     * Get the course code.
-     */
-    public function getCode(): string
-    {
-        return $this->code;
-    }
-
-    /**
-     * Get the course name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
      * Get all exams belonging to this study.
      *
      * @return Collection<array-key, CourseDocument>
@@ -125,22 +109,6 @@ class Course
     public function getDocuments(): Collection
     {
         return $this->documents;
-    }
-
-    /**
-     * Set the course code.
-     */
-    public function setCode(string $code): void
-    {
-        $this->code = $code;
-    }
-
-    /**
-     * Set the course name.
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     /**
@@ -153,8 +121,8 @@ class Course
     public function toArray(): array
     {
         return [
-            'code' => $this->getCode(),
-            'name' => $this->getName(),
+            'code' => $this->code,
+            'name' => $this->name,
             'similar' => $this->getSimilarCoursesAsString(),
         ];
     }
@@ -167,7 +135,7 @@ class Course
         return implode(
             ',',
             $this->similarCoursesTo->map(
-                static fn (self $course) => $course->getCode(),
+                static fn (self $course) => $course->code,
             )->toArray(),
         );
     }
@@ -195,7 +163,7 @@ class Course
         $similar = [];
 
         foreach ([...$this->similarCoursesTo, ...$this->similarCoursesFrom] as $course) {
-            $similar[$course->getCode()] = $course;
+            $similar[$course->code] = $course;
         }
 
         ksort($similar);
@@ -229,8 +197,8 @@ class Course
     public function toGdprArray(): array
     {
         return [
-            'code' => $this->getCode(),
-            'name' => $this->getName(),
+            'code' => $this->code,
+            'name' => $this->name,
         ];
     }
 }

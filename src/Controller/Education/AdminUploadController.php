@@ -115,7 +115,7 @@ class AdminUploadController extends AbstractController
 
         return $this->json([
             'id' => $staged->getId(),
-            'filename' => $staged->getOriginalFilename(),
+            'filename' => $staged->originalFilename,
         ]);
     }
 
@@ -147,7 +147,7 @@ class AdminUploadController extends AbstractController
             return $this->redirectToRoute('admin/education/documents/upload');
         }
 
-        $staged->setCourseCode(strtoupper(trim($staged->getCourseCode() ?? '')));
+        $staged->courseCode = strtoupper(trim($staged->courseCode ?? ''));
 
         try {
             $this->stagingService->publish($staged);

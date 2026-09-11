@@ -71,7 +71,7 @@ final class CourseOverview extends AbstractDoctrinePaginatedOverview
     public function getCounts(): array
     {
         return $this->counts ??= $this->courseRepository->countsFor(array_map(
-            static fn (Course $course): string => $course->getCode(),
+            static fn (Course $course): string => $course->code,
             $this->getCourses(),
         ));
     }
