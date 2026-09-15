@@ -11,7 +11,7 @@ use App\Entity\Career\Enums\CompanyBannerFormats;
 use App\Entity\Career\Enums\CompanyPackageTypes;
 use App\Form\Application\LocalisedTextType;
 use App\Form\Application\RequiresEnabledLanguagesTrait;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -211,8 +211,8 @@ class CompanyPackageType extends AbstractType
         $expires = $form->get('expirationDate')->getData();
 
         if (
-            !$start instanceof DateTime
-            || !$expires instanceof DateTime
+            !$start instanceof DateTimeImmutable
+            || !$expires instanceof DateTimeImmutable
             || $expires > $start
         ) {
             return;

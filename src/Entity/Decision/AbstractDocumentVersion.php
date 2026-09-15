@@ -7,7 +7,7 @@ namespace App\Entity\Decision;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -56,8 +56,8 @@ abstract class AbstractDocumentVersion
      * legacy flat documents.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $uploadedAt = null;
+    public ?DateTimeImmutable $uploadedAt = null;
 }

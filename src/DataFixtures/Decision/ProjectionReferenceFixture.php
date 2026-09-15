@@ -9,7 +9,7 @@ use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -157,7 +157,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
             );
         }
 
-        $today = new DateTime('today');
+        $today = new DateTimeImmutable('today');
 
         foreach (
             [
@@ -238,7 +238,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
      */
     private function split(
         array $meetings,
-        DateTime $today,
+        DateTimeImmutable $today,
     ): array {
         usort(
             $meetings,

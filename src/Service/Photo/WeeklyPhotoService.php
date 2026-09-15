@@ -14,7 +14,7 @@ use App\Repository\Photo\VoteRepository;
 use App\Repository\Photo\WeeklyPhotoRepository;
 use App\Service\Application\FileStorage;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -53,10 +53,10 @@ final readonly class WeeklyPhotoService
      * expired either way, so a logged-out visitor never sees a stale photo of the week: a week with no votes simply has
      * no public photo of the week.
      */
-    public function generatePhotoOfTheWeek(?DateTime $weekStart = null): ?WeeklyPhoto
+    public function generatePhotoOfTheWeek(?DateTimeImmutable $weekStart = null): ?WeeklyPhoto
     {
-        $begin = $weekStart ?? new DateTime()->sub(new DateInterval('P1W'));
-        $end = (clone $begin)->add(new DateInterval('P1W'));
+        $begin = $weekStart ?? new DateTimeImmutable()->sub(new DateInterval('P1W'));
+        $end = $begin->add(new DateInterval('P1W'));
 
         $this->expireCurrentPublicCopy();
 
@@ -81,13 +81,13 @@ final readonly class WeeklyPhotoService
      */
     public function setPhotoOfTheWeek(
         Photo $photo,
-        ?DateTime $weekStart = null,
+        ?DateTimeImmutable $weekStart = null,
     ): WeeklyPhoto {
         $this->expireCurrentPublicCopy();
 
         return $this->store(
             $photo,
-            $weekStart ?? new DateTime()->sub(new DateInterval('P1W')),
+            $weekStart ?? new DateTimeImmutable()->sub(new DateInterval('P1W')),
         );
     }
 
@@ -134,7 +134,7 @@ final readonly class WeeklyPhotoService
 
     private function store(
         Photo $photo,
-        DateTime $week,
+        DateTimeImmutable $week,
     ): WeeklyPhoto {
         $weeklyPhoto = new WeeklyPhoto();
         $weeklyPhoto->week = $week;
@@ -191,8 +191,8 @@ final readonly class WeeklyPhotoService
      * The highest-rated non-repeat photo voted on in the window, or null when nothing was voted on.
      */
     private function determinePhotoOfTheWeek(
-        DateTime $begin,
-        DateTime $end,
+        DateTimeImmutable $begin,
+        DateTimeImmutable $end,
     ): ?Photo {
         $best = null;
         $bestRating = -1.0;
@@ -235,7 +235,7 @@ final readonly class WeeklyPhotoService
     ): float {
         $ageInDays = max(
             1,
-            new DateTime()->diff(
+            new DateTimeImmutable()->diff(
                 $photo->dateTime,
                 true,
             )->days,

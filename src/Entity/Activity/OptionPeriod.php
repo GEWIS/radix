@@ -7,7 +7,7 @@ namespace App\Entity\Activity;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Application\Traits\TimestampableTrait;
 use App\Repository\Activity\OptionPeriodRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -61,26 +61,26 @@ class OptionPeriod
     /**
      * From when bodies may hand in proposals for this period.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $submissionOpensAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $submissionOpensAt;
 
     /**
      * Until when bodies may hand in proposals for this period.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $submissionClosesAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $submissionClosesAt;
 
     /**
      * The first day a proposed activity may take place on.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $startsAt;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $startsAt;
 
     /**
      * The last day a proposed activity may take place on.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $endsAt;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $endsAt;
 
     /**
      * How many activities a body may propose in this period, when the board wants a different number than usual.

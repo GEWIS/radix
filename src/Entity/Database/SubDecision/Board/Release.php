@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\SubDecision;
 use App\Repository\Database\SubDecision\Board\ReleaseRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -59,8 +59,8 @@ class Release extends SubDecision
     /**
      * Date of the discharge.
      */
-    #[Column(type: 'date')]
-    public DateTime $date;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $date;
 
     #[Override]
     protected function getTranslatedTemplate(

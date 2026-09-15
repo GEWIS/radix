@@ -18,7 +18,7 @@ use App\Service\Checker\Meeting as MeetingService;
 use App\Service\Checker\Organ as OrganService;
 use App\ViewModel\Checker\Error as ErrorModel;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
@@ -310,7 +310,7 @@ class Checker
             if (
                 OrganTypes::Fraternity === $organType
                 && MeetingTypes::BV === $meetingType
-                && $organ->decision->meeting->date <= new DateTime('2021-10-06')
+                && $organ->decision->meeting->date <= new DateTimeImmutable('2021-10-06')
             ) {
                 continue;
             }
@@ -335,12 +335,12 @@ class Checker
         $grantings = $this->keyService->getKeysGrantedDuringMeeting($meeting);
         // The max. one year restriction only applies to key codes granted from 2020-01-01 onwards, with BV 1749.15.1
         // there are no more restrictions on max. one year.
-        $maxOneYearStart = new DateTime('2020-01-01 midnight');
-        $maxOneYearCutOff = new DateTime('2025-07-01 midnight');
+        $maxOneYearStart = new DateTimeImmutable('2020-01-01 midnight');
+        $maxOneYearCutOff = new DateTimeImmutable('2025-07-01 midnight');
 
         // `$today` is when the meeting took place
         $today = $meeting->date;
-        $todayNextYear = (clone $today)->add(new DateInterval('P1Y'));
+        $todayNextYear = $today->add(new DateInterval('P1Y'));
 
         $septemberFirstNextAssociationYear = AssociationYear::fromDate($today)->septemberFirst();
 

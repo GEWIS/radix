@@ -11,7 +11,7 @@ use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Key\GrantingRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -27,8 +27,8 @@ class Granting extends SubDecision implements NamesMember
     /**
      * Till when the keycode is granted.
      */
-    #[Column(type: 'date')]
-    public DateTime $until;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $until;
 
     /**
      * Discharges.

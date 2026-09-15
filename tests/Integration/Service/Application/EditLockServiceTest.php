@@ -11,7 +11,7 @@ use App\Entity\User\User;
 use App\Repository\Application\EditLockRepository;
 use App\Service\Application\EditLockService;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 use function sprintf;
 
@@ -372,7 +372,7 @@ final class EditLockServiceTest extends DatabaseTestCase
      */
     private function makeStale(EditLock $lock): void
     {
-        $lock->lastPingAt = new DateTime(sprintf(
+        $lock->lastPingAt = new DateTimeImmutable(sprintf(
             '-%d seconds',
             EditLockService::TTL_SECONDS + 30,
         ));

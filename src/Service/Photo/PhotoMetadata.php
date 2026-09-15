@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Photo;
 
 use App\Entity\Photo\Photo;
-use DateTime;
+use DateTimeImmutable;
 
 use function array_key_exists;
 use function count;
@@ -31,7 +31,7 @@ use function trim;
 final readonly class PhotoMetadata
 {
     private function __construct(
-        public ?DateTime $dateTime,
+        public ?DateTimeImmutable $dateTime,
         public ?string $artist,
         public ?string $camera,
         public ?bool $flash,
@@ -203,7 +203,7 @@ final readonly class PhotoMetadata
         );
     }
 
-    private static function dateTime(mixed $value): ?DateTime
+    private static function dateTime(mixed $value): ?DateTimeImmutable
     {
         $value = self::string($value);
         if (null === $value) {
@@ -213,11 +213,11 @@ final readonly class PhotoMetadata
         // createFromFormat rolls invalid components over rather than failing (the "0000:00:00 00:00:00" no-date
         // sentinel would become a real date), so reject any parse that reported a warning or error. Unlike a strict
         // string round-trip this still accepts valid but unpadded components (e.g. "2019:08:12 8:45:30").
-        $dateTime = DateTime::createFromFormat(
+        $dateTime = DateTimeImmutable::createFromFormat(
             'Y:m:d H:i:s',
             $value,
         );
-        $errors = DateTime::getLastErrors();
+        $errors = DateTimeImmutable::getLastErrors();
 
         if (
             false === $dateTime

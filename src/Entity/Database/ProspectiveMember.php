@@ -9,7 +9,7 @@ use App\Entity\Database\Enums\CheckoutSessionStates;
 use App\Entity\Database\Enums\PostalRegions;
 use App\Entity\Database\Enums\Studies;
 use App\Repository\Database\ProspectiveMemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -88,14 +88,14 @@ class ProspectiveMember
     /**
      * Last changed date of membership.
      */
-    #[Column(type: 'date')]
-    public DateTime $changedOn;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $changedOn;
 
     /**
      * Member birthdate.
      */
-    #[Column(type: 'date')]
-    public DateTime $birth;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $birth;
 
     /**
      * How much the member has paid for membership. 0 by default.
@@ -364,7 +364,7 @@ class ProspectiveMember
 
         if (CheckoutSessionStates::Expired === $lastState) {
             // Checkout Session is fully expired, it cannot be recovered and is scheduled for automatic removal.
-            return (new DateTime()) >= $lastCheckoutSession->expiration;
+            return (new DateTimeImmutable()) >= $lastCheckoutSession->expiration;
         }
 
         return CheckoutSessionStates::Paid === $lastState;

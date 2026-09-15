@@ -11,7 +11,7 @@ use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\Meeting;
 use App\Entity\Database\Member as MemberModel;
 use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -31,7 +31,7 @@ class MeetingFixture extends Fixture implements DependentFixtureInterface, Fixtu
     public function load(ObjectManager $manager): void
     {
         $meeting = new Meeting();
-        $meeting->date = new DateTime('2000-01-01');
+        $meeting->date = new DateTimeImmutable('2000-01-01');
         $meeting->setNumber(1);
         $meeting->type = MeetingTypes::BV;
         $manager->persist($meeting);
@@ -46,7 +46,7 @@ class MeetingFixture extends Fixture implements DependentFixtureInterface, Fixtu
         $decision->number = 1;
 
         $installation = new BoardInstallation();
-        $installation->date = new DateTime('2000-01-01');
+        $installation->date = new DateTimeImmutable('2000-01-01');
         $installation->function = BoardFunctions::Chair;
         $installation->setMember($this->getReference(MemberFixture::REF_MEMBER_STUDENT, MemberModel::class));
         $installation->sequence = 1;

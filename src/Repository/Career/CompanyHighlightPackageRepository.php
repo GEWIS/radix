@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\Career;
 
 use App\Entity\Career\CompanyHighlightPackage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,8 +37,8 @@ class CompanyHighlightPackageRepository extends ServiceEntityRepository
             ->andWhere('p.expires > :now')
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();

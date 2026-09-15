@@ -8,7 +8,7 @@ use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
 use App\Entity\Database\RenewalLink;
-use DateTime;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -59,7 +59,7 @@ class RenewalLinkTest extends TestCase
         $member = $this->member('2026-07-01');
         $link = new RenewalLink(
             $member,
-            new DateTime('2027-07-01'),
+            new DateTimeImmutable('2027-07-01'),
         );
 
         self::assertSame(
@@ -79,7 +79,7 @@ class RenewalLinkTest extends TestCase
 
         new RenewalLink(
             $member,
-            new DateTime('2026-07-01'),
+            new DateTimeImmutable('2026-07-01'),
         );
     }
 
@@ -94,7 +94,7 @@ class RenewalLinkTest extends TestCase
     ): void {
         $link = new RenewalLink(
             $this->member($currentExpiration),
-            new DateTime('+5 years'),
+            new DateTimeImmutable('+5 years'),
         );
 
         self::assertSame(
@@ -132,7 +132,7 @@ class RenewalLinkTest extends TestCase
     {
         return new RenewalLink(
             $this->member('2026-07-01'),
-            new DateTime('2027-07-01'),
+            new DateTimeImmutable('2027-07-01'),
         );
     }
 
@@ -146,8 +146,8 @@ class RenewalLinkTest extends TestCase
             new Membership(
                 $member,
                 MembershipTypes::Ordinary,
-                new DateTime('-2 years'),
-                new DateTime($expiration),
+                new DateTimeImmutable('-2 years'),
+                new DateTimeImmutable($expiration),
             ),
         );
 

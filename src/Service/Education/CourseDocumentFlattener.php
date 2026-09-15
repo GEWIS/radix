@@ -9,7 +9,7 @@ use App\Entity\Education\CourseDocument;
 use App\Entity\Education\CourseDocumentPage;
 use App\Entity\Education\Enums\DocumentFlattenStatus;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
@@ -76,7 +76,7 @@ final readonly class CourseDocumentFlattener
             );
 
             $document->flattenStatus = DocumentFlattenStatus::Ready;
-            $document->flattenedAt = new DateTime();
+            $document->flattenedAt = new DateTimeImmutable();
             $this->entityManager->flush();
         } finally {
             $this->filesystem->remove($workspace);

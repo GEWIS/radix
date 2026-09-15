@@ -6,7 +6,7 @@ namespace App\Tests\Service\Photo;
 
 use App\Entity\Photo\Photo;
 use App\Service\Photo\PhotoMetadata;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class PhotoMetadataTest extends TestCase
@@ -69,7 +69,7 @@ final class PhotoMetadataTest extends TestCase
         ]);
 
         self::assertInstanceOf(
-            DateTime::class,
+            DateTimeImmutable::class,
             $metadata->dateTime,
         );
         self::assertSame(
@@ -92,7 +92,7 @@ final class PhotoMetadataTest extends TestCase
         $metadata = PhotoMetadata::fromExif(['DateTimeOriginal' => '2019:08:12 8:45:30']);
 
         self::assertInstanceOf(
-            DateTime::class,
+            DateTimeImmutable::class,
             $metadata->dateTime,
         );
         self::assertSame(
@@ -239,7 +239,7 @@ final class PhotoMetadataTest extends TestCase
     public function testApplyToOverridesDateTimeOnlyWhenPresent(): void
     {
         $photo = new Photo();
-        $original = new DateTime('2021-05-05 05:05:05');
+        $original = new DateTimeImmutable('2021-05-05 05:05:05');
         $photo->dateTime = $original;
 
         PhotoMetadata::empty()->applyTo($photo);

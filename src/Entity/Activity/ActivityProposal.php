@@ -12,7 +12,7 @@ use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Repository\Activity\ActivityProposalRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -168,10 +168,10 @@ class ActivityProposal
     public ?Member $decidedBy = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $decidedAt = null;
+    public ?DateTimeImmutable $decidedAt = null;
 
     /**
      * How the financial side was settled, or null while it has not been. Null is what the reminder and the lapse
@@ -194,19 +194,19 @@ class ActivityProposal
     public ?Member $budgetClearedBy = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $budgetClearedAt = null;
+    public ?DateTimeImmutable $budgetClearedAt = null;
 
     /**
      * When the body was last told the date is at risk, so a nightly run does not tell them again every night.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $budgetRemindedAt = null;
+    public ?DateTimeImmutable $budgetRemindedAt = null;
 
     public function __construct()
     {

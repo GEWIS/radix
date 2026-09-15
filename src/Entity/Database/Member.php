@@ -8,7 +8,7 @@ use App\Entity\Application\AssociationYear;
 use App\Entity\Database\Enums\Studies;
 use App\Entity\Database\SubDecision\Installation;
 use App\Repository\Database\MemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -91,8 +91,8 @@ class Member
     /**
      * Last changed date of member.
      */
-    #[Column(type: 'date')]
-    public DateTime $changedOn;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $changedOn;
 
     /**
      * Memberships of this member
@@ -114,16 +114,16 @@ class Member
      * Last date membership status was checked.
      */
     #[Column(
-        type: 'date',
+        type: 'date_immutable',
         nullable: true,
     )]
-    public ?DateTime $lastCheckedOn = null;
+    public ?DateTimeImmutable $lastCheckedOn = null;
 
     /**
      * Member birthdate.
      */
-    #[Column(type: 'date')]
-    public private(set) DateTime $birth;
+    #[Column(type: 'date_immutable')]
+    public private(set) DateTimeImmutable $birth;
 
     /**
      * If the member receives a 'supremum'
@@ -334,18 +334,18 @@ class Member
     /**
      * Get the expiration date.
      */
-    public function getExpiration(): DateTime
+    public function getExpiration(): DateTimeImmutable
     {
-        return $this->computeMembershipEndDate(formalMemberOnly: false) ?? new DateTime('0001-01-01 00:00:00');
+        return $this->computeMembershipEndDate(formalMemberOnly: false) ?? new DateTimeImmutable('0001-01-01 00:00:00');
     }
 
     /**
      * Set the birthdate.
      */
-    public function setBirth(DateTime|string $birth): void
+    public function setBirth(DateTimeImmutable|string $birth): void
     {
         if (is_string($birth)) {
-            $birth = new DateTime($birth);
+            $birth = new DateTimeImmutable($birth);
         }
 
         $this->birth = $birth;
@@ -354,9 +354,9 @@ class Member
     /**
      * Get the date on which the membership of the member will have ended (i.e., they have become "graduate").
      */
-    public function getMembershipEndsOn(): DateTime
+    public function getMembershipEndsOn(): DateTimeImmutable
     {
-        return $this->getMembershipEndDate() ?? new DateTime('0001-01-01 00:00:00');
+        return $this->getMembershipEndDate() ?? new DateTimeImmutable('0001-01-01 00:00:00');
     }
 
     /**
@@ -365,7 +365,7 @@ class Member
      * {@see self::getMembershipEndsOn()} answers the same question with a sentinel date, which reads as a real answer
      * where it is shown.
      */
-    public function getMembershipEndDate(): ?DateTime
+    public function getMembershipEndDate(): ?DateTimeImmutable
     {
         return $this->computeMembershipEndDate(formalMemberOnly: true);
     }
@@ -373,7 +373,7 @@ class Member
     /**
      * Compute the date of end of membership, or null if none
      */
-    private function computeMembershipEndDate(bool $formalMemberOnly): ?DateTime
+    private function computeMembershipEndDate(bool $formalMemberOnly): ?DateTimeImmutable
     {
         $expiration = null;
 

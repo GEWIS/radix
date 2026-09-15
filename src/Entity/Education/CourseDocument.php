@@ -9,7 +9,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Education\Enums\CourseDocumentTypes;
 use App\Entity\Education\Enums\DocumentFlattenStatus;
 use App\Repository\Education\CourseDocumentRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -55,8 +55,8 @@ abstract class CourseDocument
     /**
      * Date of the exam.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 
     /**
      * The language of the exam.
@@ -93,10 +93,10 @@ abstract class CourseDocument
     public DocumentFlattenStatus $flattenStatus = DocumentFlattenStatus::Pending;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $flattenedAt = null;
+    public ?DateTimeImmutable $flattenedAt = null;
 
     /**
      * Why rasterization failed, kept so an administrator can tell a corrupt upload from a missing binary.

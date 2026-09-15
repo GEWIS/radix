@@ -12,7 +12,7 @@ use App\Entity\User\User;
 use App\Repository\Activity\OptionPeriodRepository;
 use App\Repository\Decision\OrganRepository;
 use App\Service\Activity\ProposalLimitResolver;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -234,7 +234,7 @@ class ActivityProposalType extends AbstractType
     ): void {
         if (
             $isBoard
-            || $period->isOpenAt(new DateTime())
+            || $period->isOpenAt(new DateTimeImmutable())
         ) {
             return;
         }
@@ -352,7 +352,7 @@ class ActivityProposalType extends AbstractType
         FormInterface $form,
         OptionPeriod $period,
     ): void {
-        $today = new DateTime('today');
+        $today = new DateTimeImmutable('today');
 
         foreach ($form->get('dateOptions') as $row) {
             $begins = $row->get('beginsAt')->getData();
@@ -361,8 +361,8 @@ class ActivityProposalType extends AbstractType
             // A row missing a day was already reported by NotBlank; saying so twice helps nobody, and the entity's
             // property was never written.
             if (
-                !$begins instanceof DateTime
-                || !$ends instanceof DateTime
+                !$begins instanceof DateTimeImmutable
+                || !$ends instanceof DateTimeImmutable
             ) {
                 continue;
             }
@@ -440,9 +440,9 @@ class ActivityProposalType extends AbstractType
     private function selectablePeriods(bool $isBoard): array
     {
         if ($isBoard) {
-            return $this->optionPeriodRepository->findCurrentAndUpcoming(new DateTime());
+            return $this->optionPeriodRepository->findCurrentAndUpcoming(new DateTimeImmutable());
         }
 
-        return $this->optionPeriodRepository->findOpenAt(new DateTime());
+        return $this->optionPeriodRepository->findOpenAt(new DateTimeImmutable());
     }
 }

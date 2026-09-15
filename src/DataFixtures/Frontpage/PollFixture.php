@@ -18,7 +18,7 @@ use App\Entity\Frontpage\PollRevision;
 use App\Entity\Frontpage\PollRevisionComment;
 use App\Entity\Frontpage\PollVote;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -80,7 +80,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
                 ],
             ],
             RevisionStatus::Approved,
-            new DateTime('+3 weeks'),
+            new DateTimeImmutable('+3 weeks'),
         );
 
         $revision = $poll->getCurrentRevision();
@@ -117,7 +117,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             8006,
             'Anonymous Thirst',
             'Half past four is too early for anybody with a lecture until five.',
-            new DateTime('-2 days'),
+            new DateTimeImmutable('-2 days'),
         );
 
         $reply = $this->comment(
@@ -126,7 +126,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             8007,
             'Late Riser',
             'Friday works better for me, but I would be there either way.',
-            new DateTime('-1 day'),
+            new DateTimeImmutable('-1 day'),
             $comment,
         );
 
@@ -136,7 +136,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             8008,
             'Second Thought',
             'Friday afternoon runs into the weekend for anybody travelling home.',
-            new DateTime('-1 day'),
+            new DateTimeImmutable('-1 day'),
             $reply,
         );
 
@@ -176,7 +176,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
                 ],
             ],
             RevisionStatus::Approved,
-            new DateTime('+5 weeks'),
+            new DateTimeImmutable('+5 weeks'),
         );
 
         $revision = $poll->getCurrentRevision();
@@ -222,7 +222,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
                 ],
             ],
             RevisionStatus::Approved,
-            new DateTime('-2 months'),
+            new DateTimeImmutable('-2 months'),
         );
 
         $revision = $poll->getCurrentRevision();
@@ -257,7 +257,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             8017,
             'Wall Watcher',
             'The one on the stairs it is, then.',
-            new DateTime('-2 months'),
+            new DateTimeImmutable('-2 months'),
         );
 
         $reaction = new PollCommentReaction();
@@ -326,7 +326,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
         }
 
         $revision->setReviewer($this->member(8000));
-        $revision->setReviewedAt(new DateTime('-1 week'));
+        $revision->setReviewedAt(new DateTimeImmutable('-1 week'));
 
         $feedback = new PollRevisionComment();
         $feedback->attachTo($revision);
@@ -348,7 +348,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
         string $questionNL,
         array $answers,
         RevisionStatus $status,
-        ?DateTime $expiryDate,
+        ?DateTimeImmutable $expiryDate,
     ): Poll {
         $poll = new Poll();
         $poll->setCreator($this->member($creator));
@@ -364,7 +364,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
             RevisionStatus::Submitted === $status
             || RevisionStatus::InReview === $status
         ) {
-            $revision->setSubmittedAt(new DateTime('-2 days'));
+            $revision->setSubmittedAt(new DateTimeImmutable('-2 days'));
         }
 
         $revision->question = new FrontpageLocalisedText(
@@ -387,7 +387,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
         if (RevisionStatus::Approved === $status) {
             $poll->setLiveRevision($revision);
             $revision->setReviewer($this->member(8000));
-            $revision->setReviewedAt(new DateTime('-1 month'));
+            $revision->setReviewedAt(new DateTimeImmutable('-1 month'));
         }
 
         $manager->persist($poll);
@@ -402,7 +402,7 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
         int $lidnr,
         string $author,
         string $content,
-        DateTime $createdOn,
+        DateTimeImmutable $createdOn,
         ?PollComment $parent = null,
     ): PollComment {
         $comment = new PollComment();

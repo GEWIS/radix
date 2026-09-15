@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\SubDecision\Board\Installation;
 use App\Entity\Database\SubDecision\Board\Release;
 use App\Form\Database\DataMapper\AbstractDecisionMapper;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -27,7 +27,7 @@ class ReleaseMapper extends AbstractDecisionMapper
 
         if (
             !$installation instanceof Installation
-            || !$date instanceof DateTime
+            || !$date instanceof DateTimeImmutable
         ) {
             return;
         }

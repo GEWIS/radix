@@ -19,7 +19,6 @@ use App\Repository\Activity\ExternalSignupVerificationRepository;
 use App\Repository\Activity\SignupRepository;
 use App\Util\Application\SplitToken;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -142,7 +141,7 @@ final readonly class SignupManager
         $signup->addedManually = true;
         // Immediately confirmed (no Verify token), so it becomes a subscriber right now and gets the same admission
         // decision as a member sign-up.
-        $signup->verifiedAt = new DateTime();
+        $signup->verifiedAt = new DateTimeImmutable();
         $signup->drawn = $this->initialDrawnState($signupList);
 
         $this->entityManager->persist($signup);
@@ -216,7 +215,7 @@ final readonly class SignupManager
         $signup = $verification->externalSignup;
 
         $this->entityManager->remove($verification);
-        $signup->verifiedAt = new DateTime();
+        $signup->verifiedAt = new DateTimeImmutable();
 
         // Confirmation is the moment an external becomes a real subscriber, so the admission decision that member
         // sign-ups get at creation happens here: on a locked (drawn) limited list a remaining place admits them

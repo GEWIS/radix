@@ -13,7 +13,7 @@ use App\Repository\Photo\VoteRepository;
 use App\Repository\Photo\WeeklyPhotoRepository;
 use App\Service\Application\FileStorage;
 use App\Service\Photo\WeeklyPhotoService;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
@@ -195,7 +195,7 @@ final class WeeklyPhotoServiceTest extends TestCase
         );
         $previous = new WeeklyPhoto();
         $previous->photo = $previousPhoto;
-        $previous->week = new DateTime('-1 week');
+        $previous->week = new DateTimeImmutable('-1 week');
 
         $service = $this->service(
             $storage,
@@ -263,7 +263,7 @@ final class WeeklyPhotoServiceTest extends TestCase
 
         $weeklyPhoto = new WeeklyPhoto();
         $weeklyPhoto->photo = $photo;
-        $weeklyPhoto->week = new DateTime();
+        $weeklyPhoto->week = new DateTimeImmutable();
 
         $service->hide($weeklyPhoto);
 
@@ -376,7 +376,7 @@ final class WeeklyPhotoServiceTest extends TestCase
             $id,
         );
         $photo->path = $stored->path;
-        $photo->dateTime = new DateTime($ageModifier);
+        $photo->dateTime = new DateTimeImmutable($ageModifier);
         if ($tagged) {
             $photo->addTag(self::createStub(Tag::class));
         }

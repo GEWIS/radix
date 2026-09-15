@@ -6,7 +6,7 @@ namespace App\Tests\ViewModel\Database;
 
 use App\Entity\Database\AuditEntry;
 use App\ViewModel\Database\AuditEntryRow;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -89,7 +89,7 @@ class AuditEntryRowTest extends TestCase
 
     public function testCarriesTheEntrysTimestampAndAuthor(): void
     {
-        $updatedAt = new DateTime('2026-02-03 04:05:06');
+        $updatedAt = new DateTimeImmutable('2026-02-03 04:05:06');
         $row = AuditEntryRow::fromEntry(
             $this->entry(
                 'x',
@@ -118,17 +118,19 @@ class AuditEntryRowTest extends TestCase
     private function entry(
         string $bodyFormatted,
         array $arguments,
-        ?DateTime $updatedAt = null,
+        ?DateTimeImmutable $updatedAt = null,
         ?int $userLidnr = 8000,
     ): AuditEntry {
-        return new class ($bodyFormatted, $arguments, $updatedAt ?? new DateTime(), $userLidnr) extends AuditEntry {
+        $updatedAt ??= new DateTimeImmutable();
+
+        return new class ($bodyFormatted, $arguments, $updatedAt, $userLidnr) extends AuditEntry {
             /**
              * @param string[] $arguments
              */
             public function __construct(
                 private readonly string $bodyFormatted,
                 private readonly array $arguments,
-                DateTime $when,
+                DateTimeImmutable $when,
                 private readonly ?int $who,
             ) {
                 $this->updatedAt = $when;

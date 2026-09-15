@@ -12,7 +12,7 @@ use App\Entity\Career\Company;
 use App\Entity\Decision\Member as MemberModel;
 use App\Entity\Decision\Organ;
 use App\Repository\Frontpage\PollRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -53,10 +53,10 @@ class Poll implements RevisableInterface
     use IdentifiableTrait;
 
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $expiryDate = null;
+    public ?DateTimeImmutable $expiryDate = null;
 
     /** @var Collection<array-key, PollRevision> */
     #[OneToMany(
@@ -76,10 +76,10 @@ class Poll implements RevisableInterface
     private ?PollRevision $liveRevision = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $votesAnonymisedAt = null;
+    public ?DateTimeImmutable $votesAnonymisedAt = null;
 
     /** @var Collection<array-key, PollComment> */
     #[OneToMany(
@@ -319,7 +319,7 @@ class Poll implements RevisableInterface
         }
 
         return null !== $this->expiryDate
-            && $this->expiryDate > new DateTime('today');
+            && $this->expiryDate > new DateTimeImmutable('today');
     }
 
     /**

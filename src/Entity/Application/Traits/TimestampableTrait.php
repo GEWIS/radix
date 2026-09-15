@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Application\Traits;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\PrePersist;
@@ -20,40 +20,40 @@ trait TimestampableTrait
     /**
      * The date at which the entity was created.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    private DateTime $createdAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    private DateTimeImmutable $createdAt;
 
     /**
      * The date at which the entity was updated.
      */
     // Written by the class that is persisted rather than by the one that declares the column: an audit entry is
     // stamped by whichever kind of entry it is.
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public protected(set) DateTime $updatedAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public protected(set) DateTimeImmutable $updatedAt;
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
     /**
-     * Automatically fill in the `DateTime`s before the initial call to `persist()`.
+     * Automatically fill in the `DateTimeImmutable`s before the initial call to `persist()`.
      */
     #[PrePersist]
     public function prePersist(): void
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         $this->createdAt = $now;
         $this->updatedAt = $now;
     }
 
     /**
-     * Automatically update the `updatedAt` `DateTime` when doing an update to the entity.
+     * Automatically update the `updatedAt` `DateTimeImmutable` when doing an update to the entity.
      */
     #[PreUpdate]
     public function preUpdate(): void
     {
-        $this->updatedAt = new DateTime();
+        $this->updatedAt = new DateTimeImmutable();
     }
 }

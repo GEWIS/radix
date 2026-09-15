@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\OrganRegulation;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -33,7 +33,7 @@ class OrganRegulationMapper extends AbstractDecisionMapper
         if (
             !$organType instanceof OrganTypes
             || !is_string($abbr)
-            || !$date instanceof DateTime
+            || !$date instanceof DateTimeImmutable
             || !$author instanceof Member
             || !is_string($version)
         ) {

@@ -11,7 +11,7 @@ use App\Repository\User\CompanyUserRepository;
 use App\ViewModel\Career\Portal\CompanyDashboard;
 use App\ViewModel\Career\Portal\CompanyVacancyOverview;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -62,7 +62,7 @@ class CompanyController extends AbstractController
                     $company,
                     $vacancies,
                     $this->companyUserRepository->count(['company' => $company]),
-                    new DateTime()->add(new DateInterval(self::HORIZON)),
+                    new DateTimeImmutable()->add(new DateInterval(self::HORIZON)),
                 ),
                 'overview' => CompanyVacancyOverview::build($vacancies),
             ],

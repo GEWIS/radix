@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Decision;
 
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 
 use function intval;
 use function sprintf;
@@ -47,11 +47,11 @@ class AssociationYear
     /**
      * Returns an instance of AssociationYear.
      *
-     * @param DateTime $dateTime date to find the AssociationYear for
+     * @param DateTimeImmutable $dateTime date to find the AssociationYear for
      *
      * @return static
      */
-    public static function fromDate(DateTime $dateTime): static
+    public static function fromDate(DateTimeImmutable $dateTime): static
     {
         $inst = new static();
         // The association year starts on the first of the month, so the month alone decides which one a date is in.
@@ -89,9 +89,9 @@ class AssociationYear
     /**
      * Returns the first day of the association year.
      */
-    public function getStartDate(): DateTime
+    public function getStartDate(): DateTimeImmutable
     {
-        return new DateTime()->setDate(
+        return new DateTimeImmutable()->setDate(
             $this->firstYear,
             self::ASSOCIATION_YEAR_START_MONTH,
             self::ASSOCIATION_YEAR_START_DAY,
@@ -104,9 +104,9 @@ class AssociationYear
     /**
      * Returns the last day of the association year.
      */
-    public function getEndDate(): DateTime
+    public function getEndDate(): DateTimeImmutable
     {
-        return new DateTime()->setDate(
+        return new DateTimeImmutable()->setDate(
             $this->firstYear + 1,
             self::ASSOCIATION_YEAR_START_MONTH,
             self::ASSOCIATION_YEAR_START_DAY,

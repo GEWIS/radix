@@ -12,7 +12,7 @@ use App\Entity\Activity\UserSignup;
 use App\Entity\Application\AssociationYear;
 use App\Entity\Application\PriorityTierInterface;
 use App\Entity\Database\Enums\ProgramType;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_map;
@@ -130,7 +130,7 @@ final class SignupTiers
             return CohortTier::Unknown;
         }
 
-        return match (AssociationYear::fromDate(new DateTime())->getYear() - $generation) {
+        return match (AssociationYear::fromDate(new DateTimeImmutable())->getYear() - $generation) {
             0 => CohortTier::FirstYear,
             1 => CohortTier::SecondYear,
             default => CohortTier::Senior,

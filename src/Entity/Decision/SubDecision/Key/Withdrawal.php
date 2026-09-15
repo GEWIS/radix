@@ -7,7 +7,7 @@ namespace App\Entity\Decision\SubDecision\Key;
 use App\Doctrine\Query\Queryable;
 use App\Entity\Decision\SubDecision;
 use App\Repository\Decision\SubDecision\Key\WithdrawalRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -50,6 +50,6 @@ class Withdrawal extends SubDecision
     /**
      * When the granted keycode is prematurely revoked.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $withdrawnOn;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $withdrawnOn;
 }

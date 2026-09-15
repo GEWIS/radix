@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\Decision;
 
 use App\Entity\Decision\OrganMember;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
@@ -136,8 +136,8 @@ class OrganMemberRepository extends ServiceEntityRepository
             ))
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
     }
 }

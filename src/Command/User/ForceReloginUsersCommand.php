@@ -10,7 +10,7 @@ use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\User;
 use App\Service\User\SecurityEventLogger;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -114,7 +114,7 @@ final class ForceReloginUsersCommand extends Command
         $message = sprintf(
             'Updating forceReloginAt for %s at %s.',
             $label,
-            $forceReloginAt->format(DateTime::ATOM),
+            $forceReloginAt->format(DateTimeImmutable::ATOM),
         );
         $this->logger->info($message);
 
@@ -131,7 +131,7 @@ final class ForceReloginUsersCommand extends Command
             $isCompany ? 'company' : 'main',
             [
                 'accounts' => $updated,
-                'forceReloginAt' => $forceReloginAt->format(DateTime::ATOM),
+                'forceReloginAt' => $forceReloginAt->format(DateTimeImmutable::ATOM),
             ],
         );
 
@@ -146,14 +146,14 @@ final class ForceReloginUsersCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function parseDate(?string $dateStr): ?DateTime
+    private function parseDate(?string $dateStr): ?DateTimeImmutable
     {
         if (null === $dateStr) {
-            return AssociationYear::fromDate(new DateTime())->getStartDate();
+            return AssociationYear::fromDate(new DateTimeImmutable())->getStartDate();
         }
 
         try {
-            return new DateTime($dateStr);
+            return new DateTimeImmutable($dateStr);
         } catch (Throwable) {
             return null;
         }
@@ -164,7 +164,7 @@ final class ForceReloginUsersCommand extends Command
      */
     private function runUpdate(
         string $entityClass,
-        DateTime $forceReloginAt,
+        DateTimeImmutable $forceReloginAt,
     ): int {
         return (int) $this->entityManager->createQueryBuilder()
             ->update(
@@ -178,7 +178,7 @@ final class ForceReloginUsersCommand extends Command
             ->setParameter(
                 'forceReloginAt',
                 $forceReloginAt,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->getQuery()
             ->execute();

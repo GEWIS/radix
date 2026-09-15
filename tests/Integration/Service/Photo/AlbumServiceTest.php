@@ -11,7 +11,7 @@ use App\Entity\User\User;
 use App\Repository\Photo\AlbumRepository;
 use App\Service\Photo\AlbumService;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function array_map;
@@ -136,7 +136,7 @@ final class AlbumServiceTest extends DatabaseTestCase
         );
         $start = $gala->startDateTime;
         self::assertInstanceOf(
-            DateTime::class,
+            DateTimeImmutable::class,
             $start,
         );
 
@@ -252,7 +252,7 @@ final class AlbumServiceTest extends DatabaseTestCase
         );
         $start = $album->startDateTime;
         self::assertInstanceOf(
-            DateTime::class,
+            DateTimeImmutable::class,
             $start,
         );
 

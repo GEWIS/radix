@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\EventListener\Application;
 
 use App\Entity\Application\RevisionInterface;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 
@@ -29,6 +29,6 @@ final readonly class RevisionSubmissionStampListener
             return;
         }
 
-        $revision->setSubmittedAt(new DateTime());
+        $revision->setSubmittedAt(new DateTimeImmutable());
     }
 }

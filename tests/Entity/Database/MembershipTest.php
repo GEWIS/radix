@@ -7,7 +7,7 @@ namespace App\Tests\Entity\Database;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
-use DateTime;
+use DateTimeImmutable;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,7 +27,7 @@ class MembershipTest extends TestCase
         $membership = new Membership(
             new Member(),
             MembershipTypes::Ordinary,
-            new DateTime($startDate),
+            new DateTimeImmutable($startDate),
         );
 
         self::assertSame(
@@ -65,7 +65,7 @@ class MembershipTest extends TestCase
         $membership = new Membership(
             new Member(),
             MembershipTypes::Honorary,
-            new DateTime('2026-08-20'),
+            new DateTimeImmutable('2026-08-20'),
         );
 
         self::assertSame(
@@ -82,8 +82,8 @@ class MembershipTest extends TestCase
         $membership = new Membership(
             new Member(),
             MembershipTypes::Ordinary,
-            new DateTime('2026-08-20 13:37:00'),
-            new DateTime('2026-09-30 13:37:00'),
+            new DateTimeImmutable('2026-08-20 13:37:00'),
+            new DateTimeImmutable('2026-09-30 13:37:00'),
         );
 
         self::assertSame(
@@ -100,7 +100,7 @@ class MembershipTest extends TestCase
     {
         $membership = $this->membership();
 
-        $membership->setEndDate(new DateTime('2026-12-31'));
+        $membership->setEndDate(new DateTimeImmutable('2026-12-31'));
 
         self::assertSame(
             '2026-12-31 00:00:00',
@@ -114,7 +114,7 @@ class MembershipTest extends TestCase
 
         $this->expectException(LogicException::class);
 
-        $membership->setEndDate(new DateTime('2026-08-19'));
+        $membership->setEndDate(new DateTimeImmutable('2026-08-19'));
     }
 
     /**
@@ -126,7 +126,7 @@ class MembershipTest extends TestCase
 
         $this->expectException(LogicException::class);
 
-        $membership->setEndDate(new DateTime('2028-07-01'));
+        $membership->setEndDate(new DateTimeImmutable('2028-07-01'));
     }
 
     public function testRefusesANegativeAmountPaid(): void
@@ -143,14 +143,14 @@ class MembershipTest extends TestCase
         $current = new Membership(
             new Member(),
             MembershipTypes::Ordinary,
-            new DateTime('-1 year'),
-            new DateTime('+1 year'),
+            new DateTimeImmutable('-1 year'),
+            new DateTimeImmutable('+1 year'),
         );
         $expired = new Membership(
             new Member(),
             MembershipTypes::Ordinary,
-            new DateTime('-2 years'),
-            new DateTime('-1 year'),
+            new DateTimeImmutable('-2 years'),
+            new DateTimeImmutable('-1 year'),
         );
 
         self::assertTrue($current->isCurrent());
@@ -162,7 +162,7 @@ class MembershipTest extends TestCase
         return new Membership(
             new Member(),
             MembershipTypes::Ordinary,
-            new DateTime('2026-08-20'),
+            new DateTimeImmutable('2026-08-20'),
         );
     }
 }

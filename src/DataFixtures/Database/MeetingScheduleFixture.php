@@ -6,7 +6,7 @@ namespace App\DataFixtures\Database;
 
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\Meeting;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -47,10 +47,10 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
     #[Override]
     public function load(ObjectManager $manager): void
     {
-        $today = new DateTime('today');
+        $today = new DateTimeImmutable('today');
 
         $number = self::FIRST_BM_NUMBER;
-        $tuesday = new DateTime('tuesday this week');
+        $tuesday = new DateTimeImmutable('tuesday this week');
         foreach (
             range(
                 -12,
@@ -61,7 +61,7 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
                 $manager,
                 MeetingTypes::BV,
                 $number,
-                (clone $tuesday)->modify(sprintf(
+                $tuesday->modify(sprintf(
                     '%+d weeks',
                     $week,
                 )),
@@ -76,7 +76,7 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
                 5,
             ) as $month
         ) {
-            $candidate = new DateTime((clone $today)->modify(sprintf(
+            $candidate = new DateTimeImmutable($today->modify(sprintf(
                 'first day of %+d months',
                 $month,
             ))->format('Y-m-20'));
@@ -146,15 +146,15 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
             ) as $anchorYear
         ) {
             foreach (['03-10', '05-20', '10-20', '12-10'] as $anchor) {
-                $candidate = new DateTime(sprintf(
+                $candidate = new DateTimeImmutable(sprintf(
                     '%d-%s',
                     $anchorYear,
                     $anchor,
                 ));
 
                 if (
-                    $candidate < (clone $today)->modify('-13 months')
-                    || $candidate > (clone $today)->modify('+6 months')
+                    $candidate < $today->modify('-13 months')
+                    || $candidate > $today->modify('+6 months')
                 ) {
                     continue;
                 }
@@ -199,13 +199,13 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
             $manager,
             MeetingTypes::VIRT,
             1,
-            (clone $today)->modify('-4 months'),
+            $today->modify('-4 months'),
         );
         $this->createMeeting(
             $manager,
             MeetingTypes::VIRT,
             2,
-            (clone $today)->modify('-6 weeks'),
+            $today->modify('-6 weeks'),
         );
 
         $manager->flush();
@@ -229,7 +229,7 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
         ObjectManager $manager,
         MeetingTypes $type,
         int $number,
-        DateTime $date,
+        DateTimeImmutable $date,
     ): Meeting {
         // Narrowed for the setter, which takes a meeting number rather than any integer.
         assert($number > 0);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\User;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -54,8 +54,8 @@ class ExternalAppAuthentication
     /**
      * Time of authentication.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $time;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $time;
 
     /**
      * @return ExternalAppAuthenticationGdprArrayType

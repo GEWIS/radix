@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Application;
 
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 
 use function sprintf;
@@ -46,7 +46,7 @@ final readonly class AssociationYear
     /**
      * The association year $dateTime falls in.
      *
-     * Takes any DateTimeInterface rather than only a DateTime, because nothing here needs to modify it.
+     * Accepts any DateTimeInterface, because only the year and the month are read from it.
      */
     public static function fromDate(DateTimeInterface $dateTime): self
     {
@@ -83,9 +83,9 @@ final readonly class AssociationYear
     /**
      * The first day of this association year: July 1st, at midnight.
      */
-    public function getStartDate(): DateTime
+    public function getStartDate(): DateTimeImmutable
     {
-        return new DateTime()->setDate(
+        return new DateTimeImmutable()->setDate(
             $this->firstYear,
             self::ASSOCIATION_YEAR_START_MONTH,
             self::ASSOCIATION_YEAR_START_DAY,
@@ -101,7 +101,7 @@ final readonly class AssociationYear
      * Prefer {@see AssociationYear::endsOn()} for anything a stored date is compared against: this one only holds if
      * the other side of the comparison carries microseconds too, which a `date` column does not.
      */
-    public function getEndDate(): DateTime
+    public function getEndDate(): DateTimeImmutable
     {
         return $this->endsOn()->sub(new DateInterval('P1D'))->setTime(
             23,
@@ -117,7 +117,7 @@ final readonly class AssociationYear
      * The exclusive end, and the same instant as the start of the year that follows, which is what makes it safe to
      * compare a date against without knowing how precisely that date was stored.
      */
-    public function endsOn(): DateTime
+    public function endsOn(): DateTimeImmutable
     {
         return self::fromYear($this->firstYear + 1)->getStartDate();
     }
@@ -127,9 +127,9 @@ final readonly class AssociationYear
      *
      * The key policy hangs off this date rather than off the year's own boundary.
      */
-    public function septemberFirst(): DateTime
+    public function septemberFirst(): DateTimeImmutable
     {
-        return new DateTime()->setDate(
+        return new DateTimeImmutable()->setDate(
             $this->firstYear + 1,
             9,
             1,

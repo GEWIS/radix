@@ -10,7 +10,7 @@ use App\Entity\Decision\Organ;
 use App\Entity\Decision\OrganMember;
 use App\Entity\User\User;
 use App\Entity\User\UserRole;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
@@ -105,8 +105,8 @@ class MemberRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'now',
-                new DateTime('now'),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable('now'),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -325,8 +325,8 @@ class MemberRepository extends ServiceEntityRepository
         )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();
@@ -365,8 +365,8 @@ class MemberRepository extends ServiceEntityRepository
         )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();
@@ -404,8 +404,8 @@ class MemberRepository extends ServiceEntityRepository
         )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();
@@ -571,8 +571,8 @@ class MemberRepository extends ServiceEntityRepository
         if (true === ($filters['expiredOnly'] ?? false)) {
             $qb->andWhere('m.expiration < :now')->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
         }
 

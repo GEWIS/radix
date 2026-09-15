@@ -18,7 +18,7 @@ use App\Repository\Photo\PhotoRepository;
 use App\Repository\Photo\WeeklyPhotoRepository;
 use App\Service\Application\FileStorage;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -506,7 +506,7 @@ final class PhotoControllerTest extends DatabaseTestCase
         $photo = new Photo();
         $photo->album = $album;
         $photo->path = $stored->path;
-        $photo->dateTime = new DateTime();
+        $photo->dateTime = new DateTimeImmutable();
         $photo->aspectRatio = 1.0;
         $this->entityManager->persist($photo);
         $this->entityManager->flush();

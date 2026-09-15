@@ -113,7 +113,6 @@ class GeneralStepType extends AbstractType
                     'label' => t('Opens on'),
                     'help' => t('Leave empty to show the vacancy as soon as it is approved.'),
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                     'required' => false,
                 ],
             )
@@ -124,7 +123,6 @@ class GeneralStepType extends AbstractType
                     'label' => t('Closes on'),
                     'help' => t('The last day the vacancy is shown.'),
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                 ],
             );
     }

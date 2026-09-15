@@ -14,7 +14,7 @@ use App\Entity\Database\SubDecision\Financial\Statement;
 use App\Entity\Database\SubDecision\Key\Granting;
 use App\Entity\Database\SubDecision\Key\Withdrawal;
 use App\Entity\Database\SubDecision\Minutes;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -41,7 +41,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         $meeting->setNumber(4);
         // Later than the board meeting DecisionFixture holds, because meetings of a type are numbered in the
         // order they are held.
-        $meeting->date = new DateTime()->modify('-3 days');
+        $meeting->date = new DateTimeImmutable()->modify('-3 days');
         $manager->persist($meeting);
         $this->addReference(
             self::REF_MEETING_BV4,
@@ -87,7 +87,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         $budget = new Budget();
         $budget->name = 'Begroting Attention Test Committee';
         $budget->version = '1.0';
-        $budget->date = new DateTime()->modify('-2 months');
+        $budget->date = new DateTimeImmutable()->modify('-2 months');
         $budget->approval = true;
         $budget->changes = false;
         $budget->setMember($treasurer);
@@ -105,7 +105,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         $statement = new Statement();
         $statement->name = 'Afrekening Attention Test Committee';
         $statement->version = '1.1';
-        $statement->date = new DateTime()->modify('-2 months');
+        $statement->date = new DateTimeImmutable()->modify('-2 months');
         $statement->approval = true;
         $statement->changes = true;
         $statement->setMember($treasurer);
@@ -122,7 +122,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         );
         $granting = new Granting();
         $granting->setMember($keyholder);
-        $granting->until = new DateTime()->modify('+6 months');
+        $granting->until = new DateTimeImmutable()->modify('+6 months');
         $granting->sequence = 1;
         $granting->setDecision($decision);
         $decision->addSubdecision($granting);
@@ -140,7 +140,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         );
         $earlier = new Granting();
         $earlier->setMember($formerKeyholder);
-        $earlier->until = new DateTime()->modify('+1 year');
+        $earlier->until = new DateTimeImmutable()->modify('+1 year');
         $earlier->sequence = 1;
         $earlier->setDecision($decision);
         $decision->addSubdecision($earlier);
@@ -148,7 +148,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
 
         $withdrawal = new Withdrawal();
         $withdrawal->granting = $earlier;
-        $withdrawal->withdrawnOn = clone $meeting->date;
+        $withdrawal->withdrawnOn = $meeting->date;
         $withdrawal->sequence = 2;
         $withdrawal->setDecision($decision);
         $decision->addSubdecision($withdrawal);

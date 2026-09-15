@@ -13,7 +13,6 @@ use App\Repository\Activity\SignupListRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Application\NotificationPublisher;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -89,8 +88,8 @@ final class RemindClosingSignupsCommand extends Command
             $output,
         );
 
-        $now = new DateTime();
-        $until = new DateTime()->add(new DateInterval(self::LEAD_TIME));
+        $now = new DateTimeImmutable();
+        $until = new DateTimeImmutable()->add(new DateInterval(self::LEAD_TIME));
 
         $lists = $this->signupListRepository->findClosingSoon(
             $now,

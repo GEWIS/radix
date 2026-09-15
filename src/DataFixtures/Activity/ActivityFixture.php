@@ -34,7 +34,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Entity\User\User;
 use App\Service\Activity\AdmissionOrder;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -102,7 +102,7 @@ use function sprintf;
  */
 class ActivityFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    /** @var list<array{Signup, DateTime}> the sign-ups whose moment is written once they have an id */
+    /** @var list<array{Signup, DateTimeImmutable}> the sign-ups whose moment is written once they have an id */
     private array $signedUpAt = [];
 
     #[Override]
@@ -1180,9 +1180,9 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
     private function signedUp(
         Signup $signup,
         int $index,
-    ): DateTime {
+    ): DateTimeImmutable {
         $openDate = $signup->signupList->openDate;
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         if (
             null === $openDate
@@ -1191,7 +1191,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             return $now;
         }
 
-        $at = (clone $openDate)->modify(sprintf(
+        $at = $openDate->modify(sprintf(
             '+%d minutes',
             $index + 1,
         ));
@@ -1737,7 +1737,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             null,
         );
         $beerRevision1->setReviewer($boardA);
-        $beerRevision1->setReviewedAt(new DateTime('-2 days'));
+        $beerRevision1->setReviewedAt(new DateTimeImmutable('-2 days'));
         $beerRevision1->organ = $getest;
         $beer->addRevision($beerRevision1);
         $manager->persist($beer);
@@ -1821,7 +1821,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             null,
         );
         $casinoRevision->setReviewer($boardB);
-        $casinoRevision->setReviewedAt(new DateTime('-5 days'));
+        $casinoRevision->setReviewedAt(new DateTimeImmutable('-5 days'));
         // KEUR (disjoint from GETÉST) so organ scoping can be told apart between the two organs.
         $casinoRevision->organ = $keur;
         $casino->addRevision($casinoRevision);
@@ -1865,7 +1865,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             RevisionStatus::Submitted === $status
             || RevisionStatus::InReview === $status
         ) {
-            $revision->setSubmittedAt(new DateTime('-2 days'));
+            $revision->setSubmittedAt(new DateTimeImmutable('-2 days'));
         }
 
         $revision->setRevisionNumber($revisionNumber);
@@ -1886,8 +1886,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             $content['description']['en'],
             $content['description']['nl'],
         );
-        $revision->beginTime = new DateTime($content['beginTime']);
-        $revision->endTime = new DateTime($content['endTime']);
+        $revision->beginTime = new DateTimeImmutable($content['beginTime']);
+        $revision->endTime = new DateTimeImmutable($content['endTime']);
         $revision->category = $content['category'];
 
         return $revision;
@@ -1922,8 +1922,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             $data['name']['en'],
             $data['name']['nl'],
         );
-        $signupList->openDate = new DateTime($data['openDate']);
-        $signupList->closeDate = new DateTime($data['closeDate']);
+        $signupList->openDate = new DateTimeImmutable($data['openDate']);
+        $signupList->closeDate = new DateTimeImmutable($data['closeDate']);
         $signupList->onlyGEWIS = $data['onlyGEWIS'];
         $signupList->displaySubscribedNumber = $data['displaySubscribedNumber'];
         $signupList->limitedCapacity = $data['limitedCapacity'];
@@ -1931,7 +1931,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         $signupList->allocationMethod = $data['allocationMethod'] ?? AllocationMethod::FirstComeFirstServed;
         $signupList->drawCutoffRule = $data['drawCutoffRule'] ?? null;
         $signupList->drawCutoffAt = isset($data['drawCutoffAt'])
-            ? new DateTime($data['drawCutoffAt'])
+            ? new DateTimeImmutable($data['drawCutoffAt'])
             : null;
         $signupList->drawAfterDurationHours = $data['drawAfterDurationHours'] ?? null;
         $signupList->externalPolicyUrl = $data['externalPolicyUrl'] ?? null;
@@ -1957,7 +1957,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
         // A list that has already been drawn carries its lock and its audit: a board member by lidnr, or nobody at
         // all, which is what an automated draw leaves behind.
         if (isset($data['drawnAt'])) {
-            $signupList->drawnAt = new DateTime($data['drawnAt']);
+            $signupList->drawnAt = new DateTimeImmutable($data['drawnAt']);
 
             if (isset($data['drawnBy'])) {
                 $signupList->drawnBy = $this->getReference(

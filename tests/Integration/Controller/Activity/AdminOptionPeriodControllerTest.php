@@ -10,7 +10,7 @@ use App\Entity\Activity\PeriodProposalLimit;
 use App\Entity\Decision\Organ;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -50,10 +50,10 @@ final class AdminOptionPeriodControllerTest extends DatabaseTestCase
 
         $period = new OptionPeriod();
         $period->name = 'A round nobody used';
-        $period->submissionOpensAt = new DateTime('-1 day');
-        $period->submissionClosesAt = new DateTime('+1 day');
-        $period->startsAt = new DateTime('+300 days');
-        $period->endsAt = new DateTime('+390 days');
+        $period->submissionOpensAt = new DateTimeImmutable('-1 day');
+        $period->submissionClosesAt = new DateTimeImmutable('+1 day');
+        $period->startsAt = new DateTimeImmutable('+300 days');
+        $period->endsAt = new DateTimeImmutable('+390 days');
         $this->entityManager->persist($period);
 
         $limit = new PeriodProposalLimit();

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Database;
 
 use App\Repository\Database\MailingListMemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -83,10 +83,10 @@ class MailingListMember
      * When this association was last synced to/from Mailman.
      */
     #[Column(
-        type: 'datetime',
+        type: 'datetime_immutable',
         nullable: true,
     )]
-    public private(set) ?DateTime $lastSyncOn = null;
+    public private(set) ?DateTimeImmutable $lastSyncOn = null;
 
     /**
      * Whether the last attempted sync was successful.
@@ -147,7 +147,7 @@ class MailingListMember
     /**
      * Set when the last sync happened.
      */
-    public function setLastSyncOn(DateTime $lastSyncOn = new DateTime()): void
+    public function setLastSyncOn(DateTimeImmutable $lastSyncOn = new DateTimeImmutable()): void
     {
         $this->lastSyncOn = $lastSyncOn;
     }

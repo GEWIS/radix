@@ -20,7 +20,7 @@ use App\Entity\Activity\PeriodProposalLimit;
 use App\Entity\Activity\ProposalLimit;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -64,7 +64,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
      * handed in is what first dibs reads. Applied after the flush; the trait stamps `createdAt` itself on persist and
      * keeps its setter to itself.
      *
-     * @var array<array-key, array{ActivityProposal, DateTime}>
+     * @var array<array-key, array{ActivityProposal, DateTimeImmutable}>
      */
     private array $backdated = [];
 
@@ -497,8 +497,8 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
     private function option(
         ActivityProposal $proposal,
         int $position,
-        DateTime $beginsAt,
-        DateTime $endsAt,
+        DateTimeImmutable $beginsAt,
+        DateTimeImmutable $endsAt,
         TimeOfDay $timeOfDay,
     ): ActivityDateOption {
         $option = new ActivityDateOption();
@@ -572,8 +572,8 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         $revision->costs = new ActivityLocalisedText();
         $revision->description = new ActivityLocalisedText();
         $revision->category = ActivityCategories::Other;
-        $revision->beginTime = new DateTime(sprintf('%s 00:00:00', $option->beginsAt->format('Y-m-d')));
-        $revision->endTime = new DateTime(sprintf('%s 23:59:59', $option->endsAt->format('Y-m-d')));
+        $revision->beginTime = new DateTimeImmutable(sprintf('%s 00:00:00', $option->beginsAt->format('Y-m-d')));
+        $revision->endTime = new DateTimeImmutable(sprintf('%s 23:59:59', $option->endsAt->format('Y-m-d')));
 
         $activity->addRevision($revision);
         $activity->setCurrentRevision($revision);
@@ -607,9 +607,9 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         }
     }
 
-    private function days(int $offset): DateTime
+    private function days(int $offset): DateTimeImmutable
     {
-        return new DateTime(sprintf('%+d days', $offset));
+        return new DateTimeImmutable(sprintf('%+d days', $offset));
     }
 
     /**

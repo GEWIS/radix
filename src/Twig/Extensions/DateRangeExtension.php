@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Extensions;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use IntlDateFormatter;
 use Locale;
@@ -246,7 +246,7 @@ class DateRangeExtension extends AbstractExtension
         return match ($year) {
             'always' => true,
             'never' => false,
-            default => $date->format('Y') !== new DateTime()->format('Y'),
+            default => $date->format('Y') !== new DateTimeImmutable()->format('Y'),
         };
     }
 

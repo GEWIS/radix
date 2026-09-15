@@ -6,7 +6,7 @@ namespace App\Entity\User;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\User\Enums\UserRoles;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -57,15 +57,15 @@ class UserRole
      * Date after which this role has expired.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTime $expiration = null;
+    private ?DateTimeImmutable $expiration = null;
 
     /**
      * Get the expiration, `null` means invalid (and thus inactive).
      */
-    public function getExpiration(): ?DateTime
+    public function getExpiration(): ?DateTimeImmutable
     {
         return $this->expiration;
     }
@@ -73,7 +73,7 @@ class UserRole
     /**
      * Set the expiration date.
      */
-    public function setExpiration(DateTime $expiration): void
+    public function setExpiration(DateTimeImmutable $expiration): void
     {
         $this->expiration = $expiration;
     }
@@ -84,7 +84,7 @@ class UserRole
     public function isActive(): bool
     {
         return null !== $this->expiration
-            && (new DateTime('now')) < $this->expiration;
+            && (new DateTimeImmutable('now')) < $this->expiration;
     }
 
     /**

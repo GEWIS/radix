@@ -7,7 +7,7 @@ namespace App\DataFixtures\User;
 use App\DataFixtures\Decision\ProjectionReferenceFixture;
 use App\Entity\Decision\Member;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -32,7 +32,7 @@ class UserFixture extends Fixture implements DependentFixtureInterface, FixtureG
             $user->setPassword(
                 '$argon2id$v=19$m=10,t=3,p=1$8fI5jXSYT4a/nmlANyW5iw$1eFNdB11zahtXd/ooeCWprWuCvAGDx+OrUsH2lBZNVM',
             );
-            $user->setPasswordChangedOn(new DateTime());
+            $user->setPasswordChangedOn(new DateTimeImmutable());
 
             $manager->persist($user);
             $this->addReference(

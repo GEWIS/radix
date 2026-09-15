@@ -61,7 +61,6 @@ class MaintenanceType extends AbstractType
                     'help' => t('Leave empty to start immediately.'),
                     'required' => false,
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                 ],
             )
             ->add(
@@ -72,7 +71,6 @@ class MaintenanceType extends AbstractType
                     'help' => t('Leave empty to keep it on until you turn it off.'),
                     'required' => false,
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                 ],
             );
 

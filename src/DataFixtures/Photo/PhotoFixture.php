@@ -18,7 +18,7 @@ use App\Entity\Photo\WeeklyPhoto;
 use App\Service\Application\FileStorage;
 use App\Service\Application\ImageManagerProvider;
 use App\Service\Photo\WeeklyPhotoService;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -304,7 +304,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         $profilePhoto = new ProfilePhoto();
         $profilePhoto->photo = $dinnerPhoto;
         $profilePhoto->member = $this->member(8030);
-        $profilePhoto->dateTime = new DateTime();
+        $profilePhoto->dateTime = new DateTimeImmutable();
         $profilePhoto->explicit = false;
         $manager->persist($profilePhoto);
 
@@ -476,8 +476,8 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         $album = new Album();
         $album->name = $name;
         $album->published = $published;
-        $album->startDateTime = new DateTime($startDateTime);
-        $album->endDateTime = new DateTime($startDateTime);
+        $album->startDateTime = new DateTimeImmutable($startDateTime);
+        $album->endDateTime = new DateTimeImmutable($startDateTime);
 
         if (null !== $parent) {
             $album->setParent($parent);
@@ -577,7 +577,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         $photo = new Photo();
         $photo->album = $album;
         $photo->path = $stored->path;
-        $photo->dateTime = new DateTime($dateTime);
+        $photo->dateTime = new DateTimeImmutable($dateTime);
         // Aspect ratio is height / width, matching the pre-migration convention.
         $photo->aspectRatio = $height / $width;
 
@@ -711,7 +711,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     ): WeeklyPhoto {
         $weeklyPhoto = new WeeklyPhoto();
         $weeklyPhoto->photo = $photo;
-        $weeklyPhoto->week = new DateTime($week);
+        $weeklyPhoto->week = new DateTimeImmutable($week);
         $weeklyPhoto->hidden = $hidden;
 
         return $weeklyPhoto;

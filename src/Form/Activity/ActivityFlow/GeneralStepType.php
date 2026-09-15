@@ -91,7 +91,6 @@ class GeneralStepType extends AbstractType
                 [
                     'label' => t('Start'),
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                     // Once the activity is live and under way its start is history, so it is shown but not changed.
                     'disabled' => true === $options['schedule_locked'],
                 ],
@@ -102,7 +101,6 @@ class GeneralStepType extends AbstractType
                 [
                     'label' => t('End'),
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                 ],
             )
             ->add(

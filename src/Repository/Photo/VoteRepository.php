@@ -6,7 +6,7 @@ namespace App\Repository\Photo;
 
 use App\Entity\Photo\Vote;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,8 +33,8 @@ class VoteRepository extends ServiceEntityRepository
      * @return array<array-key, array{1: int, 2: int}>
      */
     public function getVotesInRange(
-        DateTime $startDate,
-        DateTime $endDate,
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate,
     ): array {
         $qb = $this->getEntityManager()->createQueryBuilder();
 
@@ -51,12 +51,12 @@ class VoteRepository extends ServiceEntityRepository
             ->setParameter(
                 'start',
                 $startDate,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'end',
                 $endDate,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();
@@ -85,7 +85,7 @@ class VoteRepository extends ServiceEntityRepository
      */
     public function hasRecentVote(int $lidnr): bool
     {
-        $nowMinusMonth = new DateTime('now')->sub(new DateInterval('P1M'));
+        $nowMinusMonth = new DateTimeImmutable('now')->sub(new DateInterval('P1M'));
 
         $qb = $this->createQueryBuilder('v');
         $qb->select('v.id')
@@ -98,7 +98,7 @@ class VoteRepository extends ServiceEntityRepository
             ->setParameter(
                 'after',
                 $nowMinusMonth,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setMaxResults(1);
 

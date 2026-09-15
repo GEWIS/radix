@@ -14,7 +14,7 @@ use App\Repository\Activity\ActivityProposalRepository;
 use App\Repository\Activity\OptionPeriodRepository;
 use App\Repository\Activity\PeriodProposalLimitRepository;
 use App\Service\Activity\OptionPeriodService;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,7 +60,7 @@ class AdminOptionPeriodController extends AbstractController
             'activity/admin/calendar/periods/index.html.twig',
             [
                 'periods' => $this->optionPeriodRepository->findAllNewestFirst(),
-                'now' => new DateTime(),
+                'now' => new DateTimeImmutable(),
             ],
         );
     }

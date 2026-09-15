@@ -8,7 +8,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Decision\Member as MemberModel;
 use App\Entity\Frontpage\Enums\PollCommentReactionType;
 use App\Repository\Frontpage\PollCommentRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -117,8 +117,8 @@ class PollComment
     /**
      * Comment date.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $createdOn;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $createdOn;
 
     public function __construct()
     {

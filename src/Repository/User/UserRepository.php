@@ -6,7 +6,7 @@ namespace App\Repository\User;
 
 use App\Entity\Decision\Member;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
@@ -174,8 +174,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             )
             ->setParameter(
                 'now',
-                new DateTime('now'),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable('now'),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getOneOrNullResult();

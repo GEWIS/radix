@@ -32,7 +32,7 @@ use App\Service\Decision\VersionLabelSuggester;
 use App\ViewModel\Database\MeetingView as LedgerMeetingView;
 use App\ViewModel\Decision\MeetingReadiness;
 use App\ViewModel\Decision\MeetingView;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -718,7 +718,7 @@ final class MeetingManage
     private function markSaved(): void
     {
         $this->view = null;
-        $this->savedAt = new DateTime()->format('H:i');
+        $this->savedAt = new DateTimeImmutable()->format('H:i');
     }
 
     private function actor(): User

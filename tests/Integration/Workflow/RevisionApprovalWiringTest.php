@@ -8,7 +8,7 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Workflow\Registry;
 
@@ -27,8 +27,8 @@ final class RevisionApprovalWiringTest extends DatabaseTestCase
 
         // Neutralise the past-activity guard; the seed's dates are orthogonal here and already covered by
         // PastActivityGuardListenerTest.
-        $revision->beginTime = new DateTime('+1 month');
-        $revision->endTime = new DateTime('+1 month +2 hours');
+        $revision->beginTime = new DateTimeImmutable('+1 month');
+        $revision->endTime = new DateTimeImmutable('+1 month +2 hours');
 
         $this->authenticateBoardMember();
 

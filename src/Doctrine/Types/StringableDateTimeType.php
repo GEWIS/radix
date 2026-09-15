@@ -9,20 +9,20 @@ namespace App\Doctrine\Types;
 // Retrieved 2026-06-15, License - CC BY-SA 4.0, relicensed under GPL-3.0 on 2026-06-15
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\DateTimeType;
+use Doctrine\DBAL\Types\DateTimeImmutableType;
 use Override;
 
 /**
  * Dropping requiresSQLCommentHint(), which DBAL 4 removed, stops the schema tool emitting the
  * `COMMENT ON COLUMN ... IS '(DC2Type:...)'` marker. The column type itself is unchanged.
  */
-class StringableDateTimeType extends DateTimeType
+class StringableDateTimeType extends DateTimeImmutableType
 {
     /**
      * {@inheritDoc}
      *
-     * Narrowing the parent's `?DateTime` to `?StringableDateTime` is safe — StringableDateTime extends DateTime — and
-     * is what lets entities type their properties as the stringable variant.
+     * Narrowing the parent's `?DateTimeImmutable` to `?StringableDateTime` is safe, since StringableDateTime extends
+     * DateTimeImmutable, and is what lets entities type their properties as the stringable variant.
      */
     #[Override]
     public function convertToPHPValue(
@@ -38,9 +38,6 @@ class StringableDateTimeType extends DateTimeType
             return null;
         }
 
-        $val = new StringableDateTime('@' . $dateTime->format('U'));
-        $val->setTimezone($dateTime->getTimezone());
-
-        return $val;
+        return new StringableDateTime('@' . $dateTime->format('U'))->setTimezone($dateTime->getTimezone());
     }
 }

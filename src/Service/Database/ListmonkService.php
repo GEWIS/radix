@@ -17,7 +17,7 @@ use App\Repository\Database\MailingListRepository;
 use App\Repository\Database\MemberRepository;
 use App\Service\Application\Config;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Console\Output\NullOutput;
@@ -177,7 +177,7 @@ class ListmonkService
         $this->configService->setConfig(
             ConfigNamespaces::DatabaseListmonk,
             'locked',
-            new DateTime()->modify('+23 hours'),
+            new DateTimeImmutable()->modify('+23 hours'),
         );
 
         if ($this->isSyncLocked()) {
@@ -197,7 +197,7 @@ class ListmonkService
         $this->configService->setConfig(
             ConfigNamespaces::DatabaseListmonk,
             'locked',
-            new DateTime(),
+            new DateTimeImmutable(),
         );
     }
 
@@ -209,7 +209,7 @@ class ListmonkService
         return $this->configService->getConfig(
             ConfigNamespaces::DatabaseListmonk,
             'locked',
-        ) > new DateTime();
+        ) > new DateTimeImmutable();
     }
 
     /**
@@ -244,7 +244,7 @@ class ListmonkService
         $this->configService->setConfig(
             ConfigNamespaces::DatabaseListmonk,
             'lastSync',
-            new DateTime(),
+            new DateTimeImmutable(),
         );
 
         $this->releaseSyncLock();
@@ -269,7 +269,7 @@ class ListmonkService
             OutputInterface::VERBOSITY_VERBOSE,
         );
 
-        $verifyTime = new DateTime()->sub(new DateInterval('P1D'));
+        $verifyTime = new DateTimeImmutable()->sub(new DateInterval('P1D'));
 
         $listId = $dbList->listmonkList->listmonkId;
         $knownMembers = $this->getListmonkListSubscriberEmails($listId);
@@ -335,9 +335,9 @@ class ListmonkService
 
     /**
      * @return array{
-     *     listmonkLastFetch: ?DateTime,
+     *     listmonkLastFetch: ?DateTimeImmutable,
      *     listmonkLastFetchOverdue: bool,
-     *     listmonkLastSync: ?DateTime,
+     *     listmonkLastSync: ?DateTimeImmutable,
      * }
      */
     public function getStatusFigures(): array
@@ -350,7 +350,7 @@ class ListmonkService
             'listmonkLastSync' => $this->configService->getConfig(
                 ConfigNamespaces::DatabaseListmonk,
                 'lastSync',
-                new DateTime('0001-01-01 00:00:00'),
+                new DateTimeImmutable('0001-01-01 00:00:00'),
             ),
         ];
     }
@@ -425,7 +425,7 @@ class ListmonkService
     /**
      * Get the last succesfull listmonk sync (>= 1 list)
      */
-    public function getLastFetchTime(): ?DateTime
+    public function getLastFetchTime(): ?DateTimeImmutable
     {
         return $this->listmonkMailingListRepository->getLastFetchTime();
     }
@@ -433,17 +433,15 @@ class ListmonkService
     /**
      * Whether a fetch that last succeeded at this time is late.
      *
-     * Takes the time rather than reading it, so the caller that already has it does not ask for it again. It also
-     * does not `add()` to it: that mutates the entity's own `DateTime`, and the caller is usually about to display
-     * the very object being moved an hour and five minutes into the future.
+     * The time is a parameter, because the caller has already read it from the entity.
      */
-    private static function isOverdue(?DateTime $lastFetch): bool
+    private static function isOverdue(?DateTimeImmutable $lastFetch): bool
     {
         if (null === $lastFetch) {
             return true;
         }
 
-        return $lastFetch < new DateTime()->sub(new DateInterval('PT1H5M'));
+        return $lastFetch < new DateTimeImmutable()->sub(new DateInterval('PT1H5M'));
     }
 
     /**

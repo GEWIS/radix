@@ -10,7 +10,7 @@ use App\Entity\Frontpage\PollRevision;
 use App\Entity\User\User;
 use App\Security\User\SudoMode;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -31,7 +31,7 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
     public function testApprovingWithAFutureDateSchedulesThePoll(): void
     {
         $revision = $this->aQuestionWaitingOnTheBoard();
-        $closesOn = new DateTime('+10 days');
+        $closesOn = new DateTimeImmutable('+10 days');
 
         $this->decide(
             $revision,
@@ -68,7 +68,7 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
     public function testApprovingWithTodayIsRefused(): void
     {
         $this->assertApprovalIsRefused(
-            new DateTime('today')->format('Y-m-d'),
+            new DateTimeImmutable('today')->format('Y-m-d'),
             'The closing date must be in the future.',
         );
     }
@@ -76,7 +76,7 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
     public function testApprovingWithAPastDateIsRefused(): void
     {
         $this->assertApprovalIsRefused(
-            new DateTime('-1 week')->format('Y-m-d'),
+            new DateTimeImmutable('-1 week')->format('Y-m-d'),
             'The closing date must be in the future.',
         );
     }

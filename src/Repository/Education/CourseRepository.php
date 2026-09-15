@@ -10,7 +10,7 @@ use App\Entity\Education\Enums\CourseSort;
 use App\Entity\Education\Exam;
 use App\Entity\Education\Summary;
 use App\ViewModel\Education\CourseOverviewRow;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -122,7 +122,7 @@ class CourseRepository extends ServiceEntityRepository
                 $row['name'],
                 (int) $row['summaryCount'],
                 (int) $row['examCount'],
-                null !== $row['lastAddedAt'] ? new DateTime($row['lastAddedAt']) : null,
+                null !== $row['lastAddedAt'] ? new DateTimeImmutable($row['lastAddedAt']) : null,
             ),
             $qb->getQuery()->getArrayResult(),
         );
@@ -157,7 +157,7 @@ class CourseRepository extends ServiceEntityRepository
                 $row['name'],
                 (int) $row['summaryCount'],
                 (int) $row['examCount'],
-                null !== $row['lastAddedAt'] ? new DateTime($row['lastAddedAt']) : null,
+                null !== $row['lastAddedAt'] ? new DateTimeImmutable($row['lastAddedAt']) : null,
             ),
             $qb->getQuery()->getArrayResult(),
         );
@@ -288,7 +288,7 @@ class CourseRepository extends ServiceEntityRepository
                 $row['name'],
                 (int) $row['summaryCount'],
                 (int) $row['examCount'],
-                null !== $row['lastAddedAt'] ? new DateTime($row['lastAddedAt']) : null,
+                null !== $row['lastAddedAt'] ? new DateTimeImmutable($row['lastAddedAt']) : null,
             );
         }
 

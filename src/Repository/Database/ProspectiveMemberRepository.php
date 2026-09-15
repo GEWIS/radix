@@ -9,7 +9,7 @@ use App\Entity\Database\Enums\CheckoutSessionStates;
 use App\Entity\Database\Enums\ProspectiveMemberFilter;
 use App\Entity\Database\ProspectiveMember;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join as JoinExpr;
 use Doctrine\ORM\QueryBuilder;
@@ -137,11 +137,11 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'fullyExpired',
-                new DateTime()->sub(new DateInterval('P1D')),
+                new DateTimeImmutable()->sub(new DateInterval('P1D')),
             )
             ->setParameter(
                 'fullyFailed',
-                new DateTime()->sub(new DateInterval('P31D')),
+                new DateTimeImmutable()->sub(new DateInterval('P31D')),
             );
 
         return $qb->getQuery()->getResult();
@@ -173,7 +173,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'fullyExpired',
-            new DateTime()->sub(new DateInterval('P31D')),
+            new DateTimeImmutable()->sub(new DateInterval('P31D')),
         );
 
         return $qb->getQuery()->getResult();

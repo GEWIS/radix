@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Database;
 
 use App\Repository\Database\RenewalLinkRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -35,20 +35,20 @@ class RenewalLink extends ActionLink
     /**
      * Current expiration
      */
-    #[Column(type: 'date')]
-    public private(set) DateTime $currentExpiration;
+    #[Column(type: 'date_immutable')]
+    public private(set) DateTimeImmutable $currentExpiration;
 
     /**
      * New expiration
      * This is not neccessarily a year from the previous as in principle this
      * will be until the end of next association year.
      */
-    #[Column(type: 'date')]
-    public private(set) DateTime $newExpiration;
+    #[Column(type: 'date_immutable')]
+    public private(set) DateTimeImmutable $newExpiration;
 
     public function __construct(
         Member $member,
-        DateTime $newExpiration,
+        DateTimeImmutable $newExpiration,
     ) {
         parent::__construct();
 
@@ -67,7 +67,7 @@ class RenewalLink extends ActionLink
      */
     public function linkExpired(): bool
     {
-        $diff = new DateTime()->diff($this->currentExpiration);
+        $diff = new DateTimeImmutable()->diff($this->currentExpiration);
 
         return 1 === $diff->invert && ($diff->days > 30);
     }

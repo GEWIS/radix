@@ -16,7 +16,6 @@ use App\ViewModel\Activity\Calendar\AgendaEvent;
 use App\ViewModel\Activity\Calendar\CalendarDay;
 use App\ViewModel\Activity\Calendar\CalendarEntry;
 use App\ViewModel\Activity\Calendar\CalendarMonth;
-use DateTime;
 use DateTimeImmutable;
 
 /**
@@ -116,8 +115,8 @@ final readonly class CalendarMonthBuilder
         ?Organ $organ,
     ): array {
         $options = $this->dateOptionRepository->findOverlapping(
-            DateTime::createFromInterface($from),
-            DateTime::createFromInterface($until),
+            $from,
+            $until,
             $organ,
         );
 
@@ -158,8 +157,8 @@ final readonly class CalendarMonthBuilder
         ?Organ $organ,
     ): array {
         $activities = $this->activityRepository->findLiveBetween(
-            DateTime::createFromInterface($from),
-            DateTime::createFromInterface($until->modify('+1 day')),
+            $from,
+            $until->modify('+1 day'),
         );
 
         $byDay = [];
@@ -175,11 +174,11 @@ final readonly class CalendarMonthBuilder
             $begins = $activity->getBeginTime();
             $ends = $activity->getEndTime();
 
-            $cursor = DateTimeImmutable::createFromInterface($begins)->setTime(
+            $cursor = $begins->setTime(
                 0,
                 0,
             );
-            $last = DateTimeImmutable::createFromInterface($ends)->setTime(
+            $last = $ends->setTime(
                 0,
                 0,
             );
@@ -269,11 +268,11 @@ final readonly class CalendarMonthBuilder
         DateTimeImmutable $from,
         DateTimeImmutable $until,
     ): array {
-        $begins = DateTimeImmutable::createFromInterface($option->beginsAt)->setTime(
+        $begins = $option->beginsAt->setTime(
             0,
             0,
         );
-        $ends = DateTimeImmutable::createFromInterface($option->endsAt)->setTime(
+        $ends = $option->endsAt->setTime(
             0,
             0,
         );

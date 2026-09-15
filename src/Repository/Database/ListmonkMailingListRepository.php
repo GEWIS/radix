@@ -6,7 +6,7 @@ namespace App\Repository\Database;
 
 use App\Entity\Database\ListmonkMailingList;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
@@ -45,7 +45,7 @@ class ListmonkMailingListRepository extends ServiceEntityRepository
     /**
      * Get the time of last sync, or null if none
      */
-    public function getLastFetchTime(): ?DateTime
+    public function getLastFetchTime(): ?DateTimeImmutable
     {
         $list = $this->findOneBy(
             [],
@@ -70,7 +70,7 @@ class ListmonkMailingListRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'lastSeen',
-            null !== $lastFetch ? (clone $lastFetch)->sub(new DateInterval('PT1H5M')) : null,
+            $lastFetch?->sub(new DateInterval('PT1H5M')),
         );
 
         return $qb->getQuery()->getResult();

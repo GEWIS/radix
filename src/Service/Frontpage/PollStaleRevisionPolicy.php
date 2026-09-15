@@ -10,7 +10,7 @@ use App\Entity\Frontpage\Poll;
 use App\Entity\Frontpage\PollRevision;
 use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 
 /**
@@ -30,7 +30,7 @@ final readonly class PollStaleRevisionPolicy implements StaleRevisionPolicyInter
     }
 
     #[Override]
-    public function keepUntil(RevisionInterface $revision): ?DateTime
+    public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable
     {
         $poll = $revision->getRevisable();
         if (!$poll instanceof Poll) {
@@ -44,7 +44,7 @@ final readonly class PollStaleRevisionPolicy implements StaleRevisionPolicyInter
 
         // A poll closes at the end of its expiry date, so it is still being answered all of that day. Cloned because
         // the date belongs to the poll, and moving it here would be an edit nobody asked for.
-        return (clone $expiryDate)->setTime(
+        return $expiryDate->setTime(
             23,
             59,
             59,

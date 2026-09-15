@@ -8,7 +8,7 @@ use App\Entity\Activity\Enums\SignupFieldTypes;
 use App\Entity\Activity\SignupList;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Activity\SignupListType;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Flow\FormFlowInterface;
@@ -123,13 +123,11 @@ class SignupListStepType extends AbstractType
         FormInterface $form,
         ActivityData $activity,
     ): void {
-        $beginTime = null !== $activity->beginTime
-            ? DateTime::createFromInterface($activity->beginTime)
-            : null;
+        $beginTime = $activity->beginTime;
 
         $this->validateWindow(
             $form,
-            new DateTime(),
+            new DateTimeImmutable(),
             $beginTime,
         );
         $this->requireLocalisedText(
@@ -196,8 +194,8 @@ class SignupListStepType extends AbstractType
      */
     private function validateWindow(
         FormInterface $listForm,
-        DateTime $now,
-        ?DateTime $beginTime,
+        DateTimeImmutable $now,
+        ?DateTimeImmutable $beginTime,
     ): void {
         $openForm = $listForm->get('openDate');
         $closeForm = $listForm->get('closeDate');
@@ -208,7 +206,7 @@ class SignupListStepType extends AbstractType
         // locked, so an already-past value is never newly rejected).
         if (
             !$openForm->isDisabled()
-            && $openDate instanceof DateTime
+            && $openDate instanceof DateTimeImmutable
             && $openDate <= $now
         ) {
             $this->reject(
@@ -222,8 +220,8 @@ class SignupListStepType extends AbstractType
         }
 
         if (
-            $openDate instanceof DateTime
-            && $closeDate instanceof DateTime
+            $openDate instanceof DateTimeImmutable
+            && $closeDate instanceof DateTimeImmutable
             && $openDate >= $closeDate
         ) {
             $this->reject(
@@ -237,8 +235,8 @@ class SignupListStepType extends AbstractType
         }
 
         if (
-            !$closeDate instanceof DateTime
-            || !$beginTime instanceof DateTime
+            !$closeDate instanceof DateTimeImmutable
+            || !$beginTime instanceof DateTimeImmutable
             || $closeDate < $beginTime
         ) {
             return;

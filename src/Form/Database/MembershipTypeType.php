@@ -6,7 +6,7 @@ namespace App\Form\Database;
 
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Membership;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -61,7 +61,7 @@ class MembershipTypeType extends AbstractType
             $typeOptions['data'] = $membership->getType();
             $changeDateOptions['data'] = min(
                 $membership->getStartDate(),
-                new DateTime(),
+                new DateTimeImmutable(),
             );
             $changeDateOptions['attr'] = [
                 'min' => $membership->getStartDate()->format('Y-m-d'),

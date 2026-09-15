@@ -9,7 +9,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Database\Enums\BoardFunctions;
 use App\Entity\Decision\SubDecision\Board\Installation as BoardInstallation;
 use App\Repository\Decision\BoardMemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -70,8 +70,8 @@ class BoardMember
     /**
      * Installation date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $installDate;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $installDate;
 
     /**
      * Installation.
@@ -106,17 +106,17 @@ class BoardMember
      * Release date.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $releaseDate = null;
+    public ?DateTimeImmutable $releaseDate = null;
 
     /**
      * Discharge date.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $dischargeDate = null;
+    public ?DateTimeImmutable $dischargeDate = null;
 }

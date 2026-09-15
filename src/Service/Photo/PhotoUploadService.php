@@ -13,7 +13,7 @@ use App\Message\Photo\ProcessImageVariantsMessage;
 use App\Repository\Photo\PhotoRepository;
 use App\Service\Application\FileStorage;
 use App\Service\Application\ImageManagerProvider;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -103,7 +103,7 @@ final readonly class PhotoUploadService
      * Widen the album's date range to span the given EXIF capture times, extending each bound only outward. A
      * board-set range is never contracted, and an album whose upload carried no EXIF dates keeps its existing range.
      *
-     * @param DateTime[] $captureTimes
+     * @param DateTimeImmutable[] $captureTimes
      */
     private function widenDateRange(
         Album $album,
@@ -143,8 +143,9 @@ final readonly class PhotoUploadService
     }
 
     /**
-     * @return array{status: string, capturedAt: ?DateTime} status is created|duplicate|failed; capturedAt is the
-     *                                                       photo's EXIF capture time, present only when it carried one
+     * @return array{status: string, capturedAt: ?DateTimeImmutable} status is created|duplicate|failed; capturedAt is
+     *                                                                the EXIF capture time, null when the photo has
+     *                                                                none
      */
     private function storeOne(
         Album $album,
@@ -194,7 +195,7 @@ final readonly class PhotoUploadService
             $photo->path = $stored->path;
             // A non-EXIF photo still needs a (non-nullable) timestamp for ordering; the upload time is the fallback,
             // and applyTo() overrides it only when EXIF actually carried a capture time.
-            $photo->dateTime = new DateTime();
+            $photo->dateTime = new DateTimeImmutable();
             $photo->aspectRatio = $aspectRatio;
             $metadata->applyTo($photo);
 

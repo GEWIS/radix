@@ -9,7 +9,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\ViewModel\Decision\OrganMembers;
 use App\ViewModel\Decision\OrganMembership;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_map;
@@ -46,7 +46,7 @@ final readonly class OrganMemberService
 
     public function membersOf(Organ $organ): OrganMembers
     {
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
 
         /** @var array<int, OrganMembership> $active */
         $active = [];

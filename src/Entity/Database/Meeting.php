@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\SubDecision\Minutes;
 use App\Repository\Database\MeetingRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -56,8 +56,8 @@ class Meeting
     /**
      * Meeting date.
      */
-    #[Column(type: 'date')]
-    public DateTime $date;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $date;
 
     /**
      * Decisions.

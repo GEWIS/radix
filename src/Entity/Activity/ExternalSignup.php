@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Activity;
 
 use App\Repository\Activity\ExternalSignupRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -40,10 +40,10 @@ class ExternalSignup extends Signup
      * only path that removes a token without deleting the sign-up, and it stamps this field.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $verifiedAt = null;
+    public ?DateTimeImmutable $verifiedAt = null;
 
     /**
      * Whether an organiser/board member entered this sign-up on the person's behalf. A manually added external never

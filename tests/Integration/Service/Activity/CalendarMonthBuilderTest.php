@@ -14,7 +14,6 @@ use App\Entity\Decision\Organ;
 use App\Service\Activity\CalendarMonthBuilder;
 use App\Tests\Integration\DatabaseTestCase;
 use App\ViewModel\Activity\Calendar\CalendarDay;
-use DateTime;
 use DateTimeImmutable;
 
 use function array_keys;
@@ -74,8 +73,8 @@ final class CalendarMonthBuilderTest extends DatabaseTestCase
     public function testSomethingRunningAcrossDaysIsDrawnOnEachOfThemWithContinuationMarkers(): void
     {
         $proposal = $this->aProposalSpanning(
-            new DateTime('2026-11-11'),
-            new DateTime('2026-11-13'),
+            new DateTimeImmutable('2026-11-11'),
+            new DateTimeImmutable('2026-11-13'),
         );
 
         $month = $this->builder()->build(new DateTimeImmutable('2026-11-15'));
@@ -172,14 +171,14 @@ final class CalendarMonthBuilderTest extends DatabaseTestCase
             $option,
         );
 
-        return DateTimeImmutable::createFromInterface($option->beginsAt);
+        return $option->beginsAt;
     }
 
     private function aProposalSpanning(
-        DateTime $from,
-        DateTime $until,
+        DateTimeImmutable $from,
+        DateTimeImmutable $until,
     ): ActivityProposal {
-        $period = $this->entityManager->getRepository(OptionPeriod::class)->findOpenAt(new DateTime())[0];
+        $period = $this->entityManager->getRepository(OptionPeriod::class)->findOpenAt(new DateTimeImmutable())[0];
         $organ = $this->entityManager->getRepository(Organ::class)->findOneBy(['abbr' => 'KEUR']);
         self::assertInstanceOf(
             Organ::class,

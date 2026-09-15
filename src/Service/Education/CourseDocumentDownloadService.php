@@ -15,7 +15,7 @@ use App\Message\Education\BuildWatermarkedDocumentMessage;
 use App\Repository\Education\CourseDocumentDownloadRepository;
 use App\Service\Application\FileStorage;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -61,7 +61,7 @@ final readonly class CourseDocumentDownloadService
         // An anonymous request from campus still has to be attributable, so the watermark names its address.
         $download->requestedByName = $user?->getDisplayName() ?? $clientIp ?? 'an anonymous visitor';
         $download->requestedFrom = $clientIp ?? '';
-        $download->requestedAt = new DateTime();
+        $download->requestedAt = new DateTimeImmutable();
 
         $this->entityManager->persist($download);
         $this->entityManager->flush();
@@ -97,14 +97,14 @@ final readonly class CourseDocumentDownloadService
 
     public function markCollected(CourseDocumentDownload $download): void
     {
-        $download->collectedAt = new DateTime();
+        $download->collectedAt = new DateTimeImmutable();
         $this->entityManager->flush();
     }
 
     public function purgeExpired(): int
     {
         $expired = $this->downloadRepository->findExpired(
-            new DateTime()->sub(new DateInterval(self::RETENTION)),
+            new DateTimeImmutable()->sub(new DateInterval(self::RETENTION)),
         );
 
         foreach ($expired as $download) {

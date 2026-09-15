@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\Activity;
 
 use App\Entity\Activity\OptionPeriod;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,7 +30,7 @@ class OptionPeriodRepository extends ServiceEntityRepository
      *
      * @return OptionPeriod[]
      */
-    public function findOpenAt(DateTime $moment): array
+    public function findOpenAt(DateTimeImmutable $moment): array
     {
         return $this->createQueryBuilder('p')
             ->where('p.submissionOpensAt <= :moment')
@@ -38,7 +38,7 @@ class OptionPeriodRepository extends ServiceEntityRepository
             ->setParameter(
                 'moment',
                 $moment,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'p.startsAt',
@@ -53,14 +53,14 @@ class OptionPeriodRepository extends ServiceEntityRepository
      *
      * @return OptionPeriod[]
      */
-    public function findCurrentAndUpcoming(DateTime $moment): array
+    public function findCurrentAndUpcoming(DateTimeImmutable $moment): array
     {
         return $this->createQueryBuilder('p')
             ->where('p.endsAt >= :today')
             ->setParameter(
                 'today',
                 $moment,
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->orderBy(
                 'p.startsAt',

@@ -17,7 +17,7 @@ use App\Entity\Database\SubDecision\Discharge;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation;
 use App\Entity\Database\SubDecision\Reappointment;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -562,7 +562,7 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
 
     private function meeting(
         ObjectManager $manager,
-        DateTime $on,
+        DateTimeImmutable $on,
         MeetingTypes $type,
     ): Meeting {
         // Narrowed for the setter, which takes a meeting number rather than any integer. The series starts above zero
@@ -614,12 +614,12 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
      * No two meetings may fall on the same day: several bodies here were founded the same number of years ago, and
      * meetings that share a date leave "the oldest meeting" with no single answer.
      */
-    private function yearsAgo(int $years): DateTime
+    private function yearsAgo(int $years): DateTimeImmutable
     {
         // Three months further back than the year asks for, and a few days further for every meeting already made.
         // Two general members' meetings on one day would leave "the oldest meeting" with no single answer; meetings of
         // different kinds may share a date, and do.
-        return new DateTime()->modify(sprintf(
+        return new DateTimeImmutable()->modify(sprintf(
             '-%d years -3 months +%d days',
             $years,
             $this->meetingNumber - self::FIRST_MEETING_NUMBER,

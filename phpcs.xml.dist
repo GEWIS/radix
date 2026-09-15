@@ -20,6 +20,17 @@
 
     <rule ref="GEWISPHPCodingStandards" />
 
+    <!-- Every date in the application is a DateTimeImmutable. A call such as modify() changes a DateTime in place but
+         returns a new DateTimeImmutable and leaves the original unchanged, so the two classes must not mix. This
+         forbids the mutable class; PHPStan reports a DateTimeImmutable call whose return value is discarded. -->
+    <rule ref="SlevomatCodingStandard.PHP.ForbiddenClasses">
+        <properties>
+            <property name="forbiddenClasses" type="array">
+                <element key="DateTime" value="DateTimeImmutable" />
+            </property>
+        </properties>
+    </rule>
+
     <!-- Legacy code that cannot be easily changed, so ignore for now -->
     <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps">
         <exclude-pattern>src/Entity/Database/Decision.php</exclude-pattern>

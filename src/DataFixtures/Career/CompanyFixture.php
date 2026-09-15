@@ -19,7 +19,7 @@ use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyLabel;
 use App\Entity\Career\VacancyRevision;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -536,8 +536,8 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
         bool $expired = false,
     ): void {
         $package->company = $company;
-        $package->setStartingDate(new DateTime('2020-01-01'));
-        $package->setExpirationDate(new DateTime($expired ? '2021-01-01' : '2100-01-01'));
+        $package->setStartingDate(new DateTimeImmutable('2020-01-01'));
+        $package->setExpirationDate(new DateTimeImmutable($expired ? '2021-01-01' : '2100-01-01'));
         $package->published = true;
     }
 
@@ -579,10 +579,10 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
         );
         $revision->category = $data['category'];
         $revision->startDate = isset($data['startDate'])
-            ? new DateTime($data['startDate'])
+            ? new DateTimeImmutable($data['startDate'])
             : null;
         // Without a window of its own a vacancy runs as long as the package it was sold under.
-        $revision->endDate = new DateTime($data['endDate'] ?? $package->getExpirationDate()->format('Y-m-d'));
+        $revision->endDate = new DateTimeImmutable($data['endDate'] ?? $package->getExpirationDate()->format('Y-m-d'));
 
         foreach ($data['labels'] as $labelKey) {
             $revision->addLabel($this->labels[$labelKey]);

@@ -28,7 +28,7 @@ use App\Service\Application\RevisionReviewService;
 use App\Service\Application\RevisionReviser;
 use App\Util\Activity\PastActivityRule;
 use App\Util\Activity\SignupAdminWindow;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -583,7 +583,7 @@ class AdminController extends AbstractController
         $beginTime = $live->beginTime;
 
         return null !== $beginTime
-            && $beginTime <= new DateTime();
+            && $beginTime <= new DateTimeImmutable();
     }
 
     /**

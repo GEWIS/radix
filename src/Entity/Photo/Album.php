@@ -6,7 +6,7 @@ namespace App\Entity\Photo;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Application\Traits\TimestampableTrait;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -35,19 +35,19 @@ class Album
      * First date of photos in album.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $startDateTime = null;
+    public ?DateTimeImmutable $startDateTime = null;
 
     /**
      * End date of photos in album.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $endDateTime = null;
+    public ?DateTimeImmutable $endDateTime = null;
 
     /**
      * Name of the album.

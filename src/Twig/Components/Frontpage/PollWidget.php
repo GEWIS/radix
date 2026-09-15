@@ -13,7 +13,7 @@ use App\Repository\Frontpage\PollRepository;
 use App\Repository\Frontpage\PollVoteRepository;
 use App\Service\Frontpage\PollService;
 use App\Twig\Components\Concerns\FlashesTrait;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use LogicException;
 use RuntimeException;
@@ -230,7 +230,7 @@ final class PollWidget
             return null;
         }
 
-        return new DateTime('today')->diff($expiryDate)->days;
+        return new DateTimeImmutable('today')->diff($expiryDate)->days;
     }
 
     private function answeredElsewhere(Poll $poll): RedirectResponse

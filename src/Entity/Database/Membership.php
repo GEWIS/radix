@@ -8,7 +8,7 @@ use App\Doctrine\Types\StringableDateTime;
 use App\Entity\Application\AssociationYear;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Repository\Database\MembershipRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -52,8 +52,8 @@ class Membership
     /**
      * The end date of the membership.
      */
-    #[Column(type: 'date')]
-    public private(set) DateTime $endDate;
+    #[Column(type: 'date_immutable')]
+    public private(set) DateTimeImmutable $endDate;
 
     /**
      * How much the member has paid for membership. 0 by default.
@@ -83,12 +83,13 @@ class Membership
     public function __construct(
         Member $member,
         MembershipTypes $type,
-        ?DateTime $startDate = null,
-        ?DateTime $endDate = null,
+        ?DateTimeImmutable $startDate = null,
+        ?DateTimeImmutable $endDate = null,
     ) {
-        if (null === $startDate) {
-            $startDate = new DateTime();
-        }
+        $startDate = ($startDate ?? new DateTimeImmutable())->setTime(
+            0,
+            0,
+        );
 
         if (null === $endDate) {
             // A membership runs until the association year it started in is over, whenever in that year it was taken
@@ -97,33 +98,28 @@ class Membership
 
             if (MembershipTypes::Honorary === $type) {
                 // Honorary memberships do not expire, so we set the expiration date to 100 years in the future.
-                $endDate->modify('+100 years');
+                $endDate = $endDate->modify('+100 years');
             }
         }
 
-        $startDate->setTime(
-            0,
-            0,
-        );
-        $endDate->setTime(
-            0,
-            0,
-        );
         $this->member = $member;
         $this->type = $type;
         $this->startDate = StringableDateTime::fromDateTime($startDate);
-        $this->endDate = $endDate;
+        $this->endDate = $endDate->setTime(
+            0,
+            0,
+        );
     }
 
     /**
-     * Start date of this membership (immutable).
+     * Start date of this membership.
      */
-    public function getStartDate(): DateTime
+    public function getStartDate(): DateTimeImmutable
     {
         return $this->startDate->toDateTime();
     }
 
-    public function setEndDate(DateTime $endDate): void
+    public function setEndDate(DateTimeImmutable $endDate): void
     {
         if ($endDate < $this->startDate) {
             throw new LogicException('End date cannot be before start date.');
@@ -133,11 +129,10 @@ class Membership
             throw new LogicException('End date cannot be after current end date, create a new membership instead.');
         }
 
-        $endDate->setTime(
+        $this->endDate = $endDate->setTime(
             0,
             0,
         );
-        $this->endDate = $endDate;
     }
 
     public function setPaid(int $paid): void
@@ -154,7 +149,7 @@ class Membership
      */
     public function isCurrent(): bool
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         return $this->startDate <= $now && $this->endDate >= $now;
     }

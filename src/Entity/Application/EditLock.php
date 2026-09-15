@@ -8,7 +8,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\User\CompanyUser as CompanyUserModel;
 use App\Entity\User\User as UserModel;
 use App\Repository\Application\EditLockRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -73,11 +73,11 @@ class EditLock
     )]
     public ?CompanyUserModel $lockedByCompanyUser = null;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $acquiredAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $acquiredAt;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $lastPingAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $lastPingAt;
 
     /**
      * A human-readable name for whoever holds the lock, whether a member's account or a company user.

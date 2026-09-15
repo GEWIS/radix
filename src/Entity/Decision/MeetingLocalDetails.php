@@ -6,7 +6,7 @@ namespace App\Entity\Decision;
 
 use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\Database\Enums\MeetingTypes;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -59,10 +59,10 @@ class MeetingLocalDetails
      * The time the meeting starts. Meetings have no end time; they run until closed.
      */
     #[Column(
-        type: Types::TIME_MUTABLE,
+        type: Types::TIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $startTime = null;
+    public ?DateTimeImmutable $startTime = null;
 
     #[Column(
         type: Types::STRING,

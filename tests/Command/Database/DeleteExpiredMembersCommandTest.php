@@ -7,7 +7,7 @@ namespace App\Tests\Command\Database;
 use App\Command\Database\DeleteExpiredMembersCommand;
 use App\Command\Database\DeleteExpiredProspectiveMembersCommand;
 use App\Service\Database\Member as MemberService;
-use DateTime;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,7 +31,7 @@ class DeleteExpiredMembersCommandTest extends TestCase
         $memberService->expects(self::once())
             ->method('removeExpiredMembers')
             ->with(self::callback(
-                static fn (DateTime $expiration): bool => '2020-07-01' === $expiration->format('Y-m-d'),
+                static fn (DateTimeImmutable $expiration): bool => '2020-07-01' === $expiration->format('Y-m-d'),
             ));
 
         $tester = $this->tester($memberService);
@@ -77,8 +77,8 @@ class DeleteExpiredMembersCommandTest extends TestCase
     }
 
     /**
-     * A date that is not one would otherwise be read by DateTime as something else entirely, and "yesterday" is a
-     * perfectly good relative date to hand a deletion.
+     * DateTimeImmutable would otherwise parse an invalid date as a different date, and "yesterday" is a valid
+     * relative date for a deletion.
      */
     #[DataProvider('datesThatAreNotDates')]
     public function testRefusesAnExpirationThatIsNotADate(string $expiration): void

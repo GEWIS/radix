@@ -10,7 +10,7 @@ use App\Entity\Education\Enums\CourseDocumentTypes;
 use App\Entity\Education\Enums\ExamTypes;
 use App\Entity\User\User;
 use App\Repository\Education\CourseDocumentStagingRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -43,8 +43,8 @@ class CourseDocumentStaging
     )]
     public ?User $uploadedBy = null;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $uploadedAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $uploadedAt;
 
     /** Guessed from the filename, so it may be wrong or missing; checked to exist before anything is published. */
     #[Column(
@@ -54,10 +54,10 @@ class CourseDocumentStaging
     public ?string $courseCode = null;
 
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $date = null;
+    public ?DateTimeImmutable $date = null;
 
     #[Column(
         type: Types::STRING,

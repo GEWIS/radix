@@ -20,7 +20,7 @@ use App\Entity\Database\Enums\Studies;
 use App\Entity\Decision\Member;
 use App\Service\Activity\AdmissionOrder;
 use App\Tests\Support\BuildsSignupRoles;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -253,7 +253,7 @@ final class AdmissionOrderTest extends TestCase
         $list->onlyGEWIS = true;
         $list->setCohortTierOrder(self::ranks(CohortTier::defaultOrder()));
 
-        $current = AssociationYear::fromDate(new DateTime())->getYear();
+        $current = AssociationYear::fromDate(new DateTimeImmutable())->getYear();
         $pool = [
             $this->member(
                 'no-cohort',

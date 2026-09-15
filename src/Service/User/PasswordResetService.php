@@ -9,7 +9,6 @@ use App\Entity\User\PasswordReset;
 use App\Entity\User\User;
 use App\Repository\User\PasswordResetRepository;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -73,7 +72,7 @@ final readonly class PasswordResetService
         PasswordReset $passwordReset,
         User|CompanyUser $target,
     ): void {
-        $target->setPasswordChangedOn(new DateTime());
+        $target->setPasswordChangedOn(new DateTimeImmutable());
         $this->entityManager->persist($target);
 
         $this->deleteAllForTarget($passwordReset);

@@ -12,7 +12,7 @@ use App\Entity\Activity\OptionPeriod;
 use App\Entity\Decision\Organ;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -105,7 +105,7 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
         $response = $this->submit(
             $this->body('KEUR'),
             'Ver buiten de ronde',
-            (clone $period->endsAt)->modify('+30 days'),
+            $period->endsAt->modify('+30 days'),
         );
 
         self::assertFalse($response instanceof RedirectResponse);
@@ -122,10 +122,10 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
     private function submit(
         Organ $organ,
         string $name,
-        ?DateTime $day = null,
+        ?DateTimeImmutable $day = null,
     ): mixed {
         $period = $this->openPeriod();
-        $day ??= (clone $period->startsAt)->modify('+3 days');
+        $day ??= $period->startsAt->modify('+3 days');
 
         // Stateless CSRF: the rendered token really is the literal `csrf-token`, and the manager only accepts it
         // together with a same-origin fetch header. Both are needed, neither alone is enough.
@@ -168,7 +168,7 @@ final class AdminActivityCalendarControllerTest extends DatabaseTestCase
 
     private function openPeriod(): OptionPeriod
     {
-        $periods = $this->entityManager->getRepository(OptionPeriod::class)->findOpenAt(new DateTime());
+        $periods = $this->entityManager->getRepository(OptionPeriod::class)->findOpenAt(new DateTimeImmutable());
 
         self::assertNotEmpty(
             $periods,

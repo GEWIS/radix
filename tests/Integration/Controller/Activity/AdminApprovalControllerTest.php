@@ -19,7 +19,7 @@ use App\Security\User\SudoMode;
 use App\Service\Activity\ActivityRevisionCloner;
 use App\Service\Application\EditLockService;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use SortDirection;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -150,14 +150,14 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
             'Deelnemers',
             'Participants',
         );
-        $list->openDate = new DateTime('2030-01-01 12:00');
-        $list->closeDate = new DateTime('2030-02-01 12:00');
+        $list->openDate = new DateTimeImmutable('2030-01-01 12:00');
+        $list->closeDate = new DateTimeImmutable('2030-02-01 12:00');
         $draft->addSignupList($list);
 
         $edit = new ActivityRevisionEdit();
         $edit->revision = $draft;
         $edit->setEditor($this->user(8025));
-        $edit->editedAt = new DateTime();
+        $edit->editedAt = new DateTimeImmutable();
         $edit->changedFields = ['name'];
         $this->entityManager->persist($edit);
         $this->entityManager->flush();

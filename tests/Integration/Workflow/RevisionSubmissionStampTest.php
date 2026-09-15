@@ -10,7 +10,7 @@ use App\Entity\Application\RevisionInterface;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityRevisionRepository;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -52,7 +52,7 @@ final class RevisionSubmissionStampTest extends DatabaseTestCase
         foreach (self::getContainer()->get(ActivityRevisionRepository::class)->findAll() as $revision) {
             if (
                 RevisionStatus::Draft !== $revision->getStatus()
-                || $revision->activity->getBeginTime() < new DateTime()
+                || $revision->activity->getBeginTime() < new DateTimeImmutable()
             ) {
                 continue;
             }

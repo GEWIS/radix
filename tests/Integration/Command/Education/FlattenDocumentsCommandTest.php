@@ -13,7 +13,7 @@ use App\Entity\Education\Enums\ExamTypes;
 use App\Entity\Education\Exam;
 use App\Service\Application\FileStorage;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use FPDF;
 
 use function file_put_contents;
@@ -113,7 +113,7 @@ final class FlattenDocumentsCommandTest extends DatabaseTestCase
 
         $document = new Exam();
         $document->course = $course;
-        $document->date = new DateTime('2026-01-15');
+        $document->date = new DateTimeImmutable('2026-01-15');
         $document->language = Languages::English;
         $document->examType = ExamTypes::Final;
         $document->scanned = false;

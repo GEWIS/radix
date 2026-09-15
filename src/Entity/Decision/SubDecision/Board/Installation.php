@@ -11,7 +11,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\SubDecision;
 use App\Entity\Decision\Traits\MemberAwareTrait;
 use App\Repository\Decision\SubDecision\Board\InstallationRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -40,8 +40,8 @@ class Installation extends SubDecision
     /**
      * The date at which the installation is in effect.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 
     /**
      * Discharge.

@@ -9,7 +9,7 @@ use App\Entity\Activity\Enums\BudgetClearance;
 use App\Entity\Activity\Enums\ProposalStatus;
 use App\Service\Activity\OptionBudgetSchedule;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -133,7 +133,7 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
         $option = $proposal->chosenOption;
         self::assertNotNull($option);
 
-        $day = new DateTime(sprintf(
+        $day = new DateTimeImmutable(sprintf(
             '+%d days',
             $days,
         ));
@@ -150,7 +150,7 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
     ): void {
         $proposal->status = ProposalStatus::Cleared;
         $proposal->budgetClearance = $clearance;
-        $proposal->budgetClearedAt = new DateTime();
+        $proposal->budgetClearedAt = new DateTimeImmutable();
         $this->entityManager->flush();
     }
 }

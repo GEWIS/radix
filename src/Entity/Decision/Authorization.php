@@ -6,7 +6,7 @@ namespace App\Entity\Decision;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Repository\Decision\AuthorizationRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -70,17 +70,17 @@ class Authorization
     /**
      * When the authorization was made.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $createdAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $createdAt;
 
     /**
      * When the authorization was revoked.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $revokedAt = null;
+    public ?DateTimeImmutable $revokedAt = null;
 
     /**
      * @return AuthorizationGdprArrayType

@@ -6,7 +6,7 @@ namespace App\Service\User;
 
 use App\Entity\User\CompanyUser;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -35,7 +35,7 @@ final readonly class AccountPasswordService
             $account,
             $plainPassword,
         ));
-        $account->setPasswordChangedOn(new DateTime());
+        $account->setPasswordChangedOn(new DateTimeImmutable());
 
         $this->entityManager->flush();
     }

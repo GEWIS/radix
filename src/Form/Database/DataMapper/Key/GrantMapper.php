@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\Key\Granting;
 use App\Form\Database\DataMapper\AbstractDecisionMapper;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -27,7 +27,7 @@ class GrantMapper extends AbstractDecisionMapper
 
         if (
             !$grantee instanceof Member
-            || !$until instanceof DateTime
+            || !$until instanceof DateTimeImmutable
         ) {
             return;
         }

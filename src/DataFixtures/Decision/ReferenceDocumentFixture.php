@@ -12,7 +12,7 @@ use App\Entity\Decision\ReferenceDocument;
 use App\Entity\Decision\ReferenceDocumentVersion;
 use App\Entity\User\User;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -55,7 +55,7 @@ class ReferenceDocumentFixture extends Fixture implements DependentFixtureInterf
             $version->versionLabel = $label;
             $version->path = $this->storePdf('Scenarios and Procedures ' . $label);
             $version->uploadedBy = $uploader;
-            $version->uploadedAt = new DateTime('-' . (4 - $revision) . ' weeks');
+            $version->uploadedAt = new DateTimeImmutable('-' . (4 - $revision) . ' weeks');
 
             $manager->persist($version);
             $manager->flush();
@@ -77,7 +77,7 @@ class ReferenceDocumentFixture extends Fixture implements DependentFixtureInterf
         $definitionsVersion->versionLabel = 'v1.0';
         $definitionsVersion->path = $this->storePdf('Financial Definition List v1.0');
         $definitionsVersion->uploadedBy = $uploader;
-        $definitionsVersion->uploadedAt = new DateTime('-8 weeks');
+        $definitionsVersion->uploadedAt = new DateTimeImmutable('-8 weeks');
 
         $manager->persist($definitionsVersion);
         $manager->flush();

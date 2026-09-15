@@ -7,7 +7,7 @@ namespace App\Repository\Activity;
 use App\Entity\Activity\Enums\AllocationMethod;
 use App\Entity\Activity\Enums\DrawCutoffRule;
 use App\Entity\Activity\SignupList;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
@@ -32,8 +32,8 @@ class SignupListRepository extends ServiceEntityRepository
      * @return SignupList[]
      */
     public function findClosingSoon(
-        DateTime $now,
-        DateTime $until,
+        DateTimeImmutable $now,
+        DateTimeImmutable $until,
     ): array {
         return $this->createQueryBuilder('sl')
             ->innerJoin(
@@ -55,12 +55,12 @@ class SignupListRepository extends ServiceEntityRepository
             ->setParameter(
                 'now',
                 $now,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'until',
                 $until,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->getQuery()
             ->getResult();
@@ -75,7 +75,7 @@ class SignupListRepository extends ServiceEntityRepository
      *
      * @return SignupList[]
      */
-    public function findDueForAutomatedDraw(DateTime $now): array
+    public function findDueForAutomatedDraw(DateTimeImmutable $now): array
     {
         return $this->createQueryBuilder('sl')
             ->innerJoin(
@@ -111,12 +111,12 @@ class SignupListRepository extends ServiceEntityRepository
             ->setParameter(
                 'now',
                 $now,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'admissionBound',
-                (clone $now)->modify('-1 day'),
-                Types::DATETIME_MUTABLE,
+                $now->modify('-1 day'),
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'fcfs',

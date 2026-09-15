@@ -8,7 +8,7 @@ use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\Application\Traits\VersionTrait;
 use App\Entity\Database\Enums\ConfigNamespaces;
 use App\Repository\Application\ConfigItemRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -78,13 +78,13 @@ class ConfigItem
     protected ?string $valueString = null;
 
     /**
-     * If the item is a DateTime, its value.
+     * If the item is a DateTimeImmutable, its value.
      */
     #[Column(
-        type: 'datetime',
+        type: 'datetime_immutable',
         nullable: true,
     )]
-    protected ?DateTime $valueDate = null;
+    protected ?DateTimeImmutable $valueDate = null;
 
     /**
      * If the item is a boolean, its value.
@@ -132,9 +132,9 @@ class ConfigItem
     /**
      * Set the value of the configuration item.
      */
-    public function setValue(bool|string|DateTime $value): void
+    public function setValue(bool|string|DateTimeImmutable $value): void
     {
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeImmutable) {
             $this->valueString = null;
             $this->valueDate = $value;
             $this->valueBool = null;
@@ -151,7 +151,7 @@ class ConfigItem
         }
     }
 
-    public function getValue(): bool|string|DateTime|null
+    public function getValue(): bool|string|DateTimeImmutable|null
     {
         if (null !== $this->valueDate) {
             return $this->valueDate;

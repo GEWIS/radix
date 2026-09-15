@@ -12,7 +12,6 @@ use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
 use App\Entity\Career\VacancyLabel;
 use App\Entity\Career\VacancyRevision;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
@@ -678,13 +677,13 @@ class VacancyRepository extends ServiceEntityRepository
             ->andWhere('lr.endDate >= :today')
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'today',
-                new DateTime('today'),
-                Types::DATE_MUTABLE,
+                new DateTimeImmutable('today'),
+                Types::DATE_IMMUTABLE,
             );
     }
 

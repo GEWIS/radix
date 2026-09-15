@@ -6,7 +6,7 @@ namespace App\Repository\Database;
 
 use App\Entity\Database\MailmanMailingList;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
@@ -45,7 +45,7 @@ class MailmanMailingListRepository extends ServiceEntityRepository
     /**
      * Get the time of last sync, or null if none
      */
-    public function getLastFetchTime(): ?DateTime
+    public function getLastFetchTime(): ?DateTimeImmutable
     {
         $list = $this->findOneBy(
             [],

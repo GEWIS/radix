@@ -9,7 +9,6 @@ use App\Entity\Career\VacancyRevision;
 use App\Form\Career\VacancyProfile\VacancyData;
 use App\Repository\Career\CompanyJobPackageRepository;
 use App\Repository\Career\VacancyLabelRepository;
-use DateTime;
 
 use function array_filter;
 use function array_map;
@@ -57,12 +56,8 @@ class VacancyFormMapper
             $revision->category = $data->category;
         }
 
-        $revision->startDate = null !== $data->startDate
-            ? DateTime::createFromInterface($data->startDate)
-            : null;
-        $revision->endDate = null !== $data->endDate
-            ? DateTime::createFromInterface($data->endDate)
-            : null;
+        $revision->startDate = $data->startDate;
+        $revision->endDate = $data->endDate;
 
         $data->applyTexts($revision);
 

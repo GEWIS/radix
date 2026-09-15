@@ -20,7 +20,7 @@ use App\Repository\Photo\WeeklyPhotoRepository;
 use App\Service\Application\FileStorage;
 use App\Service\Photo\WeeklyPhotoService;
 use App\Service\User\PrivacyService;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\SecurityBundle\Security;
 
 use function array_map;
@@ -79,7 +79,7 @@ final readonly class HomePageService
             static fn (Member $member): array => [
                 'member' => $member,
                 'age' => $ageVisibility[$member->lidnr] ?? false
-                    ? new DateTime()->diff($member->birth)->y
+                    ? new DateTimeImmutable()->diff($member->birth)->y
                     : null,
             ],
             $birthdayMembers,

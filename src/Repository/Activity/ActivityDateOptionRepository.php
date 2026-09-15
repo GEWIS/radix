@@ -7,7 +7,7 @@ namespace App\Repository\Activity;
 use App\Entity\Activity\ActivityDateOption;
 use App\Entity\Activity\Enums\DateOptionStatus;
 use App\Entity\Decision\Organ;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
@@ -37,8 +37,8 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
      * @return ActivityDateOption[]
      */
     public function findOverlapping(
-        DateTime $from,
-        DateTime $until,
+        DateTimeImmutable $from,
+        DateTimeImmutable $until,
         ?Organ $organ = null,
     ): array {
         return $this->standing($organ)
@@ -47,12 +47,12 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
             ->setParameter(
                 'from',
                 $from,
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->setParameter(
                 'until',
                 $until,
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->getQuery()
             ->getResult();
@@ -63,7 +63,7 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
      *
      * @return ActivityDateOption[]
      */
-    public function findStandingOn(DateTime $day): array
+    public function findStandingOn(DateTimeImmutable $day): array
     {
         return $this->standing()
             ->andWhere('o.beginsAt <= :day')
@@ -71,7 +71,7 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
             ->setParameter(
                 'day',
                 $day,
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->getQuery()
             ->getResult();

@@ -10,7 +10,7 @@ use App\Repository\Career\CompanyHighlightPackageRepository;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Career\VacancyRepository;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 use function ksort;
 
@@ -54,8 +54,8 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
 
         $package = new CompanyHighlightPackage();
         $package->company = $company;
-        $package->setStartingDate(new DateTime('-1 month'));
-        $package->setExpirationDate(new DateTime('+1 year'));
+        $package->setStartingDate(new DateTimeImmutable('-1 month'));
+        $package->setExpirationDate(new DateTimeImmutable('+1 year'));
         $package->published = true;
         $package->setVacancies($highlightable);
         $this->entityManager->persist($package);
@@ -88,7 +88,7 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
     public function testAnExpiredHighlightPackageShowsNothing(): void
     {
         $package = $this->seededHighlightPackage();
-        $package->setExpirationDate(new DateTime('-1 day'));
+        $package->setExpirationDate(new DateTimeImmutable('-1 day'));
         $this->entityManager->flush();
 
         self::assertSame(

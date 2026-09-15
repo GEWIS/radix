@@ -10,7 +10,7 @@ use App\Entity\Application\RevisableInterface;
 use App\Entity\Application\RevisionInterface;
 use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 
 /**
@@ -27,7 +27,7 @@ final readonly class ActivityStaleRevisionPolicy implements StaleRevisionPolicyI
     }
 
     #[Override]
-    public function keepUntil(RevisionInterface $revision): ?DateTime
+    public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable
     {
         if (!$revision instanceof ActivityRevision) {
             return null;

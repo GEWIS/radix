@@ -12,7 +12,7 @@ use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Decision\MemberRepository as ReportMemberRepository;
 use App\Service\Application\Email as EmailService;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Throwable;
 
@@ -39,8 +39,7 @@ class Renewal
      */
     public function sendRenewalGraduates(): void
     {
-        $expiresWithin = new DateTime();
-        $expiresWithin->add(new DateInterval('P45D'));
+        $expiresWithin = new DateTimeImmutable()->add(new DateInterval('P45D'));
         $limit = 10;
         $graduates = $this->memberRepository->getExpiringGraduates(
             $expiresWithin,

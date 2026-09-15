@@ -6,7 +6,7 @@ namespace App\ViewModel\Application;
 
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Application\RevisionInterface;
-use DateTime;
+use DateTimeImmutable;
 
 use function intval;
 
@@ -25,7 +25,7 @@ final readonly class ReviewQueueRow
         public string $reviewRoute,
         public int $revisionId,
         // How long it has been waiting, which a count on its own never says.
-        public DateTime $submittedAt,
+        public DateTimeImmutable $submittedAt,
         // The revision the public is seeing while this one waits, so a queue does not read as if nothing is up.
         public ?int $liveRevisionNumber = null,
     ) {
@@ -37,7 +37,7 @@ final readonly class ReviewQueueRow
      */
     public function waitingBadgeClass(): string
     {
-        $days = intval($this->submittedAt->diff(new DateTime())->days);
+        $days = intval($this->submittedAt->diff(new DateTimeImmutable())->days);
 
         return match (true) {
             $days >= 3 => 'danger',

@@ -11,7 +11,7 @@ use App\Repository\Photo\HiddenPhotoRepository;
 use App\Repository\Photo\MemberTagRepository;
 use App\Repository\Photo\ProfilePhotoRepository;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -57,7 +57,7 @@ final readonly class ProfilePhotoService
         $profilePhoto = new ProfilePhoto();
         $profilePhoto->photo = $photo;
         $profilePhoto->member = $member;
-        $profilePhoto->dateTime = new DateTime()->add(new DateInterval('P1Y'));
+        $profilePhoto->dateTime = new DateTimeImmutable()->add(new DateInterval('P1Y'));
         $profilePhoto->explicit = true;
 
         $this->entityManager->persist($profilePhoto);

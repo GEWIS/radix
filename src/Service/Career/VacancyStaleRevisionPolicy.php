@@ -9,7 +9,7 @@ use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\VacancyRevision;
 use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 
 /**
@@ -26,7 +26,7 @@ final readonly class VacancyStaleRevisionPolicy implements StaleRevisionPolicyIn
     }
 
     #[Override]
-    public function keepUntil(RevisionInterface $revision): ?DateTime
+    public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable
     {
         if (!$revision instanceof VacancyRevision) {
             return null;
@@ -39,7 +39,7 @@ final readonly class VacancyStaleRevisionPolicy implements StaleRevisionPolicyIn
 
         // The closing day counts in full: a vacancy shown until Friday is still open all of Friday. Cloned because
         // the date belongs to the revision, and moving it here would be an edit nobody asked for.
-        return (clone $endDate)->setTime(
+        return $endDate->setTime(
             23,
             59,
             59,

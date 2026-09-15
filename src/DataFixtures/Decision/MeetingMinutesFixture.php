@@ -11,7 +11,7 @@ use App\Entity\Decision\MeetingMinutes;
 use App\Entity\Decision\MeetingMinutesVersion;
 use App\Entity\User\User;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -62,7 +62,7 @@ class MeetingMinutesFixture extends Fixture implements DependentFixtureInterface
                 $meeting,
             );
             $version->uploadedBy = $uploader;
-            $version->uploadedAt = new DateTime('-' . (2 - $revision) . ' days');
+            $version->uploadedAt = new DateTimeImmutable('-' . (2 - $revision) . ' days');
 
             $manager->persist($version);
             $manager->flush();

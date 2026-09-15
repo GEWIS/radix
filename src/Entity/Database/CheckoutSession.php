@@ -6,7 +6,7 @@ namespace App\Entity\Database;
 
 use App\Entity\Database\Enums\CheckoutSessionStates;
 use App\Repository\Database\CheckoutSessionRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -56,16 +56,16 @@ class CheckoutSession
     /**
      * Creation of the checkout session.
      */
-    #[Column(type: 'datetime')]
-    public DateTime $created;
+    #[Column(type: 'datetime_immutable')]
+    public DateTimeImmutable $created;
 
     /**
      * Expiration of the checkout session.
      *
      * If $state == CheckoutSessionStates::Expired, then this is the last date this checkout session can be recovered.
      */
-    #[Column(type: 'datetime')]
-    public DateTime $expiration;
+    #[Column(type: 'datetime_immutable')]
+    public DateTimeImmutable $expiration;
 
     /**
      * The identifier of the PaymentIntent associated with this Checkout Session when the state is 'PAID'.

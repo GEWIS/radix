@@ -136,12 +136,8 @@ final class VacancyData
             static fn (VacancyLabel $label): int => (int) $label->id,
             $revision->getLabels()->toArray(),
         );
-        $data->startDate = null !== $revision->startDate
-            ? DateTimeImmutable::createFromInterface($revision->startDate)
-            : null;
-        $data->endDate = null !== $revision->endDate
-            ? DateTimeImmutable::createFromInterface($revision->endDate)
-            : null;
+        $data->startDate = $revision->startDate;
+        $data->endDate = $revision->endDate;
 
         $data->nameNL = $revision->name->getValueNL();
         $data->nameEN = $revision->name->getValueEN();

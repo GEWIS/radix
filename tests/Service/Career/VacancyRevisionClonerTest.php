@@ -12,7 +12,7 @@ use App\Entity\Career\VacancyLabel;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\Decision\Member;
 use App\Service\Career\VacancyRevisionCloner;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\TestCase;
 
@@ -185,8 +185,8 @@ final class VacancyRevisionClonerTest extends TestCase
         $source->contactPhone = '+31 600000000';
         $source->contactEmail = 'jane@example.com';
         $source->category = $category ?? VacancyCategories::Jobs;
-        $source->startDate = new DateTime('2026-01-01');
-        $source->endDate = new DateTime('2026-12-31');
+        $source->startDate = new DateTimeImmutable('2026-01-01');
+        $source->endDate = new DateTimeImmutable('2026-12-31');
         $source->addLabel($label ?? self::createStub(VacancyLabel::class));
 
         return $source;

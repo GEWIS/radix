@@ -9,7 +9,7 @@ use App\Entity\Frontpage\NewsItem;
 use App\Entity\User\Enums\UserRoles;
 use App\Form\Frontpage\NewsItemType;
 use App\Service\Frontpage\NewsAdminService;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,7 +57,7 @@ class AdminNewsController extends AbstractController
     public function create(Request $request): Response
     {
         $item = new NewsItem();
-        $item->date = new DateTime('today');
+        $item->date = new DateTimeImmutable('today');
         $item->pinned = false;
 
         $form = $this->createForm(

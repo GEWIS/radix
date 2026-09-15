@@ -13,7 +13,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Entity\User\Enums\UserRoles;
 use App\Service\Application\NotificationPublisher;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -83,7 +83,7 @@ final readonly class ActivityProposalManager
     ): void {
         $proposal->chosenOption = $option;
         $proposal->decidedBy = $decidedBy;
-        $proposal->decidedAt = new DateTime();
+        $proposal->decidedAt = new DateTimeImmutable();
 
         $this->activityProposalStateMachine->apply(
             $proposal,
@@ -98,7 +98,7 @@ final readonly class ActivityProposalManager
         Member $decidedBy,
     ): void {
         $proposal->decidedBy = $decidedBy;
-        $proposal->decidedAt = new DateTime();
+        $proposal->decidedAt = new DateTimeImmutable();
 
         $this->activityProposalStateMachine->apply(
             $proposal,
@@ -132,7 +132,7 @@ final readonly class ActivityProposalManager
         // After the transition, so the listener that clears the stamp on the way out of `scheduled` cannot undo it.
         $proposal->budgetClearance = $outcome;
         $proposal->budgetClearedBy = $clearedBy;
-        $proposal->budgetClearedAt = new DateTime();
+        $proposal->budgetClearedAt = new DateTimeImmutable();
 
         $this->entityManager->flush();
     }

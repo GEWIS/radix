@@ -9,7 +9,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\SubDecision;
 use App\Entity\Decision\Traits\MemberAwareTrait;
 use App\Repository\Decision\SubDecision\Member\SuspensionRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -31,14 +31,14 @@ class Suspension extends SubDecision
      * Named `since` rather than `from`, which is a reserved word in both of the databases this table lives in and
      * would have to be quoted everywhere it is read.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $since;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $since;
 
     /**
      * The last day of the suspension, which is part of it.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $until;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $until;
 
     /**
      * Get the member who is suspended.

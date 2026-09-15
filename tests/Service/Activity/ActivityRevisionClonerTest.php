@@ -22,7 +22,7 @@ use App\Entity\Career\Company;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Service\Activity\ActivityRevisionCloner;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\TestCase;
 
@@ -385,8 +385,8 @@ final class ActivityRevisionClonerTest extends TestCase
             'A talk.',
             'Een praatje.',
         );
-        $source->beginTime = new DateTime('2026-07-01 18:00');
-        $source->endTime = new DateTime('2026-07-01 22:00');
+        $source->beginTime = new DateTimeImmutable('2026-07-01 18:00');
+        $source->endTime = new DateTimeImmutable('2026-07-01 22:00');
         $source->category = ActivityCategories::Workshop;
         $source->requireGEFLITST = true;
         $source->requireZettle = true;

@@ -12,7 +12,7 @@ use App\Entity\Activity\ProposalLimit;
 use App\Entity\Decision\Organ;
 use App\Service\Activity\ProposalLimitResolver;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 use function count;
 
@@ -60,10 +60,10 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
     {
         $period = new OptionPeriod();
         $period->name = 'A round nobody has been set up for';
-        $period->submissionOpensAt = new DateTime('-1 day');
-        $period->submissionClosesAt = new DateTime('+30 days');
-        $period->startsAt = new DateTime('+200 days');
-        $period->endsAt = new DateTime('+290 days');
+        $period->submissionOpensAt = new DateTimeImmutable('-1 day');
+        $period->submissionClosesAt = new DateTimeImmutable('+30 days');
+        $period->startsAt = new DateTimeImmutable('+200 days');
+        $period->endsAt = new DateTimeImmutable('+290 days');
 
         $this->entityManager->persist($period);
         $this->entityManager->flush();
@@ -278,7 +278,7 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
 
     private function openPeriod(): OptionPeriod
     {
-        $periods = $this->entityManager->getRepository(OptionPeriod::class)->findOpenAt(new DateTime());
+        $periods = $this->entityManager->getRepository(OptionPeriod::class)->findOpenAt(new DateTimeImmutable());
 
         self::assertNotEmpty(
             $periods,

@@ -15,7 +15,7 @@ use App\Entity\Activity\SignupOption;
 use App\Entity\Decision\Member;
 use App\Service\Activity\SignupListMigrator;
 use App\Tests\Support\BuildsSignupRoles;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -516,7 +516,7 @@ final class SignupListMigratorTest extends TestCase
                 'Blue',
             ],
         );
-        $drawnAt = new DateTime('2026-01-02 03:04:05');
+        $drawnAt = new DateTimeImmutable('2026-01-02 03:04:05');
         $drawnBy = self::createStub(Member::class);
         $live->drawnAt = $drawnAt;
         $live->drawnBy = $drawnBy;
@@ -568,7 +568,7 @@ final class SignupListMigratorTest extends TestCase
                 'Blue',
             ],
         );
-        $drawnAt = new DateTime('2026-02-03 04:05:06');
+        $drawnAt = new DateTimeImmutable('2026-02-03 04:05:06');
         $live->drawnAt = $drawnAt;
         $live->presenceTaken = true;
         $outgoing = $this->revisionWith($live);

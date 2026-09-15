@@ -14,7 +14,7 @@ use App\Entity\User\User;
 use App\Repository\Activity\ActivityLabelRepository;
 use App\Repository\Activity\ActivityRepository;
 use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -313,7 +313,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
      * The effective start of the time window: an explicit "from" filter, otherwise the start of the selected
      * association year (archive), otherwise unbounded.
      */
-    private function effectiveFrom(): ?DateTime
+    private function effectiveFrom(): ?DateTimeImmutable
     {
         $explicit = $this->parseDate($this->fromDate);
         if (null !== $explicit) {
@@ -325,7 +325,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
             : null;
     }
 
-    private function effectiveUntil(): ?DateTime
+    private function effectiveUntil(): ?DateTimeImmutable
     {
         $explicit = $this->parseDate(
             $this->untilDate,
@@ -356,7 +356,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     private function parseDate(
         ?string $value,
         bool $endOfDay = false,
-    ): ?DateTime {
+    ): ?DateTimeImmutable {
         if (
             null === $value
             || '' === trim($value)
@@ -364,7 +364,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
             return null;
         }
 
-        $date = DateTime::createFromFormat(
+        $date = DateTimeImmutable::createFromFormat(
             'Y-m-d',
             $value,
         );

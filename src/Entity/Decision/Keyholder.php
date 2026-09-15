@@ -8,7 +8,7 @@ use App\Doctrine\Query\Queryable;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Decision\SubDecision\Key\Granting as KeyGranting;
 use App\Repository\Decision\KeyholderRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -60,8 +60,8 @@ class Keyholder
     /**
      * Expiration date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $expirationDate;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $expirationDate;
 
     /**
      * Installation.
@@ -96,17 +96,17 @@ class Keyholder
      * Release date.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $withdrawnDate = null;
+    public ?DateTimeImmutable $withdrawnDate = null;
 
     /**
      * Get whether the key decision is still valid
      */
     public function isCurrent(): bool
     {
-        $now = new DateTime('today');
+        $now = new DateTimeImmutable('today');
 
         return $this->expirationDate >= $now
             && (

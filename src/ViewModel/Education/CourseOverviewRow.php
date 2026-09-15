@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ViewModel\Education;
 
 use App\Entity\Education\Course;
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * Counted rather than hydrated: loading every course with its documents would fetch thousands of rows to display two
@@ -24,7 +24,7 @@ final readonly class CourseOverviewRow
         public string $name,
         public int $summaryCount,
         public int $examCount,
-        public ?DateTime $lastAddedAt,
+        public ?DateTimeImmutable $lastAddedAt,
         public array $similarCourses = [],
     ) {
     }

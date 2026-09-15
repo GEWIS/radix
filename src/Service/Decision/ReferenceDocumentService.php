@@ -15,7 +15,7 @@ use App\Repository\Decision\MeetingReferenceSelectionRepository;
 use App\Repository\Decision\MeetingRepository;
 use App\Repository\Decision\ReferenceDocumentRepository;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -310,7 +310,7 @@ final readonly class ReferenceDocumentService
             $file->getPathname(),
         )->path;
         $version->uploadedBy = $actor;
-        $version->uploadedAt = new DateTime();
+        $version->uploadedAt = new DateTimeImmutable();
 
         return $version;
     }

@@ -9,7 +9,7 @@ use App\Entity\Database\Enums\BoardFunctions;
 use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\Board\Installation;
 use App\Form\Database\DataMapper\AbstractDecisionMapper;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -30,7 +30,7 @@ class InstallMapper extends AbstractDecisionMapper
         if (
             !$member instanceof Member
             || !$function instanceof BoardFunctions
-            || !$date instanceof DateTime
+            || !$date instanceof DateTimeImmutable
         ) {
             return;
         }

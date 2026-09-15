@@ -10,7 +10,7 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\Languages;
 use App\Util\Activity\SignupTiers;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function count;
@@ -23,24 +23,26 @@ use function count;
 final readonly class SignupListView
 {
     /**
-     * @param ?DateTime   $drawAt      the announced moment of the upcoming lottery draw; only set for a conditional
-     *                                 draw that has not been performed yet. On a list drawn by hand it is the moment
-     *                                 that decides who is in the draw rather than the moment places are handed out
-     * @param bool        $drawnByHand whether that draw is made by hand after sign-up closes
-     * @param string[]    $fieldNames  column headers (localised), one per sign-up field
-     * @param SignupRow[] $rows        populated only when $canViewDetails
-     * @param string[]    $priority    the orders this list serves its places in, best first, one sentence each; these
-     *                                 are part of the deal somebody signs up under, so they are said before they do
+     * @param ?DateTimeImmutable $drawAt      the announced moment of the upcoming lottery draw; only set for a
+     *                                        conditional draw that has not been performed yet. On a list drawn by hand
+     *                                        it is the cutoff that decides who is in the draw, not the moment places
+     *                                        are allocated
+     * @param bool               $drawnByHand whether that draw is made by hand after sign-up closes
+     * @param string[]           $fieldNames  column headers (localised), one per sign-up field
+     * @param SignupRow[]        $rows        populated only when $canViewDetails
+     * @param string[]           $priority    the orders in which this list allocates its places, best first, one
+     *                                        sentence each; they are shown before sign-up because a person agrees to
+     *                                        them by signing up
      */
     public function __construct(
         public int $listId,
         public int $activityId,
         public string $name,
-        public ?DateTime $openDate,
-        public ?DateTime $closeDate,
+        public ?DateTimeImmutable $openDate,
+        public ?DateTimeImmutable $closeDate,
         public bool $limitedCapacity,
         public ?int $capacity,
-        public ?DateTime $drawAt,
+        public ?DateTimeImmutable $drawAt,
         public bool $drawnByHand,
         public bool $onlyGEWIS,
         public bool $displaySubscribedNumber,

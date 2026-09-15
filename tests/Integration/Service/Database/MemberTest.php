@@ -10,7 +10,7 @@ use App\Entity\Database\Enums\Studies;
 use App\Entity\Database\Member as MemberModel;
 use App\Service\Database\Member;
 use App\Tests\Support\LedgerBuilder;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -174,7 +174,7 @@ class MemberTest extends KernelTestCase
         $expiredLidnr = $expired->lidnr;
         $currentLidnr = $current->lidnr;
 
-        $this->memberService->removeExpiredMembers(new DateTime('2020-07-01'));
+        $this->memberService->removeExpiredMembers(new DateTimeImmutable('2020-07-01'));
         $this->entityManager->flush();
         $this->entityManager->clear();
 

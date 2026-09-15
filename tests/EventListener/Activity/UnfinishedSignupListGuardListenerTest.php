@@ -10,7 +10,7 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\SignupList;
 use App\EventListener\Activity\UnfinishedSignupListGuardListener;
 use App\Tests\Support\BuildsGuardEvents;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -133,8 +133,8 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
             'Deelnemers',
             'Participants',
         );
-        $list->openDate = new DateTime('2030-01-01 12:00');
-        $list->closeDate = new DateTime('2030-02-01 12:00');
+        $list->openDate = new DateTimeImmutable('2030-01-01 12:00');
+        $list->closeDate = new DateTimeImmutable('2030-02-01 12:00');
 
         return $list;
     }

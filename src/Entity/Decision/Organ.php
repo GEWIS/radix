@@ -9,7 +9,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Decision\SubDecision\Foundation;
 use App\Repository\Decision\OrganRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -103,17 +103,17 @@ class Organ
     /**
      * Foundation date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $foundationDate;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $foundationDate;
 
     /**
      * Abrogation date.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $abrogationDate = null;
+    public ?DateTimeImmutable $abrogationDate = null;
 
     /**
      * Reference to members.
@@ -278,6 +278,6 @@ class Organ
     public function isAbrogated(): bool
     {
         return null !== $this->abrogationDate
-            && (new DateTime()) >= $this->abrogationDate;
+            && (new DateTimeImmutable()) >= $this->abrogationDate;
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ViewModel\Activity\Admin;
 
-use DateTime;
+use DateTimeImmutable;
 
 final readonly class SignupAdminRow
 {
@@ -27,7 +27,7 @@ final readonly class SignupAdminRow
         public ?int $generation,
         public bool $external,
         public ?string $email,
-        public DateTime $signedUpAt,
+        public DateTimeImmutable $signedUpAt,
         public bool $present,
         public bool $drawn,
         public array $cells,

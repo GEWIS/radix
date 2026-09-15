@@ -8,7 +8,7 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Entity\User\UserRole;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -39,7 +39,7 @@ class UserRoleFixture extends Fixture implements DependentFixtureInterface, Fixt
             foreach ($roles as $role) {
                 $userRole = new UserRole();
                 $userRole->role = $role;
-                $userRole->setExpiration(new DateTime()->add(new DateInterval('P10Y')));
+                $userRole->setExpiration(new DateTimeImmutable()->add(new DateInterval('P10Y')));
                 $userRole->lidnr = $this->getReference(
                     'user-' . $lidnr,
                     User::class,
@@ -58,7 +58,7 @@ class UserRoleFixture extends Fixture implements DependentFixtureInterface, Fixt
         ) {
             $companyAdminRole = new UserRole();
             $companyAdminRole->role = UserRoles::CompanyAdmin;
-            $companyAdminRole->setExpiration(new DateTime()->add(new DateInterval('P10Y')));
+            $companyAdminRole->setExpiration(new DateTimeImmutable()->add(new DateInterval('P10Y')));
             $companyAdminRole->lidnr = $this->getReference(
                 'user-' . $lidnr,
                 User::class,

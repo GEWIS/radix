@@ -15,7 +15,7 @@ use App\Form\Frontpage\PollReviewDecisionType;
 use App\Repository\Frontpage\PollRevisionCommentRepository;
 use App\Service\Frontpage\PollReviewQueueProvider;
 use App\ViewModel\Application\RevisionActions;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormInterface;
@@ -143,7 +143,7 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
 
         if ('approve' === $this->clickedTransition($form)) {
             $expiryDate = $form->get('expiryDate')->getData();
-            assert($expiryDate instanceof DateTime);
+            assert($expiryDate instanceof DateTimeImmutable);
 
             $revision->poll->expiryDate = $expiryDate;
         }

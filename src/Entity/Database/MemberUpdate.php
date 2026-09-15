@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Database;
 
 use App\Repository\Database\MemberUpdateRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -32,8 +32,8 @@ class MemberUpdate
     /**
      * When the update was requested.
      */
-    #[Column(type: 'date')]
-    private DateTime $requestedDate;
+    #[Column(type: 'date_immutable')]
+    private DateTimeImmutable $requestedDate;
 
     /**
      * Member's email address.

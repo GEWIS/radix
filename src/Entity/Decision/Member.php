@@ -13,7 +13,7 @@ use App\Entity\Decision\SubDecision\Installation;
 use App\Entity\Photo\MemberTag as MemberTagModel;
 use App\Entity\User\User as UserModel;
 use App\Repository\Decision\MemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -148,8 +148,8 @@ class Member
     /**
      * Last changed date of membership.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $changedOn;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $changedOn;
 
     /**
      * Date when the real membership ("ordinary" or "external") of the member will have ended, in other words, from this
@@ -157,23 +157,23 @@ class Member
      * still meets the requirements as set forth in the bylaws and internal regulations.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $membershipEndsOn = null;
+    public ?DateTimeImmutable $membershipEndsOn = null;
 
     /**
      * Member birth date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $birth;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $birth;
 
     /**
      * The date on which the membership of the member is set to expire and will therefore have to be renewed, which
      * happens either automatically or has to be done manually, as set forth in the bylaws and internal regulations.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $expiration;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $expiration;
 
     /**
      * If the member receives a 'supremum'.
@@ -339,7 +339,7 @@ class Member
     /**
      * Member is at least 16 years old on the given date.
      */
-    public function hasReached16(DateTime $onDate = new DateTime()): bool
+    public function hasReached16(DateTimeImmutable $onDate = new DateTimeImmutable()): bool
     {
         return $this->isOlderThan(
             $onDate,
@@ -350,7 +350,7 @@ class Member
     /**
      * Member is at least 18 years old on the given date.
      */
-    public function hasReached18(DateTime $onDate = new DateTime()): bool
+    public function hasReached18(DateTimeImmutable $onDate = new DateTimeImmutable()): bool
     {
         return $this->isOlderThan(
             $onDate,
@@ -361,7 +361,7 @@ class Member
     /**
      * Member is at least 21 years old on the given date.
      */
-    public function hasReached21(DateTime $onDate = new DateTime()): bool
+    public function hasReached21(DateTimeImmutable $onDate = new DateTimeImmutable()): bool
     {
         return $this->isOlderThan(
             $onDate,
@@ -370,7 +370,7 @@ class Member
     }
 
     private function isOlderThan(
-        DateTime $onDate,
+        DateTimeImmutable $onDate,
         int $years,
     ): bool {
         return $onDate->diff($this->birth)->y >= $years;
@@ -521,7 +521,7 @@ class Member
         }
 
         // Filter out past installations
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
 
         return $this->getOrganInstallations()->filter(
             static function (OrganMember $organMember) use ($today, $includeInactive) {
@@ -579,7 +579,7 @@ class Member
     public function getCurrentBoardInstallation(): ?BoardMember
     {
         // Filter out past board installations
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
 
         $boards = $this->getBoardInstallations()->filter(
             static function (BoardMember $boardMember) use ($today) {
@@ -674,7 +674,7 @@ class Member
      */
     public function isReleasedButUndischargedSecretary(): bool
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         foreach ($this->secretaryInstallations() as $boardMember) {
             $released = $boardMember->releaseDate;
@@ -725,7 +725,7 @@ class Member
      */
     public function isCurrentBoard(BoardMember $boardMember): bool
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $installDate = $boardMember->installDate;
         $releaseDate = $boardMember->releaseDate;
         $dischargeDate = $boardMember->dischargeDate;
@@ -752,7 +752,7 @@ class Member
 
     public function isExpired(): bool
     {
-        return $this->expiration < new DateTime();
+        return $this->expiration < new DateTimeImmutable();
     }
 
     public function getSelfRole(): string

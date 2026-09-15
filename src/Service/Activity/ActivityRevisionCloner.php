@@ -12,7 +12,7 @@ use App\Entity\Activity\SignupRole;
 use App\Entity\Application\AbstractRevision;
 use App\Entity\Application\RevisionInterface;
 use App\Workflow\AbstractRevisionCloner;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 
 use function assert;
@@ -77,7 +77,7 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
         }
     }
 
-    private function copyDate(?DateTime $source): ?DateTime
+    private function copyDate(?DateTimeImmutable $source): ?DateTimeImmutable
     {
         return null !== $source
             ? clone $source
@@ -85,21 +85,16 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
     }
 
     /**
-     * Deep-clone a sign-up list onto the new draft: fresh name/date/flag values, the same lineage id, and deep-cloned
-     * fields/options. Sign-ups are deliberately not copied (they stay on the live revision until approval migration).
+     * Deep-clone a sign-up list onto the new draft: a copy of the name, the same dates, flags and lineage id, and
+     * deep-cloned fields/options. Sign-ups are deliberately not copied (they stay on the live revision until approval
+     * migration).
      */
     private function copySignupList(SignupList $source): SignupList
     {
         $list = new SignupList();
         $list->name = $source->name->copy();
-        $openDate = $source->openDate;
-        $closeDate = $source->closeDate;
-        $list->openDate = null !== $openDate
-            ? clone $openDate
-            : null;
-        $list->closeDate = null !== $closeDate
-            ? clone $closeDate
-            : null;
+        $list->openDate = $source->openDate;
+        $list->closeDate = $source->closeDate;
         $list->onlyGEWIS = $source->onlyGEWIS;
         $list->displaySubscribedNumber = $source->displaySubscribedNumber;
         $list->limitedCapacity = $source->limitedCapacity;
@@ -113,10 +108,7 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
         // Allocation method + its per-method settings are list config, carried forward like the other settings.
         $list->allocationMethod = $source->allocationMethod;
         $list->drawCutoffRule = $source->drawCutoffRule;
-        $cutoffAt = $source->drawCutoffAt;
-        $list->drawCutoffAt = null !== $cutoffAt
-            ? clone $cutoffAt
-            : null;
+        $list->drawCutoffAt = $source->drawCutoffAt;
         $list->drawAfterDurationHours = $source->drawAfterDurationHours;
         $list->externalPolicyUrl = $source->externalPolicyUrl;
         $list->externalForceOrdering = $source->externalForceOrdering;

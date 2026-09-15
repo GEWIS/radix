@@ -20,7 +20,7 @@ use App\Tests\Support\AnswersActivityForm;
 use App\ViewModel\Application\Review\ReviewOutline;
 use App\ViewModel\Application\Review\RevisionAudience;
 use App\ViewModel\Application\Review\RevisionSection;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -493,8 +493,8 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             'Participants',
             'Participants',
         );
-        $list->openDate = new DateTime('2030-01-01 12:00');
-        $list->closeDate = new DateTime('2030-02-01 12:00');
+        $list->openDate = new DateTimeImmutable('2030-01-01 12:00');
+        $list->closeDate = new DateTimeImmutable('2030-02-01 12:00');
         $list->onlyGEWIS = true;
         $list->limitedCapacity = true;
         $list->capacity = 10;

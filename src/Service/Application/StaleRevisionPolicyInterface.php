@@ -7,7 +7,7 @@ namespace App\Service\Application;
 use App\Entity\Application\AbstractRevision;
 use App\Entity\Application\RevisableInterface;
 use App\Entity\Application\RevisionInterface;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
@@ -35,7 +35,7 @@ interface StaleRevisionPolicyInterface
      * still open for applications and a poll still being voted on are all being waited on by someone. Once that
      * moment is past, the silence is all there is to go on.
      */
-    public function keepUntil(RevisionInterface $revision): ?DateTime;
+    public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable;
 
     /**
      * Why this never-approved aggregate has to stay standing anyway, or null when it may go together with its chain.

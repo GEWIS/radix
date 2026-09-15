@@ -11,7 +11,7 @@ use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Financial\BudgetRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -41,8 +41,8 @@ class Budget extends SubDecision implements NamesMember
     /**
      * Date of the budget.
      */
-    #[Column(type: 'date')]
-    public DateTime $date;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $date;
 
     /**
      * If the budget was approved.

@@ -29,7 +29,7 @@ use App\Entity\User\CompanyUser;
 use App\Service\Application\FileStorage;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Workflow\RevisionClonerRegistry;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 
 /**
@@ -60,9 +60,9 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             $draftId,
             [
-                'beginTime' => new DateTime('-2 months'),
-                'endTime' => new DateTime('-2 months +1 hour'),
-                'updatedAt' => new DateTime('-40 days'),
+                'beginTime' => new DateTimeImmutable('-2 months'),
+                'endTime' => new DateTimeImmutable('-2 months +1 hour'),
+                'updatedAt' => new DateTimeImmutable('-40 days'),
             ],
         );
 
@@ -86,9 +86,9 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             (int) $draft->id,
             [
-                'beginTime' => new DateTime('-2 months'),
-                'endTime' => new DateTime('-2 months +1 hour'),
-                'updatedAt' => new DateTime('-40 days'),
+                'beginTime' => new DateTimeImmutable('-2 months'),
+                'endTime' => new DateTimeImmutable('-2 months +1 hour'),
+                'updatedAt' => new DateTimeImmutable('-40 days'),
             ],
         );
 
@@ -109,9 +109,9 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             $draftId,
             [
-                'beginTime' => new DateTime('-2 months'),
-                'endTime' => new DateTime('-2 months +1 hour'),
-                'updatedAt' => new DateTime('-40 days'),
+                'beginTime' => new DateTimeImmutable('-2 months'),
+                'endTime' => new DateTimeImmutable('-2 months +1 hour'),
+                'updatedAt' => new DateTimeImmutable('-40 days'),
             ],
         );
 
@@ -147,9 +147,9 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             $submittedId,
             [
-                'beginTime' => new DateTime('-2 months'),
-                'endTime' => new DateTime('-2 months +1 hour'),
-                'updatedAt' => new DateTime('-40 days'),
+                'beginTime' => new DateTimeImmutable('-2 months'),
+                'endTime' => new DateTimeImmutable('-2 months +1 hour'),
+                'updatedAt' => new DateTimeImmutable('-40 days'),
             ],
         );
 
@@ -177,9 +177,9 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             $draftId,
             [
-                'beginTime' => new DateTime('+2 weeks'),
-                'endTime' => new DateTime('+2 weeks +1 hour'),
-                'updatedAt' => new DateTime('-100 days'),
+                'beginTime' => new DateTimeImmutable('+2 weeks'),
+                'endTime' => new DateTimeImmutable('+2 weeks +1 hour'),
+                'updatedAt' => new DateTimeImmutable('-100 days'),
             ],
         );
 
@@ -194,8 +194,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             $draftId,
             [
-                'beginTime' => new DateTime('-2 weeks'),
-                'endTime' => new DateTime('-2 weeks +1 hour'),
+                'beginTime' => new DateTimeImmutable('-2 weeks'),
+                'endTime' => new DateTimeImmutable('-2 weeks +1 hour'),
             ],
         );
         $this->executeCommand();
@@ -224,8 +224,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             VacancyRevision::class,
             $draftId,
             [
-                'endDate' => new DateTime('+2 weeks'),
-                'updatedAt' => new DateTime('-100 days'),
+                'endDate' => new DateTimeImmutable('+2 weeks'),
+                'updatedAt' => new DateTimeImmutable('-100 days'),
             ],
         );
 
@@ -238,7 +238,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             VacancyRevision::class,
             $draftId,
-            ['endDate' => new DateTime('-1 day')],
+            ['endDate' => new DateTimeImmutable('-1 day')],
         );
         $this->executeCommand();
 
@@ -263,7 +263,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             PollRevision::class,
             $revisionId,
-            ['updatedAt' => new DateTime('-40 days')],
+            ['updatedAt' => new DateTimeImmutable('-40 days')],
         );
 
         $this->executeCommand();
@@ -306,7 +306,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             CompanyRevision::class,
             $draftId,
-            ['updatedAt' => new DateTime('-40 days')],
+            ['updatedAt' => new DateTimeImmutable('-40 days')],
         );
 
         $fileStorage = $this->fileStorage();
@@ -368,7 +368,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             OrganInformationRevision::class,
             $draftId,
-            ['updatedAt' => new DateTime('-40 days')],
+            ['updatedAt' => new DateTimeImmutable('-40 days')],
         );
 
         $fileStorage = $this->fileStorage();
@@ -415,7 +415,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             CompanyRevision::class,
             $draftId,
-            ['updatedAt' => new DateTime('-100 days')],
+            ['updatedAt' => new DateTimeImmutable('-100 days')],
         );
 
         $this->executeCommand();
@@ -482,7 +482,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             ActivityRevision::class,
             (int) $draft->id,
-            ['updatedAt' => new DateTime('-2 days')],
+            ['updatedAt' => new DateTimeImmutable('-2 days')],
         );
 
         $this->executeCommand(['--force' => true]);
@@ -551,7 +551,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $this->backdate(
             CompanyRevision::class,
             (int) $draft->id,
-            ['updatedAt' => new DateTime('-100 days')],
+            ['updatedAt' => new DateTimeImmutable('-100 days')],
         );
 
         $this->executeCommand(['--force' => true]);
@@ -618,8 +618,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
      * so the row is refreshed before handing back — otherwise a domain that judges by a date would judge by the date
      * this helper just replaced.
      *
-     * @param class-string            $revisionClass
-     * @param array<string, DateTime> $dates
+     * @param class-string                     $revisionClass
+     * @param array<string, DateTimeImmutable> $dates
      */
     private function backdate(
         string $revisionClass,
@@ -645,7 +645,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
                 ->setParameter(
                     $field,
                     $value,
-                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_IMMUTABLE,
                 );
         }
 
@@ -892,9 +892,9 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             ActivityRevision::class,
             (int) $draft->id,
             [
-                'beginTime' => new DateTime('-2 months'),
-                'endTime' => new DateTime('-2 months +1 hour'),
-                'updatedAt' => new DateTime('-40 days'),
+                'beginTime' => new DateTimeImmutable('-2 months'),
+                'endTime' => new DateTimeImmutable('-2 months +1 hour'),
+                'updatedAt' => new DateTimeImmutable('-40 days'),
             ],
         );
 

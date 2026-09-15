@@ -9,7 +9,7 @@ use App\Entity\Activity\ActivityLocalisedText;
 use App\Entity\Activity\ActivityProposal;
 use App\Entity\Activity\Enums\DateOptionStatus;
 use App\Service\Activity\ActivityDraftFactory;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -96,17 +96,17 @@ final readonly class SeedActivityFromProposalListener
         $proposal->activity = $activity;
     }
 
-    private function startOf(ActivityDateOption $option): DateTime
+    private function startOf(ActivityDateOption $option): DateTimeImmutable
     {
-        return new DateTime(sprintf(
+        return new DateTimeImmutable(sprintf(
             '%s 00:00:00',
             $option->beginsAt->format('Y-m-d'),
         ));
     }
 
-    private function endOf(ActivityDateOption $option): DateTime
+    private function endOf(ActivityDateOption $option): DateTimeImmutable
     {
-        return new DateTime(sprintf(
+        return new DateTimeImmutable(sprintf(
             '%s 23:59:59',
             $option->endsAt->format('Y-m-d'),
         ));

@@ -49,9 +49,7 @@ class CompanyFeaturedPackageRepository extends ServiceEntityRepository
         $featuredPackages = array_values(
             array_filter(
                 $this->findCandidatesOn($today),
-                static fn (CompanyFeaturedPackage $package): bool => DateTimeImmutable::createFromMutable(
-                    $package->getStartingDate(),
-                ) <= $today,
+                static fn (CompanyFeaturedPackage $package): bool => $package->getStartingDate() <= $today,
             ),
         );
 

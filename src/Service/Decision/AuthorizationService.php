@@ -13,7 +13,7 @@ use App\Message\Decision\AuthorizationRevokedEmail;
 use App\Repository\Decision\AuthorizationRepository;
 use App\Repository\Decision\MeetingRepository;
 use App\Repository\Decision\MemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -113,7 +113,7 @@ final readonly class AuthorizationService
         $authorization->authorizer = $authorizer;
         $authorization->recipient = $recipient;
         $authorization->meetingNumber = $meeting->number;
-        $authorization->createdAt = new DateTime();
+        $authorization->createdAt = new DateTimeImmutable();
 
         $this->entityManager->persist($authorization);
         $this->entityManager->flush();
@@ -134,7 +134,7 @@ final readonly class AuthorizationService
             return;
         }
 
-        $authorization->revokedAt = new DateTime();
+        $authorization->revokedAt = new DateTimeImmutable();
         $this->entityManager->flush();
 
         $this->messageBus->dispatch(new AuthorizationRevokedEmail((int) $authorization->id));

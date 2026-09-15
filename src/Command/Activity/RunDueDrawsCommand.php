@@ -7,7 +7,7 @@ namespace App\Command\Activity;
 use App\Command\HoldsRunLockTrait;
 use App\Repository\Activity\SignupListRepository;
 use App\Service\Activity\DrawManager;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -75,7 +75,7 @@ final class RunDueDrawsCommand extends Command
         // The repository query is a coarse pre-filter; drawAutomatically() re-checks every guard under a row lock and
         // returns false when it declines (already drawn by a racing board member, admission window closed in between).
         $performed = 0;
-        foreach ($this->signupListRepository->findDueForAutomatedDraw(new DateTime()) as $list) {
+        foreach ($this->signupListRepository->findDueForAutomatedDraw(new DateTimeImmutable()) as $list) {
             if (!$this->drawManager->drawAutomatically($list)) {
                 continue;
             }
@@ -93,7 +93,7 @@ final class RunDueDrawsCommand extends Command
             }
 
             $minutesLate = intdiv(
-                new DateTime()->getTimestamp() - $dueAt->getTimestamp(),
+                new DateTimeImmutable()->getTimestamp() - $dueAt->getTimestamp(),
                 60,
             );
             if ($minutesLate < self::LATE_DRAW_WARNING_MINUTES) {

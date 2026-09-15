@@ -7,7 +7,7 @@ namespace App\DataFixtures\Decision;
 use App\Entity\Decision\Authorization;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\Member;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -38,7 +38,7 @@ class AuthorizationFixture extends Fixture implements DependentFixtureInterface,
             Member::class,
         );
         $valid->meetingNumber = $gmmNumber;
-        $valid->createdAt = new DateTime('-3 days');
+        $valid->createdAt = new DateTimeImmutable('-3 days');
 
         $manager->persist($valid);
 
@@ -52,8 +52,8 @@ class AuthorizationFixture extends Fixture implements DependentFixtureInterface,
             Member::class,
         );
         $revoked->meetingNumber = $gmmNumber;
-        $revoked->createdAt = new DateTime('-2 days');
-        $revoked->revokedAt = new DateTime('-1 day');
+        $revoked->createdAt = new DateTimeImmutable('-2 days');
+        $revoked->revokedAt = new DateTimeImmutable('-1 day');
 
         $manager->persist($revoked);
         $manager->flush();

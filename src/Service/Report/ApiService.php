@@ -11,7 +11,7 @@ use App\Exception\Report\VersionExpected as VersionExpectedException;
 use App\Exception\Report\VersionFormat as VersionFormatException;
 use App\Exception\Report\VersionIncompatible as VersionIncompatibleException;
 use App\Service\Application\Config as ConfigService;
-use DateTime;
+use DateTimeImmutable;
 use PHLAK\SemVer\Enums\Compare as SemanticCompare;
 use PHLAK\SemVer\Exceptions\InvalidVersionException;
 use PHLAK\SemVer\Version as SemanticVersion;
@@ -73,7 +73,7 @@ class ApiService
     /**
      * @return array{
      *     syncPaused: bool,
-     *     syncPausedUntil: ?DateTime,
+     *     syncPausedUntil: ?DateTimeImmutable,
      * }
      */
     public function getStatusFigures(): array
@@ -91,7 +91,7 @@ class ApiService
     {
         $syncPausedUntil = max(
             $this->getSyncPausedUntil(),
-            new DateTime()->modify('+' . $minutes . ' minutes'),
+            new DateTimeImmutable()->modify('+' . $minutes . ' minutes'),
         );
 
         $this->configService->setConfig(
@@ -111,10 +111,10 @@ class ApiService
 
     public function isSyncPaused(): bool
     {
-        return $this->getSyncPausedUntil() > new DateTime();
+        return $this->getSyncPausedUntil() > new DateTimeImmutable();
     }
 
-    private function getSyncPausedUntil(): ?DateTime
+    private function getSyncPausedUntil(): ?DateTimeImmutable
     {
         $pausedUntil = $this->configService->getConfig(
             ConfigNamespaces::DatabaseApi,

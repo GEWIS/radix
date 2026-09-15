@@ -9,7 +9,6 @@ use App\Entity\User\Enums\ExternalAppTokenDelivery;
 use App\Entity\User\Enums\JWTClaims;
 use App\Entity\User\ExternalApp;
 use App\Form\Application\Flow\HasFlowStep;
-use DateTime;
 use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -68,9 +67,7 @@ final class ExternalAppData
         $data->secret = $app->secret;
         $data->claims = $app->getClaims();
         $data->enabled = $app->enabled;
-        $data->expiresAt = null !== $app->expiresAt
-            ? DateTimeImmutable::createFromInterface($app->expiresAt)
-            : null;
+        $data->expiresAt = $app->expiresAt;
 
         return $data;
     }
@@ -85,8 +82,6 @@ final class ExternalAppData
         $app->secret = $this->secret;
         $app->setClaims($this->claims);
         $app->enabled = $this->enabled;
-        $app->expiresAt = null !== $this->expiresAt
-            ? DateTime::createFromInterface($this->expiresAt)
-            : null;
+        $app->expiresAt = $this->expiresAt;
     }
 }

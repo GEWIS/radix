@@ -13,7 +13,7 @@ use App\Entity\Database\Enums\Studies;
 use App\Entity\Database\Member as MemberModel;
 use App\Entity\Database\Membership as MembershipModel;
 use App\Entity\Database\ProspectiveMember;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -70,10 +70,10 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $prospective->middleName = '';
         $prospective->lastName = 'Testdata';
         $prospective->studentNumber = '1000012';
-        $prospective->birth = new DateTime('2001-01-01');
+        $prospective->birth = new DateTimeImmutable('2001-01-01');
         $prospective->email = 'tara@example.com';
         $prospective->paid = 20;
-        $prospective->changedOn = new DateTime();
+        $prospective->changedOn = new DateTimeImmutable();
         $prospective->study = Studies::BAM;
 
         $address = new Address();
@@ -94,8 +94,8 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $checkout = new CheckoutSession();
         $checkout->checkoutId = '123';
         $checkout->prospectiveMember = $prospective;
-        $checkout->created = new DateTime();
-        $checkout->expiration = new DateTime();
+        $checkout->created = new DateTimeImmutable();
+        $checkout->expiration = new DateTimeImmutable();
         $checkout->state = CheckoutSessionStates::Paid;
         $manager->persist($checkout);
     }
@@ -108,13 +108,13 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $student->middleName = 'de';
         $student->lastName = 'Teststudent';
         $student->setEmail('timon@example.com');
-        $student->setBirth(new DateTime('2000-01-01'));
-        $student->changedOn = new DateTime();
+        $student->setBirth(new DateTimeImmutable('2000-01-01'));
+        $student->changedOn = new DateTimeImmutable();
         $student->studentNumber = '1000020';
         $student->study = Studies::BAM;
         $this->chainMemberships(
             $student,
-            new DateTime('2018-08-14 midnight'),
+            new DateTimeImmutable('2018-08-14 midnight'),
         );
         $manager->persist($student);
         $this->addReference(
@@ -128,13 +128,13 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $external->middleName = '';
         $external->lastName = 'Bloggs';
         $external->setEmail('joe@example.com');
-        $external->setBirth(new DateTime('1999-01-01'));
-        $external->changedOn = new DateTime();
+        $external->setBirth(new DateTimeImmutable('1999-01-01'));
+        $external->changedOn = new DateTimeImmutable();
         $external->study = Studies::Other;
         $this->chainMemberships(
             $external,
-            new DateTime('2017-08-15 midnight'),
-            new DateTime('2020-06-30 midnight'),
+            new DateTimeImmutable('2017-08-15 midnight'),
+            new DateTimeImmutable('2020-06-30 midnight'),
             MembershipTypes::External,
         );
         $manager->persist($external);
@@ -149,13 +149,13 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $graduate->middleName = 'van';
         $graduate->lastName = 'Lint';
         $graduate->setEmail('vanlint@example.com');
-        $graduate->setBirth(new DateTime('1932-09-01'));
-        $graduate->changedOn = new DateTime('1990-07-01');
+        $graduate->setBirth(new DateTimeImmutable('1932-09-01'));
+        $graduate->changedOn = new DateTimeImmutable('1990-07-01');
         $graduate->study = Studies::None;
         $this->chainMemberships(
             $graduate,
-            new DateTime('1989-08-15 midnight'),
-            new DateTime('1994-06-30 midnight'),
+            new DateTimeImmutable('1989-08-15 midnight'),
+            new DateTimeImmutable('1994-06-30 midnight'),
             MembershipTypes::Graduate,
         );
         $manager->persist($graduate);
@@ -170,14 +170,14 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $deleted->middleName = '';
         $deleted->lastName = 'Removed';
         $deleted->setEmail('rita@example.com');
-        $deleted->setBirth(new DateTime('1998-01-01'));
-        $deleted->changedOn = new DateTime();
+        $deleted->setBirth(new DateTimeImmutable('1998-01-01'));
+        $deleted->changedOn = new DateTimeImmutable();
         $deleted->studentNumber = '1000030';
         $deleted->study = Studies::BAM;
         $deleted->deleted = true;
         $this->chainMemberships(
             $deleted,
-            new DateTime('2019-08-13 midnight'),
+            new DateTimeImmutable('2019-08-13 midnight'),
         );
         $manager->persist($deleted);
         $this->addReference(
@@ -191,13 +191,13 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
      */
     private function chainMemberships(
         MemberModel $member,
-        DateTime $start,
-        ?DateTime $switchOn = null,
+        DateTimeImmutable $start,
+        ?DateTimeImmutable $switchOn = null,
         ?MembershipTypes $afterSwitch = null,
     ): void {
         $startDate = $start;
 
-        while ($startDate < new DateTime()) {
+        while ($startDate < new DateTimeImmutable()) {
             $type = null !== $switchOn && null !== $afterSwitch && $startDate >= $switchOn
                 ? $afterSwitch
                 : MembershipTypes::Ordinary;
@@ -205,7 +205,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             $membership = new MembershipModel(
                 member: $member,
                 type: $type,
-                startDate: clone $startDate,
+                startDate: $startDate,
                 endDate: null,
             );
             $member->addMembership($membership);
@@ -223,11 +223,11 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
      */
     private function loadAttentionMembers(ObjectManager $manager): void
     {
-        $now = new DateTime();
-        $nextJul1 = new DateTime($now->format('Y') . '-07-01 midnight');
+        $now = new DateTimeImmutable();
+        $nextJul1 = new DateTimeImmutable($now->format('Y') . '-07-01 midnight');
 
         if ($nextJul1 <= $now) {
-            $nextJul1->modify('+1 year');
+            $nextJul1 = $nextJul1->modify('+1 year');
         }
 
         // A1: hidden and missing an e-mail address; must disappear once the finders filter hidden members.
@@ -248,7 +248,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         );
 
         // A2: a same-day membership (start equals end) is dropped silently, despite the missing address.
-        $sameDay = new DateTime()->modify('-10 days');
+        $sameDay = new DateTimeImmutable()->modify('-10 days');
         $this->makeAttentionMember(
             $manager,
             'S.',
@@ -262,7 +262,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
                 [
                     MembershipTypes::Ordinary,
                     $sameDay,
-                    clone $sameDay,
+                    $sameDay,
                 ],
             ],
         );
@@ -435,7 +435,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             Studies::BAM,
             $this->associationYearChain(
                 4,
-                new DateTime()->modify('-30 days'),
+                new DateTimeImmutable()->modify('-30 days'),
             ),
         );
 
@@ -451,7 +451,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             Studies::BAM,
             $this->associationYearChain(
                 4,
-                new DateTime()->modify('-90 days'),
+                new DateTimeImmutable()->modify('-90 days'),
             ),
         );
 
@@ -467,7 +467,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             Studies::BAM,
             $this->associationYearChain(
                 4,
-                new DateTime()->modify('-180 days'),
+                new DateTimeImmutable()->modify('-180 days'),
             ),
         );
 
@@ -483,7 +483,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             Studies::BAM,
             $this->associationYearChain(
                 4,
-                new DateTime()->modify('+180 days'),
+                new DateTimeImmutable()->modify('+180 days'),
             ),
         );
 
@@ -499,7 +499,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             Studies::Other,
             $this->associationYearChain(
                 4,
-                new DateTime()->modify('-30 days'),
+                new DateTimeImmutable()->modify('-30 days'),
                 MembershipTypes::External,
                 4,
             ),
@@ -520,7 +520,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
                 Studies::BAM,
                 $this->associationYearChain(
                     4,
-                    new DateTime()->modify('-30 days'),
+                    new DateTimeImmutable()->modify('-30 days'),
                 ),
             ),
         );
@@ -566,7 +566,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
     }
 
     /**
-     * @param list<array{0: MembershipTypes, 1: DateTime, 2: DateTime}> $segments
+     * @param list<array{0: MembershipTypes, 1: DateTimeImmutable, 2: DateTimeImmutable}> $segments
      */
     private function makeAttentionMember(
         ObjectManager $manager,
@@ -585,8 +585,8 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
         $member->firstName = $firstName;
         $member->middleName = '';
         $member->lastName = $lastName;
-        $member->setBirth(new DateTime()->modify('-' . $ageInYears . ' years'));
-        $member->changedOn = new DateTime();
+        $member->setBirth(new DateTimeImmutable()->modify('-' . $ageInYears . ' years'));
+        $member->changedOn = new DateTimeImmutable();
         $member->study = $study;
 
         if (null !== $email) {
@@ -619,11 +619,11 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
      * A chain of association-year memberships for someone who has been around `$years` years. The last
      * `$finalTypeYears` of them use `$finalType`, which models a single transition such as ordinary to external.
      *
-     * @return list<array{0: MembershipTypes, 1: DateTime, 2: DateTime}>
+     * @return list<array{0: MembershipTypes, 1: DateTimeImmutable, 2: DateTimeImmutable}>
      */
     private function associationYearChain(
         int $years,
-        DateTime $finalEnd,
+        DateTimeImmutable $finalEnd,
         MembershipTypes $finalType = MembershipTypes::Ordinary,
         int $finalTypeYears = 1,
         int $joinMonth = 8,
@@ -663,11 +663,11 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
      *
      * @param list<array{0: MembershipTypes, 1: int}> $phases
      *
-     * @return list<array{0: MembershipTypes, 1: DateTime, 2: DateTime}>
+     * @return list<array{0: MembershipTypes, 1: DateTimeImmutable, 2: DateTimeImmutable}>
      */
     private function associationYearPhases(
         array $phases,
-        DateTime $finalEnd,
+        DateTimeImmutable $finalEnd,
         int $joinMonth = 8,
         int $joinDay = 20,
     ): array {
@@ -691,11 +691,11 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
 
         for ($i = 0; $i < $count; $i++) {
             $start = 0 === $i
-                ? new DateTime(sprintf('%d-%02d-%02d 00:00:00', $firstYear, $joinMonth, $joinDay))
-                : new DateTime(($joinYear + $i) . '-07-01 midnight');
+                ? new DateTimeImmutable(sprintf('%d-%02d-%02d 00:00:00', $firstYear, $joinMonth, $joinDay))
+                : new DateTimeImmutable(($joinYear + $i) . '-07-01 midnight');
             $end = $i === $count - 1
-                ? clone $finalEnd
-                : new DateTime(($joinYear + $i + 1) . '-07-01 midnight');
+                ? $finalEnd
+                : new DateTimeImmutable(($joinYear + $i + 1) . '-07-01 midnight');
 
             $segments[] = [
                 $types[$i],
@@ -710,12 +710,12 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
     /**
      * The latest July 1 strictly before the given date.
      */
-    private function julyFirstBefore(DateTime $date): DateTime
+    private function julyFirstBefore(DateTimeImmutable $date): DateTimeImmutable
     {
-        $julyFirst = new DateTime($date->format('Y') . '-07-01 midnight');
+        $julyFirst = new DateTimeImmutable($date->format('Y') . '-07-01 midnight');
 
         if ($julyFirst >= $date) {
-            $julyFirst->modify('-1 year');
+            $julyFirst = $julyFirst->modify('-1 year');
         }
 
         return $julyFirst;

@@ -9,7 +9,7 @@ use App\Entity\Decision\Decision;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingMinutesVersion;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\NonUniqueResultException;
@@ -154,7 +154,7 @@ class MeetingRepository extends ServiceEntityRepository
         MeetingTypes $type,
     ): array {
         // Use yesterday because a meeting might still take place later on the day
-        $date = new DateTime('yesterday');
+        $date = new DateTimeImmutable('yesterday');
 
         $qb = $this->createQueryBuilder('m')
             ->where('m.date <= :date')
@@ -166,7 +166,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->setParameter(
                 'date',
                 $date,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'type',
@@ -279,7 +279,7 @@ class MeetingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('m');
 
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
         $maxDate = $today->sub(new DateInterval('P1D'));
 
         $qb->where('m.type = :gmm')
@@ -295,7 +295,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->setParameter(
                 'date',
                 $maxDate,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setMaxResults(1);
 
@@ -311,7 +311,7 @@ class MeetingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('m');
 
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
         $maxDate = $today->sub(new DateInterval('P1D'));
 
         $qb->where('m.type = :gmm')
@@ -327,7 +327,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->setParameter(
                 'date',
                 $maxDate,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             );
         $this->selectOneToOneSides($qb);
 
@@ -341,7 +341,7 @@ class MeetingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('m');
 
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
         $maxDate = $today->sub(new DateInterval('P1D'));
 
         $qb->where('m.type = :gmm OR m.type = :cm')
@@ -363,7 +363,7 @@ class MeetingRepository extends ServiceEntityRepository
             ->setParameter(
                 'date',
                 $maxDate,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();
@@ -494,7 +494,7 @@ class MeetingRepository extends ServiceEntityRepository
      * same type), either side filling in for the other when it runs short, newest first. Deliberately not entity
      * hydration; the sidebar only links, and entities drag their one-to-one sides along.
      *
-     * @return list<array{type: MeetingTypes, number: int, date: DateTime}>
+     * @return list<array{type: MeetingTypes, number: int, date: DateTimeImmutable}>
      */
     public function findNearby(Meeting $meeting): array
     {
@@ -540,7 +540,7 @@ class MeetingRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<array{type: MeetingTypes, number: int, date: DateTime}>
+     * @return list<array{type: MeetingTypes, number: int, date: DateTimeImmutable}>
      */
     private function nearbyQuery(
         Meeting $meeting,
@@ -567,7 +567,7 @@ class MeetingRepository extends ServiceEntityRepository
             $meeting->number,
         );
 
-        /** @var list<array{type: MeetingTypes, number: int, date: DateTime}> $rows */
+        /** @var list<array{type: MeetingTypes, number: int, date: DateTimeImmutable}> $rows */
         $rows = $qb->getQuery()->getArrayResult();
 
         return $rows;

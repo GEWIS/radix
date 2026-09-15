@@ -16,7 +16,7 @@ use App\Repository\Frontpage\PollRepository;
 use App\Repository\Frontpage\PollRevisionRepository;
 use App\Service\Frontpage\PollService;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Workflow\Registry;
@@ -63,7 +63,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
         }
 
         // Approving is also scheduling, which is why the date is filled in here rather than by whoever asked.
-        $poll->expiryDate = new DateTime('+2 weeks');
+        $poll->expiryDate = new DateTimeImmutable('+2 weeks');
         $this->entityManager->flush();
 
         self::assertSame(

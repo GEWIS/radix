@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Photo;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -23,8 +23,8 @@ class WeeklyPhoto
     /**
      * The start date of the week the photo is based on.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $week;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $week;
 
     /**
      * The photo of the week.

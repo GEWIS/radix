@@ -13,7 +13,7 @@ use App\Entity\User\Enums\UserTypes;
 use App\Entity\User\Traits\BackupCodeAwareTrait;
 use App\Repository\User\UserRepository;
 use App\Security\User\MfaEnforcementSwitch;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -99,19 +99,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      * Timestamp when the password was last changed.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTime $passwordChangedOn = null;
+    private ?DateTimeImmutable $passwordChangedOn = null;
 
     /**
      * Timestamp after which remember-me logins must be refreshed.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $forceReloginAt = null;
+    public ?DateTimeImmutable $forceReloginAt = null;
 
     /**
      * Base32-encoded TOTP shared secret. Null when TOTP MFA is disabled. Encrypted at rest via DoctrineEncryptBundle.
@@ -312,12 +312,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this->member->getFullName();
     }
 
-    public function getPasswordChangedOn(): ?DateTime
+    public function getPasswordChangedOn(): ?DateTimeImmutable
     {
         return $this->passwordChangedOn;
     }
 
-    public function setPasswordChangedOn(DateTime $passwordChangedOn): void
+    public function setPasswordChangedOn(DateTimeImmutable $passwordChangedOn): void
     {
         $this->passwordChangedOn = $passwordChangedOn;
     }

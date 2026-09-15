@@ -8,7 +8,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\User\Enums\ExternalAppSignature;
 use App\Entity\User\Enums\ExternalAppTokenDelivery;
 use App\Entity\User\Enums\JWTClaims;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -94,10 +94,10 @@ class ExternalApp
      * The moment after which the application may no longer be used to authenticate, if any.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $expiresAt = null;
+    public ?DateTimeImmutable $expiresAt = null;
 
     /**
      * @return JWTClaims[]
@@ -125,6 +125,6 @@ class ExternalApp
     public function isActive(): bool
     {
         return $this->enabled
-            && (null === $this->expiresAt || $this->expiresAt > new DateTime());
+            && (null === $this->expiresAt || $this->expiresAt > new DateTimeImmutable());
     }
 }

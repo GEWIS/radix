@@ -11,7 +11,7 @@ use App\Entity\Career\CompanyRevision;
 use App\Repository\User\CompanyUserRepository;
 use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 
 use function array_filter;
@@ -39,7 +39,7 @@ final readonly class CompanyStaleRevisionPolicy implements StaleRevisionPolicyIn
     }
 
     #[Override]
-    public function keepUntil(RevisionInterface $revision): ?DateTime
+    public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable
     {
         return null;
     }

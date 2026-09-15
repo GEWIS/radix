@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Util\Activity;
 
 use App\Entity\Activity\ActivityRevision;
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * The single definition of "this activity can no longer be published or changed because it is in the past", shared by
@@ -27,7 +27,7 @@ final class PastActivityRule
     {
         $endTime = $revision->endTime;
 
-        return null !== $endTime && $endTime < new DateTime();
+        return null !== $endTime && $endTime < new DateTimeImmutable();
     }
 
     /**
@@ -37,7 +37,7 @@ final class PastActivityRule
     {
         $beginTime = $revision->beginTime;
 
-        return null !== $beginTime && $beginTime < new DateTime();
+        return null !== $beginTime && $beginTime < new DateTimeImmutable();
     }
 
     /**

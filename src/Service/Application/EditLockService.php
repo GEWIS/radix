@@ -9,7 +9,7 @@ use App\Entity\Application\RevisableInterface;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\User;
 use App\Repository\Application\EditLockRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use RuntimeException;
@@ -90,7 +90,7 @@ final readonly class EditLockService
                 $lock = new EditLock();
                 $lock->resourceId = $resource->getResourceId();
                 $lock->resourceKey = $this->key($resource);
-                $lock->acquiredAt = new DateTime();
+                $lock->acquiredAt = new DateTimeImmutable();
                 $this->entityManager->persist($lock);
             } elseif (
                 !$this->heldBy(
@@ -106,14 +106,14 @@ final readonly class EditLockService
                     return null;
                 }
 
-                $lock->acquiredAt = new DateTime();
+                $lock->acquiredAt = new DateTimeImmutable();
             }
 
             $this->assign(
                 $lock,
                 $principal,
             );
-            $lock->lastPingAt = new DateTime();
+            $lock->lastPingAt = new DateTimeImmutable();
             $this->entityManager->flush();
 
             return $lock;
@@ -155,7 +155,7 @@ final readonly class EditLockService
             );
         }
 
-        $lock->lastPingAt = new DateTime();
+        $lock->lastPingAt = new DateTimeImmutable();
         $this->entityManager->flush();
 
         return true;
@@ -225,7 +225,7 @@ final readonly class EditLockService
 
     public function isAlive(EditLock $lock): bool
     {
-        return $lock->lastPingAt > new DateTime(sprintf('-%d seconds', self::TTL_SECONDS));
+        return $lock->lastPingAt > new DateTimeImmutable(sprintf('-%d seconds', self::TTL_SECONDS));
     }
 
     private function find(RevisableInterface $resource): ?EditLock

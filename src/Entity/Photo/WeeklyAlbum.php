@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Photo;
 
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * Contains all photos of the week in a certain year. This is a VirtualAlbum, meaning that it is not persisted.
@@ -12,7 +12,7 @@ use DateTime;
 class WeeklyAlbum extends VirtualAlbum
 {
     /**
-     * @param DateTime[] $dates
+     * @param DateTimeImmutable[] $dates
      */
     public function __construct(
         int $id,
@@ -22,7 +22,7 @@ class WeeklyAlbum extends VirtualAlbum
     }
 
     /**
-     * @return DateTime[]
+     * @return DateTimeImmutable[]
      */
     public function getDates(): array
     {

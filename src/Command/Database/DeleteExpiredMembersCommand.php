@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Command\Database;
 
 use App\Service\Database\Member as MemberService;
-use DateTime;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -103,7 +103,7 @@ class DeleteExpiredMembersCommand extends Command
         }
 
         $output->writeln('Deleting expired members...');
-        $this->memberService->removeExpiredMembers(new DateTime($expiration));
+        $this->memberService->removeExpiredMembers(new DateTimeImmutable($expiration));
 
         return Command::SUCCESS;
     }

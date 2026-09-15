@@ -11,7 +11,7 @@ use App\Entity\Decision\MeetingMinutes;
 use App\Entity\Decision\MeetingMinutesVersion;
 use App\Entity\User\User;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -52,7 +52,7 @@ final readonly class MeetingMinutesService
             $meeting->getStorageScope(),
         )->path;
         $version->uploadedBy = $actor;
-        $version->uploadedAt = new DateTime();
+        $version->uploadedAt = new DateTimeImmutable();
 
         $this->entityManager->persist($version);
         $this->activityLogger->log(

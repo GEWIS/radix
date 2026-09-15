@@ -12,7 +12,7 @@ use App\Entity\Database\Enums\Studies;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -211,7 +211,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
      */
     private const int STUDENT_ADDRESS_ONLY = 8005;
 
-    private DateTime $now;
+    private DateTimeImmutable $now;
 
     #[Override]
     public function load(ObjectManager $manager): void
@@ -220,7 +220,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             throw new LogicException('The ledger fixtures need the ORM to assign member numbers.');
         }
 
-        $this->now = new DateTime();
+        $this->now = new DateTimeImmutable();
 
         // `lidnr` is generated from a sequence, which cannot produce the numbers these are referred to by. The
         // generator is dropped for the rest of the run so the numbers below are taken as given. The sequence itself is
@@ -431,8 +431,8 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             self::BORN_TODAY,
             true,
         )
-            ? new DateTime()->sub(new DateInterval('P21Y'))
-            : new DateTime(sprintf(
+            ? new DateTimeImmutable()->sub(new DateInterval('P21Y'))
+            : new DateTimeImmutable(sprintf(
                 '%d-%02d-%02d',
                 1975 + $lidnr % 30,
                 1 + $lidnr % 12,
@@ -446,7 +446,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             '1%06d',
             $lidnr,
         );
-        $member->changedOn = new DateTime();
+        $member->changedOn = new DateTimeImmutable();
         $member->hidden = $hidden;
         $member->deleted = $deleted;
         $member->supremum = 'nee';
@@ -540,24 +540,24 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             ? 6 + $lidnr % 3
             : 1 + $lidnr % 6;
 
-        $start = new DateTime(sprintf(
+        $start = new DateTimeImmutable(sprintf(
             '%d-08-15 midnight',
             (int) $this->now->format('Y') - $years,
         ));
         $until = $lapsed
-            ? new DateTime()->sub(new DateInterval('P2Y'))
+            ? new DateTimeImmutable()->sub(new DateInterval('P2Y'))
             : $this->now;
 
         // Measured back from where the history ends rather than from today, so somebody who stopped renewing years
         // ago still finished as a graduate. Fixed at two years ago, a lapsed graduate never reached the switch and
         // their last membership said they were an ordinary member.
-        $switchOn = new DateTime($until->format('Y-m-d'))->sub(new DateInterval('P1Y'));
+        $switchOn = new DateTimeImmutable($until->format('Y-m-d'))->sub(new DateInterval('P1Y'));
 
         while ($start < $until) {
             $membership = new Membership(
                 member: $member,
                 type: $graduating && $start < $switchOn ? MembershipTypes::Ordinary : $type,
-                startDate: clone $start,
+                startDate: $start,
                 endDate: null,
             );
             $member->addMembership($membership);

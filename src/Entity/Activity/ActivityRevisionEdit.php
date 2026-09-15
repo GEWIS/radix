@@ -6,7 +6,7 @@ namespace App\Entity\Activity;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\User\User as UserModel;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -46,8 +46,8 @@ class ActivityRevisionEdit
     )]
     private ?UserModel $editor = null;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $editedAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $editedAt;
 
     /**
      * The names of the revision fields that changed in this save (e.g. ['organ', 'name', 'beginTime']).

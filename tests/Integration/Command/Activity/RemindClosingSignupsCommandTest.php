@@ -11,7 +11,7 @@ use App\Entity\Application\Enums\NotificationType;
 use App\Entity\Application\Notification;
 use App\Repository\Application\NotificationRepository;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 
 use function array_filter;
@@ -109,8 +109,8 @@ final class RemindClosingSignupsCommandTest extends DatabaseTestCase
             )
             ->setParameter(
                 'far',
-                new DateTime('+1 year'),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable('+1 year'),
+                Types::DATETIME_IMMUTABLE,
             )
             ->getQuery()
             ->execute();
@@ -142,8 +142,8 @@ final class RemindClosingSignupsCommandTest extends DatabaseTestCase
             'The seed is expected to contain a live sign-up list with subscribers.',
         );
 
-        $list->openDate = new DateTime('-1 week');
-        $list->closeDate = new DateTime($offset);
+        $list->openDate = new DateTimeImmutable('-1 week');
+        $list->closeDate = new DateTimeImmutable($offset);
         $list->remindedAt = null;
         $this->entityManager->flush();
 

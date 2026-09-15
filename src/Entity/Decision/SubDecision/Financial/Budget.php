@@ -8,7 +8,7 @@ use App\Doctrine\Query\Queryable;
 use App\Entity\Decision\SubDecision;
 use App\Entity\Decision\Traits\MemberAwareTrait;
 use App\Repository\Decision\SubDecision\Financial\BudgetRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -40,8 +40,8 @@ class Budget extends SubDecision
     /**
      * Date of the budget.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 
     /**
      * If the budget was approved.

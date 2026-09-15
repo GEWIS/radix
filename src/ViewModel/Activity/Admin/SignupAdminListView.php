@@ -12,7 +12,7 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
 use App\Entity\Application\Enums\Languages;
 use App\Util\Activity\SignupTiers;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_key_exists;
@@ -49,8 +49,8 @@ final readonly class SignupAdminListView
     public function __construct(
         public int $listId,
         public string $name,
-        public ?DateTime $openDate,
-        public ?DateTime $closeDate,
+        public ?DateTimeImmutable $openDate,
+        public ?DateTimeImmutable $closeDate,
         public bool $onlyGEWIS,
         public bool $displaySubscribedNumber,
         public bool $limitedCapacity,
@@ -59,9 +59,9 @@ final readonly class SignupAdminListView
         public bool $promoted,
         public bool $presenceTaken,
         public bool $drawLocked,
-        public ?DateTime $drawnAt,
+        public ?DateTimeImmutable $drawnAt,
         public ?string $drawnByName,
-        public ?DateTime $autoDrawAt,
+        public ?DateTimeImmutable $autoDrawAt,
         public bool $autoDrawDue,
         public bool $drawnByHand,
         public bool $isOpen,

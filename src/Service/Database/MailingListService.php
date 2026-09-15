@@ -9,7 +9,7 @@ use App\Entity\Database\MailingList;
 use App\Entity\Database\MailmanMailingList;
 use App\Repository\Database\MailingListMemberRepository;
 use App\Repository\Database\MailingListRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -127,7 +127,7 @@ class MailingListService
     /**
      * The moment the Listmonk lists were last fetched.
      */
-    public function getListmonkLastFetch(): ?DateTime
+    public function getListmonkLastFetch(): ?DateTimeImmutable
     {
         return $this->listmonkService->getLastFetchTime();
     }

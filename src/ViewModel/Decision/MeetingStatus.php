@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ViewModel\Decision;
 
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Translation\TranslatableMessage;
 
 /**
@@ -18,11 +18,11 @@ enum MeetingStatus
     case Complete;
 
     public static function derive(
-        DateTime $meetingDate,
+        DateTimeImmutable $meetingDate,
         bool $hasDecisions,
         bool $hasMinutes,
     ): self {
-        if ($meetingDate >= new DateTime('today')) {
+        if ($meetingDate >= new DateTimeImmutable('today')) {
             return self::Upcoming;
         }
 

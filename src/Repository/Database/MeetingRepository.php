@@ -14,7 +14,7 @@ use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
 use App\Entity\Database\SubDecision\Board\Release as BoardRelease;
 use App\Entity\Database\SubDecision\Key\Granting as KeyGranting;
 use App\Entity\Database\SubDecision\Key\Withdrawal as KeyWithdrawal;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -1004,7 +1004,7 @@ class MeetingRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'now',
-            new DateTime('now'),
+            new DateTimeImmutable('now'),
         );
 
         return $qb->getQuery()->getResult();

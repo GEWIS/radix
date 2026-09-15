@@ -6,7 +6,7 @@ namespace App\Repository\Application;
 
 use App\Entity\Application\AbstractRevision;
 use App\Entity\Application\Enums\RevisionStatus;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use SortDirection;
@@ -40,7 +40,7 @@ final readonly class StaleRevisionRepository
      */
     public function findUntouchedSince(
         string $revisionClass,
-        DateTime $cutoff,
+        DateTimeImmutable $cutoff,
     ): array {
         /** @var list<AbstractRevision> $revisions */
         $revisions = $this->entityManager->createQueryBuilder()
@@ -58,7 +58,7 @@ final readonly class StaleRevisionRepository
             ->setParameter(
                 'cutoff',
                 $cutoff,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'r.updatedAt',

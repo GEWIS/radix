@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Database;
 
 use App\Repository\Database\ListmonkMailingListRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -36,17 +36,17 @@ class ListmonkMailingList
     /**
      * When this list was last observed in listmonk
      */
-    #[Column(type: 'datetime')]
-    public private(set) DateTime $lastSeen;
+    #[Column(type: 'datetime_immutable')]
+    public private(set) DateTimeImmutable $lastSeen;
 
     /**
      * When the last full check of this mailing list took place
      */
     #[Column(
-        type: 'datetime',
+        type: 'datetime_immutable',
         nullable: true,
     )]
-    public private(set) ?DateTime $lastCheck = null;
+    public private(set) ?DateTimeImmutable $lastCheck = null;
 
     /**
      * The corresponding mailing list in the register
@@ -62,7 +62,7 @@ class ListmonkMailingList
      * Set the date the list was last seen
      * It is only sensible if this happens during a sync
      */
-    public function setLastSeen(DateTime $lastSeen = new DateTime()): void
+    public function setLastSeen(DateTimeImmutable $lastSeen = new DateTimeImmutable()): void
     {
         $this->lastSeen = $lastSeen;
     }
@@ -70,7 +70,7 @@ class ListmonkMailingList
     /**
      * Set the date the list was last fully checked
      */
-    public function setLastCheck(DateTime $lastCheck = new DateTime()): void
+    public function setLastCheck(DateTimeImmutable $lastCheck = new DateTimeImmutable()): void
     {
         $this->lastCheck = $lastCheck;
     }

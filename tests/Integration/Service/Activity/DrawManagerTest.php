@@ -13,7 +13,7 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Decision\Member;
 use App\Service\Activity\DrawManager;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 use function array_map;
 use function count;
@@ -793,6 +793,6 @@ final class DrawManagerTest extends DatabaseTestCase
 
     private function sqlDateTime(string $modifier): string
     {
-        return new DateTime($modifier)->format('Y-m-d H:i:s');
+        return new DateTimeImmutable($modifier)->format('Y-m-d H:i:s');
     }
 }

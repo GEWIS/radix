@@ -6,7 +6,7 @@ namespace App\Form\Activity;
 
 use App\Entity\Activity\ActivityDateOption;
 use App\Entity\Activity\Enums\TimeOfDay;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -53,7 +53,7 @@ class ActivityDateOptionType extends AbstractType
                     'constraints' => [new NotBlank(message: 'Enter the day this would start on.')],
                     // The entity setter is non-nullable; an empty submission would TypeError during data mapping
                     // before NotBlank ever runs, so skip the write and let NotBlank report it.
-                    'setter' => static function (ActivityDateOption $option, ?DateTime $value): void {
+                    'setter' => static function (ActivityDateOption $option, ?DateTimeImmutable $value): void {
                         if (null === $value) {
                             return;
                         }
@@ -69,7 +69,7 @@ class ActivityDateOptionType extends AbstractType
                     'label' => t('Until'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter the day this would end on.')],
-                    'setter' => static function (ActivityDateOption $option, ?DateTime $value): void {
+                    'setter' => static function (ActivityDateOption $option, ?DateTimeImmutable $value): void {
                         if (null === $value) {
                             return;
                         }

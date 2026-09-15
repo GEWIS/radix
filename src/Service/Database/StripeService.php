@@ -12,7 +12,7 @@ use App\Message\Database\RegistrationUpdate;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\CheckoutSessionRepository;
 use App\Service\Database\Member as MemberService;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
 use Psr\Log\LoggerInterface;
 use Stripe\ApiResource;
@@ -71,14 +71,8 @@ class StripeService
         $checkoutSession = new CheckoutSessionModel();
         $checkoutSession->prospectiveMember = $prospectiveMember;
         $checkoutSession->checkoutId = $session->id;
-        $checkoutSession->created = DateTime::createFromFormat(
-            'U',
-            (string) $session->created,
-        )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
-        $checkoutSession->expiration = DateTime::createFromFormat(
-            'U',
-            (string) $session->expires_at,
-        )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+        $checkoutSession->created = self::fromTimestamp($session->created);
+        $checkoutSession->expiration = self::fromTimestamp($session->expires_at);
         $this->checkoutSessionRepository->persist($checkoutSession);
 
         return $session->url;
@@ -140,7 +134,7 @@ class StripeService
         if (CheckoutSessionStates::Expired === $lastCheckoutStub->state) {
             // The Checkout Session has already been abandoned.
 
-            if (new DateTime() >= $lastCheckoutStub->expiration) {
+            if (new DateTimeImmutable() >= $lastCheckoutStub->expiration) {
                 // The Checkout Session is completely abandoned, as the maximum expiration for the recovery URL of 30
                 // days has passed. Do NOT allow recovery of this session before scheduled deletion.
 
@@ -402,14 +396,8 @@ class StripeService
             $storedCheckoutSession = new CheckoutSessionModel();
             $storedCheckoutSession->prospectiveMember = $originalCheckoutSession->prospectiveMember;
             $storedCheckoutSession->checkoutId = $session->id;
-            $storedCheckoutSession->created = DateTime::createFromFormat(
-                'U',
-                (string) $session->created,
-            )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
-            $storedCheckoutSession->expiration = DateTime::createFromFormat(
-                'U',
-                (string) $session->expires_at,
-            )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
+            $storedCheckoutSession->created = self::fromTimestamp($session->created);
+            $storedCheckoutSession->expiration = self::fromTimestamp($session->expires_at);
             // Link recovered Checkout Session to the old one.
             $storedCheckoutSession->setRecoveredFrom($originalCheckoutSession);
 
@@ -428,17 +416,17 @@ class StripeService
                 // session as expired.
                 $storedCheckoutSession->state = CheckoutSessionStates::Expired;
 
+                $recovery = $session->after_expiration?->recovery;
+
                 if (
-                    null !== $session->after_expiration &&
-                    null !== $session->after_expiration->recovery
+                    null !== $recovery
+                    && null !== $recovery->expires_at
+                    && null !== $recovery->url
                 ) {
                     // We are handling the expiration of the very first Checkout Session of the prospective member. The
                     // Recovery URL is valid for 30 days.
-                    $storedCheckoutSession->expiration = DateTime::createFromFormat(
-                        'U',
-                        (string) $session->after_expiration->recovery->expires_at,
-                    )->setTimezone(new DateTimeZone('Europe/Amsterdam'));
-                    $storedCheckoutSession->setRecoveryUrl($session->after_expiration->recovery->url);
+                    $storedCheckoutSession->expiration = self::fromTimestamp($recovery->expires_at);
+                    $storedCheckoutSession->setRecoveryUrl($recovery->url);
                 }
 
                 // (re)set the used state of the payment link to enable it.
@@ -514,6 +502,14 @@ class StripeService
         }
 
         $this->checkoutSessionRepository->persist($storedCheckoutSession);
+    }
+
+    /**
+     * Stripe returns every timestamp as Unix time.
+     */
+    private static function fromTimestamp(int $timestamp): DateTimeImmutable
+    {
+        return new DateTimeImmutable('@' . $timestamp)->setTimezone(new DateTimeZone('Europe/Amsterdam'));
     }
 
     /**

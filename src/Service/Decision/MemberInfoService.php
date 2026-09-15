@@ -9,7 +9,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Entity\Decision\OrganMember;
 use App\Repository\Decision\MemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_values;
@@ -22,8 +22,8 @@ use function usort;
  * }
  * @phpstan-type BoardMembershipType = array{
  *     function: string,
- *     installDate: DateTime,
- *     releaseDate: DateTime|null,
+ *     installDate: DateTimeImmutable,
+ *     releaseDate: DateTimeImmutable|null,
  * }
  */
 class MemberInfoService

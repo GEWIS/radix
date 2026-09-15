@@ -26,7 +26,7 @@ use App\Entity\Database\SubDecision\Key\Withdrawal;
 use App\Entity\Database\SubDecision\OrganRegulation;
 use App\Entity\Database\SubDecision\Other;
 use App\Entity\Database\SubDecision\Reappointment;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 use function spl_object_id;
@@ -65,7 +65,7 @@ final class LedgerBuilder
         $meeting = new Meeting();
         $meeting->type = $type;
         $meeting->setNumber(++$this->meetingNumber);
-        $meeting->date = new DateTime($date);
+        $meeting->date = new DateTimeImmutable($date);
 
         $this->entityManager->persist($meeting);
         $this->entityManager->flush();
@@ -92,15 +92,15 @@ final class LedgerBuilder
             $number,
         );
         $member->setEmail(sprintf('testlid-%d@example.org', $number));
-        $member->setBirth(new DateTime('2000-01-01'));
-        $member->changedOn = new DateTime();
+        $member->setBirth(new DateTimeImmutable('2000-01-01'));
+        $member->changedOn = new DateTimeImmutable();
 
         $member->addMembership(
             new Membership(
                 $member,
                 $type,
-                new DateTime($membershipStart),
-                null === $membershipEnd ? null : new DateTime($membershipEnd),
+                new DateTimeImmutable($membershipStart),
+                null === $membershipEnd ? null : new DateTimeImmutable($membershipEnd),
             ),
         );
 
@@ -202,7 +202,7 @@ final class LedgerBuilder
     ): Granting {
         $granting = new Granting();
         $granting->setMember($member);
-        $granting->until = new DateTime($until);
+        $granting->until = new DateTimeImmutable($until);
         $granting->sequence = 1;
         $granting->setDecision($this->decision($meeting));
 
@@ -216,7 +216,7 @@ final class LedgerBuilder
     ): Withdrawal {
         $withdrawal = new Withdrawal();
         $withdrawal->granting = $granting;
-        $withdrawal->withdrawnOn = new DateTime($withdrawnOn);
+        $withdrawal->withdrawnOn = new DateTimeImmutable($withdrawnOn);
         $withdrawal->sequence = 1;
         $withdrawal->setDecision($this->decision($meeting));
 
@@ -232,7 +232,7 @@ final class LedgerBuilder
         $installation = new BoardInstallation();
         $installation->setMember($member);
         $installation->function = $function;
-        $installation->date = new DateTime($date);
+        $installation->date = new DateTimeImmutable($date);
         $installation->sequence = 1;
         $installation->setDecision($this->decision($meeting));
 
@@ -246,7 +246,7 @@ final class LedgerBuilder
     ): BoardRelease {
         $release = new BoardRelease();
         $release->installation = $installation;
-        $release->date = new DateTime($date);
+        $release->date = new DateTimeImmutable($date);
         $release->sequence = 1;
         $release->setDecision($this->decision($meeting));
 
@@ -276,7 +276,7 @@ final class LedgerBuilder
         $budget = new Budget();
         $budget->name = $name;
         $budget->version = '1.0';
-        $budget->date = new DateTime($date);
+        $budget->date = new DateTimeImmutable($date);
         $budget->approval = true;
         $budget->changes = false;
         $budget->sequence = 1;
@@ -297,7 +297,7 @@ final class LedgerBuilder
         $regulation->abbr = $abbreviation;
         $regulation->organType = OrganTypes::Committee;
         $regulation->version = '1.0';
-        $regulation->date = new DateTime($date);
+        $regulation->date = new DateTimeImmutable($date);
         $regulation->approval = true;
         $regulation->changes = false;
         $regulation->setMember($this->member());

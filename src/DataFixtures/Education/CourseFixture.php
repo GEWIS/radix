@@ -15,7 +15,7 @@ use App\Entity\Education\Exam;
 use App\Entity\Education\Summary;
 use App\Service\Application\FileStorage;
 use App\Service\Application\ImageManagerProvider;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -80,41 +80,41 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         $this->createSummary(
             $manager,
             $dataStructures,
-            new DateTime('2025-11-10'),
+            new DateTimeImmutable('2025-11-10'),
             Languages::English,
         );
         $this->createSummary(
             $manager,
             $dataStructures,
-            new DateTime('2025-09-02'),
+            new DateTimeImmutable('2025-09-02'),
             Languages::English,
         );
         $this->createExam(
             $manager,
             $dataStructures,
             ExamTypes::Final,
-            new DateTime('2025-01-22'),
+            new DateTimeImmutable('2025-01-22'),
             Languages::English,
         );
         $this->createExam(
             $manager,
             $dataStructures,
             ExamTypes::Interim,
-            new DateTime('2024-11-04'),
+            new DateTimeImmutable('2024-11-04'),
             Languages::English,
         );
 
         $this->createSummary(
             $manager,
             $discrete,
-            new DateTime('2025-04-18'),
+            new DateTimeImmutable('2025-04-18'),
             Languages::Dutch,
         );
         $this->createExam(
             $manager,
             $discrete,
             ExamTypes::Final,
-            new DateTime('2025-04-09'),
+            new DateTimeImmutable('2025-04-09'),
             Languages::English,
         );
 
@@ -123,7 +123,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
             $manager,
             $algorithms,
             ExamTypes::Answers,
-            new DateTime('2024-10-14'),
+            new DateTimeImmutable('2024-10-14'),
             Languages::English,
         );
 
@@ -147,7 +147,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
     private function createSummary(
         ObjectManager $manager,
         Course $course,
-        DateTime $date,
+        DateTimeImmutable $date,
         Languages $language,
     ): void {
         $summary = new Summary();
@@ -166,7 +166,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         ObjectManager $manager,
         Course $course,
         ExamTypes $type,
-        DateTime $date,
+        DateTimeImmutable $date,
         Languages $language,
     ): void {
         $exam = new Exam();
@@ -185,7 +185,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
         ObjectManager $manager,
         CourseDocument $document,
         Course $course,
-        DateTime $date,
+        DateTimeImmutable $date,
         Languages $language,
     ): void {
         $document->course = $course;
@@ -197,7 +197,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
             $date,
         );
         $document->flattenStatus = DocumentFlattenStatus::Ready;
-        $document->flattenedAt = new DateTime();
+        $document->flattenedAt = new DateTimeImmutable();
 
         // Flushed early because a page is stored under the document's id, the way the flattener files it.
         $manager->persist($document);
@@ -217,7 +217,7 @@ class CourseFixture extends Fixture implements FixtureGroupInterface
     /** A real one-page PDF, so a seeded document can be run through the pipeline by hand. */
     private function storePdf(
         string $code,
-        DateTime $date,
+        DateTimeImmutable $date,
     ): string {
         $pdf = new FPDF();
         $pdf->AddPage();

@@ -60,25 +60,18 @@ final readonly class MemberRow
                     continue;
                 }
 
-                $expiration = $userRole->getExpiration();
                 $roleBadges[] = [
                     'label' => $userRole->role->value,
-                    'expiresAt' => null === $expiration
-                        ? null
-                        : DateTimeImmutable::createFromMutable($expiration),
+                    'expiresAt' => $userRole->getExpiration(),
                 ];
             }
         }
-
-        $membershipEndsOn = $member->membershipEndsOn;
 
         return new self(
             lidnr: $member->lidnr,
             fullName: $member->getFullName(),
             type: $member->type,
-            membershipEndsOn: null === $membershipEndsOn
-                ? null
-                : DateTimeImmutable::createFromMutable($membershipEndsOn),
+            membershipEndsOn: $member->membershipEndsOn,
             isActivated: null !== $user,
             hidden: $member->hidden,
             deleted: $member->deleted,

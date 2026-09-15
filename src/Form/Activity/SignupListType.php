@@ -16,7 +16,7 @@ use App\Entity\Database\Enums\ProgramType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Form\Application\LocalisedTextType;
 use App\Form\DisablesFieldsTrait;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -888,7 +888,7 @@ class SignupListType extends AbstractType
 
         $begin = $live->beginTime;
 
-        return null !== $begin && $begin <= new DateTime();
+        return null !== $begin && $begin <= new DateTimeImmutable();
     }
 
     /**
@@ -1093,7 +1093,7 @@ class SignupListType extends AbstractType
             null === $live
             || !$event->getForm()->has('openDate')
             || null === $live->openDate
-            || $live->openDate > new DateTime()
+            || $live->openDate > new DateTimeImmutable()
         ) {
             return;
         }
@@ -1114,7 +1114,7 @@ class SignupListType extends AbstractType
             null === $live
             || !$event->getForm()->has('closeDate')
             || null === $live->closeDate
-            || $live->closeDate > new DateTime()
+            || $live->closeDate > new DateTimeImmutable()
         ) {
             return;
         }

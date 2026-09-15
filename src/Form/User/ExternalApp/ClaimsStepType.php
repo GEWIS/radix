@@ -57,7 +57,6 @@ final class ClaimsStepType extends AbstractType
                     'label' => t('Expires at'),
                     'help' => t('After this the application can no longer authenticate. Leave empty for no expiry.'),
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                     'required' => false,
                 ],
             );

@@ -19,7 +19,7 @@ use App\Repository\Career\CompanyRepository;
 use App\Repository\User\CompanyUserRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Support\UploadsBanners;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -37,7 +37,7 @@ final class AdminPackageControllerTest extends DatabaseTestCase
 
         // The seed's packages run to 2100, so nothing expires within the horizon until one is moved.
         $banner = $this->bannerPackage();
-        $banner->setExpirationDate(new DateTime('+2 weeks'));
+        $banner->setExpirationDate(new DateTimeImmutable('+2 weeks'));
         $this->entityManager->flush();
 
         $response = $this->controller()->index();

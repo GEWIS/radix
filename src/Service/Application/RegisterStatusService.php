@@ -9,7 +9,7 @@ use App\Service\Database\MailingListService;
 use App\Service\Database\MailmanService;
 use App\Service\Database\Member as MemberService;
 use App\Service\Report\ApiService;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -64,14 +64,14 @@ class RegisterStatusService implements ResetInterface
      *   },
      *   updates: int,
      *   syncPaused: bool,
-     *   syncPausedUntil: ?DateTime,
+     *   syncPausedUntil: ?DateTimeImmutable,
      *   totalCount: int,
-     *   mailmanLastFetch: ?DateTime,
+     *   mailmanLastFetch: ?DateTimeImmutable,
      *   mailmanLastFetchOverdue: bool,
-     *   mailmanLastSync: ?DateTime,
-     *   listmonkLastFetch: ?DateTime,
+     *   mailmanLastSync: ?DateTimeImmutable,
+     *   listmonkLastFetch: ?DateTimeImmutable,
      *   listmonkLastFetchOverdue: bool,
-     *   listmonkLastSync: ?DateTime,
+     *   listmonkLastSync: ?DateTimeImmutable,
      *   mailingListChangesPending: array{
      *      creations: int,
      *      deletions: int,

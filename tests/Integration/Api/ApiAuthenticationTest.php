@@ -8,7 +8,7 @@ use App\Entity\Database\User\ApiPrincipal;
 use App\Entity\User\Enums\ApiPermissions;
 use App\Repository\User\ApiPrincipalRepository;
 use App\Security\Api\ApiTokenAuthenticator;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,7 +68,7 @@ final class ApiAuthenticationTest extends ApiTestCase
         );
 
         self::assertSame(
-            new DateTime('today')->format('Y-m-d'),
+            new DateTimeImmutable('today')->format('Y-m-d'),
             $this->principalFor($token)->lastUsedAt?->format('Y-m-d'),
         );
     }
@@ -84,7 +84,7 @@ final class ApiAuthenticationTest extends ApiTestCase
     {
         $token = $this->principalWith([ApiPermissions::HealthR]);
         $principal = $this->principalFor($token);
-        $principal->expiresAt = new DateTime('yesterday');
+        $principal->expiresAt = new DateTimeImmutable('yesterday');
         $this->saveLedger();
 
         self::assertSame(
@@ -100,7 +100,7 @@ final class ApiAuthenticationTest extends ApiTestCase
     {
         $token = $this->principalWith([ApiPermissions::HealthR]);
         $principal = $this->principalFor($token);
-        $principal->expiresAt = new DateTime('today');
+        $principal->expiresAt = new DateTimeImmutable('today');
         $this->saveLedger();
 
         self::assertSame(

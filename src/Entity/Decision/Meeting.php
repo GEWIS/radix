@@ -8,7 +8,7 @@ use App\Doctrine\Query\Queryable;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\SubDecision\Minutes;
 use App\Repository\Decision\MeetingRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -46,8 +46,8 @@ class Meeting
     /**
      * Meeting date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 
     /**
      * Decisions.

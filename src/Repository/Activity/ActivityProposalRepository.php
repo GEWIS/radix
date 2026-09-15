@@ -8,7 +8,7 @@ use App\Entity\Activity\ActivityProposal;
 use App\Entity\Activity\Enums\ProposalStatus;
 use App\Entity\Activity\OptionPeriod;
 use App\Entity\Decision\Organ;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
@@ -204,7 +204,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
      *
      * @return ActivityProposal[]
      */
-    public function findNeedingBudgetReminder(DateTime $notStartingAfter): array
+    public function findNeedingBudgetReminder(DateTimeImmutable $notStartingAfter): array
     {
         return $this->uncleared($notStartingAfter)
             ->andWhere('p.budgetRemindedAt IS NULL')
@@ -217,7 +217,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
      *
      * @return ActivityProposal[]
      */
-    public function findDueToLapse(DateTime $notStartingAfter): array
+    public function findDueToLapse(DateTimeImmutable $notStartingAfter): array
     {
         return $this->uncleared($notStartingAfter)
             ->getQuery()
@@ -248,7 +248,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
     /**
      * Scheduled, nothing recorded about the budget, and the reserved date starts on or before the given day.
      */
-    private function uncleared(DateTime $notStartingAfter): QueryBuilder
+    private function uncleared(DateTimeImmutable $notStartingAfter): QueryBuilder
     {
         return $this->createQueryBuilder('p')
             ->select(
@@ -269,7 +269,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
             ->setParameter(
                 'cutoff',
                 $notStartingAfter,
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->orderBy(
                 'c.beginsAt',

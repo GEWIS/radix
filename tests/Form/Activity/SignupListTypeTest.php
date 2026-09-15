@@ -24,7 +24,7 @@ use App\Form\Activity\SignupListType;
 use App\Form\Activity\SignupOptionType;
 use App\Form\Activity\SignupRoleType;
 use App\Form\Application\LocalisedTextType;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -542,8 +542,8 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAListWithANameAndAWindowIsFilledIn(): void
     {
         $list = $this->list();
-        $list->openDate = new DateTime('2030-01-01 12:00');
-        $list->closeDate = new DateTime('2030-02-01 12:00');
+        $list->openDate = new DateTimeImmutable('2030-01-01 12:00');
+        $list->closeDate = new DateTimeImmutable('2030-02-01 12:00');
 
         self::assertTrue(SignupListSection::Basics->isFilledIn(
             $list,
@@ -654,8 +654,8 @@ final class SignupListTypeTest extends TypeTestCase
     public function testTheWindowOfAListThatIsNotLiveStaysEditable(): void
     {
         $list = $this->list();
-        $list->openDate = new DateTime('-1 week');
-        $list->closeDate = new DateTime('-1 day');
+        $list->openDate = new DateTimeImmutable('-1 week');
+        $list->closeDate = new DateTimeImmutable('-1 day');
         $this->attachToDraft($list);
 
         $form = $this->section(
@@ -727,8 +727,8 @@ final class SignupListTypeTest extends TypeTestCase
         $liveList = new SignupList();
         $liveList->name = new ActivityLocalisedText();
         $liveList->lineageId = $list->lineageId;
-        $liveList->openDate = new DateTime('-1 week');
-        $liveList->closeDate = new DateTime('-1 day');
+        $liveList->openDate = new DateTimeImmutable('-1 week');
+        $liveList->closeDate = new DateTimeImmutable('-1 day');
         $liveRevision->addSignupList($liveList);
     }
 

@@ -16,7 +16,7 @@ use App\Service\Application\FileStorage;
 use App\Service\Education\CourseDocumentDownloadService;
 use App\Service\Education\CourseDocumentFlattener;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use FPDF;
 use Override;
 use RuntimeException;
@@ -134,7 +134,7 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
 
         $document = new Exam();
         $document->course = $course;
-        $document->date = new DateTime('2026-01-15');
+        $document->date = new DateTimeImmutable('2026-01-15');
         $document->language = Languages::English;
         $document->examType = ExamTypes::Final;
         $document->scanned = false;
@@ -187,7 +187,7 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
 
         $document = new Exam();
         $document->course = $course;
-        $document->date = new DateTime('2026-01-15');
+        $document->date = new DateTimeImmutable('2026-01-15');
         $document->language = Languages::English;
         $document->examType = ExamTypes::Final;
         $document->scanned = false;

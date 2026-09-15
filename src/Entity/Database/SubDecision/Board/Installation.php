@@ -12,7 +12,7 @@ use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\Board\InstallationRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -39,8 +39,8 @@ class Installation extends SubDecision implements NamesMember
     /**
      * The date at which the installation is in effect.
      */
-    #[Column(type: 'date')]
-    public DateTime $date;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $date;
 
     /**
      * Discharge.

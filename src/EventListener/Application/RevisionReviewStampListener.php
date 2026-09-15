@@ -6,7 +6,7 @@ namespace App\EventListener\Application;
 
 use App\Entity\Application\RevisionInterface;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Event\TransitionEvent;
@@ -61,6 +61,6 @@ final readonly class RevisionReviewStampListener
             $revision->setReviewer($user->member);
         }
 
-        $revision->setReviewedAt(new DateTime());
+        $revision->setReviewedAt(new DateTimeImmutable());
     }
 }

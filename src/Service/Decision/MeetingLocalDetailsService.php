@@ -8,7 +8,7 @@ use App\Entity\Decision\Enums\MeetingActivityVerbs;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingLocalDetails;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -53,7 +53,7 @@ final readonly class MeetingLocalDetailsService
                 trim($startTime),
             )
         ) {
-            $time = new DateTime(trim($startTime));
+            $time = new DateTimeImmutable(trim($startTime));
         }
 
         $location = null === $location || '' === trim($location)

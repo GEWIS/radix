@@ -8,7 +8,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Education\Enums\DownloadStatus;
 use App\Entity\User\User;
 use App\Repository\Education\CourseDocumentDownloadRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -70,14 +70,14 @@ class CourseDocumentDownload
     #[Column(type: Types::STRING)]
     public string $requestedFrom;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $requestedAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $requestedAt;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $collectedAt = null;
+    public ?DateTimeImmutable $collectedAt = null;
 
     #[Column(
         type: Types::STRING,

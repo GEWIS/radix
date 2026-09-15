@@ -6,7 +6,7 @@ namespace App\DataFixtures\Decision;
 
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingLocalDetails;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -26,7 +26,7 @@ class MeetingLocalDetailsFixture extends Fixture implements DependentFixtureInte
             'meeting-gmm-upcoming',
             Meeting::class,
         ));
-        $details->startTime = new DateTime('20:00');
+        $details->startTime = new DateTimeImmutable('20:00');
         $details->location = 'Auditorium 4';
 
         $manager->persist($details);

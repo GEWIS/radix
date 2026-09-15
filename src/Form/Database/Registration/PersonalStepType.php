@@ -64,7 +64,6 @@ class PersonalStepType extends AbstractType
                 [
                     'label' => t('Birthdate'),
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                 ],
             );
 

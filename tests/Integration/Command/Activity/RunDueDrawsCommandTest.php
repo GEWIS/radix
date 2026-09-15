@@ -12,7 +12,7 @@ use App\Entity\Activity\ExternalSignupVerification;
 use App\Entity\Activity\SignupList;
 use App\Service\Activity\SignupManager;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * The automated-draw cron must draw exactly the lists whose own draw moment has passed -- close for
@@ -437,7 +437,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
             ->andWhere('sl.drawnAt IS NULL')
             ->setParameter(
                 'now',
-                new DateTime(),
+                new DateTimeImmutable(),
             )
             ->setMaxResults(1)
             ->getQuery()
@@ -636,6 +636,6 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
     private function sqlDateTime(string $modifier): string
     {
-        return new DateTime($modifier)->format('Y-m-d H:i:s');
+        return new DateTimeImmutable($modifier)->format('Y-m-d H:i:s');
     }
 }

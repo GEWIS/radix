@@ -15,7 +15,7 @@ use App\Entity\Database\SubDecision\Discharge;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation;
 use App\Entity\Database\SubDecision\OrganRegulation;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -44,13 +44,13 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
         $founding = new Meeting();
         $founding->type = MeetingTypes::BV;
         $founding->setNumber(2);
-        $founding->date = new DateTime()->modify('-3 years');
+        $founding->date = new DateTimeImmutable()->modify('-3 years');
         $manager->persist($founding);
 
         $discharge = new Meeting();
         $discharge->type = MeetingTypes::BV;
         $discharge->setNumber(3);
-        $discharge->date = new DateTime()->modify('-10 days');
+        $discharge->date = new DateTimeImmutable()->modify('-10 days');
         $manager->persist($discharge);
 
         // A fraternity may only be founded at a general members' meeting, and has been able to only there since the
@@ -59,7 +59,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
         $gmm = new Meeting();
         $gmm->type = MeetingTypes::ALV;
         $gmm->setNumber(1);
-        $gmm->date = new DateTime()->modify('-3 years')->modify('+1 week');
+        $gmm->date = new DateTimeImmutable()->modify('-3 years')->modify('+1 week');
         $manager->persist($gmm);
 
         $this->loadCommittee(
@@ -285,7 +285,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
         $regulation->abbr = $organ->abbr;
         $regulation->organType = $organ->organType;
         $regulation->version = '1.0';
-        $regulation->date = clone $meeting->date;
+        $regulation->date = $meeting->date;
         $regulation->approval = true;
         $regulation->changes = false;
         $regulation->setMember($chair);

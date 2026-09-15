@@ -7,7 +7,7 @@ namespace App\Tests\Service\Photo;
 use App\Repository\Photo\AlbumRepository;
 use App\Repository\Photo\PhotoRepository;
 use App\Service\Photo\AlbumService;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -24,9 +24,9 @@ final class AlbumServiceYearsTest extends TestCase
         // years in between must be absent and 2024 must appear once. Association years start on 1 July, so a November
         // date falls in its own calendar year.
         $albumRepository->method('getPublishedRootAlbumStartDates')->willReturn([
-            ['startDateTime' => new DateTime('2024-11-01')],
-            ['startDateTime' => new DateTime('2020-11-01')],
-            ['startDateTime' => new DateTime('2024-12-15')],
+            ['startDateTime' => new DateTimeImmutable('2024-11-01')],
+            ['startDateTime' => new DateTimeImmutable('2020-11-01')],
+            ['startDateTime' => new DateTimeImmutable('2024-12-15')],
         ]);
 
         $service = new AlbumService(

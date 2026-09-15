@@ -9,7 +9,7 @@ use App\Entity\Database\Member;
 use App\Entity\Database\PaymentLink;
 use App\Entity\Database\RenewalLink;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -106,23 +106,21 @@ class ActionLinkRepository extends ServiceEntityRepository
      */
     public function createRenewalByMember(
         Member $member,
-        ?DateTime $newExpiration = null,
+        ?DateTimeImmutable $newExpiration = null,
     ): ?RenewalLink {
         if (null === $newExpiration) {
-            $newExpiration = new DateTime();
             // Expire at midnight on July 1st, renewing at most 366 + 31 days
-            $newExpiration->setTime(
+            $newExpiration = new DateTimeImmutable()->setTime(
                 0,
                 0,
-            );
-            $newExpiration->setDate(
+            )->setDate(
                 ((int) $member->getExpiration()->format('Y')) + 1,
                 7,
                 1,
             );
 
             while ($newExpiration->diff($member->getExpiration())->days > 397) {
-                $newExpiration->sub(new DateInterval('P1Y'));
+                $newExpiration = $newExpiration->sub(new DateInterval('P1Y'));
             }
         }
 

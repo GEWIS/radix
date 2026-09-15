@@ -9,7 +9,7 @@ use App\Entity\Decision\Enums\MeetingActivityVerbs;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingActivityLog;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -57,7 +57,7 @@ class MeetingActivityLogFixture extends Fixture implements DependentFixtureInter
             $entry->meeting = $meeting;
             $entry->verb = $verb;
             $entry->subject = $subject;
-            $entry->createdAt = new DateTime($moment);
+            $entry->createdAt = new DateTimeImmutable($moment);
 
             $manager->persist($entry);
         }
@@ -66,7 +66,7 @@ class MeetingActivityLogFixture extends Fixture implements DependentFixtureInter
         $libraryEntry->actor = $actor;
         $libraryEntry->verb = MeetingActivityVerbs::ReferenceDocumentCreated;
         $libraryEntry->subject = 'Scenarios and Procedures';
-        $libraryEntry->createdAt = new DateTime('-4 weeks');
+        $libraryEntry->createdAt = new DateTimeImmutable('-4 weeks');
 
         $manager->persist($libraryEntry);
         $manager->flush();

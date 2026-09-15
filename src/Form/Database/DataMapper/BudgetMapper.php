@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Financial\Statement;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -31,7 +31,7 @@ class BudgetMapper extends AbstractDecisionMapper
 
         if (
             !is_string($name)
-            || !$date instanceof DateTime
+            || !$date instanceof DateTimeImmutable
             || !$author instanceof Member
             || !is_string($version)
         ) {

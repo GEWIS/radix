@@ -9,7 +9,7 @@ use App\Entity\Career\Enums\CompanyAuditVerbs;
 use App\Entity\User\CompanyUser as CompanyUserModel;
 use App\Entity\User\User as UserModel;
 use App\Repository\Career\CompanyAuditLogRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -77,12 +77,12 @@ class CompanyAuditLog
     #[Column(type: Types::STRING)]
     public string $detail = '';
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public private(set) DateTime $createdAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public private(set) DateTimeImmutable $createdAt;
 
     public function __construct()
     {
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     /**

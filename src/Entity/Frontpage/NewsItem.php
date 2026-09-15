@@ -7,7 +7,7 @@ namespace App\Entity\Frontpage;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Frontpage\Enums\NewsCategory;
 use App\Repository\Frontpage\NewsItemRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -26,8 +26,8 @@ class NewsItem
     /**
      * The date the news item was written.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 
     /**
      * Title of the news item.

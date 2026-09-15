@@ -10,7 +10,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\SubDecision;
 use App\Entity\Decision\Traits\MemberAwareTrait;
 use App\Repository\Decision\SubDecision\OrganRegulationRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -50,8 +50,8 @@ class OrganRegulation extends SubDecision
     /**
      * Date of the regulation.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 
     /**
      * If the regulation was approved.

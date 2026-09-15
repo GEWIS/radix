@@ -13,7 +13,7 @@ use App\Repository\Activity\ActivityRevisionRepository;
 use App\Security\User\MfaEnforcementSwitch;
 use App\Service\Application\OfficeMailboxes;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Workflow\Registry;
@@ -120,7 +120,7 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
         foreach (self::getContainer()->get(ActivityRevisionRepository::class)->findAll() as $revision) {
             if (
                 RevisionStatus::Draft !== $revision->getStatus()
-                || $revision->activity->getBeginTime() < new DateTime()
+                || $revision->activity->getBeginTime() < new DateTimeImmutable()
             ) {
                 continue;
             }

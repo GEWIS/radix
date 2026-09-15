@@ -12,7 +12,7 @@ use App\Entity\Application\RevisableInterface;
 use App\Entity\Career\Company as CompanyModel;
 use App\Entity\Decision\Organ as OrganModel;
 use App\Repository\Activity\ActivityRevisionRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -125,11 +125,11 @@ class ActivityRevision extends AbstractRevision
 
     // PHP-nullable so a not-yet-filled draft renders an empty field; the column stays NOT NULL and the form's NotBlank
     // constraint guarantees a value before persist, so a saved revision always has a schedule.
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public ?DateTime $beginTime = null;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public ?DateTimeImmutable $beginTime = null;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public ?DateTime $endTime = null;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public ?DateTimeImmutable $endTime = null;
 
     #[Column(
         type: Types::STRING,

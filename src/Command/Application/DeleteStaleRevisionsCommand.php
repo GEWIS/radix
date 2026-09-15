@@ -6,7 +6,7 @@ namespace App\Command\Application;
 
 use App\Command\HoldsRunLockTrait;
 use App\Service\Application\StaleRevisionCleaner;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -99,7 +99,7 @@ final class DeleteStaleRevisionsCommand extends Command
         );
         $dryRun = true === $input->getOption('dry-run');
         $force = true === $input->getOption('force');
-        $cutoff = new DateTime(sprintf('-%d days', self::STALE_AFTER_DAYS));
+        $cutoff = new DateTimeImmutable(sprintf('-%d days', self::STALE_AFTER_DAYS));
 
         // Only the run that is actually going to do it asks. A dry run reports what forcing would reach, which is the
         // list an operator wants in front of them before answering this, and answering "no" here would hide it.

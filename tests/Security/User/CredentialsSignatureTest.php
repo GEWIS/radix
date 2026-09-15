@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Security\User;
 
 use App\Security\User\CredentialsSignature;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -41,7 +41,7 @@ final class CredentialsSignatureTest extends TestCase
 
         self::assertFalse($signature->matches(
             $stored,
-            $this->account(passwordChangedOn: new DateTime('2026-08-31 12:00:00')),
+            $this->account(passwordChangedOn: new DateTimeImmutable('2026-08-31 12:00:00')),
         ));
     }
 
@@ -52,7 +52,7 @@ final class CredentialsSignatureTest extends TestCase
 
         self::assertFalse($signature->matches(
             $stored,
-            $this->account(forceReloginAt: new DateTime('2026-08-31 12:00:00')),
+            $this->account(forceReloginAt: new DateTimeImmutable('2026-08-31 12:00:00')),
         ));
     }
 
@@ -79,8 +79,8 @@ final class CredentialsSignatureTest extends TestCase
 
     private function account(
         string $password = 'the hash the account is holding',
-        ?DateTime $passwordChangedOn = null,
-        ?DateTime $forceReloginAt = null,
+        ?DateTimeImmutable $passwordChangedOn = null,
+        ?DateTimeImmutable $forceReloginAt = null,
         ?string $totpSecret = null,
     ): UserInterface {
         return new class (
@@ -91,8 +91,8 @@ final class CredentialsSignatureTest extends TestCase
         ) implements UserInterface {
             public function __construct(
                 public readonly string $password,
-                public readonly ?DateTime $passwordChangedOn,
-                public readonly ?DateTime $forceReloginAt,
+                public readonly ?DateTimeImmutable $passwordChangedOn,
+                public readonly ?DateTimeImmutable $forceReloginAt,
                 public readonly ?string $totpSecret,
             ) {
             }

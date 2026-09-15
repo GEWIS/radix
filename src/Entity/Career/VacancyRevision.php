@@ -9,7 +9,7 @@ use App\Entity\Application\AbstractRevisionComment;
 use App\Entity\Application\RevisableInterface;
 use App\Entity\Career\Enums\VacancyCategories;
 use App\Repository\Career\VacancyRevisionRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -157,10 +157,10 @@ class VacancyRevision extends AbstractRevision
      * The day the vacancy starts being shown, or null to show it from the moment it is approved.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $startDate = null;
+    public ?DateTimeImmutable $startDate = null;
 
     /**
      * The last day the vacancy is shown. Required: a company knows when applications close before it knows anything
@@ -172,8 +172,8 @@ class VacancyRevision extends AbstractRevision
      * PHP-nullable so a not-yet-filled draft renders an empty field; the column stays NOT NULL and the form's NotBlank
      * constraint guarantees a value before persist, so a saved revision always has a closing day.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public ?DateTime $endDate = null;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public ?DateTimeImmutable $endDate = null;
 
     /**
      * The labels of this revision of the vacancy. Each revision owns its own assignments (carried forward when a draft
@@ -303,7 +303,7 @@ class VacancyRevision extends AbstractRevision
      */
     public function isWithinPostingWindow(): bool
     {
-        $today = new DateTime('today');
+        $today = new DateTimeImmutable('today');
 
         if (
             null !== $this->startDate

@@ -8,7 +8,7 @@ use App\Controller\Activity\AdminController;
 use App\Entity\Activity\Activity;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -168,8 +168,8 @@ final class AdminControllerTest extends DatabaseTestCase
         $revision = $activity->getLiveRevision();
         self::assertNotNull($revision);
 
-        $revision->beginTime = new DateTime('-2 days');
-        $revision->endTime = new DateTime('-1 day');
+        $revision->beginTime = new DateTimeImmutable('-2 days');
+        $revision->endTime = new DateTimeImmutable('-1 day');
 
         self::assertTrue($activity->hasPassed());
     }
@@ -258,7 +258,7 @@ final class AdminControllerTest extends DatabaseTestCase
             ->andWhere('lr.endTime > :now')
             ->setParameter(
                 'now',
-                new DateTime(),
+                new DateTimeImmutable(),
             )
             ->setMaxResults(1)
             ->getQuery()

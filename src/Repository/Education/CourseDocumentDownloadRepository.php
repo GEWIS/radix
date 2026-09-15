@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\Education;
 
 use App\Entity\Education\CourseDocumentDownload;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
@@ -34,7 +34,7 @@ class CourseDocumentDownloadRepository extends ServiceEntityRepository
      *
      * @return CourseDocumentDownload[]
      */
-    public function findExpired(DateTime $before): array
+    public function findExpired(DateTimeImmutable $before): array
     {
         $qb = $this->createQueryBuilder('d');
         $qb->where('d.requestedAt < :before')

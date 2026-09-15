@@ -6,7 +6,7 @@ namespace App\Entity\Photo;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Decision\Member as MemberModel;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -57,8 +57,8 @@ class ProfilePhoto
     /**
      * Date and time when the photo was taken.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $dateTime;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $dateTime;
 
     /**
      * Date and time when the photo was taken.

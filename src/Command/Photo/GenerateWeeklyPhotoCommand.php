@@ -8,7 +8,7 @@ use App\Command\HoldsRunLockTrait;
 use App\Entity\Photo\WeeklyPhoto;
 use App\Repository\Photo\PhotoRepository;
 use App\Service\Photo\WeeklyPhotoService;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -97,7 +97,7 @@ final class GenerateWeeklyPhotoCommand extends Command
         $weekStart = null;
         if (is_string($weekOption)) {
             try {
-                $weekStart = new DateTime($weekOption);
+                $weekStart = new DateTimeImmutable($weekOption);
             } catch (Throwable) {
                 $io->error(sprintf('Could not parse the week start date "%s".', $weekOption));
 
@@ -137,7 +137,7 @@ final class GenerateWeeklyPhotoCommand extends Command
     private function choosePhoto(
         InputInterface $input,
         SymfonyStyle $io,
-        ?DateTime $weekStart,
+        ?DateTimeImmutable $weekStart,
     ): WeeklyPhoto|false|null {
         $photoOption = $input->getOption('photo');
         if (!is_string($photoOption)) {

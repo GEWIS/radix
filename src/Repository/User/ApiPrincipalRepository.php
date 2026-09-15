@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\User;
 
 use App\Entity\Database\User\ApiPrincipal;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use SensitiveParameter;
@@ -48,7 +48,7 @@ class ApiPrincipalRepository extends ServiceEntityRepository
      */
     public function stampUsage(ApiPrincipal $principal): void
     {
-        $today = new DateTime('today');
+        $today = new DateTimeImmutable('today');
         $id = $principal->id;
 
         if (

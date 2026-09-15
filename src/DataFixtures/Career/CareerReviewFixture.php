@@ -17,7 +17,6 @@ use App\Entity\User\CompanyUser;
 use App\Entity\User\CompanyUserInvite;
 use App\Entity\User\User;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
@@ -110,7 +109,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
     ): void {
         $draft = $this->nextProfileDraft($company);
         $draft->setStatus(RevisionStatus::Submitted);
-        $draft->setSubmittedAt(new DateTime('-2 days'));
+        $draft->setSubmittedAt(new DateTimeImmutable('-2 days'));
         $draft->setAuthorCompanyUser($author);
         $draft->slogan = new CareerLocalisedText(
             self::SUBMITTED_SLOGAN,
@@ -133,7 +132,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $draft->setStatus(RevisionStatus::Rejected);
         $draft->setAuthorCompanyUser($author);
         $draft->setReviewer($reviewer->member);
-        $draft->setReviewedAt(new DateTime('-3 days'));
+        $draft->setReviewedAt(new DateTimeImmutable('-3 days'));
         $draft->description = new CareerLocalisedText(
             'Delta Robotics builds cobots. Contact us at info@example.com for a quote.',
             'Delta Robotics bouwt cobots. Neem contact op via info@example.com voor een offerte.',
@@ -174,7 +173,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
         $reviewed->setStatus(RevisionStatus::ChangesRequested);
         $reviewed->setAuthorCompanyUser($author);
         $reviewed->setReviewer($reviewer->member);
-        $reviewed->setReviewedAt(new DateTime('-5 days'));
+        $reviewed->setReviewedAt(new DateTimeImmutable('-5 days'));
 
         $feedback = new VacancyRevisionComment();
         $feedback->setRevision($reviewed);

@@ -10,7 +10,7 @@ use App\Entity\Career\CompanyBannerPackage;
 use App\Entity\Career\CompanyHighlightPackage;
 use App\Entity\Career\CompanyPackage;
 use App\Entity\Career\Vacancy;
-use DateTime;
+use DateTimeImmutable;
 
 use function count;
 use function usort;
@@ -50,7 +50,7 @@ final readonly class CompanyDashboard
         Company $company,
         array $vacancies,
         int $representatives,
-        DateTime $expiringBefore,
+        DateTimeImmutable $expiringBefore,
     ): self {
         $live = [];
         $awaitingReview = [];

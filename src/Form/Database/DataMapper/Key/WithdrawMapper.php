@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\SubDecision\Key\Granting;
 use App\Entity\Database\SubDecision\Key\Withdrawal;
 use App\Form\Database\DataMapper\AbstractDecisionMapper;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -27,7 +27,7 @@ class WithdrawMapper extends AbstractDecisionMapper
 
         if (
             !$granting instanceof Granting
-            || !$withdrawOn instanceof DateTime
+            || !$withdrawOn instanceof DateTimeImmutable
         ) {
             return;
         }

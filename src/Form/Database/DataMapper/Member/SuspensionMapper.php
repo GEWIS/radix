@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\Member\Suspension;
 use App\Form\Database\DataMapper\AbstractDecisionMapper;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -28,8 +28,8 @@ class SuspensionMapper extends AbstractDecisionMapper
 
         if (
             !$member instanceof Member
-            || !$since instanceof DateTime
-            || !$until instanceof DateTime
+            || !$since instanceof DateTimeImmutable
+            || !$until instanceof DateTimeImmutable
         ) {
             return;
         }

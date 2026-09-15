@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Util\Activity;
 
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * The time windows that gate the sign-ups page. Centralised here so the friendly page-level gate
@@ -17,24 +17,24 @@ final class SignupAdminWindow
      * Organisers may view sign-up details until a week after the activity ends; the board is never time-limited.
      */
     public static function canView(
-        DateTime $endTime,
+        DateTimeImmutable $endTime,
         bool $isBoard,
     ): bool {
         return $isBoard
-            || new DateTime() <= (clone $endTime)->modify('+1 week');
+            || new DateTimeImmutable() <= $endTime->modify('+1 week');
     }
 
     /**
      * Attendance may be marked from 30 minutes before the activity begins until a day after it ends.
      */
     public static function canMarkPresence(
-        DateTime $beginTime,
-        DateTime $endTime,
+        DateTimeImmutable $beginTime,
+        DateTimeImmutable $endTime,
     ): bool {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
-        return $now >= (clone $beginTime)->modify('-30 minutes')
-            && $now <= (clone $endTime)->modify('+1 day');
+        return $now >= $beginTime->modify('-30 minutes')
+            && $now <= $endTime->modify('+1 day');
     }
 
     /**
@@ -42,8 +42,8 @@ final class SignupAdminWindow
      * same upper bound as attendance, so a draw forgotten before the activity can still be run at the door. Otherwise
      * a never-drawn limited list would strand: no admission and, since presence needs admission, no attendance either.
      */
-    public static function canChangeAdmission(DateTime $endTime): bool
+    public static function canChangeAdmission(DateTimeImmutable $endTime): bool
     {
-        return new DateTime() <= (clone $endTime)->modify('+1 day');
+        return new DateTimeImmutable() <= $endTime->modify('+1 day');
     }
 }

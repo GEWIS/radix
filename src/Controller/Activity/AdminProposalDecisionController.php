@@ -13,7 +13,7 @@ use App\Entity\User\User;
 use App\Repository\Activity\ActivityProposalRepository;
 use App\Repository\Activity\OptionPeriodRepository;
 use App\Service\Activity\ActivityProposalManager;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -70,8 +70,8 @@ class AdminProposalDecisionController extends AbstractController
             [
                 'waiting' => $waiting,
                 'contested' => $this->contestedDays($waiting),
-                'holding' => $this->activityProposalRepository->findDueToLapse(new DateTime('+1 year')),
-                'periods' => $this->optionPeriodRepository->findCurrentAndUpcoming(new DateTime()),
+                'holding' => $this->activityProposalRepository->findDueToLapse(new DateTimeImmutable('+1 year')),
+                'periods' => $this->optionPeriodRepository->findCurrentAndUpcoming(new DateTimeImmutable()),
             ],
         );
     }
@@ -108,7 +108,7 @@ class AdminProposalDecisionController extends AbstractController
         }
 
         $option->decidedBy = $user->member;
-        $option->decidedAt = new DateTime();
+        $option->decidedAt = new DateTimeImmutable();
 
         $this->proposalManager->schedule(
             $proposal,

@@ -11,7 +11,7 @@ use App\Entity\User\User;
 use App\Repository\User\PasswordResetRepository;
 use App\Security\User\Firewall;
 use App\Service\User\SessionManager;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -46,7 +46,7 @@ final readonly class CompanyRepresentativeService
             return false;
         }
 
-        $representative->disabledAt = new DateTime();
+        $representative->disabledAt = new DateTimeImmutable();
 
         // Somebody who cannot sign in cannot be the contact either, so the company is left without one and the board
         // is asked to appoint a replacement.

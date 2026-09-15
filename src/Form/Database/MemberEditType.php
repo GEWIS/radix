@@ -8,7 +8,7 @@ use App\Entity\Database\Enums\Studies;
 use App\Entity\Database\Member;
 use App\Form\DataTransformer\LowercaseTransformer;
 use App\Validator\Database\StudentNumber;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -136,7 +136,7 @@ class MemberEditType extends AbstractType
                 'label' => t('Birthdate'),
                 'widget' => 'single_text',
                 'constraints' => [new Assert\NotNull()],
-                'setter' => static function (Member $member, DateTime|string|null $birth): void {
+                'setter' => static function (Member $member, DateTimeImmutable|string|null $birth): void {
                     if (null === $birth) {
                         return;
                     }

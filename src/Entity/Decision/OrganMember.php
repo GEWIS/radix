@@ -9,7 +9,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Decision\SubDecision\Installation;
 use App\Repository\Decision\OrganMemberRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -79,8 +79,8 @@ class OrganMember
     /**
      * Installation date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $installDate;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $installDate;
 
     /**
      * Installation.
@@ -115,17 +115,17 @@ class OrganMember
      * Discharge date.
      */
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $dischargeDate = null;
+    public ?DateTimeImmutable $dischargeDate = null;
 
     /**
      * Get whether the organ membership has ended or was annulled
      */
     public function isCurrent(): bool
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         return $this->installDate <= $now
             && (

@@ -10,7 +10,6 @@ use App\Form\Activity\ActivityFlow\ActivityData;
 use App\Repository\Activity\ActivityLabelRepository;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Decision\OrganRepository;
-use DateTime;
 
 use function array_filter;
 use function array_map;
@@ -39,12 +38,8 @@ class ActivityFormMapper
             ? $this->companyRepository->find($companyId)
             : null;
 
-        $revision->beginTime = null !== $data->beginTime
-            ? DateTime::createFromInterface($data->beginTime)
-            : null;
-        $revision->endTime = null !== $data->endTime
-            ? DateTime::createFromInterface($data->endTime)
-            : null;
+        $revision->beginTime = $data->beginTime;
+        $revision->endTime = $data->endTime;
 
         if (null !== $data->category) {
             $revision->category = $data->category;

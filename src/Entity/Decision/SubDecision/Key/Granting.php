@@ -10,7 +10,7 @@ use App\Entity\Decision\Member;
 use App\Entity\Decision\SubDecision;
 use App\Entity\Decision\Traits\MemberAwareTrait;
 use App\Repository\Decision\SubDecision\Key\GrantingRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -27,8 +27,8 @@ class Granting extends SubDecision
     /**
      * Till when the keycode is granted.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $until;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $until;
 
     /**
      * Discharges.

@@ -17,7 +17,7 @@ use App\Repository\Database\MailmanMailingListRepository;
 use App\Repository\Database\MemberRepository;
 use App\Service\Application\Config;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Console\Output\NullOutput;
@@ -178,7 +178,7 @@ class MailmanService
         $this->configService->setConfig(
             ConfigNamespaces::DatabaseMailman,
             'locked',
-            new DateTime()->modify('+23 hours'),
+            new DateTimeImmutable()->modify('+23 hours'),
         );
 
         if ($this->isSyncLocked()) {
@@ -198,7 +198,7 @@ class MailmanService
         $this->configService->setConfig(
             ConfigNamespaces::DatabaseMailman,
             'locked',
-            new DateTime(),
+            new DateTimeImmutable(),
         );
     }
 
@@ -210,7 +210,7 @@ class MailmanService
         return $this->configService->getConfig(
             ConfigNamespaces::DatabaseMailman,
             'locked',
-        ) > new DateTime();
+        ) > new DateTimeImmutable();
     }
 
     /**
@@ -245,7 +245,7 @@ class MailmanService
         $this->configService->setConfig(
             ConfigNamespaces::DatabaseMailman,
             'lastSync',
-            new DateTime(),
+            new DateTimeImmutable(),
         );
 
         $this->releaseSyncLock();
@@ -270,7 +270,7 @@ class MailmanService
             OutputInterface::VERBOSITY_VERBOSE,
         );
 
-        $verifyTime = new DateTime()->sub(new DateInterval('P1D'));
+        $verifyTime = new DateTimeImmutable()->sub(new DateInterval('P1D'));
 
         $listId = $dbList->mailmanList->mailmanId;
         $knownMembers = $this->getMailmanListSubscriberEmails($listId);
@@ -336,9 +336,9 @@ class MailmanService
 
     /**
      * @return array{
-     *     mailmanLastFetch: ?DateTime,
+     *     mailmanLastFetch: ?DateTimeImmutable,
      *     mailmanLastFetchOverdue: bool,
-     *     mailmanLastSync: ?DateTime,
+     *     mailmanLastSync: ?DateTimeImmutable,
      * }
      */
     public function getStatusFigures(): array
@@ -351,7 +351,7 @@ class MailmanService
             'mailmanLastSync' => $this->configService->getConfig(
                 ConfigNamespaces::DatabaseMailman,
                 'lastSync',
-                new DateTime('0001-01-01 00:00:00'),
+                new DateTimeImmutable('0001-01-01 00:00:00'),
             ),
         ];
     }
@@ -426,7 +426,7 @@ class MailmanService
     /**
      * Get the last succesfull mailman sync (>= 1 list)
      */
-    public function getLastFetchTime(): ?DateTime
+    public function getLastFetchTime(): ?DateTimeImmutable
     {
         return $this->mailmanMailingListRepository->getLastFetchTime();
     }
@@ -434,17 +434,15 @@ class MailmanService
     /**
      * Whether a fetch that last succeeded at this time is late.
      *
-     * Takes the time rather than reading it, so the caller that already has it does not ask for it again. It also
-     * does not `add()` to it: that mutates the entity's own `DateTime`, and the caller is usually about to display
-     * the very object being moved an hour and five minutes into the future.
+     * The time is a parameter, because the caller has already read it from the entity.
      */
-    private static function isOverdue(?DateTime $lastFetch): bool
+    private static function isOverdue(?DateTimeImmutable $lastFetch): bool
     {
         if (null === $lastFetch) {
             return true;
         }
 
-        return $lastFetch < new DateTime()->sub(new DateInterval('PT1H5M'));
+        return $lastFetch < new DateTimeImmutable()->sub(new DateInterval('PT1H5M'));
     }
 
     /**

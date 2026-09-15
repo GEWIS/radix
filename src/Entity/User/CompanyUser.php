@@ -11,7 +11,7 @@ use App\Entity\Career\Company as CompanyModel;
 use App\Entity\User\Enums\UserTypes;
 use App\Entity\User\Traits\BackupCodeAwareTrait;
 use App\Repository\User\CompanyUserRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -86,28 +86,28 @@ class CompanyUser implements
      * board removes the account outright once it is no longer worth keeping around.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $disabledAt = null;
+    public ?DateTimeImmutable $disabledAt = null;
 
     /**
      * Timestamp when the password was last changed.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTime $passwordChangedOn = null;
+    private ?DateTimeImmutable $passwordChangedOn = null;
 
     /**
      * Timestamp after which remember-me logins must be refreshed.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $forceReloginAt = null;
+    public ?DateTimeImmutable $forceReloginAt = null;
 
     /**
      * Base32-encoded TOTP shared secret. Null when TOTP MFA is disabled. Encrypted at rest via DoctrineEncryptBundle.
@@ -177,12 +177,12 @@ class CompanyUser implements
         return null !== $this->disabledAt;
     }
 
-    public function getPasswordChangedOn(): ?DateTime
+    public function getPasswordChangedOn(): ?DateTimeImmutable
     {
         return $this->passwordChangedOn;
     }
 
-    public function setPasswordChangedOn(DateTime $passwordChangedOn): void
+    public function setPasswordChangedOn(DateTimeImmutable $passwordChangedOn): void
     {
         $this->passwordChangedOn = $passwordChangedOn;
     }

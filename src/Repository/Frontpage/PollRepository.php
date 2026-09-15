@@ -7,7 +7,7 @@ namespace App\Repository\Frontpage;
 use App\Entity\Decision\Member;
 use App\Entity\Frontpage\Poll;
 use App\Entity\Frontpage\PollVote;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -295,7 +295,7 @@ class PollRepository extends ServiceEntityRepository
             ->setParameter(
                 'expiryDate',
                 $poll->expiryDate,
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->orderBy(
                 'p.expiryDate',
@@ -324,7 +324,7 @@ class PollRepository extends ServiceEntityRepository
             ->setParameter(
                 'cutoff',
                 $this->aMonthAgo(),
-                Types::DATE_MUTABLE,
+                Types::DATE_IMMUTABLE,
             )
             ->orderBy(
                 'p.expiryDate',
@@ -339,10 +339,10 @@ class PollRepository extends ServiceEntityRepository
      * the 31st of March into the 3rd of March, which would take a poll's votes three days before the month is up. A
      * day the earlier month does not have becomes its last one.
      */
-    private function aMonthAgo(): DateTime
+    private function aMonthAgo(): DateTimeImmutable
     {
-        $today = new DateTime('today');
-        $cutoff = new DateTime('today')->modify('first day of last month');
+        $today = new DateTimeImmutable('today');
+        $cutoff = new DateTimeImmutable('today')->modify('first day of last month');
 
         return $cutoff->setDate(
             intval($cutoff->format('Y')),

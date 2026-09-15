@@ -9,7 +9,7 @@ use App\Entity\Application\RevisionInterface;
 use App\Entity\Decision\OrganInformationRevision;
 use App\Service\Application\StaleRevisionDeletionBlock;
 use App\Service\Application\StaleRevisionPolicyInterface;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 
 use function array_filter;
@@ -33,7 +33,7 @@ final readonly class OrganPageStaleRevisionPolicy implements StaleRevisionPolicy
     }
 
     #[Override]
-    public function keepUntil(RevisionInterface $revision): ?DateTime
+    public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable
     {
         return null;
     }

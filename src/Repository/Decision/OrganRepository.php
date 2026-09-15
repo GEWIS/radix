@@ -7,7 +7,7 @@ namespace App\Repository\Decision;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Decision\Organ;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\NonUniqueResultException;
@@ -57,8 +57,8 @@ class OrganRepository extends ServiceEntityRepository
         ))
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
 
         if (null !== $type) {
@@ -100,8 +100,8 @@ class OrganRepository extends ServiceEntityRepository
             ))
                 ->setParameter(
                     'now',
-                    new DateTime(),
-                    Types::DATETIME_MUTABLE,
+                    new DateTimeImmutable(),
+                    Types::DATETIME_IMMUTABLE,
                 );
         }
 
@@ -153,14 +153,14 @@ class OrganRepository extends ServiceEntityRepository
                 SortDirection::Ascending,
             );
 
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         if ($abrogated) {
             $qb->andWhere('o.abrogationDate IS NOT NULL')
                 ->andWhere('o.abrogationDate <= :now')
                 ->setParameter(
                     'now',
                     $now,
-                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_IMMUTABLE,
                 );
         } else {
             $qb->andWhere($qb->expr()->orX(
@@ -173,7 +173,7 @@ class OrganRepository extends ServiceEntityRepository
                 ->setParameter(
                     'now',
                     $now,
-                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_IMMUTABLE,
                 );
         }
 
@@ -355,8 +355,8 @@ class OrganRepository extends ServiceEntityRepository
         )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -386,8 +386,8 @@ class OrganRepository extends ServiceEntityRepository
         ))
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'o.abrogationDate',

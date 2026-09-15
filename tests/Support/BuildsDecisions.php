@@ -8,7 +8,7 @@ use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\Meeting;
 use App\Entity\Database\SubDecision\Other;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -31,7 +31,7 @@ trait BuildsDecisions
         $meeting = new Meeting();
         $meeting->type = $type;
         $meeting->setNumber($number);
-        $meeting->date = new DateTime($date);
+        $meeting->date = new DateTimeImmutable($date);
 
         return $meeting;
     }

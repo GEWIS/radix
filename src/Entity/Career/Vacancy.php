@@ -13,7 +13,7 @@ use App\Entity\Decision\Member as MemberModel;
 use App\Entity\Decision\Organ as OrganModel;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Career\VacancyRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -261,7 +261,7 @@ class Vacancy implements RevisableInterface
     /**
      * Display proxy. The day the vacancy starts being shown, or null for as soon as it is approved.
      */
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->getDisplayRevision()->startDate;
     }
@@ -269,7 +269,7 @@ class Vacancy implements RevisableInterface
     /**
      * Display proxy. The last day the vacancy is shown.
      */
-    public function getEndDate(): ?DateTime
+    public function getEndDate(): ?DateTimeImmutable
     {
         return $this->getDisplayRevision()->endDate;
     }

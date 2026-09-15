@@ -10,7 +10,7 @@ use App\Entity\Activity\Signup;
 use App\Entity\Activity\SignupList;
 use App\Entity\Decision\Member;
 use App\Util\Activity\SignupAdminWindow;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\Randomizer;
@@ -196,7 +196,7 @@ final readonly class DrawManager
             ++$position;
         }
 
-        $list->drawnAt = new DateTime();
+        $list->drawnAt = new DateTimeImmutable();
         $list->drawnBy = $drawnBy;
 
         $this->entityManager->flush();
@@ -277,7 +277,7 @@ final readonly class DrawManager
      * The moment a sign-up became a real subscriber (a member: sign-up creation; an external: email confirmation or
      * organiser add), or null for an external still awaiting its double opt-in.
      */
-    private function subscribedAt(Signup $signup): ?DateTime
+    private function subscribedAt(Signup $signup): ?DateTimeImmutable
     {
         return $signup instanceof ExternalSignup
             ? $signup->verifiedAt

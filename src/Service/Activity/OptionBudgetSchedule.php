@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Activity;
 
-use DateTime;
+use DateTimeImmutable;
 
 use function sprintf;
 
@@ -32,9 +32,9 @@ final readonly class OptionBudgetSchedule
     /**
      * Days starting on or before this are close enough to warn about.
      */
-    public function remindBefore(): DateTime
+    public function remindBefore(): DateTimeImmutable
     {
-        return new DateTime(sprintf(
+        return new DateTimeImmutable(sprintf(
             '+%d days',
             self::LEAD_DAYS,
         ));
@@ -43,9 +43,9 @@ final readonly class OptionBudgetSchedule
     /**
      * Days starting on or before this have run out of road.
      */
-    public function lapseBefore(): DateTime
+    public function lapseBefore(): DateTimeImmutable
     {
-        return new DateTime(sprintf(
+        return new DateTimeImmutable(sprintf(
             '+%d days',
             self::LEAD_DAYS - self::GRACE_DAYS,
         ));

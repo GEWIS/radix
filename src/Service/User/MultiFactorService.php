@@ -7,7 +7,7 @@ namespace App\Service\User;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -37,7 +37,7 @@ final readonly class MultiFactorService
         string $secret,
     ): void {
         $account->totpSecret = $secret;
-        $account->forceReloginAt = new DateTime();
+        $account->forceReloginAt = new DateTimeImmutable();
 
         $this->entityManager->flush();
     }
@@ -59,7 +59,7 @@ final readonly class MultiFactorService
      */
     public function forceRelogin(User|CompanyUser $account): void
     {
-        $account->forceReloginAt = new DateTime();
+        $account->forceReloginAt = new DateTimeImmutable();
 
         $this->entityManager->flush();
     }
@@ -68,7 +68,7 @@ final readonly class MultiFactorService
     {
         $account->totpSecret = null;
         $account->setBackupCodeSlots(null);
-        $account->forceReloginAt = new DateTime();
+        $account->forceReloginAt = new DateTimeImmutable();
 
         $this->entityManager->flush();
 

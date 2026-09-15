@@ -10,7 +10,7 @@ use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\Decision\Member as MemberModel;
 use App\Entity\User\CompanyUser as CompanyUserModel;
 use App\Entity\User\User as UserModel;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -89,20 +89,20 @@ abstract class AbstractRevision implements RevisionInterface
     private ?MemberModel $reviewer = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTime $reviewedAt = null;
+    private ?DateTimeImmutable $reviewedAt = null;
 
     /**
      * When this revision was handed to its reviewers, which is a different moment from when it was written: a draft
      * can be worked on for a week before it is submitted. Null while it never has been.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    private ?DateTime $submittedAt = null;
+    private ?DateTimeImmutable $submittedAt = null;
 
     /**
      * Optimistic-locking version, bumped on every flush. A backstop against lost updates if two edits ever race past
@@ -234,25 +234,25 @@ abstract class AbstractRevision implements RevisionInterface
     }
 
     #[Override]
-    public function getReviewedAt(): ?DateTime
+    public function getReviewedAt(): ?DateTimeImmutable
     {
         return $this->reviewedAt;
     }
 
     #[Override]
-    public function setReviewedAt(?DateTime $reviewedAt): void
+    public function setReviewedAt(?DateTimeImmutable $reviewedAt): void
     {
         $this->reviewedAt = $reviewedAt;
     }
 
     #[Override]
-    public function getSubmittedAt(): ?DateTime
+    public function getSubmittedAt(): ?DateTimeImmutable
     {
         return $this->submittedAt;
     }
 
     #[Override]
-    public function setSubmittedAt(?DateTime $submittedAt): void
+    public function setSubmittedAt(?DateTimeImmutable $submittedAt): void
     {
         $this->submittedAt = $submittedAt;
     }

@@ -7,7 +7,7 @@ namespace App\Entity\Career;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Career\Enums\CompanyPackageTypes;
 use App\Repository\Career\CompanyPackageRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
@@ -53,14 +53,14 @@ abstract class CompanyPackage
     /**
      * The package's starting date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $starts;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    private DateTimeImmutable $starts;
 
     /**
      * The package's expiration date.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    private DateTime $expires;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    private DateTimeImmutable $expires;
 
     /**
      * The package's published state.
@@ -84,7 +84,7 @@ abstract class CompanyPackage
     /**
      * Get the package's starting date.
      */
-    public function getStartingDate(): DateTime
+    public function getStartingDate(): DateTimeImmutable
     {
         return $this->starts;
     }
@@ -92,7 +92,7 @@ abstract class CompanyPackage
     /**
      * Set the package's starting date.
      */
-    public function setStartingDate(DateTime $starts): void
+    public function setStartingDate(DateTimeImmutable $starts): void
     {
         $this->starts = $starts;
     }
@@ -100,7 +100,7 @@ abstract class CompanyPackage
     /**
      * Get the package's expiration date.
      */
-    public function getExpirationDate(): DateTime
+    public function getExpirationDate(): DateTimeImmutable
     {
         return $this->expires;
     }
@@ -108,7 +108,7 @@ abstract class CompanyPackage
     /**
      * Set the package's expiration date.
      */
-    public function setExpirationDate(DateTime $expires): void
+    public function setExpirationDate(DateTimeImmutable $expires): void
     {
         $this->expires = $expires;
     }
@@ -123,7 +123,7 @@ abstract class CompanyPackage
      */
     public function isExpired(): bool
     {
-        return (new DateTime()) >= $this->getExpirationDate();
+        return (new DateTimeImmutable()) >= $this->getExpirationDate();
     }
 
     public function isActive(): bool
@@ -132,7 +132,7 @@ abstract class CompanyPackage
             return false;
         }
 
-        return new DateTime() >= $this->getStartingDate()
+        return new DateTimeImmutable() >= $this->getStartingDate()
             && $this->published;
     }
 
@@ -172,10 +172,12 @@ abstract class CompanyPackage
     {
         $this->contractNumber = $data['contractNumber'];
         $this->setStartingDate(
-            isset($data['startDate']) ? new DateTime($data['startDate']) : $this->getStartingDate(),
+            isset($data['startDate']) ? new DateTimeImmutable($data['startDate']) : $this->getStartingDate(),
         );
         $this->setExpirationDate(
-            isset($data['expirationDate']) ? new DateTime($data['expirationDate']) : $this->getExpirationDate(),
+            isset($data['expirationDate'])
+                ? new DateTimeImmutable($data['expirationDate'])
+                : $this->getExpirationDate(),
         );
         $this->published = isset($data['published'])
             ? boolval($data['published'])

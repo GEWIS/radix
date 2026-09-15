@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Photo;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -46,8 +46,8 @@ class Photo
     /**
      * Date and time when the photo was taken.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $dateTime;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $dateTime;
 
     /**
      * Artist/author.

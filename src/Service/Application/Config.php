@@ -7,7 +7,7 @@ namespace App\Service\Application;
 use App\Entity\Database\ConfigItem;
 use App\Entity\Database\Enums\ConfigNamespaces;
 use App\Repository\Application\ConfigItemRepository;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -22,7 +22,7 @@ use function array_key_exists;
  */
 class Config implements ResetInterface
 {
-    /** @var array<string, bool|string|DateTime|null> */
+    /** @var array<string, bool|string|DateTimeImmutable|null> */
     private array $values = [];
 
     public function __construct(private readonly ConfigItemRepository $configItemRepository)
@@ -36,17 +36,17 @@ class Config implements ResetInterface
     }
 
     /**
-     * @template T of bool|string|DateTime|null
+     * @template T of bool|string|DateTimeImmutable|null
      *
      * @psalm-param T $default
      *
-     * @psalm-return (T is null ? bool|string|DateTime|null : T)
+     * @psalm-return (T is null ? bool|string|DateTimeImmutable|null : T)
      */
     public function getConfig(
         ConfigNamespaces $namespace,
         string $key,
-        bool|string|DateTime|null $default = null,
-    ): bool|string|DateTime|null {
+        bool|string|DateTimeImmutable|null $default = null,
+    ): bool|string|DateTimeImmutable|null {
         $memoKey = $namespace->value . '.' . $key;
 
         if (
@@ -67,7 +67,7 @@ class Config implements ResetInterface
     public function setConfig(
         ConfigNamespaces $namespace,
         string $key,
-        bool|string|DateTime $value,
+        bool|string|DateTimeImmutable $value,
     ): void {
         $configItem = $this->configItemRepository->findByKey(
             $namespace,

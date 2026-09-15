@@ -7,7 +7,7 @@ namespace App\Entity\Application;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Decision\Member;
 use App\Entity\User\CompanyUser;
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * A single, self-contained revision in a revision chain. Once submitted, a revision is an immutable record; further
@@ -75,27 +75,27 @@ interface RevisionInterface
 
     public function setReviewer(?Member $reviewer): void;
 
-    public function getReviewedAt(): ?DateTime;
+    public function getReviewedAt(): ?DateTimeImmutable;
 
-    public function setReviewedAt(?DateTime $reviewedAt): void;
+    public function setReviewedAt(?DateTimeImmutable $reviewedAt): void;
 
     /**
      * When this revision was handed to its reviewers, which is how long whatever is waiting on it has been waiting.
      * Null while it never has been, which is every draft.
      */
-    public function getSubmittedAt(): ?DateTime;
+    public function getSubmittedAt(): ?DateTimeImmutable;
 
     /**
      * Stamped by the listener on the `submit` transition. Application code submits a revision through
      * `$workflow->apply()`, never by calling this directly.
      */
-    public function setSubmittedAt(?DateTime $submittedAt): void;
+    public function setSubmittedAt(?DateTimeImmutable $submittedAt): void;
 
     /**
      * When this revision was written, which for a draft that was worked on for a while is well before it was
      * submitted.
      */
-    public function getCreatedAt(): DateTime;
+    public function getCreatedAt(): DateTimeImmutable;
 
     /**
      * The stable aggregate this revision belongs to.

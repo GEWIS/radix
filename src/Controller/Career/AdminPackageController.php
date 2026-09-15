@@ -19,7 +19,7 @@ use App\Service\Career\CareerOverviewCountsProvider;
 use App\Service\Career\CompanyBannerService;
 use App\Service\Career\CompanyPackageService;
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -69,7 +69,7 @@ class AdminPackageController extends AbstractController
     )]
     public function index(): Response
     {
-        $horizon = new DateTime()->add(new DateInterval(self::HORIZON));
+        $horizon = new DateTimeImmutable()->add(new DateInterval(self::HORIZON));
 
         $expiring = [];
         $starting = [];
@@ -163,8 +163,8 @@ class AdminPackageController extends AbstractController
 
         $package = new $class();
         $package->company = $company;
-        $package->setStartingDate(new DateTime('today'));
-        $package->setExpirationDate(new DateTime('today +1 year'));
+        $package->setStartingDate(new DateTimeImmutable('today'));
+        $package->setExpirationDate(new DateTimeImmutable('today +1 year'));
         $package->published = true;
 
         $form = $this->createForm(

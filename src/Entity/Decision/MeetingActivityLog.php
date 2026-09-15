@@ -8,7 +8,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Decision\Enums\MeetingActivityVerbs;
 use App\Entity\User\User;
 use App\Repository\Decision\MeetingActivityLogRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -60,11 +60,11 @@ class MeetingActivityLog
     #[Column(type: Types::STRING)]
     public string $subject;
 
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public DateTime $createdAt;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public DateTimeImmutable $createdAt;
 
     public function __construct()
     {
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
     }
 }

@@ -13,7 +13,7 @@ use App\Entity\Career\Company;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
@@ -252,7 +252,7 @@ class ActivityRepository extends ServiceEntityRepository
      */
     public function getApprovedActivityYears(): array
     {
-        /** @var list<array{beginTime: DateTime}> $rows */
+        /** @var list<array{beginTime: DateTimeImmutable}> $rows */
         $rows = $this->createQueryBuilder('a')
             ->select('lr.beginTime')
             ->join(
@@ -264,8 +264,8 @@ class ActivityRepository extends ServiceEntityRepository
             ->andWhere('a.unpublishedAt IS NULL')
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->getQuery()
             ->getResult();
@@ -283,7 +283,7 @@ class ActivityRepository extends ServiceEntityRepository
     {
         // A sign-up's list belongs to the live revision (sign-ups are migrated onto it on approval), so that
         // revision's schedule is the activity's live schedule.
-        /** @var list<array{beginTime: DateTime}> $rows */
+        /** @var list<array{beginTime: DateTimeImmutable}> $rows */
         $rows = $this->getEntityManager()->createQueryBuilder()
             ->select('r.beginTime')
             ->from(
@@ -314,8 +314,8 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->getQuery()
             ->getResult();
@@ -326,7 +326,7 @@ class ActivityRepository extends ServiceEntityRepository
     /**
      * Maps a list of activity begin times to their distinct association years (first calendar year), newest first.
      *
-     * @param list<array{beginTime: DateTime}> $rows
+     * @param list<array{beginTime: DateTimeImmutable}> $rows
      *
      * @return int[]
      */
@@ -367,8 +367,8 @@ class ActivityRepository extends ServiceEntityRepository
         array $labelIds,
         ?int $organId,
         bool $openSignupOnly,
-        ?DateTime $from,
-        ?DateTime $until,
+        ?DateTimeImmutable $from,
+        ?DateTimeImmutable $until,
         int $limit,
         int $offset,
     ): Paginator {
@@ -415,8 +415,8 @@ class ActivityRepository extends ServiceEntityRepository
         ) {
             $qb->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             );
         }
 
@@ -546,7 +546,7 @@ class ActivityRepository extends ServiceEntityRepository
                 ->setParameter(
                     'from',
                     $from,
-                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_IMMUTABLE,
                 );
         }
 
@@ -555,7 +555,7 @@ class ActivityRepository extends ServiceEntityRepository
                 ->setParameter(
                     'until',
                     $until,
-                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_IMMUTABLE,
                 );
         }
 
@@ -643,8 +643,8 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'lr.beginTime',
@@ -687,8 +687,8 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'lr.beginTime',
@@ -732,8 +732,8 @@ class ActivityRepository extends ServiceEntityRepository
             ->andWhere('lr.endTime > :now')
             ->setParameter(
                 'now',
-                new DateTime(),
-                Types::DATETIME_MUTABLE,
+                new DateTimeImmutable(),
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'lr.beginTime',
@@ -762,8 +762,8 @@ class ActivityRepository extends ServiceEntityRepository
      * @return Activity[]
      */
     public function findLiveBetween(
-        DateTime $from,
-        DateTime $until,
+        DateTimeImmutable $from,
+        DateTimeImmutable $until,
     ): array {
         return $this->createQueryBuilder('a')
             ->addSelect(
@@ -784,12 +784,12 @@ class ActivityRepository extends ServiceEntityRepository
             ->setParameter(
                 'from',
                 $from,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'until',
                 $until,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'lr.beginTime',

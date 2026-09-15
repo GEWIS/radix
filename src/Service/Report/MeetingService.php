@@ -185,8 +185,8 @@ class MeetingService
         } elseif ($reportMeeting->date->format('Y-m-d') !== $meeting->date->format('Y-m-d')) {
             // The type and number identify the meeting and can therefore never change, but the date can be corrected
             // after the fact, so it must be kept in sync. Only assign it when the stored date actually differs:
-            // Doctrine detects changes by identity, so handing it an equal but distinct DateTime would mark the
-            // meeting as dirty and rewrite the row on every single projection.
+            // Doctrine compares objects by identity, so assigning an equal but distinct DateTimeImmutable marks the
+            // meeting as changed and rewrites the row on every projection.
             $reportMeeting->date = $meeting->date;
         }
 

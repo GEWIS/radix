@@ -6,7 +6,7 @@ namespace App\Service\Application;
 
 use App\Entity\Application\RevisableInterface;
 use App\Repository\Application\StaleRevisionRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -61,11 +61,11 @@ final readonly class StaleRevisionCleaner
      * objected in a way it said may be overruled.
      */
     public function clean(
-        DateTime $cutoff,
+        DateTimeImmutable $cutoff,
         bool $dryRun = false,
         bool $force = false,
     ): StaleRevisionCleanupReport {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $reverted = 0;
         $deleted = 0;
         $forced = 0;

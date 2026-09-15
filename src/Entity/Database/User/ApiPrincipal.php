@@ -7,7 +7,7 @@ namespace App\Entity\Database\User;
 use App\Entity\Application\Traits\TimestampableTrait;
 use App\Entity\User\Enums\ApiPermissions;
 use App\Repository\User\ApiPrincipalRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -84,22 +84,22 @@ class ApiPrincipal
     protected ?array $permissions = null;
 
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public protected(set) ?DateTime $lastUsedAt = null;
+    public protected(set) ?DateTimeImmutable $lastUsedAt = null;
 
     #[Column(
-        type: Types::DATE_MUTABLE,
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $expiresAt = null;
+    public ?DateTimeImmutable $expiresAt = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public protected(set) ?DateTime $revokedAt = null;
+    public protected(set) ?DateTimeImmutable $revokedAt = null;
 
     public static function hash(
         #[SensitiveParameter]
@@ -157,14 +157,14 @@ class ApiPrincipal
         );
     }
 
-    public function markUsedOn(DateTime $day): void
+    public function markUsedOn(DateTimeImmutable $day): void
     {
         $this->lastUsedAt = $day;
     }
 
     public function revoke(): void
     {
-        $this->revokedAt ??= new DateTime();
+        $this->revokedAt ??= new DateTimeImmutable();
     }
 
     public function isRevoked(): bool
@@ -175,7 +175,7 @@ class ApiPrincipal
     public function isExpired(): bool
     {
         return null !== $this->expiresAt
-            && $this->expiresAt < new DateTime('today');
+            && $this->expiresAt < new DateTimeImmutable('today');
     }
 
     public function isUsable(): bool

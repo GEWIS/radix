@@ -7,7 +7,7 @@ namespace App\Tests\Integration\Repository\Frontpage;
 use App\Entity\Frontpage\Poll;
 use App\Repository\Frontpage\PollRepository;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 use function count;
 
@@ -35,7 +35,7 @@ final class PollRepositoryTest extends DatabaseTestCase
         foreach ($this->repository()->findActivePolls() as $poll) {
             $expiryDate = $poll->expiryDate;
             self::assertInstanceOf(
-                DateTime::class,
+                DateTimeImmutable::class,
                 $expiryDate,
             );
 
@@ -62,7 +62,7 @@ final class PollRepositoryTest extends DatabaseTestCase
 
         $expiryDate = $last->expiryDate;
         self::assertInstanceOf(
-            DateTime::class,
+            DateTimeImmutable::class,
             $expiryDate,
         );
 

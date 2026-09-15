@@ -14,7 +14,7 @@ use App\Entity\User\User;
 use App\Message\Education\FlattenCourseDocumentMessage;
 use App\Repository\Education\CourseRepository;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -53,7 +53,7 @@ final readonly class DocumentStagingService
         $staged = new CourseDocumentStaging();
         $staged->originalFilename = $originalName;
         $staged->uploadedBy = $user;
-        $staged->uploadedAt = new DateTime();
+        $staged->uploadedAt = new DateTimeImmutable();
         $staged->courseCode = $guess->courseCode;
         $staged->date = $guess->date;
         $staged->language = $guess->language;
@@ -99,7 +99,7 @@ final readonly class DocumentStagingService
         }
 
         $document->course = $course;
-        $document->date = $staged->date ?? new DateTime();
+        $document->date = $staged->date ?? new DateTimeImmutable();
         $document->language = $staged->language;
         $document->scanned = $staged->scanned;
         // The file is re-filed under the course now that it is known, which also gives it its final content-addressed

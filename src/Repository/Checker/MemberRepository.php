@@ -9,7 +9,7 @@ use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
 use App\Entity\Database\RenewalLink;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,12 +31,12 @@ class MemberRepository extends ServiceEntityRepository
      * Get all expiring graduates for which no renewal link exists
      * The check for hidden is required because hidden members may also expire but should not be emailed
      *
-     * @param ?DateTime $expiresBefore Latest expiry date, end of current association year if null
+     * @param ?DateTimeImmutable $expiresBefore Latest expiry date, end of current association year if null
      *
      * @return Member[]
      */
     public function getExpiringGraduates(
-        ?DateTime $expiresBefore = null,
+        ?DateTimeImmutable $expiresBefore = null,
         ?int $limit = null,
     ): array {
         $qb = $this->createQueryBuilder('m');
@@ -68,7 +68,7 @@ class MemberRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             'expiresBefore',
-            $expiresBefore ?? AssociationYear::fromDate(new DateTime())->endsOn(),
+            $expiresBefore ?? AssociationYear::fromDate(new DateTimeImmutable())->endsOn(),
         );
 
         $qb->andWhere($qb->expr()->not(

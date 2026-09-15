@@ -14,7 +14,7 @@ use App\Entity\Frontpage\PollRevision;
 use App\Entity\Frontpage\PollVote;
 use App\Repository\Frontpage\PollCommentReactionRepository;
 use App\Repository\Frontpage\PollVoteRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -165,7 +165,7 @@ final readonly class PollService
         $comment->setUser($member);
         $comment->author = $author;
         $comment->content = $content;
-        $comment->createdOn = new DateTime();
+        $comment->createdOn = new DateTimeImmutable();
         $comment->setParent($parent);
         $poll->addComment($comment);
 
@@ -223,7 +223,7 @@ final readonly class PollService
      */
     public function softExpire(Poll $poll): void
     {
-        $poll->expiryDate = new DateTime('today');
+        $poll->expiryDate = new DateTimeImmutable('today');
         $this->entityManager->flush();
     }
 }

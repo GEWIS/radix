@@ -7,7 +7,6 @@ namespace App\ViewModel\Activity\Admin;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\Enums\RevisionStatus;
-use DateTime;
 use DateTimeImmutable;
 
 use function assert;
@@ -79,7 +78,6 @@ final readonly class ActivityAdminRow
         $revisionId = $revision->id;
         assert(null !== $revisionId);
 
-        $beginTime = $revision->beginTime;
         $endTime = $revision->endTime;
 
         return new self(
@@ -93,14 +91,12 @@ final readonly class ActivityAdminRow
             companyName: $revision->company?->name,
             submitter: $revision->getAuthorDisplayName(),
             status: $revision->getStatus(),
-            beginTime: null === $beginTime
-                ? null
-                : DateTimeImmutable::createFromMutable($beginTime),
+            beginTime: $revision->beginTime,
             isLive: null !== $activity->getLiveRevision(),
             liveRevisionNumber: $revision->getLiveCounterpart()?->getRevisionNumber(),
             changesRequested: RevisionStatus::Draft === $revision->getStatus()
                 && RevisionStatus::ChangesRequested === $revision->getPreviousRevision()?->getStatus(),
-            passed: null !== $endTime && $endTime < new DateTime(),
+            passed: null !== $endTime && $endTime < new DateTimeImmutable(),
             cancelled: $activity->isCancelled(),
             unpublished: $activity->isUnpublished(),
         );

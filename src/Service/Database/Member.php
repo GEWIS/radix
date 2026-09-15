@@ -38,7 +38,7 @@ use App\Repository\Database\MemberUpdateRepository;
 use App\Repository\Database\ProspectiveMemberRepository;
 use App\Service\Checker\Renewal as RenewalService;
 use App\Validator\Database\BulkMemberIds;
-use DateTime;
+use DateTimeImmutable;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -98,15 +98,11 @@ class Member
         $prospectiveMember->middleName = $data->middleName;
         $prospectiveMember->lastName = (string) $data->lastName;
         $prospectiveMember->studentNumber = $data->studentNumber;
-        $prospectiveMember->birth = DateTime::createFromInterface($data->birth ?? new DateTime());
+        $prospectiveMember->birth = $data->birth ?? new DateTimeImmutable();
         $prospectiveMember->study = $data->study ?? Studies::Other;
 
         // changed on date
-        $date = new DateTime();
-        $date->setTime(
-            0,
-            0,
-        );
+        $date = new DateTimeImmutable('today');
         $prospectiveMember->changedOn = $date;
 
         // store the address
@@ -201,11 +197,7 @@ class Member
         $member->studentNumber = $prospectiveMember->studentNumber;
 
         // changed on date
-        $date = new DateTime();
-        $date->setTime(
-            0,
-            0,
-        );
+        $date = new DateTimeImmutable('today');
         $member->changedOn = $date;
 
         // creating the first membership for the member
@@ -399,7 +391,7 @@ class Member
     /**
      * Remove all members that are expired on or before some date.
      */
-    public function removeExpiredMembers(DateTime $expiration): void
+    public function removeExpiredMembers(DateTimeImmutable $expiration): void
     {
         $members = $this->memberRepository->findExpired($expiration);
 
@@ -445,13 +437,13 @@ class Member
             $this->auditEntryRepository->remove($auditEntry);
         }
 
-        $date = new DateTime('0001-01-01 00:00:00');
+        $date = new DateTimeImmutable('0001-01-01 00:00:00');
 
         $member->setEmail(null);
         $member->studentNumber = null;
         $member->study = Studies::Unknown;
         $member->lastCheckedOn = null;
-        $member->changedOn = new DateTime();
+        $member->changedOn = new DateTimeImmutable();
         $member->setBirth($date);
         $member->supremum = 'optout';
         $member->hidden = true;
@@ -479,11 +471,7 @@ class Member
         }
 
         // update changed on date
-        $date = new DateTime();
-        $date->setTime(
-            0,
-            0,
-        );
+        $date = new DateTimeImmutable('today');
         $member->changedOn = $date;
 
         $this->memberRepository->persist($member);
@@ -590,7 +578,7 @@ class Member
                 $preview['rows'][$index]['member'] = $this->applyMembershipChange(
                     $row['member'],
                     $membershipType,
-                    clone $lastMembership->endDate,
+                    $lastMembership->endDate,
                 );
                 $preview['rows'][$index]['executed'] = true;
                 $preview['rows'][$index]['message'] = $this->translator->trans('Renewed.');
@@ -633,7 +621,7 @@ class Member
         $validCount = 0;
         $invalidCount = 0;
 
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         foreach ($memberIds as $memberId) {
             $member = $this->getMember($memberId);
@@ -691,7 +679,7 @@ class Member
                 $resolvedChange = $this->resolveMembershipChange(
                     $member,
                     $membershipType,
-                    clone $lastMembership->endDate,
+                    $lastMembership->endDate,
                 );
 
                 $rows[] = [
@@ -732,14 +720,14 @@ class Member
      * The period is built the same way {@see self::expiration()} builds the one it stores, so what is asked for on
      * the confirmation page cannot drift away from what is carried out.
      */
-    public function getExtendedExpiration(MemberModel $member): DateTime
+    public function getExtendedExpiration(MemberModel $member): DateTimeImmutable
     {
         $membership = $member->getCurrentOrLastMembership();
 
         return new MembershipModel(
             member: $member,
             type: $membership->type,
-            startDate: clone $membership->endDate,
+            startDate: $membership->endDate,
         )->endDate;
     }
 
@@ -1119,16 +1107,16 @@ class Member
     /**
      * @return array{
      *     currentType: MembershipTypes,
-     *     oldExpiration: DateTime,
-     *     newExpiration: DateTime,
-     *     changeDate: DateTime,
+     *     oldExpiration: DateTimeImmutable,
+     *     newExpiration: DateTimeImmutable,
+     *     changeDate: DateTimeImmutable,
      *     lastMembership: MembershipModel,
      * }
      */
     private function resolveMembershipChange(
         MemberModel $member,
         MembershipTypes $newType,
-        ?DateTime $changeDate = null,
+        ?DateTimeImmutable $changeDate = null,
     ): array {
         $currentMembership = $member->getCurrentOrLastMembership();
 
@@ -1143,33 +1131,30 @@ class Member
         $lastMembership = $member->getLastMembership();
         assert($lastMembership instanceof MembershipModel);
 
-        $effectiveChangeDate = null === $changeDate
-            ? new DateTime()
-            : clone $changeDate;
-        $effectiveChangeDate->setTime(
+        $effectiveChangeDate = ($changeDate ?? new DateTimeImmutable())->setTime(
             0,
             0,
         );
 
         if ($effectiveChangeDate < $lastMembership->getStartDate()) {
-            $effectiveChangeDate = clone $lastMembership->getStartDate();
+            $effectiveChangeDate = $lastMembership->getStartDate();
         }
 
         if ($effectiveChangeDate > $lastMembership->endDate) {
-            $effectiveChangeDate = clone $lastMembership->endDate;
+            $effectiveChangeDate = $lastMembership->endDate;
         }
 
         $newExpiration = $effectiveChangeDate->getTimestamp() === $lastMembership->getStartDate()->getTimestamp()
-            ? clone $lastMembership->endDate
+            ? $lastMembership->endDate
             : new MembershipModel(
                 $member,
                 $newType,
-                clone $effectiveChangeDate,
+                $effectiveChangeDate,
             )->endDate;
 
         return [
             'currentType' => $lastMembership->type,
-            'oldExpiration' => clone $member->getExpiration(),
+            'oldExpiration' => $member->getExpiration(),
             'newExpiration' => $newExpiration,
             'changeDate' => $effectiveChangeDate,
             'lastMembership' => $lastMembership,
@@ -1179,7 +1164,7 @@ class Member
     private function applyMembershipChange(
         MemberModel $member,
         MembershipTypes $newType,
-        ?DateTime $changeDate = null,
+        ?DateTimeImmutable $changeDate = null,
     ): MemberModel {
         $resolvedChange = $this->resolveMembershipChange(
             $member,
@@ -1187,11 +1172,7 @@ class Member
             $changeDate,
         );
 
-        $date = new DateTime();
-        $date->setTime(
-            0,
-            0,
-        );
+        $date = new DateTimeImmutable('today');
         $member->changedOn = $date;
 
         $renewalAudit = new AuditRenewalModel();
@@ -1203,11 +1184,11 @@ class Member
         if ($effectiveChangeDate->getTimestamp() === $lastMembership->getStartDate()->getTimestamp()) {
             $lastMembership->type = $newType;
         } else {
-            $lastMembership->setEndDate(clone $effectiveChangeDate);
+            $lastMembership->setEndDate($effectiveChangeDate);
             $member->addMembership(new MembershipModel(
                 member: $member,
                 type: $newType,
-                startDate: clone $effectiveChangeDate,
+                startDate: $effectiveChangeDate,
                 endDate: null,
             ));
         }
@@ -1420,9 +1401,9 @@ class Member
     public function renewMember(
         MemberModel $member,
         RenewalLinkModel $renewalLink,
-        DateTime $newExpiration,
+        DateTimeImmutable $newExpiration,
     ): MemberModel {
-        $member->changedOn = new DateTime();
+        $member->changedOn = new DateTimeImmutable();
 
         $renewalLink->used = true;
         $this->actionLinkRepository->persist($renewalLink);

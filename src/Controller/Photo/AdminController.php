@@ -19,7 +19,7 @@ use App\Service\Photo\AlbumService;
 use App\Service\Photo\PhotoService;
 use App\Service\Photo\PhotoUploadService;
 use App\Service\Photo\WeeklyPhotoService;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -149,7 +149,7 @@ class AdminController extends AbstractController
      */
     private function withinHideWindow(): bool
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         return 1 === (int) $now->format('N')
             && 12 > (int) $now->format('G');

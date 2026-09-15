@@ -15,7 +15,7 @@ use App\Repository\Photo\AlbumRepository;
 use App\Repository\Photo\PhotoRepository;
 use App\Service\Application\FileStorage;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -275,7 +275,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         $photo = new Photo();
         $photo->album = $album;
         $photo->path = $stored->path;
-        $photo->dateTime = new DateTime();
+        $photo->dateTime = new DateTimeImmutable();
         $photo->aspectRatio = 1.0;
         $this->entityManager->persist($photo);
         $this->entityManager->flush();

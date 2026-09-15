@@ -18,7 +18,7 @@ use App\Security\Activity\ActivityProposalVoter;
 use App\Service\Activity\ActivityProposalManager;
 use App\Service\Activity\ProposalAllowanceExhausted;
 use App\Service\Activity\ProposalLimitResolver;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -73,7 +73,7 @@ class AdminActivityCalendarController extends AbstractController
     public function index(#[CurrentUser]
         User $user,): Response
     {
-        $openPeriods = $this->optionPeriodRepository->findOpenAt(new DateTime());
+        $openPeriods = $this->optionPeriodRepository->findOpenAt(new DateTimeImmutable());
         $organs = $this->actableOrgans($user);
 
         return $this->render(

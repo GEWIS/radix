@@ -14,7 +14,7 @@ use App\Entity\Decision\Member as MemberModel;
 use App\Entity\Decision\Organ as OrganModel;
 use App\Entity\User\Enums\UserRoles;
 use App\Repository\Activity\ActivityRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -46,8 +46,8 @@ use function assert;
  *     id: ?int,
  *     name: ?string,
  *     nameEn: ?string,
- *     beginTime: DateTime,
- *     endTime: DateTime,
+ *     beginTime: DateTimeImmutable,
+ *     endTime: DateTimeImmutable,
  *     location: ?string,
  *     locationEn: ?string,
  *     costs: ?string,
@@ -137,10 +137,10 @@ class Activity implements RevisableInterface
      * can un-cancel it.
      */
     #[Column(
-        type: 'datetime',
+        type: 'datetime_immutable',
         nullable: true,
     )]
-    public private(set) ?DateTime $cancelledAt = null;
+    public private(set) ?DateTimeImmutable $cancelledAt = null;
 
     /**
      * The board member who cancelled this activity, or null when it is not cancelled.
@@ -159,10 +159,10 @@ class Activity implements RevisableInterface
      * interaction frozen; the board can re-publish it.
      */
     #[Column(
-        type: 'datetime',
+        type: 'datetime_immutable',
         nullable: true,
     )]
-    public private(set) ?DateTime $unpublishedAt = null;
+    public private(set) ?DateTimeImmutable $unpublishedAt = null;
 
     /**
      * The board member who unpublished this activity, or null when it is published.
@@ -278,7 +278,7 @@ class Activity implements RevisableInterface
      */
     public function getRelevantSignupList(): ?SignupList
     {
-        $now = new DateTime('now');
+        $now = new DateTimeImmutable('now');
         $open = null;
         $upcoming = null;
 
@@ -311,7 +311,7 @@ class Activity implements RevisableInterface
      */
     public function countPendingSignupLists(): int
     {
-        $now = new DateTime('now');
+        $now = new DateTimeImmutable('now');
         $count = 0;
 
         foreach ($this->getLiveSignupLists() as $signupList) {
@@ -353,7 +353,7 @@ class Activity implements RevisableInterface
 
     public function cancel(MemberModel $member): void
     {
-        $this->cancelledAt = new DateTime('now');
+        $this->cancelledAt = new DateTimeImmutable('now');
         $this->cancelledBy = $member;
     }
 
@@ -370,7 +370,7 @@ class Activity implements RevisableInterface
 
     public function unpublish(MemberModel $member): void
     {
-        $this->unpublishedAt = new DateTime('now');
+        $this->unpublishedAt = new DateTimeImmutable('now');
         $this->unpublishedBy = $member;
     }
 
@@ -429,7 +429,7 @@ class Activity implements RevisableInterface
         return $this->getDisplayRevision()->description;
     }
 
-    public function getBeginTime(): DateTime
+    public function getBeginTime(): DateTimeImmutable
     {
         // A displayed revision is always persisted, and the form's NotBlank constraint guarantees a schedule, so this
         // is never null in practice; the revision getter is only nullable to let a brand-new draft render empty fields.
@@ -439,7 +439,7 @@ class Activity implements RevisableInterface
         return $beginTime;
     }
 
-    public function getEndTime(): DateTime
+    public function getEndTime(): DateTimeImmutable
     {
         $endTime = $this->getDisplayRevision()->endTime;
         assert(null !== $endTime);
@@ -456,7 +456,7 @@ class Activity implements RevisableInterface
      */
     public function hasPassed(): bool
     {
-        return $this->getEndTime() < new DateTime();
+        return $this->getEndTime() < new DateTimeImmutable();
     }
 
     public function getCategory(): ActivityCategories

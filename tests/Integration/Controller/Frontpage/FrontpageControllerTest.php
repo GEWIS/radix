@@ -10,7 +10,7 @@ use App\Entity\User\User;
 use App\Repository\Frontpage\PollRepository;
 use App\Service\Frontpage\HomePageService;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -62,7 +62,7 @@ final class FrontpageControllerTest extends DatabaseTestCase
     public function testWithNothingRunningThePollPanelFallsBackToTheLastQuestion(): void
     {
         foreach (self::getContainer()->get(PollRepository::class)->findActivePolls() as $poll) {
-            $poll->expiryDate = new DateTime('-1 day');
+            $poll->expiryDate = new DateTimeImmutable('-1 day');
         }
 
         $this->entityManager->flush();

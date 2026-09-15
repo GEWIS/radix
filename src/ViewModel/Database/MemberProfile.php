@@ -8,7 +8,7 @@ use App\Entity\Database\AuditEntry;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\Installation;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -58,7 +58,7 @@ final readonly class MemberProfile
             // Only the types that have to be renewed by hand can be extended, and only once less than a year of the
             // membership is left: the extension always lands on the first of July after the current expiration.
             null !== $lastMembership
-                && $member->getExpiration() < new DateTime('+1 year')
+                && $member->getExpiration() < new DateTimeImmutable('+1 year')
                 && in_array(
                     $lastMembership->type,
                     [

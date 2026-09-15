@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Frontpage;
 
 use App\Form\Application\ReviewDecisionType;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -44,8 +44,8 @@ class PollReviewDecisionType extends ReviewDecisionType
                 'label' => t('Closing date'),
                 'help' => t('The closing date schedules the poll; it closes on this date.'),
                 // A poll closes on its date, so today would publish a poll that is already over.
-                'data' => new DateTime('tomorrow'),
-                'attr' => ['min' => new DateTime('tomorrow')->format('Y-m-d')],
+                'data' => new DateTimeImmutable('tomorrow'),
+                'attr' => ['min' => new DateTimeImmutable('tomorrow')->format('Y-m-d')],
                 'constraints' => [
                     new NotBlank(
                         message: 'Fill in a closing date before approving this poll.',

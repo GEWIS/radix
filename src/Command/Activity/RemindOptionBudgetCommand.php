@@ -12,7 +12,7 @@ use App\Repository\Activity\ActivityProposalRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Activity\OptionBudgetSchedule;
 use App\Service\Application\NotificationPublisher;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -158,7 +158,7 @@ final class RemindOptionBudgetCommand extends Command
 
         // A body whose member no longer has an account still gets its day released on time; there is simply nobody to
         // warn first, so the stamp is set anyway rather than looking again every night.
-        $proposal->budgetRemindedAt = new DateTime();
+        $proposal->budgetRemindedAt = new DateTimeImmutable();
 
         if (null === $user) {
             return;

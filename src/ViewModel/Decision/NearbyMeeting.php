@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ViewModel\Decision;
 
 use App\Entity\Database\Enums\MeetingTypes;
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * A row in the "Other meetings" sidebar. Deliberately not a {@see \App\Entity\Decision\Meeting}: hydrating the
@@ -16,7 +16,7 @@ final readonly class NearbyMeeting
     public function __construct(
         public MeetingTypes $type,
         public int $number,
-        public DateTime $date,
+        public DateTimeImmutable $date,
     ) {
     }
 }

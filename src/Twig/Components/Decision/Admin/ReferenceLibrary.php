@@ -13,7 +13,7 @@ use App\Repository\Decision\ReferenceDocumentRepository;
 use App\Security\User\SudoVoter;
 use App\Service\Decision\ReferenceDocumentService;
 use App\Service\Decision\VersionLabelSuggester;
-use DateTime;
+use DateTimeImmutable;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -132,7 +132,7 @@ final class ReferenceLibrary
             return;
         }
 
-        $this->savedAt = new DateTime()->format('H:i');
+        $this->savedAt = new DateTimeImmutable()->format('H:i');
     }
 
     #[LiveAction]

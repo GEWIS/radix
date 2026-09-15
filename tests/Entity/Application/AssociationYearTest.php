@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Entity\Application;
 
 use App\Entity\Application\AssociationYear;
-use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,7 +24,7 @@ class AssociationYearTest extends TestCase
     ): void {
         self::assertSame(
             $firstYear,
-            AssociationYear::fromDate(new DateTime($moment))->getYear(),
+            AssociationYear::fromDate(new DateTimeImmutable($moment))->getYear(),
         );
     }
 
@@ -80,7 +79,7 @@ class AssociationYearTest extends TestCase
 
     public function testRunsFromJulyFirstToTheLastMomentOfJuneThirtieth(): void
     {
-        $year = AssociationYear::fromDate(new DateTime('2026-08-20 12:34:56'));
+        $year = AssociationYear::fromDate(new DateTimeImmutable('2026-08-20 12:34:56'));
 
         self::assertSame(
             '2026-07-01 00:00:00.000000',
@@ -98,7 +97,7 @@ class AssociationYearTest extends TestCase
      */
     public function testEndsOnTheDayTheNextYearBegins(): void
     {
-        $year = AssociationYear::fromDate(new DateTime('2026-08-20'));
+        $year = AssociationYear::fromDate(new DateTimeImmutable('2026-08-20'));
 
         self::assertSame(
             '2027-07-01 00:00:00',
@@ -116,7 +115,7 @@ class AssociationYearTest extends TestCase
 
     public function testSeptemberFirstFollowsTheYearItEndsIn(): void
     {
-        $year = AssociationYear::fromDate(new DateTime('2026-02-01'));
+        $year = AssociationYear::fromDate(new DateTimeImmutable('2026-02-01'));
 
         self::assertSame(
             2025,
@@ -125,22 +124,6 @@ class AssociationYearTest extends TestCase
         self::assertSame(
             '2026-09-01 00:00:00',
             $year->septemberFirst()->format('Y-m-d H:i:s'),
-        );
-    }
-
-    /**
-     * Every date comes out fresh, because callers do move them: a membership takes its expiry from `endsOn()` and an
-     * honorary one then pushes it a century out.
-     */
-    public function testHandsOutADateTheCallerMayMove(): void
-    {
-        $year = AssociationYear::fromYear(2026);
-
-        $year->endsOn()->modify('+100 years');
-
-        self::assertSame(
-            '2027-07-01 00:00:00',
-            $year->endsOn()->format('Y-m-d H:i:s'),
         );
     }
 }

@@ -15,7 +15,6 @@ use App\Repository\User\CompanyUserRepository;
 use App\Service\Career\CompanyAuditLogger;
 use App\Util\Application\SplitToken;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -160,7 +159,7 @@ final readonly class CompanyUserInviteService
             $companyUser,
             $plainPassword,
         ));
-        $companyUser->setPasswordChangedOn(new DateTime());
+        $companyUser->setPasswordChangedOn(new DateTimeImmutable());
 
         $this->entityManager->persist($companyUser);
         $this->entityManager->remove($invite);

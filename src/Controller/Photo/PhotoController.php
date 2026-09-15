@@ -23,7 +23,7 @@ use App\Service\Photo\AlbumService;
 use App\Service\Photo\PhotoPrivacyService;
 use App\Service\Photo\PhotoService;
 use App\Service\Photo\WeeklyPhotoService;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -420,7 +420,7 @@ class PhotoController extends AbstractController
         }
 
         $weeks = array_map(
-            static fn (WeeklyPhoto $weeklyPhoto): DateTime => $weeklyPhoto->week,
+            static fn (WeeklyPhoto $weeklyPhoto): DateTimeImmutable => $weeklyPhoto->week,
             $weeklyPhotos,
         );
 

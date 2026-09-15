@@ -8,28 +8,22 @@ namespace App\Doctrine\Types;
 // Posted by Ocramius, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-06-15, License - CC BY-SA 4.0, relicensed under GPL-3.0 on 2026-06-15
 
-use DateTime;
+use DateTimeImmutable;
 
-class StringableDateTime extends DateTime
+class StringableDateTime extends DateTimeImmutable
 {
     public function __toString(): string
     {
         return $this->format('U');
     }
 
-    public function toDateTime(): DateTime
+    public function toDateTime(): DateTimeImmutable
     {
-        $val = new DateTime($this->format(DateTime::ATOM));
-        $val->setTimezone($this->getTimezone());
-
-        return $val;
+        return new DateTimeImmutable($this->format(DateTimeImmutable::ATOM))->setTimezone($this->getTimezone());
     }
 
-    public static function fromDateTime(DateTime $dateTime): self
+    public static function fromDateTime(DateTimeImmutable $dateTime): self
     {
-        $val = new self($dateTime->format(DateTime::ATOM));
-        $val->setTimezone($dateTime->getTimezone());
-
-        return $val;
+        return new self($dateTime->format(DateTimeImmutable::ATOM))->setTimezone($dateTime->getTimezone());
     }
 }

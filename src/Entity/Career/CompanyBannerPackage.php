@@ -8,7 +8,7 @@ use App\Entity\Career\Enums\CompanyBannerFormats;
 use App\Entity\Career\Enums\CompanyPackageTypes;
 use App\Entity\User\CompanyUser as CompanyUserModel;
 use App\Repository\Career\CompanyBannerPackageRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -58,10 +58,10 @@ class CompanyBannerPackage extends CompanyPackage
     private ?string $pendingImage = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public private(set) ?DateTime $pendingImageSubmittedAt = null;
+    public private(set) ?DateTimeImmutable $pendingImageSubmittedAt = null;
 
     /**
      * Who proposed it, or null once their account is gone.
@@ -120,7 +120,7 @@ class CompanyBannerPackage extends CompanyPackage
         $replaced = $this->pendingImage;
 
         $this->pendingImage = $path;
-        $this->pendingImageSubmittedAt = new DateTime();
+        $this->pendingImageSubmittedAt = new DateTimeImmutable();
         $this->pendingImageSubmittedBy = $submittedBy;
 
         return $replaced;

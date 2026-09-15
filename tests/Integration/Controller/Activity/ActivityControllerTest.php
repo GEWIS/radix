@@ -9,7 +9,7 @@ use App\Entity\Activity\Activity;
 use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\Decision\AssociationYear;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -35,7 +35,7 @@ final class ActivityControllerTest extends DatabaseTestCase
         $this->pushRequest();
 
         // The current year's archive lists finished activities only (past-only), but the page still renders.
-        $year = AssociationYear::fromDate(new DateTime())->getYear();
+        $year = AssociationYear::fromDate(new DateTimeImmutable())->getYear();
 
         self::assertSame(
             Response::HTTP_OK,

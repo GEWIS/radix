@@ -9,7 +9,6 @@ use App\Entity\User\CompanyUser;
 use App\Repository\User\CompanyUserRepository;
 use App\Service\User\CompanyUserAccessPolicy;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
 use DateTimeImmutable;
 
 final class CompanyUserAccessPolicyTest extends DatabaseTestCase
@@ -39,8 +38,8 @@ final class CompanyUserAccessPolicyTest extends DatabaseTestCase
 
         $package = new CompanyJobPackage();
         $package->company = $companyUser->company;
-        $package->setStartingDate(new DateTime('+1 month'));
-        $package->setExpirationDate(new DateTime('+1 year'));
+        $package->setStartingDate(new DateTimeImmutable('+1 month'));
+        $package->setExpirationDate(new DateTimeImmutable('+1 year'));
         $package->published = false;
         $this->entityManager->persist($package);
         $this->entityManager->flush();

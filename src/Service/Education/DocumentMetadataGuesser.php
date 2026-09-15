@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\Languages;
 use App\Entity\Education\Enums\CourseDocumentTypes;
 use App\Entity\Education\Enums\ExamTypes;
 use App\ViewModel\Education\GuessedDocumentMetadata;
-use DateTime;
+use DateTimeImmutable;
 
 use function array_keys;
 use function explode;
@@ -114,7 +114,7 @@ final readonly class DocumentMetadataGuesser
     private function guessDate(
         string $stem,
         ?string $code,
-    ): ?DateTime {
+    ): ?DateTimeImmutable {
         // The course code is full of digits that would otherwise be read as a date.
         $remainder = null !== $code
             ? str_replace(
@@ -178,8 +178,8 @@ final readonly class DocumentMetadataGuesser
         string $year,
         string $month,
         string $day,
-    ): ?DateTime {
-        $date = DateTime::createFromFormat(
+    ): ?DateTimeImmutable {
+        $date = DateTimeImmutable::createFromFormat(
             'Y-m-d H:i:s',
             $year . '-' . $month . '-' . $day . ' 00:00:00',
         );

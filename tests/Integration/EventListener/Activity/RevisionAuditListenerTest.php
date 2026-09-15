@@ -12,7 +12,7 @@ use App\Entity\Activity\SignupList;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\User\User;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 use SortDirection;
 use Symfony\Component\Uid\Uuid;
 
@@ -194,8 +194,8 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
             'Lijst',
             'List',
         );
-        $list->openDate = new DateTime('2026-01-01 00:00:00');
-        $list->closeDate = new DateTime('2026-12-31 00:00:00');
+        $list->openDate = new DateTimeImmutable('2026-01-01 00:00:00');
+        $list->closeDate = new DateTimeImmutable('2026-12-31 00:00:00');
         $revision->addSignupList($list);
         $this->entityManager->persist($list);
         // System flush (no editor set): creates the list without appending an audit row, so the subsequent change under

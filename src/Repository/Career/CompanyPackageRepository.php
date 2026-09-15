@@ -11,7 +11,6 @@ use App\Entity\Career\CompanyHighlightPackage;
 use App\Entity\Career\CompanyJobPackage;
 use App\Entity\Career\CompanyPackage;
 use App\Entity\Career\Enums\CompanyPackageTypes;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
@@ -36,7 +35,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
     /**
      * Will return a list of published packages that will expire between now and $date.
      *
-     * @param DateTime $date The date until where to search
+     * @param DateTimeImmutable $date The date until where to search
      *
      * @phpstan-return (
      *     $companyPackageType is CompanyPackageTypes::Banner
@@ -54,7 +53,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
      */
     public function findFuturePackageExpirationsBeforeDate(
         CompanyPackageTypes $companyPackageType,
-        DateTime $date,
+        DateTimeImmutable $date,
     ): array {
         $companyPackageClass = CompanyPackageTypes::entityClass($companyPackageType);
 
@@ -75,7 +74,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->setParameter(
                 'date',
                 $date,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();
@@ -84,7 +83,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
     /**
      * Will return a list of published packages that will expire between now and $date.
      *
-     * @param DateTime $date The date until where to search
+     * @param DateTimeImmutable $date The date until where to search
      *
      * @phpstan-return (
      *     $companyPackageType is CompanyPackageTypes::Banner
@@ -102,7 +101,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
      */
     public function findFuturePackageStartsBeforeDate(
         CompanyPackageTypes $companyPackageType,
-        DateTime $date,
+        DateTimeImmutable $date,
     ): array {
         $companyPackageClass = CompanyPackageTypes::entityClass($companyPackageType);
 
@@ -123,7 +122,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
             ->setParameter(
                 'date',
                 $date,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             );
 
         return $qb->getQuery()->getResult();

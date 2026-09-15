@@ -8,7 +8,7 @@ use App\Entity\Activity\Activity;
 use App\Entity\Activity\ActivityRevision;
 use App\EventListener\Activity\PastActivityGuardListener;
 use App\Tests\Support\BuildsGuardEvents;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -28,7 +28,7 @@ final class PastActivityGuardListenerTest extends TestCase
 
     public function testBlocksSubmitWhenABrandNewActivityHasAlreadyStarted(): void
     {
-        $revision = $this->brandNewRevision(new DateTime('2000-01-01 12:00'));
+        $revision = $this->brandNewRevision(new DateTimeImmutable('2000-01-01 12:00'));
 
         $event = $this->guardEvent(
             $revision,
@@ -51,7 +51,7 @@ final class PastActivityGuardListenerTest extends TestCase
 
     public function testBlocksApproveWhenAnEstablishedActivityHasEnded(): void
     {
-        $revision = $this->establishedInFlightRevision(new DateTime('2000-01-01 12:00'));
+        $revision = $this->establishedInFlightRevision(new DateTimeImmutable('2000-01-01 12:00'));
 
         $event = $this->guardEvent($revision);
         $listener = new PastActivityGuardListener();
@@ -69,14 +69,14 @@ final class PastActivityGuardListenerTest extends TestCase
 
     public function testAllowsWhenTheRelevantDeadlineIsStillInTheFuture(): void
     {
-        $brandNew = $this->brandNewRevision(new DateTime('2999-01-01 12:00'));
+        $brandNew = $this->brandNewRevision(new DateTimeImmutable('2999-01-01 12:00'));
         $brandNewEvent = $this->guardEvent(
             $brandNew,
             'submit',
             'draft',
             'submitted',
         );
-        $established = $this->establishedInFlightRevision(new DateTime('2999-01-01 12:00'));
+        $established = $this->establishedInFlightRevision(new DateTimeImmutable('2999-01-01 12:00'));
         $establishedEvent = $this->guardEvent($established);
 
         $listener = new PastActivityGuardListener();
@@ -112,7 +112,7 @@ final class PastActivityGuardListenerTest extends TestCase
         self::assertFalse($event->isBlocked());
     }
 
-    private function brandNewRevision(?DateTime $beginTime): ActivityRevision
+    private function brandNewRevision(?DateTimeImmutable $beginTime): ActivityRevision
     {
         $activity = new Activity();
         $revision = new ActivityRevision();
@@ -125,7 +125,7 @@ final class PastActivityGuardListenerTest extends TestCase
     /**
      * An in-flight revision on an activity that already has a (separate) live revision ending at the given time.
      */
-    private function establishedInFlightRevision(?DateTime $liveEndTime): ActivityRevision
+    private function establishedInFlightRevision(?DateTimeImmutable $liveEndTime): ActivityRevision
     {
         $activity = new Activity();
 

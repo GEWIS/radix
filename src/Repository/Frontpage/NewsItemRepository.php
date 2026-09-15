@@ -7,7 +7,7 @@ namespace App\Repository\Frontpage;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Frontpage\Enums\NewsCategory;
 use App\Entity\Frontpage\NewsItem;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
@@ -97,12 +97,12 @@ class NewsItemRepository extends ServiceEntityRepository
                 ->setParameter(
                     'yearStart',
                     $associationYear->getStartDate(),
-                    Types::DATE_MUTABLE,
+                    Types::DATE_IMMUTABLE,
                 )
                 ->setParameter(
                     'yearEnd',
                     $associationYear->getEndDate(),
-                    Types::DATE_MUTABLE,
+                    Types::DATE_IMMUTABLE,
                 );
         }
 
@@ -157,7 +157,7 @@ class NewsItemRepository extends ServiceEntityRepository
 
         $years = [];
         foreach ($rows as $row) {
-            $month = new DateTime(sprintf(
+            $month = new DateTimeImmutable(sprintf(
                 '%d-%d-15',
                 $row['y'],
                 $row['m'],

@@ -13,7 +13,7 @@ use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityDraftFactory;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Support\AnswersActivityForm;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -259,8 +259,8 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
                 $name,
                 $name,
             );
-            $list->openDate = new DateTime('2030-01-01 12:00');
-            $list->closeDate = new DateTime('2030-02-01 12:00');
+            $list->openDate = new DateTimeImmutable('2030-01-01 12:00');
+            $list->closeDate = new DateTimeImmutable('2030-02-01 12:00');
             $revision->addSignupList($list);
         }
 

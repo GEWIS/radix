@@ -12,7 +12,7 @@ use App\Entity\Decision\MeetingDocumentVersion;
 use App\Entity\Decision\MeetingPoint;
 use App\Entity\User\User;
 use App\Service\Application\FileStorage;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -58,14 +58,14 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
             $agenda,
             'v1.0',
             $uploader,
-            new DateTime('-3 weeks'),
+            new DateTimeImmutable('-3 weeks'),
         );
         $this->createVersion(
             $manager,
             $agenda,
             'v1.1',
             $uploader,
-            new DateTime('-2 weeks'),
+            new DateTimeImmutable('-2 weeks'),
         );
 
         $decisionList = $this->createDocument(
@@ -80,7 +80,7 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
             $decisionList,
             'v1.0',
             $uploader,
-            new DateTime('-2 weeks'),
+            new DateTimeImmutable('-2 weeks'),
         );
 
         // Carried over from the legacy flat model: no agenda point, no uploader, unknown upload date.
@@ -111,7 +111,7 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
             $budget,
             'v2.1',
             $uploader,
-            new DateTime('-1 week'),
+            new DateTimeImmutable('-1 week'),
         );
 
         $upcomingAgenda = $this->createDocument(
@@ -126,7 +126,7 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
             $upcomingAgenda,
             'v1.0',
             $uploader,
-            new DateTime('-2 days'),
+            new DateTimeImmutable('-2 days'),
         );
 
         $manager->flush();
@@ -177,7 +177,7 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
         MeetingDocument $document,
         string $label,
         ?User $uploader,
-        ?DateTime $uploadedAt,
+        ?DateTimeImmutable $uploadedAt,
     ): void {
         $version = new MeetingDocumentVersion();
         $version->setDocument($document);

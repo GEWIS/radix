@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository\Photo;
 
 use App\Entity\Photo\Album;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -30,14 +30,14 @@ class AlbumRepository extends ServiceEntityRepository
     /**
      * Gets all root albums with a start date between the specified dates.
      *
-     * @param DateTime $start start date and time
-     * @param DateTime $end   end date and time
+     * @param DateTimeImmutable $start start date and time
+     * @param DateTimeImmutable $end   end date and time
      *
      * @return Album[]
      */
     public function getAlbumsInDateRange(
-        DateTime $start,
-        DateTime $end,
+        DateTimeImmutable $start,
+        DateTimeImmutable $end,
         bool $onlyPublished = true,
     ): array {
         $qb = $this->createQueryBuilder('a');
@@ -46,12 +46,12 @@ class AlbumRepository extends ServiceEntityRepository
             ->setParameter(
                 'start',
                 $start,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->setParameter(
                 'end',
                 $end,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             )
             ->orderBy(
                 'a.startDateTime',
@@ -137,11 +137,11 @@ class AlbumRepository extends ServiceEntityRepository
      * The start date of every published, dated root album, in one query, so the overview can derive the association
      * years that actually hold albums (a year with none never reaches the year switcher).
      *
-     * @return list<array{startDateTime: DateTime}>
+     * @return list<array{startDateTime: DateTimeImmutable}>
      */
     public function getPublishedRootAlbumStartDates(): array
     {
-        /** @var list<array{startDateTime: DateTime}> $rows */
+        /** @var list<array{startDateTime: DateTimeImmutable}> $rows */
         $rows = $this->createQueryBuilder('a')
             ->select('a.startDateTime')
             ->where('a.parent IS NULL')

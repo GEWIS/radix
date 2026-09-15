@@ -9,7 +9,6 @@ use App\Entity\User\Enums\SecurityEventType;
 use App\Entity\User\ExternalApp;
 use App\Entity\User\ExternalAppAuthentication;
 use App\Entity\User\User;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Jose\Component\Core\JWK;
@@ -181,7 +180,7 @@ class ExternalAppService
         $authentication = new ExternalAppAuthentication();
         $authentication->user = $user;
         $authentication->externalApp = $app;
-        $authentication->time = new DateTime();
+        $authentication->time = new DateTimeImmutable();
 
         $this->entityManager->persist($authentication);
         $this->entityManager->flush();

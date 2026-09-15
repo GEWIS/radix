@@ -9,7 +9,7 @@ use App\Entity\Frontpage\Poll;
 use App\Repository\Frontpage\PollCommentReactionRepository;
 use App\Repository\Frontpage\PollRepository;
 use App\Repository\Frontpage\PollVoteRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Psr\Log\LoggerInterface;
@@ -94,7 +94,7 @@ final class AnonymisePollVotesCommand extends Command
                     $votes += $this->anonymiseVotes($poll);
                     $reactions += $this->reactionRepository->anonymiseForPoll($poll);
 
-                    $poll->votesAnonymisedAt = new DateTime();
+                    $poll->votesAnonymisedAt = new DateTimeImmutable();
                     $this->entityManager->flush();
                 },
             );

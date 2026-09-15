@@ -7,7 +7,7 @@ namespace App\DataFixtures\Frontpage;
 use App\Entity\Frontpage\Enums\NewsCategory;
 use App\Entity\Frontpage\FrontpageLocalisedText;
 use App\Entity\Frontpage\NewsItem;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -95,7 +95,7 @@ class NewsItemFixture extends Fixture implements FixtureGroupInterface
 
         foreach ($items as $item) {
             $news = new NewsItem();
-            $news->date = new DateTime('-' . $item['days'] . ' days');
+            $news->date = new DateTimeImmutable('-' . $item['days'] . ' days');
             $news->category = $item['category'];
             $news->pinned = $item['pinned'];
             $news->title = new FrontpageLocalisedText(

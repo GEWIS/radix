@@ -9,7 +9,7 @@ use App\Entity\Activity\Enums\TimeOfDay;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Decision\Member;
 use App\Repository\Activity\ActivityDateOptionRepository;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -49,14 +49,14 @@ class ActivityDateOption
     /**
      * The first day the activity would take place on.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $beginsAt;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $beginsAt;
 
     /**
      * The last day the activity would take place on, the same as {@see self::$beginsAt} for anything within one day.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $endsAt;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $endsAt;
 
     #[Column(
         type: Types::STRING,
@@ -88,10 +88,10 @@ class ActivityDateOption
     public ?Member $decidedBy = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $decidedAt = null;
+    public ?DateTimeImmutable $decidedAt = null;
 
     /**
      * Whether this option takes up the given day, which for anything spanning several days is every day in between.

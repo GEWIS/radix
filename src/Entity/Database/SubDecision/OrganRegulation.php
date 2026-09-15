@@ -12,7 +12,7 @@ use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\OrganRegulationRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -51,8 +51,8 @@ class OrganRegulation extends SubDecision implements NamesMember
     /**
      * Date of the regulation.
      */
-    #[Column(type: 'date')]
-    public DateTime $date;
+    #[Column(type: 'date_immutable')]
+    public DateTimeImmutable $date;
 
     /**
      * If the regulation was approved.

@@ -12,7 +12,7 @@ use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\CheckoutSessionRepository;
 use App\Service\Database\Member as MemberService;
 use App\Service\Database\StripeService;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -205,8 +205,8 @@ class StripeServiceTest extends TestCase
         $session = new CheckoutSession();
         $session->checkoutId = 'cs_test';
         $session->state = $state;
-        $session->created = new DateTime('-1 hour');
-        $session->expiration = new DateTime($expiration);
+        $session->created = new DateTimeImmutable('-1 hour');
+        $session->expiration = new DateTimeImmutable($expiration);
 
         return $session;
     }

@@ -7,7 +7,7 @@ namespace App\Tests\ViewModel\Decision;
 use App\Entity\Database\Enums\OrganTypes;
 use App\Entity\Decision\Organ;
 use App\ViewModel\Decision\BodyIteration;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -203,10 +203,10 @@ final class BodyIterationTest extends TestCase
         $organ->abbr = 'GETÉST';
         $organ->name = 'A committee';
         $organ->type = OrganTypes::Committee;
-        $organ->foundationDate = new DateTime($foundedIn . '-' . $foundedOn);
+        $organ->foundationDate = new DateTimeImmutable($foundedIn . '-' . $foundedOn);
 
         if (null !== $abrogatedIn) {
-            $organ->abrogationDate = new DateTime($abrogatedIn . '-12-31');
+            $organ->abrogationDate = new DateTimeImmutable($abrogatedIn . '-12-31');
         }
 
         // Two bodies are told apart by id, which a fresh entity has none of; the seed is what gives them one, so the

@@ -8,7 +8,7 @@ use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
 use App\Repository\Career\VacancyRepository;
 use App\Tests\Integration\DatabaseTestCase;
-use DateTime;
+use DateTimeImmutable;
 
 final class VacancyRepositoryTest extends DatabaseTestCase
 {
@@ -48,7 +48,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
         $live = $vacancy->getLiveRevision();
         self::assertNotNull($live);
 
-        $live->startDate = new DateTime('+1 week');
+        $live->startDate = new DateTimeImmutable('+1 week');
         $this->entityManager->flush();
 
         self::assertNotContains(
@@ -63,7 +63,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
 
         $live = $this->vacancy('backend-engineer')->getLiveRevision();
         self::assertNotNull($live);
-        $live->endDate = new DateTime('-1 day');
+        $live->endDate = new DateTimeImmutable('-1 day');
         $this->entityManager->flush();
 
         self::assertNull($this->publicVacancy('backend-engineer', VacancyCategories::Jobs));

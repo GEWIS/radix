@@ -81,7 +81,6 @@ class AnnouncementType extends AbstractType
                     'label' => t('Show until'),
                     'required' => false,
                     'widget' => 'single_text',
-                    'input' => 'datetime_immutable',
                     'mapped' => false,
                 ],
             );

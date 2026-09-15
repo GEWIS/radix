@@ -7,7 +7,7 @@ namespace App\Entity\Decision\SubDecision\Board;
 use App\Doctrine\Query\Queryable;
 use App\Entity\Decision\SubDecision;
 use App\Repository\Decision\SubDecision\Board\ReleaseRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -56,6 +56,6 @@ class Release extends SubDecision
     /**
      * Date of the discharge.
      */
-    #[Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date;
+    #[Column(type: Types::DATE_IMMUTABLE)]
+    public DateTimeImmutable $date;
 }

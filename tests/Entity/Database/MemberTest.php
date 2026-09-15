@@ -8,7 +8,7 @@ use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
 use App\Entity\Database\RenewalLink;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -68,7 +68,7 @@ class MemberTest extends TestCase
             new Membership(
                 $member,
                 MembershipTypes::Ordinary,
-                new DateTime($startDate),
+                new DateTimeImmutable($startDate),
             ),
         );
 
@@ -135,8 +135,8 @@ class MemberTest extends TestCase
             new Membership(
                 $member,
                 MembershipTypes::Graduate,
-                new DateTime('2027-08-01'),
-                new DateTime('2028-07-01'),
+                new DateTimeImmutable('2027-08-01'),
+                new DateTimeImmutable('2028-07-01'),
             ),
         );
 
@@ -153,14 +153,14 @@ class MemberTest extends TestCase
         $expired = new Membership(
             $member,
             MembershipTypes::Ordinary,
-            new DateTime('-3 years'),
-            new DateTime('-2 years'),
+            new DateTimeImmutable('-3 years'),
+            new DateTimeImmutable('-2 years'),
         );
         $current = new Membership(
             $member,
             MembershipTypes::Ordinary,
-            new DateTime('-1 month'),
-            new DateTime('+11 months'),
+            new DateTimeImmutable('-1 month'),
+            new DateTimeImmutable('+11 months'),
         );
         $member->addMembership($expired);
         $member->addMembership($current);
@@ -189,8 +189,8 @@ class MemberTest extends TestCase
         $expired = new Membership(
             $member,
             MembershipTypes::Ordinary,
-            new DateTime('-3 years'),
-            new DateTime('-2 years'),
+            new DateTimeImmutable('-3 years'),
+            new DateTimeImmutable('-2 years'),
         );
         $member->addMembership($expired);
 
@@ -222,7 +222,7 @@ class MemberTest extends TestCase
         $member->getRenewalLinks()->add(
             new RenewalLink(
                 $member,
-                new DateTime('+2 years'),
+                new DateTimeImmutable('+2 years'),
             ),
         );
 
@@ -239,15 +239,15 @@ class MemberTest extends TestCase
             new Membership(
                 $member,
                 MembershipTypes::Ordinary,
-                new DateTime('2026-08-20'),
+                new DateTimeImmutable('2026-08-20'),
             ),
         );
         $member->addMembership(
             new Membership(
                 $member,
                 MembershipTypes::Graduate,
-                new DateTime('2027-08-01'),
-                new DateTime('2028-07-01'),
+                new DateTimeImmutable('2027-08-01'),
+                new DateTimeImmutable('2028-07-01'),
             ),
         );
 

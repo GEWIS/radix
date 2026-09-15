@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Activity;
 
 use App\Entity\Activity\OptionPeriod;
-use DateTime;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -72,7 +72,7 @@ class OptionPeriodType extends AbstractType
                     'constraints' => [new NotBlank(message: 'Enter when bodies may start proposing.')],
                     // The entity setter is non-nullable; an empty submission would TypeError during data mapping
                     // before NotBlank ever runs, so skip the write and let NotBlank report it.
-                    'setter' => static function (OptionPeriod $period, ?DateTime $value): void {
+                    'setter' => static function (OptionPeriod $period, ?DateTimeImmutable $value): void {
                         if (null === $value) {
                             return;
                         }
@@ -88,7 +88,7 @@ class OptionPeriodType extends AbstractType
                     'label' => t('Bodies may propose until'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter when proposing closes.')],
-                    'setter' => static function (OptionPeriod $period, ?DateTime $value): void {
+                    'setter' => static function (OptionPeriod $period, ?DateTimeImmutable $value): void {
                         if (null === $value) {
                             return;
                         }
@@ -104,7 +104,7 @@ class OptionPeriodType extends AbstractType
                     'label' => t('First day activities may fall on'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter the first day of this round.')],
-                    'setter' => static function (OptionPeriod $period, ?DateTime $value): void {
+                    'setter' => static function (OptionPeriod $period, ?DateTimeImmutable $value): void {
                         if (null === $value) {
                             return;
                         }
@@ -120,7 +120,7 @@ class OptionPeriodType extends AbstractType
                     'label' => t('Last day activities may fall on'),
                     'widget' => 'single_text',
                     'constraints' => [new NotBlank(message: 'Enter the last day of this round.')],
-                    'setter' => static function (OptionPeriod $period, ?DateTime $value): void {
+                    'setter' => static function (OptionPeriod $period, ?DateTimeImmutable $value): void {
                         if (null === $value) {
                             return;
                         }
@@ -171,8 +171,8 @@ class OptionPeriodType extends AbstractType
         }
 
         if (
-            $form->get('submissionOpensAt')->getData() instanceof DateTime
-            && $form->get('submissionClosesAt')->getData() instanceof DateTime
+            $form->get('submissionOpensAt')->getData() instanceof DateTimeImmutable
+            && $form->get('submissionClosesAt')->getData() instanceof DateTimeImmutable
             && $period->submissionClosesAt <= $period->submissionOpensAt
         ) {
             $form->get('submissionClosesAt')->addError(new FormError(
@@ -185,8 +185,8 @@ class OptionPeriodType extends AbstractType
         }
 
         if (
-            !($form->get('startsAt')->getData() instanceof DateTime)
-            || !($form->get('endsAt')->getData() instanceof DateTime)
+            !($form->get('startsAt')->getData() instanceof DateTimeImmutable)
+            || !($form->get('endsAt')->getData() instanceof DateTimeImmutable)
             || $period->endsAt >= $period->startsAt
         ) {
             return;

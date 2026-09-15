@@ -15,7 +15,6 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Database\Enums\ProgramType;
 use App\Entity\Decision\Member as MemberModel;
 use App\Repository\Activity\SignupListRepository;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -53,15 +52,15 @@ use const PHP_INT_MAX;
  *     id: ?int,
  *     name: ?string,
  *     nameEn: ?string,
- *     openDate: ?DateTime,
- *     closeDate: ?DateTime,
+ *     openDate: ?DateTimeImmutable,
+ *     closeDate: ?DateTimeImmutable,
  *     onlyGEWIS: bool,
  *     displaySubscribedNumber: bool,
  *     limitedCapacity: bool,
  *     capacity: ?int,
  *     allocationMethod: string,
  *     drawCutoffRule: ?string,
- *     drawCutoffAt: ?DateTime,
+ *     drawCutoffAt: ?DateTimeImmutable,
  *     drawAfterDurationHours: ?int,
  *     externalPolicyUrl: ?string,
  *     externalForceOrdering: bool,
@@ -164,16 +163,16 @@ class SignupList
     public ActivityLocalisedText $name;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $openDate = null;
+    public ?DateTimeImmutable $openDate = null;
 
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $closeDate = null;
+    public ?DateTimeImmutable $closeDate = null;
 
     /**
      * When subscribers were told this was about to close, so they are told once rather than every time the reminder
@@ -220,10 +219,10 @@ class SignupList
      * reviewer/reviewedAt audit on {@see \App\Entity\Application\AbstractRevision}.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $drawnAt = null;
+    public ?DateTimeImmutable $drawnAt = null;
 
     /**
      * The board member who performed (and locked) the draw; null while not drawn, and also for a draw performed
@@ -260,10 +259,10 @@ class SignupList
      * For {@see DrawCutoffRule::IfFullBefore}: the moment the list must be full by.
      */
     #[Column(
-        type: Types::DATETIME_MUTABLE,
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
-    public ?DateTime $drawCutoffAt = null;
+    public ?DateTimeImmutable $drawCutoffAt = null;
 
     /**
      * For {@see DrawCutoffRule::AfterDurationOpen}: how many hours after opening the draw happens.
@@ -568,7 +567,7 @@ class SignupList
             return false;
         }
 
-        $now = new DateTime('now');
+        $now = new DateTimeImmutable('now');
 
         return $now >= $this->openDate && $now < $this->closeDate;
     }
@@ -581,7 +580,7 @@ class SignupList
     public function isClosed(): bool
     {
         return null !== $this->closeDate
-            && new DateTime('now') >= $this->closeDate;
+            && new DateTimeImmutable('now') >= $this->closeDate;
     }
 
     /**
@@ -608,7 +607,7 @@ class SignupList
      * legacy sign-up lists) have no draw moment. First-come-first-served draws at close; a conditional draw at
      * the moment its {@see DrawCutoffRule} describes.
      */
-    public function getAutoDrawAt(): ?DateTime
+    public function getAutoDrawAt(): ?DateTimeImmutable
     {
         if (!$this->limitedCapacity) {
             return null;
@@ -628,7 +627,7 @@ class SignupList
             DrawCutoffRule::AfterDurationOpen => null === $this->drawAfterDurationHours
                 || null === $this->openDate
                     ? null
-                    : (clone $this->openDate)->modify(sprintf(
+                    : $this->openDate->modify(sprintf(
                         '+%d hours',
                         $this->drawAfterDurationHours,
                     )),
@@ -644,7 +643,7 @@ class SignupList
         $dueAt = $this->getAutoDrawAt();
 
         return null !== $dueAt
-            && new DateTime('now') >= $dueAt;
+            && new DateTimeImmutable('now') >= $dueAt;
     }
 
     /**

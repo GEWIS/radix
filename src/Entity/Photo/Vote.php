@@ -6,7 +6,7 @@ namespace App\Entity\Photo;
 
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Decision\Member as MemberModel;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -32,8 +32,8 @@ class Vote
     /**
      * Date and time when the photo was voted for.
      */
-    #[Column(type: Types::DATETIME_MUTABLE)]
-    public private(set) DateTime $dateTime;
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
+    public private(set) DateTimeImmutable $dateTime;
 
     /**
      * @param MemberModel $voter The member who voted
@@ -58,7 +58,7 @@ class Vote
         )]
         private MemberModel $voter,
     ) {
-        $this->dateTime = new DateTime();
+        $this->dateTime = new DateTimeImmutable();
     }
 
     public function setPhoto(Photo $photo): void

@@ -13,7 +13,7 @@ use App\Entity\Database\Member;
 use App\Entity\Database\SubDecision\Board\Discharge;
 use App\Entity\Database\SubDecision\Board\Installation;
 use App\Entity\Database\SubDecision\Board\Release;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -118,7 +118,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     #[Override]
     public function load(ObjectManager $manager): void
     {
-        $currentTermStart = self::associationYearStart(new DateTime());
+        $currentTermStart = self::associationYearStart(new DateTimeImmutable());
 
         foreach (self::BOARDS as $board) {
             $this->seat(
@@ -143,7 +143,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
         int $seats,
         int $firstMember,
         bool $discharged,
-        DateTime $currentTermStart,
+        DateTimeImmutable $currentTermStart,
     ): void {
         if (
             $seats < 3
@@ -156,11 +156,11 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
             ));
         }
 
-        $takesEffect = new DateTime($currentTermStart->format('Y-m-d'))->modify(sprintf(
+        $takesEffect = new DateTimeImmutable($currentTermStart->format('Y-m-d'))->modify(sprintf(
             '-%d years',
             $termsAgo,
         ));
-        $released = new DateTime($takesEffect->format('Y-m-d'))->modify('+1 year');
+        $released = new DateTimeImmutable($takesEffect->format('Y-m-d'))->modify('+1 year');
 
         // Decided in May, in office from 1 July. The meeting is where the decision lives; the date on the
         // installation is when it starts.
@@ -168,7 +168,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
             $manager,
             $this->meeting(
                 $manager,
-                new DateTime($takesEffect->format('Y-m-d'))->modify('-6 weeks'),
+                new DateTimeImmutable($takesEffect->format('Y-m-d'))->modify('-6 weeks'),
             ),
             $takesEffect,
             $seats,
@@ -184,7 +184,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
             $manager,
             $this->meeting(
                 $manager,
-                new DateTime($released->format('Y-m-d'))->modify('-6 weeks'),
+                new DateTimeImmutable($released->format('Y-m-d'))->modify('-6 weeks'),
             ),
             $released,
             $installations,
@@ -200,7 +200,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
             $manager,
             $this->meeting(
                 $manager,
-                new DateTime($released->format('Y-m-d'))->modify('+5 months'),
+                new DateTimeImmutable($released->format('Y-m-d'))->modify('+5 months'),
             ),
             $installations,
         );
@@ -212,7 +212,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     private function install(
         ObjectManager $manager,
         Meeting $meeting,
-        DateTime $takesEffect,
+        DateTimeImmutable $takesEffect,
         int $seats,
         int $firstMember,
     ): array {
@@ -228,7 +228,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
             $installation = new Installation();
             $installation->setMember($this->member($firstMember + $seat));
             $installation->function = self::SEATS[$seat];
-            $installation->date = clone $takesEffect;
+            $installation->date = $takesEffect;
             $installation->sequence = $sequence++;
             $installation->setDecision($decision);
             $decision->addSubdecision($installation);
@@ -247,7 +247,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     private function release(
         ObjectManager $manager,
         Meeting $meeting,
-        DateTime $on,
+        DateTimeImmutable $on,
         array $installations,
     ): void {
         $decision = $this->decision(
@@ -259,7 +259,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
         foreach ($installations as $installation) {
             $release = new Release();
             $release->installation = $installation;
-            $release->date = clone $on;
+            $release->date = $on;
             $release->sequence = $sequence++;
             $release->setDecision($decision);
             $decision->addSubdecision($release);
@@ -301,9 +301,9 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
      */
     private function meeting(
         ObjectManager $manager,
-        DateTime $on,
+        DateTimeImmutable $on,
     ): Meeting {
-        $on->modify(sprintf(
+        $on = $on->modify(sprintf(
             '+%d days',
             $this->meetingNumber - self::FIRST_MEETING_NUMBER,
         ));
@@ -350,12 +350,12 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     /**
      * The 1 July an association year starts on: this year's if it has already been, last year's otherwise.
      */
-    private static function associationYearStart(DateTime $on): DateTime
+    private static function associationYearStart(DateTimeImmutable $on): DateTimeImmutable
     {
-        $start = new DateTime($on->format('Y') . '-07-01 midnight');
+        $start = new DateTimeImmutable($on->format('Y') . '-07-01 midnight');
 
         if ($start > $on) {
-            $start->modify('-1 year');
+            $start = $start->modify('-1 year');
         }
 
         return $start;

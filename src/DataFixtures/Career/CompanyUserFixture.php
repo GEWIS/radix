@@ -6,7 +6,7 @@ namespace App\DataFixtures\Career;
 
 use App\Entity\Career\Company;
 use App\Entity\User\CompanyUser;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -78,10 +78,10 @@ class CompanyUserFixture extends Fixture implements DependentFixtureInterface, F
                 $companyUser->name = $representative['name'];
                 $companyUser->email = $representative['email'];
                 $companyUser->setPassword(self::PASSWORD_HASH);
-                $companyUser->setPasswordChangedOn(new DateTime());
+                $companyUser->setPasswordChangedOn(new DateTimeImmutable());
 
                 if ($representative['disabled'] ?? false) {
-                    $companyUser->disabledAt = new DateTime('2025-11-01');
+                    $companyUser->disabledAt = new DateTimeImmutable('2025-11-01');
                 }
 
                 if (0 === $index) {

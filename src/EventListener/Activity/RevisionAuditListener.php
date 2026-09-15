@@ -10,7 +10,7 @@ use App\Entity\Activity\SignupField;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\SignupOption;
 use App\Entity\Application\Enums\RevisionStatus;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
@@ -172,7 +172,7 @@ final readonly class RevisionAuditListener
             $edit = new ActivityRevisionEdit();
             $edit->revision = $revision;
             $edit->setEditor($editor);
-            $edit->editedAt = new DateTime();
+            $edit->editedAt = new DateTimeImmutable();
             $edit->changedFields = array_keys($fields);
 
             $entityManager->persist($edit);
