@@ -46,13 +46,6 @@ final readonly class CourseOverviewRow
     #[NoDiscard]
     public function withSimilarCourses(array $similarCourses): self
     {
-        return new self(
-            $this->code,
-            $this->name,
-            $this->summaryCount,
-            $this->examCount,
-            $this->lastAddedAt,
-            $similarCourses,
-        );
+        return clone($this, ['similarCourses' => $similarCourses]);
     }
 }

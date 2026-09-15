@@ -24,11 +24,6 @@ final readonly class MeetingReference
     #[NoDiscard]
     public function withType(?MeetingTypes $type): self
     {
-        return new self(
-            $type,
-            $this->number,
-            $this->point,
-            $this->decision,
-        );
+        return clone($this, ['type' => $type]);
     }
 }

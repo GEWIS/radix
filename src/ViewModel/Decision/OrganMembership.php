@@ -28,9 +28,6 @@ final readonly class OrganMembership
     #[NoDiscard]
     public function withFunctions(array $functions): self
     {
-        return new self(
-            $this->member,
-            $functions,
-        );
+        return clone($this, ['functions' => $functions]);
     }
 }
