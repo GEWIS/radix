@@ -297,6 +297,26 @@ final class PhotoApiTest extends ApiTestCase
         );
     }
 
+    public function testTheChildrenOfAnAlbumAreListedOldestFirst(): void
+    {
+        $body = $this->json($this->get(
+            '/api/photos/albums/' . $this->aPublishedAlbumWithBothKindsOfChild(),
+            $this->principalWith([ApiPermissions::PhotoAlbumsR]),
+        ));
+
+        // The seed's afterparty starts four hours after its dinner, so a chronological listing puts the dinner first.
+        self::assertSame(
+            [
+                'Gala 2024 – Dinner',
+                'Gala 2024 – Afterparty',
+            ],
+            array_column(
+                $body['data']['children'],
+                'name',
+            ),
+        );
+    }
+
     public function testAPhotoRowNamesEveryFieldInTheOrderItPromises(): void
     {
         $body = $this->json($this->get(

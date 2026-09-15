@@ -249,6 +249,9 @@ class AlbumRepository extends ServiceEntityRepository
     }
 
     /**
+     * The published sub-albums of an album, oldest first, so a parent's parts are listed in the order they happened
+     * (the same order the album's own photos are in).
+     *
      * @return Album[]
      */
     public function findPublishedChildren(Album $album): array
@@ -262,11 +265,7 @@ class AlbumRepository extends ServiceEntityRepository
             )
             ->orderBy(
                 'a.startDateTime',
-                SortDirection::Descending,
-            )
-            ->addOrderBy(
-                'a.id',
-                SortDirection::Descending,
+                SortDirection::Ascending,
             )
             ->getQuery()
             ->getResult();

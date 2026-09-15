@@ -178,6 +178,32 @@ final class AlbumServiceTest extends DatabaseTestCase
         );
     }
 
+    public function testViewableChildrenAreOrderedByTheirStartDate(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $gala = $this->albumRepository()->findOneBy(['name' => 'Gala 2024']);
+        self::assertInstanceOf(
+            Album::class,
+            $gala,
+            'The seed is expected to contain the Gala album.',
+        );
+
+        // The afterparty starts four hours after the dinner, so a chronological listing puts the dinner first.
+        self::assertSame(
+            [
+                'Gala 2024 – Dinner',
+                'Gala 2024 – Afterparty',
+            ],
+            array_map(
+                static fn (Album $album): string => $album->name,
+                $this->service()->getViewableChildren($gala),
+            ),
+        );
+    }
+
     public function testCardCountsCountDraftSubAlbumsOnlyForTheAdmin(): void
     {
         $gala = $this->albumRepository()->findOneBy(['name' => 'Gala 2024']);

@@ -84,6 +84,7 @@ class Album
         ],
         fetch: 'EXTRA_LAZY',
     )]
+    #[OrderBy(value: ['startDateTime' => SortDirection::Ascending])]
     private Collection $children;
 
     /**
