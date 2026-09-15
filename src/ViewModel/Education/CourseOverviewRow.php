@@ -6,6 +6,7 @@ namespace App\ViewModel\Education;
 
 use App\Entity\Education\Course;
 use DateTimeImmutable;
+use NoDiscard;
 
 /**
  * Counted rather than hydrated: loading every course with its documents would fetch thousands of rows to display two
@@ -42,6 +43,7 @@ final readonly class CourseOverviewRow
     /**
      * @param Course[] $similarCourses
      */
+    #[NoDiscard]
     public function withSimilarCourses(array $similarCourses): self
     {
         return new self(

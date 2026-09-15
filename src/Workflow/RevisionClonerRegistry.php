@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Workflow;
 
 use App\Entity\Application\RevisionInterface;
+use NoDiscard;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -28,6 +29,7 @@ final readonly class RevisionClonerRegistry
     /**
      * Build the next draft revision (N+1) from {@see $source}, carrying its authorship forward.
      */
+    #[NoDiscard]
     public function cloneAsDraft(RevisionInterface $source): RevisionInterface
     {
         foreach ($this->cloners as $cloner) {

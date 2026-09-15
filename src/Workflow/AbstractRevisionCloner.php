@@ -6,6 +6,7 @@ namespace App\Workflow;
 
 use App\Entity\Application\AbstractRevision;
 use App\Entity\Application\RevisionInterface;
+use NoDiscard;
 use Override;
 
 /**
@@ -22,6 +23,7 @@ use Override;
 abstract readonly class AbstractRevisionCloner implements RevisionClonerInterface
 {
     #[Override]
+    #[NoDiscard]
     public function cloneAsDraft(RevisionInterface $source): RevisionInterface
     {
         $draft = $this->spawnDraft($source);

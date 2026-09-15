@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\SocialPlatform;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
+use NoDiscard;
 
 /**
  * One place a body or a company can be followed, as the platform and the handle it is known by there. The address is
@@ -72,6 +73,7 @@ abstract class AbstractSocialLink
     /**
      * A fresh, unpersisted copy for the cloners, so orphan removal can never take the source revision's row with it.
      */
+    #[NoDiscard]
     public function copy(): static
     {
         $copy = new static($this->platform);

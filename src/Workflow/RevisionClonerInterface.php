@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Workflow;
 
 use App\Entity\Application\RevisionInterface;
+use NoDiscard;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
@@ -30,5 +31,6 @@ interface RevisionClonerInterface
     /**
      * Create the next draft revision from {@see $source}, carrying its authorship forward.
      */
+    #[NoDiscard]
     public function cloneAsDraft(RevisionInterface $source): RevisionInterface;
 }

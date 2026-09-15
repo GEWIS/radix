@@ -9,6 +9,7 @@ use App\Entity\Application\Traits\IdentifiableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use InvalidArgumentException;
+use NoDiscard;
 
 /**
  * Class LocalisedText: stores Dutch and English versions of text fields.
@@ -44,6 +45,7 @@ abstract class LocalisedText
      * A fresh, unpersisted copy of this localised text (same concrete subtype, no id), for deep-copying revision
      * content so orphan-removal can never delete the source revision's row.
      */
+    #[NoDiscard]
     public function copy(): static
     {
         return new static(

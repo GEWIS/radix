@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Decision;
 
 use App\Entity\Database\Enums\MeetingTypes;
+use NoDiscard;
 
 /**
  * A meeting, a point in it or a single decision, as a search prompt addresses it: "BV 1749", "GMM 214.3" or
@@ -20,6 +21,7 @@ final readonly class MeetingReference
     ) {
     }
 
+    #[NoDiscard]
     public function withType(?MeetingTypes $type): self
     {
         return new self(

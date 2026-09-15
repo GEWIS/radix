@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ViewModel\Decision;
 
 use App\Entity\Decision\Member;
+use NoDiscard;
 
 /**
  * One member of a body, with whatever they were installed as beyond simply being a member. The functions are already
@@ -24,6 +25,7 @@ final readonly class OrganMembership
     /**
      * @param list<string> $functions
      */
+    #[NoDiscard]
     public function withFunctions(array $functions): self
     {
         return new self(
