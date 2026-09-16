@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { visit } from '@hotwired/turbo';
 
 interface DirectoryResult {
     lidnr: number;
@@ -128,7 +129,7 @@ export default class extends Controller {
         return results.map((result) => {
             const row = document.createElement('tr');
             row.style.cursor = 'pointer';
-            row.addEventListener('click', () => window.location.assign(result.url));
+            row.addEventListener('click', () => visit(result.url));
 
             const lidnr = document.createElement('td');
             lidnr.className = 'text-muted';

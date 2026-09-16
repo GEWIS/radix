@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { visit } from '@hotwired/turbo';
 
 /**
  * Nothing is submitted: the point and the decision number are part of the decision's address, so they go into the
@@ -43,6 +44,6 @@ export default class extends Controller<HTMLFormElement> {
             `/points/${point}/decisions/${number}`,
         );
 
-        window.location.assign(url.toString());
+        visit(url.toString());
     }
 }

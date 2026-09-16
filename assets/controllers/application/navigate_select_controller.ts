@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { visit } from '@hotwired/turbo';
 
 /* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLSelectElement> {
@@ -11,6 +12,6 @@ export default class extends Controller<HTMLSelectElement> {
             return;
         }
 
-        window.location.assign(url);
+        visit(url);
     }
 }
