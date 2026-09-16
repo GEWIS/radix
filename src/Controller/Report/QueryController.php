@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Report;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Entity\Database\SavedQuery;
 use App\Form\Report\QueryExportType;
 use App\Form\Report\QuerySaveType;
@@ -36,6 +37,7 @@ final class QueryController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function index(Request $request): Response
     {
         return $this->page(
@@ -56,6 +58,7 @@ final class QueryController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function show(
         Request $request,
         int $query,

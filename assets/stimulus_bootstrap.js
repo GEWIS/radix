@@ -3,8 +3,10 @@ import { loadControllers, startStimulusApp } from '@symfony/stimulus-bundle';
 // On every page, so loading these on demand would cost a round trip after the entrypoint has parsed.
 import CosmeticsToggleController from './controllers/application/cosmetics_toggle_controller.ts';
 import DismissibleController from './controllers/application/dismissible_controller.ts';
+import FlashToastsController from './controllers/application/flash_toasts_controller.ts';
 import NavDropdownController from './controllers/application/nav_dropdown_controller.ts';
 import NotificationsController from './controllers/application/notifications_controller.ts';
+import ThemeSwitcherController from './controllers/application/theme_switcher_controller.ts';
 
 const app = startStimulusApp();
 
@@ -20,8 +22,10 @@ loadControllers(
     {
         'cosmetics-toggle': CosmeticsToggleController,
         'dismissible': DismissibleController,
+        'flash-toasts': FlashToastsController,
         'nav-dropdown': NavDropdownController,
         'notifications': NotificationsController,
+        'theme-switcher': ThemeSwitcherController,
     },
     {
         // Application-wide, domain-agnostic controllers.

@@ -6,6 +6,12 @@ import { Controller } from '@hotwired/stimulus';
  */
 const requests = new Map<string, Promise<unknown>>();
 
+// The cache covers one render, not the lifetime of the tab. Turbo Drive keeps this module loaded across navigations,
+// so without this the quote fetched on the first page would stay in the footer for the whole session.
+document.addEventListener('turbo:before-render', (): void => {
+    requests.clear();
+});
+
 function fetchInfimum(url: string): Promise<unknown> {
     let request = requests.get(url);
     if (undefined === request) {

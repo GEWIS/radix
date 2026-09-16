@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
@@ -86,6 +87,7 @@ class AdminController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function create(
         Request $request,
         #[CurrentUser]
@@ -195,6 +197,7 @@ class AdminController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Company $company,

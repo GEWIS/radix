@@ -16,8 +16,9 @@
     </div>
 {% endmacro %}
 
-<div aria-live="polite" aria-atomic="true" class="position-sticky bottom-0">
-    <div id="flash-toast-container" class="toast-container bottom-0 end-0 p-3">
+<div aria-live="polite" aria-atomic="true" class="position-sticky bottom-0" data-controller="flash-toasts">
+    {# The id is kept because the realtime connection selects the container by it to append its own toasts. #}
+    <div id="flash-toast-container" class="toast-container bottom-0 end-0 p-3" data-flash-toasts-target="container">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
                 {{ _self.toast(message, label) }}
@@ -28,12 +29,3 @@
 <template id="realtime-toast-template">
     {{ _self.toast(null, null, 8000) }}
 </template>
-<script nonce="{{ csp_nonce('script') }}">
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('#flash-toast-container .toast:not(.show)').forEach((toast, index) => {
-            setTimeout(() => {
-                bootstrap.Toast.getOrCreateInstance(toast).show();
-            }, index * 10);
-        });
-    });
-</script>

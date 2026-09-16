@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\AbstractRevisionReviewController;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
@@ -99,6 +100,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function create(
         Request $request,
         #[CurrentUser]
@@ -183,6 +185,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Vacancy $vacancy,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Frontpage;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ImageVariant;
@@ -78,6 +79,7 @@ class AdminPageController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function create(Request $request): Response
     {
         $page = new Page();
@@ -146,6 +148,7 @@ class AdminPageController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Page $page,

@@ -34,6 +34,7 @@ export default class extends Controller {
     private lastActivity = 0;
     private lost = false;
     private submitting = false;
+    private released = false;
     private inflight: AbortController | null = null;
     private timer = 0;
 
@@ -41,8 +42,9 @@ export default class extends Controller {
         this.lastActivity = Date.now();
     };
 
-    // Submitting the form is itself a navigation, so the beforeunload handler would otherwise race a lock release
-    // against the save the server is about to perform. The server releases the lock once the save succeeds.
+    // Submitting the form is itself a navigation, so the release handlers would otherwise race a lock release against
+    // the save the server is about to perform. The server releases the lock once the save succeeds. `turbo:submit-start`
+    // is listened for as well because a submission Turbo starts itself dispatches no native `submit` event.
     private readonly _onSubmit = (): void => {
         this.submitting = true;
     };
@@ -55,11 +57,13 @@ export default class extends Controller {
         this.lastActivity = Date.now();
         this.lost = false;
         this.submitting = false;
+        this.released = false;
         this.inflight = null;
 
         this.element.addEventListener('mousedown', this._onActivity);
         this.element.addEventListener('keydown', this._onActivity);
         this.element.addEventListener('submit', this._onSubmit);
+        this.element.addEventListener('turbo:submit-start', this._onSubmit);
         window.addEventListener('beforeunload', this._onUnload);
 
         this.timer = window.setInterval(() => this._tick(), this.intervalValue);
@@ -72,7 +76,13 @@ export default class extends Controller {
         this.element.removeEventListener('mousedown', this._onActivity);
         this.element.removeEventListener('keydown', this._onActivity);
         this.element.removeEventListener('submit', this._onSubmit);
+        this.element.removeEventListener('turbo:submit-start', this._onSubmit);
         window.removeEventListener('beforeunload', this._onUnload);
+
+        // A Turbo Drive navigation replaces the document without unloading it, so `beforeunload` does not fire and
+        // this is the only point at which leaving the form is observable. Without it the lock is not released until
+        // the server expires it, which blocks other editors.
+        this._release();
     }
 
     async _tick(): Promise<void> {
@@ -128,11 +138,14 @@ export default class extends Controller {
         }
     }
 
+    // Called from three places that can overlap: the idle branch of a tick, a real unload, and disconnect. The flag
+    // prevents a second call from sending the beacon for a lock that was already released.
     _release(): void {
-        if (this.lost || this.submitting || !this.hasReleaseUrlValue) {
+        if (this.released || this.lost || this.submitting || !this.hasReleaseUrlValue) {
             return;
         }
 
+        this.released = true;
         navigator.sendBeacon(this.releaseUrlValue, this._body());
     }
 

@@ -44,16 +44,19 @@
             <h6 class="dropdown-header">{{ 'Theme'|trans }}</h6>
         </li>
         <li>
-            <div class="nav-menu-segmented">
-                <button type="button" class="btn" data-bs-theme-value="gewis-day" aria-pressed="false">
+            <div class="nav-menu-segmented" data-controller="theme-switcher">
+                <button type="button" class="btn" data-bs-theme-value="gewis-day" aria-pressed="false"
+                        data-action="theme-switcher#select">
                     <span class="fas fa-sun" aria-hidden="true"></span>
                     {{ 'Light'|trans }}
                 </button>
-                <button type="button" class="btn" data-bs-theme-value="gewis-night" aria-pressed="false">
+                <button type="button" class="btn" data-bs-theme-value="gewis-night" aria-pressed="false"
+                        data-action="theme-switcher#select">
                     <span class="fas fa-moon" aria-hidden="true"></span>
                     {{ 'Dark'|trans }}
                 </button>
-                <button type="button" class="btn" data-bs-theme-value="auto" aria-pressed="false">
+                <button type="button" class="btn" data-bs-theme-value="auto" aria-pressed="false"
+                        data-action="theme-switcher#select">
                     <span class="fas fa-star-half-stroke" aria-hidden="true"></span>
                     {{ 'Auto'|trans }}
                 </button>

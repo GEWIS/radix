@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\MeetingTypes;
@@ -212,6 +213,7 @@ final class DecisionController extends AbstractController
         methods: ['POST'],
     )]
     #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    #[RendersOnSuccess]
     public function form(
         Request $request,
         string $form,
@@ -532,6 +534,7 @@ final class DecisionController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function export(Request $request): Response
     {
         $form = $this->createForm(ExportType::class);

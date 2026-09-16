@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\Enums\UserRoles;
@@ -70,6 +71,7 @@ class AdminExternalAppController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function create(Request $request): Response
     {
         $run = $this->flowRun($request);
@@ -125,6 +127,7 @@ class AdminExternalAppController extends AbstractController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function edit(
         Request $request,
         ExternalApp $externalApp,

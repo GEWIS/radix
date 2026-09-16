@@ -32,8 +32,19 @@ export default class extends Controller {
     declare readonly cappedValue: string;
     declare readonly modeValue: string;
 
-    private token = 0;
     private debounce: number | null = null;
+    private inflight: AbortController | null = null;
+
+    // A pending debounce would otherwise search from a detached element, and its response would render into one.
+    disconnect(): void {
+        if (null !== this.debounce) {
+            clearTimeout(this.debounce);
+            this.debounce = null;
+        }
+
+        this.inflight?.abort();
+        this.inflight = null;
+    }
 
     search(): void {
         if (null !== this.debounce) {
@@ -45,7 +56,11 @@ export default class extends Controller {
 
     private async fetchResults(): Promise<void> {
         const query = this.inputTarget.value.trim();
-        const token = ++this.token;
+
+        // Aborting the previous search is what discards its response: the `await` below rejects into the `catch`, so
+        // an earlier search can no longer render over a later one.
+        this.inflight?.abort();
+        this.inflight = null;
 
         if (query.length < 2) {
             this.resultsTarget.replaceChildren();
@@ -54,19 +69,26 @@ export default class extends Controller {
             return;
         }
 
-        const response = await fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`, {
-            headers: { Accept: 'application/json' },
-        });
-        if (!response.ok || token !== this.token) {
-            return;
-        }
+        const controller = new AbortController();
+        this.inflight = controller;
 
-        const results = (await response.json()) as DirectoryResult[];
-        if (token !== this.token) {
-            return;
-        }
+        try {
+            const response = await fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`, {
+                headers: { Accept: 'application/json' },
+                signal: controller.signal,
+            });
+            if (!response.ok) {
+                return;
+            }
 
-        this.render(results);
+            this.render((await response.json()) as DirectoryResult[]);
+        } catch {
+            // An aborted or failed search leaves the previous results in place; the next keystroke tries again.
+        } finally {
+            if (controller === this.inflight) {
+                this.inflight = null;
+            }
+        }
     }
 
     private render(results: DirectoryResult[]): void {

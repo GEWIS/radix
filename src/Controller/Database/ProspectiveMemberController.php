@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Form\Database\MemberApproveType;
@@ -71,6 +72,7 @@ final class ProspectiveMemberController extends AbstractController
      *
      * `join_index` is declared in config/routes.yaml; the sign-up host allowlists the address it is served at.
      */
+    #[RendersOnSuccess]
     public function subscribe(Request $request): Response
     {
         if (!$this->registrationService->isOpen($request->getClientIp())) {
@@ -148,6 +150,7 @@ final class ProspectiveMemberController extends AbstractController
      * `join_renew` is declared in config/routes.yaml, along with the two addresses this used to be served at, which
      * redirect here because a renewal e-mail sent months ago links to one of them.
      */
+    #[RendersOnSuccess]
     public function renew(
         Request $request,
         string $token,

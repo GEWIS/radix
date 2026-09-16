@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Decision;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\AbstractRevisionController;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
@@ -154,6 +155,7 @@ class AdminBodyController extends AbstractRevisionController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Organ $organ,

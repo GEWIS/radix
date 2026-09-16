@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\Enums\UserTypes;
@@ -87,6 +88,7 @@ class UserController extends AbstractSecurityController
      * Routed from {@see /config/routes.yaml} (`user_token`) rather than via an attribute, so it stays a plain locale-
      * less URL.
      */
+    #[RendersOnSuccess]
     public function token(
         Request $request,
         string $app,

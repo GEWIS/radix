@@ -4,6 +4,11 @@
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  */
 
+/*
+ * Inlined in the head so the theme is on the document before the first paint. Only what has to happen that early is
+ * here; the switcher buttons are bound by the `theme-switcher` Stimulus controller, which goes through the
+ * `window.gewisTheme` API below so the storage key and the `auto` rule are written down once.
+ */
 (() => {
     'use strict'
 
@@ -29,18 +34,6 @@
 
     setTheme(getPreferredTheme())
 
-    const showActiveTheme = (theme) => {
-        const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-
-        document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-            element.classList.remove('active')
-            element.setAttribute('aria-pressed', 'false')
-        })
-
-        btnToActive.classList.add('active')
-        btnToActive.setAttribute('aria-pressed', 'true')
-    }
-
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         const storedTheme = getStoredTheme()
         if (storedTheme !== 'gewis-day' && storedTheme !== 'gewis-night') {
@@ -48,17 +41,9 @@
         }
     })
 
-    window.addEventListener('DOMContentLoaded', () => {
-        showActiveTheme(getPreferredTheme())
-
-        document.querySelectorAll('[data-bs-theme-value]')
-            .forEach(toggle => {
-                toggle.addEventListener('click', () => {
-                    const theme = toggle.getAttribute('data-bs-theme-value')
-                    setStoredTheme(theme)
-                    setTheme(theme)
-                    showActiveTheme(theme)
-                })
-            })
-    })
+    window.gewisTheme = {
+        preferred: getPreferredTheme,
+        apply: setTheme,
+        store: setStoredTheme,
+    }
 })()

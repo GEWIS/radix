@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Database;
 
+use App\Attribute\Application\RendersOnSuccess;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Form\Database\AuditNoteType;
@@ -109,6 +110,7 @@ final class MemberController extends AbstractMemberController
             'POST',
         ],
     )]
+    #[RendersOnSuccess]
     public function bulkRenewal(Request $request): Response
     {
         $form = $this->createForm(
