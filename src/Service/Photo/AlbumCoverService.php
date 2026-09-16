@@ -20,7 +20,7 @@ use function sprintf;
  * Composes an album's cover mosaic as a single 1280x720 WebP master, from which the cover variants are derived. The
  * four tiles are laid out to suit the photos' orientation: landscape-heavy albums keep the legacy 2x2 grid of 640x360
  * tiles, while portrait-heavy albums use four 320x720 columns (a landscape cell would crop a portrait to a thin
- * horizontal slice). Each tile is cover-cropped before compositing, so no full-resolution frame is ever held in the
+ * horizontal slice). Each tile is cover-cropped before compositing, so no full-resolution frame is ever kept in the
  * canvas. This, combined with running in a Messenger worker (off the request thread) and the result being cached
  * immutably, replaces the legacy synchronous per-request cover render.
  */
@@ -42,7 +42,7 @@ final readonly class AlbumCoverService
 
     /**
      * Compose and store the album's cover mosaic and point the album at it. Returns the stored cover path, or null when
-     * the album (and its sub-albums) hold no photos to build a cover from. The caller flushes.
+     * the album (and its sub-albums) contain no photos to build a cover from. The caller flushes.
      */
     public function generateForAlbum(Album $album): ?string
     {

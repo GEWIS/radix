@@ -16,9 +16,9 @@ use function count;
 use function usort;
 
 /**
- * What a company sees when it signs in: where its profile stands, what its vacancies are doing, what runs out soon and
- * whether anything is waiting on somebody. Assembled once so the dashboard template does not work any of it out again
- * while rendering.
+ * What a company sees when it signs in: where its profile stands, what its vacancies are doing, what runs out
+ * soon and whether anything is waiting for action. Assembled once so the dashboard template does not compute any
+ * of it again while rendering.
  */
 final readonly class CompanyDashboard
 {
@@ -99,8 +99,8 @@ final readonly class CompanyDashboard
             $highlighted += count($package->getDisplayableVacancies());
         }
 
-        // The packages come out in whatever order the company happens to hold them, and what runs out this week
-        // belongs above what runs out in three months.
+        // The packages come out in whatever order they are stored on the company, and what runs out this week belongs
+        // above what runs out in three months.
         usort(
             $expiring,
             static function (
@@ -114,8 +114,8 @@ final readonly class CompanyDashboard
         $current = $company->getCurrentRevision();
 
         // A profile that has never been approved, or that came back with changes requested, is waiting on the company
-        // rather than on anybody else. A request for changes is read off the draft that was spawned in answer to it,
-        // since that draft is what the company is looking at by the time it gets here.
+        // rather than on the committee. A request for changes is read from the draft that was created in response to
+        // it, since that draft is what the company is looking at by the time it gets here.
         $needsAttention = null === $company->getLiveRevision()
             || (
                 null !== $current

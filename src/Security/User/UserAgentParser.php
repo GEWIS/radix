@@ -19,7 +19,7 @@ use function strtolower;
 use function trim;
 
 /**
- * Thin wrapper around Matomo's `DeviceDetector` that yields the three pieces we persist on
+ * Thin wrapper around Matomo's `DeviceDetector` that returns the three pieces we persist on
  * {@see \App\Entity\User\Session}: the semantic device type, the browser name + major version (joined), and the OS name
  * + major version (joined).
  *
@@ -51,8 +51,8 @@ final readonly class UserAgentParser
      *
      * Shared deliberately. {@see \App\EventListener\User\StaleSessionGuardListener} tears a session down when the
      * family changes under a cookie, and {@see DeviceFingerprint} keys a recognised device on it. Were the two to
-     * disagree about what counts as the same browser, a device could be torn down as a stranger and recognised as
-     * familiar on the same request.
+     * disagree about what counts as the same browser, a device could have its session torn down as unknown and be
+     * recognised as familiar on the same request.
      */
     public static function family(?string $combined): ?string
     {
@@ -82,7 +82,7 @@ final readonly class UserAgentParser
     }
 
     /**
-     * The client hints a request carries, flattened to the single values Matomo expects.
+     * The client hints a request contains, flattened to the single values Matomo expects.
      *
      * @return array<string, string>
      */
@@ -107,7 +107,7 @@ final readonly class UserAgentParser
 
     /**
      * The operating system version is only reported where the browser stated it in a client hint. `Windows NT 10.0`
-     * covers both Windows 10 and Windows 11, so a version read from the user agent would show somebody on Windows 11 a
+     * covers both Windows 10 and Windows 11, so a version read from the user agent would show a user on Windows 11 a
      * device they do not recognise. The browser version is taken from the user agent as before, which reports it
      * accurately.
      *
@@ -147,8 +147,8 @@ final readonly class UserAgentParser
                 ? ($bot['name'] ?? 'Unknown bot')
                 : 'Unknown bot';
 
-            // Bots do not have an OS; the bot name lives in `browser` so the template's browser / OS / fallback chain
-            // stays uniform.
+            // Bots do not have an OS; the bot name is returned in `browser` so the template's browser / OS / fallback
+            // chain stays uniform.
             return [
                 'type' => DeviceTypes::Bot,
                 'browser' => $name,

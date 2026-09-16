@@ -15,8 +15,8 @@ final class UserAgentParserTest extends TestCase
         . '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
     /**
-     * Windows 11 reports itself as `Windows NT 10.0` and always will, so a version read from the user agent would tell
-     * somebody on Windows 11 that they are on Windows 10. The browser version in the user agent is accurate and stays.
+     * Windows 11 reports itself as `Windows NT 10.0` and always will, so a version read from the user agent would show
+     * a user on Windows 11 that they are on Windows 10. The browser version in the user agent is accurate and stays.
      */
     public function testOnlyTheSystemVersionIsWithheldWithoutAHint(): void
     {
@@ -73,7 +73,7 @@ final class UserAgentParserTest extends TestCase
     }
 
     /**
-     * Only `sec-ch-ua*` headers are hints; everything else on the request is none of the detector's business.
+     * Only `sec-ch-ua*` headers are hints; everything else on the request is not passed to the detector.
      */
     public function testOnlyClientHintHeadersArePassedOn(): void
     {

@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\RealtimeEventType;
 
 /**
- * A toast envelope. Text is carried per language because the client has no translation runtime; it picks the language
+ * A toast envelope. Text is included per language because the client has no translation runtime; it picks the language
  * matching its locale.
  *
  * @phpstan-type LocalisedString = array{en: string, nl: string}

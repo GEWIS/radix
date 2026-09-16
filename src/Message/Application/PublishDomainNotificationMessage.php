@@ -9,7 +9,7 @@ use App\Entity\User\Enums\UserRoles;
 
 /**
  * Requests a notification for a domain event that just happened (an album going public, an activity submitted for
- * review). Carries the type, the subject's key, and who it is for when that is a role rather than everybody.
+ * review). Contains the type, the subject's key, and who it is for when that is a role rather than everybody.
  */
 class PublishDomainNotificationMessage
 {

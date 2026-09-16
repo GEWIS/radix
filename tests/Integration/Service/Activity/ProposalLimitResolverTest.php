@@ -17,9 +17,9 @@ use DateTimeImmutable;
 use function count;
 
 /**
- * The ladder that answers how many activities a body may put forward, against the seeded calendar.
+ * The ladder that determines how many activities a body may put forward, against the seeded calendar.
  *
- * The seed holds GETÉST to two in the round that is open (a one-off override) and has it use both, puts KEUR on a
+ * The seed limits GETÉST to two in the round that is open (a one-off override) and has it use both, puts KEUR on a
  * standing limit of two with one used, and writes nothing at all for any other body. That last case is the one the old
  * calendar got wrong: it wrote a row per body when a period was opened, started them all at zero, and read a missing
  * row as zero as well, so a body founded afterwards could propose nothing.
@@ -221,7 +221,7 @@ final class ProposalLimitResolverTest extends DatabaseTestCase
     }
 
     /**
-     * The batch answer has to say exactly what the one-at-a-time answer says, or the picker and the form disagree.
+     * The batch result has to match the one-at-a-time result exactly, or the picker and the form disagree.
      */
     public function testTheBatchAnswerMatchesTheSingleAnswer(): void
     {

@@ -15,8 +15,8 @@ use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * What reserving a day actually does: it starts the activity the body now has to build, and lets go of every other day
- * that body was standing on.
+ * What reserving a day actually does: it starts the activity the body now has to build, and releases every other day
+ * that body had reserved.
  *
  * The connection between the two is the point of the whole feature. Without it a body that has just been given a day
  * would go to another screen and type its own proposal in again, and nothing would be able to tell whether a reserved

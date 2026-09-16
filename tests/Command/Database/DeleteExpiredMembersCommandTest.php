@@ -18,8 +18,8 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * The sweep that nobody watches. It deletes members outright, so the guards in front of it — the shape of the date,
- * and a confirmation that defaults to no — are the whole safety of the thing.
+ * The sweep runs unattended. It deletes members outright, so the guards in front of it (the shape of the date, and a
+ * confirmation that defaults to no) are the whole safety of the thing.
  */
 #[CoversClass(DeleteExpiredMembersCommand::class)]
 #[CoversClass(DeleteExpiredProspectiveMembersCommand::class)]
@@ -105,8 +105,8 @@ class DeleteExpiredMembersCommandTest extends TestCase
     }
 
     /**
-     * Its sibling has nothing to confirm: what counts as expired is worked out from the checkout sessions rather
-     * than given by whoever runs it.
+     * Its sibling has nothing to confirm: what counts as expired is computed from the checkout sessions rather than
+     * given by the user who runs it.
      */
     public function testSweepsProspectiveMembersWithoutAsking(): void
     {

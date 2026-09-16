@@ -28,9 +28,9 @@ use function assert;
 use function Symfony\Component\Translation\t;
 
 /**
- * The slug and the package sit on the vacancy rather than on a revision, so a change to either takes effect the
- * moment it is saved instead of when the committee agrees to it. Once the vacancy is live `identity_editable` is
- * false and only the board may still change them.
+ * The slug and the package are on the vacancy rather than on a revision, so a change to either takes effect the moment
+ * it is saved instead of when the committee agrees to it. Once the vacancy is live `identity_editable` is false and
+ * only the board may still change them.
  *
  * @extends AbstractType<VacancyData>
  */
@@ -130,7 +130,7 @@ class GeneralStepType extends AbstractType
     /**
      * A package that has already run out is not on offer any more, but the one a vacancy was sold under has to stay
      * choosable: without it the select comes up empty on edit and the only way to save is to move the vacancy to
-     * somebody else's contract.
+     * another company's contract.
      *
      * @return array<string, int>
      */

@@ -31,8 +31,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Who may act for a company, from the board's side. Inviting somebody, shutting them out again and removing them
- * outright all live here; the portal only shows the company who its own people are.
+ * Who may act for a company, from the board's side. Inviting a representative, shutting them out again and removing
+ * them outright are all handled here; the portal only shows the company who its own people are.
  */
 #[IsGranted(
     attribute: UserRoles::CompanyAdmin->value,
@@ -244,7 +244,7 @@ class AdminRepresentativeController extends AbstractController
 
     /**
      * Removes the account outright. Everything that points at it from the review chains falls back to null, which is
-     * why shutting somebody out is the milder option offered first.
+     * why shutting a representative out is the milder option offered first.
      */
     #[IsCsrfTokenValid(
         id: new Expression('"company_representative_remove-" ~ args["representativeId"]'),

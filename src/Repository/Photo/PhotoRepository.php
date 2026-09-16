@@ -66,8 +66,7 @@ class PhotoRepository extends ServiceEntityRepository
                     'member',
                     $album->getMember(),
                 );
-            // We want to display the photos in a member's album in reversed
-            // chronological order
+            // We want to display the photos in a member's album in reversed chronological order
             $qb->setFirstResult($start)
                 ->orderBy(
                     'p.dateTime',
@@ -154,7 +153,7 @@ class PhotoRepository extends ServiceEntityRepository
 
     /**
      * Resolve a set of photo ids to their {@see Photo} entities. Shared by the member and admin bulk actions so the id
-     * resolution (and any future capping or access filtering) lives in one place. An empty id list issues no query.
+     * resolution (and any future capping or access filtering) is in one place. An empty id list issues no query.
      *
      * @param int[] $ids
      *
@@ -168,7 +167,7 @@ class PhotoRepository extends ServiceEntityRepository
     }
 
     /**
-     * The number of direct photos each of the given albums has, keyed by album id, in a single query — so a grid of
+     * The number of direct photos each of the given albums has, keyed by album id, in a single query, so a grid of
      * album cards does not issue one `COUNT(*) ... WHERE album_id = ?` per card. Albums with no photos are absent.
      *
      * @param Album[] $albums

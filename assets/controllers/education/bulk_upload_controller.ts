@@ -157,7 +157,7 @@ export default class extends Controller<HTMLElement> {
         request.send(body);
     }
 
-    // What the server said went wrong, so a rejected file says why rather than only that it failed.
+    // The error the server reported, so a rejected file shows why rather than only that it failed.
     private _reason(request: XMLHttpRequest): string | null {
         try {
             const data: unknown = JSON.parse(request.responseText);

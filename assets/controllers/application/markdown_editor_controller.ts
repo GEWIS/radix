@@ -4,14 +4,14 @@ import { flattenFloatingLabel } from '../../js/floating_label.ts';
 
 /**
  * The editor is built as the page opens, not when the box is first pressed: the bundle is large, but nearly every box
- * it is put on sits on a screen whose whole purpose is writing, and there a download in the way of the first keystroke
- * costs more than it saves.
+ * it is put on appears on a screen whose whole purpose is writing, and there a download in the way of the first
+ * keystroke costs more than it saves.
  *
  * `data-markdown-editor-toolbar-value="minimal"` selects the restricted toolbar (the sign-up email) and `"comment"`
- * the four inline marks a poll comment may carry; the default is the full toolbar (activity descriptions).
+ * the four inline marks a poll comment may contain; the default is the full toolbar (activity descriptions).
  *
  * `clear()` empties the editor, for a form that is not reloaded after it is sent: a live component that keeps its
- * textarea behind `data-live-ignore` cannot empty it through a re-render, so it says so with a browser event instead
+ * textarea behind `data-live-ignore` cannot empty it through a re-render, so it dispatches a browser event instead
  * (`data-action="poll-comment:posted@window->markdown-editor#clear"`).
  *
  * `insertText()` inserts a string at the caret, for a controller that supplies text without writing it itself
@@ -104,7 +104,7 @@ export default class extends Controller {
         }
     }
 
-    // The Markdown plugin makes getData() and the initial data GFM Markdown whichever toolbar is asked for.
+    // The Markdown plugin makes getData() and the initial data GFM Markdown whichever toolbar is selected.
     // 'GPL' license key: valid for this GPL-3.0 project (CKEditor 5 >= v44 requires a key).
     private config(c: CkEditorModule): Record<string, unknown> {
         // A poll comment is a sentence or two, not a document, and every button beyond these four invites one to be

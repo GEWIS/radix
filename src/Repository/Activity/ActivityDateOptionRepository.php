@@ -28,11 +28,11 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
     }
 
     /**
-     * Every option that takes up any day in the given stretch, whether it starts before it, ends after it, or swallows
+     * Every option that takes up any day in the given stretch, whether it starts before it, ends after it, or covers
      * it whole. A month grid needs all four cases or an option running across the turn of the month vanishes from both
      * months.
      *
-     * Ordered by when the proposal was handed in, so first dibs is simply the order they come back in.
+     * Ordered by when the proposal was submitted, so first dibs is simply the order they come back in.
      *
      * @return ActivityDateOption[]
      */
@@ -59,7 +59,7 @@ class ActivityDateOptionRepository extends ServiceEntityRepository
     }
 
     /**
-     * Who is in line for one particular day, in the order they asked.
+     * Who is in line for one particular day, in the order they requested it.
      *
      * @return ActivityDateOption[]
      */

@@ -26,9 +26,9 @@ class MiscService
     /**
      * Generate the mailing lists themselves.
      *
-     * The memberships of those lists are not generated here. A membership needs both its list and its member to be
-     * in the projection already, and generating the members is what puts each of their memberships there -- so a pass
-     * over the memberships either runs before the members it needs, or after they have already been written.
+     * The memberships of those lists are not generated here. A membership needs both its list and its member to be in
+     * the projection already, and generating the members is what puts each of their memberships there, so a pass over
+     * the memberships either runs before the members it needs, or after they have already been written.
      */
     public function generateLists(): void
     {

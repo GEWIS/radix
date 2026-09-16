@@ -87,7 +87,7 @@ final class SignupOverviewTest extends DatabaseTestCase
             1,
             $sent,
         );
-        // All four subscribers carry an email, so the default "everyone" scope reaches all of them.
+        // All four subscribers have an email, so the default "everyone" scope reaches all of them.
         self::assertCount(
             4,
             $sent[0]->getRecipients(),
@@ -468,7 +468,7 @@ final class SignupOverviewTest extends DatabaseTestCase
     }
 
     /**
-     * The component as the page draws it, so the template runs against the real read-models without the HTTP layer
+     * The component as the page renders it, so the template runs against the real read-models without the HTTP layer
      * the class comment rules out.
      *
      * @param array<string, mixed> $props
@@ -486,7 +486,7 @@ final class SignupOverviewTest extends DatabaseTestCase
         // The dates are written in the request's locale, so there has to be a request.
         self::getContainer()->get('request_stack')->push(new Request());
 
-        // Through a template rather than the renderer, which wants a Twig template on the stack for the live id.
+        // Through a template rather than the renderer, which requires a Twig template on the stack for the live id.
         return self::getContainer()->get(Environment::class)
             ->createTemplate('{{ component(\'Activity:Admin:SignupOverview\', props) }}')
             ->render(['props' => ['activity' => $activity] + $props]);

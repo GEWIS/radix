@@ -44,9 +44,9 @@ class BoardService
         $boardMember = $this->findBoardMember($discharge->installation);
 
         if (null === $boardMember) {
-            // The installation this discharge undoes never took effect, so there is nobody on the board to discharge.
-            // That is what the ledger says whenever the installation was annulled before this point, and it is also
-            // what the older meetings say, from before board membership was recorded the way it is now.
+            // The installation this discharge undoes never took effect, so there is no member on the board to
+            // discharge. That is what the ledger says whenever the installation was annulled before this point, and it
+            // is also what the older meetings say, from before board membership was recorded the way it is now.
             return;
         }
 
@@ -60,7 +60,7 @@ class BoardService
         $boardMember = $this->findBoardMember($release->installation);
 
         if (null === $boardMember) {
-            // See generateDischarge(): there is nothing to release somebody from.
+            // See generateDischarge(): there is nothing to release a member from.
             return;
         }
 

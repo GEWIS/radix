@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\PrePersist;
 use LogicException;
 
 /**
- * One entry of a company's administrative timeline: who was invited, which packages changed hands, what happened to the
+ * One entry of a company's administrative timeline: who was invited, which packages changed, what happened to the
  * banner. The action can come from either side of the arrangement, so the actor is a board member or one of the
  * company's own representatives, never both.
  */
@@ -86,7 +86,7 @@ class CompanyAuditLog
     }
 
     /**
-     * A human-readable name for whoever acted, or null when nobody did.
+     * A human-readable name for the actor, or null when the system acted on its own.
      */
     public function getActorDisplayName(): ?string
     {

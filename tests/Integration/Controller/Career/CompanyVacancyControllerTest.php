@@ -46,7 +46,7 @@ final class CompanyVacancyControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The tabs narrow the list to one state at a time, and a vacancy sits in exactly one of them.
+     * The tabs narrow the list to one state at a time, and a vacancy is in exactly one of them.
      */
     public function testATabOnlyShowsTheVacanciesInThatState(): void
     {

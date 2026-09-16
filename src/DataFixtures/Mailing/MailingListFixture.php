@@ -35,8 +35,8 @@ class MailingListFixture extends Fixture implements FixtureGroupInterface
     public const string REF_LIST_ACTIVITIES = 'list-activities';
 
     /**
-     * Name, descriptions, whether the registration form offers it, whether it is ticked, and which server carries
-     * it -- the Listmonk id the seed gives it, or null where Mailman carries it instead.
+     * Name, descriptions, whether the registration form offers it, whether it is ticked, and which server it is on:
+     * the Listmonk id the seed gives it, or null where Mailman has it instead.
      */
     private const array LISTS = [
         [

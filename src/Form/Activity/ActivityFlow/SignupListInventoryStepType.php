@@ -32,8 +32,8 @@ class SignupListInventoryStepType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
-        // A marker, so that what this step submits says which step it is: a step that collects nothing would carry
-        // no key, and the flow takes a submission with no key for whichever step it is on now.
+        // A marker, so that what this step submits says which step it is: a step that collects nothing would have no
+        // key, and the flow takes a submission with no key for whichever step it is on now.
         $builder->add(
             'open',
             HiddenType::class,
@@ -55,7 +55,7 @@ class SignupListInventoryStepType extends AbstractType
         $rows = [];
 
         if ($revision instanceof ActivityRevision) {
-            // A list is named in the languages the activity is being written in, which the form still holds.
+            // A list is named in the languages the activity is being written in, which the form still has.
             $activity = $form->getRoot()->getData();
             $languages = $activity instanceof ActivityData
                 ? $activity->languages()

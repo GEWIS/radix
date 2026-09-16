@@ -25,11 +25,11 @@ use function unlink;
 
 /**
  * Draws the banner and the card image the body fixtures need, so the overviews and the body pages serve real files
- * instead of pointing at paths nobody ever wrote anything to. Generated rather than committed, as the career and photo
+ * instead of pointing at paths that were never written to. Generated rather than committed, as the career and photo
  * fixtures do.
  *
  * Each is drawn at the shape it is shown in, since what a body stores is already cropped; only the original is written,
- * and the renditions a page asks for are generated the first time one is requested.
+ * and the renditions a page uses are generated the first time one is requested.
  */
 final readonly class OrganImageGenerator
 {

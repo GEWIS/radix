@@ -16,7 +16,7 @@ use function sprintf;
 /**
  * The companies tab of the career overview. Searching and paging happen in the component rather than the controller,
  * so they are exercised on a real instance with its real repository. Each case builds its own component: one instance
- * answers for one set of filters (it holds on to its paginator), which is exactly how a render uses it.
+ * serves one set of filters (it caches its paginator), which is exactly how a render uses it.
  */
 final class CompanyOverviewTest extends DatabaseTestCase
 {
@@ -68,7 +68,7 @@ final class CompanyOverviewTest extends DatabaseTestCase
     }
 
     /**
-     * Narrowing the search from a later page must not leave the reader stranded on a page that no longer exists.
+     * Narrowing the search from a later page must not leave the component on a page that no longer exists.
      */
     public function testSearchingReturnsToTheFirstPage(): void
     {
@@ -84,7 +84,7 @@ final class CompanyOverviewTest extends DatabaseTestCase
     }
 
     /**
-     * The seed holds a handful of companies, too few to page through, so this adds enough to fill a second page.
+     * The seed has a handful of companies, too few to page through, so this adds enough to fill a second page.
      */
     private function seedCompanies(int $count): void
     {

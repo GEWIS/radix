@@ -30,17 +30,17 @@ class NotificationRepository extends ServiceEntityRepository
 
     /**
      * The most recent notifications within the window that this user may see, newest first: everything addressed to
-     * nobody in particular, everything addressed to them, and everything addressed to a role they hold.
+     * nobody in particular, everything addressed to them, and everything addressed to a role they have.
      *
      * Anything the viewer has cleared away is excluded here rather than afterwards, so the limit counts what they will
      * actually be shown: clearing ten notifications must not leave them with an empty centre while older ones are
      * still within the window.
      *
      * Deliberately not result-cached. One list used to serve every member, which made caching worth it; now that it is
-     * per-member the saving is small, and a cached list would keep being handed back after the notification centre has
-     * already been told to refresh itself.
+     * per-member the saving is small, and a cached list would keep being returned after the notification centre has
+     * already been instructed to refresh itself.
      *
-     * @param UserRoles[] $roles every role the viewer holds, hierarchy included
+     * @param UserRoles[] $roles every role the viewer has, hierarchy included
      *
      * @return Notification[]
      */
@@ -86,8 +86,8 @@ class NotificationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Take down the notification about a subject that has since been dealt with. Announcing is deduplicated per
-     * subject and type, so one that outlives what it was about would keep the next one from being published at all.
+     * Removes the notification about a subject that has since been dealt with. Announcing is deduplicated per subject
+     * and type, so one that outlives what it was about would keep the next one from being published at all.
      */
     public function removeForSubject(
         NotificationType $type,

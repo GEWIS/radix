@@ -66,7 +66,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
     }
 
     /**
-     * The same count for a set of bodies in one go, keyed by body. Bodies with nothing handed in are absent, which the
+     * The same count for a set of bodies in one go, keyed by body. Bodies with nothing submitted are absent, which the
      * caller reads as zero.
      *
      * @param Organ[] $organs
@@ -114,8 +114,8 @@ class ActivityProposalRepository extends ServiceEntityRepository
     }
 
     /**
-     * The board's queue: everything still waiting for a decision, oldest first, because who asked first is the first
-     * thing the board wants to see.
+     * The board's queue: everything still waiting for a decision, oldest first, because who submitted first is the
+     * first thing the board wants to see.
      *
      * @return ActivityProposal[]
      */
@@ -157,7 +157,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
     }
 
     /**
-     * Everything a body has going in a period, whatever became of it.
+     * Every proposal a body has in a period, whatever its status.
      *
      * @param Organ[] $organs
      *
@@ -199,7 +199,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
     }
 
     /**
-     * Proposals holding a date that is coming up without the financial side having been settled, and that have not
+     * Proposals whose reserved date is coming up without the financial side having been settled, and that have not
      * been warned about it yet.
      *
      * @return ActivityProposal[]
@@ -213,7 +213,7 @@ class ActivityProposalRepository extends ServiceEntityRepository
     }
 
     /**
-     * Proposals whose reserved date is now so close that the option has run out of road.
+     * Proposals whose reserved date is now so close that the option lapses.
      *
      * @return ActivityProposal[]
      */

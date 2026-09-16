@@ -31,7 +31,7 @@ class PregenerateImageVariantHandler
             $message->getVariant(),
         )?->webpQuality() ?? self::FALLBACK_QUALITY;
 
-        // Skipping upscales, unlike {@see GenerateImageVariantHandler}: nobody is waiting on this variant, so a
+        // Skipping upscales, unlike {@see GenerateImageVariantHandler}: no request is waiting on this variant, so a
         // narrower original is left without one rather than stored larger than it can fill.
         $this->variantGenerator->generateVariant(
             $message->getSourcePath(),

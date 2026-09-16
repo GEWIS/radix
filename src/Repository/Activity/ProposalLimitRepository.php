@@ -29,7 +29,7 @@ class ProposalLimitRepository extends ServiceEntityRepository
     }
 
     /**
-     * The standing limits for a set of bodies at once, keyed by body, so listing every body somebody may act for does
+     * The standing limits for a set of bodies at once, keyed by body, so listing every body a user may act for does
      * not cost one query per body.
      *
      * @param Organ[] $organs

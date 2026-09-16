@@ -20,7 +20,7 @@ class UserSignup extends Signup
     /**
      * Who is subscribed. The column is nullable at the database level only because {@see ExternalSignup} shares the
      * single `Signup` table and has no member; a UserSignup always has one. {@see \App\Service\Activity\SignupManager}
-     * is the only place one is built and it sets the member, and the cascade below takes the sign-up with the member,
+     * is the only place one is built and it sets the member, and the cascade below removes the sign-up with the member,
      * so no row can outlive the member it names and hydrate into an uninitialised property.
      */
     #[ManyToOne(targetEntity: MemberModel::class)]

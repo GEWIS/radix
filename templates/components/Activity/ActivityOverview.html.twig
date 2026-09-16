@@ -53,7 +53,7 @@
                 </div>
                 {% if this.labels is not empty %}
                     {# Tom Select replaces the select with markup of its own, which the live component's morph would
-                       take back out on every re-render. The option list never changes, so the subtree is left to it. #}
+                       remove on every re-render. The option list never changes, so the subtree is left to it. #}
                     <div class="col-12" data-live-ignore>
                         <label class="form-label" for="activity-overview-labels">{{ 'Labels'|trans }}</label>
                         <select class="form-select" id="activity-overview-labels" multiple

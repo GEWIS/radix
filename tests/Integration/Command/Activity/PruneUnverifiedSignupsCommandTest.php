@@ -76,7 +76,7 @@ final class PruneUnverifiedSignupsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * The seeded list that already carries an external sign-up (Alex Visitor), so a confirmed-and-kept assertion has a
+     * The seeded list that already has an external sign-up (Alex Visitor), so a confirmed-and-kept assertion has a
      * real subject alongside the freshly-created unverified ones.
      */
     private function listWithExternals(): SignupList

@@ -47,7 +47,7 @@ class DeleteExpiredMembersCommand extends Command
     }
 
     /**
-     * The expiration date is mandatory but has no sensible default, so an interactive run asks for it rather than
+     * The expiration date is mandatory but has no sensible default, so an interactive run prompts for it rather than
      * failing outright.
      */
     #[Override]

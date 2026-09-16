@@ -19,10 +19,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Putting an image on a banner package. Both sides of the arrangement come through here: a company proposes a banner
- * and waits for the committee, and the committee sets one straight away because there is nobody left to ask.
+ * and waits for the committee, and the committee sets one straight away because it is the approver itself.
  *
- * Whatever the new image displaces is reclaimed once the change is stored, so a proposal that was thought better of,
- * or a banner that has been replaced, does not leave its bytes behind.
+ * Whatever the new image displaces is reclaimed once the change is stored, so a proposal that was superseded, or a
+ * banner that has been replaced, does not leave its bytes behind.
  */
 final readonly class CompanyBannerService
 {
@@ -37,7 +37,7 @@ final readonly class CompanyBannerService
     }
 
     /**
-     * The committee putting a banner on the site, which is where it stays until somebody replaces it.
+     * The committee putting a banner on the site, which is where it stays until the committee replaces it.
      *
      * @return bool whether the image could be stored
      */
@@ -85,8 +85,8 @@ final readonly class CompanyBannerService
             return false;
         }
 
-        // Thinking better of a proposal before the committee has looked at it leaves the earlier upload behind, so
-        // what is reclaimed here is that one and not the banner that is live.
+        // A second proposal before the committee has looked at the first leaves the earlier upload behind, so what is
+        // reclaimed here is that one and not the banner that is live.
         $replaced = $package->proposeImage(
             $path,
             $proposedBy,

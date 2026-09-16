@@ -304,7 +304,7 @@ class CourseRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many courses hold at least one document of the given kind, or of any kind when none is given.
+     * How many courses have at least one document of the given kind, or of any kind when none is given.
      *
      * @phpstan-param class-string<Exam>|class-string<Summary>|null $type
      */

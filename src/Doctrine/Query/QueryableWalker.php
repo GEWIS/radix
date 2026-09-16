@@ -25,17 +25,17 @@ use function sprintf;
  * Refuses a console query that addresses an entity which is not marked #[Queryable], and any query that writes.
  *
  * A custom tree walker runs inside Doctrine\ORM\Query\Parser::parse(), over the finished AST and before the output
- * walker is even constructed, so a query is turned down while it is still DQL: no SQL is generated for it and the
- * connection is never asked for anything.
+ * walker is even constructed, so a query is rejected while it is still DQL: no SQL is generated for it and nothing is
+ * sent to the connection.
  *
  * Two passes are needed, because an entity can be reached with or without an alias. The parser's alias map is complete
- * by this point — it holds a component for the FROM clause, for every join and for every subselect — which is what
+ * by this point (it contains a component for the FROM clause, for every join and for every subselect), which is what
  * lets the first pass cover the paths a mapping boundary never could: `SELECT m, t FROM db:Member m JOIN m.tags t`
- * leaves the projection through an association the projection itself declares, and the entity it arrives at,
+ * leaves the projection through an association the projection itself declares, and the entity it reaches,
  * App\Entity\Photo\MemberTag, is a component here like any other. But `SELECT SIZE(m.tags) FROM db:Member m` reads
- * that same table from a subquery Doctrine writes itself, and never names an alias for it; SIZE, IS EMPTY, MEMBER OF
- * and IDENTITY all do that, and NEW and INSTANCE OF name a class outright without one either. So the second pass
- * walks the AST and applies the same question to every association target and every class name it finds there.
+ * that same table from a subquery Doctrine generates itself, and never names an alias for it; SIZE, IS EMPTY, MEMBER
+ * OF and IDENTITY all do that, and NEW and INSTANCE OF name a class outright without one either. So the second pass
+ * traverses the AST and applies the same check to every association target and every class name in it.
  */
 final class QueryableWalker extends TreeWalkerAdapter
 {
@@ -71,8 +71,8 @@ final class QueryableWalker extends TreeWalkerAdapter
     }
 
     /**
-     * Descends through everything the AST holds, so that a node is judged wherever it sits — in the select clause, in
-     * a WHERE, inside a function's arguments or several subselects down.
+     * Descends through the whole AST, so that a node is checked wherever it is: in the select clause, in a WHERE,
+     * inside a function's arguments or several subselects down.
      */
     private function assertNodeIsQueryable(mixed $node): void
     {
@@ -144,9 +144,9 @@ final class QueryableWalker extends TreeWalkerAdapter
 
     /**
      * @param class-string $class
-     * @param string       $named the author's own word for what they reached for — an alias, a path or the class name
-     *                            they typed — so that pointing at it says which part of the query to fix without the
-     *                            answer itself confirming anything about what the database holds
+     * @param string       $named the name as the author typed it (an alias, a path or a class name), so that the
+     *                            error points at the part of the query to fix without confirming anything about
+     *                            what the database contains
      */
     private function assertQueryable(
         string $class,
@@ -165,9 +165,9 @@ final class QueryableWalker extends TreeWalkerAdapter
     }
 
     /**
-     * A DQL UPDATE or DELETE does not go through the unit of work: its executor hands the statement straight to the
-     * connection, which is why one typed into the console would really run, on the same MariaDB the site's own tables
-     * live in. The console is a read surface, and this is where that is stated.
+     * A DQL UPDATE or DELETE does not go through the unit of work: its executor sends the statement directly to the
+     * connection, which is why one typed into the console would really run, on the same MariaDB that contains the
+     * site's own tables. The console is a read surface, and this is where that is stated.
      */
     private static function readOnly(): QueryException
     {

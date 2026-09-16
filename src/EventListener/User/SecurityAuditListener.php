@@ -31,7 +31,7 @@ use function strrchr;
 use function substr;
 
 /**
- * Records what the firewalls do: who got in, who did not, who left, and who acted as somebody else.
+ * Records what the firewalls do: who got in, who did not, who left, and who impersonated another account.
  *
  * It listens rather than editing the authenticators, because the same handful of things happen on both interactive
  * firewalls and through several authenticators, and a listener sees all of them the same way. What the firewalls
@@ -49,9 +49,9 @@ final readonly class SecurityAuditListener
     }
 
     /**
-     * A sign-in that still owes a second factor is recorded here all the same. Somebody whose password was accepted
-     * and who then failed the second factor is exactly the sequence worth being able to read back, and recording
-     * only completed sign-ins would leave the first half of it out.
+     * A sign-in that still requires a second factor is recorded here all the same. A password that was accepted
+     * followed by a failed second factor is exactly the sequence worth being able to read back, and recording only
+     * completed sign-ins would leave the first half of it out.
      */
     #[AsEventListener(event: LoginSuccessEvent::class)]
     public function onLoginSuccess(LoginSuccessEvent $event): void
@@ -79,9 +79,9 @@ final readonly class SecurityAuditListener
 
         $this->securityEvents->record(
             self::failureType($exception),
-            // Never the identifier that was typed when no account answers to it: somebody walking a list of
-            // addresses would otherwise write that list into our database, and an address belonging to nobody here
-            // is not ours to keep.
+            // Never the identifier that was typed when no account exists for it: an attacker trying a list of
+            // addresses would otherwise write that list into our database, and an address that belongs to no account
+            // here is not ours to keep.
             $unknownAccount ? null : self::attemptedIdentifier($event),
             $event->getFirewallName(),
             [
@@ -112,13 +112,13 @@ final readonly class SecurityAuditListener
 
     /**
      * Both ends of an impersonation, filed against the member being acted as rather than the administrator doing it:
-     * it is the member's account the thing was done to, and their history it has to show up in. The administrator is
-     * named as the actor, which {@see SecurityEventLogger} resolves from the token on its own.
+     * it is the member's account the action was performed on, and their history it has to appear in. The
+     * administrator is named as the actor, which {@see SecurityEventLogger} resolves from the token on its own.
      */
     #[AsEventListener(event: SwitchUserEvent::class)]
     public function onSwitchUser(SwitchUserEvent $event): void
     {
-        // Symfony hands this listener the freshly built `SwitchUserToken` when an impersonation starts, and the
+        // Symfony passes this listener the freshly built `SwitchUserToken` when an impersonation starts, and the
         // original token that is about to replace it when one ends. Which of the two it is, is the only reliable
         // signal for the direction; the request parameter is named per firewall and says nothing on its own.
         $starting = $event->getToken() instanceof SwitchUserToken;
@@ -161,7 +161,7 @@ final readonly class SecurityAuditListener
     }
 
     /**
-     * Who is currently being impersonated, read while the impersonation is still standing. The event that ends one
+     * Who is currently being impersonated, read while the impersonation is still active. The event that ends one
      * names the administrator it returns to, not the member it is leaving.
      */
     private function impersonatedIdentifier(): ?string

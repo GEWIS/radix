@@ -57,7 +57,7 @@ final class UserCheckerTest extends TestCase
     }
 
     /**
-     * A read-only window leaves everyone reading, and what somebody may read is decided by who they are signed in as.
+     * A read-only window leaves everyone reading, and what a user may read is decided by who they are signed in as.
      */
     public function testAnyoneMayStillSignInWhileTheSiteIsReadOnly(): void
     {
@@ -92,7 +92,7 @@ final class UserCheckerTest extends TestCase
     }
 
     /**
-     * The access policy reads the company off the user, and a stub never runs the constructor that would have set it.
+     * The access policy reads the company from the user, and a stub never runs the constructor that would have set it.
      */
     private function companyUser(): CompanyUser
     {

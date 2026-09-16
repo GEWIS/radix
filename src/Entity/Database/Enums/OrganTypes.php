@@ -94,8 +94,8 @@ enum OrganTypes: string implements TranslatableInterface
     /**
      * Whether this type of organ knows inactive members ("Inactief Lid").
      *
-     * Only fraternities do: they keep members who no longer study (HR art. 13), who then hold no function. Every other
-     * organ simply discharges whoever is no longer part of it.
+     * Only fraternities do: they keep members who no longer study (HR art. 13), who then have no function. Every other
+     * organ simply discharges a member who is no longer part of it.
      */
     public function allowsInactiveMembers(): bool
     {
@@ -110,7 +110,7 @@ enum OrganTypes: string implements TranslatableInterface
      * chair it is required to have. The Internal Regulations and the Articles of Association put a higher floor under
      * the KCC, the AVC, the RvA, and the voting committee as well; those are not encoded here yet.
      *
-     * Members installed as "Inactief Lid" do not count towards this, they hold no function in the organ.
+     * Members installed as "Inactief Lid" do not count towards this, they have no function in the organ.
      */
     public function getMinimumMembers(): int
     {

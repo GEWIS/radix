@@ -21,8 +21,8 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
  * searched and paged rather than listed: the search reaches the answers as well as the question, since a poll is
  * usually remembered by what could be answered rather than by how it was asked.
  *
- * Narrowing to what the reader did or did not answer is offered only while they are signed in; to a passer-by it
- * would mean nothing.
+ * Narrowing to what the reader did or did not answer is offered only while they are signed in; to an anonymous visitor
+ * it would mean nothing.
  *
  * @extends AbstractDoctrinePaginatedOverview<Poll>
  */

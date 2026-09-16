@@ -13,7 +13,7 @@ use App\ViewModel\Decision\OrganMembership;
 use function array_map;
 
 /**
- * Who is in a body is not stored anywhere: it is read off the installations the decisions left behind. These pin the
+ * Who is in a body is not stored anywhere: it is read from the installations the decisions left behind. These pin the
  * reading, since a body's page and the members overview both show what comes out of it.
  */
 final class OrganMemberServiceTest extends DatabaseTestCase
@@ -30,7 +30,7 @@ final class OrganMemberServiceTest extends DatabaseTestCase
     }
 
     /**
-     * Being a member is what everybody in a body is, so it is not a function worth naming beside somebody's name.
+     * Being a member is what everyone in a body is, so it is not a function worth naming beside a member's name.
      */
     public function testPlainMembershipIsNotNamedAsAFunction(): void
     {
@@ -45,7 +45,7 @@ final class OrganMemberServiceTest extends DatabaseTestCase
     }
 
     /**
-     * A body that was abrogated has nobody in it any more, so everybody it ever had is a former member.
+     * A body that was abrogated has no members any more, so everyone it ever had is a former member.
      */
     public function testAnAbrogatedBodyHasOnlyFormerMembers(): void
     {
@@ -65,8 +65,8 @@ final class OrganMemberServiceTest extends DatabaseTestCase
     }
 
     /**
-     * Nobody is in two of the lists at once: a member who was discharged and installed again is a current member, not
-     * a former one.
+     * No member is in two of the lists at once: a member who was discharged and installed again is a current member,
+     * not a former one.
      */
     public function testTheListsDoNotOverlap(): void
     {

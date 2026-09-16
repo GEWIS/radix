@@ -28,13 +28,13 @@ use RuntimeException;
 use SortDirection;
 
 /**
- * A question put to the members, which is a stable thing the votes and the discussion hang off while the question
- * itself lives on a chain of {@see PollRevision}s that the board has to agree to first.
+ * A question put to the members, which is the stable entity the votes and the discussion are attached to while the
+ * question itself is on a chain of {@see PollRevision}s that the board has to agree to first.
  *
- * The expiry date is set by the reviewer rather than by whoever asked: approving a question is also scheduling it, so
- * more than one poll can be running at a time and the front page pages through all of them, the one closing first at
- * the front. A poll closes on that date, so taking one down early is a matter of moving the date to today rather than
- * deleting anything.
+ * The expiry date is set by the reviewer rather than by the member who asked: approving a question is also scheduling
+ * it, so more than one poll can be running at a time and the front page pages through all of them, the one closing
+ * first at the front. A poll closes on that date, so taking one down early is a matter of moving the date to today
+ * rather than deleting anything.
  *
  * @phpstan-import-type LocalisedTextGdprArrayType from LocalisedTextModel as ImportedLocalisedTextGdprArrayType
  * @phpstan-type PollGdprArrayType = array{
@@ -95,8 +95,8 @@ class Poll implements RevisableInterface
 
     /**
      * The member who asked the question, or null once that member has been removed from the register. The poll stays:
-     * other members have voted on it and commented under it, and those tallies and threads are not the asker's to
-     * take with them.
+     * other members have voted on it and commented under it, and those tallies and threads should not be removed with
+     * that member.
      */
     #[ManyToOne(targetEntity: MemberModel::class)]
     #[JoinColumn(

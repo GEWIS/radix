@@ -16,8 +16,8 @@ use function sprintf;
 
 /**
  * The paging shared by every administrative overview, exercised through one of them. Clamping used to be written out
- * in each component and tested in none, so a component that got it wrong would happily render an empty page or divide
- * by a page size nobody offered.
+ * in each component and tested in none, so a component that got it wrong would render an empty page or divide by a
+ * page size that was never offered.
  */
 final class PaginatedOverviewTest extends DatabaseTestCase
 {
@@ -36,8 +36,8 @@ final class PaginatedOverviewTest extends DatabaseTestCase
     }
 
     /**
-     * The query is worked out once per instance and working out the last page already runs it, so a page asked for
-     * after that has to reach the query as well: the same instance renders the answer.
+     * The query is computed once per instance and computing the last page already runs it, so a page requested after
+     * that has to reach the query as well: the same instance renders the result.
      */
     public function testGoingToAPageServesThatPagesRows(): void
     {
@@ -79,7 +79,7 @@ final class PaginatedOverviewTest extends DatabaseTestCase
     }
 
     /**
-     * The page size is client-writable, so a value nobody offered must not reach the query.
+     * The page size is client-writable, so a value that was never offered must not reach the query.
      */
     public function testAPageSizeOutsideTheOfferedStepsFallsBackToTheSmallest(): void
     {

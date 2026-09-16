@@ -185,7 +185,7 @@ final class MemberAddressController extends AbstractMemberController
         $form = $this->createForm(DeleteAddressType::class);
         $form->handleRequest($request);
 
-        // `isValid()` before the button: a clicked button says nothing about the token, which is only weighed when
+        // `isValid()` before the button: a clicked button says nothing about the token, which is only checked when
         // the form as a whole is validated.
         if (
             $form->isSubmitted()

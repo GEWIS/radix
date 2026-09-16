@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus';
  * `SC<meeting>-`; picking that type relabels both fields to say so.
  *
  * The membership starts with blank rows to fill in, and the ones that were left blank should not be submitted as
- * empty members, so they are dropped on the way out.
+ * empty members, so they are removed before the form is submitted.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {

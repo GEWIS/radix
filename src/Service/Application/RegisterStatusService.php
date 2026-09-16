@@ -29,14 +29,14 @@ class RegisterStatusService implements ResetInterface
     /**
      * How long a set of figures is reused across requests.
      *
-     * The notification bell carries these on every page the secretary opens, so without this a dozen queries run to
-     * decide whether the bell has anything to say. None of them is a number anyone acts on within the minute: a
+     * The notification bell renders these on every page the secretary opens, so without this a dozen queries run to
+     * decide whether the bell has anything to show. None of them is a number anyone acts on within the minute: a
      * membership approved now shows up on the page after next.
      */
     private const int TTL = 60;
 
     /**
-     * What the figures were this request, so that asking twice costs once even when they come from the cache.
+     * What the figures were this request, so that reading them twice costs once even when they come from the cache.
      * Cleared between requests because the application runs in a worker, where the service outlives the request.
      *
      * @var array<string, mixed>|null
@@ -97,7 +97,7 @@ class RegisterStatusService implements ResetInterface
                     $this->mailingListService->getStatusFigures(),
                 );
 
-                // Counted from the figures rather than asked for again: the bell and the dashboard then cannot state
+                // Counted from the figures rather than queried again: the bell and the dashboard then cannot state
                 // different numbers, and it saves running every one of those queries a second time.
                 $figures['totalCount'] = $figures['updates']
                     + $figures['prospectives']['paid']
@@ -144,7 +144,7 @@ class RegisterStatusService implements ResetInterface
     }
 
     /**
-     * How many members hold a current membership of each type, for the dashboard's breakdown.
+     * How many members have a current membership of each type, for the dashboard's breakdown.
      *
      * @return array<string, int>
      */

@@ -46,7 +46,7 @@ final class SudoEnforcementListenerTest extends TestCase
             ['/en/_components/UsersOverview'],
             ['/health'],
             ['/api/members'],
-            // Somebody with no grant has to be able to go and get one.
+            // A user with no grant has to be able to request one.
             ['/en/user/sudo'],
             ['/nl/company/sudo'],
             ['/en/user/login'],
@@ -98,7 +98,7 @@ final class SudoEnforcementListenerTest extends TestCase
     }
 
     /**
-     * A fragment is not a request of its own; the main request it was rendered for was asked for the grant.
+     * A fragment is not a request of its own; the grant was already checked on the main request it was rendered for.
      */
     public function testASubRequestIsLeftAlone(): void
     {

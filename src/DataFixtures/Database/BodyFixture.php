@@ -33,11 +33,11 @@ use function sprintf;
  *
  * There are committees and fraternities, and one of each of the bodies a general members' meeting appoints; some are
  * still standing and some have been abrogated, so a page listing bodies has both to show. Their members are installed
- * the way the regulations require -- the board founds a body, and members are installed into it afterwards.
+ * the way the regulations require: the board founds a body, and members are installed into it afterwards.
  *
  * Two decisions are annulled rather than merely superseded, because an annulment is not an undo written later: it says
- * the decision never took effect at all. One annuls an installation, so somebody who looks installed is not in the body
- * at all; the other annuls a discharge, so somebody who looks discharged never left it.
+ * the decision never took effect at all. One annuls an installation, so a member who looks installed is not in the body
+ * at all; the other annuls a discharge, so a member who looks discharged never left it.
  *
  * A body membership can be prolonged only in an Advisory Board (RvA), which is the one body whose members serve a term
  * that can be extended rather than being installed afresh, so it is the only one here with a reappointment.
@@ -64,7 +64,7 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
      *
      * `externals` fills that many of the seats from the external block instead: an external member is a member, and
      * bodies are not closed to them. `graduates` does the same from the graduates, and is only meaningful on a
-     * fraternity -- see {@see self::body()}.
+     * fraternity; see {@see self::body()}.
      */
     private const array BODIES = [
         [
@@ -147,7 +147,7 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
             'externals' => 1,
         ],
         // Founded and then abrogated, and staffed by members who have since been removed: the decisions still name
-        // them, which is the case that proves a removed member does not take the association's records with them.
+        // them, which is the case that proves removing a member does not remove the association's records.
         [
             'abbr' => 'HIST',
             'name' => 'Historische Commissie',
@@ -227,8 +227,8 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         $ordinary = $body['seats'] - $externals;
 
         for ($seat = 0; $seat < $body['seats']; $seat++) {
-            // The last seats go to external members, drawn from their own block. Being external says how somebody is
-            // a member of the association, not whether they may sit in one of its bodies.
+            // The last seats go to external members, drawn from their own block. Being external describes how a member
+            // belongs to the association, not whether they may sit in one of its bodies.
             $member = $seat < $ordinary
                 ? $this->member($body['members'] + $seat)
                 : $this->member(MemberPopulationFixture::EXTERNAL + $this->externalSeat++);
@@ -299,7 +299,7 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
             return;
         }
 
-        // A body that is abrogated has its members discharged with it: nobody stays a member of something that no
+        // A body that is abrogated has its members discharged with it: a member cannot stay in a body that no
         // longer exists.
         $closing = $this->meeting(
             $manager,
@@ -566,7 +566,7 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
         MeetingTypes $type,
     ): Meeting {
         // Narrowed for the setter, which takes a meeting number rather than any integer. The series starts above zero
-        // and only climbs.
+        // and only increases.
         $number = $this->meetingNumber++;
         assert($number >= self::FIRST_MEETING_NUMBER);
 
@@ -616,9 +616,9 @@ final class BodyFixture extends Fixture implements DependentFixtureInterface, Fi
      */
     private function yearsAgo(int $years): DateTimeImmutable
     {
-        // Three months further back than the year asks for, and a few days further for every meeting already made.
-        // Two general members' meetings on one day would leave "the oldest meeting" with no single answer; meetings of
-        // different kinds may share a date, and do.
+        // Three months further back than the number of years given, and a few days further for every meeting already
+        // made. Two general members' meetings on one day would leave "the oldest meeting" with no single answer;
+        // meetings of different kinds may share a date, and do.
         return new DateTimeImmutable()->modify(sprintf(
             '-%d years -3 months +%d days',
             $years,

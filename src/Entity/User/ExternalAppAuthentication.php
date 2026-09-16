@@ -29,7 +29,7 @@ class ExternalAppAuthentication
 
     /**
      * The user who was authenticated. This is a log of one account's sign-ins to other applications, so it goes with
-     * the account rather than lingering as a trail nobody can be held to.
+     * the account rather than remaining as a trail that no member is accountable for.
      */
     #[ManyToOne(targetEntity: User::class)]
     #[JoinColumn(

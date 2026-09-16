@@ -6,8 +6,8 @@ interface DownloadStatus {
 }
 
 /**
- * Waits for a watermarked course document to be built. Polling backs off: the answer is nearly always ready on one of
- * the first few tries, and a page left open should not keep asking every half second.
+ * Waits for a watermarked course document to be built. Polling backs off: the document is nearly always ready on
+ * one of the first few tries, and a page left open should not keep asking every half second.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {

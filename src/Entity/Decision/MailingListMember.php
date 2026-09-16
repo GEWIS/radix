@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
  * we use this class as a connector.
  *
  * A subscription is identified by the list and the address that is subscribed to it, as that is the pair the ledger
- * records a change for; the member is carried along but is not part of the identifier.
+ * records a change for; the member is stored alongside it but is not part of the identifier.
  *
  * A subscription the ledger has only marked for removal is not projected, so everything here is a subscription that
  * actually stands.
@@ -51,9 +51,9 @@ class MailingListMember
     public MailingList $mailingList;
 
     /**
-     * Member. A subscription is nobody's once the member is gone, and unsubscribing them is already the first thing
+     * Member. A subscription has no owner once the member is gone, and unsubscribing them is already the first thing
      * that happens when a member is removed; the cascade only guarantees that a subscription the projection still
-     * holds cannot stop the member from being removed.
+     * contains cannot stop the member from being removed.
      */
     #[ManyToOne(
         targetEntity: Member::class,

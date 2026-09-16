@@ -10,8 +10,8 @@ use App\Service\Application\AbstractNotificationSubjectNamer;
 use Override;
 
 /**
- * A page awaiting review reads by the body that wrote it, which is what the board recognises it as; the page itself has
- * no name of its own.
+ * A page awaiting review is named after the body that wrote it, which is what the board recognises it as; the page
+ * itself has no name of its own.
  */
 final class OrganNotificationSubjectNamer extends AbstractNotificationSubjectNamer
 {

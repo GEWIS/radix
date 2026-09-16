@@ -25,8 +25,8 @@ class OrganInformationRevisionRepository extends ServiceEntityRepository
     }
 
     /**
-     * The pages waiting on the board, oldest first. The queue names each one by its body and says what is live while
-     * it waits, so the organ and that revision come along.
+     * The pages waiting on the board, oldest first. The queue names each one by its body and shows what is live while
+     * it waits, so the organ and that revision are selected as well.
      *
      * @return OrganInformationRevision[]
      */

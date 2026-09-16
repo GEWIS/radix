@@ -10,12 +10,12 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 /**
- * The other way a list gets longer: a public overview shows the first {@see STEP} of something and hands the reader
- * more when they ask, rather than cutting the list into numbered pages.
+ * The other way a list gets longer: a public overview shows the first {@see STEP} of something and adds more when the
+ * reader asks, rather than cutting the list into numbered pages.
  *
- * Sibling to {@see AbstractPaginatedOverview} and deliberately not the same thing. Pagination is for a surface
- * somebody works through, where the page number is worth a URL and worth jumping between; this is for a surface
- * somebody browses, where there is no page to link to and asking for more never takes anything away.
+ * Sibling to {@see AbstractPaginatedOverview} and deliberately not the same thing. Pagination is for a surface a reader
+ * works through, where the page number is worth a URL and worth jumping between; this is for a surface a reader
+ * browses, where there is no page to link to and asking for more never takes anything away.
  *
  * Only the step is shared. How the rows are fetched is not, and should not be: the album overview windows after
  * loading because a voter decides per album what a visitor may see, and the course overview asks for one row more
@@ -36,13 +36,13 @@ abstract class AbstractInfiniteScrollOverview
      */
     public const int STEP = 24;
 
-    /** Not client-writable: it travels in the signed props, so a crafted request cannot ask for the whole archive. */
+    /** Not client-writable: it is passed in the signed props, so a crafted request cannot ask for the whole archive. */
     #[LiveProp]
     public int $limit = self::STEP;
 
     /**
-     * Whether asking for more would bring anything back. Each overview knows this its own way, and some of them
-     * cannot answer it with a count.
+     * Whether asking for more would return any further rows. Each overview knows this its own way, and some of them
+     * cannot determine it with a count.
      */
     abstract public function hasMore(): bool;
 

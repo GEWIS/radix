@@ -15,8 +15,8 @@ use function str_starts_with;
  * Maps a stored source path back onto the {@see StorageNamespace} it belongs to (which decides whether serving it needs
  * a signature and session) and, for the image namespaces, together with the requested variant onto the
  * {@see ImageProfile} that governs its encoding, so both the serving gate and the miss handler's queued encode
- * agree on the same rules. Not every namespace holds images: attachments and meeting files are PDFs, which resolve to a
- * namespace but never to a profile.
+ * agree on the same rules. Not every namespace contains images: attachments and meeting files are PDFs, which resolve
+ * to a namespace but never to a profile.
  */
 final readonly class FilePathResolver
 {
@@ -97,8 +97,8 @@ final readonly class FilePathResolver
     /**
      * The image profile (variant set + quality) that governs a variant of a stored path, or null when the path is not a
      * variant-generating image namespace. Company logos and banners share the career namespace, so the requested
-     * variant says which of the two is being served: a banner is only ever asked for at one of the boxes its format
-     * is shown in.
+     * variant determines which of the two is being served: a banner is only ever requested at one of the boxes its
+     * format is shown in.
      */
     public function profileForPath(
         string $path,

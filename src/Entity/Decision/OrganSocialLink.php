@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
- * Somewhere a body can be followed, as said by one revision of its page.
+ * Somewhere a body can be followed, as recorded on one revision of its page.
  */
 #[Entity]
 class OrganSocialLink extends AbstractSocialLink

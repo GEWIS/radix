@@ -34,8 +34,8 @@ final readonly class SignupAdminRow
         public array $priority = [],
         public ?int $roleId = null,
         public ?string $roleName = null,
-        // Installed in the organ organising this activity, so a place was held off the top for them. Not a tier
-        // somebody is ranked in, which is why it is said apart from the priority labels.
+        // Installed in the organ organising this activity, so a place was reserved for them. Not a tier
+        // a subscriber is ranked in, which is why it is shown separately from the priority labels.
         public bool $organisingBody = false,
         public array $otherLists = [],
         public bool $selected = false,

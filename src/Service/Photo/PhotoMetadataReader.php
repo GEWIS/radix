@@ -9,8 +9,8 @@ use function function_exists;
 use function is_array;
 
 /**
- * Reads a photo's EXIF into a {@see PhotoMetadata}. Returns an empty instance when ext-exif is absent or the image
- * carries no EXIF, so storing a photo never depends on metadata being present.
+ * Reads a photo's EXIF into a {@see PhotoMetadata}. Returns an empty instance when ext-exif is absent or the image has
+ * no EXIF, so storing a photo never depends on metadata being present.
  */
 final readonly class PhotoMetadataReader
 {

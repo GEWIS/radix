@@ -131,8 +131,8 @@ class MeetingService
         foreach ($meetings as $meeting) {
             $this->generateMeeting($meeting[0]);
             $this->emReport->flush();
-            // Nothing generated so far is needed again by name, and holding on to all of it makes every subsequent
-            // flush more expensive than the last.
+            // Nothing generated so far is needed again by name, and keeping all of it makes every subsequent flush
+            // more expensive than the last.
             $this->emReport->clear();
             ++$num;
 
@@ -151,10 +151,9 @@ class MeetingService
     /**
      * Link every projected decision that repeats another to the one it repeats.
      *
-     * A pass of its own rather than part of projecting a decision, because the meetings are replayed oldest first and
-     * a virtual meeting may sort before the meeting whose decision it says again -- a meeting's date can be corrected
-     * after the fact. Projecting them in one go and matching up afterwards is what makes the link independent of that
-     * order.
+     * A pass of its own rather than part of projecting a decision, because the meetings are replayed oldest first and a
+     * virtual meeting may sort before the meeting whose decision it repeats (a meeting's date can be corrected after
+     * the fact). Projecting them in one go and matching up afterwards is what makes the link independent of that order.
      */
     private function linkCounterparts(): void
     {
@@ -231,7 +230,7 @@ class MeetingService
             $reportDecision->number = $decision->number;
         }
 
-        // The decision a virtual one repeats, as far as it can be told from here: a decision the projection does not
+        // The decision a virtual one repeats, as far as it can be determined here: a decision the projection does not
         // know yet is left for {@see self::linkCounterparts()}, which runs once every meeting has been replayed.
         $counterpart = $decision->counterpart;
         $projectedCounterpart = null === $counterpart
@@ -283,9 +282,9 @@ class MeetingService
     }
 
     /**
-     * A subdecision written after its decision was recorded leaves the decision itself saying what it said before,
-     * and that text is what the site shows and what the search reads. A decision the projection does not know yet is
-     * left to {@see self::generateDecision()}, which is about to write it in full.
+     * A subdecision written after its decision was recorded leaves the decision itself with the text it had before, and
+     * that text is what the site shows and what the search reads. A decision the projection does not know yet is left
+     * to {@see self::generateDecision()}, which is about to write it in full.
      */
     public function refreshDecisionContent(DatabaseDecision $decision): void
     {
@@ -365,12 +364,12 @@ class MeetingService
             null !== $reportSubDecision
             && $this->realClass($reportSubDecision) !== $class
         ) {
-            // A subdecision that turned out to be wrong is put right by replacing it with one of another kind, and
-            // then this position no longer holds what the projection has at it. Nothing about the old one is still
-            // true, so it goes, along with everything derived from it, rather than being dressed up as the new one;
-            // keeping it would leave the body member it discharged, or the body it founded, standing on a decision
-            // that was never taken. Its removal has to reach the database before the replacement takes its place,
-            // because they share an identity and a single flush would insert before it deletes.
+            // A subdecision that turned out to be wrong is put right by replacing it with one of another kind, and then
+            // this position no longer matches what the projection has at it. Nothing about the old one is still true,
+            // so it goes, along with everything derived from it, rather than being converted into the new one; keeping
+            // it would leave the body member it discharged, or the body it founded, based on a decision that was never
+            // taken. Its removal has to reach the database before the replacement takes its place, because they share
+            // an identity and a single flush would insert before it deletes.
             $this->deleteSubDecision($reportSubDecision);
             $this->emReport->flush();
 
@@ -559,7 +558,7 @@ class MeetingService
      *
      * The register operates as a ledger, meaning the chronological order of decisions must be preserved. A target
      * decision made at point X may be annulled at point Z, but only while no decision in between builds on it. That
-     * rule lives in the `Database` domain, which owns the ledger and turns down an annulment that would break it; by
+     * rule is enforced in the `Database` domain, which owns the ledger and rejects an annulment that would break it; by
      * the time an annulment reaches the projection it merely has to be applied.
      *
      * NOTE: to adhere to our ordering assumption within a decision, we must loop through its subdecisions in reverse.
@@ -574,8 +573,8 @@ class MeetingService
     /**
      * Undoes an annulment, restoring the entities that were derived from the annulled decision.
      *
-     * The same ledger assumption applies as for {@see self::annulDecision()}: the annulment can only be taken back
-     * while nothing has been decided about the affected entities since.
+     * The same ledger assumption applies as for {@see self::annulDecision()}: the annulment can only be undone while
+     * nothing has been decided about the affected entities since.
      */
     private function unannulDecision(ReportDecision $target): void
     {
@@ -606,8 +605,7 @@ class MeetingService
             $this->subDecisionService->revertRelated($subDecision);
 
             // On top of that, the subdecision is about to disappear, so the references to it must be dropped as well.
-            // One that no longer has the subdecision it points at has nothing to drop; being reverted above is what
-            // it came here for.
+            // One that no longer has the subdecision it points at has nothing to drop; it only needs the revert above.
             if ($this->subDecisionService->stillReferences($subDecision)) {
                 switch (true) {
                     case $subDecision instanceof ReportSubDecision\Discharge:
@@ -628,8 +626,8 @@ class MeetingService
                 }
             }
 
-            // A body keeps a list of the decisions it was shaped by, and that list stands in the way of the row going
-            // anywhere until the body lets go of it.
+            // A body keeps a list of the decisions it was shaped by, and that list prevents the row from being deleted
+            // until the body no longer references it.
             $this->subDecisionService->detachFromOrgans($subDecision);
         }
 
@@ -639,8 +637,8 @@ class MeetingService
     /**
      * The class an entity actually is, rather than the one it presents itself as.
      *
-     * Doctrine hands out proxies for entities it has not loaded yet, and those are subclasses in a namespace of their
-     * own. Anything reasoning about which kind of subdecision it is holding has to look past that.
+     * Doctrine creates proxies for entities it has not loaded yet, and those are subclasses in a namespace of their
+     * own. Anything reasoning about which kind of subdecision it has must look past that.
      *
      * @return class-string
      */

@@ -71,8 +71,8 @@ trait RequiresEnabledLanguagesTrait
     }
 
     /**
-     * One localised field, filled in for every enabled language. Separate from the loop above because a form can hold
-     * localised text well below the revision, as an activity's sign-up lists do.
+     * One localised field, filled in for every enabled language. Separate from the loop above because a form can
+     * contain localised text well below the revision, as an activity's sign-up lists do.
      *
      * @param FormInterface<mixed> $localised
      */

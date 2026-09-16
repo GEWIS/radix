@@ -66,7 +66,7 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
             null === $principal
             || !$principal->isUsable()
         ) {
-            // The token itself is never recorded, not even hashed: what is worth knowing is that an unusable one was
+            // The token itself is never recorded, not even hashed: what matters is that an unusable one was
             // presented, from where, and against which path. A principal that resolved but is switched off is named,
             // because that one is somebody's own token still being used after it was withdrawn.
             $this->securityEvents->record(
@@ -86,7 +86,7 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator implements Authe
         $user = new ApiPrincipalUser($principal);
 
         // The token is the entire credential and has already been resolved, so there is nothing left to validate.
-        // The badge carries the resolved user rather than the token, keeping the secret out of the user identifier.
+        // The badge contains the resolved user rather than the token, keeping the secret out of the user identifier.
         return new SelfValidatingPassport(
             new UserBadge(
                 $user->getUserIdentifier(),

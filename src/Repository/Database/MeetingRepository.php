@@ -145,7 +145,7 @@ class MeetingRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many meetings each type has, so the chips can say so before they are clicked.
+     * How many meetings each type has, so the chips can show it before they are clicked.
      *
      * @return array<string, int> keyed by the value of `MeetingTypes`, in the order that enum declares them
      */
@@ -165,8 +165,8 @@ class MeetingRepository extends ServiceEntityRepository
             $counts[$row['type']->value] = (int) $row['total'];
         }
 
-        // A type nobody has minuted does not come back from a `GROUP BY`, and it is still a type: it is a zero, not
-        // a missing row.
+        // A type that has never been minuted does not come back from a `GROUP BY`, and it is still a type: it is a
+        // zero, not a missing row.
         $byType = [];
         foreach (MeetingTypes::cases() as $case) {
             $byType[$case->value] = $counts[$case->value] ?? 0;
@@ -176,9 +176,9 @@ class MeetingRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many decisions each of the given meetings holds, keyed by type and number.
+     * How many decisions each of the given meetings has, keyed by type and number.
      *
-     * Counted for the visible page in one query rather than read off each meeting, so the table costs two queries
+     * Counted for the visible page in one query rather than read from each meeting, so the table costs two queries
      * whatever the page size.
      *
      * @param Meeting[] $meetings
@@ -479,7 +479,7 @@ class MeetingRepository extends ServiceEntityRepository
     /**
      * How many decisions a lookup may put forward.
      *
-     * What this feeds is a dropdown someone picks from while typing, not a list they read, and the cap is what keeps
+     * What this feeds is a dropdown a user picks from while typing, not a list they read, and the cap is what keeps
      * a broad prompt from costing the whole archive: without it the query below matched, sorted and loaded every
      * decision whose reference contained what was typed, along with all of their sub-decisions.
      */
@@ -493,8 +493,8 @@ class MeetingRepository extends ServiceEntityRepository
      *
      * Two steps rather than one query: which decisions match is settled first, over their identity alone and under a
      * cap, and only the handful that survive are then loaded with the sub-decisions that make up their text. The
-     * matching query has no predicate an index can serve -- a reference is matched by writing it out and comparing
-     * it with LIKE -- so anything it loads per row it loads for the whole table.
+     * matching query has no predicate an index can serve (a reference is matched by writing it out and comparing it
+     * with LIKE), so anything it loads per row it loads for the whole table.
      *
      * @param Meeting|null $before when given, only decisions taken before this meeting are returned, and within that
      *                             meeting only those before $beforePoint and $beforeNumber.
@@ -523,7 +523,7 @@ class MeetingRepository extends ServiceEntityRepository
      * The addresses of the decisions that may be offered and whose reference contains what was typed.
      *
      * Nothing but the four numbers that identify a decision is selected, and nothing is joined that only the text
-     * needs, so the cap bounds the work rather than only the answer.
+     * needs, so the cap bounds the work rather than only the result.
      *
      * @return list<array{meeting_type: string, meeting_number: int, point: int, number: int}>
      */
@@ -571,7 +571,7 @@ class MeetingRepository extends ServiceEntityRepository
                 '%' . strtolower($query) . '%',
             )
             // A stable order, so the same prompt offers the same decisions in the same places; the newest meeting
-            // first, because that is the one somebody is most likely to be looking for.
+            // first, because that is the one a user is most likely to be looking for.
             ->orderBy(
                 'm.date',
                 SortDirection::Descending,
@@ -627,8 +627,8 @@ class MeetingRepository extends ServiceEntityRepository
         ));
 
         if ($onlyUnlinkedVirtual) {
-            // Asked for by the lookup that picks a virtual counterpart: only a virtual decision is one, and one that
-            // is already somebody's counterpart is spoken for. Left-joined rather than asked with
+            // Used by the lookup that picks a virtual counterpart: only a virtual decision is one, and one that is
+            // already the counterpart of another decision is excluded. Left-joined rather than filtered with
             // `d.counterpart IS NULL`, because the association is keyed on four columns and DQL refuses a
             // single-valued path expression to a composite key.
             $qb->leftJoin(
@@ -1014,7 +1014,7 @@ class MeetingRepository extends ServiceEntityRepository
      * Find the subdecisions of the given type that reference the given subdecision.
      *
      * The references are deliberately looked up here instead of through the inverse side of the association: an
-     * installation can carry more than one discharge once an earlier one has been annulled, and the to-one inverse
+     * installation can have more than one discharge once an earlier one has been annulled, and the to-one inverse
      * sides silently return only the first of those.
      *
      * @template T of SubDecision

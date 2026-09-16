@@ -10,8 +10,8 @@ use App\Repository\Education\CourseRepository;
 use App\ViewModel\Education\ArchiveCounts;
 
 /**
- * The figures on the education overview. The landing page and the navigation menu both ask for them, so the counting
- * lives here rather than in either.
+ * The figures on the education overview. The landing page and the navigation menu both need them, so the counting is
+ * defined here rather than in either.
  */
 final readonly class EducationOverviewCountsProvider
 {

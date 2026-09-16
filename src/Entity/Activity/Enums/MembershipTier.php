@@ -33,8 +33,8 @@ enum MembershipTier: string implements PriorityTierInterface
     }
 
     /**
-     * What the association holds a membership of is one thing to a sign-up list, so the three kinds of it are
-     * admitted together until an organiser says otherwise.
+     * Membership of the association is one thing to a sign-up list, so the three kinds of it are admitted together
+     * until an organiser says otherwise.
      *
      * @return list<list<self>>
      */
@@ -53,7 +53,7 @@ enum MembershipTier: string implements PriorityTierInterface
     }
 
     /**
-     * The membership this tier stands for, or null for a sign-up the association holds no membership of at all.
+     * The membership this tier corresponds to, or null for a sign-up with no membership of the association at all.
      */
     public function membershipType(): ?MembershipTypes
     {

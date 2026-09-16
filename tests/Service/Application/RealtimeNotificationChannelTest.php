@@ -180,8 +180,8 @@ final class RealtimeNotificationChannelTest extends TestCase
                 $hub,
                 new RealtimeTopics('a secret that is only ever this test\'s'),
             ),
-            // Nobody names a subject here: these tests are about which topic a notification lands on and whether a
-            // frozen label stands in for a subject, not about lookups.
+            // No notification names a subject here: these tests are about which topic a notification is published on
+            // and whether a frozen label replaces a subject, not about lookups.
             new NotificationSubjectResolver([]),
             new NotificationContextResolver(new DeviceDescription($translator)),
             $translator,

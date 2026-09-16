@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Enum describing why a member/membership requires attention in the overview.
  *
- * A reason carries two pieces of prose: why the member surfaced (`getLabel()`) and what to do about it
+ * A reason has two pieces of prose: why the member requires attention (`getLabel()`) and what to do about it
  * (`getRecommendedAction()`). `trans()` renders the former, since that is the reason's name.
  */
 enum AttentionReasons: string implements TranslatableInterface
@@ -27,7 +27,7 @@ enum AttentionReasons: string implements TranslatableInterface
     case ExpiringGraduateActiveInactive = 'expiring_graduate_active_inactive';
 
     /**
-     * Why the member surfaced, deferred so the caller decides on the locale (or takes the source string).
+     * Why the member requires attention, deferred so the caller decides on the locale (or takes the source string).
      *
      * The expiry reasons are one sentence with two named placeholders. `%type%` is the membership type itself,
      * so the two stay in step, and both parameters are nested translatables that resolve in whichever locale the

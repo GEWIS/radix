@@ -58,7 +58,7 @@ final readonly class SecurityEventLogger
      * @param array<string, scalar|null> $detail  what this event needs beyond the account and the firewall: the
      *                                            series that ended, the route that refused, the reason it did.
      *                                            Never a token, a password or a session identifier.
-     * @param Request|null               $request the request being answered, for the few callers with a request the
+     * @param Request|null               $request the request being handled, for the few callers with a request the
      *                                            stack does not have (a sub-request, a listener acting on an event's
      *                                            own request)
      */
@@ -85,7 +85,7 @@ final readonly class SecurityEventLogger
         $requestId = $this->requestId->current();
 
         // The message is the event's own value rather than a sentence: it is what an alert on the file matches on,
-        // and a sentence is something somebody will reword next year.
+        // and a sentence is something a developer will reword next year.
         $this->logger->log(
             $event->level(),
             $event->value,
@@ -137,10 +137,10 @@ final readonly class SecurityEventLogger
     }
 
     /**
-     * Who did it, when that is somebody other than the account it was done to.
+     * Who did it, when that is an account other than the one it was done to.
      *
      * An impersonating administrator is named even though the token reports them as the member they are acting as;
-     * that is the whole reason the column exists. Somebody acting on their own account is not an actor, because the
+     * that is the whole reason the column exists. A user acting on their own account is not an actor, because the
      * row already names them.
      */
     private function actor(?string $userIdentifier): ?string

@@ -132,8 +132,8 @@ class PollRepository extends ServiceEntityRepository
     }
 
     /**
-     * Hands every answer of the given polls the number of votes on it, so counting one does not fall back to loading
-     * the votes. Answers nobody picked are absent from the grouped query and are told they are at nothing.
+     * Sets the number of votes on every answer of the given polls, so counting one does not fall back to loading the
+     * votes. Answers no member picked are absent from the grouped query and are set to zero.
      *
      * @param list<Poll> $polls
      */
@@ -250,7 +250,7 @@ class PollRepository extends ServiceEntityRepository
         }
 
         // Whether this reader answered it, which only means anything while they are signed in and the votes have not
-        // been anonymised out from under them.
+        // been anonymised.
         if (
             null !== $member
             && null !== $answered
@@ -276,7 +276,7 @@ class PollRepository extends ServiceEntityRepository
     }
 
     /**
-     * A few questions from just before this one, so a poll sits among the others rather than on its own.
+     * A few questions from just before this one, so a poll is shown among the others rather than on its own.
      *
      * @return Poll[]
      */

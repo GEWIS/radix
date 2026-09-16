@@ -162,7 +162,7 @@ class SignupListStepType extends AbstractType
 
     /**
      * Whether the step is being handed in rather than only filled back in. Nothing is clicked while the step is
-     * restored from what it last held, and the back button asks for what was filled in to be kept rather than to be
+     * restored from what was last stored, and the back button keeps what was filled in without checking that it is
      * correct (it turns the validator off the same way, but these checks are made by hand and would still run).
      *
      * @param FormInterface<mixed> $form
@@ -181,7 +181,7 @@ class SignupListStepType extends AbstractType
             return false;
         }
 
-        // A button that asks for no groups asks for no checks; `false` is normalised to the empty list before it
+        // A button with no validation groups requires no checks; `false` is normalised to the empty list before it
         // reaches here, which is the same thing the validator itself reads.
         $groups = $button->getConfig()->getOption('validation_groups');
 
@@ -333,7 +333,7 @@ class SignupListStepType extends AbstractType
     }
 
     /**
-     * A message rather than a literal, so the string is written where the extractor can see it: what is handed to a
+     * A message rather than a literal, so the string is written where the extractor can see it: a string passed to a
      * method is invisible to it, and `make translations` deletes every message it cannot find.
      *
      * @param FormInterface<mixed> $form

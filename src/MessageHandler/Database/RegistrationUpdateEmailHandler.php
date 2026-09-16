@@ -50,7 +50,7 @@ class RegistrationUpdateEmailHandler
             return;
         }
 
-        // What the templates say, rather than the record they say it about: the name to greet, the number that was
+        // What the templates need, rather than the record they describe: the name to greet, the number that was
         // assigned, the link back into a checkout that did not finish, and where a confirmed member sets their first
         // password (no account exists until they do, so a reset request is the way in).
         $paymentLink = $member instanceof ProspectiveMember

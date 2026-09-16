@@ -212,8 +212,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         );
 
         if ($raced) {
-            // A token this row has never held is forged rather than replayed. Reading it as theft would let anybody
-            // who learns a series sign the account out of every device by presenting rubbish alongside it.
+            // A token this row has never stored is forged rather than replayed. Treating it as theft would let an
+            // attacker who learns a series sign the account out of every device by presenting rubbish alongside it.
             if (
                 !hash_equals(
                     $session->previousHashedToken ?? '',
@@ -230,7 +230,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                 throw new AuthenticationException('Remember-me token is not recognised.');
             }
 
-            // The token this row just replaced, presented past the window a second tab could still be holding it in.
+            // The token this row just replaced, presented after the window in which a second tab could still use it.
             if (!$this->withinGracePeriod($session->previousTokenValidUntil)) {
                 $this->reportTheft($session);
             }
@@ -258,7 +258,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             );
         }
 
-        // Setting a cookie here would strand the one the winner already handed the browser.
+        // Setting a cookie here would overwrite the one the winning request already sent to the browser.
         if ($raced) {
             $this->logger?->debug(
                 'Remember-me token was rotated by a concurrent request; accepted within the grace period.',
@@ -273,8 +273,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
         }
 
         // Rotate the token on every successful use. This is what makes the theft check above meaningful: an old raw
-        // token reappearing after the grace period is the smoking gun. Without rotation, we could not distinguish
-        // legitimate reuse from a replayed stolen cookie.
+        // token reappearing after the grace period is the evidence of theft. Without rotation, we could not
+        // distinguish legitimate reuse from a replayed stolen cookie.
         $newRawToken = UrlSafeToken::generate();
         $newHashedToken = hash(
             self::HASH_ALGO,
@@ -296,7 +296,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
             $now,
         );
 
-        // Lost the write, so what this request holds has just become the previous token.
+        // Lost the write, so the token this request presented has just become the previous token.
         if (!$rotated) {
             $grace = $this->repository->findRotationGrace($session->series);
 
@@ -399,7 +399,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
                 2,
             );
 
-            // Returning the whole value as a series would walk past the guards that check for the absence of one.
+            // Returning the whole value as a series would bypass the guards that check for the absence of one.
             if (2 !== count($parts)) {
                 return null;
             }
@@ -473,8 +473,8 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
      * A sign-in is announced unless it came from a device this account has signed in from before.
      *
      * Only this notice is ever withheld. A changed password or a second factor turned off goes out whatever device it
-     * came from, which is why the decision sits here rather than inside {@see SecurityNotifier}, where it could
-     * quietly come to cover them too. {@see \App\Service\User\KnownDeviceRegistry} sets out what recognition rests
+     * came from, which is why the decision is made here rather than inside {@see SecurityNotifier}, where it could
+     * later be extended to cover them too. {@see \App\Service\User\KnownDeviceRegistry} sets out what recognition rests
      * on and how weak it is.
      */
     private function announceSignIn(

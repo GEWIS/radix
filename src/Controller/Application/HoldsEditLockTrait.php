@@ -14,10 +14,10 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * The two endpoints every edit screen needs behind it: the browser saying it is still there, and saying it has gone.
- * The `edit-lock` Stimulus controller reads `held` and `released`, so the answers are the same wherever the screen is.
+ * The `edit-lock` Stimulus controller reads `held` and `released`, so the responses are the same for every screen.
  *
  * The routes stay on the concrete actions: each screen has its own path and its own CSRF token id, and only the
- * concrete controller can name the resource its value resolver hands it.
+ * concrete controller can name the resource its value resolver provides.
  */
 trait HoldsEditLockTrait
 {
@@ -34,7 +34,7 @@ trait HoldsEditLockTrait
     }
 
     /**
-     * Whether the lock is still held after this, which is what tells the screen to stop asking.
+     * Whether the lock is still held after this, which is what the screen uses to stop pinging.
      */
     protected function pingLock(
         RevisableInterface $resource,
@@ -54,7 +54,7 @@ trait HoldsEditLockTrait
     }
 
     /**
-     * Releasing is idempotent: a screen that is closed twice, or that was never holding the lock, answers the same.
+     * Releasing is idempotent: a screen that is closed twice, or that never had the lock, receives the same response.
      */
     protected function releaseLock(
         RevisableInterface $resource,

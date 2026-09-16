@@ -14,7 +14,7 @@ use Symfony\Component\Workflow\Event\EnteredEvent;
 /**
  * Announces an activity the first time it goes live. Runs before {@see PromoteLiveRevisionListener} repoints the live
  * revision, so a null live revision here means the activity has never been public; a later revision (an edit) already
- * has one and is skipped. Dispatched rather than published inline so a hub hiccup cannot fail the approval.
+ * has one and is skipped. Dispatched rather than published inline so a hub failure cannot break the approval.
  */
 #[AsEventListener(
     event: 'workflow.revision.entered.approved',

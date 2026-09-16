@@ -16,7 +16,7 @@ use Symfony\Component\Mercure\Exception\RuntimeException as MercureRuntimeExcept
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * What the browser holding this request may hear over Mercure, and the single cookie that says so.
+ * What the browser making this request may receive over Mercure, and the single cookie that grants it.
  */
 final class RealtimeAuthorization
 {
@@ -39,14 +39,14 @@ final class RealtimeAuthorization
         $topics = [RealtimeTopics::PUBLIC];
 
         // Someone who still has a second factor to clear has a user on the token but has not signed in yet, so they
-        // get no more than a passer-by does. Anything else would push their notifications to whoever holds the
-        // password.
+        // get no more than an anonymous visitor does. Anything else would push their notifications to anyone who
+        // knows the password.
         if (!$this->security->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             return $topics;
         }
 
         // What every member is shown at once, such as the infimum being rotated. A company user is signed in but is
-        // not a member, so this sits behind the role rather than behind being signed in at all.
+        // not a member, so this depends on the role rather than on being signed in at all.
         if ($this->security->isGranted(UserRoles::User->value)) {
             $topics[] = RealtimeTopics::MEMBERS;
         }
@@ -85,8 +85,8 @@ final class RealtimeAuthorization
     }
 
     /**
-     * A browser holds one cookie, so this has to answer the same whatever page mints it; a page-scoped grant was
-     * taken away again by the next tab to render a page without it. Templates, so one grant covers every id.
+     * A browser has one cookie, so this has to return the same grants whatever page sets it; a page-scoped grant was
+     * removed again by the next tab to render a page without it. Templates, so one grant covers every id.
      *
      * @return string[]
      */
@@ -119,13 +119,13 @@ final class RealtimeAuthorization
                 $topics,
             );
         } catch (MercureRuntimeException) {
-            // Thrown when the hub sits on a different host than the request (a hostless request under test, or a
+            // Thrown when the hub is on a different host than the request (a hostless request under test, or a
             // misconfigured hub). Leave realtime off for this page rather than failing the whole render.
         }
     }
 
     /**
-     * Reaches only the browser making this request. A device signed out from elsewhere keeps what it holds until the
+     * Reaches only the browser making this request. A device signed out from elsewhere keeps its cookie until the
      * lifetime in `config/packages/mercure.yaml` runs out.
      */
     public function revoke(): void

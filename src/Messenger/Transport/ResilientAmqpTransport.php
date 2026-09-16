@@ -44,9 +44,9 @@ final readonly class ResilientAmqpTransport implements
     #[Override]
     public function get(int $fetchSize = 1): iterable
     {
-        // `$fetchSize` is declared because the interface asks implementations to declare it, and forwarded through
-        // `func_get_args()` because the transport being decorated has not declared it yet: there it is still the
-        // extra argument Messenger passes, so passing it by name would be an argument the signature does not have.
+        // `$fetchSize` is declared because the interface requires implementations to declare it, and forwarded
+        // through `func_get_args()` because the transport being decorated has not declared it yet: there it is still
+        // the extra argument Messenger passes, so passing it by name would be an argument the signature does not have.
         $arguments = func_get_args();
 
         return $this->survivingReceiveFailure(

@@ -36,7 +36,7 @@ use function usleep;
 /**
  * Queues the missing image variants of every stored image onto the `images` transport.
  *
- * The command walks storage and dispatches; it never encodes. Encoding happens in the `messenger-images` workers,
+ * The command traverses storage and dispatches; it never encodes. Encoding happens in the `messenger-images` workers,
  * which is where the image pipeline's CPU and memory limits are set and what `IMAGE_WORKER_REPLICAS` scales. Doing
  * it inline (as this command once did) put the whole backfill in whichever container the command was run from,
  * single-threaded, competing with whatever else that container does.
@@ -49,7 +49,9 @@ final class PregenerateImageVariantsCommand extends Command
 {
     use HoldsRunLockTrait;
 
-    /** Career is absent on purpose: logos and banners share `career/{id}/images`, so only the database separates them. */
+    /**
+     * Career is absent on purpose: logos and banners share `career/{id}/images`, so only the database separates them.
+     */
     private const array UNAMBIGUOUS_PREFIXES = [
         'photos/albums',
         'photos/covers',
@@ -229,8 +231,8 @@ final class PregenerateImageVariantsCommand extends Command
                 $queued++;
 
                 if (!$force) {
-                    // A forced variant is still in the cache and so is still served; only a missing one can draw a
-                    // duplicate message out of the serving path while this one waits on the transport.
+                    // A forced variant is still in the cache and so is still served; only a missing one can cause the
+                    // serving path to dispatch a duplicate message while this one waits on the transport.
                     $this->markPending(
                         $path,
                         $variant,
@@ -313,7 +315,7 @@ final class PregenerateImageVariantsCommand extends Command
 
     /**
      * Claim the serving path's pending marker for a variant now on the transport, so a visitor who hits it before a
-     * worker gets there answers 503 without dispatching a second message ({@see ImageVariantResponder}).
+     * worker gets there receives 503 without dispatching a second message ({@see ImageVariantResponder}).
      */
     private function markPending(
         string $path,

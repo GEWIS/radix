@@ -49,9 +49,9 @@ class VacancyLabelRepository extends ServiceEntityRepository
     }
 
     /**
-     * Every label with the number of vacancy revisions carrying it, which is what says whether it may still be
-     * removed. Counted in the query: the overview only ever shows the number, and reading it off each label's
-     * collection would load every revision of every label to do it.
+     * Every label with the number of vacancy revisions using it, which determines whether it may still be removed.
+     * Counted in the query: the overview only ever shows the number, and reading it from each label's collection would
+     * load every revision of every label to do it.
      *
      * @return list<array{label: VacancyLabel, usage: int}>
      */

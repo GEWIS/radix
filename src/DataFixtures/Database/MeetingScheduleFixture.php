@@ -23,11 +23,11 @@ use function sprintf;
  * The association's meeting calendar, in the ledger where meetings belong.
  *
  * Board meetings every week, general members' meetings every month outside the summer, chairs' meetings once a
- * quarter, and two virtual meetings. Most carry no decision of their own: they are the diary that the agenda, the
+ * quarter, and two virtual meetings. Most have no decision of their own: they are the diary that the agenda, the
  * minutes and the documents hang off, and the replay copies them into the projection with everything else.
  *
  * Besides naming each meeting, this names the ones the rest of the seed writes decisions at, by the part they play
- * relative to today rather than by their number -- `ledger-meeting-gmm-complete` and the rest. The projection
+ * relative to today rather than by their number: `ledger-meeting-gmm-complete` and the rest. The projection
  * republishes the same names without the prefix once the replay has been through; see
  * {@see \App\DataFixtures\Decision\ProjectionReferenceFixture}.
  */

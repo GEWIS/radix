@@ -13,11 +13,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use function array_replace;
 
 /**
- * Sends an address that carries no language to the same page under one that does, for the addresses we do not get to
- * move: links already sent, return addresses travelling with an open checkout session, and whatever an external
+ * Sends an address that has no language to the same page under one that does, for the addresses we do not get to
+ * move: links already sent, return addresses passed with an open checkout session, and whatever an external
  * application is configured with.
  *
- * A 302 rather than a 301, because where it lands depends on `Accept-Language`.
+ * A 302 rather than a 301, because the target depends on `Accept-Language`.
  */
 final class LocaleRedirectController extends AbstractController
 {
@@ -43,7 +43,7 @@ final class LocaleRedirectController extends AbstractController
 
         return $this->redirect($this->urlGenerator->generate(
             $route,
-            // The checkout return addresses carry the Stripe session id the page reads.
+            // The checkout return addresses contain the Stripe session id the page reads.
             array_replace(
                 $request->query->all(),
                 $parameters,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Application;
 
 /**
- * The result of storing a file through {@see FileStorage}: where it landed and what it is. Immutable; carries the
+ * The result of storing a file through {@see FileStorage}: where it landed and what it is. Immutable; contains the
  * content hash so callers can persist the stored path on their entity and reason about de-duplication.
  */
 final readonly class StoredFile

@@ -15,8 +15,8 @@ use SortDirection;
  * concrete comment class, but it is always called `revision`, and a thread across a whole chain only differs in which
  * association on the revision points back at the aggregate.
  *
- * A repository using this still answers {@see RevisionCommentRepositoryInterface::supports()} for itself, since which
- * revisions are its own is the one thing that genuinely differs.
+ * A repository using this still implements {@see RevisionCommentRepositoryInterface::supports()} for itself, since
+ * which revisions are its own is the one thing that genuinely differs.
  */
 trait FindsRevisionCommentsTrait
 {

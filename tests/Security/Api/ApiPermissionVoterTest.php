@@ -40,7 +40,7 @@ class ApiPermissionVoterTest extends TestCase
     }
 
     /**
-     * The wildcard lives in {@see ApiPrincipal::can()}; the voter is what proves it reaches an attribute check.
+     * {@see ApiPrincipal::can()} implements the wildcard; the voter is what proves it reaches an attribute check.
      */
     public function testGrantsEverythingToAPrincipalHoldingTheWildcard(): void
     {
@@ -65,7 +65,7 @@ class ApiPermissionVoterTest extends TestCase
     }
 
     /**
-     * A session of the web interface carries no principal, so an API permission cannot be granted to it.
+     * A session of the web interface has no principal, so an API permission cannot be granted to it.
      */
     public function testDeniesATokenThatDidNotAuthenticateWithABearerToken(): void
     {

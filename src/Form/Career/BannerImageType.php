@@ -17,12 +17,12 @@ use function round;
 use function Symfony\Component\Translation\t;
 
 /**
- * The image going onto a banner package, whoever puts it there: the company proposing one and the committee setting
- * one both upload through this form.
+ * The image going onto a banner package: the company proposing one and the committee setting one both upload
+ * through this form.
  *
  * The size the package was bought in is a hard requirement rather than something we crop towards. A banner is finished
  * artwork with a logo and a line of text on it, so anything that has to be cropped or stretched to fit is not the
- * banner that was paid for, and the company is better off being told than being surprised by the result.
+ * banner that was paid for, and the company is better off being notified than being surprised by the result.
  *
  * @extends AbstractType<null>
  */

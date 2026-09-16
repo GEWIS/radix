@@ -180,7 +180,7 @@ class MemberTest extends TestCase
     }
 
     /**
-     * Once a membership has run out there is still a member to show a page for, and it is the last one that says
+     * Once a membership has run out there is still a member to show a page for, and it is the last one that records
      * what they were.
      */
     public function testFallsBackOnTheLastMembershipOnceItHasRunOut(): void

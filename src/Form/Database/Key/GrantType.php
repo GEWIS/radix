@@ -70,7 +70,7 @@ class GrantType extends AbstractType
     }
 
     /**
-     * A key code cannot be handed out with an expiry that has already passed by the time the decision is taken.
+     * A key code cannot be granted with an expiry that has already passed by the time the decision is taken.
      */
     public static function validateNotInThePast(
         mixed $value,

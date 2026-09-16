@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     /**
      * The corresponding member for this user. An account exists only for as long as the member does: it is fetched
      * eagerly and typed non-nullable, so a row that outlived its member would break every page the account can reach.
-     * The cascade removes the account, and with it everything that hangs off the account, in one statement.
+     * The cascade removes the account, and with it everything attached to the account, in one statement.
      */
     #[OneToOne(
         targetEntity: MemberModel::class,
@@ -225,7 +225,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             $roles[] = UserRoles::Board->value;
         }
 
-        // The register's own rights, granted for as long as somebody is the secretary rather than written down
+        // The register's own rights, granted for as long as a member is the secretary rather than written down
         // against their account. A serving secretary administers it; one who has been relieved but whose year is not
         // yet discharged keeps reading it, so the questions their report raises can still be answered.
         if ($member->isServingSecretary()) {
@@ -234,7 +234,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             $roles[] = UserRoles::DatabaseReadOnly->value;
         }
 
-        // When MFA enforcement is on and this user is in scope (admin, current board member, or holding either of
+        // When MFA enforcement is on and this user is in scope (admin, current board member, or having either of
         // the register's roles) but has not enrolled, strip every role that opens something worth protecting, so that
         // each existing `IsGranted` / `access_control` check fails. The exception is then converted into a redirect
         // to enrolment by `MfaEnforcementListener`.
@@ -278,8 +278,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             return true;
         }
 
-        // The register is read and written through these two, so neither is handed out to somebody who has not
-        // enrolled -- the same bar the website's own administrator is held to.
+        // The register is read and written through these two, so neither is granted to a user who has not enrolled: the
+        // same requirement that applies to the website's own administrator.
         if (
             $member->isServingSecretary()
             || $member->isReleasedButUndischargedSecretary()
@@ -287,8 +287,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             return true;
         }
 
-        // Granted outright rather than derived from an office, these still open the same things and are held to the
-        // same bar.
+        // Granted outright rather than derived from a function, these still open the same things, so the same
+        // requirement applies to them.
         foreach (self::MFA_PROTECTED_ROLES as $role) {
             if (
                 in_array(

@@ -10,7 +10,7 @@ use App\Entity\Activity\Enums\CalendarEntryKind;
  * One block in a day of the option calendar.
  *
  * Whatever spans several days is drawn on every day it covers, with a marker on the ends that run past the edge of
- * what is on screen, so a week that only shows the middle of something still says it carries on.
+ * what is on screen, so a week that only shows the middle of an entry still shows that it continues.
  */
 final readonly class CalendarEntry
 {
@@ -27,8 +27,8 @@ final readonly class CalendarEntry
     }
 
     /**
-     * Whether this is the first body to ask for the day, which is what first dibs means. Only ever shown; the board
-     * decides.
+     * Whether this is the first body to request the day, which is what first dibs means. Only ever shown; the
+     * board decides.
      */
     public function isFirstInLine(): bool
     {

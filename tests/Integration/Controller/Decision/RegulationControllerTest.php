@@ -16,11 +16,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Who may download which regulation, and from where. The board keeps the current version of a policy in that policy's
- * own folder as `<slug>-latest.pdf`; only the two policies an activity sign-up makes somebody agree to are served to a
+ * own folder as `<slug>-latest.pdf`; only the two policies an activity sign-up makes a user agree to are served to a
  * visitor without an account, and every other regulation stays behind the login as it was.
  *
- * Invoked directly, which is this codebase's pattern for controller tests; the access check being exercised lives in
- * the action itself rather than on the class, precisely so these two can be let through.
+ * Invoked directly, which is this codebase's pattern for controller tests; the access check being exercised is defined
+ * in the action itself rather than on the class, precisely so these two can be let through.
  */
 final class RegulationControllerTest extends DatabaseTestCase
 {

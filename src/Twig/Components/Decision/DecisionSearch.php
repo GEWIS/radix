@@ -81,9 +81,9 @@ final class DecisionSearch
     {
         $groups = [];
 
-        // Someone typing a meeting is looking for that meeting, so it stands at the top of the answer whether or not
-        // anything in it matched. Without this a meeting that decided nothing, or nothing matching, can only be found
-        // through the decisions elsewhere that mention it.
+        // Someone typing a meeting is looking for that meeting, so it is placed at the top of the results whether or
+        // not anything in it matched. Without this a meeting that decided nothing, or nothing matching, can only be
+        // found through the decisions elsewhere that mention it.
         foreach ($this->getNamedMeetings() as $meeting) {
             $groups[spl_object_id($meeting)] = [
                 'meeting' => $meeting,
@@ -108,9 +108,9 @@ final class DecisionSearch
     /**
      * The virtual decisions that are this one's counterpart.
      *
-     * A virtual meeting says again what a real meeting decided, and the search answers with the real decision rather
-     * than with both. What the virtual meeting made of it is still worth reaching, so it hangs off the decision it
-     * belongs to instead of standing beside it.
+     * A virtual meeting repeats what a real meeting decided, and the search returns the real decision rather than both.
+     * The virtual decision is still worth reaching, so it is attached to the decision it belongs to rather than listed
+     * beside it.
      *
      * @return list<Decision>
      */

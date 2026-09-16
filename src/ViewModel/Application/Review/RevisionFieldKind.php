@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ViewModel\Application\Review;
 
 /**
- * How a field is rendered, and with it what its old and new values hold. The set is closed on purpose: a domain that
+ * How a field is rendered, and with it what its old and new values contain. The set is closed on purpose: a domain that
  * wants something else describes it with what is here or the kind is added once, for everybody.
  */
 enum RevisionFieldKind: string

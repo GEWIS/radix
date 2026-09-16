@@ -23,9 +23,9 @@ use function random_int;
  * that grows `limit` through the loadMore action.
  *
  * The companies are listed in a random order, so that no company is structurally favoured by being early in the
- * alphabet. Paging through a list that is reshuffled on every request would show some companies twice and others not
- * at all, so the order is drawn once, at mount, and carried along as a seed for as long as the visitor stays on the
- * page. Reloading it deals a new hand.
+ * alphabet. Paging through a list that is reshuffled on every request would show some companies twice and others not at
+ * all, so the order is drawn once, at mount, and kept as a seed for as long as the visitor stays on the page. Reloading
+ * the page draws a new order.
  */
 #[AsLiveComponent(
     name: 'Career:CompanyOverview',
@@ -39,8 +39,8 @@ final class CompanyOverview extends AbstractInfiniteScrollOverview
     )]
     public string $search = '';
 
-    // Neither is client-writable: they travel in the signed props, so a crafted request can neither reshuffle the list
-    // mid-page nor ask for an arbitrarily large page. The seed's ceiling keeps it inside the range JavaScript
+    // Neither is client-writable: they are passed in the signed props, so a crafted request can neither reshuffle the
+    // list mid-page nor ask for an arbitrarily large page. The seed's ceiling keeps it inside the range JavaScript
     // represents exactly, since the props go through JSON.parse in the browser and a rounded seed fails the checksum.
     #[LiveProp]
     public int $seed = 0;
@@ -90,7 +90,7 @@ final class CompanyOverview extends AbstractInfiniteScrollOverview
 
     /**
      * The matching companies in this visitor's order. A seeded Mt19937 rather than the global generator, so drawing
-     * this hand leaves the rest of the request's randomness alone.
+     * this order leaves the rest of the request's randomness alone.
      *
      * @return int[]
      */

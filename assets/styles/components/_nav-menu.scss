@@ -191,7 +191,7 @@
     }
 }
 
-// These panels are wider than Bootstrap's default, and the toggles they hang from sit well short of the right edge,
+// These panels are wider than Bootstrap's default, and the toggles they hang from are well short of the right edge,
 // so on a phone they ran off the screen. Dropping the positioning off the nav item lets them resolve against the
 // navbar instead and span it: `right`/`left` rather than `inset-inline`, and repeated with the attribute Bootstrap
 // stamps on a positioned menu, since its own `right: 0; left: auto` is more specific than a plain two-class selector.

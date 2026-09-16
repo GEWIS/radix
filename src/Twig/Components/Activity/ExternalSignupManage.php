@@ -27,12 +27,12 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 use function strval;
 
 /**
- * Self-service edit/unsubscribe for an external (non-member) sign-up, reached through the emailed Manage link. There
- * is no login, so the token rides as a read-only, signed {@see LiveProp} and is RE-VALIDATED on every render and action
- * (via {@see self::signup()}); a once-validated token is never trusted. Editing the name and answers is an inline live
- * action ({@see self::save()}); the email is locked ({@see SignupType::MODE_MANAGE}) because it is the verified
- * identity. Unsubscribing ({@see self::unsubscribe()}) withdraws and redirects to the activity, confirmed via the
- * shared confirm-modal.
+ * Self-service edit/unsubscribe for an external (non-member) sign-up, reached through the emailed Manage link. There is
+ * no login, so the token is passed as a read-only, signed {@see LiveProp} and is RE-VALIDATED on every render and
+ * action (via {@see self::signup()}); a once-validated token is never trusted. Editing the name and answers is an
+ * inline live action ({@see self::save()}); the email is locked ({@see SignupType::MODE_MANAGE}) because it is the
+ * verified identity. Unsubscribing ({@see self::unsubscribe()}) withdraws and redirects to the activity, confirmed via
+ * the shared confirm-modal.
  */
 #[AsLiveComponent(
     name: 'Activity:ExternalSignupManage',

@@ -44,8 +44,8 @@ use function intval;
  * The same component serves the rail on the front page and the poll's own page; `detailed` decides which. The
  * results are on both, because how a poll is going is the point of reading one.
  *
- * Deliberately not gated as a whole, because a passer-by should still see what the association is being asked; they
- * simply get no controls, and {@see self::vote()} checks for itself rather than trusting that.
+ * Deliberately not gated as a whole, because an anonymous visitor should still see what the association is being asked;
+ * they simply get no controls, and {@see self::vote()} checks for itself rather than trusting that.
  *
  * Answering and paging are live actions and nothing else, so a reader without JavaScript sees the first question and
  * the results but cannot answer or move on.
@@ -124,7 +124,7 @@ final class PollWidget
 
     /**
      * A live action re-hydrates the polls bare, so the render after it would count every answer's votes one query at
-     * a time. The initial render is primed by whoever mounts the component instead.
+     * a time. The initial render is primed by the caller that loads the polls instead.
      */
     #[PostHydrate]
     public function primeResults(): void

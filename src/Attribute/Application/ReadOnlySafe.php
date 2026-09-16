@@ -13,8 +13,8 @@ use Attribute;
  * {@see \App\EventListener\Application\MaintenanceListener} would otherwise refuse paging and filtering along with
  * the writes while the site is read-only.
  *
- * Absence is the safe answer: an action that does not say it is read-only is refused, so a new one that writes is
- * covered without being remembered.
+ * Absence is the safe default: an action that does not declare itself read-only is refused, so a new action that
+ * writes is covered without anyone having to remember the attribute.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class ReadOnlySafe

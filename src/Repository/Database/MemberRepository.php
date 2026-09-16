@@ -80,9 +80,9 @@ class MemberRepository extends ServiceEntityRepository
     /**
      * Search for a member, for the name lookup the decision forms type into.
      *
-     * Capped rather than paginated on purpose: this answers a typeahead, which wants the first handful of matches
-     * while somebody is still typing and never wants a second page. Narrowing the query is what finds a member who
-     * is not in the first thirty-two, not asking for more of them.
+     * Capped rather than paginated on purpose: this serves a typeahead, which wants the first handful of matches
+     * while a user is still typing and never wants a second page. Narrowing the query is what finds a member who
+     * is not in the first thirty-two, not requesting more of them.
      *
      * @return Member[]
      */
@@ -584,9 +584,9 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many members hold a current membership of each type.
+     * How many members have a current membership of each type.
      *
-     * Counts members rather than memberships, and someone who holds two current memberships of different types is
+     * Counts members rather than memberships, and a member who has two current memberships of different types is
      * counted under both, so these do not add up to the number of members and are not rendered as a share of one.
      *
      * @return array<string, int> keyed by the value of `MembershipTypes`, in the order that enum declares them
@@ -618,7 +618,7 @@ class MemberRepository extends ServiceEntityRepository
             $counts[$row['type']->value] = (int) $row['total'];
         }
 
-        // A type nobody holds does not come back from a `GROUP BY`, and it is still a type: it is a zero, not a
+        // A type no member has does not come back from a `GROUP BY`, and it is still a type: it is a zero, not a
         // missing row.
         $breakdown = [];
         foreach (MembershipTypes::cases() as $type) {
@@ -784,7 +784,7 @@ class MemberRepository extends ServiceEntityRepository
         int $page,
         int $pageSize,
     ): Paginator {
-        // The memberships come along: every row states the membership a member holds, and reading that off a lazy
+        // The memberships come along: every row states the membership a member has, and reading that from a lazy
         // collection is one query per row. `Paginator` pages the members first and fetches their memberships after,
         // so the join does not cut the page short.
         $qb = $this->createQueryBuilder('m')
@@ -813,7 +813,7 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many records each filter would return, so the chips can say so before they are clicked.
+     * How many records each filter would return, so the chips can show it before they are clicked.
      *
      * @return array<string, int>
      */
@@ -841,7 +841,7 @@ class MemberRepository extends ServiceEntityRepository
 
     /**
      * A removed member is only ever reached through its own filter: they are kept so the decisions that mention them
-     * stay readable, not so they turn up while looking for someone.
+     * stay readable, not so they appear while searching for a member.
      */
     private function applyOverviewFilter(
         QueryBuilder $qb,
@@ -869,7 +869,7 @@ class MemberRepository extends ServiceEntityRepository
         match ($filter) {
             MemberFilter::Everyone => null,
             MemberFilter::Active => $membership(false),
-            // Held a membership at some point but holds none now, which is the difference between the two subqueries.
+            // Had a membership at some point but has none now, which is the difference between the two subqueries.
             MemberFilter::Expired => (static function () use ($qb, $membership): void {
                 $membership(true);
 
@@ -906,7 +906,7 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * Name, e-mail, member number or student number — whichever the secretary has to hand.
+     * Name, e-mail, member number or student number: whichever the secretary has available.
      */
     private function applyOverviewSearch(
         QueryBuilder $qb,

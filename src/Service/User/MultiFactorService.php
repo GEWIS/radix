@@ -12,11 +12,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Turning multi-factor authentication on and off for an account, and taking it off entirely — which is what the board
- * does for somebody who has lost their second factor and cannot get back in.
+ * Turning multi-factor authentication on and off for an account, and taking it off entirely, which is what the board
+ * does for an account owner who has lost their second factor and cannot get back in.
  *
- * The secret, the backup codes and the forced re-login go together in one commit: an account left holding a secret it
- * can no longer answer, or one that is not made to sign in again, is half changed and either locked out or still
+ * The secret, the backup codes and the forced re-login go together in one commit: an account left with a secret it can
+ * no longer produce codes for, or one that is not made to sign in again, is half changed and either locked out or still
  * trusting a factor that is gone.
  */
 final readonly class MultiFactorService
@@ -54,8 +54,8 @@ final readonly class MultiFactorService
     }
 
     /**
-     * Make every session sign in again. Done before new backup codes are handed out, so a session that is still
-     * holding the old ones cannot go on using them.
+     * Make every session sign in again. Done before new backup codes are issued, so a session that still has the old
+     * ones cannot go on using them.
      */
     public function forceRelogin(User|CompanyUser $account): void
     {
@@ -72,9 +72,9 @@ final readonly class MultiFactorService
 
         $this->entityManager->flush();
 
-        // Only the board reaches this, on behalf of somebody who cannot get in; taking one's own second factor off is
-        // {@see self::disable()} and is recorded by the controller that offers it. The administrator who did this is
-        // filled in as the actor.
+        // Only the board reaches this, on behalf of an account owner who cannot get in; taking one's own second factor
+        // off is {@see self::disable()} and is recorded by the controller that offers it. The administrator who did
+        // this is filled in as the actor.
         $this->securityEvents->record(
             SecurityEventType::MfaDisabled,
             $account->getUserIdentifier(),

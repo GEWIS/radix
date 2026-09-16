@@ -30,7 +30,7 @@ enum UserRoles: string implements TranslatableInterface
     /**
      * The register's own administrator, which is not the website's.
      *
-     * Granted for as long as somebody is the serving secretary rather than written down against an account, and taken
+     * Granted for as long as a member is the serving secretary rather than written down against an account, and taken
      * away again the day they are relieved. {@see \App\Entity\User\User::getRoles()} is where that is decided.
      */
     case DatabaseAdmin = 'ROLE_DATABASE_ADMIN';

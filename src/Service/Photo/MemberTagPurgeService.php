@@ -9,8 +9,8 @@ use App\Repository\Photo\MemberTagRepository;
 
 /**
  * Removes every existing photo tag of a member on request (the "remove all tags of me" action that accompanies the
- * photo-tagging opt-out). Preventing new tags lives in {@see TagService::addMemberTag()}; this is the retroactive
- * counterpart.
+ * photo-tagging opt-out). Preventing new tags is implemented in {@see TagService::addMemberTag()}; this is the
+ * retroactive counterpart.
  */
 final readonly class MemberTagPurgeService
 {

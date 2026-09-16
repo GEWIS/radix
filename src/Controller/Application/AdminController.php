@@ -28,7 +28,7 @@ use function count;
 use function usort;
 
 /**
- * Where an administrator lands: what is waiting on them, what the whole association is being told at the moment, and
+ * Where an administrator lands: what is waiting on them, what the whole association is being shown at the moment, and
  * the way on to the parts of the administration they may use.
  *
  * Everything waiting is shown as one list rather than a queue per module, because what an administrator wants to know
@@ -71,7 +71,7 @@ class AdminController extends AbstractController
         $queues = $this->queues();
         $isAdmin = $this->isGranted(UserRoles::Admin->value);
 
-        // An area nobody has heard of, or one this reader may not deal with, reads as no filter at all.
+        // An unknown area, or one this reader may not deal with, counts as no filter at all.
         $selected = null;
         foreach ($queues as $summary) {
             if ($summary->key !== $queue) {
@@ -112,8 +112,8 @@ class AdminController extends AbstractController
                     ? $this->ipDatabaseStatus->status()
                     : null,
                 // The whole schedule, so only for a reader who administers the whole application. What the register's
-                // own syncs are doing is told to a database administrator by the register notifications, off the
-                // fetch times rather than off the schedule.
+                // own syncs are doing is reported to a database administrator by the register notifications, from the
+                // fetch times rather than from the schedule.
                 'lateTasks' => $isAdmin
                     ? $this->scheduledTaskStatus->late()
                     : [],
@@ -128,7 +128,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * What the register has to say for itself, for the section of the dashboard that used to be its own front page.
+     * The register's own status, for the section of the dashboard that used to be its own front page.
      *
      * @return array<string, mixed>
      */
@@ -137,7 +137,7 @@ class AdminController extends AbstractController
         $data = $this->registerStatus->getStatusViewData();
         // Every one of these is something to go and do: approve a prospective member, work through the proposed
         // changes, restart a sync. A reader who may only read the register can act on none of them, so they are not
-        // told to.
+        // shown any.
         $data['notifications'] = $this->isGranted(UserRoles::DatabaseAdmin->value)
             ? Notification::fromRegisterStatus($data)
             : [];
@@ -147,7 +147,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * The queues this reader may deal with: every tagged domain queue whose role they hold.
+     * The queues this reader may deal with: every tagged domain queue whose role they have.
      *
      * @return list<ReviewQueueSummary>
      */

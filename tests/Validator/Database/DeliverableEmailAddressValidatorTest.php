@@ -46,9 +46,8 @@ class DeliverableEmailAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * The host is what follows the *last* `@`. The `html5` mode of the Email constraint next to this one never lets
-     * a quoted local part through, so this cannot arrive from the registration form; the parsing does not lean on
-     * that.
+     * The host is what follows the *last* `@`. The `html5` mode of the Email constraint next to this one never lets a
+     * quoted local part through, so this cannot arrive from the registration form; the parsing does not lean on that.
      */
     #[DataProvider('addressesAndTheirHost')]
     public function testAsksAboutTheHostAfterTheLastAtSign(

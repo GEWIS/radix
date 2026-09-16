@@ -17,7 +17,7 @@ use function assert;
 use function sprintf;
 
 /**
- * A question put to the whole association is the board's to agree to, and nobody else's.
+ * A question put to the whole association is the board's to approve, and no other body's.
  */
 final readonly class PollRevisionNotification implements RevisionNotificationInterface
 {

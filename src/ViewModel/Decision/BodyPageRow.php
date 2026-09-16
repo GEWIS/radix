@@ -27,7 +27,7 @@ final readonly class BodyPageRow
         // The revision visitors are seeing while the working one is not, so a page with a draft or a rejected revision
         // in hand is not read as one with nothing on the website. Null when the working revision is the live one.
         public ?int $liveRevisionNumber,
-        // The working draft answers a review that asked for changes, so there is feedback waiting to be acted on.
+        // The working draft follows a review that requested changes, so there is feedback waiting to be acted on.
         public bool $changesRequested,
     ) {
     }

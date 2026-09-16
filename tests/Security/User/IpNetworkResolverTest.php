@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Without the ASN database on disk, which is every development machine and the test suite. The addresses are
- * reserved ones the database would not answer for either, so these answers hold with the file present too.
+ * reserved ones the database would have no record for either, so these results hold with the file present too.
  */
 final class IpNetworkResolverTest extends TestCase
 {
@@ -82,7 +82,7 @@ final class IpNetworkResolverTest extends TestCase
     }
 
     /**
-     * An attacker varies the address, so a malformed one must not read as a network of its own.
+     * An attacker varies the address, so a malformed one must not count as a network of its own.
      */
     public function testAMalformedAddressIsNoNetworkAtAll(): void
     {
@@ -101,9 +101,8 @@ final class IpNetworkResolverTest extends TestCase
     }
 
     /**
-     * The internal side of the campus NAT hands out rotating shared-space addresses no database names, so every
-     * campus address must reduce to the one campus network, with what a public one would have learned kept behind
-     * it.
+     * The internal side of the campus NAT assigns rotating shared-space addresses no database names, so every campus
+     * address must reduce to the one campus network, with what a public one would have learned kept behind it.
      */
     public function testEverySideOfTheCampusNatIsTheOneCampusNetwork(): void
     {

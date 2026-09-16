@@ -40,8 +40,8 @@
             border-left: 0;
         }
 
-        // A day of a neighbouring month still carries its blocks: a week runs across the turn of a month, and a body
-        // asking for the 31st has to see it from both sides.
+        // A day of a neighbouring month still shows its blocks: a week runs across the turn of a month, and a body
+        // requesting the 31st has to see it from both sides.
         &--outside {
             background-color: var(--option-calendar-shade-weak);
 

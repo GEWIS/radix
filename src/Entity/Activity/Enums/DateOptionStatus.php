@@ -9,27 +9,27 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * What became of one of the dates a body put forward.
+ * What happened to one of the dates a body proposed.
  *
  * Exactly one date option of a proposal can be Approved, which the proposal guarantees by pointing at it through a
- * unique association rather than by anybody counting these statuses.
+ * unique association rather than by counting these statuses.
  */
 enum DateOptionStatus: string implements TranslatableInterface
 {
-    /** Still on the table. */
+    /** Still awaiting a decision. */
     case Proposed = 'proposed';
 
-    /** The board picked this date; the proposal holds it. */
+    /** The board picked this date; the proposal reserves it. */
     case Approved = 'approved';
 
-    /** Not the date that was picked, or the whole proposal was turned down. */
+    /** Not the date that was picked, or the whole proposal was declined. */
     case Declined = 'declined';
 
-    /** The body took its proposal back before a decision. */
+    /** The body withdrew its proposal before a decision. */
     case Withdrawn = 'withdrawn';
 
     /**
-     * Whether an option in this state still stands in anybody's way on the calendar.
+     * Whether an option in this state still blocks other proposals on the calendar.
      */
     public function isStanding(): bool
     {

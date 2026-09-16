@@ -13,7 +13,7 @@ use Twig\TwigFunction;
 use function array_map;
 
 /**
- * Twig helpers for building image URLs. `image_url(path, variant)` yields the serving URL for a variant of a stored
+ * Twig helpers for building image URLs. `image_url(path, variant)` returns the serving URL for a variant of a stored
  * source; `image_srcset(path, variants)` builds a responsive `srcset`. Both accept a variant as an `ImageVariant` or
  * its string value and delegate to {@see ImageUrlBuilder}, which does the signing.
  */

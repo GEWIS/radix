@@ -13,9 +13,9 @@ security:
                 - bcrypt
 
     providers:
-        # Both accounts are mapped on `web`, and the declarative provider asks the registry for the manager it is
-        # named rather than for the one that maps the class. Left unnamed it would reach for the default manager,
-        # which is the ledger, and every lookup would fail on a class it does not map.
+        # Both accounts are mapped on `web`, and the declarative provider looks up the manager it is named rather than
+        # the one that maps the class. Left unnamed it would use the default manager, which is the ledger, and every
+        # lookup would fail on a class it does not map.
         user_provider:
             entity:
                 class: App\Entity\User\User
@@ -50,7 +50,7 @@ security:
             stateless: true
             provider: user_provider
             # The bearer-token authenticator resolves an ApiPrincipal itself and doubles as the entry point, so the
-            # provider above is never consulted on this firewall.
+            # provider above is never used on this firewall.
             custom_authenticators:
                 - App\Security\Api\ApiTokenAuthenticator
 
@@ -105,8 +105,8 @@ security:
         ROLE_TUE_GUEST: [ 'ROLE_GUEST' ]
         ROLE_USER: [ ]
         ROLE_COMPANY_USER: [ ]
-        # What a bearer token carries. Authorization on the API is decided per permission by ApiPermissionVoter, so
-        # this grants nothing and exists only so the role a token holds is declared like every other.
+        # The role a bearer token is given. Authorization on the API is decided per permission by ApiPermissionVoter, so
+        # this grants nothing and exists only so the role a token has is declared like every other.
         ROLE_API: [ ]
         # Retired with the GEWISWEB-era API token, and kept only because UserRoles is persisted; see the enum.
         ROLE_API_USER: [ ]
@@ -116,9 +116,9 @@ security:
         ROLE_COMPANY_ADMIN: [ 'ROLE_ACTIVE_MEMBER' ]
         ROLE_BOARD: [ 'ROLE_ACTIVE_MEMBER', 'ROLE_COMPANY_ADMIN' ] # The board is always considered an active member
         ROLE_ADMIN: [ 'ROLE_BOARD' ]
-        # The register reads with one role and is changed with the other, so the one that may change it inherits the
-        # one that may read it. A page that only shows something therefore asks for the read-only role and lets both
-        # through, and only the paths that write ask for the administrator by name.
+        # The register reads with one role and is changed with the other, so the one that may change it inherits the one
+        # that may read it. A page that only shows something therefore requires the read-only role and lets both
+        # through, and only the paths that write require the administrator by name.
         ROLE_DATABASE_READ_ONLY: [ ]
         ROLE_DATABASE_ADMIN: [ 'ROLE_DATABASE_READ_ONLY' ]
 
@@ -132,33 +132,33 @@ security:
         # The register's own subtrees, which no other part of the administration reaches into. Anything that changes
         # something needs the administrator; everything else needs no more than the reader, which the administrator
         # inherits. Matching on the method rather than on the path is what keeps a write that forgets to say so from
-        # being reachable by somebody who may only read. Before the rule below, which would otherwise answer first for
-        # a reader who administers the register and nothing else.
+        # being reachable by a user who may only read. Before the rule below, which would otherwise match first for a
+        # reader who administers the register and nothing else.
         - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', methods: [POST, PUT, PATCH, DELETE], roles: [ROLE_DATABASE_ADMIN] }
         - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', roles: [ROLE_DATABASE_READ_ONLY] }
         # Bearer tokens that read the register over the API. Credentials rather than a page about them, so reading the
-        # list asks for an administrator as much as changing it does. The association's administrator is named next to
-        # the register's because a token is not the register: nothing about handing one out or revoking one has to
-        # happen from the network the register itself is restricted to.
+        # list requires an administrator as much as changing it does. The association's administrator is named next to
+        # the register's because a token is not the register: nothing about issuing one or revoking one has to happen
+        # from the network the register itself is restricted to.
         - { path: '^/(%app.locales%)/admin/users/api-principals', roles: [ROLE_ADMIN, ROLE_DATABASE_ADMIN] }
         # The rest of the administration. The register's roles are named here as well because the meeting and body
-        # pages are shared with the board: this rule lets a register reader as far as the door, and the controllers
-        # behind it decide what they are shown.
+        # pages are shared with the board: this rule lets a register reader through, and the controllers behind it
+        # decide what they are shown.
         - { path: '^/(%app.locales%)/admin', roles: [ROLE_ACTIVE_MEMBER, ROLE_BOARD, ROLE_ADMIN, ROLE_DATABASE_READ_ONLY] }
         # Everything a representative needs before they have a session, which the rule below would otherwise send them
         # to the login page for, which is itself one of these paths.
-        # `realtime/grant` is open on purpose: what a subscribe cookie grants is read from whoever asks for it.
+        # `realtime/grant` is open on purpose: what a subscribe cookie grants is read from the current user.
         - { path: '^/(%app.locales%)/company/(login|logout|forgot-password|reset-password|invite|realtime/grant)', role: PUBLIC_ACCESS }
         - { path: '^/(%app.locales%)/company', roles: [ROLE_COMPANY_USER] }
         # - { path: ^/profile, roles: ROLE_USER }
 
         # `openapi.yaml` is committed to a public repository, so gating the same document buys no secrecy.
         - { path: ^/api-docs, roles: PUBLIC_ACCESS }
-        # Endpoints carry their own permission checks; this is what catches one that forgot.
+        # Endpoints have their own permission checks; this is what catches one that forgot.
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
-        # The register's public flows: a visitor to them is nobody yet. Each is named twice, once where it answers
-        # now and once where it used to, so the older spelling still reaches the redirect that forwards it.
+        # The register's public flows: a visitor to them is not signed in yet. Each is named twice, once where it is
+        # served now and once where it used to be, so the older spelling still reaches the redirect that forwards it.
         - { path: ^/join, roles: PUBLIC_ACCESS }
         - { path: '^/(%app.locales%)/join', roles: PUBLIC_ACCESS }
         - { path: ^/member/subscribe, roles: PUBLIC_ACCESS }

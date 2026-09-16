@@ -38,7 +38,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
     #[Override]
     public function load(ObjectManager $manager): void
     {
-        // Two board meetings after MeetingFixture's BV 1. The founding meeting sits three years back: after everyone
+        // Two board meetings after MeetingFixture's BV 1. The founding meeting is three years back: after everyone
         // installed had joined, and long enough ago that the installations count as current. The discharge meeting is
         // ten days back, after the misclassified member's membership had already expired.
         $founding = new Meeting();
@@ -109,7 +109,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
             $chair,
         );
 
-        // Whoever holds a function in an organ is one of its members as well, and is installed as a member first.
+        // A member with a function in an organ is one of its members as well, and is installed as a member first.
         $this->installInOrgan(
             $manager,
             $founding,
@@ -133,7 +133,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
         );
 
         // Installed on founding, discharged ten days ago. Their membership had already expired thirty days ago, so at
-        // the end of it they were still active — but activity is read as of today, which files them as non-active.
+        // the end of it they were still active, but activity is read as of today, which files them as non-active.
         $misclassified = $this->installInOrgan(
             $manager,
             $founding,
@@ -155,7 +155,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
 
     /**
      * A fraternity, which is the only kind of body that has inactive members: it keeps members who no longer study
-     * (HR art. 13), and they then hold no function. It needs a chair and three active members, and an inactive one
+     * (HR art. 13), and they then have no function. It needs a chair and three active members, and an inactive one
      * does not count towards that, so three are installed alongside the graduate.
      */
     private function loadFraternity(
@@ -209,7 +209,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
             InstallationFunctions::Member,
         );
 
-        // Someone from outside the attention matrix, so that making them an active organ member does not change what
+        // A member from outside the attention matrix, so that making them an active organ member does not change what
         // any of those members are there to demonstrate.
         $this->installInOrgan(
             $manager,
@@ -223,9 +223,9 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
             InstallationFunctions::Member,
         );
 
-        // The graduate the "requiring attention" overview surfaces, because the finder counts an inactive organ
-        // member as active. This is the installation that has to be in a fraternity: in a committee the checker
-        // rejects it, and rightly — committees discharge whoever is no longer part of them.
+        // The graduate the "requiring attention" overview shows, because the finder counts an inactive organ member
+        // as active. This is the installation that has to be in a fraternity: in a committee the checker rejects it,
+        // and rightly, because committees discharge members who are no longer part of them.
         $this->installInOrgan(
             $manager,
             $founding,
@@ -300,7 +300,7 @@ class DecisionFixture extends Fixture implements DependentFixtureInterface, Fixt
     /**
      * Install a member in a body through a decision of its own.
      *
-     * Someone holding a function is a member of the body as well, so more than one function may be given; they are
+     * A member who has a function is a member of the body as well, so more than one function may be given; they are
      * recorded in the order given, which is why "Lid" always comes first.
      *
      * @return Installation the installation for the first of the given functions

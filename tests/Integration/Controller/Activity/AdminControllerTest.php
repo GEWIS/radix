@@ -91,7 +91,7 @@ final class AdminControllerTest extends DatabaseTestCase
     }
 
     /**
-     * An activity that has taken place cannot be called off. Un-cancelling one still can be, so an activity cancelled
+     * An activity that has taken place cannot be cancelled. Un-cancelling one still can be, so an activity cancelled
      * before it ended can still be reversed afterwards.
      */
     public function testCancelIsRefusedForAnActivityThatHasTakenPlace(): void
@@ -239,7 +239,7 @@ final class AdminControllerTest extends DatabaseTestCase
     }
 
     /**
-     * An approved activity that has still to take place, which is what cancelling asks for.
+     * An approved activity that has still to take place, which is what cancelling requires.
      */
     private function anUpcomingApprovedActivity(): Activity
     {

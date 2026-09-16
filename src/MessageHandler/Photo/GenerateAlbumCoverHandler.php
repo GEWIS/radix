@@ -53,7 +53,7 @@ class GenerateAlbumCoverHandler
             $message->getAlbumId(),
         );
 
-        // Always tell the manage view the outcome so it can stop waiting; an album without photos yields no cover.
+        // Always report the outcome to the manage view so it can stop waiting; an album without photos has no cover.
         if (null === $coverPath) {
             $this->hub->publish(new Update(
                 $topic,

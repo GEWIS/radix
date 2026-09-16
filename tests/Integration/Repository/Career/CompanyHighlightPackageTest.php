@@ -112,8 +112,8 @@ final class CompanyHighlightPackageTest extends DatabaseTestCase
     }
 
     /**
-     * The landing page asks for the picks themselves rather than walking the packages, so what it puts on the page has
-     * to agree with what each package says it can show.
+     * The landing page reads the picks themselves rather than traversing the packages, so what it puts on the page
+     * has to agree with what each package says it can show.
      */
     public function testTheHighlightsOnTheLandingPageAreThePicksThatAreStillShowable(): void
     {

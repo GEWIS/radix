@@ -20,8 +20,8 @@ twig:
         matomo_domain: '%env(MATOMO_DOMAIN)%'
         external_affairs_email: '%app.email.external_affairs%'
         education_email: '%app.email.education%'
-        # The build the container was made from. Read through the container rather than off `$_SERVER`, which never
-        # carries it: `variables_order` is GPCS, so no environment variable reaches the superglobal.
+        # The build the container was made from. Read through the container rather than from `$_SERVER`, which never
+        # contains it: `variables_order` is GPCS, so no environment variable reaches the superglobal.
         git_commit: '%env(string:default::GIT_COMMIT)%'
 
 when@test:

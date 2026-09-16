@@ -17,10 +17,10 @@ use function array_map;
 use function in_array;
 
 /**
- * The member page: the member themselves, plus everything about them that the page cannot read off the entity.
+ * The member page: the member themselves, plus everything about them that the page cannot read from the entity.
  *
- * The two flags decide whether the page offers the actions next to the membership; both are questions about what is
- * still possible for this member, which is why they are answered once here instead of in the markup.
+ * The two flags decide whether the page offers the actions next to the membership; both are checks on what is still
+ * possible for this member, which is why they are computed once here instead of in the markup.
  */
 final readonly class MemberProfile
 {
@@ -67,8 +67,8 @@ final readonly class MemberProfile
                     ],
                     true,
                 ),
-            // Without the installations that hold up, the ones on the member are whatever happens to be on file,
-            // discharges and annulments included, so they are not stated at all.
+            // Without installations that meet the requirements, the ones on the member are whatever happens to be on
+            // file, discharges and annulments included, so they are not stated at all.
             $hasCorrectInstallations
                 ? array_map(
                     static fn (Installation $installation): OrganRow => OrganRow::fromInstallation(

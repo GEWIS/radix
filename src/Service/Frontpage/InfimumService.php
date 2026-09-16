@@ -13,11 +13,10 @@ use function is_string;
 use function trim;
 
 /**
- * The infimum the website shows, fetched from the Supremum's own API and kept for a few minutes. The cron fills the
- * cache and pushes what it found; nothing here is ever asked for while a page is being rendered.
+ * The infimum the website shows, fetched from the Supremum's own API and cached for a few minutes. The cron fills the
+ * cache and pushes what it found; nothing here is fetched while a page is being rendered.
  *
- * A fetch that goes wrong out there is kept as well, so an API that is down costs one request in a while rather than
- * one for every reader who arrives.
+ * A failed fetch is cached as well, so an API that is down costs one request in a while, not one per page request.
  */
 final readonly class InfimumService
 {
@@ -29,8 +28,8 @@ final readonly class InfimumService
     private const int TTL_SECONDS = 300;
 
     /**
-     * How long a failed fetch is remembered for: short enough that the infimum comes back on its own once the API
-     * does, long enough that a run of readers does not each wait for it to.
+     * How long a failed fetch is cached for: short enough that the infimum comes back on its own once the API does,
+     * long enough that not every page request has to wait for it.
      */
     private const int FAILURE_TTL_SECONDS = 60;
 
@@ -67,7 +66,7 @@ final readonly class InfimumService
     }
 
     /**
-     * A new infimum whatever is kept, which is what the rotation asks for. A failed fetch leaves what was kept alone.
+     * A new infimum regardless of what is cached, which is what the rotation requires. A failed fetch changes nothing.
      */
     public function refresh(): ?string
     {

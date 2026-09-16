@@ -116,8 +116,8 @@ class Session
     public DeviceTypes $deviceType;
 
     /**
-     * Parsed from userAgent (e.g. "Chrome 124"); for bots holds the bot name on its own. Nullable when the User Agent
-     * is empty or unrecognised.
+     * Parsed from userAgent (e.g. "Chrome 124"); for bots contains the bot name on its own. Nullable when the User
+     * Agent is empty or unrecognised.
      */
     #[Column(
         type: Types::STRING,

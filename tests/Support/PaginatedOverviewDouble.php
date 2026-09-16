@@ -32,7 +32,7 @@ final class PaginatedOverviewDouble extends AbstractDoctrinePaginatedOverview
     /** @var array{int, int}|null */
     public ?array $secondAskedFor = null;
 
-    /** Stands in for a subclass's filter props, so the cache key can be looked at. */
+    /** Represents a subclass's filter props, so the cache key can be looked at. */
     public string $filter = '';
 
     /**

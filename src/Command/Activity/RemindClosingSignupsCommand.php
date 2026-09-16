@@ -32,11 +32,11 @@ use function strval;
  * Warn everybody on a sign-up list that it is about to close, while they can still act on it.
  *
  * Withdrawing is impossible once a list closes, so a member who has changed their mind has until then and no longer.
- * The reminder is a nudge rather than news, so it stays on the website: one closing list can concern a hundred people
- * and none of them asked to be emailed about it.
+ * The reminder is a low-priority message, so it is shown on the website only: one closing list can concern a hundred
+ * people and none of them asked to be emailed about it.
  *
- * Hourly rather than by the minute: a reminder a little either side of a day ahead is the same reminder, and a list is
- * marked as reminded so a member hears about it once.
+ * Hourly rather than by the minute: a reminder slightly before or after a day ahead is the same reminder, and a list
+ * is marked as reminded so a member is reminded once.
  */
 #[AsCommand(
     name: 'app:activity:remind-closing-signups',

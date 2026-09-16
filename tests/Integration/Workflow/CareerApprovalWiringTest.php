@@ -24,7 +24,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 /**
  * The generic revision workflow covers the career chains by instanceof, so nothing about it was written for them. These
  * pin that it genuinely does: a company profile and a vacancy go all the way round, promoting the live version at the
- * end, and turn up in the review queues while they are with the committee.
+ * end, and appear in the review queues while they are with the committee.
  */
 final class CareerApprovalWiringTest extends DatabaseTestCase
 {
@@ -176,7 +176,7 @@ final class CareerApprovalWiringTest extends DatabaseTestCase
             CompanyRevision::class,
             $draft,
         );
-        // Something that would be lost with the draft, so the discard has to take it too.
+        // Something that would be lost with the draft, so the discard has to remove it too.
         $draft->slogan = new CareerLocalisedText(
             'Changed',
             'Gewijzigd',

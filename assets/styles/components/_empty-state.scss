@@ -8,8 +8,8 @@
 }
 
 // Font Awesome's own rules are imported after every component, and `.fas` sets `display: var(--fa-display,
-// inline-block)`, which beats a `display` declared here. Setting the variable is how the icon font means for that to
-// be overridden. `aspect-ratio` keeps the box square whatever the glyph's own metrics are.
+// inline-block)`, which beats a `display` declared here. Setting the variable is the way the icon font supports
+// overriding it. `aspect-ratio` keeps the box square whatever the glyph's own metrics are.
 .empty-state-icon {
     --fa-display: inline-flex;
 

@@ -27,7 +27,7 @@ use function str_repeat;
 use function substr;
 
 /**
- * A holder of an API token, and the set of permissions that token carries. Only a hash of the token is kept; the
+ * An owner of an API token, and the set of permissions that token grants. Only a hash of the token is kept; the
  * last few characters stay in the clear so an administrator can tell two apart.
  */
 #[Entity(repositoryClass: ApiPrincipalRepository::class)]

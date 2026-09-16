@@ -63,7 +63,7 @@ final readonly class DrawManager
      * have closed, because {@see \App\Entity\Activity\Enums\DrawCutoffRule::IfFullBefore} and
      * {@see \App\Entity\Activity\Enums\DrawCutoffRule::AfterDurationOpen} legitimately fire while sign-up is still
      * open. A null drawnBy marks the draw as automated. A list that guarantees roles is never drawn here: the roles
-     * are handed out once sign-up has closed, so its own moment only fixes who is in the draw.
+     * are assigned once sign-up has closed, so its own moment only fixes who is in the draw.
      *
      * Returns whether a draw was actually performed.
      */

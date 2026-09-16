@@ -37,7 +37,7 @@ framework:
             limit: 3
             interval: '1 hour'
         # Sliding, so a consumer cannot spend a whole window in the second before it rolls over. Generous by
-        # design: it exists to stop one token walking the member list at 500 a page, not to police normal use.
+        # design: it exists to stop one token traversing the member list at 500 a page, not to police normal use.
         api_principal:
             policy: 'sliding_window'
             limit: 600

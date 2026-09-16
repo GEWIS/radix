@@ -17,7 +17,7 @@ import { Controller } from '@hotwired/stimulus';
  *   </div>
  *
  * A field tagged `required` is the one its block exists to ask for, so it is required exactly while that block is
- * shown; the server holds a list to the same rule (see SignupListType::validateAllocationMethod).
+ * shown; the server applies the same rule to a list (see SignupListType::validateAllocationMethod).
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -63,7 +63,7 @@ export default class extends Controller {
     }
 
     setHidden(name: string, hidden: boolean): void {
-        // Every one of them: the places held per rank are one target per row of the membership order.
+        // Every one of them: the places reserved per rank are one target per row of the membership order.
         this.targets.findAll(name).forEach((target) => {
             if (!(target instanceof HTMLElement)) {
                 return;
@@ -73,8 +73,8 @@ export default class extends Controller {
         });
     }
 
-    // Only the label is marked, with the same asterisk every other required field carries: a field that is not asked
-    // for is still submitted (hidden, not disabled) and is cleared server-side, so the browser must not refuse it.
+    // Only the label is marked, with the same asterisk every other required field has: a field that is not asked for
+    // is still submitted (hidden, not disabled) and is cleared server-side, so the browser must not refuse it.
     markRequired(): void {
         this.requiredTargets.forEach((field) => {
             const asked = null === field.closest('[hidden]');

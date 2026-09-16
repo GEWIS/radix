@@ -33,9 +33,9 @@ class Installation extends FoundationReference
      *
      * Declared here rather than taken from {@see \App\Entity\Decision\Traits\MemberAwareTrait}: an installation is
      * the one sub-decision that names an inverse side, and naming it through an association override only works
-     * because the association happens to be declared in a trait rather than on the parent class. The mapping should
-     * not rest on that. The column is shared with every other sub-decision in the single table, so it stays nullable
-     * here even though an installation always has a member; {@see self::getMember()} is where that guarantee lives.
+     * because the association happens to be declared in a trait rather than on the parent class. The mapping should not
+     * rest on that. The column is shared with every other sub-decision in the single table, so it stays nullable here
+     * even though an installation always has a member; {@see self::getMember()} is where that guarantee is enforced.
      *
      * Deliberately without an `onDelete`: a sub-decision names the member the association decided something about,
      * and neither dropping the sub-decision nor blanking the name is an outcome a member's removal may reach on its

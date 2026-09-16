@@ -16,9 +16,9 @@ use function count;
 use function intval;
 
 /**
- * A month after a poll has closed, how it was answered stops being anybody's in particular. These pin that what the
- * association answered survives that: the tallies are identical before and after, while the rows saying who answered
- * are gone and the reactions no longer name anybody.
+ * A month after a poll has closed, how it was answered is no longer attributed to individual members. These pin that
+ * what the association answered survives that: the tallies are identical before and after, while the rows saying who
+ * answered are gone and the reactions no longer name a member.
  */
 final class AnonymisePollVotesCommandTest extends DatabaseTestCase
 {
@@ -91,7 +91,7 @@ final class AnonymisePollVotesCommandTest extends DatabaseTestCase
     }
 
     /**
-     * A poll that is still running is left alone: a member can still be told what they answered until well after it
+     * A poll that is still running is left alone: a member can still be shown what they answered until well after it
      * has closed.
      */
     public function testARunningPollIsLeftAlone(): void

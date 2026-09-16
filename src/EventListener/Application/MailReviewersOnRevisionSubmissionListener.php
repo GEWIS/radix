@@ -17,13 +17,13 @@ use Symfony\Component\Workflow\Event\EnteredEvent;
 use function in_array;
 
 /**
- * Writes to the office that answers for a domain when one of its revisions is handed in.
+ * Writes to the mailbox responsible for a domain when one of its revisions is submitted.
  *
- * {@see NotifyOnRevisionSubmissionListener} already tells whoever holds the reviewing role, but only once they sign
- * in. This reaches the mailbox, so that something waiting is noticed by the officer whose job it is rather than by
- * whoever happens to log in next.
+ * {@see NotifyOnRevisionSubmissionListener} already notifies the users with the reviewing role, but only once they sign
+ * in. This reaches the mailbox, so that something waiting is noticed by the officer whose job it is rather than by the
+ * next user who logs in.
  *
- * Nothing is sent when the person who handed it in reviews this domain themselves: they know already, and the old
+ * Nothing is sent when the user who submitted it reviews this domain themselves: they know already, and the old
  * website's habit of mailing an officer about their own submission is what made these easy to ignore.
  */
 #[AsEventListener(event: 'workflow.revision.entered.submitted')]
@@ -89,8 +89,8 @@ final readonly class MailReviewersOnRevisionSubmissionListener
     }
 
     /**
-     * Whether whoever handed this in is one of the people it would be sent to. A company user never is: the roles
-     * that review a domain are the association's, and a company account holds none of them.
+     * Whether the author who submitted this is one of the people it would be sent to. A company user never is: the
+     * roles that review a domain are the association's, and a company account has none of them.
      */
     private function submitterReviewsThis(
         RevisionInterface $revision,

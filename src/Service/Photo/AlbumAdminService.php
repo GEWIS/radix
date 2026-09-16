@@ -44,8 +44,8 @@ final readonly class AlbumAdminService
     /**
      * Move photos to another album in one go: reassign them, flush once, then regenerate the cover of each album whose
      * photo set actually changed (the destination and every distinct source), each cover at most once. Returns the
-     * number of photos actually moved — zero when every selected photo already lives in the destination, so the caller
-     * can tell a real move apart from a no-op (e.g. the destination being the photos' current album).
+     * number of photos actually moved: zero when every selected photo is already in the destination, so the caller can
+     * tell a real move apart from a no-op (e.g. the destination being the photos' current album).
      *
      * @param Photo[] $photos
      */

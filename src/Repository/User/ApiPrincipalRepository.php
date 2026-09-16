@@ -42,9 +42,9 @@ class ApiPrincipalRepository extends ServiceEntityRepository
     }
 
     /**
-     * Bookkeeping nobody waits on: it runs on every authenticated request, so a write that fails must not take the
-     * request with it. Written straight through the connection rather than the unit of work, which would flush
-     * whatever else is pending and let `TimestampableTrait::preUpdate()` rewrite the administrative `updatedAt`.
+     * Bookkeeping that nothing waits on: it runs on every authenticated request, so a write that fails must not fail
+     * the request. Written straight through the connection rather than the unit of work, which would flush whatever
+     * else is pending and let `TimestampableTrait::preUpdate()` rewrite the administrative `updatedAt`.
      */
     public function stampUsage(ApiPrincipal $principal): void
     {

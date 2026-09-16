@@ -37,7 +37,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * A form that is filled in a step at a time, each step its own request, so the browser is never asked to validate a
- * control it cannot show. Every rule lives on the data object in the group named after the step that collects it.
+ * control it cannot show. Every rule is defined on the data object in the group named after the step that collects it.
  */
 abstract class AbstractStepperFlowType extends AbstractFlowType
 {
@@ -88,9 +88,9 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
                 FinishFlowType::class,
                 [
                     'label' => $options['finish_label'],
-                    // Symfony offers finishing on the last step alone, which a flow whose tail is built from
-                    // records has no meaningful version of: naming a step says everything that has to be
-                    // answered has been by here.
+                    // Symfony offers finishing on the last step alone, which a flow whose tail is built from records
+                    // has no meaningful version of: naming a step means everything required has been filled
+                    // in by that point.
                     'include_if' => static function (FormFlowCursor $cursor) use ($options): bool {
                         $from = array_search(
                             $options['finish_from'],
@@ -128,8 +128,8 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
     }
 
     /**
-     * Handing a step in judges that step alone, so a step that is left behind is never judged again. Finishing is the
-     * one moment the whole thing has to be true at once, and the step that is wanting is named, because it is not the
+     * Submitting a step validates that step alone, so a step that is left behind is never validated again. Finishing is
+     * the one moment the whole thing has to be true at once, and the incomplete step is named, because it is not the
      * step on screen and there is nothing on screen for the message to point at.
      *
      * @param array<string, mixed>                $labels
@@ -192,8 +192,8 @@ abstract class AbstractStepperFlowType extends AbstractFlowType
     }
 
     /**
-     * Whether a step holds together: by the rules in the group named after it, or, for a step built from a record
-     * the data object does not hold, by what the step says itself. One answer for the tick, the jump and the finish.
+     * Whether a step holds together: by the rules in the group named after it, or, for a step built from a record the
+     * data object does not contain, by the step's `complete` callback. One check for the tick, the jump and the finish.
      *
      * @param array<string, array<string, mixed>> $groups
      */

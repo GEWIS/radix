@@ -22,8 +22,9 @@ use function Symfony\Component\Translation\t;
  * One of the days a body would like its activity to fall on.
  *
  * Days rather than clock times: the calendar reserves a date, and which part of the day is wanted is a separate
- * question the board reads when two bodies want the same day. Where this date sits in the body's order of preference
- * is not asked either, it is the order the rows are in, which {@see ActivityProposalType} numbers on submit.
+ * question the board reads when two bodies want the same day. The position of this date in the body's order of
+ * preference is not asked for either, it is the order the rows are in, which {@see ActivityProposalType}
+ * numbers on submit.
  *
  * @extends AbstractType<ActivityDateOption>
  */

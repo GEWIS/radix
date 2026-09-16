@@ -47,7 +47,7 @@ enum MembershipTypes: string implements TranslatableInterface
 
     /**
      * Whether this type is a member within the meaning of the law, with the associated rights (voting and the like).
-     * Ordinary, external, and honorary members are; a graduate only holds graduate status. That distinction is why the
+     * Ordinary, external, and honorary members are; a graduate only has graduate status. That distinction is why the
      * association tracks both a membership end date and an expiration.
      */
     public function isFormalMember(): bool

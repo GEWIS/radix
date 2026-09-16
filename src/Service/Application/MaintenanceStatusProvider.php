@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * The maintenance window in force right now, resolved once per request. The request listener, the login checker and
- * the Twig layer all ask for it, so the answer is memoised on the request's attributes (safe under FrankenPHP's worker
+ * the Twig layer all use it, so the result is memoised on the request's attributes (safe under FrankenPHP's worker
  * mode, where a plain service property would leak between requests) to keep it to a single query.
  */
 final readonly class MaintenanceStatusProvider

@@ -14,7 +14,7 @@
 <div class="panel mt-0">
     <div class="panel-heading"><h3>{{ 'Membership types'|trans }}</h3></div>
     <div class="panel-body">
-        {# The bars are drawn against the largest type rather than against a total: somebody can hold two current
+        {# The bars are drawn against the largest type rather than against a total: a member can have two current
            memberships of different types, so these are not slices of one number. #}
         {% set largest = max(membership_breakdown) %}
         {% for type, count in membership_breakdown %}

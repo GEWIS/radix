@@ -21,7 +21,7 @@ use function in_array;
 
 class UnclaimedPageAddressValidator extends ConstraintValidator
 {
-    /** The routes that answer for a page rather than instead of one, so an address landing on either is free. */
+    /** The routes that serve a page rather than replace one, so an address matched by either is free. */
     private const array PAGE_ROUTES = [
         'page_route',
         'catch_all',
@@ -123,8 +123,8 @@ class UnclaimedPageAddressValidator extends ConstraintValidator
 
     /**
      * A real route is matched before the page route ever sees the request, so a page written at the same address
-     * would be unreachable. The whole address is judged rather than its first segment: every page the association
-     * has sits under `association`, which does answer further down.
+     * would be unreachable. The whole address is checked rather than its first segment: every page of the association
+     * is under `association`, which is itself matched by a route further down.
      */
     private function isAnsweredByTheApplication(
         Languages $language,
@@ -158,7 +158,7 @@ class UnclaimedPageAddressValidator extends ConstraintValidator
         } catch (ResourceNotFoundException) {
             return false;
         } catch (MethodNotAllowedException) {
-            // Something answers here, just not to the method this request happens to use.
+            // A route matches this address, but not the method of this request.
             return true;
         }
 

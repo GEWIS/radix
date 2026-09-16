@@ -16,7 +16,7 @@ final class SessionRepositoryTest extends DatabaseTestCase
 
     /**
      * `expiresAt` is fixed when the row is written and never extended, so without this sweep a private window that
-     * was closed rather than signed out of sits in the member's device list for the rest of its ninety days.
+     * was closed rather than signed out of remains in the member's device list for the rest of its ninety days.
      */
     public function testAnAbandonedSessionIsSweptLongBeforeItExpires(): void
     {
@@ -54,7 +54,7 @@ final class SessionRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * A device still in use keeps its `lastUsedAt` moving, so the sweep never reaches it however old the row is.
+     * A device still in use keeps updating its `lastUsedAt`, so the sweep never reaches it however old the row is.
      */
     public function testASessionInDailyUseSurvivesTheSweep(): void
     {

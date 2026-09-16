@@ -129,13 +129,13 @@ class CompanyPackageRepository extends ServiceEntityRepository
     }
 
     /**
-     * The banner packages with a proposal waiting for the committee, oldest first so nothing sits unanswered.
+     * The banner packages with a proposal waiting for the committee, oldest first so nothing is left waiting.
      *
      * @return list<CompanyBannerPackage>
      */
     public function findPendingBanners(): array
     {
-        // The queue names the company and whoever put the banner forward, so both come along with the packages.
+        // The queue names the company and the company user who submitted the banner, so both are fetch-joined.
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select(
                 'p',
@@ -206,8 +206,8 @@ class CompanyPackageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Whether the company still has a contract to stand on: a package of any type that has not expired yet. A package
-     * that has not started counts, so a company can prepare its profile in the run-up to its contract.
+     * Whether the company still has a valid contract: a package of any type that has not expired yet. A package that
+     * has not started counts, so a company can prepare its profile in the run-up to its contract.
      */
     public function hasNonExpiredPackage(
         Company $company,

@@ -212,7 +212,7 @@ final class CompanyProfileFlowTypeTest extends TypeTestCase
     }
 
     /**
-     * The slug carries the same rule the routes and the migration use, so a company cannot be given a name it could
+     * The slug enforces the same rule the routes and the migration use, so a company cannot be given a name it could
      * never be reached under.
      */
     #[DataProvider('slugs')]

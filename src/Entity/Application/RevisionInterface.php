@@ -64,7 +64,7 @@ interface RevisionInterface
     public function setAuthorCompanyUser(?CompanyUser $authorCompanyUser): void;
 
     /**
-     * A human-readable name for whoever authored this revision.
+     * A human-readable name for the author of this revision.
      */
     public function getAuthorDisplayName(): string;
 
@@ -80,7 +80,7 @@ interface RevisionInterface
     public function setReviewedAt(?DateTimeImmutable $reviewedAt): void;
 
     /**
-     * When this revision was handed to its reviewers, which is how long whatever is waiting on it has been waiting.
+     * When this revision was submitted to its reviewers, which is how long whatever is waiting on it has been waiting.
      * Null while it never has been, which is every draft.
      */
     public function getSubmittedAt(): ?DateTimeImmutable;

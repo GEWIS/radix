@@ -24,8 +24,8 @@ use function strval;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * A rotation that fetched nothing must publish nothing: whoever is reading keeps the infimum they already had, which
- * is a better answer than blanking the panel because somebody else's server had a bad minute.
+ * A rotation that fetched nothing must publish nothing: a reader keeps the infimum they already had, which is better
+ * than blanking the panel because an external server was briefly unavailable.
  */
 final class RotateInfimumCommandTest extends TestCase
 {

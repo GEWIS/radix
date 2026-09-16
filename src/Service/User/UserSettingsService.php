@@ -17,8 +17,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * Writing a member's own settings, and taking their request for a copy of their data.
  *
  * The notification screen is the reason this is a service rather than four flushes: which categories are subscribed to
- * lives in its own table and whether notifications are paused lives on the settings row, and a member who paused their
- * mail but whose subscriptions did not save would keep receiving it.
+ * is in its own table and whether notifications are paused is on the settings row, and a member who paused their mail
+ * but whose subscriptions did not save would keep receiving it.
  */
 final readonly class UserSettingsService
 {

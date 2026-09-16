@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The two kinds of course material. The backing values match the discriminator of the single table both are stored in,
- * so the two never drift apart.
+ * so the two never differ.
  */
 enum CourseDocumentTypes: string implements TranslatableInterface
 {

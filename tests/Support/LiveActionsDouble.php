@@ -9,7 +9,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveAction;
 
 /**
  * A live component with one action of each kind, so what
- * {@see \App\EventListener\Application\MaintenanceListener} reads off an action is real rather than described.
+ * {@see \App\EventListener\Application\MaintenanceListener} reads from an action is real rather than described.
  */
 final class LiveActionsDouble
 {

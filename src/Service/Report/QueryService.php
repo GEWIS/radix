@@ -30,7 +30,7 @@ class QueryService
      *
      * `db:` was an ORM entity namespace alias, `Report\Model\` the namespace it pointed at. Saved queries are stored
      * verbatim and are years old, so both keep working: they are expanded to the entities' current namespace before
-     * the query is handed to the ORM.
+     * the query is passed to the ORM.
      */
     private const array ENTITY_PREFIXES = [
         'db:',
@@ -140,7 +140,7 @@ class QueryService
         );
 
         // The hydration mode belongs to the boundary as much as to the presentation: it is the one mode that leaves
-        // `SELECT NEW ...` unhydrated, so no query can have a class of its own choosing constructed for it.
+        // `SELECT NEW ...` unhydrated, so no query can have an arbitrary class constructed for it.
         /** @var array<array-key, array<string, mixed>> $rows */
         $rows = $ormQuery->getResult(AbstractQuery::HYDRATE_SCALAR);
 

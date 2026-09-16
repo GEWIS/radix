@@ -14,9 +14,9 @@ use stdClass;
 use function implode;
 
 /**
- * A poll has nothing to edit, which is what this guard is for: asking for changes would hand back a draft that does
- * not exist, and a second question on a poll members are already answering would replace it underneath them. Both
- * refusals carry their own message, which these pin.
+ * A poll has nothing to edit, which is what this guard is for: asking for changes would return a draft that does not
+ * exist, and a second question on a poll members are already answering would replace it underneath them. Both
+ * refusals have their own message, which these pin.
  */
 final class PollRevisionGuardListenerTest extends TestCase
 {

@@ -20,13 +20,13 @@ use function implode;
 
 /**
  * Which category a sign-up falls in for each of the things a sign-up list can rank on. In one place because the
- * draw and the sign-ups page that explains it afterwards must answer this identically, and because every one of
- * them has to have an answer for an external sign-up, who has no member behind them at all.
+ * draw and the sign-ups page that explains it afterwards must compute this identically, and because every one of
+ * them has to have a value for an external sign-up, which has no member behind it at all.
  */
 final class SignupTiers
 {
     /**
-     * An order as it is read back to somebody: the ranks in turn, the tiers admitted together on one of them named
+     * An order as it is shown to a user: the ranks in turn, the tiers admitted together on one of them named
      * beside each other.
      *
      * @param ?list<list<PriorityTierInterface>> $order
@@ -55,7 +55,7 @@ final class SignupTiers
     }
 
     /**
-     * Every order a list admits in, as they are read back to somebody, in the order the list applies them.
+     * Every order a list admits in, as they are shown to a user, in the order the list applies them.
      *
      * @return list<string>
      */
@@ -87,7 +87,7 @@ final class SignupTiers
     }
 
     /**
-     * The current members of the body organising the activity, by membership number, or nobody when no body does.
+     * The current members of the body organising the activity, by membership number, or empty when no body does.
      *
      * @return array<int, true>
      */

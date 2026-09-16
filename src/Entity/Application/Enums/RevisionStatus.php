@@ -23,13 +23,13 @@ enum RevisionStatus: string implements TranslatableInterface
     /** The author is still editing this revision; it is the only mutable state. The initial place. */
     case Draft = 'draft';
 
-    /** The author handed the revision to the board; awaiting a reviewer to pick it up. */
+    /** The author submitted the revision to the board; awaiting a reviewer to pick it up. */
     case Submitted = 'submitted';
 
     /** A reviewer is actively reviewing this revision. */
     case InReview = 'in-review';
 
-    /** The board asked for changes; this revision becomes an immutable record and a new Draft (N+1) is spawned. */
+    /** The board requested changes; this revision becomes an immutable record and a new Draft (N+1) is spawned. */
     case ChangesRequested = 'changes-requested';
 
     /** The board rejected this revision. Terminal, but the chain can be reopened into a fresh Draft. */
@@ -74,9 +74,9 @@ enum RevisionStatus: string implements TranslatableInterface
     }
 
     /**
-     * Why a revision in this state cannot be revised into a new draft, or null when it can. Every module refuses for
-     * the same three reasons, so this is where they are settled; what a refusal reads as and where the reader goes
-     * next is the domain's business.
+     * Why a revision in this state cannot be revised into a new draft, or null when it can. Every module
+     * refuses for the same three reasons, so they are defined here; what a refusal reads as and where the
+     * reader goes next is left to the domain.
      */
     public function reviseRefusal(): ?ReviseRefusal
     {

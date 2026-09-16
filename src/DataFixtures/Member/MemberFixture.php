@@ -37,14 +37,14 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
     public const string REF_MEMBER_PROSPECTIVE = 'member-prospective';
 
     /**
-     * A deleted member. Without one, the `members_deleted` API permission is unobservable: every response looks the
-     * same whether or not the calling principal holds it, and a regression that started leaking deleted members would
-     * go unnoticed.
+     * A deleted member. Without one, the `members_deleted` API permission is unobservable: every response looks
+     * the same whether or not the calling principal has it, and a regression that started leaking deleted members
+     * would go unnoticed.
      */
     public const string REF_MEMBER_DELETED = 'member-deleted';
 
     /**
-     * Members crafted to surface on the "members requiring attention" overview. The ones that have to count as active
+     * Members crafted to appear on the "members requiring attention" overview. The ones that have to count as active
      * organ members are referenced so {@see \App\DataFixtures\Database\DecisionFixture} can install them.
      */
     public const string REF_MEMBER_ATTN_ORDINARY_ACTIVE = 'attn-ordinary-active';
@@ -267,7 +267,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ],
         );
 
-        // A3: visible and missing an address — the control that stays once A1 is fixed.
+        // A3: visible and missing an address (the control that stays once A1 is fixed).
         $this->makeAttentionMember(
             $manager,
             'V.',
@@ -299,7 +299,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // B1: ordinary, active in an organ, expiring — the one with a renewal button.
+        // B1: ordinary, active in an organ, expiring (the one with a renewal button).
         $this->addReference(
             self::REF_MEMBER_ATTN_ORDINARY_ACTIVE,
             $this->makeAttentionMember(
@@ -356,8 +356,8 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // B4: external, not active, expiring. Joined as an external — a PhD or a student from another department —
-        // so external from the start rather than by conversion.
+        // B4: external, not active, expiring. Joined as an external (a PhD or a student from another department), so
+        // external from the start rather than by conversion.
         $this->makeAttentionMember(
             $manager,
             'E.',
@@ -397,7 +397,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // B6: a graduate who is not active — never surfaces, because the graduate finder only includes active ones.
+        // B6: a graduate who is not active; never appears, because the graduate finder only includes active ones.
         // Reached graduate status the common way, as an external who stopped studying.
         $this->makeAttentionMember(
             $manager,
@@ -423,7 +423,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // C1: expired 30 days ago — labelled "expiring soon" with a date in the past.
+        // C1: expired 30 days ago (labelled "expiring soon" with a date in the past).
         $this->makeAttentionMember(
             $manager,
             'P.',
@@ -439,7 +439,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // C2: ended exactly 90 days ago at midnight — the off-by-a-few-hours boundary.
+        // C2: ended exactly 90 days ago at midnight (the off-by-a-few-hours boundary).
         $this->makeAttentionMember(
             $manager,
             'B.',
@@ -455,7 +455,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // C3: expired 180 days ago — the control beyond the window, which must not appear.
+        // C3: expired 180 days ago (the control beyond the window), which must not appear.
         $this->makeAttentionMember(
             $manager,
             'L.',
@@ -471,7 +471,7 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // C4: expiring in 180 days — the control beyond the other end of the window.
+        // C4: expiring in 180 days (the control beyond the other end of the window).
         $this->makeAttentionMember(
             $manager,
             'F.',
@@ -505,8 +505,8 @@ class MemberFixture extends Fixture implements FixtureGroupInterface
             ),
         );
 
-        // D1: expired 30 days ago, active in an organ at that point, discharged 10 days ago. The finder reads
-        // activity as of today and therefore files them as non-active.
+        // D1: expired 30 days ago, active in an organ at that point, discharged 10 days ago. The finder reads activity
+        // as of today and therefore counts them as non-active.
         $this->addReference(
             self::REF_MEMBER_ATTN_MISCLASSIFIED,
             $this->makeAttentionMember(

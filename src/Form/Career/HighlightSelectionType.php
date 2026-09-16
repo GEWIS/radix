@@ -23,9 +23,9 @@ use function in_array;
 use function Symfony\Component\Translation\t;
 
 /**
- * Which of a company's vacancies go on the career landing page. The choices are worked out from what the company has
+ * Which of a company's vacancies go on the career landing page. The choices are computed from what the company has
  * running at this moment, and checked again when the form comes back: the two are separated by however long the page
- * sat open, and in between a vacancy can close or be taken down.
+ * was open, and in between a vacancy can close or be taken down.
  *
  * There is deliberately no cap per category. A company that has paid for the package is trusted to know what it wants
  * shown.
@@ -88,8 +88,8 @@ class HighlightSelectionType extends AbstractType
     }
 
     /**
-     * Re-assert the eligibility the choice list expresses, because what is eligible is worked out fresh on every
-     * request and a submission is answering a list that was drawn a while ago.
+     * Re-assert the eligibility the choice list expresses, because what is eligible is computed fresh on every request
+     * and a submission responds to a list that was rendered earlier.
      *
      * @param list<Vacancy> $eligible
      */

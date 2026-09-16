@@ -29,9 +29,9 @@ class Year extends FunctionNode
     }
 
     /**
-     * The ledger runs on PostgreSQL and everything else on MariaDB, and only the latter knows `YEAR()`, so the platform
-     * behind the query decides which spelling comes out. Doctrine salts the DQL cache key with the platform, so the two
-     * translations of one query never stand in for each other.
+     * The ledger runs on PostgreSQL and everything else on MariaDB, and only the latter supports `YEAR()`, so the
+     * platform behind the query determines which SQL is generated. Doctrine salts the DQL cache key with the platform,
+     * so the two translations of one query are never mixed up.
      */
     #[Override]
     public function getSql(SqlWalker $sqlWalker): string

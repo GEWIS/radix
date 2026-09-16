@@ -37,8 +37,8 @@ final readonly class IpDatabaseStatusProvider
     }
 
     /**
-     * The oldest of the databases speaks for both, because they are refreshed together and the stale one is the
-     * problem.
+     * The oldest of the databases determines the status for both, because they are refreshed together and the stale one
+     * is the problem.
      *
      * @return array{updatedAt: ?DateTimeImmutable, overdue: bool}
      */

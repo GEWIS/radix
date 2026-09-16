@@ -175,8 +175,8 @@ class SignupList
     public ?DateTimeImmutable $closeDate = null;
 
     /**
-     * When subscribers were told this was about to close, so they are told once rather than every time the reminder
-     * job runs.
+     * When subscribers were notified this was about to close, so they are notified once rather than every time the
+     * reminder job runs.
      */
     #[Column(
         type: Types::DATETIME_IMMUTABLE,
@@ -455,7 +455,7 @@ class SignupList
     /**
      * The live revision's list this one descends from (matched by lineage), or null when there is none. A draft's
      * own sign-ups and draw state stay empty until approval, so anything about people or windows already shown to
-     * members is answered by the counterpart.
+     * members is read from the counterpart.
      */
     public function liveCounterpart(): ?SignupList
     {
@@ -522,7 +522,7 @@ class SignupList
     }
 
     /**
-     * Whether any of this list's fields holds sensitive data (so its column is hidden from other subscribers on the
+     * Whether any of this list's fields contains sensitive data (so its column is hidden from other subscribers on the
      * public view, and the guest form warns before collecting it).
      */
     public function hasSensitiveField(): bool
@@ -592,8 +592,9 @@ class SignupList
     }
 
     /**
-     * A role is handed out once sign-up has closed, so a draw at the list's own moment would run before anybody held
-     * one and would make up no shortfall at all. That moment still fixes who is in the draw, only the running waits.
+     * A role is assigned once sign-up has closed, so a draw at the list's own moment would run before any subscriber
+     * had one and would make up no shortfall at all. That moment still fixes who is in the draw, only the run of the
+     * draw is delayed.
      */
     public function isDrawnByHand(): bool
     {
@@ -683,8 +684,8 @@ class SignupList
     }
 
     /**
-     * The order a list starts from before anybody arranges it: the association's own, with the tiers admitted
-     * together on one rank, less the rank a members-only list has nobody for.
+     * The order a list starts from before it is reordered: the association's own, with the tiers admitted together on
+     * one rank, less the rank that does not apply to a members-only list.
      *
      * @return list<list<MembershipTier>>
      */
@@ -738,8 +739,8 @@ class SignupList
     }
 
     /**
-     * The places held for one rank of the membership order. Tiers admitted together share the places held for them:
-     * the rank is the pool, not the tier.
+     * The places reserved for one rank of the membership order. Tiers admitted together share the places reserved for
+     * them: the rank is the pool, not the tier.
      *
      * @param list<MembershipTier> $rank
      */
@@ -749,8 +750,8 @@ class SignupList
     }
 
     /**
-     * The tiers of a rank as the places held for it are keyed, in the association's own order so that dragging two
-     * tiers past one another within a rank does not lose the number held for them.
+     * The tiers of a rank as the places reserved for it are keyed, in the association's own order so that dragging two
+     * tiers past one another within a rank does not lose the number reserved for them.
      *
      * @param list<MembershipTier> $rank
      */
@@ -884,7 +885,7 @@ class SignupList
 
     public function hasPriorityModifiers(): bool
     {
-        // Through the getters: an order the list can no longer act on is stored but not held.
+        // Through the getters: an order the list can no longer apply is stored but does not count as a modifier.
         return null !== $this->getMembershipTierOrder()
             || null !== $this->getCohortTierOrder()
             || null !== $this->getProgramTypeOrder()
@@ -941,7 +942,7 @@ class SignupList
         }
 
         // What the stored order left out is appended the way the association would rank it, ties and all, so a tier
-        // added to the enum lands beside the ones it belongs with rather than alone at the end.
+        // added to the enum is placed beside the ones it belongs with rather than alone at the end.
         foreach ($tier::defaultRanks() as $rank) {
             $missing = [];
             foreach ($rank as $case) {
@@ -1001,8 +1002,8 @@ class SignupList
     }
 
     /**
-     * Returns the activity this list ultimately belongs to (via its owning revision). Kept so resource/GDPR call
-     * sites that reach for the activity keep working unchanged.
+     * Returns the activity this list ultimately belongs to (via its owning revision). Kept so resource/GDPR call sites
+     * that use the activity keep working unchanged.
      */
     public function getActivity(): Activity
     {

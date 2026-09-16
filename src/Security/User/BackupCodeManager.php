@@ -26,13 +26,13 @@ use function random_bytes;
  * the MFA challenge template for the login flow. The manager therefore only ever sees well-shaped input under normal
  * use; a length mismatch from a bypassed validator simply causes `hash_equals` to return false for every slot.
  *
- * Each slot carries a `used` flag. Consuming a code flips the flag but keeps the slot in place, so the verification
+ * Each slot has a `used` flag. Consuming a code flips the flag but keeps the slot in place, so the verification
  * path always performs the same number of comparisons. As such, the wall-clock time of {@see isBackupCode()} does not
  * reveal which slot matched or whether any slot was already spent. From the caller's perspective a spent code is
- * rejected like any other invalid input; no UI surface tells the requester that their code was already used.
+ * rejected like any other invalid input; no UI surface shows the requester that their code was already used.
  *
  * Plaintext is generated only at enrollment / regeneration time and returned to the controller for one-shot display;
- * the same plaintext continues to live (encrypted) in the DB so subsequent verifications can match against it.
+ * the same plaintext stays (encrypted) in the DB so subsequent verifications can match against it.
  */
 final class BackupCodeManager implements BackupCodeManagerInterface
 {

@@ -11,8 +11,8 @@ use function mb_substr;
 /**
  * Where a request came from, as the parts that name a device.
  *
- * Only ever a description, never an identity: nothing decides anything on the strength of it. The parts are returned
- * rather than a sentence, because the words joining them are translated wherever they are read.
+ * Only ever a description, never an identity: no decision is based on it. The parts are returned rather than a
+ * sentence, because the words joining them are translated wherever they are read.
  */
 final readonly class RequestOrigin
 {

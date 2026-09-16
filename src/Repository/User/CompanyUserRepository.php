@@ -54,8 +54,8 @@ class CompanyUserRepository extends ServiceEntityRepository implements PasswordU
     }
 
     /**
-     * Everybody who represents a company, whether or not they are still allowed in, oldest first so the list reads as
-     * the order they joined.
+     * Everybody who represents a company, whether or not they can still sign in, oldest first so the list is in the
+     * order they joined.
      *
      * @return list<CompanyUser>
      */

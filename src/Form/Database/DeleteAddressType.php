@@ -14,7 +14,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Confirmation of an address removal. The caller must check isValid() before acting on `submit_yes`: the form
- * carries the CSRF token, and a branch on the button alone would never validate it.
+ * contains the CSRF token, and a branch on the button alone would never validate it.
  */
 class DeleteAddressType extends AbstractType
 {

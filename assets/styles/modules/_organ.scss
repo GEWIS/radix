@@ -8,7 +8,7 @@
     border-radius: var(--#{$prefix}border-radius);
 }
 
-// A flex box rather than a plain image, since the same class dresses the monogram a body without a logo falls back
+// A flex box rather than a plain image, since the same class styles the monogram a body without a logo falls back
 // to, and that is a span with a letter in it.
 .organ-logo {
     display: flex;
@@ -59,9 +59,9 @@
     color: var(--#{$prefix}secondary-color);
 }
 
-// Cropper puts its canvas next to the image and hides the image itself, so the height belongs to the box around
-// both. The image is fitted inside the canvas, so the canvas is what decides how large the thing being framed is
-// drawn; it grows with the column it sits in, up to a ceiling that keeps the two frames beside each other in view.
+// Cropper puts its canvas next to the image and hides the image itself, so the height belongs to the box around both.
+// The image is fitted inside the canvas, so the canvas is what determines how large the framed image is drawn; it
+// grows with the column it is in, up to a ceiling that keeps the two frames beside each other in view.
 .organ-image-crop {
     max-width: 100%;
 

@@ -61,8 +61,8 @@ final class CompanyHighlightControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The choice list is drawn from what is live at that moment, so a submission naming something else is answering a
-     * list that has moved on and is refused rather than trusted.
+     * The choice list is drawn from what is live at that moment, so a submission naming something else refers to a
+     * list that is out of date and is refused rather than trusted.
      */
     public function testAVacancyThatIsNotEligibleIsRefused(): void
     {

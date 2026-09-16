@@ -24,9 +24,9 @@ use function in_array;
 readonly class UserChecker implements UserCheckerInterface
 {
     /**
-     * Says nothing about which of the several reasons applies, so somebody probing the login form learns nothing about
-     * an account they do not own. Shared with {@see \App\EventListener\User\CompanyAccessGuardListener}, which ends
-     * a session for the same reasons and must not word it differently.
+     * Says nothing about which of the several reasons applies, so an attacker probing the login form learns nothing
+     * about an account they do not own. Shared with {@see \App\EventListener\User\CompanyAccessGuardListener}, which
+     * ends a session for the same reasons and must not word it differently.
      */
     public const string BLANKET_DENIAL =
         'You cannot sign in to this account at this moment. Contact the board for more information.';
@@ -79,11 +79,11 @@ readonly class UserChecker implements UserCheckerInterface
      * the {@see \App\EventListener\Application\MaintenanceListener}, which the firewall would otherwise bypass for a
      * login.
      *
-     * A read-only window is not a reason to refuse anybody: it leaves everyone reading, and what somebody may read is
-     * decided by who they are signed in as. Refusing here meant the login form answered every submission with the same
-     * failure, and Symfony's failure redirect names an address of its own -- built from a scheme the proxy only
-     * carries in `X-Forwarded-Proto` -- so a visitor on HTTPS was sent to `http://` and bounced back to the form they
-     * had just come from.
+     * A read-only window is not a reason to refuse anyone: it leaves everyone reading, and what a user may read is
+     * decided by who they are signed in as. Refusing here meant the login form rejected every submission with the same
+     * failure, and Symfony's failure redirect names an address of its own (built from a scheme the proxy only passes
+     * in `X-Forwarded-Proto`), so a visitor on HTTPS was sent to `http://` and bounced back to the form they had just
+     * come from.
      */
     #[Override]
     public function checkPostAuth(

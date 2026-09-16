@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    {# The modals live with the rows they belong to, so a page change takes the ones that left with it. #}
+    {# The modals are rendered with the rows they belong to, so a page change removes the ones whose rows are gone. #}
     {% for item in this.items %}
         {{ modals.confirm_modal(
             'modal-delete-news-' ~ item.id,

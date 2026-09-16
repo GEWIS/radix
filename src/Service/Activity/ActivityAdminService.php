@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Writing an activity from the admin screens, and the four standing decisions that can be taken about one that is
- * already out: cancelling it, taking that back, unpublishing it and putting it back up.
+ * already out: cancelling it, uncancelling it, unpublishing it and republishing it.
  *
  * Saving an edit and letting go of the edit lock are one operation rather than two: a save that commits but leaves the
  * lock standing blocks the author out of their own draft until the lock's TTL lapses.
@@ -33,7 +33,7 @@ final readonly class ActivityAdminService
     }
 
     /**
-     * A brand-new activity and its first revision, which rides along: Activity::$revisions cascades persist.
+     * A brand-new activity and its first revision, which is persisted with it: Activity::$revisions cascades persist.
      */
     public function create(Activity $activity): void
     {
@@ -86,9 +86,9 @@ final readonly class ActivityAdminService
     }
 
     /**
-     * Claim the draft at the version it was opened at, so an edit made against a copy somebody else has since changed
-     * is refused rather than silently overwriting theirs. A draft that was only just spawned has nothing to race, so
-     * there is nothing to claim.
+     * Claim the draft at the version it was opened at, so an edit made against a copy another user has since changed is
+     * refused rather than silently overwriting theirs. A draft that was only just spawned has nothing to race, so there
+     * is nothing to claim.
      *
      * @throws OptimisticLockException when it was changed elsewhere in the meantime.
      */
@@ -116,8 +116,8 @@ final readonly class ActivityAdminService
 
         $this->entityManager->persist($activity);
         $this->entityManager->persist($revision);
-        // Read before the flush, which is what lets a facility that was just asked for be told apart from one that
-        // was already on the draft.
+        // Read before the flush, which is what lets a facility that was just requested be told apart from one that was
+        // already on the draft.
         $this->facilityNotifier->draftSaved($revision);
         $this->entityManager->flush();
 

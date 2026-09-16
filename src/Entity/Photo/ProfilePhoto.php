@@ -42,8 +42,8 @@ class ProfilePhoto
     public Photo $photo;
 
     /**
-     * The member this is the profile photo of. A profile photo is a picture of one person and says nothing without
-     * them, so it goes when they do.
+     * The member this is the profile photo of. A profile photo is a picture of one person and is meaningless without
+     * them, so it is removed with the member.
      */
     #[OneToOne(targetEntity: MemberModel::class)]
     #[JoinColumn(

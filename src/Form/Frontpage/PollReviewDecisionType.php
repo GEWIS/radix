@@ -16,9 +16,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use function Symfony\Component\Translation\t;
 
 /**
- * The decision on a poll question. Agreeing to a question is also scheduling it, so approving carries the closing
- * date the board picks. The date's constraints ride the approve button's validation group, the same way the base
- * type makes feedback mandatory to reject: the other decisions never ask for a date.
+ * The decision on a poll question. Agreeing to a question is also scheduling it, so approving includes the closing
+ * date the board picks. The date's constraints use the approve button's validation group, the same way the base
+ * type makes feedback mandatory to reject: the other decisions never require a date.
  */
 class PollReviewDecisionType extends ReviewDecisionType
 {
@@ -60,7 +60,7 @@ class PollReviewDecisionType extends ReviewDecisionType
             ],
         );
 
-        // The base type gives approve nothing to validate; here the closing date must hold before a poll goes live.
+        // The base type gives approve nothing to validate; here the closing date must be valid before a poll goes live.
         $builder->add(
             'approve',
             SubmitType::class,

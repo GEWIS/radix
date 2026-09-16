@@ -16,8 +16,8 @@ use function array_filter;
 use function array_values;
 
 /**
- * When a body's page has been walked away from. A page says nothing about when it stops being true and carries
- * nothing that would be lost with it, so a first draft nobody came back to simply goes; the body starts a new page
+ * When a body's page has been abandoned. A page says nothing about when it stops being true and contains nothing that
+ * would be lost with it, so a first draft that was never returned to is simply deleted; the body starts a new page
  * whenever it wants one, and the organ itself is the decisions' business rather than this page's.
  *
  * All four image columns are reported: an upload and the cut made from it are separate files, and a cloned revision

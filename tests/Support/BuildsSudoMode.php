@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 /**
- * A {@see SudoMode} standing on a request of its own, for the tests of the class itself and of the listeners that
+ * A {@see SudoMode} with a request of its own, for the tests of the class itself and of the listeners that
  * read and write grants.
  */
 trait BuildsSudoMode

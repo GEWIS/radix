@@ -6,7 +6,7 @@ namespace App\ViewModel\Application;
 
 /**
  * What can be done with one revision right now: which workflow transitions are open, whether resubmitting it has to
- * carry a response, and whether the draft may simply be thrown away. Read once per request by
+ * include a response, and whether the draft may simply be thrown away. Read once per request by
  * {@see \App\Service\Application\RevisionActionResolver} so the review screens and the decision form agree.
  */
 final readonly class RevisionActions

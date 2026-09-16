@@ -50,7 +50,7 @@ class MeetingPoint
     public private(set) Meeting $meeting;
 
     /**
-     * Free-form agenda point number, e.g. "7" or "7a". Gaps and duplicates are allowed; duplicates surface as a
+     * Free-form agenda point number, e.g. "7" or "7a". Gaps and duplicates are allowed; duplicates are shown as a
      * readiness warning on the management page.
      */
     #[Column(

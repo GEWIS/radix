@@ -14,8 +14,8 @@ use Symfony\Component\Workflow\Event\EnteredEvent;
 
 /**
  * Writes to a company's representatives when the committee has decided. They have no notification centre of their own,
- * and a decision is exactly the kind of thing somebody needs to hear about without going looking, so it goes out as
- * plain email to everybody who can act for the company.
+ * and a decision is exactly the kind of thing a representative needs to be notified of without checking for it, so it
+ * goes out as plain email to everybody who can act for the company.
  */
 #[AsEventListener(event: 'workflow.revision.entered.approved')]
 #[AsEventListener(event: 'workflow.revision.entered.changes-requested')]

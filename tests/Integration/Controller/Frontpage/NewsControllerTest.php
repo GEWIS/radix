@@ -114,8 +114,8 @@ final class NewsControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The entity has no author and the pages must never grow one, since news is the association speaking. A member's
-     * name turning up in the markup is the failure this guards against.
+     * The entity has no author and the pages must never add one, since news is the association speaking. A member's
+     * name appearing in the markup is the failure this guards against.
      */
     public function testNothingOnTheNewsPagesNamesAMember(): void
     {

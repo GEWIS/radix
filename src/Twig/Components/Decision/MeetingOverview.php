@@ -137,8 +137,8 @@ final class MeetingOverview extends AbstractPaginatedOverview
     }
 
     /**
-     * The repository answers with its own row shape rather than a `Paginator`, carrying a decision count and whether
-     * minutes exist alongside each meeting, which is why this is the plain overview rather than the Doctrine one.
+     * The repository returns its own row shape rather than a `Paginator`, with a decision count and whether minutes
+     * exist alongside each meeting, which is why this is the plain overview rather than the Doctrine one.
      *
      * @return ResultPage<array{0: Meeting, 1: int, 2: int}>
      */

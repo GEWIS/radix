@@ -25,7 +25,7 @@ use function trim;
  * A label a vacancy can be tagged with, in both languages. Labels are shared reference data rather than revisable
  * content, so this form writes straight through.
  *
- * A label is one or two words carried by every vacancy tagged with it, so there is no enabling a language here the way
+ * A label is one or two words shown on every vacancy tagged with it, so there is no enabling a language here the way
  * there is on the revisable content: both translations are required.
  *
  * @extends AbstractType<VacancyLabel>

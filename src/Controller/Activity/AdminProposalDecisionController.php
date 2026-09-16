@@ -32,12 +32,12 @@ use function ksort;
 /**
  * Where the board decides which body gets which day.
  *
- * The queue groups everything waiting by the day it is asked for, in the order it was asked, so who was first is
- * plain to see. It is only ever shown, never enforced: the board may pick whichever it likes, which is the exception
- * power it has always had and which no screen should take away from it.
+ * The queue groups everything waiting by the day it requests, in the order it was requested, so who was first is plain
+ * to see. It is only ever shown, never enforced: the board may pick whichever it likes, which is the exception power it
+ * has always had and which no screen should take away from it.
  *
- * Reserving a day starts the activity itself off as a draft and releases every other day that proposal was standing
- * on, both through the workflow rather than here.
+ * Reserving a day starts the activity itself off as a draft and releases every other day that proposal was still
+ * blocking, both through the workflow rather than here.
  */
 #[IsGranted(UserRoles::Board->value)]
 #[Route(
@@ -168,7 +168,7 @@ class AdminProposalDecisionController extends AbstractController
 
     /**
      * Records that the financial side is settled, either because a budget was approved or because there is nothing to
-     * approve. Posting it again with no outcome takes it back, which is the way out of recording the wrong one.
+     * approve. Posting it again with no outcome revokes it, which is how a wrong outcome is corrected.
      */
     #[Route(
         path: '/{proposal}/clearance',
@@ -242,7 +242,7 @@ class AdminProposalDecisionController extends AbstractController
     }
 
     /**
-     * The days more than one body is asking for, keyed by the day, each list in the order they asked.
+     * The days more than one body is requesting, keyed by the day, each list in the order the bodies requested them.
      *
      * @param ActivityProposal[] $waiting
      *

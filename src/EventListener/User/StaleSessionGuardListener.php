@@ -37,7 +37,7 @@ use function assert;
  *     removed if present, PHP session invalidated, redirect to log in). Our policy is that a remember-me cookie is
  *     always issued at login, so absence is anomalous and warrants a hard reset rather than silent recovery. Otherwise,
  *     a stolen PHP session cookie could self-upgrade to a persistent remember-me cookie.
- *  2. Otherwise (cookie present + row found) rebind `phpSessionId` if the stored value has drifted from the current
+ *  2. Otherwise (cookie present + row found) rebind `phpSessionId` if the stored value differs from the current
  *     request's session ID (happens for example when the SessionAuthenticationStrategy migrates the ID after
  *     rememberme-resumed login), and bump `lastUsedAt` (throttled), so the security UI's "Last seen" column tracks real
  *     activity rather than just cookie-rotation moments.
@@ -50,8 +50,8 @@ use function assert;
  * "log out this device" can destroy the matching Valkey entry directly.
  *
  * Every way out of here that ends a session is recorded through {@see \App\Service\User\SecurityEventLogger},
- * including the two that used to say nothing at all. A member asking why they were signed out is asking about one of
- * these five, and the answer has to be findable without them having noticed the minute it happened.
+ * including the two that used to record nothing at all. A member asking why they were signed out is asking about one
+ * of these five, and the answer has to be findable without an exact time from the member.
  */
 #[AsEventListener(event: RequestEvent::class)]
 final class StaleSessionGuardListener
@@ -172,9 +172,9 @@ final class StaleSessionGuardListener
             return;
         }
 
-        // The remember-me handler makes the same comparison, but only on a request that hands it the cookie, which a
-        // device with a live PHP session never makes: Valkey pushes that session's expiry forward on every request,
-        // so without this a password reset would leave whoever it was meant to shut out signed in.
+        // The remember-me handler makes the same comparison, but only on a request that sends it the cookie, which a
+        // device with a live PHP session never makes: Valkey extends that session's expiration on every request, so
+        // without this a password reset would leave the user it was meant to sign out still signed in.
         $user = $this->signedInUser();
         if (
             null !== $user
@@ -201,9 +201,9 @@ final class StaleSessionGuardListener
         }
 
         // Fingerprint check: compare the current request's browser+OS family (names sans version) against what was
-        // stored at login. Versions are intentionally ignored so legit updates (Firefox 124 -> 140) do not trip the
-        // gate. A mismatch on either side suggests the cookie pair has been replayed from a different device -> tear
-        // down.
+        // stored at login. Versions are intentionally ignored so legit updates (Firefox 124 -> 140) do not end the
+        // session. A mismatch on either side suggests the cookie pair has been replayed from a different device ->
+        // tear down.
         $currentMeta = $this->userAgentParser->parseRequest($request);
         $storedBrowser = UserAgentParser::family($managedSession->browser);
         $currentBrowser = UserAgentParser::family($currentMeta['browser']);
@@ -242,8 +242,8 @@ final class StaleSessionGuardListener
 
         $changed = false;
 
-        // Rebind phpSessionId if it has drifted (Symfony's session migration on a rememberme-resumed login changes the
-        // ID between createSession and the next request).
+        // Rebind phpSessionId if it differs (Symfony's session migration on a rememberme-resumed login changes the ID
+        // between createSession and the next request).
         if ($managedSession->phpSessionId !== $phpSessionId) {
             $managedSession->phpSessionId = $phpSessionId;
             $changed = true;
@@ -267,9 +267,9 @@ final class StaleSessionGuardListener
             return;
         }
 
-        // Somebody working in a device they signed in from months ago is the same reason to keep it recognised as
-        // signing in from it again would be, and this is the only place that sees them do it. Behind the same throttle
-        // as the bump above, so it costs one lookup per window of activity.
+        // A user active on a device they signed in from months ago is the same reason to keep it recognised as
+        // signing in from it again would be, and this is the only place where that activity is visible. Behind the
+        // same throttle as the bump above, so it costs one lookup per window of activity.
         $this->knownDevices->refresh(
             $managedSession->userIdentifier,
             $firewall,

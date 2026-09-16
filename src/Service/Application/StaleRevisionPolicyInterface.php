@@ -11,26 +11,26 @@ use DateTimeImmutable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * What one revisable domain has to say about being abandoned. Working out that nobody has touched a revision, that it
+ * What one revisable domain has to say about being abandoned. Determining that nobody has touched a revision, that it
  * is still the working head of its aggregate and what to do about it is the same everywhere, and
- * {@see StaleRevisionCleaner} does it once; what only the domain knows is answered here, so a new revisable domain
+ * {@see StaleRevisionCleaner} does it once; what only the domain knows is defined here, so a new revisable domain
  * lapses correctly by registering a policy and changing nothing else.
  *
- * Implementations are read by a cron and must be side-effect free: they answer about the state they are handed and
+ * Implementations are read by a cron and must be side-effect free: they report on the state they are passed and
  * remove nothing themselves.
  */
 #[AutoconfigureTag('app.stale_revision_policy')]
 interface StaleRevisionPolicyInterface
 {
     /**
-     * The revision entity this policy speaks for.
+     * The revision entity this policy applies to.
      *
      * @return class-string<AbstractRevision>
      */
     public function revisionClass(): string;
 
     /**
-     * The moment up to which this revision is kept however long it has sat untouched, or null when nothing about it
+     * The moment up to which this revision is kept however long it has been untouched, or null when nothing about it
      * is dated. Silence about something that has not happened yet says nothing: an activity still to come, a vacancy
      * still open for applications and a poll still being voted on are all being waited on by someone. Once that
      * moment is past, the silence is all there is to go on.
@@ -38,21 +38,21 @@ interface StaleRevisionPolicyInterface
     public function keepUntil(RevisionInterface $revision): ?DateTimeImmutable;
 
     /**
-     * Why this never-approved aggregate has to stay standing anyway, or null when it may go together with its chain.
-     * It is the last thing asked before rows are removed, so answer from what the aggregate carries — sign-ups,
-     * votes, a sold package — rather than from what it is.
+     * Why this never-approved aggregate has to be kept anyway, or null when it may go together with its chain. It is
+     * the last check before rows are removed, so decide from what the aggregate contains (sign-ups, votes, a sold
+     * package) rather than from what it is.
      *
      * An objection also says whether an operator running the cleanup by hand may overrule it; see
-     * {@see StaleRevisionDeletionBlock}. Hold out for {@see StaleRevisionDeletionBlock::hard()} when what would go
-     * with the aggregate belongs to somebody else.
+     * {@see StaleRevisionDeletionBlock}. Use {@see StaleRevisionDeletionBlock::hard()} when what would go with the
+     * aggregate belongs to someone else.
      */
     public function deletionBlockedBy(RevisableInterface $revisable): ?StaleRevisionDeletionBlock;
 
     /**
      * Every stored file path this revision names, so that whatever nothing points at any more can be reclaimed with
-     * the row. Paths are content-addressed and a clone carries them forward by value, so several revisions routinely
-     * name one file; deletion is reference-checked by {@see FileStorage::remove()}, and a policy simply lists what it
-     * sees without deciding whether the bytes may go.
+     * the row. Paths are content-addressed and a clone copies them by value, so several revisions routinely name one
+     * file; deletion is reference-checked by {@see FileStorage::remove()}, and a policy simply lists what it sees
+     * without deciding whether the bytes may go.
      *
      * @return list<string>
      */

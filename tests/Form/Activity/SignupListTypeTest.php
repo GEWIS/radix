@@ -78,7 +78,7 @@ final class SignupListTypeTest extends TypeTestCase
             $this->listWithSignUp(),
         );
 
-        // The allocation method and every per-method setting are disabled: the deal can no longer be rewritten.
+        // The allocation method and every per-method setting are disabled: the terms can no longer be changed.
         foreach (
             [
                 'allocationMethod',
@@ -159,7 +159,7 @@ final class SignupListTypeTest extends TypeTestCase
         );
 
         // Submit only the fields collection (clearMissing = false keeps the list's other values); the hidden position
-        // inputs carry the dragged order as strings and the default marker is a checkbox on one option.
+        // inputs contain the dragged order as strings and the default marker is a checkbox on one option.
         $form->submit(
             [
                 'fields' => [
@@ -220,7 +220,7 @@ final class SignupListTypeTest extends TypeTestCase
 
     /**
      * The settings an allocation method needs are required only for the method that needs them, which is what the
-     * editor draws by revealing a block at a time. These pin the same rule on the server, where a submission that
+     * editor shows by revealing a block at a time. These pin the same rule on the server, where a submission that
      * skipped the editor also lands.
      */
     public function testAConditionalDrawMustSayWhenItIsDrawn(): void
@@ -285,7 +285,7 @@ final class SignupListTypeTest extends TypeTestCase
     }
 
     /**
-     * A method asks only for its own settings: an unlimited list is held to none of them.
+     * A method asks only for its own settings: an unlimited list requires none of them.
      */
     public function testAnUnlimitedListIsAskedForNoAllocationSettings(): void
     {
@@ -634,13 +634,13 @@ final class SignupListTypeTest extends TypeTestCase
             $list,
         );
 
-        // The list is members-only, so the rank the non-members stood on is gone and the places held for it with it.
+        // The list is members-only, so the rank the non-members were on is gone and the places held for it with it.
         self::assertSame(
             [MembershipTier::Ordinary->value => 4],
             $list->getHeldMembershipPlaces(),
         );
         // The tiers the order left out are appended as the one rank the association would rank them on, and that
-        // rank holds nothing until somebody says otherwise.
+        // rank has no places until some are assigned.
         self::assertSame(
             [
                 MembershipTier::Ordinary->value => 4,

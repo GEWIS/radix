@@ -13,7 +13,7 @@ use App\Entity\User\Enums\UserRoles;
  * A stable aggregate root whose content is versioned through a chain of {@see RevisionInterface}s.
  *
  * The aggregate keeps its identity (and anything that must survive across edits, e.g. an activity's sign-ups) while
- * each revision carries an immutable snapshot of the revisable content.
+ * each revision contains an immutable snapshot of the revisable content.
  *
  * The three resource accessors generalise the authorization hooks the legacy ACL used and are read by
  * {@see \App\Security\Application\RevisionVoter}.
@@ -31,8 +31,8 @@ interface RevisableInterface
     public function getResourceId(): string;
 
     /**
-     * The roles that may review this resource on top of the board, which reviews everything. An activity answers with
-     * nothing; the career resources answer with C4. Declaring it here rather than listing resource ids inside
+     * The roles that may review this resource on top of the board, which reviews everything. An activity returns
+     * nothing; the career resources return C4. Declaring it here rather than listing resource ids inside
      * {@see \App\Security\Application\RevisionVoter} means a new revisable domain never has to edit the voter.
      *
      * @return list<UserRoles>
@@ -82,7 +82,7 @@ interface RevisableInterface
     public function markRevisionLive(RevisionInterface $revision): void;
 
     /**
-     * Put the working head back on the publicly live revision, dropping whatever draft sat in front of it. The
+     * Put the working head back on the publicly live revision, dropping whatever draft was in front of it. The
      * counterpart of {@see self::markRevisionLive()}, used when a draft is discarded rather than reviewed. Callers
      * must have established that there is a live revision to fall back to.
      */
@@ -90,8 +90,8 @@ interface RevisableInterface
 
     /**
      * Point the aggregate at no revision at all. Both pointers are foreign keys into the chain, so they have to be
-     * nulled and committed before the revisions they name may be removed; only the cleanup that takes a
-     * never-approved aggregate away whole has any business calling this.
+     * nulled and committed before the revisions they name may be removed; only the cleanup that removes a
+     * never-approved aggregate entirely should call this.
      */
     public function detachRevisions(): void;
 }

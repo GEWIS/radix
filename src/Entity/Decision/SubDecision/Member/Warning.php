@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping\Entity;
 use function assert;
 
 /**
- * An official warning handed to a member by the board.
+ * An official warning issued to a member by the board.
  */
 #[Entity(repositoryClass: WarningRepository::class)]
 #[Queryable]
@@ -28,7 +28,7 @@ class Warning extends SubDecision
     public function getMember(): Member
     {
         // The trait keeps the association nullable for mapping reasons; a warning always names the member it is
-        // handed to.
+        // issued to.
         assert(null !== $this->member);
 
         return $this->member;

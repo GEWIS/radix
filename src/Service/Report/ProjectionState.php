@@ -7,8 +7,8 @@ namespace App\Service\Report;
 /**
  * Whether the projection is following the ledger, and whether it is in the middle of doing so.
  *
- * Shared by the listeners that keep the projection level with the ledger. The container guarantees they all hold the
- * same instance, which is what lets one of them stand the others down.
+ * Shared by the listeners that keep the projection level with the ledger. The container guarantees they all share the
+ * same instance, which is what lets one of them disable the others.
  */
 final class ProjectionState
 {

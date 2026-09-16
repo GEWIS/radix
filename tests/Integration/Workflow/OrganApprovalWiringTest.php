@@ -26,7 +26,7 @@ use function array_map;
 
 /**
  * The generic revision workflow covers a body's page by instanceof, so nothing about it was written for one. These pin
- * that it genuinely does: a page goes all the way round and becomes what the website shows, turns up in the board's
+ * that it genuinely does: a page goes all the way round and becomes what the website shows, appears in the board's
  * queue while it waits, and leaves the body a fresh draft when the board asks for changes.
  */
 final class OrganApprovalWiringTest extends DatabaseTestCase
@@ -151,7 +151,7 @@ final class OrganApprovalWiringTest extends DatabaseTestCase
     }
 
     /**
-     * A draft's own localised texts and social links are its alone, so throwing it away has to take them with it and
+     * A draft's own localised texts and social links are its alone, so discarding it has to remove them as well and
      * leave what is live untouched.
      */
     public function testDiscardingADraftPutsTheLivePageBack(): void

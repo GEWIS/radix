@@ -51,7 +51,7 @@ trait BuildsDecisions
     }
 
     /**
-     * A subdecision carrying literal text, which is the one shape that does not go through a template.
+     * A subdecision containing literal text, which is the one shape that does not go through a template.
      */
     protected function other(
         Decision $decision,
@@ -69,7 +69,7 @@ trait BuildsDecisions
     }
 
     /**
-     * A translator that hands back the source string, so a test reads the template the entity asked for.
+     * A translator that returns the source string, so a test reads the template the entity requested.
      */
     protected function translator(string $locale = 'nl'): TranslatorInterface
     {

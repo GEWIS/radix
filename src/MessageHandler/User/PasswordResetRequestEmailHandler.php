@@ -100,10 +100,10 @@ class PasswordResetRequestEmailHandler
             return;
         }
 
-        // Recorded here rather than in the controller that asked for it, because this is the first point at which the
-        // account is known: the request itself is answered identically whether one exists or not, and recording what
-        // was typed would mean keeping addresses belonging to people who are not members. The cost is that the row
-        // carries no address of its own -- a worker is answering nobody's request.
+        // Recorded here rather than in the controller that requested it, because this is the first point at which the
+        // account is known: the request itself gets the same response whether one exists or not, and recording what was
+        // entered would mean keeping addresses belonging to people who are not members. The cost is that the row has no
+        // address of its own, because a worker has no request to read one from.
         $this->securityEvents->record(
             SecurityEventType::PasswordResetRequested,
             $member instanceof Member

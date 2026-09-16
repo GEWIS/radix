@@ -11,10 +11,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Mime\Address;
 
 /**
- * Who a domain wants told that one of its revisions is waiting for a reviewer, and under which kind of notification.
+ * Who a domain wants notified that one of its revisions is waiting for a reviewer, and the kind of notification used.
  *
  * One per module rather than a branch in the listener that sends it, so a new revisable domain arrives with its own
- * answer instead of everybody editing the same match. The listener itself is
+ * implementation instead of every domain editing the same match. The listener itself is
  * {@see \App\EventListener\Application\NotifyOnRevisionSubmissionListener}.
  */
 #[AutoconfigureTag('app.revision_notification')]
@@ -28,15 +28,15 @@ interface RevisionNotificationInterface
     public function awaitingReviewType(RevisionInterface $revision): NotificationType;
 
     /**
-     * The role it is addressed to. A role rather than each member holding it, because who holds a role is worked out
-     * from current installations rather than stored, and one row per submission beats one per reviewer either way.
+     * The role it is addressed to. A role rather than each member who has it, because role membership is computed from
+     * current installations rather than stored, and one row per submission beats one per reviewer either way.
      */
     public function audienceRole(RevisionInterface $revision): UserRoles;
 
     /**
-     * The mailboxes told that a submission is waiting, which is a different question from the role above: the
-     * notification reaches whoever holds the role in the website, and this reaches the office that answers for it
-     * whether or not anybody has signed in lately.
+     * The mailboxes notified that a submission is waiting, which is a different question from the role above: the
+     * notification reaches the members who have the role in the website, and this reaches the mailbox responsible for
+     * it whether or not any of them has signed in lately.
      *
      * @return Address[]
      */

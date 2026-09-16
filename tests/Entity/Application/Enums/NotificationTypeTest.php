@@ -14,8 +14,8 @@ use function array_values;
 use function in_array;
 
 /**
- * The enum holds everything a notification says, so a kind that is wired up wrongly is only noticed once somebody is
- * looking at a broken notification centre. These pin the parts that are easy to get wrong when a kind is added.
+ * The enum contains everything a notification says, so a kind that is wired up wrongly is only noticed once a member
+ * is looking at a broken notification centre. These pin the parts that are easy to get wrong when a kind is added.
  */
 final class NotificationTypeTest extends TestCase
 {
@@ -32,8 +32,8 @@ final class NotificationTypeTest extends TestCase
     ];
 
     /**
-     * Only what a member can be told about themselves belongs in the always-on list on the settings page; what goes to
-     * a role is somebody's work queue, not their preferences.
+     * Only what a member can be notified about themselves belongs in the always-on list on the settings page; what
+     * goes to a role is that role's work queue, not their preferences.
      */
     public function testEachKindIsAddressedExactlyOneWay(): void
     {
@@ -86,7 +86,7 @@ final class NotificationTypeTest extends TestCase
 
     /**
      * A security notice is mailed from its own handler, so it needs a subject line. Anything that goes out in a digest
-     * takes its subject from whatever else is in that digest, and must not carry one.
+     * takes its subject from whatever else is in that digest, and must not have one.
      */
     public function testOnlySecurityNoticesAreEmailedOnTheirOwn(): void
     {
@@ -138,7 +138,7 @@ final class NotificationTypeTest extends TestCase
     }
 
     /**
-     * These carry a frozen label rather than a subject, so the sentence has to have somewhere to put it.
+     * These have a frozen label rather than a subject, so the sentence has to have somewhere to put it.
      */
     public function testAccountNoticesSayWhereTheyCameFrom(): void
     {

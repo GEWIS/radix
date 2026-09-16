@@ -15,14 +15,14 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * What a review screen actually does to a revision: starting a draft off it, deciding on it, discarding that draft,
- * and adding to its thread. Every domain that reviews something drives these, so they live here rather than being
- * re-sequenced by each controller.
+ * and adding to its thread. Every domain that reviews something drives these, so they are defined here rather than
+ * being re-sequenced by each controller.
  *
  * Each is one unit of work. A decision and the feedback typed alongside it commit together, because a rejection whose
- * reason did not save is a rejection nobody can answer; a discard commits with the edit lock it releases, so the
- * aggregate is never left locked against a draft that is gone.
+ * reason did not save is a rejection the author cannot act on; a discard commits with the edit lock it releases, so
+ * the aggregate is never left locked against a draft that is gone.
  *
- * The pieces this composes — {@see RevisionReviser}, {@see RevisionDiscarder}, the state machine — deliberately do not
+ * The pieces this composes ({@see RevisionReviser}, {@see RevisionDiscarder}, the state machine) deliberately do not
  * flush, so that the batch callers that drive them over many revisions still commit in one go.
  */
 final readonly class RevisionReviewService

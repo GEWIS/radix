@@ -23,9 +23,9 @@ use Override;
  * one of the two sizes {@see CompanyBannerFormats} describes.
  *
  * Because it is shown to everyone who visits the site, a company cannot simply swap it out: it proposes one and the
- * committee either takes the proposal or leaves it. The proposal sits beside the live banner rather than replacing it,
- * so whatever is already up stays up until somebody agrees to the new one. The committee sets a banner directly, since
- * there is nobody left to ask.
+ * committee accepts or rejects the proposal. The proposal is stored beside the live banner rather than replacing it, so
+ * whatever is already up stays up until the committee accepts the new one. The committee sets a banner directly, since
+ * there is no one else whose approval is needed.
  */
 #[Entity(repositoryClass: CompanyBannerPackageRepository::class)]
 class CompanyBannerPackage extends CompanyPackage
@@ -96,8 +96,8 @@ class CompanyBannerPackage extends CompanyPackage
 
     /**
      * Move the proposal's file without touching who proposed it or when. A proposal is made with
-     * {@see self::proposeImage()}; this is for the storage migration, which changes where a file lives and nothing
-     * about the proposal itself.
+     * {@see self::proposeImage()}; this is for the storage migration, which changes where a file is stored and
+     * nothing about the proposal itself.
      */
     public function setPendingImage(string $pendingImage): void
     {
@@ -110,7 +110,7 @@ class CompanyBannerPackage extends CompanyPackage
     }
 
     /**
-     * Puts a proposal up for review, and hands back the earlier one it replaced so the caller can reclaim the file
+     * Puts a proposal up for review, and returns the earlier one it replaced so the caller can reclaim the file
      * behind it.
      */
     public function proposeImage(
@@ -127,7 +127,7 @@ class CompanyBannerPackage extends CompanyPackage
     }
 
     /**
-     * Takes the proposal, and hands back the banner it replaced so the caller can reclaim the file behind it.
+     * Accepts the proposal, and returns the banner it replaced so the caller can reclaim the file behind it.
      */
     public function acceptPendingImage(): ?string
     {
@@ -143,7 +143,7 @@ class CompanyBannerPackage extends CompanyPackage
     }
 
     /**
-     * Leaves the proposal, and hands back the file behind it so the caller can reclaim that instead.
+     * Rejects the proposal, and returns the file behind it so the caller can reclaim that instead.
      */
     public function rejectPendingImage(): ?string
     {

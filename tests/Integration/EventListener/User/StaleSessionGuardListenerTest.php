@@ -26,9 +26,9 @@ use function hash;
 
 /**
  * The row of a managed session is stamped for the account that opened it. While an administrator is impersonating
- * somebody, the account on the token is the one being looked at instead, and comparing that account's credentials
- * against the administrator's row is a mismatch every time. That tore the session down on the first impersonated
- * request that reached the guard, which is every one of them now that a grant carries into an impersonation.
+ * another account, the account on the token is the one being looked at instead, and comparing its credentials against
+ * the administrator's row is a mismatch every time. That tore the session down on the first impersonated request that
+ * reached the guard, which is every one of them now that a grant persists into an impersonation.
  */
 final class StaleSessionGuardListenerTest extends DatabaseTestCase
 {

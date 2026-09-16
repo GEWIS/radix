@@ -14,7 +14,7 @@ use App\Service\Photo\TagService;
 use App\Tests\Integration\DatabaseTestCase;
 
 /**
- * A member who opts out of being tagged can no longer be tagged; the enforcement lives in the service so it holds for
+ * A member who opts out of being tagged can no longer be tagged; the enforcement is in the service so it holds for
  * every caller. The seeded member 8031 is not tagged on the Trip photo, so it is a clean subject for both cases.
  */
 final class TagServiceOptOutTest extends DatabaseTestCase

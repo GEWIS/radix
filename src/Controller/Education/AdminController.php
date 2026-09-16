@@ -27,8 +27,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use function strtoupper;
 
 /**
- * Courses are plain reference data rather than revisable content, so they are edited directly. A course code is the
- * identity documents hang off, so it is set once and then fixed.
+ * Courses are plain reference data rather than revisable content, so they are edited directly. Documents are linked
+ * to a course by its code, so the code is set once and then fixed.
  */
 #[IsGranted(
     attribute: UserRoles::Board->value,
@@ -60,7 +60,7 @@ class AdminController extends AbstractController
     public function index(): Response
     {
         // The queue itself is `Education:Admin:UnprocessedDocumentOverview`, which pages over it on its own; the
-        // tile above still wants the whole number, which the table no longer knows.
+        // tile above still needs the whole number, which the table no longer has.
         return $this->render(
             'education/admin/index.html.twig',
             [

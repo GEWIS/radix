@@ -119,7 +119,7 @@ class MemberTest extends KernelTestCase
     }
 
     /**
-     * Someone who appears in the decisions cannot be deleted without taking a hole out of the historical record, so
+     * A member who appears in the decisions cannot be deleted without taking a hole out of the historical record, so
      * they are stripped of everything personal and kept.
      */
     public function testStripsRatherThanRemovesAMemberTheDecisionsReferTo(): void

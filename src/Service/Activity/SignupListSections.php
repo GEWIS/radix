@@ -38,9 +38,8 @@ use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
- * A list is matched to the one it descends from by lineage rather than by its place in the revision, and its
- * questions by what they say first and their place second, which is what tells a moved question from a rewritten
- * one.
+ * A list is matched to the one it descends from by lineage rather than by its place in the revision, and its questions
+ * by what they say first and their place second, which is what tells a moved question from a rewritten one.
  */
 final readonly class SignupListSections
 {
@@ -453,7 +452,7 @@ final readonly class SignupListSections
                 === $list->membershipPriorityMode,
             )
         ) {
-            // The places are held for a rank of the order, so they are read back against the tiers that share them.
+            // The places are reserved for a rank of the order, so they are read back against the tiers that share them.
             $ranks = [];
             foreach (
                 [
@@ -634,8 +633,8 @@ final readonly class SignupListSections
     }
 
     /**
-     * Which thing before each thing after carries on from: the first unclaimed one that reads the same, and failing
-     * that whatever stood in the same place, so long as nothing has claimed it. Nothing before is claimed twice.
+     * Which thing before each thing after descends from: the first unclaimed one that reads the same, and failing that
+     * whatever stood in the same place, so long as nothing has claimed it. Nothing before is claimed twice.
      *
      * @template T
      *

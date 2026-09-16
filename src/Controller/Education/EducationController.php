@@ -27,8 +27,8 @@ use function strtoupper;
 
 /**
  * Browsing is open to everyone, downloading is not: see {@see CourseDocumentVoter}. A visitor who may not download
- * still sees the whole archive, because knowing an exam exists is what tells someone whether logging in or walking to
- * campus is worth it.
+ * still sees the whole archive, because knowing an exam exists is what they need to decide whether logging in or
+ * walking to campus is worth it.
  */
 #[Route(
     path: '/education',
@@ -228,8 +228,8 @@ class EducationController extends AbstractController
     }
 
     /**
-     * A built file names whoever asked for it, so only they may collect it. The document gate is checked again in case
-     * the visitor's standing changed between asking and collecting.
+     * A built file names the user who requested it, so only they may collect it. The document gate is checked again
+     * in case the visitor's standing changed between the request and the collection.
      */
     private function denyUnlessCollectable(
         CourseDocumentDownload $download,

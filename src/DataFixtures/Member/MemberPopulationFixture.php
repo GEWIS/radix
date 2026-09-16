@@ -37,10 +37,10 @@ use function sprintf;
  * The body of members the association is made of, so that every surface that lists people has a realistic number of
  * them rather than the handful its neighbours are built out of.
  *
- * These live in the ledger, like every other member: a member is a ledger record, and the projection the website reads
- * is replayed from it. What the projection ends up saying about somebody -- their type, when their membership expires,
- * their addresses -- is derived from the memberships and addresses written here rather than set on the far side, which
- * is why none of it is set twice.
+ * These are in the ledger, like every other member: a member is a ledger record, and the projection the website reads
+ * is replayed from it. What the projection ends up saying about a member (their type, when their membership expires,
+ * their addresses) is derived from the memberships and addresses written here rather than set on the projection itself,
+ * which is why none of it is set twice.
  *
  * The numbering is fixed rather than left to the sequence. The fixtures that hang off these members name them by
  * `lidnr`, and a seed whose members come back under different numbers every run cannot be referred to at all. Their
@@ -197,7 +197,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
     ];
 
     /**
-     * The members whose birthday falls on the day the seed is loaded, so the front page's birthday panel has somebody
+     * The members whose birthday falls on the day the seed is loaded, so the front page's birthday panel has a member
      * to show without a row being edited by hand.
      */
     private const array BORN_TODAY = [
@@ -206,8 +206,8 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
     ];
 
     /**
-     * Reachable only at a university address, so the notice telling somebody to give the association an address that
-     * outlives their studies has a member to appear for.
+     * Reachable only at a university address, so the notice asking a member to give the association an address that
+     * outlives their studies has one to appear for.
      */
     private const int STUDENT_ADDRESS_ONLY = 8005;
 
@@ -223,15 +223,15 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         $this->now = new DateTimeImmutable();
 
         // `lidnr` is generated from a sequence, which cannot produce the numbers these are referred to by. The
-        // generator is dropped for the rest of the run so the numbers below are taken as given. The sequence itself is
-        // left where it stands, well below this range, so anything creating a member afterwards still gets a free
-        // number.
+        // generator is dropped for the rest of the run so the numbers below are taken as given. The sequence
+        // itself is left where it stands, well below this range, so anything creating a member afterwards still
+        // gets a free number.
         $metadata = $manager->getClassMetadata(Member::class);
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
         $metadata->setIdGenerator(new AssignedGenerator());
 
-        // Ordinary members who hold an account with rights on the website. Named apart from the rank and file so a
-        // seeded login always lands on the same person.
+        // Ordinary members who have an account with rights on the website. Named apart from the rank and file so a
+        // seeded login is always for the same member.
         $this->block(
             $manager,
             self::ADMIN,
@@ -310,7 +310,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         );
 
         // Kept off every list the website shows, at their own request. Nothing else about them differs, which is the
-        // point: a page that forgets to filter them shows somebody who asked not to be shown.
+        // point: a page that does not filter them shows a member who asked not to be shown.
         $this->block(
             $manager,
             self::HIDDEN,
@@ -321,7 +321,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         );
 
         // Removed, but still named by the decisions that were taken about them. A decision is the association's own
-        // record and does not go away because somebody left, so what is left of them is a name and nothing else.
+        // record and does not go away because a member left, so what is left of them is a name and nothing else.
         $this->block(
             $manager,
             self::DELETED,
@@ -374,9 +374,9 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
 
             $manager->persist($member);
 
-            // Named for the ledger fixtures that decide things about these people. The projection has references of
-            // its own, handed out after the replay by
-            // {@see \App\DataFixtures\Decision\ProjectionReferenceFixture}, which is why these carry a prefix.
+            // Named for the ledger fixtures that decide things about these people. The projection has references of its
+            // own, added after the replay by {@see \App\DataFixtures\Decision\ProjectionReferenceFixture}, which is why
+            // these have a prefix.
             $this->addReference(
                 sprintf(
                     'ledger-member-%d',
@@ -386,7 +386,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             );
         }
 
-        // Flushed a block at a time: the whole population in one unit of work holds a few hundred members and their
+        // Flushed a block at a time: the whole population in one unit of work keeps a few hundred members and their
         // whole histories in memory at once.
         $manager->flush();
     }
@@ -458,9 +458,9 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             $lapsed,
         );
 
-        // What is left of somebody who has been removed is their name and the decisions that named them. Their
-        // address and the mail they were reachable at are what "removed" means, so they are not written in the first
-        // place rather than written and then cleared.
+        // What is left of a member who has been removed is their name and the decisions that named them. Their address
+        // and the mail they were reachable at are what "removed" means, so they are not written in the first place
+        // rather than written and then cleared.
         if ($deleted) {
             $member->setEmail(null);
 
@@ -522,9 +522,9 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
     }
 
     /**
-     * A membership for every association year the member has been one, which is what the projection reads their type
-     * and their expiry off. Somebody who has lapsed stops renewing two years ago; everybody else runs to the year in
-     * progress.
+     * A membership for every association year the member has been one, which is what the projection reads their
+     * type and their expiry from. A member who has lapsed stops renewing two years ago; everybody else runs to the
+     * year in progress.
      */
     private function chain(
         Member $member,
@@ -532,7 +532,7 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
         MembershipTypes $type,
         bool $lapsed,
     ): void {
-        // Nobody starts out a graduate: they were an ordinary member while they studied and became one on finishing,
+        // No member starts out a graduate: they were an ordinary member while they studied and became one on finishing,
         // which is what lets a graduate have been an ordinary member of a body before they were an inactive one. A
         // graduate is given a longer history for that reason, and switches type two years back.
         $graduating = MembershipTypes::Graduate === $type;
@@ -548,9 +548,9 @@ final class MemberPopulationFixture extends Fixture implements DependentFixtureI
             ? new DateTimeImmutable()->sub(new DateInterval('P2Y'))
             : $this->now;
 
-        // Measured back from where the history ends rather than from today, so somebody who stopped renewing years
-        // ago still finished as a graduate. Fixed at two years ago, a lapsed graduate never reached the switch and
-        // their last membership said they were an ordinary member.
+        // Measured back from where the history ends rather than from today, so a member who stopped renewing years ago
+        // still finished as a graduate. Fixed at two years ago, a lapsed graduate never reached the switch and their
+        // last membership said they were an ordinary member.
         $switchOn = new DateTimeImmutable($until->format('Y-m-d'))->sub(new DateInterval('P1Y'));
 
         while ($start < $until) {

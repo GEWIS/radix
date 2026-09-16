@@ -22,12 +22,12 @@ use function tempnam;
 trait UploadsBanners
 {
     /**
-     * A POST carrying an image of the given format, named the way the form expects to find it. The stateless CSRF
+     * A POST containing an image of the given format, named the way the form expects to find it. The stateless CSRF
      * token is satisfied by naming the cookie and saying the request came from this site, which is what a browser does
      * for a form on one of our own pages.
      *
      * The request is pushed onto the stack as well, because that is the one the CSRF check reads rather than the one
-     * the form is handed.
+     * passed to the form.
      */
     private function bannerUploadRequest(CompanyBannerFormats $format): Request
     {

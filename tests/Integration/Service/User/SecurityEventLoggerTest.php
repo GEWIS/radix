@@ -78,7 +78,7 @@ final class SecurityEventLoggerTest extends DatabaseTestCase
     }
 
     /**
-     * The reason the row is written around the ORM. Recording happens halfway through somebody else's work, and a
+     * The reason the row is written around the ORM. Recording happens halfway through the caller's work, and a
      * `flush()` here would write out whatever else that work had part-built.
      */
     public function testRecordingDoesNotWriteOutTheCallersPendingWork(): void
@@ -100,8 +100,8 @@ final class SecurityEventLoggerTest extends DatabaseTestCase
             $this->request(),
         );
 
-        // Asked of the connection rather than through the ORM, so the unit of work has no chance to write itself out
-        // on the way to answering.
+        // Queried on the connection rather than through the ORM, so the unit of work has no chance to write itself out
+        // while the query runs.
         $written = $this->entityManager->getConnection()->fetchOne(
             'SELECT COUNT(*) FROM KnownDevice WHERE fingerprint = ?',
             ['unflushed-fingerprint'],
@@ -112,7 +112,7 @@ final class SecurityEventLoggerTest extends DatabaseTestCase
             (int) $written,
         );
 
-        // The event itself did land, which is the other half of the claim.
+        // The event itself was recorded, which is the other half of the claim.
         self::assertCount(
             1,
             $this->repository()->findAllByUser(self::USER),

@@ -27,8 +27,8 @@ class OrganiserAnnouncementEmailHandler
     {
         $replyTo = $message->getReplyTo();
 
-        // One personalised email per recipient (no shared To/BCC, so nobody sees the others, and the greeting is by
-        // name). A single recipient failing (a bad address, a transient transport error) is logged and skipped, not
+        // One personalised email per recipient (no shared To/BCC, so no recipient sees the others, and the greeting is
+        // by name). A single recipient failing (a bad address, a transient transport error) is logged and skipped, not
         // thrown: throwing would make Messenger retry the whole message and re-send to everyone already mailed.
         foreach ($message->getRecipients() as $recipient) {
             try {

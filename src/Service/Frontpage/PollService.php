@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * Everything that happens to a poll after it has been written: asking for it, answering it, talking underneath it and
- * taking it down again.
+ * Everything that happens to a poll after it has been written: requesting it, answering it, commenting underneath it
+ * and taking it down again.
  */
 final readonly class PollService
 {
@@ -39,12 +39,12 @@ final readonly class PollService
 
     /**
      * Ask the board a question. A poll is written and submitted in one go, so there is no draft to leave behind: the
-     * revision the form filled in is persisted and handed straight to the board.
+     * revision the form filled in is persisted and submitted directly to the board.
      *
-     * A question that was turned down is asked again by continuing that poll's chain rather than starting a new one,
+     * A question that was rejected is submitted again by continuing that poll's chain rather than starting a new one,
      * so the board can read the new wording against what it refused.
      *
-     * The revision has to exist before it is submitted: the listener that tells the board silently skips a revision
+     * The revision has to exist before it is submitted: the listener that notifies the board silently skips a revision
      * without an id, so submitting first loses the notification without saying so.
      */
     public function requestPoll(
@@ -83,11 +83,11 @@ final readonly class PollService
     }
 
     /**
-     * Answer a poll. One answer per member per poll, which the database holds as well: two requests racing each other
-     * both pass the check below and the second one is turned away by the constraint rather than counted twice.
+     * Answer a poll. One answer per member per poll, which the database enforces as well: two requests racing each
+     * other both pass the check below and the second one is rejected by the constraint rather than counted twice.
      *
      * That refusal reaches the caller as the database's own exception. It leaves the entity manager closed, so the
-     * caller cannot carry on rendering and has to send the reader somewhere with a fresh one.
+     * caller cannot continue rendering and has to redirect to a new request, which gets a fresh one.
      */
     public function submitVote(
         Poll $poll,
@@ -141,7 +141,7 @@ final readonly class PollService
     }
 
     /**
-     * Write underneath a poll, either on its own or in answer to something already there.
+     * Write underneath a poll, either on its own or as a reply to an existing comment.
      */
     public function addComment(
         Poll $poll,
@@ -176,9 +176,9 @@ final readonly class PollService
     }
 
     /**
-     * Reacting again with the same thing takes the reaction back, which is the only way to undo one.
+     * Reacting again with the same type removes the reaction, which is the only way to undo one.
      *
-     * One reaction per member per comment is held by the database as well, and a race over a first reaction reaches
+     * One reaction per member per comment is enforced by the database as well, and a race over a first reaction reaches
      * the caller the same way a race over an answer does.
      */
     public function toggleReaction(

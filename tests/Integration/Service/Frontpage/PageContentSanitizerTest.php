@@ -14,8 +14,8 @@ use function strval;
 
 /**
  * A custom page is stored as HTML and rendered as-is, so what the sanitizer lets through is the whole of what stands
- * between whoever writes a page and whoever reads it. These pin the configuration itself: a permission quietly
- * widened, or a restriction quietly dropped, shows up here rather than on somebody's screen.
+ * between the member who writes a page and the visitor who reads it. These pin the configuration itself: a permission
+ * quietly widened, or a restriction quietly dropped, shows up here rather than on a reader's screen.
  */
 final class PageContentSanitizerTest extends KernelTestCase
 {
@@ -146,8 +146,8 @@ final class PageContentSanitizerTest extends KernelTestCase
     }
 
     /**
-     * The sanitizer stops reading after a length it is told, and the default is short enough that a real page would be
-     * cut off halfway. Losing the end of somebody's work without saying so is the failure this guards against.
+     * The sanitizer stops reading after a configured length, and the default is short enough that a real page would
+     * be cut off halfway. Losing the end of the author's work without saying so is the failure this guards against.
      */
     public function testALongPageIsNotCutOffHalfway(): void
     {

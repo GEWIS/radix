@@ -141,7 +141,7 @@ class MemberService
             }
 
             // A membership only reaches here when the address it was entered with equals the member's own, and a
-            // membership always carries one, so the member has one too.
+            // membership always has one, so the member has one too.
             if (null === $email) {
                 throw new LogicException('mailing list membership without an e-mail address');
             }
@@ -216,8 +216,8 @@ class MemberService
      * Take a member out of the projection, because the ledger has taken them out of the register.
      *
      * The database cascades the rest: what cannot outlive a member declares `ON DELETE CASCADE`, what names one only
-     * for attribution `ON DELETE SET NULL`. Walking the graph here would mean knowing every corner of the website and
-     * leaving orphans the day a new one is added. The unit of work does not learn what the database took, so this
+     * for attribution `ON DELETE SET NULL`. Traversing the graph here would mean knowing every corner of the website
+     * and leaving orphans the day a new one is added. The unit of work does not learn what the database took, so this
      * runs at the end of a removal.
      *
      * Rows that record a decision keep a plain foreign key, so a member the association decided something about

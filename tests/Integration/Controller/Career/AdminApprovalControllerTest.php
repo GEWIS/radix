@@ -19,8 +19,8 @@ use function strval;
 
 /**
  * The career review screen renders two different aggregates through one template, and since the fields it shows are
- * described rather than written out, a describer that answers wrong shows a reviewer an empty panel instead of
- * failing. These render both and read what came out.
+ * described rather than written out, a describer that returns the wrong fields shows a reviewer an empty panel
+ * instead of failing. These render both and read what came out.
  *
  * The actions are invoked directly with the current user on the token storage, as the activity approval tests do and
  * for the same reason: the session guard force-logs-out any session with no managed-session row behind it.
@@ -92,8 +92,8 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A revision that was turned down says nothing about what visitors see, so the screen has to name the revision
-     * that is still up rather than leave "Rejected" to be read as "the company is offline".
+     * A revision that was rejected does not determine what visitors see, so the screen has to name the revision that
+     * is still up rather than leave "Rejected" to be read as "the company is offline".
      */
     public function testARejectedRevisionStillNamesTheOneThatIsLive(): void
     {
@@ -145,7 +145,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
     }
 
     /**
-     * Opening a review screen asks a reviewer for sudo, so the grant has to be in the session the request carries.
+     * Opening a review screen requires sudo, so the grant has to be in the session attached to the request.
      */
     private function authenticateAsBoardWithSudo(): void
     {
@@ -169,7 +169,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
 
         $request = new Request();
         $request->setSession($session);
-        // A sudo grant is only read back off a session the request already carried, so the cookie has to be there.
+        // A sudo grant is only read back from a session the request already had, so the cookie has to be there.
         $request->cookies->set(
             $session->getName(),
             'test',

@@ -80,9 +80,9 @@ class Annulment
      * Assert that the given annulment can be deleted, restoring the decision it annulled.
      *
      * On top of the requirements for making the annulment in the first place, the annulment must still be the last
-     * word on the entities it took away. Anything decided about those entities afterwards was decided in a world
-     * where the annulled decision did not exist; putting that decision back would silently invalidate it. This
-     * includes later annulments, which are decisions about those entities just as much as the rest.
+     * decision about the entities it annulled. Anything decided about those entities afterwards was decided while
+     * the annulled decision did not exist; putting that decision back would silently invalidate it. This includes
+     * later annulments, which are decisions about those entities just as much as the rest.
      *
      * @throws AnnulmentNotPossible when the annulled decision can no longer be restored.
      */
@@ -121,7 +121,7 @@ class Annulment
                     );
                 }
 
-                // Looked up rather than read off the inverse side, so that an annulment made earlier in this same
+                // Looked up rather than read from the inverse side, so that an annulment made earlier in this same
                 // request is seen as well.
                 $laterAnnulments = $this->meetingRepository->findReferencingSubDecisions(
                     AnnulmentModel::class,
@@ -156,16 +156,17 @@ class Annulment
     }
 
     /**
-     * Assert that the organs affected by a decision still hold up once that decision starts or stops counting.
+     * Assert that the organs affected by a decision still meet the requirements once that decision starts or stops
+     * counting.
      *
      * The Articles of Association and the Internal Regulations put requirements on how an organ is made up; those
-     * live on {@see \App\Entity\Database\Enums\OrganTypes}. Taking a decision back can break them just as easily as
-     * making a new one can, which would leave the register describing an organ that is not allowed to exist in that
-     * shape.
+     * are defined on {@see \App\Entity\Database\Enums\OrganTypes}. Taking a decision back can break them just as
+     * easily as making a new one can, which would leave the register describing an organ with a composition that is
+     * not allowed.
      *
-     * Only requirements that hold right now and would stop holding are reported. An organ that is already in a shape
-     * the regulations do not allow (an organ is founded before anyone is installed in it, for one) is not something
-     * this annulment has to answer for, and refusing it would only make that state harder to get out of.
+     * Only requirements that hold right now and would stop holding are reported. An organ that already has a
+     * composition the regulations do not allow (an organ is founded before anyone is installed in it, for one) is not
+     * the responsibility of this annulment, and refusing it would only make that state harder to correct.
      *
      * @throws AnnulmentNotPossible when the change would break a requirement that currently holds.
      */
@@ -190,7 +191,7 @@ class Annulment
                 || null === $after
             ) {
                 // The organ either does not exist yet (or any more) after the change, or it comes back exactly as it
-                // was before it was abolished. Either way this decision does not shape its composition.
+                // was before it was abolished. Either way this decision does not affect its composition.
                 continue;
             }
 
@@ -403,7 +404,7 @@ class Annulment
                 continue;
             }
 
-            // Holding a function in an organ means being one of its (active) members; an inactive member holds none.
+            // Having a function in an organ means being one of its (active) members; an inactive member has none.
             $violations['function-without-membership'] = sprintf(
                 $this->translator->trans(
                     'it would leave someone with a function in %s without being an active member of it',
@@ -461,7 +462,7 @@ class Annulment
 
         switch (true) {
             case $subDecision instanceof FoundationModel:
-                // Every surviving reference (installation, discharge, abrogation) keeps the organ alive.
+                // Every surviving reference (installation, discharge, abrogation) keeps the organ in existence.
                 $this->assertNone(
                     $this->findDependents(
                         FoundationReferenceModel::class,
@@ -529,8 +530,8 @@ class Annulment
 
             case $subDecision instanceof ReappointmentModel:
                 // Reappointments run until a meeting decides otherwise, and annulling one shortens a term without
-                // saying when it ended. The register cannot invent the discharge that would say so, so this is
-                // pointed out rather than refused; whoever enters the annulment can follow it with a discharge if one
+                // saying when it ended. The register cannot create the discharge that would record this, so this is
+                // reported rather than refused; whoever enters the annulment can follow it with a discharge if one
                 // is needed.
                 $installation = $subDecision->installation;
                 $warnings = [
@@ -739,7 +740,7 @@ class Annulment
     /**
      * Find every subdecision that concerns the same entity as the given subdecision.
      *
-     * Where {@see self::findDependents()} looks only at what builds directly on a subdecision, this walks the whole
+     * Where {@see self::findDependents()} looks only at what builds directly on a subdecision, this covers the whole
      * entity it belongs to: the organ, the board membership, or the key code. Founding and abolishing an organ affect
      * all of its members at once, so for those the entity is the organ as a whole; an installation only concerns the
      * one membership.
@@ -890,7 +891,7 @@ class Annulment
     /**
      * Whether the given decision has been annulled.
      *
-     * Looked up rather than read off the inverse side, so that an annulment made earlier in this same request counts
+     * Looked up rather than read from the inverse side, so that an annulment made earlier in this same request counts
      * as well.
      */
     private function isAnnulled(DecisionModel $decision): bool

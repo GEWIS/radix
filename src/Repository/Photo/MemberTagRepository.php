@@ -32,7 +32,7 @@ class MemberTagRepository extends ServiceEntityRepository
     /**
      * Whether the member is tagged in any photo anywhere in the album's subtree (the album itself or any descendant).
      * This is the recursive form the graduate-subtree fix requires: a graduate tagged in a sub-album may view the
-     * parent album, not only the album that directly holds the photo they are in.
+     * parent album, not only the album that directly contains the photo they are in.
      */
     public function isTaggedInAlbumTree(
         int $albumId,
@@ -78,8 +78,8 @@ class MemberTagRepository extends ServiceEntityRepository
     }
 
     /**
-     * Which of the given photo ids the member is tagged in, as a set for O(1) lookup — one query for a whole
-     * selection instead of a {@see self::findTag} per photo.
+     * Which of the given photo ids the member is tagged in, as a set for O(1) lookup: one query for a whole selection
+     * instead of a {@see self::findTag} per photo.
      *
      * @param int[] $photoIds
      *
@@ -193,9 +193,9 @@ class MemberTagRepository extends ServiceEntityRepository
     }
 
     /**
-     * The newest photo each of these members is tagged in, at most one per member. A member nobody has ever tagged
-     * simply does not appear, which is what lets the birthday panel rotate between the members it can show rather
-     * than showing the same one all day.
+     * The newest photo each of these members is tagged in, at most one per member. A member who has never been tagged
+     * simply does not appear, which is what lets the birthday panel rotate between the members it can show rather than
+     * showing the same one all day.
      *
      * @param Member[] $members
      *

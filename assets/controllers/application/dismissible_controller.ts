@@ -4,7 +4,7 @@ const KEY = 'gewis:dismissed-announcements';
 
 /**
  * Banners arrive hidden and are shown here once they are known not to have been dismissed. The other way around
- * meant a banner somebody had already closed was painted and then taken away again.
+ * meant a banner the user had already closed was rendered and then removed again.
  */
 export default class extends Controller<HTMLElement> {
     static targets = ['banner'];

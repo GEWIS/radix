@@ -60,7 +60,7 @@ final readonly class ActivityProposalManager
     }
 
     /**
-     * Take the proposal back off the calendar's queue, at the body's own request.
+     * Withdraw the proposal from the calendar's queue, at the body's own request.
      */
     public function withdraw(ActivityProposal $proposal): void
     {
@@ -73,7 +73,7 @@ final readonly class ActivityProposalManager
     }
 
     /**
-     * Give the proposal one of the days it asked for. Who decided and when is part of the decision rather than a note
+     * Give the proposal one of the days it requested. Who decided and when is part of the decision rather than a note
      * added to it afterwards, so it commits with the transition.
      */
     public function schedule(
@@ -129,7 +129,7 @@ final readonly class ActivityProposalManager
             'clear_budget',
         );
 
-        // After the transition, so the listener that clears the stamp on the way out of `scheduled` cannot undo it.
+        // After the transition, so the listener that clears the timestamp on leaving `scheduled` cannot undo it.
         $proposal->budgetClearance = $outcome;
         $proposal->budgetClearedBy = $clearedBy;
         $proposal->budgetClearedAt = new DateTimeImmutable();
@@ -150,13 +150,13 @@ final readonly class ActivityProposalManager
     /**
      * Store a proposal, refusing it when the body ran out of room while the form was being filled in.
      *
-     * @throws ProposalAllowanceExhausted when somebody else took the last slot in the meantime.
+     * @throws ProposalAllowanceExhausted when another member of the body took the last slot in the meantime.
      */
     public function create(ActivityProposal $proposal): void
     {
         $organ = $proposal->organ;
 
-        // The board hosts its own activities and is held to no allowance, so there is nothing to serialise against.
+        // The board hosts its own activities and no allowance applies to it, so there is nothing to serialise against.
         if (null === $organ) {
             $this->entityManager->persist($proposal);
             $this->entityManager->flush();
@@ -179,7 +179,7 @@ final readonly class ActivityProposalManager
             ],
         )->fetchOne();
 
-        // GET_LOCK() answers 1 when granted, 0 when the wait timed out and NULL on error. Never fall through
+        // GET_LOCK() returns 1 when granted, 0 when the wait timed out and NULL on error. Never fall through
         // unguarded: without the mutex the re-count below is exactly the race it exists to close.
         if (null === $granted) {
             throw new RuntimeException(sprintf(
@@ -218,8 +218,8 @@ final readonly class ActivityProposalManager
     }
 
     /**
-     * A proposal nobody is told about sits in a queue nobody opens, which is how the old calendar ended up needing a
-     * nightly email to the web committee to notice anything at all.
+     * A proposal nobody is notified about stays in a queue nobody opens, which is how the old calendar ended up needing
+     * a nightly email to the web committee to notice anything at all.
      */
     private function tellTheBoard(ActivityProposal $proposal): void
     {

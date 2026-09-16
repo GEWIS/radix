@@ -71,7 +71,7 @@ class MailHostResolverTest extends TestCase
     }
 
     /**
-     * A check that cannot be performed refuses rather than waves the address through, or it would stop being a check
+     * A check that cannot be performed refuses rather than accepting the address, or it would stop being a check
      * exactly when something is wrong. The outage is logged, because otherwise it reads as a run of visitors who all
      * typed their address wrong.
      */
@@ -91,7 +91,7 @@ class MailHostResolverTest extends TestCase
     }
 
     /**
-     * A domain that simply is not there is not an outage, and saying so on every typo would drown the log.
+     * A domain that simply is not there is not an outage, and logging a warning on every typo would fill the log.
      */
     public function testDoesNotReportADomainThatDoesNotExistAsAFailure(): void
     {

@@ -109,8 +109,8 @@ class MeetingRepository extends ServiceEntityRepository
     }
 
     /**
-     * The meetings a search prompt addresses: the one it names, or every meeting carrying that number when the prompt
-     * left the type out.
+     * The meetings a search prompt addresses: the one it names, or every meeting with that number when the prompt left
+     * the type out.
      *
      * @return Meeting[]
      */
@@ -492,7 +492,7 @@ class MeetingRepository extends ServiceEntityRepository
     /**
      * Scalar rows for the nearby-meetings sidebar: ideally two meetings after and two before the given one (of the
      * same type), either side filling in for the other when it runs short, newest first. Deliberately not entity
-     * hydration; the sidebar only links, and entities drag their one-to-one sides along.
+     * hydration; the sidebar only links, and entities load their one-to-one sides with them.
      *
      * @return list<array{type: MeetingTypes, number: int, date: DateTimeImmutable}>
      */

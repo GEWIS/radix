@@ -12,7 +12,7 @@ use function preg_match;
 /**
  * Builds the serving URL for an image variant, signing it when the namespace is private. Used both by the Twig
  * `image_url`/`image_srcset` helpers and by services that build image URLs in PHP (such as the photo album manifest),
- * so the URL shape and signing live in one place.
+ * so the URL shape and signing are defined in one place.
  */
 final readonly class ImageUrlBuilder
 {
@@ -26,7 +26,7 @@ final readonly class ImageUrlBuilder
 
     /**
      * Whether a URL addresses this pipeline: the shape {@see self::url()} produces, with at least something after the
-     * variant. The custom-page sanitizer keeps an image only when this says so.
+     * variant. The custom-page sanitizer keeps an image only when this returns true.
      */
     public function isPipelineUrl(string $url): bool
     {

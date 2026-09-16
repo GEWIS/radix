@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 /**
- * Caddy is serving and the application behind it is healthy. Both are asked, because the admin API answers whether
- * or not PHP can serve, and /health answers whether or not Caddy is still listening on the port the proxy uses.
+ * Caddy is serving and the application behind it is healthy. Both are checked, because the admin API responds whether
+ * or not PHP can serve, and /health responds whether or not Caddy is still listening on the port the proxy uses.
  *
- * /health is asked over 127.0.0.1 with the Host header the site block answers to, so a probe needs no DNS.
+ * /health is requested over 127.0.0.1 with the Host header the site block matches, so a probe needs no DNS.
  */
 
 $get = static function (string $url, int $timeout, array $header = []): string|false {

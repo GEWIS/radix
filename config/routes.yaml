@@ -1,6 +1,6 @@
-# The website's own pages. The register answers under the administration's prefix but with the locale as a path
-# segment, and the API and the anonymous sign-up flow under no prefix at all, so those controllers are excluded here
-# and imported below; leaving them in would give every one of their routes a second, wrong address as well.
+# The website's own pages. The register is served under the administration's prefix but with the locale as a path
+# segment, and the API and the anonymous sign-up flow under no prefix at all, so those controllers are excluded here and
+# imported below; leaving them in would give every one of their routes a second, wrong address as well.
 localised_routes:
     resource: '../src/Controller/'
     exclude:
@@ -17,24 +17,24 @@ localised_routes:
     requirements:
         _locale: 'en|nl'
 
-# The member register, which is part of the administration and answers under /{_locale}/admin with the rest of it.
+# The member register, which is part of the administration and is served under /{_locale}/admin with the rest of it.
 #
 # The locale is a path segment here rather than the per-locale prefix map above. A prefix map splits every route it
 # touches into `<name>.<locale>`, and the register is linked to, redirected to and named in security.yaml by a single
 # name per address throughout. Sharing a prefix with the routes above is not a conflict: two imports may contribute
 # routes under one path as long as no two of them claim the same path and method.
 #
-# The handful of addresses further down that have to keep answering without a prefix belong to these same controllers,
-# but carry no `#[Route]` of their own: an attribute here would be swallowed by the prefix, so those actions are given
-# their paths in this file instead.
+# The handful of addresses further down that have to remain available without a prefix belong to these same controllers,
+# but have no `#[Route]` of their own: an attribute here would be given the prefix, so those actions are given their
+# paths in this file instead.
 database_routes:
     resource: '../src/Controller/Database/'
     # The checkout return and webhook addresses are Stripe's, not ours to move; they are imported unprefixed below.
     exclude: '../src/Controller/Database/CheckoutController.php'
     type: attribute
     prefix: '/{_locale}/admin'
-    # A URL built outside a request — an e-mail sent from a console command or a message handler — has no locale in
-    # the router context to fill the segment with, and one language is a better answer than a failure.
+    # A URL built outside a request (an e-mail sent from a console command or a message handler) has no locale in the
+    # router context to fill the segment with, and one language is better than a failure.
     defaults:
         _locale: '%kernel.default_locale%'
     requirements:
@@ -60,7 +60,7 @@ database_query_routes:
     requirements:
         _locale: '%app.locales%'
 
-# The bearer tokens the API below is read with, and who holds them.
+# The bearer tokens the API below is read with, and who they belong to.
 database_api_principal_routes:
     resource: '../src/Controller/User/ApiPrincipalController.php'
     type: attribute
@@ -70,7 +70,7 @@ database_api_principal_routes:
     requirements:
         _locale: '%app.locales%'
 
-# What the container healthcheck asks. No language in the address, and no firewall in front of it.
+# What the container healthcheck requests. No language in the address, and no firewall in front of it.
 health_routes:
     resource: '../src/Controller/Application/HealthController.php'
     type: attribute
@@ -80,9 +80,9 @@ health_routes:
 # these endpoints out of that firewall and put them behind the login form instead.
 #
 # Order matters below this line. API Platform's resources come from config/routes/api_platform.yaml, which is loaded
-# before this file, so they always answer first. Everything imported here is matched in the order it is imported, and
-# `api_routes` ends in a catch-all that turns an unknown /api path into `error-router-no-match` — so it has to be
-# imported last, or it swallows the ones after it.
+# before this file, so they are always matched first. Everything imported here is matched in the order it is imported,
+# and `api_routes` ends in a catch-all that turns an unknown /api path into `error-router-no-match`, so it has to be
+# imported last, or it prevents the ones after it from being matched.
 
 # Outside `/api`: a browser cannot send an Authorization header on the first navigation.
 api_documentation:
@@ -102,14 +102,15 @@ api_routes:
     resource: '../src/Controller/Report/ApiController.php'
     type: attribute
 
-# Where someone is returned to after paying, and where Stripe reports the payment. The pages carry their language like
-# every other page; the webhook does not, because nobody reads it and its address is configured in Stripe's dashboard.
+# Where a visitor is returned to after paying, and where Stripe reports the payment. The pages include their
+# language like every other page; the webhook does not, because no user reads it and its address is
+# configured in Stripe's dashboard.
 join_checkout_routes:
     resource: '../src/Controller/Database/CheckoutController.php'
     type: attribute
 
-# Where those pages used to answer, in both spellings: the sign-up host exposes the short one and rewrites it onto the
-# long one, and a return address travels with a checkout session that may already be open.
+# Where those pages used to be served, in both spellings: the sign-up host exposes the short one and rewrites it onto
+# the long one, and a return address is stored in a checkout session that may already be open.
 join_checkout_completed_legacy_short:
     path: /checkout/completed
     controller: App\Controller\Application\LocaleRedirectController
@@ -170,8 +171,8 @@ join_checkout_restart_legacy:
         token: '[a-zA-Z0-9_\-\+]+'
     methods: [GET]
 
-# The rest of the anonymous flows. Each is a page somebody reads, so each carries its language; the addresses they
-# used to answer at are kept below, because they are on posters and in mailboxes and we do not get to move them.
+# The rest of the anonymous flows. Each is a page a visitor reads, so each includes its language; the addresses they
+# used to be served at are kept below, because they are on posters and in mailboxes and we do not get to move them.
 join_index:
     path: '/{_locale}/join'
     controller: App\Controller\Database\ProspectiveMemberController::subscribe
@@ -179,15 +180,15 @@ join_index:
         _locale: '%app.locales%'
     methods: [GET, POST]
 
-# The address on the posters and behind gew.is/join, which carries no language: it sends the visitor into whichever
-# one they are already reading the site in.
+# The address on the posters and behind gew.is/join, which contains no language: it sends the visitor into whichever one
+# they are already reading the site in.
 join_index_short:
     path: /join
     controller: App\Controller\Database\ProspectiveMemberController::subscribeUnlocalised
     methods: [GET]
 
-# Where signing up used to answer, kept because it is printed on posters and sits in mailboxes. GET only: a redirect in
-# answer to a POST is not something every client replays as a POST, and nothing submits to this address any more.
+# Where signing up used to be served, kept because it is printed on posters and is in mailboxes. GET only: a redirect in
+# response to a POST is not something every client replays as a POST, and nothing submits to this address any more.
 join_subscribe_legacy:
     path: /member/subscribe
     controller: App\Controller\Application\LocaleRedirectController
@@ -196,7 +197,7 @@ join_subscribe_legacy:
     methods: [GET]
 
 # The renewal form, which is reached from a link in an e-mail. That e-mail is written in English and says so in its
-# address; a link sent before the language moved into the path is answered below.
+# address; a link sent before the language moved into the path is handled below.
 join_renew:
     path: '/{_locale}/renew/{token}'
     controller: App\Controller\Database\ProspectiveMemberController::renew
@@ -207,7 +208,7 @@ join_renew:
         _locale: '%kernel.default_locale%'
     methods: [GET, POST]
 
-# GET only, for the same reason as the sign-up address above: the form submits to the address the page answers at.
+# GET only, for the same reason as the sign-up address above: the form submits to the address the page is served at.
 join_renew_legacy_short:
     path: /renew/{token}
     controller: App\Controller\Application\LocaleRedirectController
@@ -226,8 +227,8 @@ join_renew_legacy:
         token: '[a-zA-Z0-9_\-\+]+'
     methods: [GET]
 
-# Where a member consents to an external application signing them in. Declared above page_route, which would
-# otherwise read `/en/user/token` as a page that does not exist.
+# Where a member consents to an external application signing them in. Declared above page_route, which would otherwise
+# match `/en/user/token` as a page that does not exist.
 user_token:
     path: '/{_locale}/user/token/{app}'
     controller: App\Controller\User\UserController::token
@@ -237,8 +238,8 @@ user_token:
     defaults:
         _locale: '%kernel.default_locale%'
 
-# Image serving is defined here (not as a controller attribute) so it is NOT locale-prefixed (image URLs are assets,
-# not pages), and so its slash-bearing {path} is matched before the localised page_route below could grab it.
+# Image serving is defined here (not as a controller attribute) so it is NOT locale-prefixed (image URLs are assets, not
+# pages), and so its slash-bearing {path} is matched before the localised page_route below could match it.
 image_serve:
     path: /img/{variant}/{path}
     controller: App\Controller\Application\ImageController::serve
@@ -250,14 +251,14 @@ image_serve:
 # that it does not "steal" the route from any other attribute-defined route.
 # And without the priority everything will land in the catch_all route below.
 #
-# It is also why everything above is above it: its first segment is a variable with no requirement on it, so it reads
+# It is also why everything above is above it: its first segment is a variable with no requirement on it, so it matches
 # /join and /en/admin/members alike as a page that does not exist.
 page_route:
     path: /{_locale}/{category}/{subCategory}/{name}
     controller: App\Controller\Frontpage\PageController::index
     # A segment that does not read as a slug is not a page here, and falls through to the catch-all below. Deliberately
-    # not the bounded rule the page form holds a new address to: how long an address may be is a rule about writing one,
-    # and a page that was published before it existed still has to answer.
+    # not the bounded rule the page form applies to a new address: how long an address may be is a rule about writing
+    # one, and a page that was published before it existed still has to be served.
     requirements:
         category: !php/const App\Util\Application\SlugRule::ROUTE_REQUIREMENT
         subCategory: !php/const App\Util\Application\SlugRule::ROUTE_REQUIREMENT
@@ -266,7 +267,7 @@ page_route:
         subCategory: null
         name: null
 
-# Where that page used to answer, kept because an external application is configured with the address.
+# Where that page used to be served, kept because an external application is configured with the address.
 user_token_legacy:
     path: /user/token/{app}
     controller: App\Controller\Application\LocaleRedirectController

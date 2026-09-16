@@ -172,7 +172,7 @@ class SubDecisionService
                 $organ?->removeSubdecision($subDecision);
 
                 if (null !== $organ) {
-                    // Abolishing the organ discharged whoever was still in it, so those discharges go as well.
+                    // Abolishing the organ discharged the members still in it, so those discharges go as well.
                     foreach ($organ->getMembers() as $organMember) {
                         $discharge = $organMember->installation->discharge;
                         $organMember->dischargeDate = $discharge?->decision->meeting->date;
@@ -205,7 +205,7 @@ class SubDecisionService
                 $organ = $this->findFoundedOrgan($installation);
                 $organ?->removeSubdecision($subDecision);
 
-                // An abolished organ discharges whoever is left in it, so that date must survive the revert.
+                // An abolished organ discharges the members left in it, so that date must survive the revert.
                 $organMember = $this->findOrganMember($installation);
 
                 if (null !== $organMember) {
@@ -228,9 +228,9 @@ class SubDecisionService
      * Whether the subdecision still has the subdecision, or decision, that it points at.
      *
      * A subdecision that turned out to be wrong is put right by replacing it with one of another kind, and the
-     * projection can be left holding the old one without what it pointed at. Doctrine leaves a typed property without
-     * a default uninitialised when the columns behind it are empty, so such a subdecision cannot simply be asked for
-     * it. A subdecision that points at nothing to begin with has nothing to be missing, and so always says yes.
+     * projection can be left with the old one without what it pointed at. Doctrine leaves a typed property without a
+     * default uninitialised when the columns behind it are empty, so such a property cannot simply be read. A
+     * subdecision that points at nothing to begin with has nothing to be missing, and so always returns true.
      */
     public function stillReferences(SubDecision $subDecision): bool
     {
@@ -283,12 +283,12 @@ class SubDecisionService
      * Take the subdecision out of every body that lists it among the decisions it was shaped by.
      *
      * Reverting already does that for the body a subdecision was about, but a subdecision that is about to be deleted
-     * has to be let go of by any body at all, including one it can no longer point back to.
+     * has to be removed from any body at all, including one it can no longer point back to.
      */
     public function detachFromOrgans(SubDecision $subDecision): void
     {
         // A subdecision is identified by the decision it belongs to and its place in it, and a composite identity
-        // like that cannot be handed to a query as one value, so it goes in field by field.
+        // like that cannot be passed to a query as one value, so it goes in field by field.
         $organs = $this->emReport->getRepository(Organ::class)
             ->createQueryBuilder('o')
             ->innerJoin(

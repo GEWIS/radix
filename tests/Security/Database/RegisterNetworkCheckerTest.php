@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Where the register may be read and changed from. This decides whether the office somebody holds counts at all, so
- * what an unconfigured list and an unestablished address mean are pinned here.
+ * Where the register may be read and changed from. This decides whether the function a member has counts at all,
+ * so what an unconfigured list and an unestablished address mean are pinned here.
  */
 final class RegisterNetworkCheckerTest extends TestCase
 {
@@ -55,7 +55,7 @@ final class RegisterNetworkCheckerTest extends TestCase
         self::assertFalse($this->checker()->matches('131.155.69.1'));
     }
 
-    /** Refusing is the safe answer here, unlike the campus check, where it would merely grant nothing extra. */
+    /** Refusing is the safe default here, unlike the campus check, where it would merely grant nothing extra. */
     public function testAnAddressThatCannotBeEstablishedMayNot(): void
     {
         self::assertFalse($this->checker()->matches(null));
@@ -63,7 +63,7 @@ final class RegisterNetworkCheckerTest extends TestCase
         self::assertFalse($this->checker()->matches('not an address'));
     }
 
-    /** A proxy's address arrives when the forwarded chain is missing, and it stands on the opened networks. */
+    /** A proxy's address arrives when the forwarded chain is missing, and it is on the opened networks. */
     public function testATrustedProxyMayNeverReachTheRegister(): void
     {
         Request::setTrustedProxies(

@@ -145,7 +145,7 @@ final class RevisionAuditListenerTest extends DatabaseTestCase
         $editor = $this->anEditor();
         $before = $this->auditCount($revision);
 
-        // In-place edits only happen on a Draft; a later flush carrying a stale editor must not append a phantom row.
+        // In-place edits only happen on a Draft; a later flush with a stale editor must not append a phantom row.
         $revision->setStatus(RevisionStatus::Submitted);
         $revision->requireGEFLITST = !$revision->requireGEFLITST;
         $revision->setLastEditedBy($editor);

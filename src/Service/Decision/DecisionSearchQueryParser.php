@@ -102,7 +102,7 @@ final class DecisionSearchQueryParser
                         PREG_UNMATCHED_AS_NULL,
                     )
                 ) {
-                    // The type is left to `type:`, so that neither operator says what the other one says.
+                    // The type is left to `type:`, so that the two operators do not set the same field.
                     $meeting = new MeetingReference(
                         null,
                         (int) $meetingMatch[1],
@@ -128,8 +128,8 @@ final class DecisionSearchQueryParser
             $remainderParts,
         ));
 
-        // "type:bm 1" is board meeting 1, not every meeting numbered 1. A reference that names a type of its own says
-        // which meeting it means and keeps it.
+        // "type:bm 1" is board meeting 1, not every meeting numbered 1. A reference that names a type of its own
+        // already determines which meeting it refers to, and that type is kept.
         if (
             null !== $reference
             && null === $reference->type

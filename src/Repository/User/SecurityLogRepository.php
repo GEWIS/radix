@@ -128,7 +128,7 @@ class SecurityLogRepository extends ServiceEntityRepository
 
         $search = trim($search);
         if ('' !== $search) {
-            // The account, whoever acted on it, and the address it came from: the three things somebody already
+            // The account, the actor, and the address it came from: the three things an administrator already
             // knows when they open this page.
             $qb->andWhere(
                 $qb->expr()->orX(
@@ -152,8 +152,8 @@ class SecurityLogRepository extends ServiceEntityRepository
             );
         }
 
-        // A category is a set of event types; resolving it here keeps the column a plain string the index can answer
-        // on, rather than something the database has to classify per row.
+        // A category is a set of event types; resolving it here keeps the column a plain string the index covers,
+        // rather than something the database has to classify per row.
         $selected = [] !== $events
             ? $events
             : (null !== $category ? self::eventsIn($category) : []);
@@ -217,7 +217,7 @@ class SecurityLogRepository extends ServiceEntityRepository
 
     /**
      * Forget an account's history outright, for a member whose account is removed. The rows that named them as the
-     * actor rather than the subject are kept: they belong to whoever the action was done to, who is still entitled
+     * actor rather than the subject are kept: they belong to the member the action was done to, who is still entitled
      * to know it happened.
      */
     public function deleteAllForUser(string $userIdentifier): int

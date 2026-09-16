@@ -22,7 +22,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 {
     private const string BASE_URI = 'https://pwned-passwords.example/api/';
 
-    /** What the service answers the next time it is asked. */
+    /** What the service returns the next time it is called. */
     private MockResponse $response;
 
     /** @var list<string> */
@@ -81,7 +81,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * The whole hash, in capitals: the service answers for neither a prefix nor lower case.
+     * The whole hash, in capitals: the service accepts neither a prefix nor lower case.
      */
     public function testAsksAboutTheWholeHashInCapitals(): void
     {
@@ -126,7 +126,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * A service that cannot be reached is no reason to hand somebody an account with a breached password on it, so
+     * A service that cannot be reached is no reason to give somebody an account with a breached password on it, so
      * the lookup failing refuses the password rather than letting it through.
      */
     public function testLetsALookupThatFailedThrough(): void

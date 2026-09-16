@@ -1,4 +1,4 @@
-{# `reports` holds one entry per checked meeting -- `{'meeting': ..., 'errors': [...]}`.
+{# `reports` contains one entry per checked meeting: `{'meeting': ..., 'errors': [...]}`.
 
    The heading names the meeting type as well as the number because numbering restarts per type. A `.txt.twig`
    template is not escaped, so every line arrives as `App\ViewModel\Checker\Error::asText()` wrote it. #}

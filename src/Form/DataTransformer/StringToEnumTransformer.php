@@ -12,7 +12,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use function sprintf;
 
 /**
- * Maps a hidden or select field carrying a backed enum value onto the enum itself.
+ * Maps a hidden or select field containing a backed enum value onto the enum itself.
  *
  * Rejecting an empty or unknown value here rather than letting it through as `null` keeps the field from writing
  * `null` into a non-nullable enum property while the form is being mapped, which happens before validation runs.

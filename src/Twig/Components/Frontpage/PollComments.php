@@ -62,7 +62,7 @@ final class PollComments
     #[LiveProp(writable: true)]
     public string $content = '';
 
-    /** The comment the reader is answering, or null while they are not answering one. */
+    /** The comment the reader is replying to, or null while they are not replying to one. */
     #[LiveProp(writable: true)]
     public ?int $replyTo = null;
 
@@ -241,8 +241,8 @@ final class PollComments
     }
 
     /**
-     * The comment boxes are editors the re-render is told to leave alone, so emptying the property behind one does
-     * not empty the box. This says so out loud and the editor clears itself.
+     * The comment boxes are editors the re-render leaves alone, so emptying the property behind one does not empty the
+     * box. This dispatches a browser event instead and the editor clears itself.
      */
     private function clearEditors(): void
     {
@@ -268,7 +268,7 @@ final class PollComments
     }
 
     /**
-     * Anything that is not this poll's comment is somebody reaching into another poll's thread through this one.
+     * Anything that is not this poll's comment is a member reaching into another poll's thread through this one.
      */
     private function find(int $comment): PollComment
     {

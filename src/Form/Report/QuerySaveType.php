@@ -19,7 +19,7 @@ use function Symfony\Component\Translation\t;
 /**
  * Form for storing a query under a name, on top of the query itself.
  *
- * The form yields an array; turning that into a `SavedQuery` (looking up an existing query by name, or creating a new
+ * The form returns an array; turning that into a `SavedQuery` (looking up an existing query by name, or creating a new
  * one) is done by `App\Service\Report\QueryService::save()`.
  */
 class QuerySaveType extends AbstractType

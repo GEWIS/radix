@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {# The editor draws itself with this; without it the toolbar and the editing area render unstyled. #}
+    {# The editor needs this stylesheet; without it the toolbar and the editing area render unstyled. #}
     <link rel="stylesheet" href="{{ asset('styles/ckeditor5/ckeditor5.css') }}">
 {% endblock %}
 

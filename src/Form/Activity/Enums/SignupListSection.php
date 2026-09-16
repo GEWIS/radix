@@ -32,7 +32,7 @@ enum SignupListSection: string implements TranslatableInterface
     }
 
     /**
-     * The one address a list's section has, as the step the form edits it on and the section the review shows it in.
+     * The one key a list's section has, as the step the form edits it on and the section the review shows it in.
      */
     public function keyFor(SignupList $list): string
     {
@@ -44,8 +44,8 @@ enum SignupListSection: string implements TranslatableInterface
     }
 
     /**
-     * Whether the section has been answered, which is the same question the form asks when the section is handed
-     * in: a name in every language the activity is written in, and a window.
+     * Whether the section has been answered, which is the same question the form asks when the section is submitted: a
+     * name in every language the activity is written in, and a window.
      *
      * @param list<Languages> $languages
      */

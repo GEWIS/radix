@@ -95,9 +95,9 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * The ids of the public companies matching the overview's search box. The order is pinned rather than left to
-     * the database: the overview seeds a shuffle over this list and pages through it, which only holds together if the
-     * same seed always meets the same list.
+     * The ids of the public companies matching the overview's search box. The order is pinned rather than left to the
+     * database: the overview seeds a shuffle over this list and pages through it, which only works if the same seed is
+     * always applied to the same list.
      *
      * @return int[]
      */
@@ -127,7 +127,7 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * Hydrate the given companies, in the order they are asked for. Ids that no longer resolve to a company are
+     * Hydrate the given companies, in the order they are requested. Ids that no longer resolve to a company are
      * left out.
      *
      * @param int[] $ids
@@ -167,7 +167,7 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many companies the public overview would list, for the count the navigation menu carries. The same three
+     * How many companies the public overview would list, for the count the navigation menu shows. The same three
      * conditions as {@see self::findAllPublic()}, counted rather than hydrated, since the menu is on every page.
      */
     public function countPublic(): int
@@ -234,12 +234,12 @@ class CompanyRepository extends ServiceEntityRepository
      *
      * The overview reads each company's live revision and its localised texts (slogan, description, website), the
      * places it can be followed, plus the active vacancies grouped per package. Since every {@see CareerLocalisedText}
-     * lives in its own row, lazy loading them is the dominant source of the N+1 explosion. Three fetch-joining queries
-     * warm the identity map instead: one for the companies (a single to-many join on the packages), one for the social
-     * links (a second to-many join, which in the same query would multiply the rows by the packages), and one for the
-     * vacancies (whose collection lives on the {@see CompanyJobPackage} subclass and so cannot be joined through the
-     * base package in the same query). The results are discarded; hydrating them populates the associations on the
-     * managed instances passed in.
+     * is stored in its own row, lazy loading them is the dominant source of the N+1 explosion. Three fetch-joining
+     * queries warm the identity map instead: one for the companies (a single to-many join on the packages), one for the
+     * social links (a second to-many join, which in the same query would multiply the rows by the packages), and one
+     * for the vacancies (whose collection is defined on the {@see CompanyJobPackage} subclass and so cannot be joined
+     * through the base package in the same query). The results are discarded; hydrating them populates the associations
+     * on the managed instances passed in.
      *
      * @param Company[] $companies
      */
@@ -381,7 +381,7 @@ class CompanyRepository extends ServiceEntityRepository
         int $pageSize,
     ): Paginator {
         // The row shows the state of the working head and counts the packages, and whether a company is shown at all
-        // is worked out from those packages too, so both come along rather than being fetched once per row.
+        // is computed from those packages too, so both are fetched in the same query rather than once per row.
         $qb = $this->createQueryBuilder('c')
             ->addSelect(
                 'cr',

@@ -15,9 +15,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * The ledger's central rule, against a real database: a decision may be annulled only while it is still the last word
- * on what it decided about. Every entity family has its own idea of what "built on" means, which is why each is
- * checked here rather than one standing in for the rest.
+ * The ledger's central rule, against a real database: a decision may be annulled only while it is still the last
+ * decision about what it decided. Every entity family has its own idea of what "built on" means, which is why each
+ * is checked here rather than only one of them.
  *
  * Every write is rolled back by dama/doctrine-test-bundle, so the seed these decisions are added to survives the run.
  */
@@ -49,7 +49,7 @@ class AnnulmentTest extends KernelTestCase
     }
 
     /**
-     * The organ would go on existing through the people installed in it, which is not a state the register can hold.
+     * The organ would go on existing through the people installed in it, which is not a state the register allows.
      */
     public function testRefusesToAnnulTheFoundationOfAnOrganPeopleWereInstalledIn(): void
     {
@@ -152,7 +152,7 @@ class AnnulmentTest extends KernelTestCase
     }
 
     /**
-     * The withdrawal is the last word on that key code, so it is the one that can still be taken back.
+     * The withdrawal is the last decision about that key code, so it is the one that can still be annulled.
      */
     public function testAllowsAnnullingTheWithdrawalOfAKeyCode(): void
     {
@@ -186,8 +186,8 @@ class AnnulmentTest extends KernelTestCase
     }
 
     /**
-     * Annulling a reappointment shortens a term without saying when it ended, which the ledger cannot work out on
-     * its own. That is worth pointing out to whoever is entering it, and not worth refusing.
+     * Annulling a reappointment shortens a term without saying when it ended, which the ledger cannot determine on
+     * its own. That is worth reporting to the person entering it, and not worth refusing.
      */
     public function testPointsOutRatherThanRefusesWhatFollowedAReappointment(): void
     {
@@ -214,7 +214,7 @@ class AnnulmentTest extends KernelTestCase
     }
 
     /**
-     * Taking an annulment back restores exactly what it took away, so it holds to the same rule.
+     * Deleting an annulment restores exactly what it removed, so the same rule applies to it.
      */
     public function testAllowsDeletingAnAnnulmentNothingHappenedAfter(): void
     {
@@ -230,9 +230,9 @@ class AnnulmentTest extends KernelTestCase
     }
 
     /**
-     * Whatever was decided afterwards was decided in a world where the annulled decision did not exist; putting it
-     * back would silently invalidate that. Here the annulment says the member was never discharged, a later meeting
-     * discharges them for real, and restoring the first discharge would leave the installation ended twice.
+     * Whatever was decided afterwards was decided while the annulled decision did not exist; putting it back would
+     * silently invalidate that. Here the annulment says the member was never discharged, a later meeting discharges
+     * them for real, and restoring the first discharge would leave the installation ended twice.
      */
     public function testRefusesToDeleteAnAnnulmentTheInstallationWasDecidedAboutAfter(): void
     {

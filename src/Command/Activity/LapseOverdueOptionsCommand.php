@@ -33,14 +33,14 @@ use function sprintf;
 use function strval;
 
 /**
- * Releases a day whose holder never settled the financial side, so whoever is next in line can have it.
+ * Releases a day whose owner never settled the financial side, so the next body in line can have it.
  *
- * The rule the paper calendar had: a body that holds a day and does not get its budget in loses the day, rather than
- * sitting on it until it is too late for anybody else. The old site chased this with an email to the web committee and
- * left the releasing to a human, which is why the calendar filled up with claims nobody was going to use.
+ * The rule of the paper calendar: a body that has reserved a day and does not submit its budget loses the day, rather
+ * than keeping it until it is too late for anybody else. The old site chased this with an email to the web committee
+ * and left the releasing to a human, which is why the calendar filled up with claims nobody was going to use.
  *
  * A proposal the board has settled either way is never touched, and that includes one settled by the board saying
- * there is no budget to approve, because an activity that costs nothing has nothing to hand in.
+ * there is no budget to approve, because an activity that costs nothing has no budget to submit.
  */
 #[AsCommand(
     name: 'app:activity:lapse-overdue-options',
@@ -127,7 +127,7 @@ final class LapseOverdueOptionsCommand extends Command
             }
 
             // Nothing should refuse it at this point, but a domain guard added later might, and a sweep that stops
-            // dead on one row would leave the rest of the calendar clogged. Skip it and say so.
+            // on one row would leave the rest of the calendar unreleased. Skip it and log it.
             if (
                 !$this->activityProposalStateMachine->can(
                     $proposal,
@@ -171,8 +171,8 @@ final class LapseOverdueOptionsCommand extends Command
     }
 
     /**
-     * The officer of internal affairs keeps the calendar, so they are told once about the whole sweep rather than
-     * once per body. Each body's own member has already been told about theirs.
+     * The Internal Affairs Officer keeps the calendar, so they are notified once about the whole sweep rather than
+     * once per body. Each body's own member has already been notified about theirs.
      *
      * @param ActivityProposal[] $proposals
      */

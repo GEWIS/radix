@@ -15,9 +15,9 @@ use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
 
 /**
- * The automated-draw cron must draw exactly the lists whose own draw moment has passed -- close for
+ * The automated-draw cron must draw exactly the lists whose own draw moment has passed (close for
  * first-come-first-served and on-close draws, the configured cutoff for the other conditional rules, which
- * legitimately fire while sign-up is still open -- and nothing else: not-yet-due lists, lists outside the admission
+ * legitimately fire while sign-up is still open), and nothing else: not-yet-due lists, lists outside the admission
  * window and unverified externals are all left alone. A draw later than the announced moment must not change the
  * outcome: only those who were confirmed participants at the cutoff join the lottery, later sign-ups and later e-mail
  * confirmations continue the first-come-first-served fill in the order they became participants. Every scenario pins
@@ -211,7 +211,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     {
         // Participation order is inverted relative to id order: the two LAST sign-ups (by id) were there before the
         // cutoff, the two FIRST arrived after it. A draw running an hour late must lottery only the two from before
-        // the cutoff -- which exactly fill the two places -- never the later arrivals an execution-time (or id-order)
+        // the cutoff (which exactly fill the two places), never the later arrivals an execution-time (or id-order)
         // pool would have included.
         $ids = $this->signupIds(6);
         $this->pinSignupCreatedAt(
@@ -255,7 +255,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     {
         // One sign-up predates the cutoff and wins the lottery outright; the remaining place goes to the latecomer
         // who became a participant first (again inverted relative to id order), reproducing the first-come-first-served
-        // fill an on-time draw would have handed out afterwards.
+        // fill an on-time draw would have assigned afterwards.
         $ids = $this->signupIds(6);
         $this->pinSignupCreatedAt(
             $ids[1],
@@ -295,7 +295,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     public function testAnExternalConfirmedAfterTheCutoffFillsOnlyAfterEarlierParticipants(): void
     {
         // The external signed up before the cutoff but confirmed its e-mail only after it: confirmation is the moment
-        // it became a participant, so it queues behind the member who arrived half an hour ago -- an on-time draw
+        // it became a participant, so it queues behind the member who arrived half an hour ago. An on-time draw
         // followed by this confirmation would have produced exactly that.
         $external = $this->createConfirmedExternal(6);
         $externalId = (int) $external->id;
@@ -342,8 +342,8 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
     public function testAnExternalConfirmedAfterTheCutoffIsAdmittedWhenPlacesRemain(): void
     {
-        // With everyone admitted there is still a place left over, so the late-confirmed external gets it as the fill
-        // -- confirming after the cutoff postpones participation, it never forfeits it.
+        // With everyone admitted there is still a place left over, so the late-confirmed external gets it as the
+        // fill: confirming after the cutoff postpones participation, it never forfeits it.
         $external = $this->createConfirmedExternal(6);
         $externalId = (int) $external->id;
 
@@ -373,7 +373,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
 
     public function testAFirstComeFirstServedLateDrawAdmitsPreCloseSignupsFirst(): void
     {
-        // First-come-first-served draws at close in creation order -- but only among those from before the close. The
+        // First-come-first-served draws at close in creation order, but only among those from before the close. The
         // lowest-id sign-up postdates it (its list was reconfigured), so a late draw admits the two earliest sign-ups
         // from before the close instead of blindly taking the two lowest ids.
         $ids = $this->signupIds(11);
@@ -516,7 +516,7 @@ final class RunDueDrawsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * The member sign-up ids of a list, in id (arrival) order -- excluding externals, for scenarios that add their
+     * The member sign-up ids of a list, in id (arrival) order, excluding externals, for scenarios that add their
      * own external next to the seeded members.
      *
      * @return list<int>

@@ -109,8 +109,8 @@
                     {% elseif member.isPaymentSettled %}
                         {{ _self.approval(form, member) }}
                     {% else %}
-                        {# Approving someone who has not paid through the checkout means the fee was settled in cash,
-                           which is rare enough that the form stays folded away. #}
+                        {# Approving a prospective member who has not paid through the checkout means the fee
+                           was settled in cash, which is rare enough that the form stays folded away. #}
                         <div class="accordion" id="not-paid-accordion">
                             <div class="accordion-item">
                                 <h4 class="accordion-header">

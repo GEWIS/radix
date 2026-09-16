@@ -76,8 +76,8 @@ class ConsistentVacancyValidator extends ConstraintValidator
                 ->addViolation();
         }
 
-        // A vacancy is reached through its company and the category it sits in, so its slug only has to be free
-        // within that pair. No single index holds that shape, which is why the database does not settle it and this
+        // A vacancy is reached through its company and its category, so its slug only has to be free within that
+        // pair. No single index covers that combination, which is why the database does not enforce it and this
         // does.
         if (
             null === $value->slugName

@@ -14,8 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * The continuation of a body.
  *
  * A body that is continued carries on under the foundation it has had since it was established rather than being
- * founded again, which is why this refers to that foundation. Fraternities are the ones this is said of every year;
- * it is not restricted to them.
+ * founded again, which is why this refers to that foundation. This is recorded for fraternities every year; it is
+ * not restricted to them.
  */
 #[Entity(repositoryClass: ContinuationRepository::class)]
 class Continuation extends FoundationReference

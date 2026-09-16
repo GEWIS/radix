@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * One request per URL however many instances are on the page: the front page mounts the controller twice (its own
- * panel and the footer), and both write the same answer.
+ * panel and the footer), and both write the same result.
  */
 const requests = new Map<string, Promise<unknown>>();
 
@@ -19,9 +19,9 @@ function fetchInfimum(url: string): Promise<unknown> {
 }
 
 /**
- * The infimum is fetched here rather than rendered with the page because it comes from somebody else's server, and
- * the footer it sits in is on every page of this website. The rotation needs no connection of its own: the
- * application's single EventSource re-dispatches anything it does not handle as a `gewis:realtime:<type>` DOM event.
+ * The infimum is fetched here rather than rendered with the page because it comes from an external server, and the
+ * footer it is in is on every page of this website. The rotation needs no connection of its own: the application's
+ * single EventSource re-dispatches anything it does not handle as a `gewis:realtime:<type>` DOM event.
  *
  *   - the text:    data-infimum-target="quote"
  *   - the source:  data-infimum-url-value="<the infimum endpoint>"

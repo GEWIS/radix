@@ -11,8 +11,8 @@ use SortDirection;
 use function intval;
 
 /**
- * What "waiting for a reviewer" means, in one place: submitted, or already being looked at. Every revisable domain has
- * a queue built on it, and which statuses belong in one is a property of the workflow rather than of any single domain.
+ * What "waiting for a reviewer" means, in one place: submitted, or already in review. Every revisable domain has a
+ * queue built on it, and which statuses belong in one is a property of the workflow rather than of any single domain.
  *
  * A repository still writes its own selects and joins, because what a queue row needs in order to name its subject
  * differs per domain.
@@ -53,8 +53,8 @@ trait FindsRevisionsForReviewTrait
     }
 
     /**
-     * Longest waiting first, so nothing sits in a queue unanswered while later submissions are dealt with. By when it
-     * was submitted rather than by when it was written: a draft somebody spent a week on is not older than one
+     * Longest waiting first, so nothing stays in a queue unreviewed while later submissions are dealt with. By when it
+     * was submitted rather than by when it was written: a draft an author spent a week on is not older than one
      * submitted the day it was started.
      */
     protected function orderOldestFirst(

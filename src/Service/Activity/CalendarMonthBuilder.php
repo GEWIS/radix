@@ -19,16 +19,16 @@ use App\ViewModel\Activity\Calendar\CalendarMonth;
 use DateTimeImmutable;
 
 /**
- * Lays a month of the option calendar out: six weeks of days, each carrying what is already in the agenda and what
- * bodies are asking for.
+ * Lays a month of the option calendar out: six weeks of days, each with what is already in the agenda and what
+ * bodies have requested.
  *
- * Two queries and a cached agenda, whatever the month holds. Everything that touches the visible stretch is read once
- * and then spread across the days it covers, so something running from a Friday to a Sunday really is drawn on all
- * three days rather than only on the day it starts. That is what makes a week worth looking at: a body deciding
- * whether to ask for the Saturday needs to see the thing that started on the Friday.
+ * Two queries and a cached agenda, whatever the month contains. Everything that touches the visible stretch is read
+ * once and then spread across the days it covers, so something running from a Friday to a Sunday really is drawn on all
+ * three days rather than only on the day it starts. That is what makes a week worth looking at: a body deciding whether
+ * to request the Saturday needs to see the thing that started on the Friday.
  *
- * Rank is the order the bodies asked in, which is what first dibs means. It is worked out per day rather than stored,
- * because it changes the moment somebody withdraws, and it is never enforced anywhere: the board decides.
+ * Rank is the order the bodies requested in, which is what first dibs means. It is computed per day rather than stored,
+ * because it changes the moment a body withdraws, and it is never enforced anywhere: the board decides.
  */
 final readonly class CalendarMonthBuilder
 {
@@ -120,8 +120,8 @@ final readonly class CalendarMonthBuilder
             $organ,
         );
 
-        // Rank is per day and per body's turn in the queue, so it is counted while spreading rather than read off a
-        // column that would go stale the moment somebody withdrew.
+        // Rank is per day and per body's turn in the queue, so it is counted while spreading rather than read from a
+        // column that would go stale the moment a body withdrew.
         $rankPerDay = [];
         $byDay = [];
 
@@ -204,7 +204,7 @@ final readonly class CalendarMonthBuilder
 
     /**
      * What the association's own agenda has in this stretch, spread over the days it covers. Read from the copy the
-     * sync command keeps; nothing here ever waits on somebody else's server.
+     * sync command keeps; nothing here ever depends on an external server.
      *
      * @return array<string, CalendarEntry[]>
      */
@@ -259,7 +259,7 @@ final readonly class CalendarMonthBuilder
     }
 
     /**
-     * The days one option takes up that are on screen, each saying whether the run carries on past it.
+     * The days one option takes up that are on screen, each recording whether the run continues past it.
      *
      * @return array<string, array{continuesBefore: bool, continuesAfter: bool}>
      */

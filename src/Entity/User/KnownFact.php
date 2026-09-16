@@ -12,8 +12,8 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 
 /**
  * One thing sign-in recognition rests on, seen for one account on one firewall: a {@see KnownDevice}, a
- * {@see KnownNetwork} or a {@see KnownDeviceToken}. Nothing here decides whether somebody may sign in, only whether
- * they are told about it afterwards.
+ * {@see KnownNetwork} or a {@see KnownDeviceToken}. Nothing here decides whether a user may sign in, only whether
+ * they are notified about it afterwards.
  */
 #[MappedSuperclass]
 abstract class KnownFact

@@ -147,7 +147,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
 
     /**
      * The cookie recognises the browser itself, wherever it goes: a member on a network never seen before is not
-     * written to as long as the browser can present what it was handed at an earlier sign-in.
+     * written to as long as the browser can present what it was given at an earlier sign-in.
      */
     public function testAPresentedCookieIsRecognisedOnANetworkNeverSeenBefore(): void
     {
@@ -193,7 +193,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
     }
 
     /**
-     * A device nobody has signed in from for months is announced again, rather than waiting on the pruning job.
+     * A device no member has signed in from for months is announced again, rather than waiting on the pruning job.
      */
     public function testADeviceGoneStaleIsAnnouncedAgain(): void
     {
@@ -256,7 +256,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
 
     /**
      * On a new password, a second factor turned off, or every other session being signed out, nothing stays trusted,
-     * the cookies out in the world included.
+     * including the cookies already issued.
      */
     public function testForgettingLeavesNothingRecognised(): void
     {
@@ -388,7 +388,7 @@ final class KnownDeviceRegistryTest extends DatabaseTestCase
 
     /**
      * The value {@see KnownDeviceRegistry::recognise()} left to be set as the device cookie, as the browser would
-     * carry it to the next sign-in.
+     * send it at the next sign-in.
      */
     private function issuedCookieValue(Request $request): string
     {

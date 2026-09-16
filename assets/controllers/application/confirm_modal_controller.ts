@@ -3,7 +3,7 @@ import { getComponent } from '@symfony/ux-live-component';
 import type { Component } from '@symfony/ux-live-component';
 
 /**
- * The modal lives OUTSIDE the live component, so the component's re-render after the action never touches the modal
+ * The modal is OUTSIDE the live component, so the component's re-render after the action never touches the modal
  * or leaves an orphaned backdrop.
  *
  *   <button data-bs-toggle="modal" data-bs-target="#confirm-modal"
@@ -26,7 +26,7 @@ export default class extends Controller {
     declare readonly hasConfirmTarget: boolean;
     declare readonly confirmTarget: HTMLElement;
 
-    // Held in one field so an armed action always comes with the component lookup to run it on.
+    // Kept in one field so an armed action always comes with the component lookup to run it on.
     private _pending: {
         action: string;
         args: Record<string, unknown>;
@@ -54,8 +54,9 @@ export default class extends Controller {
         }
 
         // getComponent() does a STRICT lookup keyed by the component's ROOT element, not a closest() from a descendant,
-        // so passing the trigger button never matches. Resolve the root at show-time while the trigger is still attached:
-        // a re-render between opening and confirming can detach it, and a detached node's closest() returns null.
+        // so passing the trigger button never matches. Resolve the root at show-time while the trigger is still
+        // attached: a re-render between opening and confirming can detach it, and a detached node's
+        // closest() returns null.
         // `.catch(() => null)` is attached eagerly so a cancelled modal never logs an unhandled rejection.
         const action = trigger.dataset.confirmLiveAction ?? null;
         const root = trigger.closest<HTMLElement>('[data-controller~="live"]');
@@ -99,7 +100,7 @@ export default class extends Controller {
     }
 
     private readonly _onConfirm = async (): Promise<void> => {
-        // The confirm button also carries data-bs-dismiss, so Bootstrap closes the modal; here we just run the action.
+        // The confirm button also has data-bs-dismiss, so Bootstrap closes the modal; here we just run the action.
         if (null === this._pending) {
             return;
         }

@@ -50,8 +50,8 @@ class SignupOptionType extends AbstractType
                 ],
             );
 
-        // Options are reorderable too (see the sortable Stimulus controller); carry the dragged order in a hidden
-        // input, transformed to/from the entity's int position like the field's own position.
+        // Options are reorderable too (see the sortable Stimulus controller); keep the dragged order in a hidden input,
+        // transformed to/from the entity's int position like the field's own position.
         $builder->add(
             'position',
             HiddenType::class,

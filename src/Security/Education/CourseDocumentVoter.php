@@ -59,7 +59,7 @@ final class CourseDocumentVoter extends Voter
 
     private function canDownload(CourseDocument $document): bool
     {
-        // Nothing to hand out until the document has been rasterized: a download is rebuilt from its pages.
+        // Nothing can be downloaded until the document has been rasterized: a download is rebuilt from its pages.
         if (!$document->isDownloadable()) {
             return false;
         }

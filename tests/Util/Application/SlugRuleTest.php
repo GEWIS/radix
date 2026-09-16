@@ -128,7 +128,7 @@ final class SlugRuleTest extends TestCase
     }
 
     /**
-     * Where the slug is the whole address, it is held between three and thirty-two characters as well.
+     * Where the slug is the whole address, it is limited to between three and thirty-two characters as well.
      */
     #[DataProvider('boundedSlugs')]
     public function testWhatCountsAsABoundedSlug(

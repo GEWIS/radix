@@ -96,7 +96,7 @@ final class MigrateSignupsOnApprovalListenerTest extends TestCase
 
     /**
      * A revision attached to the activity owning a single choice-field sign-up list on the given lineage, optionally
-     * already carrying one sign-up that answered that field's first option.
+     * already containing one sign-up that answered that field's first option.
      */
     private function revisionOn(
         Activity $activity,

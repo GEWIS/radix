@@ -16,9 +16,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use function Symfony\Component\Translation\t;
 
 /**
- * Unmapped: the controller stores the upload and puts the path on the revision. Asked for last rather than alongside
- * the name, so the file never has to be carried between requests. `has_*` says whether one is already on file, which
- * is what decides whether it is required.
+ * Unmapped: the controller stores the upload and puts the path on the revision. Collected last rather than alongside
+ * the name, so the file never has to be kept between requests. `has_*` records whether one is already on file, which is
+ * what decides whether it is required.
  *
  * @extends AbstractType<CompanyProfileData>
  */

@@ -64,7 +64,7 @@ class Course
     private Collection $documents;
 
     /**
-     * Courses that say they are similar to this course
+     * Courses that list this course as similar
      *
      * @var Collection<array-key, Course>
      */

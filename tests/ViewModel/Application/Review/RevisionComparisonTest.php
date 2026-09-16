@@ -23,7 +23,7 @@ use function array_values;
 
 /**
  * What the author of a revision is shown against what its reviewer is shown, and when a value counts as changed. Both
- * decide what a reader sees, and both were previously spread across four templates that had quietly drifted apart.
+ * decide what a reader sees, and both were previously spread across four templates that had quietly come to differ.
  */
 
 final class RevisionComparisonTest extends TestCase
@@ -215,7 +215,7 @@ final class RevisionComparisonTest extends TestCase
 
     /**
      * Three sections covering the cases the filter has to get right: one everybody sees, one only a reviewer sees, and
-     * one everybody sees that holds a field only a reviewer sees.
+     * one everybody sees that contains a field only a reviewer sees.
      */
     private function comparison(): RevisionComparison
     {

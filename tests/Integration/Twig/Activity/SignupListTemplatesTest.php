@@ -78,7 +78,7 @@ final class SignupListTemplatesTest extends DatabaseTestCase
             'data-tier-order-value-param="non-member"',
             $html,
         );
-        // The places are asked for on the rank they are held for, inside the order itself.
+        // The places are entered on the rank they are reserved for, inside the order itself.
         self::assertStringContainsString(
             'data-tier-order-target="places"',
             $html,

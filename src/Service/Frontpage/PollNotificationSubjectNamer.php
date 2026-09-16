@@ -10,7 +10,7 @@ use App\Service\Application\AbstractNotificationSubjectNamer;
 use Override;
 
 /**
- * A poll awaiting review reads by the question it asks, which is the only thing about it the board recognises.
+ * A poll awaiting review is named by the question it asks, which is the only thing about it the board recognises.
  */
 final class PollNotificationSubjectNamer extends AbstractNotificationSubjectNamer
 {

@@ -3,10 +3,10 @@ import { getComponent } from '@symfony/ux-live-component';
 import type { Component } from '@symfony/ux-live-component';
 
 /**
- * One modal serves every decision of the meeting: the trigger carries the decision it was opened for, and the lookup
+ * One modal serves every decision of the meeting: the trigger records the decision it was opened for, and the lookup
  * beside this controller fills in the four hidden fields naming the virtual decision that was picked.
  *
- * It lives OUTSIDE the live component, like the shared confirmation does, so the re-render that follows the action
+ * It is rendered OUTSIDE the live component, like the shared confirmation, so the re-render that follows the action
  * never touches the modal or leaves an orphaned backdrop behind.
  */
 /* stimulusFetch: 'lazy' */
@@ -22,7 +22,7 @@ export default class extends Controller {
     declare readonly hasConfirmTarget: boolean;
     declare readonly confirmTarget: HTMLButtonElement;
 
-    // Held with the component lookup to run the action on; null while nothing is armed.
+    // Kept with the component lookup to run the action on; null while nothing is armed.
     private _pending: {
         point: string;
         number: string;
@@ -48,7 +48,7 @@ export default class extends Controller {
 
         const trigger = event.relatedTarget;
         // The root is resolved here, while the trigger is still attached: a re-render can detach it between opening
-        // the modal and confirming, and a detached node's closest() answers null.
+        // the modal and confirming, and a detached node's closest() returns null.
         const root = trigger?.closest<HTMLElement>('[data-controller~="live"]') ?? null;
 
         this._pending = undefined !== trigger?.dataset.point

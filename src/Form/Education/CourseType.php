@@ -23,7 +23,7 @@ use function strtoupper;
 use function Symfony\Component\Translation\t;
 
 /**
- * Similar courses are what a course holding nothing of its own points at. They are picked out of the archive rather
+ * Similar courses are what a course that has nothing of its own points at. They are picked out of the archive rather
  * than typed, so a link can only ever be made to a course that exists, and never to the course itself.
  *
  * @extends AbstractType<Course>
@@ -48,7 +48,7 @@ final class CourseType extends AbstractType
                 [
                     'label' => t('Course code'),
                     'help' => t('As the TU/e writes it, for example 2IL50.'),
-                    // The code identifies a course and documents hang off it, so it is set once and then fixed.
+                    // The code identifies a course and documents are filed under it, so it is set once and then fixed.
                     'disabled' => $editing,
                     'constraints' => [
                         new NotBlank(message: 'Enter the course code.'),

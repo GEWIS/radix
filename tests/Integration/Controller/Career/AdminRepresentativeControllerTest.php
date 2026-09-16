@@ -96,7 +96,8 @@ final class AdminRepresentativeControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The board writes to the primary contact and expects an answer, which somebody who cannot sign in will not give.
+     * The board writes to the primary contact and expects an answer, which a representative who cannot
+     * sign in will not give.
      */
     public function testSomebodyWhoCannotSignInCannotBecomeThePrimaryContact(): void
     {

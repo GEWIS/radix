@@ -804,7 +804,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 ],
             ],
             // Upcoming, approved, but CANCELLED by the board: it stays publicly visible with a [CANCELLED] marker and a
-            // notice, and all sign-up interaction is frozen (existing sign-ups are kept, but nobody can join/leave).
+            // notice, and all sign-up interaction is frozen (existing sign-ups are kept, but no member can join/leave).
             [
                 'creator' => 8025,
                 'status' => RevisionStatus::Approved,
@@ -959,7 +959,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             $activity = new Activity();
             $activity->setCreator($creator);
 
-            // A seeded activity is a single-revision chain: revision 1 carries the content and its lifecycle state.
+            // A seeded activity is a single-revision chain: revision 1 contains the content and its lifecycle state.
             $revision = $this->buildRevision(
                 $data,
                 $data['status'],
@@ -974,7 +974,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 $revision->addLabel($this->getReference($labelReference, ActivityLabel::class));
             }
 
-            // The organ behind the activity, which is what the places held for the organising body are read against.
+            // The organ behind the activity, which is what the organising body's reserved places are read against.
             if (isset($data['organ'])) {
                 $revision->organ = $this->getReference(
                     $data['organ'],
@@ -982,7 +982,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 );
             }
 
-            // The organising company (a reviewable, display-only field) surfaces on that company's career detail page.
+            // The organising company (a reviewable, display-only field) is shown on that company's career detail page.
             if (isset($data['company'])) {
                 $revision->company = $this->getReference(
                     'career-company-' . $data['company'],
@@ -998,7 +998,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             }
 
             // Board lifecycle actions on an approved activity: cancel (stays public with a notice) or unpublish
-            // (removed from public view). Both freeze sign-up interaction; the creator stands in as the board member.
+            // (removed from public view). Both freeze sign-up interaction; the creator is used as the board member.
             if ($data['cancelled'] ?? false) {
                 $activity->cancel($creator);
             }
@@ -1065,8 +1065,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     // apply this same rule (drawn = !limitedCapacity) when it creates sign-ups.
                     $signup->drawn = $entry['drawn'] ?? !$signupList->limitedCapacity;
                     $signup->present = $entry['present'] ?? false;
-                    // A role is handed out by the organiser once sign-up has closed, so the draw has something to
-                    // make up the shortfall from.
+                    // A role is assigned by the organiser once sign-up has closed, so the draw has something to make up
+                    // the shortfall from.
                     if (isset($entry['role'])) {
                         foreach ($signupList->getRoles() as $role) {
                             if ($role->name !== $entry['role']) {
@@ -1098,7 +1098,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     $signup->setFullName($external['fullName']);
                     $signup->setEmail($external['email']);
                     // No token rows are seeded, so seeded externals are confirmed subscribers, mirroring the
-                    // organiser-add path; without the stamp they would count as unverified everywhere.
+                    // organiser-add path; without the timestamp they would count as unverified everywhere.
                     $signup->verifiedAt = $this->signedUp(
                         $signup,
                         count($signupListData['subscribers'] ?? []) + $index,
@@ -1116,9 +1116,9 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     );
                 }
 
-                // A list that says it has been drawn carries the outcome the draw itself would produce: the pool in
-                // the order the modifiers put it in, the first capacity of it admitted, and everybody holding the
-                // place they were given. Seeding that by hand would be seeding a claim about the algorithm.
+                // A list that says it has been drawn records the outcome the draw itself would produce: the pool in the
+                // order the modifiers put it in, the first capacity of it admitted, and everybody with the place they
+                // were given. Seeding that by hand would be seeding a claim about the algorithm.
                 if ($signupListData['draw'] ?? false) {
                     $capacity = $signupList->capacity ?? 0;
                     $position = 0;
@@ -1158,7 +1158,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
         $manager->flush();
 
-        // The entity stamps its creation on persist, so the moments the sign-ups were made are written afterwards.
+        // The creation timestamp is set on persist, so the moments the sign-ups were made are written afterwards.
         assert($manager instanceof EntityManagerInterface);
         foreach ($this->signedUpAt as [$signup, $at]) {
             $manager->getConnection()->update(
@@ -1173,9 +1173,9 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
     }
 
     /**
-     * When a sign-up was made: a few minutes into its list's window, one after the other, so a list that has closed
-     * or been drawn holds sign-ups from before that moment rather than from the moment the seed ran. A list that
-     * has not opened yet keeps the seeding moment, which is all a sign-up on it could have.
+     * When a sign-up was made: a few minutes into its list's window, one after the other, so a list that has closed or
+     * been drawn has sign-ups from before that moment rather than from the moment the seed ran. A list that has not
+     * opened yet keeps the seeding moment, which is all a sign-up on it could have.
      */
     private function signedUp(
         Signup $signup,
@@ -1209,17 +1209,17 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
     /**
      * The allocation matrix: every way of deciding who gets a place, in every state a list can be in, so each of the
-     * board's screens can be looked at before, at and after the moment the places are handed out. Coded the way the
+     * board's screens can be looked at before, at and after the moment the places are assigned. Coded the way the
      * members requiring attention are: the letter says what the list does, the number how far along it is.
      *
      * @return list<ActivitySeedType>
      */
     private function allocationMatrix(): array
     {
-        // Enough of a cast that a ranking shows: ordinary members of four generations, an external member, an
-        // honorary member, a graduate, a master student and somebody doing a doctorate.
-        // The master student and the doctoral candidate are attention members whose number the ledger hands out,
-        // so they go by the name the projection references them under.
+        // Enough of a cast that a ranking shows: ordinary members of four generations, an external member, an honorary
+        // member, a graduate, a master student and a doctoral candidate.
+        // The master student and the doctoral candidate are attention members whose number the ledger assigns, so they
+        // go by the name the projection references them under.
         $cast = [
             8005,
             8010,
@@ -1419,8 +1419,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                     8155,
                     8100,
                 ],
-                // A list that guarantees a role is drawn by hand once it has closed, so it never stands drawn
-                // while sign-up is still running, whatever its own moment says.
+                // A list that guarantees a role is drawn by hand once it has closed, so it is never drawn while sign-up
+                // is still running, whatever its own moment says.
                 'perState' => [
                     1 => ['drawCutoffAt' => '+3 days 12:00'],
                     2 => ['drawCutoffAt' => '-1 day 12:00'],
@@ -1547,7 +1547,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 $state = $states[$number];
                 $onlyGEWIS = $config['onlyGEWIS'] ?? false;
                 $subscribers = $config['subscribers'] ?? $cast;
-                // The roles are handed out once sign-up has closed, which is before the draw rather than with it.
+                // The roles are assigned once sign-up has closed, which is before the draw rather than with it.
                 $holders = 1 === $number
                     ? []
                     : $config['roleHolders'] ?? [];
@@ -1637,8 +1637,8 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
     }
 
     /**
-     * Seeds activities that exercise the revision workflow: one awaiting review, one bounced back with a
-     * changes-requested chain and a discussion thread, and one rejected with reviewer feedback.
+     * Seeds activities that exercise the revision workflow: one awaiting review, one returned with a changes-requested
+     * chain and a discussion thread, and one rejected with reviewer feedback.
      */
     private function loadWorkflowExamples(ObjectManager $manager): void
     {
@@ -1662,7 +1662,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             Organ::class,
         );
 
-        // In review: sits in the board's review queue (no live revision, so not publicly visible).
+        // In review: is in the board's review queue (no live revision, so not publicly visible).
         $hackathonCreator = $this->getReference(
             'member-8013',
             Member::class,
@@ -1954,7 +1954,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             $signupList->addRole($signupRole);
         }
 
-        // A list that has already been drawn carries its lock and its audit: a board member by lidnr, or nobody at
+        // A list that has already been drawn records its lock and its audit: a board member by lidnr, or no member at
         // all, which is what an automated draw leaves behind.
         if (isset($data['drawnAt'])) {
             $signupList->drawnAt = new DateTimeImmutable($data['drawnAt']);

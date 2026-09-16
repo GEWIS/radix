@@ -58,8 +58,8 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
             );
         }
 
-        // The whole hash, in capitals: the service does not answer for a prefix, and it does not answer for lower
-        // case either.
+        // The whole hash, in capitals: the service does not accept a prefix, and it does not accept lower case
+        // either.
         $hash = strtoupper(sha1((string) $value));
 
         try {

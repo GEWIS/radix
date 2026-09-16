@@ -49,7 +49,7 @@ final class RouteSmokeTest extends DatabaseTestCase
      * The member the sweep signs in as. The fixtures grant this member ROLE_ADMIN and ROLE_DATABASE_ADMIN, so the
      * administration is included in the sweep. Those roles only survive {@see User::getRoles()} while MFA
      * enforcement is disabled, because enforcement removes them from a member in scope who has not enrolled and the
-     * fixtures enrol nobody. {@see DatabaseTestCase::setUp()} assigns the switch from the parameter this
+     * fixtures enrol no member. {@see DatabaseTestCase::setUp()} assigns the switch from the parameter this
      * environment configures, for every test, so what the sweep reads does not depend on what ran before it. The
      * test asserts ROLE_ADMIN is present before it starts, so that this cannot regress without being noticed.
      *
@@ -62,9 +62,9 @@ final class RouteSmokeTest extends DatabaseTestCase
     /**
      * A page only the administration reaches, which is asserted to have rendered.
      *
-     * Every route the member may not open answers 302 to the login page, and a redirect is a valid response here, so
-     * without this a sweep that is signed out altogether — a renamed firewall, a remember-me cookie the guard no
-     * longer accepts — still renders the public pages and passes. `user_api_principal_index` is behind
+     * Every route the member may not open returns 302 to the login page, and a redirect is a valid response here, so
+     * without this a sweep that is signed out altogether (a renamed firewall, a remember-me cookie the guard no
+     * longer accepts) still renders the public pages and passes. `user_api_principal_index` is behind
      * `ROLE_ADMIN`/`ROLE_DATABASE_ADMIN` in `access_control`, which is exactly what the fixtures grant this member.
      */
     private const string ADMIN_PAGE = 'user_api_principal_index';
@@ -173,7 +173,7 @@ final class RouteSmokeTest extends DatabaseTestCase
                 continue;
             } catch (HttpExceptionInterface $exception) {
                 // A valid response, including a denial. Only a status of 500 or above is a failure here, and it is
-                // counted as well: the summary printed on failure is what says what the run did.
+                // counted as well: the summary printed on failure reports what the run did.
                 $thrown = 'thrown ' . $exception->getStatusCode();
                 $outcomes[$thrown] = ($outcomes[$thrown] ?? 0) + 1;
                 $statuses[$route] = $exception->getStatusCode();

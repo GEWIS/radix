@@ -10,13 +10,13 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Event\GuardEvent;
 
 /**
- * Withholds `approve`/`submit` for an activity revision whose approval could not carry the live sign-ups across.
+ * Withholds `approve`/`submit` for an activity revision whose approval could not migrate the live sign-ups.
  *
  * This only happens when a sign-up list was removed or restructured in this revision (only reachable by a race or
  * request tampering, since the form freezes such lists). This turns {@see MigrateSignupsOnApprovalListener}'s
  * last-resort hard-fail into a clean, up-front block: the action is not offered (and a forged request is refused).
  *
- * The review screen surfaces the reason and the recovery. A blocked draft cannot be fixed in place since its diverged
+ * The review screen shows the reason and the recovery. A blocked draft cannot be fixed in place since its diverged
  * structure re-freezes read-only, so it MUST be discarded back to the live version
  * ({@see \App\Controller\Activity\AdminApprovalController::discard()}); a blocked in-review revision is rejected or
  * sent back for changes, which spawns a draft that is then discarded.

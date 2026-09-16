@@ -71,7 +71,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
 
     /**
      * A virtual meeting exists to say again what a real meeting decided. Searching for the words they share must not
-     * answer with both, which is what naming the decision it repeats settles.
+     * return both, which is what naming the decision it repeats settles.
      */
     public function testADecisionThatRepeatsAnotherIsLeftOutOfTheTextSearch(): void
     {
@@ -88,7 +88,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
 
     /**
      * Hidden from the results, but not out of reach: the search page folds them away under the decision they repeat,
-     * which is what this answers with.
+     * which is what this returns.
      */
     public function testTheVirtualDecisionsRepeatingAResultAreFoundAlongsideIt(): void
     {
@@ -181,7 +181,7 @@ final class DecisionRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * A reference is written by hand, and it used to answer only when it was typed the way the register writes it:
+     * A reference is written by hand, and it used to be read only when it was typed the way the register writes it:
      * `bv 1800` fell through to the text search, which finds every decision mentioning the meeting but not one of
      * the decisions the meeting took.
      */
@@ -242,8 +242,8 @@ final class DecisionRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * A number without a type addresses every meeting carrying it, until `type:` says which one is meant. Without
-     * that, "type:bm 1" answered with the first agenda point of the first GMM as readily as with board meeting 1.
+     * A number without a type addresses every meeting that has it, until `type:` says which one is meant. Without
+     * that, "type:bm 1" returned the first agenda point of the first GMM as readily as board meeting 1.
      */
     public function testTheTypeFilterNarrowsABareNumber(): void
     {
@@ -264,8 +264,8 @@ final class DecisionRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * Unlike a spelled-out reference, the filter is a filter: it narrows the text match instead of standing beside
-     * it, so the decisions that merely mention the meeting are left out.
+     * Unlike a spelled-out reference, the filter is a filter: it narrows the text match instead of adding to it, so
+     * the decisions that merely mention the meeting are left out.
      */
     public function testTheMeetingFilterCombinesWithTheTextSearch(): void
     {
@@ -278,8 +278,8 @@ final class DecisionRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * The text search leaves a virtual decision out, because it repeats one taken in a real meeting. Asking for the
-     * virtual meeting itself is asking for what it put on the record.
+     * The text search leaves a virtual decision out, because it repeats one taken in a real meeting. Searching for
+     * the virtual meeting itself returns what it put on the record.
      */
     public function testTheMeetingFilterReachesAVirtualMeeting(): void
     {

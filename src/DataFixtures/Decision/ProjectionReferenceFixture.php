@@ -22,11 +22,11 @@ use function sprintf;
 use function usort;
 
 /**
- * Hands the rest of the web fixtures the members, meetings and bodies that were replayed out of the ledger.
+ * Provides the rest of the web fixtures with the members, meetings and bodies that were replayed out of the ledger.
  *
  * Nothing here writes anything. Members are not seeded into the projection, they are derived from the ledger:
  * `app:fixtures:load` replays it before this group is loaded, so by the time this runs every member already exists.
- * What they do not have is fixture references, because a reference lives only for as long as the executor that made
+ * What they do not have is fixture references, because a reference exists only for as long as the executor that made
  * it, and the replay is not one.
  *
  * So this looks them up and names them `member-<lidnr>`, which is what the fixtures hanging off them have always
@@ -35,7 +35,7 @@ use function usort;
 final class ProjectionReferenceFixture extends Fixture implements FixtureGroupInterface
 {
     /**
-     * The bodies the web fixtures ask for, by the abbreviation their founding decision gave them.
+     * The bodies the web fixtures need, by the abbreviation their founding decision gave them.
      *
      * A mapping rather than a definition: rename one in {@see \App\DataFixtures\Database\OrganDecisionFixture} and
      * this is where it has to be followed.
@@ -95,7 +95,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
      * The bodies, and the ones that have been abrogated.
      *
      * Two may share an abbreviation, because one was founded after the other had been abrogated. That is exactly what
-     * the fixtures asking for a "former" body want, so they are told apart by whether the replay gave them an
+     * the fixtures that need a "former" body want, so they are told apart by whether the replay gave them an
      * abrogation date.
      */
     private function organs(ObjectManager $manager): void
@@ -173,7 +173,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
                 ],
             ] as [$type, $name, $firstOfCalendar]
         ) {
-            // Only the calendar's own meetings answer to these names. A board's or a body's history was written at
+            // Only the calendar's own meetings have these names. A board's or a body's history was written at
             // meetings that reach much further back and are numbered below the calendar, and "the last meeting held"
             // means the last one on the calendar rather than the last thing decided anywhere.
             [

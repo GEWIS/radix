@@ -15,8 +15,8 @@ use function is_string;
 use function str_starts_with;
 
 /**
- * Below the firewall at 8, so a caller without a token is challenged rather than told the route is missing: every
- * address under `/api` answers 401 first.
+ * Below the firewall at 8, so a caller without a token is challenged rather than given a 404: every address under
+ * `/api` returns 401 first.
  */
 #[AsEventListener(
     event: KernelEvents::REQUEST,

@@ -16,7 +16,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {# Only album pages carry the viewer, so its stylesheet is linked here rather than loaded on every page. #}
+    {# Only album pages render the viewer, so its stylesheet is linked here rather than loaded on every page. #}
     <link rel="stylesheet" href="{{ asset('vendor/photoswipe/dist/photoswipe.min.css') }}">
 {% endblock %}
 

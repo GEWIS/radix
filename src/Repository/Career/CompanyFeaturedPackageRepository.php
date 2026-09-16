@@ -20,7 +20,7 @@ class CompanyFeaturedPackageRepository extends ServiceEntityRepository
 {
     public const string CACHE_KEY_PREFIX = 'layout.featured_packages.';
 
-    /** A day, so the entry cannot outlive the day it was asked about even if nothing invalidates it. */
+    /** A day, so the entry cannot outlive the day it was cached for even if nothing invalidates it. */
     private const int CACHE_LIFETIME = 86400;
 
     public function __construct(ManagerRegistry $registry)
@@ -38,7 +38,7 @@ class CompanyFeaturedPackageRepository extends ServiceEntityRepository
     public function getFeaturedPackage(): ?CompanyFeaturedPackage
     {
         // The company is read wherever the pick is shown (the navigation menu names it, the career page also renders
-        // the article), so both come along instead of being lazy-loaded on every page that draws the menu.
+        // the article), so both are fetch-joined instead of being lazy-loaded on every page that renders the menu.
         $today = new DateTimeImmutable()->setTime(
             0,
             0,

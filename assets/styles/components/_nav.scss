@@ -4,7 +4,7 @@
     --#{$prefix}nav-link-font-size: #{$nav-font-size};
 }
 
-// Two colours have to be said out loud for tabs on a panel: the one every nav link inherits, which is the white the
+// Two colours have to be set explicitly for tabs on a panel: the one every nav link inherits, which is the white the
 // main navbar needs and no panel can use, and the one Bootstrap gives the tab you are on, which is its emphasis
 // colour and stays black on the night theme.
 .nav-tabs {

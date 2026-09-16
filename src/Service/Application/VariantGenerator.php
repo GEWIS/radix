@@ -54,12 +54,12 @@ final readonly class VariantGenerator
      *
      * Pre-generation skips upscales so no redundant larger-than-original variant is stored; the serving path's miss
      * handler ({@see \App\MessageHandler\Application\GenerateImageVariantHandler}) passes `$skipUpscale = false`,
-     * capping at the original width (`scaleDown` never upscales) so a valid original always yields something to
+     * capping at the original width (`scaleDown` never upscales) so a valid original always produces something to
      * serve rather than an eternal miss.
      *
      * `$force` re-encodes over a variant that is already cached. A content-addressed source cannot have gone stale,
-     * so the only reason to ask is that the variant set, the quality or the encoder changed underneath it; the write
-     * goes through the same temporary file and move, so a viewer never sees the variant missing while it is redone.
+     * so the only reason to force one is that the variant set, the quality or the encoder changed; the write goes
+     * through the same temporary file and move, so a viewer never sees the variant missing while it is redone.
      */
     public function generateVariant(
         string $sourcePath,
@@ -127,7 +127,7 @@ final readonly class VariantGenerator
 
     /**
      * {@see ImageVariantResponder::respond()} serves a cached variant before it looks at the source, so removing a
-     * source without this does not stop the picture being handed out.
+     * source without this does not stop the variant being served.
      */
     public function purge(string $sourcePath): void
     {

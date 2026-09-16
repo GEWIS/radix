@@ -29,11 +29,11 @@ final readonly class ActivityAdminRow
         public ?DateTimeImmutable $beginTime,
         // Whether anything of this activity is public at all, which decides whether there is a page to link to.
         public bool $isLive,
-        // The revision the public is seeing while the working one is not, so a rejected or in-flight revision is not
-        // read as "nothing is up". Null when the working revision is itself the live one.
+        // The revision the public is seeing while the working one is not, so a rejected or pending revision is not
+        // read as "nothing is published". Null when the working revision is itself the live one.
         public ?int $liveRevisionNumber,
         // The working revision is a draft that addresses a "changes requested" review (its predecessor was rejected
-        // with feedback). Is surfaced in the overview so the author knows there is feedback to act on.
+        // with feedback). Is shown in the overview so the author knows there is feedback to act on.
         public bool $changesRequested,
         // The activity has already taken place; an approved, passed activity is immutable and can no longer be revised.
         public bool $passed,
@@ -83,7 +83,7 @@ final readonly class ActivityAdminRow
         return new self(
             id: $id,
             revisionId: $revisionId,
-            // Organ/company now live on the revision; the overview shows the working revision's values (not the
+            // Organ/company are now on the revision; the overview shows the working revision's values (not the
             // activity proxy, which would resolve to the live revision and hide a pending organ/company change).
             organAbbr: $revision->organ?->abbr,
             nameNL: $revision->name->getValueNL(),

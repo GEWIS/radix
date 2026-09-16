@@ -22,7 +22,7 @@
     </div>
 {% endmacro %}
 
-{# Past `maxDepth` the replies stop moving right, so a long back and forth does not walk off the panel. #}
+{# Past `maxDepth` the replies stop moving right, so a long back and forth does not extend past the panel. #}
 {% macro thread(comment, component, depth) %}
     {% import _self as self %}
     {% set maxDepth = 4 %}
@@ -59,7 +59,7 @@
                 <div class="mt-2">
                     <label class="form-label" for="poll-reply-{{ comment.id }}">{{ 'Your reply'|trans }}</label>
                     {# data-live-ignore: the editor replaces the textarea with markup of its own, which the re-render
-                       morph would otherwise take back out from under it. #}
+                       morph would otherwise remove. #}
                     <div data-live-ignore>
                         <textarea class="form-control" id="poll-reply-{{ comment.id }}" rows="2"
                                   data-model="norender|replyContent"

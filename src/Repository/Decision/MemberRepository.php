@@ -480,7 +480,7 @@ class MemberRepository extends ServiceEntityRepository
 
     /**
      * Admin overview paginator: every member, including hidden / deleted / expired ones, with their associated `User`
-     * (if any) hydrated so the row knows whether the account is activated and whether MFA is enabled.
+     * (if any) hydrated so the row can show whether the account is activated and whether MFA is enabled.
      *
      * @param array<string, mixed> $filters
      * @phpstan-param array{

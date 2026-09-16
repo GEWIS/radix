@@ -46,9 +46,9 @@ final class SecurityLogOverview extends AbstractDoctrinePaginatedOverview
     ];
 
     /**
-     * A membership number, a company user's address, or an IP address. Matched whole rather than as a fragment: this
-     * is a lookup of somebody already known, and a `LIKE` over a table this size answers slowly and finds members
-     * whose number merely contains the digits typed.
+     * A membership number, a company user's address, or an IP address. Matched whole rather than as a fragment: this is
+     * a lookup of an account that is already known, and a `LIKE` over a table this size is slow and finds members whose
+     * number merely contains the digits typed.
      */
     #[LiveProp(
         writable: true,
@@ -139,8 +139,8 @@ final class SecurityLogOverview extends AbstractDoctrinePaginatedOverview
 
     private function since(): ?DateTimeImmutable
     {
-        // Anything but one of the offered windows is treated as no window at all, rather than as a number of days
-        // somebody put in the address bar.
+        // Anything but one of the offered windows is treated as no window at all, rather than as a number of days an
+        // administrator put in the address bar.
         if (
             !in_array(
                 $this->days,

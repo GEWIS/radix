@@ -28,8 +28,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use function assert;
 
 /**
- * The review surface for the career module: one queue holding both the company profiles and the vacancies waiting for
- * the committee, and a per-revision screen showing what changed against the revision before it, the discussion, and
+ * The review surface for the career module: one queue containing both the company profiles and the vacancies waiting
+ * for the committee, and a per-revision screen showing what changed against the revision before it, the discussion, and
  * whichever transitions the workflow allows the person looking at it.
  *
  * Everything here is the committee's; a company follows its own proposal through the portal instead. Which buttons
@@ -264,8 +264,8 @@ class AdminApprovalController extends AbstractRevisionReviewController
     }
 
     /**
-     * Both career aggregates share one screen, so the branch that used to sit inside the template's context array
-     * lives here: which subject is named, whose thread is shown, and which of the two route families the decision,
+     * Both career aggregates share one screen, so the branch that used to be inside the template's context array is
+     * defined here: which subject is named, whose thread is shown, and which of the two route families the decision,
      * comment and discard forms post to.
      *
      * @return array<string, mixed>

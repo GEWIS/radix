@@ -62,7 +62,7 @@ abstract class AbstractRevisionComment
     public string $body;
 
     /**
-     * A human-readable name for whoever wrote this comment, whether a member's account or a company user.
+     * A human-readable name for the author of this comment, whether a member's account or a company user.
      */
     public function getAuthorDisplayName(): string
     {

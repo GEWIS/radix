@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
- * Authorizes removing a photo {@see Tag}. Any member -- which the board and admins are, through the role hierarchy --
+ * Authorizes removing a photo {@see Tag}. Any member (which the board and admins are, through the role hierarchy)
  * may remove any tag. A graduate is the exception: they may remove only a member tag that concerns themselves, which is
  * the sole tag action they can take (they may not remove anyone else's tag or an organ tag, create tags, or vote).
  *
@@ -47,7 +47,7 @@ final class TagVoter extends Voter
         ?Vote $vote = null,
     ): bool {
         // A member (which the board and admins are, through the role hierarchy) may remove any tag. Only a graduate is
-        // held to their own member tag, and they are the only authenticated non-member who reaches this action.
+        // limited to their own member tag, and they are the only authenticated non-member who reaches this action.
         if ($this->security->isGranted(UserRoles::Member->value)) {
             return true;
         }

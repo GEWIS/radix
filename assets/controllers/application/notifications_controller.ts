@@ -31,7 +31,7 @@ interface LocalisedText {
  * The application's Server-Sent Events connection, mounted once per page by the base layout.
  *
  * One connection per browser, not per tab: whichever tab wins an exclusive Web Lock opens it and passes what arrives
- * to the others over a BroadcastChannel. Releasing the lock is what hands the connection on, which the browser does
+ * to the others over a BroadcastChannel. Releasing the lock is what transfers the connection, which the browser does
  * for a tab that is closed. Without either API every tab keeps its own connection.
  *
  * Messages are routed on their `type`: system commands act on the browser (sign out, reload) and a toast is rendered
@@ -63,7 +63,7 @@ export default class extends Controller<HTMLElement> {
 
     private election: AbortController | null = null;
 
-    /** Bumped by stop(), so work that was already in flight can tell that this tab has since let go. */
+    /** Bumped by stop(), so work that was already in flight can detect that this tab has since released the lock. */
     private generation = 0;
 
     private recoverTimer: number | null = null;
@@ -86,7 +86,7 @@ export default class extends Controller<HTMLElement> {
         this.channel = null;
     }
 
-    /** A tab frozen into the back/forward cache would sit on the lock while unable to read from the connection. */
+    /** A tab frozen into the back/forward cache would keep the lock while unable to read from the connection. */
     private readonly onPageHide = (): void => {
         this.stop();
     };
@@ -164,13 +164,13 @@ export default class extends Controller<HTMLElement> {
                 },
             );
         } catch {
-            // The queue place was abandoned before it came up, so nothing was opened.
+            // The lock request was abandoned before it was granted, so nothing was opened.
         }
     }
 
     private openChannel(): BroadcastChannel {
         const channel = new BroadcastChannel(CHANNEL_NAME);
-        // A channel does not deliver to whoever posted, so nothing is handled twice.
+        // A channel does not deliver to the tab that posted, so nothing is handled twice.
         channel.onmessage = (event: MessageEvent): void => {
             this.handle(event.data as Envelope);
         };
@@ -221,7 +221,7 @@ export default class extends Controller<HTMLElement> {
                 return;
             case 'toast':
                 // One per window, so it needs no agreement between the tabs. Focus would be one per browser, but a
-                // window sitting behind another has none and would be told nothing at all.
+                // window behind another has none and would not be notified at all.
                 if ('visible' === document.visibilityState) {
                     this.renderToast(data);
                 }
@@ -250,7 +250,7 @@ export default class extends Controller<HTMLElement> {
 
     /**
      * A connection that closes the moment it is opened would otherwise be reopened every round trip, for as long as
-     * the hub is down. Backing off holds that to something the hub can survive being asked.
+     * the hub is down. Backing off limits that to a rate the hub can handle.
      */
     private scheduleRecovery(): void {
         if (null !== this.recoverTimer) {
@@ -298,12 +298,12 @@ export default class extends Controller<HTMLElement> {
 
             return 204 === response.status;
         } catch {
-            // Offline, or the application is not answering.
+            // Offline, or the application is not responding.
             return false;
         }
     }
 
-    /** Only the tabs left on their own connection can reach this together, and the mark is what spares them. */
+    /** Only the tabs left on their own connection can reach this together; the stored timestamp stops all but one. */
     private reload(): void {
         try {
             const last = Number(localStorage.getItem(RELOAD_KEY) ?? '0');
@@ -313,7 +313,7 @@ export default class extends Controller<HTMLElement> {
 
             localStorage.setItem(RELOAD_KEY, String(Date.now()));
         } catch {
-            // Nothing to read and nowhere to write, so this tab answers for itself.
+            // Nothing to read and nowhere to write, so this tab reloads without the shared throttle.
         }
 
         window.location.reload();
@@ -336,8 +336,8 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // Only a genuine warning/danger/success level overrides the template's GEWIS red, keeping ordinary notifications
-        // on-brand rather than Bootstrap's info blue.
+        // Only a genuine warning/danger/success level overrides the template's GEWIS red, keeping ordinary
+        // notifications on-brand rather than Bootstrap's info blue.
         const level = 'string' === typeof data.level ? data.level : 'info';
         const indicator = toast.querySelector('.toast-indicator');
         if (indicator instanceof HTMLElement && 'info' !== level) {

@@ -81,7 +81,7 @@ final class CompanyUserInviteServiceTest extends DatabaseTestCase
     }
 
     /**
-     * Inviting the same address again reissues the one invitation rather than leaving two links in the wild.
+     * Inviting the same address again reissues the one invitation rather than leaving two valid links.
      */
     public function testInvitingTheSameAddressTwiceReissuesTheOneInvitation(): void
     {

@@ -18,7 +18,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Unmapped: the controller stores the upload and puts the path on the revision, because only it can talk to storage.
- * Asked for on the last step, so the file and its crop never have to be carried between requests.
+ * Collected on the last step, so the file and its crop never have to be kept between requests.
  *
  * @extends AbstractType<OrganPageData>
  */
@@ -41,7 +41,7 @@ class ImagesStepType extends AbstractType
     /** A logo is shown small, but the frame takes only a share of the upload, so it still needs some room. */
     public const int LOGO_MINIMUM_WIDTH = 640;
 
-    /** The shape each image is cut to, which is also what the crop picker holds itself to. */
+    /** The shape each image is cut to, which is also what the crop picker is limited to. */
     public const float BANNER_RATIO = 4.0;
 
     public const float LOGO_RATIO = 16 / 9;
@@ -78,8 +78,8 @@ class ImagesStepType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 // The picker offers only what the constraint below would accept, so a file that could never be stored
-                // is not offered in the first place, and the width the constraint wants travels along so the frame can
-                // turn away an image it would refuse. The constraints still decide: both attributes are conveniences.
+                // is not offered in the first place, and the minimum width is passed along so the frame can reject an
+                // image the constraint would refuse. The constraints still decide: both attributes are conveniences.
                 'attr' => [
                     'accept' => self::ACCEPT,
                     'data-minimum-width' => self::BANNER_MINIMUM_WIDTH,
@@ -153,8 +153,8 @@ class ImagesStepType extends AbstractType
 
     /**
      * The height that follows from a minimum width and the shape the image is cut to. An upload that is wide enough but
-     * too flat holds no rectangle of that shape and that width, so asking for the width alone would let through a file
-     * that has no usable crop in it at all.
+     * too flat contains no rectangle of that shape and that width, so requiring the width alone would let through a
+     * file that has no usable crop in it at all.
      */
     private static function minimumHeight(
         int $width,

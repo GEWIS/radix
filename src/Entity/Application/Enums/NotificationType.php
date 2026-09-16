@@ -10,9 +10,10 @@ use Symfony\Component\Translation\TranslatableMessage;
 use function sprintf;
 
 /**
- * The kind of event a persisted {@see \App\Entity\Application\Notification} records. Drives the icon shown in the
- * notification centre and, as a category, the per-member email opt-in. It also holds everything the notification says:
- * the sentence, where it points and what the link reads, so a notification row only has to record its subject.
+ * The kind of event a persisted {@see \App\Entity\Application\Notification} records. Drives the icon
+ * shown in the notification centre and, as a category, the per-member email opt-in. It also defines
+ * everything a notification contains: the sentence, where it points and what the link reads, so a
+ * notification row only has to record its subject.
  */
 enum NotificationType: string
 {
@@ -64,7 +65,7 @@ enum NotificationType: string
     }
 
     /**
-     * The topic a member sees this under. Several kinds share one where they are one thing to whoever reads them.
+     * The topic a member sees this under. Several kinds share one where they are one thing to the member reading them.
      */
     public function category(): NotificationCategory
     {
@@ -269,8 +270,8 @@ enum NotificationType: string
         ?int $subjectId,
         array $context = [],
     ): array {
-        // Several reminders are about the same activity, so they cannot key on a subject the way an announcement
-        // does. What they point at travels with them instead.
+        // Several reminders are about the same activity, so they cannot key on a subject the way an announcement does.
+        // What they point at is in their context instead.
         if (
             self::SignupClosing === $this
             || self::SignupClosingWithFields === $this
@@ -310,7 +311,7 @@ enum NotificationType: string
             self::CompanyBannerAwaitingReview => [],
             self::SignIn, self::PasswordChanged, self::MfaEnabled,
             self::MfaDisabled, self::BackupCodesRegenerated, self::DataExportReady => [],
-            // The other four never reach here: they carry the proposal in their context and returned above.
+            // The other four never reach here: they have the proposal in their context and returned above.
             self::ActivityProposalAwaitingDecision => [],
         };
     }

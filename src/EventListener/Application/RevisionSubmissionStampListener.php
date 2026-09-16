@@ -10,8 +10,8 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 
 /**
- * Records the moment a revision reached the reviewers. Whoever applies the transition flushes afterwards, so the stamp
- * is persisted together with the new status.
+ * Records the moment a revision reached the reviewers. The caller that applies the transition flushes afterwards, so
+ * the stamp is persisted together with the new status.
  *
  * A draft can be written on Monday and submitted on Friday, so when it was written says nothing about how long the
  * board has had it: the queues are ordered and coloured by this moment instead.

@@ -18,8 +18,8 @@ use function assert;
 use function Symfony\Component\Translation\t;
 
 /**
- * What a vacancy offers, when it runs and who to talk to about it. Which company it belongs to only tells a reviewer
- * something: a representative is already inside their own company when they read this.
+ * What a vacancy offers, when it runs and who to talk to about it. Which company it belongs to is shown to reviewers
+ * only: a representative is already inside their own company when they read this.
  */
 final class VacancyRevisionDescriber extends AbstractRevisionDescriber
 {

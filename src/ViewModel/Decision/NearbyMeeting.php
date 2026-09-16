@@ -9,7 +9,7 @@ use DateTimeImmutable;
 
 /**
  * A row in the "Other meetings" sidebar. Deliberately not a {@see \App\Entity\Decision\Meeting}: hydrating the
- * entity drags its one-to-one sides along, and the sidebar only links.
+ * entity also loads its one-to-one sides, and the sidebar only links.
  */
 final readonly class NearbyMeeting
 {

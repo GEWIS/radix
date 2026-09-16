@@ -31,7 +31,7 @@ class CompanyRevisionRepository extends ServiceEntityRepository
      */
     public function findForReview(): array
     {
-        // The queue says who put each one forward, which is either a member or a representative, and what is live
+        // The queue shows who put each one forward, which is either a member or a representative, and what is live
         // while it waits.
         $builder = $this->createQueryBuilder('r')
             ->addSelect(

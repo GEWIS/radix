@@ -14,7 +14,7 @@ use function implode;
 
 /**
  * Reduces a request to the fingerprints {@see \App\Service\User\KnownDeviceRegistry} keys recognition on: what kind
- * of device this is and the networks it could be said to be on, hashed apart because they are learned apart. Browser
+ * of device this is and the networks it may be on, hashed apart because they are learned apart. Browser
  * and OS versions are left out of the device key so a routine update does not read as a new device.
  */
 final readonly class DeviceFingerprint
@@ -31,8 +31,8 @@ final readonly class DeviceFingerprint
     }
 
     /**
-     * `networks` is empty when the address does not parse: an unnameable network is one recognition cannot vouch
-     * for, not one of its own.
+     * `networks` is empty when the address does not parse: a network that cannot be named cannot be recognised, and
+     * must not count as a network of its own.
      *
      * @return array{device: string, networks: list<string>, browser: ?string, operatingSystem: ?string}
      */
@@ -86,7 +86,7 @@ final readonly class DeviceFingerprint
 
     /**
      * Read through Symfony's parsing so the same preferences spelled differently compare equal; a browser that
-     * states none lands on the empty string, a device of its own rather than one matching everybody.
+     * states none is keyed on the empty string, a device of its own rather than one matching everybody.
      */
     private static function languages(Request $request): string
     {

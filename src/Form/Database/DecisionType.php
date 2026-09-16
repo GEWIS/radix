@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Refers to an existing decision, such as the one an annulment takes back.
+ * Refers to an existing decision, such as the one an annulment annuls.
  *
  * The data of this type is the decision itself.
  */

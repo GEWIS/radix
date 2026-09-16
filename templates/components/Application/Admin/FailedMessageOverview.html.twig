@@ -41,7 +41,8 @@
                                 <tr>
                                     <td><small class="text-muted">{{ message.id ?? '?' }}</small></td>
                                     <td>
-                                        {# The class is what identifies the work; the namespace in front of it is noise in a table. #}
+                                        {# The class is what identifies the work; the namespace in front of it is noise
+                                           in a table. #}
                                         <code>{{ message.class|split('\\')|last }}</code>
                                         <br>
                                         {% if message.command %}

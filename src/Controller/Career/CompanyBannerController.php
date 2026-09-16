@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * one and C4 decides. Whatever is already up stays up until they do.
  *
  * The panels are the ones C4 gets on its own side of the package, so neither side has a screen the other lacks; what
- * differs is only that C4 needs nobody's agreement and this side does.
+ * differs is only that C4 needs no approval and this side does.
  */
 #[IsGranted(
     attribute: UserRoles::Company->value,

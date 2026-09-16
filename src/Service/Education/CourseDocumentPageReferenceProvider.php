@@ -10,8 +10,8 @@ use Override;
 
 /**
  * Keeps a rendered page alive while any course document still points at it. Page images are content-addressed, so two
- * documents holding an identical page (a blank sheet, a shared front page, the same exam filed under two courses) share
- * one stored file, and deleting one of them must not take the other's pages with it.
+ * documents with an identical page (a blank sheet, a shared front page, the same exam filed under two courses) share
+ * one stored file, and deleting one of them must not remove the other's pages.
  */
 final readonly class CourseDocumentPageReferenceProvider implements FileReferenceProviderInterface
 {

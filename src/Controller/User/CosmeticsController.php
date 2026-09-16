@@ -19,9 +19,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 /**
  * Whether this member is shown the seasonal decorations, flipped from the switch in the navbar.
  *
- * It answers outside `/user/settings`, where a member's other preferences live, because the switch posts with `fetch`
- * from every page and everything under there is behind sudo: a lapsed grant would answer with the confirmation page
- * and the switch would spring back without saying why.
+ * It is served outside `/user/settings`, where a member's other preferences are set, because the switch posts with
+ * `fetch` from every page and everything under there is behind sudo: a lapsed grant would return the confirmation page
+ * and the switch would revert without any explanation.
  */
 #[IsGranted(
     attribute: UserRoles::User->value,

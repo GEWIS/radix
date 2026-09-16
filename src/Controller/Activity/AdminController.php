@@ -75,7 +75,7 @@ class AdminController extends AbstractController
     )]
     public function index(): Response
     {
-        // The two tables (pending + approved), scoping and the board "show all" toggle live in the
+        // The two tables (pending + approved), scoping and the board "show all" toggle are implemented in the
         // Activity:Admin:ActivityOverview live component embedded by this template.
         return $this->render('activity/admin/index.html.twig');
     }
@@ -122,8 +122,8 @@ class AdminController extends AbstractController
         );
         $flow->handleRequest($request);
 
-        // The clicked button is handled here, which moves the flow on and, on finishing, leaves the run standing on
-        // the lists, so the step is only known afterwards.
+        // The clicked button is handled here, which moves the flow on and, on finishing, leaves the run on the lists,
+        // so the step is only known afterwards.
         $form = $flow->getStepForm();
 
         if ($flow->isFinished()) {
@@ -164,9 +164,9 @@ class AdminController extends AbstractController
     }
 
     /**
-     * Remember, server-side, the version this edit started from, so the optimistic-lock check on save cannot be
-     * bypassed by tampering a submitted field. Once per run of the form: every step ends in a redirect, and stamping
-     * on the requests that follow would walk the version past a change somebody else made while the form was open.
+     * Store, server-side, the version this edit started from, so the optimistic-lock check on save cannot be bypassed
+     * by tampering a submitted field. Once per run of the form: every step ends in a redirect, and stamping on the
+     * requests that follow would advance the version past a change another user made while the form was open.
      */
     private function stampEditVersion(
         Request $request,
@@ -197,9 +197,9 @@ class AdminController extends AbstractController
     }
 
     /**
-     * Whether the request handed a step in, which is answered with a redirect rather than a page: refreshing a page
+     * Whether the request submitted a step, which is followed by a redirect rather than a page: refreshing a page
      * reached by a POST sends that POST again, and a submission the flow cannot place lands on whichever step it has
-     * since moved to, emptying every field of one nobody filled in.
+     * since moved to, emptying every field of a step no user filled in.
      */
     private function stepWasHandedIn(FormFlowInterface $flow): bool
     {
@@ -386,8 +386,8 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('admin/activities/index');
         }
 
-        // A cancelled activity is a finished tombstone: it stays visible but is not revised. (An unpublished activity,
-        // by contrast, is only temporarily hidden and stays fully editable so it can be fixed up before re-publishing.)
+        // A cancelled activity is finished: it stays visible but is not revised. (An unpublished activity, by contrast,
+        // is only temporarily hidden and stays fully editable so it can be fixed up before re-publishing.)
         if ($activity->isCancelled()) {
             $this->addFlash(
                 AlertTypes::Warning->value,
@@ -398,7 +398,7 @@ class AdminController extends AbstractController
         }
 
         // Acquire the exclusive edit lock before spawning/binding: this is also what prevents two people both spawning
-        //a competing draft of the same live activity. A reviewer may force-take an alive lock (?take=1).
+        // a competing draft of the same live activity. A reviewer may force-take an alive lock (?take=1).
         $forceTake = $request->query->getBoolean('take')
             && $this->isGranted(UserRoles::Board->value);
         $lock = $this->editLockService->acquire(
@@ -425,7 +425,7 @@ class AdminController extends AbstractController
             );
         }
 
-        // The registry is typed to the shared RevisionInterface; for an activity it always yields an ActivityRevision.
+        // The registry is typed to the shared RevisionInterface; for an activity it always returns an ActivityRevision.
         assert($revision instanceof ActivityRevision);
 
         // For a spawned draft the cloner has already pointed the activity's current revision at it; for an in-place
@@ -468,8 +468,8 @@ class AdminController extends AbstractController
                 $run,
             );
 
-            // The clicked button is handled here, which is what moves the flow on, so this comes before the
-            // step it ended up on is answered with anything.
+            // The clicked button is handled here, which is what moves the flow on, so this comes before the form for
+            // the step it ended up on is read.
             $form = $flow->getStepForm();
 
             if ($this->stepWasHandedIn($flow)) {
@@ -506,10 +506,10 @@ class AdminController extends AbstractController
             $revision,
         );
 
-        // Refuse the save only if the lock was force-taken by SOMEONE ELSE (a reviewer) while this form was open. We
-        // use the read-only blockingLock() rather than ping(): ping() flushes, which would commit the bound form
+        // Refuse the save only if the lock was force-taken by ANOTHER USER (a reviewer) while this form was open. The
+        // read-only blockingLock() is used rather than ping(): ping() flushes, which would commit the bound form
         // changes before the optimistic-version check below and before lastEditedBy is stamped (breaking both), and a
-        // lock we self-released on navigation (a page-unload beacon racing the submit) must not count as "taken over".
+        // lock self-released on navigation (a page-unload beacon racing the submit) must not count as "taken over".
         if (
             null !== $this->editLockService->blockingLock(
                 $activity,
@@ -697,7 +697,7 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('admin/activities/index');
         }
 
-        // A cancelled activity is a finished tombstone and is not revised; the board must un-cancel it first.
+        // A cancelled activity is finished and is not revised; the board must un-cancel it first.
         if ($activity->isCancelled()) {
             $this->addFlash(
                 AlertTypes::Warning->value,
@@ -894,9 +894,9 @@ class AdminController extends AbstractController
 
     /**
      * The sign-ups page: a table per (live) sign-up list of everyone who signed up, with their answers,
-     * membership type, attendance marking and a bulk-email composer. The table, marking and email all live in the
-     * {@see \App\Twig\Components\Activity\Admin\SignupOverview} live component embedded by the template, which
-     * re-asserts access on every action.
+     * membership type, attendance marking and a bulk-email composer. The table, marking and email are all
+     * implemented in the {@see \App\Twig\Components\Activity\Admin\SignupOverview} live component embedded by the
+     * template, which re-asserts access on every action.
      */
     #[Route(
         path: '/{activity}/signups',

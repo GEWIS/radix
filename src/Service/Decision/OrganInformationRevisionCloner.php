@@ -13,10 +13,10 @@ use Override;
 use function assert;
 
 /**
- * Spawns the next draft {@see OrganInformationRevision} from an existing one, whether because the board asked for
+ * Spawns the next draft {@see OrganInformationRevision} from an existing one, whether because the board requested
  * changes, because a rejected page is being reopened, or because a body wants to change what is already on the website.
  * The localised texts and the social links are deep-copied into fresh rows so orphan removal can never delete the
- * source revision's content; the images and the crops on them are carried by value.
+ * source revision's content; the images and the crops on them are copied by value.
  */
 final readonly class OrganInformationRevisionCloner extends AbstractRevisionCloner
 {

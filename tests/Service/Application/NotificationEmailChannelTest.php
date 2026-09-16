@@ -43,8 +43,8 @@ final class NotificationEmailChannelTest extends TestCase
     }
 
     /**
-     * A notification addressed to one user is nobody else's to receive. Were it to reach the subscriber fan-out, it
-     * would be mailed to every member who opted into its category.
+     * A notification addressed to one user must not be delivered to anyone else. Were it to reach the subscriber
+     * fan-out, it would be mailed to every member who opted into its category.
      */
     public function testANotificationAddressedToSomeoneIsNeverQueued(): void
     {

@@ -13,7 +13,7 @@ settings:
 # The available types are "header", "topblock", "activities", "activityfooter", "extramessage" and "tinyfooter"
 messageblocks:
 
-    # Each mailing must have a header to make the template shine! It contains the title and the date.
+    # Each mailing must have a header. It contains the title and the date.
     - type: "header"
       title: "{{SUBJECT_NAME}}"
       date: 2026-08-02 # Note that this date needs to be updated

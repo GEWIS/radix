@@ -15,10 +15,9 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
 /**
- * The member register, filtered the way a secretary looks for someone: by what they typed, and by the state the
- * record is in.
+ * The member register, filtered by the search text and by the state the record is in.
  *
- * The counts on the chips are of the current search rather than of the whole table, so narrowing the search says how
+ * The counts on the chips are of the current search rather than of the whole table, so narrowing the search shows how
  * many of those matches are expired rather than how many members are.
  *
  * @extends AbstractDoctrinePaginatedOverview<Member>

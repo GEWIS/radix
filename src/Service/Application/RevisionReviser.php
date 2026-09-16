@@ -12,7 +12,7 @@ use App\Workflow\RevisionClonerRegistry;
 /**
  * Starting a new draft off what a revisable currently shows, which is the only way anything already decided on is
  * changed. Whether that is allowed at all is {@see \App\Entity\Application\Enums\RevisionStatus::reviseRefusal()};
- * this is the part that does it, whichever kind of principal asked.
+ * this is the part that does it, whichever kind of principal requested it.
  *
  * The counterpart of {@see RevisionDiscarder}, which throws such a draft away again.
  */
@@ -23,8 +23,8 @@ final readonly class RevisionReviser
     }
 
     /**
-     * A fresh draft off this revision, authored by whoever asked for it. The caller persists and flushes, so a draft
-     * commits together with whatever else the same request did.
+     * A fresh draft off this revision, authored by the principal that requested it. The caller persists and flushes,
+     * so a draft commits together with whatever else the same request did.
      */
     public function spawnDraft(
         RevisionInterface $revision,

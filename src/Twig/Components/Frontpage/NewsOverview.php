@@ -32,8 +32,8 @@ final class NewsOverview extends AbstractInfiniteScrollOverview
     #[LiveProp]
     public ?int $year = null;
 
-    // Not URL-synced: the year is a query parameter of its own, which the component's own sync could drop. A link
-    // to one category still lands right, because the page hands the parameter in when it mounts the component.
+    // Not URL-synced: the year is a query parameter of its own, which the component's own sync could drop. A link to
+    // one category still lands right, because the page passes the parameter in when it mounts the component.
     #[LiveProp(writable: true)]
     public ?string $category = null;
 

@@ -22,8 +22,8 @@
         cursor: grabbing;
     }
 
-    // A tier admitted together with the one above sits against it, so a rank reads as one block rather than as two
-    // rows that happen to carry the same number.
+    // A tier admitted together with the one above is flush against it, so a rank reads as one block rather than as
+    // two rows that happen to have the same number.
     &--tied {
         margin-block-start: -0.35rem;
         border-start-start-radius: 0;

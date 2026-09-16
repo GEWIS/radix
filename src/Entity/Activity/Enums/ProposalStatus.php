@@ -27,17 +27,17 @@ enum ProposalStatus: string implements TranslatableInterface
     /** The financial side is settled, either by an approved budget or because the activity costs nothing. */
     case Cleared = 'cleared';
 
-    /** The board turned the proposal down; none of its dates are held. */
+    /** The board turned the proposal down; none of its dates are reserved. */
     case Declined = 'declined';
 
-    /** The body took the proposal back; none of its dates are held. */
+    /** The body withdrew the proposal; none of its dates are reserved. */
     case Withdrawn = 'withdrawn';
 
     /** The reserved date came too close without the financial side being settled, so it was released. */
     case Lapsed = 'lapsed';
 
     /**
-     * Whether a proposal in this state holds its date against everybody else.
+     * Whether a proposal in this state reserves its date against other proposals.
      */
     public function holdsADate(): bool
     {
@@ -50,7 +50,7 @@ enum ProposalStatus: string implements TranslatableInterface
 
     /**
      * Whether a proposal in this state counts against its body's allowance for the period. A proposal the board turned
-     * down, or that was taken back, does not burn a slot for the rest of the quartile.
+     * down, or that was withdrawn, does not use up a slot for the rest of the quartile.
      */
     public function countsTowardsAllowance(): bool
     {
@@ -63,8 +63,8 @@ enum ProposalStatus: string implements TranslatableInterface
     }
 
     /**
-     * Whether the body may still change what it asked for. Once a date is held, changing the dates would mean holding
-     * a date nobody approved, so the way to change it is to withdraw and propose again.
+     * Whether the body may still change what it requested. Once a date is reserved, changing the dates would mean
+     * reserving a date nobody approved, so the way to change it is to withdraw and propose again.
      */
     public function isEditableByAuthor(): bool
     {
@@ -86,8 +86,8 @@ enum ProposalStatus: string implements TranslatableInterface
     }
 
     /**
-     * The states {@see self::countsTowardsAllowance()} answers true for, for the queries that have to say the same
-     * thing in DQL.
+     * The states {@see self::countsTowardsAllowance()} returns true for, for the queries that have to apply the same
+     * check in DQL.
      *
      * @return list<self>
      */
@@ -101,7 +101,7 @@ enum ProposalStatus: string implements TranslatableInterface
     }
 
     /**
-     * The states {@see self::holdsADate()} answers true for.
+     * The states {@see self::holdsADate()} returns true for.
      *
      * @return list<self>
      */

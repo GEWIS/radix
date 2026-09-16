@@ -11,13 +11,13 @@ use Doctrine\ORM\Mapping\Column;
 use NoDiscard;
 
 /**
- * One place a body or a company can be followed, as the platform and the handle it is known by there. The address is
- * never stored: {@see SocialPlatform::urlFor()} builds it when a page needs one, so nothing a reader was tracked with
- * survives being pasted in.
+ * One place a body or a company can be followed, as the platform and the handle it is known by there. The
+ * address is never stored: {@see SocialPlatform::urlFor()} builds it when a page needs one, so no tracking
+ * parameters from a pasted link are kept.
  *
  * A social link belongs to a revision rather than to the aggregate, so adding or dropping one goes through review like
- * everything else the page says. Each domain's concrete subclass is the entity, and declares the association back to
- * the revision that owns it; this class holds only what every one of them says, as {@see LocalisedText} does.
+ * everything else on the page. Each domain's concrete subclass is the entity, and declares the association back to the
+ * revision that owns it; this class declares only what all of them have in common, as {@see LocalisedText} does.
  */
 abstract class AbstractSocialLink
 {
@@ -28,8 +28,8 @@ abstract class AbstractSocialLink
 
     /**
      * Final so every concrete subclass shares this exact signature, which lets {@see self::copy()} use `new static()`.
-     * The platform is settled when the link is made and never changes: a handle only means anything on the platform it
-     * was written for, and it is normalised against that platform on the way in.
+     * The platform is set when the link is created and never changes: a handle only means anything on the platform it
+     * was written for, and the handle is normalised against that platform when it is assigned.
      */
     final public function __construct(
         #[Column(
@@ -71,7 +71,7 @@ abstract class AbstractSocialLink
     }
 
     /**
-     * A fresh, unpersisted copy for the cloners, so orphan removal can never take the source revision's row with it.
+     * A fresh, unpersisted copy for the cloners, so orphan removal can never delete the source revision's row.
      */
     #[NoDiscard]
     public function copy(): static

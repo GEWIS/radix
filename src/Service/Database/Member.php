@@ -78,7 +78,7 @@ class Member
     /**
      * Subscribe a member from what the sign-up flow collected.
      *
-     * Answers null when the address is already spoken for. The flow rejects that on the step that asks for it, so
+     * Returns null when the address is already in use. The flow rejects that on the step that collects it, so
      * getting here means it was taken while the rest of the form was being filled in.
      */
     public function subscribe(RegistrationData $data): ?ProspectiveMemberModel
@@ -139,9 +139,9 @@ class Member
      * Queue an e-mail to the (prospective) member and the secretary with an update on the (prospective) member's
      * registration.
      *
-     * Only the membership number travels; the record is read back and rendered from by
+     * Only the membership number is passed; the record is read back and rendered by
      * {@see \App\MessageHandler\Database\RegistrationUpdateEmailHandler}. Every caller has flushed by the time it
-     * gets here, so there is something left to read back.
+     * gets here, so the record can be read back.
      */
     public function sendRegistrationUpdateEmail(
         MemberModel|ProspectiveMemberModel $member,
@@ -717,8 +717,8 @@ class Member
     /**
      * The date the membership would run until after being extended once more.
      *
-     * The period is built the same way {@see self::expiration()} builds the one it stores, so what is asked for on
-     * the confirmation page cannot drift away from what is carried out.
+     * The period is built the same way {@see self::expiration()} builds the one it stores, so what is shown on the
+     * confirmation page cannot differ from what is executed.
      */
     public function getExtendedExpiration(MemberModel $member): DateTimeImmutable
     {
@@ -1006,9 +1006,9 @@ class Member
     }
 
     /**
-     * How many members hold a current membership of each type.
+     * How many members have a current membership of each type.
      *
-     * Kept out of the status figures because only the dashboard asks for it.
+     * Kept out of the status figures because only the dashboard uses it.
      *
      * @return array<string, int>
      */
@@ -1027,7 +1027,7 @@ class Member
     }
 
     /**
-     * Prospective members who have paid. Counted on its own so the sidebar badge does not have to ask for the whole
+     * Prospective members who have paid. Counted on its own so the sidebar badge does not have to load the whole
      * state of the register.
      */
     public function getPaidProspectivesCount(): int
@@ -1057,7 +1057,7 @@ class Member
         MemberModel $member,
         MemberUpdateModel $memberUpdate,
     ): ?MemberModel {
-        // We use reflection here, because using the hydrator on Member(Edit)Form sucks (requires more info). This does
+        // We use reflection here, because using the hydrator on Member(Edit)Form requires more information. This does
         // not account for any type changes that may be required (everything is currently a string).
         $reflectionClass = new ReflectionClass($member);
         foreach ($memberUpdate->toArray() as $property => $value) {
@@ -1320,7 +1320,7 @@ class Member
                 }
             }
 
-            // A member can turn up under several reasons, which are gathered onto the one row they get.
+            // A member can appear under several reasons, which are gathered onto the single row for that member.
             foreach ($combined[$reason->value] ?? [] as $member) {
                 $members[$member->lidnr] = $member;
                 $reasons[$member->lidnr][] = $reason;
@@ -1377,10 +1377,10 @@ class Member
     }
 
     /**
-     * Whether this address already belongs to someone else — a member or an applicant.
+     * Whether this address already belongs to someone else (a member or an applicant).
      *
-     * A renewal may change the address it is sent to, and two records answering to the same address cannot both be
-     * reached, so the form refuses one that is taken.
+     * A renewal may change the address it is sent to, and two records with the same address cannot both be reached,
+     * so the form refuses one that is taken.
      */
     public function emailBelongsToSomeoneElse(
         string $email,
@@ -1433,9 +1433,9 @@ class Member
     /**
      * The member an audit entry is attributed to.
      *
-     * Security::getUser() answers with whatever the firewall authenticated, which on this side is a member's own
-     * account; the ledger records the member behind it, because that is who did the thing. A command run from the
-     * console is nobody.
+     * Security::getUser() returns whatever the firewall authenticated, which on this side is a member's own account;
+     * the ledger records the member behind it, because that is who performed the action. A command run from the
+     * console has no member.
      */
     private function auditUser(): ?MemberModel
     {

@@ -147,8 +147,8 @@ final readonly class EditLockService
         if (!$this->isAlive($lock)) {
             // The lock is still ours on record but its heartbeat lapsed (e.g. the tab slept past the TTL). Re-acquire
             // under the GET_LOCK mutex rather than giving up: acquire()'s heldBy path re-assigns and re-pings, and the
-            // mutex serialises against a concurrent takeover — if someone else grabbed it meanwhile, heldBy fails there
-            // and acquire() returns null, so we still return false as before.
+            // mutex serialises against a concurrent takeover. If someone else acquired it meanwhile, heldBy fails
+            // there and acquire() returns null, so we still return false as before.
             return null !== $this->acquire(
                 $resource,
                 $principal,

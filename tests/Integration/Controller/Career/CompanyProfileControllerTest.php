@@ -55,7 +55,7 @@ final class CompanyProfileControllerTest extends DatabaseTestCase
             $companyUser,
             $draft->getAuthorCompanyUser(),
         );
-        // What visitors see does not move until the committee agrees.
+        // What visitors see does not change until the committee agrees.
         self::assertSame(
             $live,
             $company->getLiveRevision(),
@@ -88,7 +88,7 @@ final class CompanyProfileControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A company can only ever act on its own profile, because the company is read off the signed-in representative
+     * A company can only ever act on its own profile, because the company is read from the signed-in representative
      * rather than out of the URL.
      */
     public function testARepresentativeActsOnItsOwnCompanyOnly(): void

@@ -31,8 +31,8 @@ use SortDirection;
 /**
  * Vacancy aggregate root.
  *
- * The stable identity, the slug, the publication flag and the owning package live here and survive across edits. The
- * revisable, reviewable content (localised texts, contact details, category and labels) lives on the chain of
+ * The stable identity, the slug, the publication flag and the owning package are on this entity and survive across
+ * edits. The revisable, reviewable content (localised texts, contact details, category and labels) is on the chain of
  * {@see VacancyRevision}s, so label changes go through review; the labels getter here is a display proxy to the
  * display revision. The publicly live version is {@see self::getLiveRevision()} (the latest approved revision); the
  * working head is {@see self::getCurrentRevision()}.
@@ -203,7 +203,7 @@ class Vacancy implements RevisableInterface
     }
 
     /**
-     * Display proxy: the labels of the display revision. Labels live on the revision now (so their changes are
+     * Display proxy: the labels of the display revision. Labels are on the revision now (so their changes are
      * reviewed); the public view shows the approved set.
      *
      * @return Collection<array-key, VacancyLabel>
@@ -214,7 +214,7 @@ class Vacancy implements RevisableInterface
     }
 
     /**
-     * Display proxy. Read paths (templates, views) keep reading content straight off the vacancy; it delegates to the
+     * Display proxy. Read paths (templates, views) keep reading content from the vacancy; it delegates to the
      * display revision (the live one when present, otherwise the working head).
      */
     public function getName(): CareerLocalisedText

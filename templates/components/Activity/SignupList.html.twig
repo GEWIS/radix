@@ -44,7 +44,8 @@
             {% endif %}
         </div>
 
-        {# The id keeps idiomorph from replacing the modal, so modal-close stays connected and can hide it on the scoped signup:success event after a re-render. #}
+        {# The id keeps idiomorph from replacing the modal, so modal-close stays connected and can hide it on the
+           scoped signup:success event after a re-render. #}
         <div class="modal fade" id="{{ signupModalId }}" tabindex="-1" aria-hidden="true"
              data-controller="modal-close" data-modal-close-list-id-value="{{ listId }}"
              data-action="signup:success@window->modal-close#hide">

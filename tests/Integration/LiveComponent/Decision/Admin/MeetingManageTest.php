@@ -272,7 +272,7 @@ final class MeetingManageTest extends DatabaseTestCase
 
     public function testTheBoardKeepsTheAgendaAndItsDocuments(): void
     {
-        // Keeping a meeting is the board's job, so a board seat is all its agenda and its documents ask for.
+        // Keeping a meeting is the board's job, so a board seat is all its agenda and its documents require.
         $this->authenticate(['ROLE_BOARD']);
         $component = $this->manageFor();
 
@@ -415,7 +415,7 @@ final class MeetingManageTest extends DatabaseTestCase
     }
 
     /**
-     * The complete GMM by default; positive offsets walk forward through the sequentially numbered GMMs (+1 the
+     * The complete GMM by default; positive offsets move forward through the sequentially numbered GMMs (+1 the
      * processing one, +2 the soonest upcoming, +3 the one after).
      */
     private function manageFor(int $offset = 0): MeetingManage

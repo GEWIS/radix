@@ -19,8 +19,8 @@ use function dirname;
 use function sort;
 
 /**
- * Storage is the in-memory adapter, so the walk only sees what each test stores, and the `images` transport is
- * in-memory too, so what the command queued is what the transport holds. The command encodes nothing itself: every
+ * Storage is the in-memory adapter, so the command only finds what each test stores, and the `images` transport is
+ * in-memory too, so what the command queued is what the transport contains. The command encodes nothing itself: every
  * assertion here is about the messages, not about files in the variant cache.
  */
 final class PregenerateImageVariantsCommandTest extends DatabaseTestCase

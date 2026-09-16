@@ -112,7 +112,7 @@ class AbstractPaginatedOverviewTest extends TestCase
     }
 
     /**
-     * Changing the page size moves everything, so the reader goes back to the start rather than to whatever now
+     * Changing the page size moves everything, so the overview returns to the first page rather than to whatever now
      * happens to be under the old page number.
      */
     public function testStartsOverWhenThePageSizeChanges(): void
@@ -168,7 +168,7 @@ class AbstractPaginatedOverviewTest extends TestCase
                 25,
                 3,
             ],
-            // A reader is always on page 1 of 1, even of nothing.
+            // A table with nothing to show still has one page.
             'nothing to show' => [
                 0,
                 25,
@@ -297,7 +297,7 @@ class AbstractPaginatedOverviewTest extends TestCase
     }
 
     /**
-     * The page number alone is not what a page holds. Leaving a filter out of the key means the rows of the old one
+     * The page number alone does not identify a page. Leaving a filter out of the key means the rows of the old one
      * survive a change that lands on the same page number, which is the shape of every paging bug this class exists
      * to stop.
      */
@@ -332,9 +332,9 @@ class AbstractPaginatedOverviewTest extends TestCase
     /**
      * A second table pages through the same action and the same clamping, and its totals are read before its page
      * is: the pagination partial renders the page count, and the collapsed half of the activity overview renders the
-     * total in its heading. The table that ran its own action instead queried while the old page number still stood,
-     * and then rendered that page again for every request for a different one, which is why a page in the first
-     * table of that overview changed nothing until the page was reloaded.
+     * total in its heading. The table that ran its own action instead queried while the old page number was still
+     * current, and then rendered that page again for every request for a different one, which is why a page in the
+     * first table of that overview changed nothing until the page was reloaded.
      */
     public function testASecondTableServesThePageThatWasAskedFor(): void
     {

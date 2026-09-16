@@ -37,7 +37,7 @@ use function assert;
 
 /**
  * Vacancies across every company, from the board's side. Like a company profile, a vacancy is revised rather than
- * edited once it has been approved, so what is public only changes when somebody agrees to it.
+ * edited once it has been approved, so what is public only changes when a reviewer approves it.
  */
 #[IsGranted(
     attribute: UserRoles::CompanyAdmin->value,
@@ -246,8 +246,8 @@ class AdminVacancyController extends AbstractController
             );
         }
 
-        // A vacancy belongs to whichever company sold the package it hangs off, so leaving the choice open would let
-        // an edit hand the posting to somebody else. Creating one is where that choice is actually made.
+        // A vacancy belongs to whichever company sold the package it is attached to, so leaving the choice open would
+        // let an edit move the posting to another company. Creating one is where that choice is actually made.
         $run = $this->flowRun($request);
 
         if ($run instanceof RedirectResponse) {

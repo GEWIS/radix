@@ -34,12 +34,12 @@ use function substr;
 use function usort;
 
 /**
- * The directory a page's images live in is the whole record of them; there is no table, which is what lets the
+ * The directory a page's images are stored in is the whole record of them; there is no table, which is what lets the
  * browser still offer an image the HTML no longer shows.
  */
 final readonly class PageImageStore
 {
-    /** Where a page that has no id yet parks its uploads; a page id cannot collide, since ids are numbers. */
+    /** Where a page that has no id yet stores its uploads; a page id cannot collide, since ids are numbers. */
     private const string PENDING = 'pending';
 
     /** After this an image is taken to be finished, so a worker that died cannot block it for good. */
@@ -146,7 +146,7 @@ final readonly class PageImageStore
         return $images;
     }
 
-    /** Answers whether anything moved, so the caller knows to flush. */
+    /** Returns whether anything moved, so the caller knows to flush. */
     public function claim(
         Page $page,
         string $flowRun,
@@ -188,7 +188,7 @@ final readonly class PageImageStore
                 $path,
                 $destination,
             );
-            // Variants are keyed by the source path, so the ones under the old path are of no use to anybody.
+            // Variants are keyed by the source path, so the ones under the old path are of no further use.
             $this->variantGenerator->purge($path);
             $this->settle($path);
             $this->process(
@@ -271,7 +271,7 @@ final readonly class PageImageStore
         $this->fileStorage->deleteDirectory($directory);
     }
 
-    /** Answers how many files went. */
+    /** Returns how many files were deleted. */
     public function prune(DateTimeImmutable $before): int
     {
         $root = $this->directory(self::PENDING);
@@ -295,7 +295,7 @@ final readonly class PageImageStore
             ++$pruned;
         }
 
-        // A run key is minted per arrival at the form, so an emptied run directory is written to again by nobody.
+        // A run key is minted per arrival at the form, so an emptied run directory is never written to again.
         foreach (array_unique($runs) as $run) {
             if ([] !== $this->fileStorage->listFiles($run)) {
                 continue;

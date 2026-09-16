@@ -23,7 +23,7 @@ use function sprintf;
  *
  * Saving a page sanitises it, so from now on nothing gets in that should not. What was written before that was true
  * has never been checked, which is what this is for. It is deliberately not scheduled: a page is only ever written by
- * somebody the board trusts, and running it over and over would be answering a question that has been settled.
+ * a user the board trusts, and running it repeatedly would re-check pages that have already been sanitised.
  */
 #[AsCommand(
     name: 'app:page:sanitise',

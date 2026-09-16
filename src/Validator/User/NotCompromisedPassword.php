@@ -9,9 +9,9 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Checks that a password does not appear in a known data breach. Symfony ships a constraint of the same name, but it
- * speaks haveibeenpwned's k-anonymity protocol: it asks for the first five characters of the hash and searches the
- * range that comes back. The association runs its own lookup, which answers for the whole hash instead, so the two
- * cannot be reconciled through the endpoint setting alone.
+ * implements haveibeenpwned's k-anonymity protocol: it sends the first five characters of the hash and searches the
+ * returned range. The association runs its own lookup, which takes the whole hash instead, so the two cannot be
+ * reconciled through the endpoint setting alone.
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class NotCompromisedPassword extends Constraint
@@ -27,7 +27,7 @@ class NotCompromisedPassword extends Constraint
 
     /**
      * Whether a lookup that fails lets the password through. It does not: a service that is unreachable is no reason
-     * to hand somebody an account with a breached password on it.
+     * to give somebody an account with a breached password on it.
      */
     public bool $skipOnError = false;
 

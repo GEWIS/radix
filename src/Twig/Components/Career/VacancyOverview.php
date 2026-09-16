@@ -34,14 +34,14 @@ use function strval;
 
 /**
  * Backs the public vacancies overview: the whole filter set (category, owning company, labels and a free-text search)
- * lives here and mirrors itself into the query string, so the address bar is a shareable, reload-safe link. A company
+ * is defined here and is mirrored into the query string, so the address bar is a shareable, reload-safe link. A company
  * card's per-category link lands here with `?category=...&company=...` pre-applied. Infinite scroll grows `limit`
  * through the loadMore action.
  *
  * As on the company overview, the vacancies are listed in a random order, so that a company is not structurally
- * favoured by where its name falls in the alphabet. The order is drawn once, at mount, and carried along as a seed for
- * as long as the visitor stays on the page; without that, every filter keystroke and every loaded page would reshuffle
- * the list under the reader. Reloading the page deals a new hand.
+ * favoured by where its name falls in the alphabet. The order is drawn once, at mount, and kept as a seed for as long
+ * as the visitor stays on the page; without that, every filter keystroke and every loaded page would reshuffle the list
+ * under the reader. Reloading the page draws a new order.
  */
 #[AsLiveComponent(
     name: 'Career:VacancyOverview',
@@ -74,8 +74,8 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
     )]
     public array $labelFilters = [];
 
-    // Neither is client-writable: they travel in the signed props, so a crafted request can neither reshuffle the list
-    // mid-page nor ask for an arbitrarily large page. The seed's ceiling keeps it inside the range JavaScript
+    // Neither is client-writable: they are passed in the signed props, so a crafted request can neither reshuffle the
+    // list mid-page nor ask for an arbitrarily large page. The seed's ceiling keeps it inside the range JavaScript
     // represents exactly, since the props go through JSON.parse in the browser and a rounded seed fails the checksum.
     #[LiveProp]
     public int $seed = 0;
@@ -152,7 +152,7 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
 
     /**
      * The highlighted vacancies among the current results, for the strip above the grid. Narrowed by the filters, so
-     * filtering down to internships does not leave a highlighted full-time job sitting on top.
+     * filtering down to internships does not leave a highlighted full-time job at the top.
      *
      * @return Vacancy[]
      */
@@ -204,7 +204,7 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
     }
 
     /**
-     * The filter panel reads this twice (once to decide whether to draw the block, once for the checkboxes), so it is
+     * The filter panel reads this twice (once to check whether to render the block, once for the checkboxes), so it is
      * fetched once per render, with the localised names the checkboxes are labelled with.
      *
      * @return VacancyLabel[]
@@ -216,7 +216,7 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
 
     /**
      * The matching vacancies in this visitor's order. A seeded Mt19937 rather than the global generator, so drawing
-     * this hand leaves the rest of the request's randomness alone.
+     * this order leaves the rest of the request's randomness alone.
      *
      * @return int[]
      */
@@ -252,7 +252,7 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
 
     /**
      * Normalise a raw list of label-id values into a clean, re-indexed list of positive ints (dropping blanks, zero and
-     * negatives). Shared by mount() (query-string parsing) and matchingIds() (filtering) so the two can never drift.
+     * negatives). Shared by mount() (query-string parsing) and matchingIds() (filtering) so the two can never differ.
      *
      * @param array<mixed> $values
      *

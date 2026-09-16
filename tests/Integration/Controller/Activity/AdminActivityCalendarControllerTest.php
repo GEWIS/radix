@@ -21,9 +21,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use function count;
 
 /**
- * Handing a proposal in, against the seeded calendar.
+ * Submitting a proposal, against the seeded calendar.
  *
- * The seed holds GETÉST to two in the round that is taking proposals and has it use both, and puts KEUR on a standing
+ * The seed limits GETÉST to two in the round that is taking proposals and has it use both, and puts KEUR on a standing
  * two with one used, so one body has room and the other does not. Actions are invoked directly, as the other admin
  * controller tests do.
  */

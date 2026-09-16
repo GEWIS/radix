@@ -22,8 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The labels a vacancy can be tagged with. Shared reference data rather than revisable content, so these are edited
- * directly; a label already in use cannot be removed, since that would quietly rewrite vacancies that were approved
- * carrying it.
+ * directly; a label already in use cannot be removed, since that would quietly rewrite vacancies approved with it.
  */
 #[IsGranted(
     attribute: UserRoles::CompanyAdmin->value,
@@ -139,8 +138,8 @@ class AdminVacancyLabelController extends AbstractController
     )]
     public function delete(VacancyLabel $label): Response
     {
-        // Removing a label that revisions still carry would change what was approved without anybody reviewing it, so
-        // it has to be taken off those vacancies first.
+        // Removing a label that revisions still use would change what was approved without anybody reviewing it, so it
+        // has to be taken off those vacancies first.
         if (!$label->getRevisions()->isEmpty()) {
             $this->addFlash(
                 AlertTypes::Warning->value,

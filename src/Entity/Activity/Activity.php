@@ -33,12 +33,12 @@ use function assert;
 /**
  * Activity aggregate root.
  *
- * Only the stable identity and the (immutable) creator live here and survive across edits. The revisable, reviewable
- * content (the organising organ and company, the labels, the localised texts, the schedule, the category, the facility
- * flags, and the sign-up lists) lives on the chain of {@see ActivityRevision}s, so every change to them goes through
- * review; on approval, existing sign-ups are migrated onto the newly-live revision's lists so they survive across
- * edits. The publicly live version is {@see self::getLiveRevision()} (the latest approved revision); the working head
- * is {@see self::getCurrentRevision()}.
+ * Only the stable identity and the (immutable) creator are on this entity and survive across edits. The revisable,
+ * reviewable content (the organising organ and company, the labels, the localised texts, the schedule, the category,
+ * the facility flags, and the sign-up lists) is on the chain of {@see ActivityRevision}s, so every change to them goes
+ * through review; on approval, existing sign-ups are migrated onto the newly-live revision's lists so they survive
+ * across edits. The publicly live version is {@see self::getLiveRevision()} (the latest approved revision); the
+ * working head is {@see self::getCurrentRevision()}.
  *
  * @phpstan-import-type ActivityLabelArrayType from ActivityLabel as ImportedActivityLabelArrayType
  * @phpstan-import-type SignupListArrayType from SignupList as ImportedSignupListArrayType
@@ -93,8 +93,8 @@ class Activity implements RevisableInterface
 
     /**
      * Who created this activity, or null once that member has been removed from the register. The activity stays: it
-     * carries sign-up lists other members are on and it is part of the association's calendar, neither of which is
-     * the organiser's to take with them.
+     * has sign-up lists other members are on and it is part of the association's calendar, neither of which should be
+     * removed with the organiser.
      */
     #[ManyToOne(targetEntity: MemberModel::class)]
     #[JoinColumn(
@@ -326,7 +326,7 @@ class Activity implements RevisableInterface
     }
 
     /**
-     * Display proxy: the labels of the display revision (organ/company/labels now live on the revision so their
+     * Display proxy: the labels of the display revision (organ/company/labels are now on the revision so their
      * changes are reviewed; the public view shows the approved set).
      *
      * @return Collection<array-key, ActivityLabel>
@@ -406,7 +406,7 @@ class Activity implements RevisableInterface
     }
 
     /**
-     * Display proxy. Read paths (templates, views, GDPR export) keep reading content straight off the activity; it
+     * Display proxy. Read paths (templates, views, GDPR export) keep reading content from the activity; it
      * delegates to the display revision (the live one when present, otherwise the working head).
      */
     public function getName(): ActivityLocalisedText
@@ -450,9 +450,9 @@ class Activity implements RevisableInterface
     /**
      * Whether the activity has taken place, on the schedule the public is shown.
      *
-     * {@see \App\ViewModel\Activity\Admin\ActivityAdminRow::$passed} answers the same question for the revision a
+     * {@see \App\ViewModel\Activity\Admin\ActivityAdminRow::$passed} computes the same value for the revision a
      * row is built for, which is what decides whether that revision can still be revised. This one is about the
-     * activity itself, so it reads the displayed schedule.
+     * activity itself, so it uses the displayed schedule.
      */
     public function hasPassed(): bool
     {

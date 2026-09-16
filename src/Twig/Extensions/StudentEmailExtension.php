@@ -48,7 +48,7 @@ class StudentEmailExtension extends AbstractExtension
     {
         $user = $this->security->getUser();
 
-        // A company user has no membership to lose touch over, and a passer-by has nothing to be told.
+        // A company user has no membership this concerns, and an anonymous visitor is not shown the notice.
         if (!$user instanceof User) {
             return false;
         }

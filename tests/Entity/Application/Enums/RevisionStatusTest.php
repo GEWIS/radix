@@ -11,7 +11,7 @@ use function in_array;
 
 /**
  * These predicates drive the voter (what is editable), the live-revision promotion (what is live) and the review queue
- * (what is reviewable), so a miscategorised case ripples widely. Each test walks every case so a newly added status
+ * (what is reviewable), so a miscategorised case ripples widely. Each test checks every case so a newly added status
  * cannot silently default to the wrong side of a predicate.
  */
 final class RevisionStatusTest extends TestCase

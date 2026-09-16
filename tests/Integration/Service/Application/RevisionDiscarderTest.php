@@ -23,9 +23,8 @@ use function intval;
  * revision with a NON-cascading foreign key, so a plain `remove($revision)` would fail on them; the service removes
  * them first.
  *
- * Exercised against all three revisable domains. The discarder reads the comment class off the revision, so a domain
- * that answers that wrong loses its thread rows silently — which is exactly what the career half of this had no
- * coverage for.
+ * Exercised against all three revisable domains. The discarder reads the comment class from the revision, so a domain
+ * that gets it wrong loses its thread rows silently, which is exactly what the career half of this had no coverage for.
  */
 final class RevisionDiscarderTest extends DatabaseTestCase
 {
@@ -143,7 +142,7 @@ final class RevisionDiscarderTest extends DatabaseTestCase
     }
 
     /**
-     * An approved activity whose live revision carries no sign-up lists, so cloning it into a draft needs no extra
+     * An approved activity whose live revision has no sign-up lists, so cloning it into a draft needs no extra
      * cascade handling and the discard path stays the subject under test.
      */
     private function anApprovedActivityWithoutSignupLists(): Activity

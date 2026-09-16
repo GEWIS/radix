@@ -67,8 +67,8 @@ final readonly class HomePageService
         $weeklyPhoto = $this->weeklyPhotoRepository->getCurrentPhotoOfTheWeek();
         $activePolls = $this->pollRepository->findActivePolls();
 
-        // Who has a birthday today is only shown to members, and finding out costs a date calculation over every
-        // member plus a photo lookup for each of them, so a passer-by is not made to pay for a panel they never see.
+        // Who has a birthday today is only shown to members, and finding out costs a date calculation over every member
+        // plus a photo lookup for each of them, so an anonymous visitor does not pay for a panel they never see.
         $birthdayMembers = $this->security->isGranted(UserRoles::User->value)
             ? $this->memberRepository->findBirthdayMembers(0)
             : [];

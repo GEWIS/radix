@@ -38,7 +38,7 @@ use function substr_count;
 final class AdminConsolidationTest extends DatabaseTestCase
 {
     /**
-     * A member who administers the register but holds no board seat.
+     * A member who administers the register but has no board seat.
      */
     private const int REGISTER_ADMIN = 8002;
 
@@ -49,7 +49,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
 
     public function testAMeetingOffersItsDocumentsToTheSameHandsAsItsDecisions(): void
     {
-        // A serving secretary holds both: the register's rights are granted for as long as they are an installed,
+        // A serving secretary has both: the register's rights are granted for as long as they are an installed,
         // unrelieved board member, so the two never come apart in practice.
         $this->authenticate(
             self::REGISTER_ADMIN,
@@ -177,8 +177,8 @@ final class AdminConsolidationTest extends DatabaseTestCase
             'The seed is expected to contain a body that has been abrogated.',
         );
 
-        // Asked of the overview rather than of the rendered page: the table pages, so which page an abrogated body
-        // lands on is not something to assert against. What matters is that it is in the list at all.
+        // Checked against the overview rather than the rendered page: the table pages, so which page an abrogated
+        // body lands on is not something to assert against. What matters is that it is in the list at all.
         $overview = self::getContainer()->get(BodyPageOverview::class);
         $overview->pageSize = 100;
 
@@ -195,7 +195,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
     }
 
     /**
-     * A general members' meeting the seed's calendar holds.
+     * A general members' meeting the seed's calendar contains.
      */
     private function aMeetingNumber(): int
     {
@@ -228,7 +228,7 @@ final class AdminConsolidationTest extends DatabaseTestCase
     }
 
     /**
-     * A virtual counterpart is shown on the decision it belongs to, and taking it back is asked for through the
+     * A virtual counterpart is shown on the decision it belongs to, and unlinking it is requested through the
      * shared confirmation rather than done on the click.
      */
     public function testAVirtualCounterpartIsShownAndUnlinkedThroughTheSharedConfirmation(): void
@@ -327,8 +327,8 @@ final class AdminConsolidationTest extends DatabaseTestCase
 
         $request = new Request();
         $request->setSession($session);
-        // Sudo mode reads the session off a request that arrived with one, so the cookie has to be there: without it
-        // `hasPreviousSession()` is false and nothing that was granted is ever found again.
+        // Sudo mode reads the session from a request that arrived with one, so the cookie has to be there: without
+        // it `hasPreviousSession()` is false and nothing that was granted is ever found again.
         $session->start();
         $request->cookies->set(
             $session->getName(),

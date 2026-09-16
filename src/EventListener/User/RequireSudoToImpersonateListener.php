@@ -13,17 +13,17 @@ use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
- * Puts starting an impersonation behind sudo, so that the grant an administrator holds can stand in for the one the
- * account being impersonated would otherwise have to give. Nobody knows the password of the member they are looking
- * at, so without this the administration is unreachable from inside an impersonation.
+ * Puts starting an impersonation behind sudo, so that the grant an administrator has can be used in place of the one
+ * the account being impersonated would otherwise have to give. An administrator does not know the password of the
+ * member they are impersonating, so without this the administration is unreachable from inside an impersonation.
  *
  * `SwitchUserListener` has already decided the administrator may switch by the time this runs, and has not yet put
  * the new token in storage, so {@see SudoMode} still reads the administrator here. Refusing with the `SUDO` attribute
  * sends them through {@see SudoAccessDeniedListener} to the confirmation form, which returns them to the address
- * they asked for, impersonation parameter and all.
+ * they requested, impersonation parameter and all.
  *
- * Leaving an impersonation carries the original token rather than a `SwitchUserToken`, and is never refused: somebody
- * whose grant ran out while impersonating has to be able to get back to their own account.
+ * The event that ends an impersonation has the original token rather than a `SwitchUserToken`, and is never refused:
+ * an administrator whose grant expired while impersonating has to be able to get back to their own account.
  */
 #[AsEventListener(event: SecurityEvents::SWITCH_USER)]
 final class RequireSudoToImpersonateListener

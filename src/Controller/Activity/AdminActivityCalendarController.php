@@ -36,12 +36,12 @@ use function array_values;
 use function intval;
 
 /**
- * The option calendar as a body sees it: what is already claimed, what its own body has going, and the form to claim
+ * The option calendar as a body sees it: what is already claimed, what its own body has proposed, and the form to claim
  * a day.
  *
- * Everything lives under `/admin` because that is where the three menus already point and because proposing is
- * something an active member does, exactly like creating an activity. The board-only screens (rounds, exceptions,
- * decisions) say so on the action rather than on the class.
+ * Everything is under `/admin` because that is where the three menus already point and because proposing is something
+ * an active member does, exactly like creating an activity. The board-only screens (rounds, exceptions, decisions) say
+ * so on the action rather than on the class.
  */
 #[IsGranted(new Expression(
     'is_granted("' . UserRoles::ActiveMember->value . '") or is_granted("' . UserRoles::Board->value . '")',
@@ -235,7 +235,7 @@ class AdminActivityCalendarController extends AbstractController
     }
 
     /**
-     * Taking a proposal back, which releases every day it was standing on.
+     * Withdrawing a proposal, which releases every day it was still blocking.
      */
     #[Route(
         path: '/proposals/{proposal}/withdraw',

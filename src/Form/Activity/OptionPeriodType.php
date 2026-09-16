@@ -26,11 +26,11 @@ use function Symfony\Component\Translation\t;
 
 /**
  * A round of the option calendar. Two windows that are easy to confuse, so the labels spell out which is which: when
- * bodies may hand proposals in, and which days the activities they propose have to fall on.
+ * bodies may submit proposals, and which days the activities they propose have to fall on.
  *
  * There is no list of bodies here on purpose. The board sets exceptions on the limits screen, one row per exception,
- * and everybody else is answered by the default. The calendar this replaces asked for a number per body every time a
- * round was opened, pre-filled every one of them with zero, and shut out any body founded afterwards.
+ * and every other body gets the default. The calendar this replaces asked for a number per body every time a round was
+ * opened, pre-filled every one of them with zero, and shut out any body founded afterwards.
  *
  * @extends AbstractType<OptionPeriod>
  */

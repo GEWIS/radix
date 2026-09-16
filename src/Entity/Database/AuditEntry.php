@@ -60,9 +60,9 @@ abstract class AuditEntry
     /**
      * The member who made the entry.
      *
-     * A member rather than an account: the register is administered by whoever holds the office, and an entry says
-     * who did something rather than which login they did it under. Emptied rather than removed when that member is,
-     * because what was done still happened.
+     * A member rather than an account: the register is administered by the member who has the function, and an
+     * entry records who performed the action rather than which login they used. Emptied rather than removed when
+     * that member is, because what was done still happened.
      */
     #[ManyToOne(targetEntity: Member::class)]
     #[JoinColumn(
@@ -99,10 +99,10 @@ abstract class AuditEntry
     }
 
     /**
-     * The member number of whoever made the entry, or null once that member is gone.
+     * The number of the member who made the entry, or null once that member is gone.
      *
-     * A number rather than a name: it is what the register is searched and referred to by, it does not move when
-     * someone's name does, and it still says who acted when the member it belongs to has been deleted.
+     * A number rather than a name: it is what the register is searched and referred to by, it does not change when a
+     * member's name changes, and it still records who performed the action after that member has been deleted.
      */
     public function getUserLidnr(): ?int
     {

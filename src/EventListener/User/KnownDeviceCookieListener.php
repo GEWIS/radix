@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Attaches the device cookie {@see KnownDeviceRegistry::recognise()} left on the request; Symfony's remember-me
- * attribute carries exactly one cookie, so this one has an attribute and a listener of its own.
+ * attribute contains exactly one cookie, so this one has an attribute and a listener of its own.
  */
 #[AsEventListener(event: ResponseEvent::class)]
 final readonly class KnownDeviceCookieListener

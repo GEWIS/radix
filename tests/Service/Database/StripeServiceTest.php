@@ -24,9 +24,9 @@ use Stripe\PaymentIntent;
 /**
  * What the checkout decides before it talks to Stripe.
  *
- * Everything that reaches the API is left alone here: the client is built inside the service, so those paths cannot
- * be exercised without a network. The decisions in front of them can, and they are the ones that decide whether
- * somebody is sent back to a checkout, kept away from one, or charged twice.
+ * Everything that reaches the API is left alone here: the client is built inside the service, so those paths cannot be
+ * exercised without a network. The decisions in front of them can, and they are the ones that decide whether a
+ * prospective member is sent back to a checkout, kept away from one, or charged twice.
  */
 #[CoversClass(StripeService::class)]
 class StripeServiceTest extends TestCase
@@ -57,7 +57,7 @@ class StripeServiceTest extends TestCase
     }
 
     /**
-     * Stripe keeps a recovery URL for 30 days; while it lasts, that is where someone is sent back to.
+     * Stripe keeps a recovery URL for 30 days; while it lasts, that is where a prospective member is sent back to.
      */
     public function testSendsSomeoneBackToTheRecoveryUrlOfAnAbandonedCheckout(): void
     {
@@ -125,7 +125,7 @@ class StripeServiceTest extends TestCase
     }
 
     /**
-     * The session id arrives in a URL, where "no session" can turn into the four letters that spell it.
+     * The session id arrives in a URL, where "no session" arrives as an empty string or as the word "null".
      */
     #[DataProvider('sessionIdsThatAreNotOne')]
     public function testTakesNoSessionIdAsNoSession(string $sessionId): void
@@ -156,7 +156,7 @@ class StripeServiceTest extends TestCase
     }
 
     /**
-     * Stripe types an expandable field as either the id it was returned as or the object that id stands for,
+     * Stripe types an expandable field as either the id it was returned as or the object that id refers to,
      * depending on what the request asked to have expanded, and `payment_intent` is one of those. What is stored is
      * the id, whichever of the two arrives, because it is what a refund is looked up by later.
      */

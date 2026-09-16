@@ -187,10 +187,11 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // FontAwesome sprite icons for PhotoSwipe's built-in buttons, overridden through its own SVG options. Both arrows
-        // use the left chevron because PhotoSwipe mirrors the next arrow horizontally. The zoom icon carries a plus and a
-        // minus <use>; the stylesheet shows the right one for the current zoom state. The <use> inset (6px padding, 20/32
-        // glyph) matches spriteIcon(), so the close and zoom icons come out the same size as the other toolbar buttons.
+        // FontAwesome sprite icons for PhotoSwipe's built-in buttons, overridden through its own SVG options. Both
+        // arrows use the left chevron because PhotoSwipe mirrors the next arrow horizontally. The zoom icon has a plus
+        // and a minus <use>; the stylesheet shows the right one for the current zoom state. The <use> inset (6px
+        // padding, 20/32 glyph) matches spriteIcon(), so the close and zoom
+        // icons come out the same size as the other toolbar buttons.
         const sprite = this.iconSpriteUrlValue;
         const leftArrowSVG = `<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 50 30" width="50" height="30"><use href="${sprite}#chevron-left"></use></svg>`;
         const closeSVG = `<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 32 32" width="32" height="32"><use href="${sprite}#xmark" x="6" y="6" width="20" height="20"></use></svg>`;
@@ -432,7 +433,7 @@ export default class extends Controller<HTMLElement> {
         this.selecting = !this.selecting;
         this.gridTarget.classList.toggle('is-selecting', this.selecting);
 
-        // `d-none` (display:none !important), not the `hidden` attribute, because the bar carries `d-flex` which would
+        // `d-none` (display:none !important), not the `hidden` attribute, because the bar has `d-flex` which would
         // otherwise win and keep the actions visible.
         if (this.hasBulkBarTarget) {
             this.bulkBarTarget.classList.toggle('d-none', !this.selecting);
@@ -471,7 +472,7 @@ export default class extends Controller<HTMLElement> {
         this.updateCount();
     }
 
-    // Keep the page's bulk-action form carrying exactly the selected ids, so its native submit posts them.
+    // Keep exactly the selected ids in the page's bulk-action form, so its native submit posts them.
     private syncSelectionForm(): void {
         if (!this.hasSelectionFormTarget) {
             return;
@@ -599,7 +600,7 @@ export default class extends Controller<HTMLElement> {
             });
 
             // Only virtual albums (the weekly album) set an albumUrl; there the button links to the photo's real album,
-            // otherwise it stays hidden (order > the preloader divider so it sits with the right-hand buttons).
+            // otherwise it stays hidden (order > the preloader divider so it is placed with the right-hand buttons).
             this.lightbox.pswp.ui.registerElement({
                 name: 'album-button',
                 order: 9,

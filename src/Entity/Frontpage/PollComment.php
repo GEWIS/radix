@@ -25,7 +25,7 @@ use SortDirection;
  * What a member wrote underneath a poll. Members sign their comment with a name of their own choosing, and only the
  * board gets to see which member that was.
  *
- * A comment either stands on its own or answers another, however deep that goes.
+ * A comment either stands on its own or is a reply to another, however deep that goes.
  *
  * @phpstan-type PollCommentGdprArrayType = array{
  *     id: ?int,
@@ -141,7 +141,7 @@ class PollComment
     }
 
     /**
-     * Kept in step with {@see self::setParent()} so a reply shows up under the comment it answers straight away,
+     * Kept in step with {@see self::setParent()} so a reply appears under the comment it replies to straight away,
      * rather than only after the thread is read from the database again.
      */
     public function addReply(PollComment $reply): void

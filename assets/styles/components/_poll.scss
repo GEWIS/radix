@@ -37,8 +37,8 @@
     text-align: left;
     width: 100%;
 
-    // Everything but the fill sits above it; the fill itself is taken out of the flow so the row lays out as if it were
-    // not there at all.
+    // Everything but the fill is stacked above it; the fill itself is taken out of the flow so the row lays out as if
+    // it were not there at all.
     > * {
         position: relative;
     }

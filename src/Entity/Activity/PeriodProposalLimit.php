@@ -18,12 +18,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * A one-off exception to how many activities one body may propose, for a single option period.
  *
- * Beats the body's standing {@see ProposalLimit} and the period's own default. Like the standing limit, rows exist
- * only where the board wants something different; nothing is generated when a period is opened.
+ * Takes precedence over the body's standing {@see ProposalLimit} and the period's own default. Like the standing
+ * limit, rows exist only where the board wants something different; nothing is generated when a period is opened.
  *
  * This is a separate entity rather than a nullable period on {@see ProposalLimit} because MariaDB treats NULLs as
- * distinct in a unique index, so a single `UNIQUE (organ_id, period_id)` would happily accept two standing rows for
- * the same body. Two tables, two plain constraints, no invariant that only holds if everybody remembers it.
+ * distinct in a unique index, so a single `UNIQUE (organ_id, period_id)` would accept two standing rows for the same
+ * body. Two tables, two plain constraints, no invariant that only holds if everybody remembers it.
  */
 #[Entity(repositoryClass: PeriodProposalLimitRepository::class)]
 #[UniqueConstraint(
@@ -59,7 +59,7 @@ class PeriodProposalLimit
     public Organ $organ;
 
     /**
-     * How many activities this body may propose in this period. Zero is a real answer, deliberately written down.
+     * How many activities this body may propose in this period. Zero is a real value, deliberately written down.
      */
     #[Column(type: Types::INTEGER)]
     public int $maxProposals;

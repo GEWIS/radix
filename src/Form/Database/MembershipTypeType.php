@@ -40,7 +40,7 @@ class MembershipTypeType extends AbstractType
             'label' => t('Membership Type'),
             'class' => MembershipTypes::class,
             'expanded' => true,
-            // The radios say who each type applies to, which is more than the enum labels itself with.
+            // The radios show who each type applies to, which is more than the enum labels itself with.
             'choice_label' => static fn (MembershipTypes $type): TranslatableMessage => MembershipTypeChoices::label(
                 $type,
             ),

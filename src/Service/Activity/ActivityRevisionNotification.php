@@ -17,7 +17,7 @@ use function assert;
 use function sprintf;
 
 /**
- * An activity waiting to be published is the board's to look at.
+ * An activity waiting to be published is reviewed by the board.
  */
 final readonly class ActivityRevisionNotification implements RevisionNotificationInterface
 {

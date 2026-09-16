@@ -23,8 +23,8 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use function array_map;
 
 /**
- * Changing how you sign in has to tell you it happened, whether or not you were the one who did it. The action is
- * invoked directly (the codebase has no WebTestCase); the sudo guard on it is enforced at the HTTP layer.
+ * Changing how a member signs in has to notify them it happened, whether or not they made the change themselves. The
+ * action is invoked directly (the codebase has no WebTestCase); the sudo guard on it is enforced at the HTTP layer.
  *
  * The seeded members all share the password below, hashed at the reduced cost dev and test configure.
  */
@@ -93,7 +93,7 @@ final class SecurityControllerNoticesTest extends DatabaseTestCase
             'POST',
             [
                 'change_password_form' => [
-                    // Forms use stateless CSRF: the field carries a sentinel and the origin does the proving.
+                    // Forms use stateless CSRF: the field contains a sentinel and the origin is what is checked.
                     '_csrf_token' => 'csrf-token',
                     'currentPassword' => $currentPassword,
                     'plainPassword' => [

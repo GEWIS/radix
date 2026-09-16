@@ -16,11 +16,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use function strval;
 
 /**
- * The website channel: pushes the notification as a real-time toast to whoever it concerns, which for most kinds is
+ * The website channel: pushes the notification as a real-time toast to the users it concerns, which for most kinds is
  * everyone online and otherwise is the one user it is addressed to. It is always on; the persisted row is what the
  * notification centre shows to anyone who was offline.
  *
- * The toast carries its text and its link in both languages, because the browser has no translation runtime and picks
+ * The toast contains its text and its link in both languages, because the browser has no translation runtime and picks
  * whichever matches its locale.
  */
 final readonly class RealtimeNotificationChannel implements NotificationChannelInterface
@@ -98,7 +98,8 @@ final readonly class RealtimeNotificationChannel implements NotificationChannelI
     }
 
     /**
-     * What the notification reads by, in both languages. A subject that has since gone leaves nothing to announce.
+     * The name the notification is shown with, in both languages. A subject that has since been removed leaves
+     * nothing to announce.
      *
      * @param array<string, string>|null $context
      *

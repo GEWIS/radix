@@ -97,7 +97,7 @@ class BudgetType extends AbstractType
                     ],
                 ],
             )
-            // Approval and modifications carry no constraints: anything that is not an explicit yes counts as a no,
+            // Approval and modifications have no constraints: anything that is not an explicit yes counts as a no,
             // which is what the original form falls back to as well.
             ->add(
                 'approve',
@@ -147,7 +147,7 @@ class BudgetType extends AbstractType
 
     /**
      * A budget and a financial statement are approved as they stand at the meeting, so neither can be dated after it.
-     * The date they carry is the version's own date, not when it takes effect.
+     * The date they record is the version's own date, not when it takes effect.
      */
     public static function validateNotAfterMeeting(
         mixed $value,

@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * Both are per member rather than on the notification itself, because most notifications go out to everybody, and one
  * member clearing an album announcement must not clear it for the rest of the association.
  *
- * A row exists only once somebody acts on a single notification. Marking everything read still just stamps
+ * A row exists only once a member acts on a single notification. Marking everything read still just stamps
  * {@see UserSettings::$notificationsReadAt}, so a member who never touches an individual notification never has a row
  * here at all.
  */

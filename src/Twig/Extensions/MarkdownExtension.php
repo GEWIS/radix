@@ -64,14 +64,14 @@ final class MarkdownExtension extends AbstractExtension
      * The opening words of a piece of Markdown as plain text, for a list row that shows what an article is about
      * before the reader opens it. Longer than the excerpt gets an ellipsis.
      *
-     * What comes back is text and not HTML: the escaping the converter did is undone, so an ampersand somebody wrote
-     * is an ampersand again by the time Twig escapes it the once. Deliberately not marked safe for that reason.
+     * The result is text and not HTML: the escaping the converter did is undone, so an ampersand the author wrote is
+     * an ampersand again when Twig escapes it once. Deliberately not marked safe for that reason.
      */
     public function markdownExcerpt(
         ?string $text,
         int $length,
     ): string {
-        // Only the opening of the article is converted: a list row should not pay for a full render of a long one.
+        // Only the opening of the article is converted: a list row should not need a full render of a long one.
         $body = trim(html_entity_decode(strip_tags($this->markdown(
             mb_substr(
                 $text ?? '',
@@ -95,9 +95,9 @@ final class MarkdownExtension extends AbstractExtension
      * A comment written with the four-button editor: bold, italic, underline and strikethrough, and nothing else.
      *
      * Underline is the one of the four that GitHub-flavoured Markdown has no syntax for, so the editor writes it as a
-     * `<u>` tag. Everything the converter is handed is escaped first and its output narrowed to the handful of tags a
-     * comment may carry; only that exact tag is put back afterwards, so no attribute and no other tag can come
-     * through: `&lt;u onclick=...&gt;` simply does not match.
+     * `<u>` tag. The converter's input is escaped first and its output narrowed to the few tags a comment may
+     * contain; only that exact tag is put back afterwards, so no attribute and no other tag can come through:
+     * `&lt;u onclick=...&gt;` does not match.
      */
     public function markdownComment(?string $text): string
     {
@@ -117,9 +117,9 @@ final class MarkdownExtension extends AbstractExtension
     }
 
     /**
-     * Turns the escaped `<u>` tags back into real ones, in pairs and never inside code: a member showing what the tag
-     * looks like keeps it as text, and an opening tag whose closing tag never came stays text as well rather than
-     * underlining everything after the comment.
+     * Turns the escaped `<u>` tags back into real ones, in pairs and never inside code: a tag written inside code
+     * stays text, and an opening tag without a closing tag stays text as well rather than underlining everything
+     * after the comment.
      */
     private function underline(string $html): string
     {

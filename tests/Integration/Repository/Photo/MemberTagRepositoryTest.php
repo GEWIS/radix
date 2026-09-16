@@ -15,8 +15,8 @@ use function array_values;
 use function count;
 
 /**
- * The birthday panel rotates between the members it can show a photo of, so the query behind it has to answer with at
- * most one photo per member and leave out anybody nobody has ever tagged.
+ * The birthday panel rotates between the members it can show a photo of, so the query behind it has to return at most
+ * one photo per member and exclude members who have never been tagged.
  */
 final class MemberTagRepositoryTest extends DatabaseTestCase
 {

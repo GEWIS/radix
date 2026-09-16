@@ -23,7 +23,7 @@ use function sprintf;
 /**
  * Perform the automated admission draw for every sign-up list whose draw moment has passed.
  *
- * Runs every minute: once the draw locks a list its remaining places are handed out first-come-first-served, so the
+ * Runs every minute: once the draw locks a list its remaining places are assigned first-come-first-served, so the
  * switch should happen close to the announced moment. The scheduler is stateful with processOnlyLastMissedRun, so
  * downtime will result in a single catch-up run that draws all due lists at once.
  */

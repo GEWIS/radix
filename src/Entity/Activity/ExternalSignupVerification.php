@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 /**
  * A signed, single-purpose token tied to one {@see ExternalSignup}, modelled on {@see \App\Entity\User\PasswordReset}.
  *
- * Only the hash of the token is stored; the link carries `selector.verifier` and the verifier is checked with
+ * Only the hash of the token is stored; the link contains `selector.verifier` and the verifier is checked with
  * `hash_equals` against {@see self::$hashedToken}. The {@see ExternalSignupVerificationPurpose} distinguishes the
  * short-lived double-opt-in token (a live one means the sign-up is still unverified) from the long-lived self-service
  * manage token. Rows are removed by the owning {@see ExternalSignup} via `onDelete: CASCADE`.

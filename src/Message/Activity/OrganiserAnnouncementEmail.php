@@ -16,8 +16,8 @@ namespace App\Message\Activity;
  * and handled by {@see \App\MessageHandler\Activity\OrganiserAnnouncementEmailHandler}, which sends one
  * personalised email per recipient and is resilient to an individual send failing. Routed to the bulk transport.
  *
- * The email itself has no locale: its boilerplate is always English (the composing organiser's locale says nothing
- * about what each recipient reads); only the organiser's own subject/body text carries whatever language they wrote.
+ * The email itself has no locale: its boilerplate is always English (the composing organiser's locale does not
+ * determine what each recipient reads); only the organiser's own subject/body text is in whatever language they wrote.
  */
 class OrganiserAnnouncementEmail
 {

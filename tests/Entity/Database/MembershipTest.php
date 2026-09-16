@@ -58,7 +58,7 @@ class MembershipTest extends TestCase
     }
 
     /**
-     * Honorary membership does not expire; the entity says so with a date a century out.
+     * Honorary membership does not expire; the entity records this with a date a century out.
      */
     public function testGivesAnHonoraryMembershipADateItWillNotReach(): void
     {
@@ -118,7 +118,7 @@ class MembershipTest extends TestCase
     }
 
     /**
-     * Extending is a new membership, not an edit: the ledger keeps every term a member has held.
+     * Extending is a new membership, not an edit: the ledger keeps every term a member has had.
      */
     public function testRefusesToBeExtended(): void
     {

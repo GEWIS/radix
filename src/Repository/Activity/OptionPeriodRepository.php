@@ -25,7 +25,7 @@ class OptionPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * The periods bodies may hand proposals in for right now, soonest first. More than one can be open at a time when
+     * The periods bodies may submit proposals for right now, soonest first. More than one can be open at a time when
      * the board runs ahead, and each is counted on its own.
      *
      * @return OptionPeriod[]

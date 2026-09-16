@@ -32,8 +32,8 @@
                             {% endif %}
                             <span class="flex-grow-1">{{ tier|trans }}</span>
                             {% if places is not null %}
-                                {# The places are held for the rank rather than for one tier, so the number sits on
-                                   the row the rank starts on and the tiers tied to it share what it says. #}
+                                {# The places are held for the rank rather than for one tier, so the number is on
+                                   the row the rank starts on and the tiers tied to it share that value. #}
                                 <span class="flex-shrink-0" style="width: 4.5rem" data-tier-order-target="placesBox"
                                       data-signup-list-target="membershipPlaces">
                                     <input type="number" min="0" class="form-control form-control-sm"
@@ -65,7 +65,7 @@
 {% macro signup_field_panel(child, collapse_id, remove_label) %}
     <div class="panel mb-3" data-form-collection-target="entry">
         {# The drag handle is a sibling of (never nested in) the collapse button: a nested interactive element would
-           fight `data-bs-toggle` and swallow text selection. It is offered only when the fields collection is
+           conflict with `data-bs-toggle` and prevent text selection. It is offered only when the fields collection is
            editable, since a frozen list ignores its submissions. #}
         <div class="panel-heading d-flex align-items-center gap-2">
             {% if not child.vars.disabled %}
@@ -93,7 +93,7 @@
                     }}) }}</div>
                     <div class="col-md-6">{{ form_row(child.isSensitive) }}</div>
                 </div>
-                {# Both bounds are what the number type exists to ask for, so they carry the asterisk while shown. #}
+                {# Both bounds are what the number type exists to collect, so they have the asterisk while shown. #}
                 <div data-signup-field-target="number">
                     <div class="row">
                         <div class="col-md-6">{{ form_row(child.minimumValue, {'attr': {'data-signup-field-target': 'required'}}) }}</div>

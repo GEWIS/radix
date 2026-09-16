@@ -77,7 +77,7 @@ class AdminUploadController extends AbstractController
     }
 
     /**
-     * Called once per file by the upload page, so a rejected file reports itself without taking the batch with it.
+     * Called once per file by the upload page, so a rejected file is reported without failing the rest of the batch.
      */
     #[Route(
         path: '/stage',

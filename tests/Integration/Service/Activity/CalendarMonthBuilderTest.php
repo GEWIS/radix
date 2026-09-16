@@ -22,9 +22,9 @@ use function array_keys;
  * Laying a month out.
  *
  * The two things worth pinning are the ones the mock-up this was drawn from could not do. Something running across
- * several days has to appear on every one of them, with a marker where the run carries on past the edge of the week,
+ * several days has to appear on every one of them, with a marker where the run continues past the edge of the week,
  * or a body looking at the Saturday cannot see the thing that started on the Friday. And the days either side of the
- * month are real days carrying real blocks, because a week runs across the turn of a month.
+ * month are real days with real blocks, because a week runs across the turn of a month.
  */
 final class CalendarMonthBuilderTest extends DatabaseTestCase
 {

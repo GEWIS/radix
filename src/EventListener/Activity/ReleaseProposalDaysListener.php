@@ -10,16 +10,16 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Event\Event;
 
 /**
- * Frees the days a proposal was standing on once it is out of the running, and keeps the budget stamp honest.
+ * Frees the days a proposal had reserved once it is out of the running. It also keeps the budget timestamp accurate.
  *
- * A day nobody is holding has to be free the moment they stop holding it, or the calendar quietly fills with claims
- * that no longer mean anything, which is what the old overdue email existed to chase by hand.
+ * A day that is no longer reserved has to be free the moment the proposal releases it, or the calendar quietly fills
+ * with claims that no longer mean anything, which is what the old overdue email existed to clean up by hand.
  *
- * An activity that was already started for the body is deliberately left where it is. If nobody ever touches it,
- * {@see \App\Command\Activity\DeleteStaleDraftsCommand} reaps it after a month, which is its whole job and is a good
- * deal more careful about it than a workflow listener could be; and if somebody did touch it, it is their work and
- * losing a day is no reason to throw it away. The proposal keeps pointing at it either way, and the association is
- * `SET NULL` on delete, so the record of who held the day survives the reaping.
+ * An activity that was already started for the body is deliberately left where it is. If no member ever edits it,
+ * {@see \App\Command\Activity\DeleteStaleDraftsCommand} reaps it after a month, which is its whole job and is more
+ * careful about it than a workflow listener could be; and if a member did edit it, it is their work and losing a day
+ * is no reason to throw it away. The proposal keeps pointing at it either way, and the association is `SET NULL` on
+ * delete, so the record of who reserved the day survives the reaping.
  */
 final readonly class ReleaseProposalDaysListener
 {
@@ -60,8 +60,8 @@ final readonly class ReleaseProposalDaysListener
     }
 
     /**
-     * Reaching `scheduled` means the financial side is not settled: either it never was, or the board has just taken a
-     * clearance back. Either way the stamp goes and the reminder is armed again.
+     * Reaching `scheduled` means the financial side is not settled: either it never was, or the board has just
+     * withdrawn a clearance. Either way the timestamp is cleared and the reminder is armed again.
      *
      * @param Event<object> $event
      */

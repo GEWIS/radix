@@ -27,8 +27,7 @@ use Symfony\Contracts\Cache\CacheInterface;
  *    worth catching up on once rather than replaying.
  *  - lock(), because a rolling deploy has both containers consuming briefly.
  *
- * Scaling this worker adds failover but no throughput: a second replica cannot take the lock, so it generates
- * nothing.
+ * Scaling this worker adds failover but no throughput: a second replica cannot take the lock, so it generates nothing.
  */
 #[AsSchedule('default')]
 final readonly class MainSchedule implements ScheduleProviderInterface

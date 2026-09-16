@@ -32,7 +32,7 @@ class ActivityRevisionRepository extends ServiceEntityRepository
      */
     public function findForReview(): array
     {
-        // The queue says who put each one forward and what is live while it waits, so both come along with it.
+        // The queue shows who submitted each one and what is live while it waits, so both are fetched with it.
         $builder = $this->createQueryBuilder('r')
             ->addSelect(
                 'n',

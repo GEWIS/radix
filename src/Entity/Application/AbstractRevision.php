@@ -23,17 +23,17 @@ use LogicException;
 use Override;
 
 /**
- * Shared base for every revision entity. Carries the workflow fields common to all revisable domains; the concrete
+ * Shared base for every revision entity. Declares the workflow fields common to all revisable domains; the concrete
  * subclasses add the domain-specific content snapshot, the typed back-reference to their aggregate, and the
  * self-referencing `previousRevision` link.
  *
- * Only unidirectional, owning-side associations to a *concrete* entity may live on a mapped superclass, so `author`
- * and `reviewer` (both -> {@see MemberModel}) are declared here; `previousRevision` (a self-reference) and the
+ * Only unidirectional, owning-side associations to a *concrete* entity may be defined on a mapped superclass, so
+ * `author` and `reviewer` (both -> {@see MemberModel}) are declared here; `previousRevision` (a self-reference) and the
  * aggregate back-reference are declared per subclass.
  *
- * Everyone a revision names is named for attribution; the text itself lives on the revision and outlives the person
- * who wrote it. All six of those columns are therefore nullable with `ON DELETE SET NULL`, so removing a member,
- * their account or a company user leaves the revision — and the thing it is a revision of — standing but unsigned.
+ * Everyone a revision names is named for attribution; the text itself is on the revision and outlives the person who
+ * wrote it. All six of those columns are therefore nullable with `ON DELETE SET NULL`, so removing a member, their
+ * account or a company user leaves the revision (and the thing it is a revision of) in place but unsigned.
  *
  * Concrete subclasses MUST declare {@see \Doctrine\ORM\Mapping\HasLifecycleCallbacks} so the timestamp callbacks from
  * {@see TimestampableTrait} are registered.
@@ -95,7 +95,7 @@ abstract class AbstractRevision implements RevisionInterface
     private ?DateTimeImmutable $reviewedAt = null;
 
     /**
-     * When this revision was handed to its reviewers, which is a different moment from when it was written: a draft
+     * When this revision was submitted to its reviewers, which is a different moment from when it was written: a draft
      * can be worked on for a week before it is submitted. Null while it never has been.
      */
     #[Column(
@@ -171,8 +171,8 @@ abstract class AbstractRevision implements RevisionInterface
     }
 
     /**
-     * Taking over authorship hands the revision to the other side entirely: a board member picking up a profile a
-     * company put forward is now its author, and the company user no longer is.
+     * Taking over authorship transfers it entirely: a board member who picks up a profile a company submitted is now
+     * its author, and the company user no longer is.
      */
     #[Override]
     public function setAuthor(?MemberModel $author): void
@@ -205,7 +205,7 @@ abstract class AbstractRevision implements RevisionInterface
     }
 
     /**
-     * A human-readable name for whoever authored this revision, regardless of whether that was a member or a company.
+     * A human-readable name for the author of this revision, regardless of whether that was a member or a company.
      */
     #[Override]
     public function getAuthorDisplayName(): string
@@ -280,7 +280,7 @@ abstract class AbstractRevision implements RevisionInterface
     }
 
     /**
-     * A human-readable name for whoever last edited this revision, or null if it has never been edited in place.
+     * A human-readable name for the last editor of this revision, or null if it has never been edited in place.
      */
     public function getLastEditorDisplayName(): ?string
     {
@@ -291,8 +291,8 @@ abstract class AbstractRevision implements RevisionInterface
     /**
      * What visitors are seeing while this revision is not: the live revision, unless that is this one.
      *
-     * A revision that was rejected, or is still with the reviewers, says nothing about what is public, so a screen
-     * showing one can name what is instead of leaving the reader to assume the worst.
+     * A revision that was rejected, or is still with the reviewers, does not indicate what is public, so a screen
+     * showing one can name the live revision instead of leaving the reader to assume the worst.
      */
     #[Override]
     public function getLiveCounterpart(): ?RevisionInterface
@@ -306,8 +306,8 @@ abstract class AbstractRevision implements RevisionInterface
 
     /**
      * Enforce the documented invariant that a revision is never authored, nor last edited, by both a member and a
-     * company user at once. The setters hand the revision over rather than let both sides be set, so this catches only
-     * what reached the fields another way, such as a row hydrated from the database.
+     * company user at once. The setters clear the other side rather than let both be set, so this catches only what
+     * reached the fields another way, such as a row hydrated from the database.
      */
     #[PrePersist]
     #[PreUpdate]

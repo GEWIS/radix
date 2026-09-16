@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use function array_column;
 
 /**
- * What happens to a poll once it exists, against a real database: the constraint that holds a member to one answer,
+ * What happens to a poll once it exists, against a real database: the constraint that limits a member to one answer,
  * the re-parenting that keeps a discussion one level deep, and the fact that taking a poll down keeps everything it
  * asked and was answered.
  */
@@ -68,7 +68,7 @@ final class PollServiceTest extends DatabaseTestCase
         $rejected = $this->rejectedPoll();
         $previousHead = $rejected->getCurrentRevision();
 
-        // Only whoever asked gets to ask again, so the workflow guards read that member behind the request.
+        // Only the member who asked may ask again, so the workflow guards read that member behind the request.
         $creator = $rejected->getCreator();
         self::assertNotNull($creator);
         $this->authenticate($creator->lidnr);
@@ -131,10 +131,10 @@ final class PollServiceTest extends DatabaseTestCase
     }
 
     /**
-     * The check above is not the only thing holding a member to one answer: two requests racing each other both pass
+     * The check above is not the only thing limiting a member to one answer: two requests racing each other both pass
      * it, and the second is turned away by the unique index. Writing the second vote by hand is that race in one
-     * process, since going through the service is exactly what the losing request has already got past. What comes
-     * back is the database's own exception, which is what tells the widget it cannot render its way out of this.
+     * process, since going through the service is exactly what the losing request has already got past. The result is
+     * the database's own exception, which the widget cannot turn into a validation message.
      */
     public function testASecondAnswerIsRefusedByTheDatabaseToo(): void
     {
@@ -316,7 +316,7 @@ final class PollServiceTest extends DatabaseTestCase
     }
 
     /**
-     * The export used to read the polls a member approved off the poll itself; it now reads them off the revisions
+     * The export used to read the polls a member approved from the poll itself; it now reads them from the revisions
      * they decided on, which has to keep working for a reviewer who has decided something.
      */
     public function testTheDataExportStillNamesThePollsAMemberDecidedOn(): void

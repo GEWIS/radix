@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * Answers what may be done with a revision, so the review screens, the decision form and the discard button all read
+ * Determines what may be done with a revision, so the review screens, the decision form and the discard button all read
  * the same two predicates instead of each re-deriving them.
  */
 final readonly class RevisionActionResolver
@@ -37,7 +37,7 @@ final readonly class RevisionActionResolver
     }
 
     /**
-     * A draft spawned because a reviewer asked for changes. Submitting it again has to say what was done about them,
+     * A draft spawned because a reviewer requested changes. Submitting it again has to say what was done about them,
      * which is what turns the decision form's message field into a required one.
      */
     private function isResubmission(RevisionInterface $revision): bool

@@ -6,8 +6,8 @@ namespace App\Security\User;
 
 /**
  * The application's security firewalls, and the routes each one sends a user to. Symfony's FirewallMap exposes no
- * per-firewall route metadata, so the mapping lives here and is shared by the guards, listeners and handlers that need
- * it, keyed off the firewall name they already have.
+ * per-firewall route metadata, so the mapping is defined here and is shared by the guards, listeners and handlers
+ * that need it, keyed off the firewall name they already have.
  */
 enum Firewall: string
 {
@@ -31,7 +31,7 @@ enum Firewall: string
     }
 
     /**
-     * Where somebody who cannot sign in asks for a password reset.
+     * Where a user who cannot sign in requests a password reset.
      */
     public function forgotPasswordRoute(): string
     {
@@ -53,8 +53,8 @@ enum Firewall: string
     }
 
     /**
-     * One per firewall, each answering inside its own firewall's pattern: a company user fetching a subscribe cookie
-     * from an address the main firewall answers is nobody there, and is handed a passer-by's cookie.
+     * One per firewall, each served inside its own firewall's pattern: a company user fetching a subscribe cookie
+     * from an address served by the main firewall is anonymous there, and receives an anonymous visitor's cookie.
      */
     public function realtimeGrantRoute(): string
     {

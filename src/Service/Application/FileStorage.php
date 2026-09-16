@@ -21,7 +21,7 @@ use function sprintf;
 /**
  * The service through which the application reads and writes stored files. It wraps a flysystem
  * {@see FilesystemOperator} rooted at `data/` (an in-memory adapter under test), so nothing else needs to know whether
- * the bytes live on local disk, S3, or memory.
+ * the bytes are stored on local disk, S3, or memory.
  *
  * New uploads are content-addressed: {@see store()} hashes the content (sha256), derives the path from the
  * {@see StorageNamespace} plus that hash, and skips the write when identical content already exists (de-duplication).
@@ -29,7 +29,7 @@ use function sprintf;
  * algorithm from a path, so both coexist. Deletion is reference-checked: a content-addressed file may be shared by
  * several entities, so {@see remove()} unlinks only when no {@see FileReferenceProviderInterface} still claims it.
  *
- * The service is stateless and worker-safe: it holds no request- or user-scoped state.
+ * The service is stateless and worker-safe: it keeps no request- or user-scoped state.
  */
 final readonly class FileStorage
 {

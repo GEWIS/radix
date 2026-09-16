@@ -15,11 +15,11 @@ use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
- * A company profile as the form asks for it. How a company is identified and whether it appears at all is the
- * board's call, so the step that asks for those is only built for the board and their rules only run there.
+ * A company profile as the form collects it. How a company is identified and whether it appears at all is the board's
+ * call, so the step that collects those is only built for the board and their rules only run there.
  *
- * The two logos are files, which only the controller can store, and are asked for on the last step so they never
- * travel through the session.
+ * The two logos are files, which only the controller can store, and are collected on the last step so they are never
+ * passed through the session.
  */
 final class CompanyProfileData
 {
@@ -136,7 +136,7 @@ final class CompanyProfileData
     }
 
     /**
-     * `$identity` says whether that step was part of this flow. A company never sees those fields, so writing them
+     * `$identity` records whether that step was part of this flow. A company never sees those fields, so writing them
      * back from a data object it could not fill in would blank them.
      */
     public function applyTo(

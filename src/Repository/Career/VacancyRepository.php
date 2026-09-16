@@ -50,8 +50,8 @@ class VacancyRepository extends ServiceEntityRepository
      *
      * A slug is unique when no vacancy of the same company and category already uses it. This deliberately does NOT
      * route through {@see self::findVacancy()} (whose `liveRevision` inner join would hide not-yet-approved vacancies
-     * and let a pending vacancy collide unseen); it matches on the stable slug columns and resolves the category off
-     * the working head ({@see Vacancy::getCurrentRevision()}), where the category now lives.
+     * and let a pending vacancy collide unseen); it matches on the stable slug columns and resolves the category from
+     * the working head ({@see Vacancy::getCurrentRevision()}), where the category is now stored.
      */
     public function isSlugNameUnique(
         Company $company,
@@ -103,7 +103,7 @@ class VacancyRepository extends ServiceEntityRepository
      * Find all vacancies identified by $vacancySlugName that are owned by a company
      * identified with $companySlugName.
      *
-     * The category lives on the live (approved) revision, so category filtering joins through it.
+     * The category is on the live (approved) revision, so category filtering joins through it.
      *
      * @return Vacancy[]
      */
@@ -174,8 +174,8 @@ class VacancyRepository extends ServiceEntityRepository
      * owning company, assigned labels and a free-text search over the localised name), in a fixed order.
      *
      * The order is pinned rather than left to the database: the overview seeds a shuffle over this list and pages
-     * through it, which only holds together if the same seed always meets the same list. The page that ends up on
-     * screen is hydrated afterwards by {@see self::findForOverviewByIds()}.
+     * through it, which only works if the same seed is always applied to the same list. The page that ends up on screen
+     * is hydrated afterwards by {@see self::findForOverviewByIds()}.
      *
      * @param int[] $labelIds
      *
@@ -273,7 +273,7 @@ class VacancyRepository extends ServiceEntityRepository
     }
 
     /**
-     * Hydrate the given vacancies, in the order they are asked for. The "active" predicate is applied again, so a
+     * Hydrate the given vacancies, in the order they are requested. The "active" predicate is applied again, so a
      * vacancy whose package expired between picking the ids and rendering them drops out rather than appearing one
      * last time.
      *
@@ -313,9 +313,9 @@ class VacancyRepository extends ServiceEntityRepository
     }
 
     /**
-     * The most recently approved vacancies, for the taste of the list the career landing page gives. Ordered by when
-     * the live revision was approved, which is the moment a vacancy actually appeared, rather than by when the company
-     * started drafting it.
+     * The most recently approved vacancies, for the short list the career landing page shows. Ordered by when the live
+     * revision was approved, which is the moment a vacancy actually appeared, rather than by when the company started
+     * drafting it.
      *
      * @return Vacancy[]
      */
@@ -333,7 +333,7 @@ class VacancyRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         // The labels are fetch-joined, so a plain limit would cut rows rather than vacancies and return fewer than
-        // asked for. The paginator collects the ids first and hydrates those, which is what makes the limit count
+        // requested. The paginator collects the ids first and hydrates those, which is what makes the limit count
         // vacancies again.
         return iterator_to_array(
             new Paginator(
@@ -345,8 +345,8 @@ class VacancyRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many publicly visible vacancies there are per category, for the counts the navigation menu carries. Grouped
-     * in one query because the menu is on every page; categories nobody is hiring for are left out, so read a missing
+     * How many publicly visible vacancies there are per category, for the counts the navigation menu shows. Grouped in
+     * one query because the menu is on every page; categories nobody is hiring for are left out, so read a missing
      * category as zero.
      *
      * @return array<string, int>
@@ -490,7 +490,7 @@ class VacancyRepository extends ServiceEntityRepository
                 'c',
             )
             ->addSelect('c')
-            // The company's own live revision holds the logo the card renders; join it so getLogo does not lazy-load
+            // The company's own live revision has the logo the card renders; join it so getLogo does not lazy-load
             // one revision per distinct company on the overview.
             ->leftJoin(
                 'c.liveRevision',
@@ -566,7 +566,7 @@ class VacancyRepository extends ServiceEntityRepository
      * nothing is scheduled to start or stop counting.
      *
      * The counts this bounds are aggregates the database computes, so they cannot be narrowed in PHP from a wider
-     * cached set the way the layout's other answers are. Their entry expires at this moment instead.
+     * cached set the way the layout's other cached values are. Their entry expires at this moment instead.
      */
     public function nextActiveBoundaryAfter(DateTimeImmutable $now): ?DateTimeImmutable
     {
@@ -688,9 +688,9 @@ class VacancyRepository extends ServiceEntityRepository
     }
 
     /**
-     * A page of the administrative overview, narrowed by the optional filters. The status and the category come off
-     * the working head rather than the live revision, since a vacancy that has never been approved is precisely the
-     * one somebody is looking for here.
+     * A page of the administrative overview, narrowed by the optional filters. The status and the category are read
+     * from the working head rather than the live revision, since a vacancy that has never been approved is precisely
+     * the one an administrator is looking for here.
      *
      * @return Paginator<Vacancy>
      */
@@ -789,8 +789,8 @@ class VacancyRepository extends ServiceEntityRepository
      */
     public function findAllForCompany(Company $company): array
     {
-        // Both the dashboard and the portal list ask every row whether it is live, which reads the package and the
-        // approved revision, so those come along instead of being fetched one row at a time.
+        // Both the dashboard and the portal list check for every row whether it is live, which reads the package and
+        // the approved revision, so those are fetched in the same query instead of one row at a time.
         $qb = $this->createQueryBuilder('v')
             ->addSelect(
                 'cr',

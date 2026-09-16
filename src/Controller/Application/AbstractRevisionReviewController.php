@@ -52,12 +52,12 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
     ): array;
 
     /**
-     * Back to this revision's own review screen. The career module answers with a different route per aggregate.
+     * Back to this revision's own review screen. The career module returns a different route per aggregate.
      */
     abstract protected function reviewResponse(RevisionInterface $revision): Response;
 
     /**
-     * Who this domain's review screen is written for. An admin surface is read by somebody deciding; the company
+     * Who this domain's review screen is written for. An admin surface is read by a reviewer deciding; the company
      * portal shows the same revision to the author who wrote it, and is told apart here rather than in the template.
      */
     protected function reviewAudience(): RevisionAudience
@@ -67,8 +67,9 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
 
     /**
      * Opening a review screen is gated on being allowed to see it, and reviewers additionally on sudo. The path rule
-     * has already asked by the time this runs; this is kept because it is about who is looking at this revision
-     * rather than about where the screen answers. Somebody who can only submit their own draft is never asked.
+     * has already been checked by the time this runs; this is kept because it is about who is looking at this revision
+     * rather than about which address the screen is served at. A user who can only submit their own draft is never
+     * required to sudo.
      */
     protected function assertMayReview(RevisionInterface $revision): void
     {
@@ -145,8 +146,8 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
 
     /**
      * The whole decision round-trip: bind what was pressed, come back with the review screen on any error, apply it,
-     * say what it did and send the reader on. Every domain does exactly this; the wording and the destinations are
-     * the parts that differ, and they are asked for below.
+     * report what it did and send the reader on. Every domain does exactly this; the wording and the destinations are
+     * the parts that differ, and they are supplied by the methods below.
      */
     protected function handleDecision(
         Request $request,
@@ -193,12 +194,12 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
     }
 
     /**
-     * What the reader is told the decision did, in this domain's words.
+     * The message shown to the reader about what the decision did, in this domain's words.
      */
     abstract protected function decisionFlash(string $transition): string;
 
     /**
-     * Where a decision leaves the reader. Staying on the screen they decided from is the answer that needs no
+     * Where a decision leaves the reader. Staying on the screen they decided from is the behaviour that needs no
      * knowledge of the domain, so it is the default; a queue to return to is not.
      */
     protected function decisionResponse(
@@ -210,8 +211,8 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
 
     /**
      * Apply the decision the reader pressed, together with whatever they typed alongside it. Returns the transition
-     * that was applied, or null when it could not be — in which case a flash already says why and the caller should
-     * send the reader back to the review screen.
+     * that was applied, or null when it could not be applied, in which case a flash already says why and the caller
+     * should send the reader back to the review screen.
      *
      * @param FormInterface<array<string, mixed>|null> $form
      */
@@ -252,8 +253,8 @@ abstract class AbstractRevisionReviewController extends AbstractRevisionControll
     }
 
     /**
-     * Throwing a draft away and pointing the aggregate back at what is live. Which aggregate it hangs off is the
-     * revision's own business, so only where the reader lands afterwards differs per domain.
+     * Throwing a draft away and pointing the aggregate back at what is live. Which aggregate it belongs to is the
+     * revision's own responsibility, so only where the reader lands afterwards differs per domain.
      *
      * @param array<string, int|string|null> $routeParameters
      */

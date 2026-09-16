@@ -40,9 +40,9 @@ use function sprintf;
 class GenerateCommandTest extends KernelTestCase
 {
     /**
-     * What the replay owns. The web connection carries the whole site besides, and the decision entities that are
-     * not derived from the ledger — meeting documents, organ information, the activity log — are among them, so the
-     * projection has to be named rather than taken to be everything the connection holds.
+     * What the replay owns. The web connection contains the whole site besides, and the decision entities that are
+     * not derived from the ledger (meeting documents, organ information, the activity log) are among them, so the
+     * projection has to be named rather than taken to be everything the connection contains.
      */
     private const array PROJECTED_ENTITIES = [
         Address::class,
@@ -93,7 +93,7 @@ class GenerateCommandTest extends KernelTestCase
 
     /**
      * The listeners and the replay are two implementations of the same projection, and this is the only thing that
-     * says they agree.
+     * checks they agree.
      */
     public function testAProjectionRebuiltFromNothingMatchesTheOneTheListenersWrote(): void
     {
@@ -155,8 +155,8 @@ class GenerateCommandTest extends KernelTestCase
             ),
         );
 
-        // The replay rewrote every projected row, so what this manager still holds describes a projection that has
-        // since been thrown away and built again.
+        // The replay rewrote every projected row, so what this manager still contains describes a projection that
+        // has since been thrown away and built again.
         $this->report->clear();
     }
 
@@ -178,10 +178,10 @@ class GenerateCommandTest extends KernelTestCase
     {
         $connection = $this->report->getConnection();
 
-        // DELETE rather than TRUNCATE: TRUNCATE commits in MariaDB, which would take the transaction the test is
-        // wrapped in with it and leave the projection empty for everything that runs after this. The keys are lifted
-        // for the duration instead of deleting in dependency order, because the projection is a graph and no order
-        // over it satisfies every constraint.
+        // DELETE rather than TRUNCATE: TRUNCATE commits in MariaDB, which would end the transaction the test is
+        // wrapped in and leave the projection empty for everything that runs after this. The keys are lifted for the
+        // duration instead of deleting in dependency order, because the projection is a graph and no order over it
+        // satisfies every constraint.
         $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
 
         try {

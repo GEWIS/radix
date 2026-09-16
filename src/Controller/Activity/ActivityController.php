@@ -148,7 +148,7 @@ class ActivityController extends AbstractController
 
         $language = Languages::current();
 
-        // A cancelled activity carries a [CANCELLED] marker everywhere its title is shown, the calendar entry included.
+        // A cancelled activity has a [CANCELLED] marker everywhere its title is shown, the calendar entry included.
         $title = $entity->getName()->getText($language) ?? '';
         if ($entity->isCancelled()) {
             $title = $this->translator->trans('[CANCELLED]') . ' ' . $title;

@@ -3,7 +3,7 @@ api_platform:
     title: GEWIS API
     version: 5.0.0
 
-    # The entrypoint would answer on a bare `/api`, which is the health endpoint.
+    # The entrypoint would be routed at a bare `/api`, which is the health endpoint.
     enable_entrypoint: false
     # Swagger UI is routed at /api-docs instead: a browser cannot send a bearer token on the first navigation.
     enable_docs: true

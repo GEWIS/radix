@@ -96,7 +96,7 @@ final readonly class CollectionPagination
             $operation->getPaginationMaximumItemsPerPage() ?? self::MAXIMUM_ITEMS_PER_PAGE,
         );
         // API Platform turns the page into the offset `($page - 1) * $itemsPerPage`, which overflows to a float and
-        // aborts the request; the last page that still multiplies out to an integer answers empty instead.
+        // aborts the request; the last page that still multiplies out to an integer returns an empty page instead.
         $filters = $this->clamped(
             $filters,
             'page',

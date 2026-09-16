@@ -36,7 +36,7 @@ class MemberInfoService
 
     /**
      * Group a member's organ installations into the organs they are currently part of and those they used to be part
-     * of, each with the functions (other than plain membership) they held there.
+     * of, each with the functions (other than plain membership) they had there.
      *
      * @return array{
      *     current: list<OrganMembershipType>,

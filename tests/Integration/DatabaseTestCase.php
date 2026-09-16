@@ -24,8 +24,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 abstract class DatabaseTestCase extends KernelTestCase
 {
     /**
-     * The MariaDB manager, which holds everything but the ledger. A test that writes decisions into the ledger
-     * itself wants the default manager instead, and asks for it by name.
+     * The MariaDB manager, which contains everything but the ledger. A test that writes decisions into the ledger
+     * itself wants the default manager instead, and gets it by name.
      */
     protected EntityManagerInterface $entityManager;
 
@@ -36,9 +36,9 @@ abstract class DatabaseTestCase extends KernelTestCase
 
         // MfaEnforcementSwitch is process-wide and is only assigned by the boot listener on a dispatched request, so
         // its value here is whatever the last test left behind. Assigned from the parameter this environment
-        // configures — `false`, by `when@test:` in `config/services.yaml` — so that a test reading a member's roles
-        // without dispatching a request reads the same ones whatever ran before it. Enforcement removes the roles
-        // the fixtures grant from a member who has not enrolled, and the fixtures enrol nobody.
+        // configures (`false`, by `when@test:` in `config/services.yaml`), so that a test reading a member's roles
+        // without dispatching a request reads the same ones whatever ran before it. Enforcement removes the roles the
+        // fixtures grant from a member who has not enrolled, and the fixtures enrol no member.
         //
         // Here rather than in the tearDown of each test that changes it: one of those forgetting to restore it is
         // the ordering dependency this prevents.

@@ -271,8 +271,8 @@ enum PostalRegions: string implements TranslatableInterface
      * The region name, deferred so the caller decides on the locale (or takes the source string).
      *
      * The case value is the label: these are the region names as PostNL writes them on an envelope, and a translated
-     * catalogue keys on exactly that string. Restating all of them in a match would only be a second copy of the
-     * case list that can drift away from it.
+     * catalogue keys on exactly that string. Restating all of them in a match would only be a second copy of the case
+     * list that can differ from it.
      */
     public function getName(): TranslatableMessage
     {

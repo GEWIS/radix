@@ -16,7 +16,7 @@ use function assert;
  * Spawns the next Draft {@see CompanyRevision} from an existing one (for "changes requested", reopening, or editing
  * an approved company profile). The localised texts and social links are deep-copied into fresh rows so orphan-removal
  * can never delete the source revision's content; the logo and contact details are copied by value. The shared workflow
- * wiring (authorship, revision number, chain link) lives in {@see AbstractRevisionCloner}.
+ * wiring (authorship, revision number, chain link) is defined in {@see AbstractRevisionCloner}.
  */
 final readonly class CompanyRevisionCloner extends AbstractRevisionCloner
 {

@@ -50,8 +50,8 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     #[LiveProp]
     public bool $crossYear = false;
 
-    // All the filters mirror themselves into the query string via the History API, so the state survives a reload and
-    // the address bar is itself a shareable link (the copy button just yields the same URL in one click).
+    // All the filters are mirrored into the query string via the History API, so the state survives a reload and
+    // the address bar is itself a shareable link (the copy button just copies the same URL in one click).
     #[LiveProp(
         writable: true,
         url: true,
@@ -208,7 +208,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     }
 
     /**
-     * The filter panel reads this twice (once to decide whether to draw the block, once for the checkboxes), so it is
+     * The filter panel reads this twice (once to check whether to render the block, once for the checkboxes), so it is
      * fetched once per render, with the localised names the checkboxes are labelled with.
      *
      * @return ActivityLabel[]
@@ -276,7 +276,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     /**
      * Normalise a raw list of label-id values into a clean, re-indexed list of positive ints (dropping blanks, zero and
      * negatives). Shared by mount() (query-string parsing) and selectedLabelIds() (paginator filtering) so the two can
-     * never drift.
+     * never differ.
      *
      * @param array<mixed> $values
      *

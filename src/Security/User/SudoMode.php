@@ -25,17 +25,17 @@ use function max;
  * Granted by the sudo-confirmation flow after the user re-proves identity; either by providing their password or their
  * password + MFA if that is enabled for their account. Checked by {@see SudoVoter} on the 'SUDO' attribute.
  *
- * A grant is held against the firewall it was given on and the account it was given to. One browser holds one PHP
- * session and both firewalls read it, so a single key had a representative confirming their company password unlock
- * the administration for whichever member the same browser was signed in as.
+ * A grant is scoped to the firewall it was given on and the account it was given to. One browser has one PHP session
+ * and both firewalls read it, so a single key had a representative confirming their company password unlock the
+ * administration for whichever member the same browser was signed in as.
  *
- * The grant has a key of its own instead of sitting on the session because sessions are read and written whole and
- * Valkey does not lock them. A request from a second tab that read the session before the grant was written puts its
- * copy back afterwards, which dropped the grant and returned the user to the prompt they had just answered. A SETEX
- * on a single key cannot be overwritten that way.
+ * The grant has a key of its own instead of being stored on the session because sessions are read and written whole
+ * and Valkey does not lock them. A request from a second tab that read the session before the grant was written puts
+ * its copy back afterwards, which dropped the grant and returned the user to the prompt they had just completed. A
+ * SETEX on a single key cannot be overwritten that way.
  *
  * The key includes the PHP session ID, so a grant is unreachable once that session ends and session.use_strict_mode
- * stops the ID being handed out again.
+ * stops the ID being issued again.
  */
 final class SudoMode
 {
@@ -205,9 +205,9 @@ final class SudoMode
     {
         $token = $this->tokenStorage->getToken();
 
-        // While impersonating, the account on the token is the one being looked at rather than the one that proved
-        // itself. The grant belongs to the administrator behind the switch, who is the only party that typed a
-        // password, so read through to them.
+        // While impersonating, the account on the token is the impersonated one rather than the one that authenticated.
+        // The grant belongs to the administrator behind the switch, who is the only one that entered a password, so
+        // read through to them.
         while ($token instanceof SwitchUserToken) {
             $token = $token->getOriginalToken();
         }

@@ -151,17 +151,17 @@ final class ActivityOverviewTest extends DatabaseTestCase
     }
 
     /**
-     * The component as the page draws it, so the template runs against the real component.
+     * The component as the page renders it, so the template runs against the real component.
      */
     private function render(): string
     {
         // The dates are written in the request's locale, so there has to be a request, and the confirmation modals
-        // ask for a CSRF token, which is stored on its session.
+        // require a CSRF token, which is stored on its session.
         $request = new Request();
         $request->setSession(new Session(new MockArraySessionStorage()));
         self::getContainer()->get('request_stack')->push($request);
 
-        // Through a template rather than the renderer, which wants a Twig template on the stack for the live id.
+        // Through a template rather than the renderer, which requires a Twig template on the stack for the live id.
         return self::getContainer()->get(Environment::class)
             ->createTemplate('{{ component(\'Activity:Admin:ActivityOverview\', props) }}')
             ->render([

@@ -20,11 +20,11 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * A standing offer for somebody to represent a company in the careers portal. No account exists until the offer is
+ * A standing offer for a person to represent a company in the careers portal. No account exists until the offer is
  * accepted, because an account needs a password and only the person behind the address can choose one.
  *
- * The link carries `selector.verifier` and only the hash of the verifier is stored, as with a password reset. It lasts
- * far longer than one, though: it is not a way back into an account somebody already has, so the risk of a link sitting
+ * The link contains `selector.verifier` and only the hash of the verifier is stored, as with a password reset. It
+ * lasts far longer than one, though: it is not a way back into an existing account, so the risk of a link remaining
  * in a mailbox is different, and a week is what it takes for an invitation to survive a holiday.
  */
 #[Entity(repositoryClass: CompanyUserInviteRepository::class)]

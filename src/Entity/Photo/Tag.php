@@ -22,12 +22,12 @@ use function sprintf;
 
 /**
  * A tag placed on a photo. Single-table inheritance splits it into a {@see MemberTag} (a member appearing in the photo)
- * and an {@see OrganTag} (an organ the photo belongs to or features). A tag optionally carries a normalized
- * point-in-image position (`positionX`/`positionY` in the range [0, 1]); a whole-photo tag leaves both null.
+ * and an {@see OrganTag} (an organ the photo belongs to or features). A tag optionally has a normalized point-in-image
+ * position (`positionX`/`positionY` in the range [0, 1]); a whole-photo tag leaves both null.
  *
- * Both `member_id` and `organ_id` live on the single `Tag` table (one is always NULL for a given row). MariaDB treats
- * NULLs as distinct in a unique index, so `UNIQUE(photo_id, member_id)` and `UNIQUE(photo_id, organ_id)` coexist:
- * a member row (NULL organ_id) and an organ row (NULL member_id) never collide.
+ * Both `member_id` and `organ_id` are on the single `Tag` table (one is always NULL for a given row). MariaDB treats
+ * NULLs as distinct in a unique index, so `UNIQUE(photo_id, member_id)` and `UNIQUE(photo_id, organ_id)` coexist: a
+ * member row (NULL organ_id) and an organ row (NULL member_id) never collide.
  */
 #[Entity(repositoryClass: TagRepository::class)]
 #[InheritanceType(value: 'SINGLE_TABLE')]

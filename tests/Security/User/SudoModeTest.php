@@ -234,7 +234,7 @@ final class SudoModeTest extends TestCase
         self::assertFalse($sudo->isActive());
     }
 
-    /** Signing another device out has to take its grant with it; the session it belongs to is not this one. */
+    /** Signing another device out has to drop its grant; the session it belongs to is not this one. */
     public function testRevokingAnotherSessionDropsItsGrant(): void
     {
         $tokenStorage = $this->tokenStorage('8025');

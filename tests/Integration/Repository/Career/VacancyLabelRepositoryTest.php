@@ -13,7 +13,7 @@ final class VacancyLabelRepositoryTest extends DatabaseTestCase
 {
     /**
      * The overview only shows how often a label is used, and whether that is zero decides whether it may still be
-     * removed, so the count is asked of the database rather than read off a hydrated collection.
+     * removed, so the count is computed by the database rather than read from a hydrated collection.
      */
     public function testALabelIsListedWithHowManyRevisionsCarryIt(): void
     {

@@ -34,10 +34,10 @@ use function sprintf;
 /**
  * Seeds the option calendar: three rounds, two exceptions to the usual allowance, and proposals in every state.
  *
- * Deliberately seeded so the allowance is worth looking at. In the round that is taking proposals, GETÉST is held to
- * two for that round alone and has used both, KEUR is on a standing limit of two and has one left, and the board is
- * held to nothing. Nothing at all is seeded for a body without an exception, because a body without an exception is
- * meant to work without a row anywhere.
+ * Deliberately seeded so the allowance is worth looking at. In the round that is taking proposals, GETÉST is limited
+ * to two for that round alone and has used both, KEUR is on a standing limit of two and has one left, and no limit
+ * applies to the board. Nothing at all is seeded for a body without an exception, because a body without an exception
+ * is meant to work without a row anywhere.
  *
  * There are deliberately no board meetings seeded ahead of today near any of this: the association records a board
  * meeting after it has happened, so nothing here may be built on knowing when the next one is.
@@ -61,8 +61,8 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
 
     /**
      * Proposals whose creation moment has to be older than the moment they were seeded, because the order they were
-     * handed in is what first dibs reads. Applied after the flush; the trait stamps `createdAt` itself on persist and
-     * keeps its setter to itself.
+     * submitted in is what first dibs means. Applied after the flush; the trait sets `createdAt` itself on persist and
+     * exposes no setter for it.
      *
      * @var array<array-key, array{ActivityProposal, DateTimeImmutable}>
      */
@@ -79,7 +79,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             'organ-keur',
             Organ::class,
         );
-        // 8010 sits in GETÉST, 8025 in KEUR (and on the board), 8026 is the board member who decides.
+        // 8010 is in GETÉST, 8025 in KEUR (and on the board), 8026 is the board member who decides.
         $getestMember = $this->getReference(
             'member-8010',
             Member::class,
@@ -100,7 +100,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             -210,
             -120,
         );
-        // Its days are running now, so this is where everything already decided lives.
+        // Its days are running now, so this is where everything already decided is seeded.
         $running = $this->period(
             'Q1 this year',
             -90,
@@ -134,13 +134,13 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             $open,
         );
 
-        // KEUR is a small body and the board holds it to two activities a quartile, every quartile.
+        // KEUR is a small body and the board limits it to two activities a quartile, every quartile.
         $standing = new ProposalLimit();
         $standing->organ = $keur;
         $standing->maxProposals = 2;
         $manager->persist($standing);
 
-        // GETÉST is held to two in the round that is open alone, because that quartile is already busy.
+        // GETÉST is limited to two in the round that is open alone, because that quartile is already busy.
         $override = new PeriodProposalLimit();
         $override->period = $open;
         $override->organ = $getest;
@@ -241,7 +241,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         );
         $manager->persist($fourth);
 
-        // Holding a date, with the activity itself started off as a draft and still to be filled in.
+        // Reserving a date, with the activity itself started off as a draft and still to be filled in.
         $scheduled = $this->proposal(
             $running,
             $getest,
@@ -278,7 +278,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         );
         $manager->persist($scheduled);
 
-        // Budget approved at a board meeting: nothing chases this one any more.
+        // Budget approved at a board meeting: no reminder is sent for this one any more.
         $clearedBudget = $this->proposal(
             $running,
             $keur,
@@ -306,7 +306,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         );
         $manager->persist($clearedBudget);
 
-        // Costs nothing, so there was never a budget to hand in, and it must not be chased for one either.
+        // Costs nothing, so there was never a budget to submit, and no reminder may be sent for one either.
         $clearedFree = $this->proposal(
             $running,
             $getest,
@@ -334,7 +334,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
         );
         $manager->persist($clearedFree);
 
-        // Held a date, never settled the financial side, and ran out of road; the day is free for the next in line.
+        // Reserved a date, never settled the financial side, and lapsed; the day is free for the next in line.
         $lapsed = $this->proposal(
             $running,
             $getest,
@@ -448,7 +448,7 @@ class OptionCalendarFixture extends Fixture implements DependentFixtureInterface
             ProjectionReferenceFixture::class,
             // Proposals name the body hosting the activity, so the organs must be seeded first.
             ProjectionReferenceFixture::class,
-            // A reserved date starts an activity off, and the tests that reach for a seeded activity by its id expect
+            // A reserved date starts an activity off, and the tests that look up a seeded activity by its id expect
             // the ordinary ones to be numbered first, so this has to seed after them.
             ActivityFixture::class,
         ];

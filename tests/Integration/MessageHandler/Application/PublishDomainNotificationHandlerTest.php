@@ -14,8 +14,8 @@ use App\Tests\Integration\DatabaseTestCase;
 
 /**
  * The handler drops anything whose subject it cannot name, since a subject can be gone by the time an announcement is
- * worked through. A kind whose name is never resolved is therefore never announced at all, which is silent: nothing
- * fails, the notification simply does not appear.
+ * processed. A kind whose name is never resolved is therefore never announced at all, which is silent: nothing fails,
+ * the notification simply does not appear.
  */
 final class PublishDomainNotificationHandlerTest extends DatabaseTestCase
 {

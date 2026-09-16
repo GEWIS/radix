@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Only ever used to widen access to course material, and this should stay the exception: an address is a weak thing to
- * grant on. The two other places that read one -- {@see \App\Service\Database\RegistrationService} for the July
- * sign-up window and {@see \App\Security\Database\RegisterNetworkChecker} for the register -- only ever take
- * something away with it, which is why they refuse what they cannot establish and this refuses nothing.
+ * grant on. The two other places that read one ({@see \App\Service\Database\RegistrationService} for the July sign-up
+ * window and {@see \App\Security\Database\RegisterNetworkChecker} for the register) only ever restrict access with it,
+ * which is why they refuse what they cannot establish and this refuses nothing.
  */
 final readonly class CampusNetworkChecker
 {
@@ -44,8 +44,8 @@ final readonly class CampusNetworkChecker
             return false;
         }
 
-        // The proxy in front stands on TU/e space, inside the ranges below, so believing its own address would put
-        // every visitor on campus as soon as a request arrives without a forwarded one.
+        // The reverse proxy is on TU/e space, inside the ranges below, so using its address would put every visitor on
+        // campus as soon as a request arrives without a forwarded one.
         if (
             IpUtils::checkIp(
                 $clientIp,

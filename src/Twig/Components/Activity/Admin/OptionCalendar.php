@@ -25,11 +25,11 @@ use function preg_match;
 /**
  * The month grid: what is already in the agenda and what bodies are asking for, side by side.
  *
- * Server-rendered rather than handed to a calendar library. The grid is a table of days that changes when the month
+ * Server-rendered rather than delegated to a calendar library. The grid is a table of days that changes when the month
  * changes, which is what a live component is for, and it keeps working without JavaScript, inside the site's strict
- * content-security policy, and without carrying a dependency for one screen.
+ * content-security policy, and without adding a dependency for one screen.
  *
- * Moving through the months is in the address, so a link to a particular month is a link somebody can send.
+ * Moving through the months is in the address, so a link to a particular month is a link a member can send.
  */
 #[AsLiveComponent(
     name: 'Activity:Admin:OptionCalendar',
@@ -69,7 +69,7 @@ final class OptionCalendar
 
     /**
      * Deliberately not `getMonth()`: a live component reads a getter of that name as the type of the `$month` prop,
-     * which is the string in the address, not the grid it stands for.
+     * which is the string in the address, not the grid it represents.
      */
     public function getGrid(): CalendarMonth
     {
@@ -118,7 +118,7 @@ final class OptionCalendar
 
     /**
      * A live action arrives over its own request, which the class-level attribute does not cover, so every one of them
-     * asks again.
+     * checks again.
      */
     private function assertAccess(): void
     {

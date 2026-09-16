@@ -68,7 +68,7 @@ final class CompanyUserRepositoryTest extends DatabaseTestCase
             $byRepresentative[0]->email,
         );
 
-        // Including the representative who has moved on: the board still has to be able to find and remove them.
+        // Including the disabled representative: the board still has to be able to find and remove them.
         self::assertCount(
             3,
             $this->paginate('Nexunt Systems'),

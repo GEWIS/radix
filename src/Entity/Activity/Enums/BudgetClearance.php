@@ -13,13 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Association policy is that an organiser may not commit, spend or promote before their budget has been approved at a
  * board meeting, which should be at least four weeks before the activity. Board meetings are not known in advance, so
- * the website cannot work out that deadline itself; the board records the outcome here instead.
+ * the website cannot compute that deadline itself; the board records the outcome here instead.
  *
- * It is not a flag, because an activity that costs nothing has no budget to hand in and must not be chased for one.
+ * It is not a flag, because an activity that costs nothing has no budget to submit and must not be reminded about one.
  */
 enum BudgetClearance: string implements TranslatableInterface
 {
-    /** A budget was handed in and approved at a board meeting. */
+    /** A budget was submitted and approved at a board meeting. */
     case Approved = 'approved';
 
     /** The activity costs nothing, so there is no budget to approve. */

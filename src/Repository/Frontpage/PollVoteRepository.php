@@ -79,8 +79,8 @@ class PollVoteRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many votes each answer of a poll holds, keyed by answer id, counted in one query. Answers nobody picked are
-     * absent. This is what the tallies are built from before the votes themselves go.
+     * How many votes each answer of a poll has, keyed by answer id, counted in one query. Answers no member picked are
+     * absent. This is what the tallies are built from before the votes themselves are deleted.
      *
      * @return array<int, int>
      */
@@ -110,8 +110,8 @@ class PollVoteRepository extends ServiceEntityRepository
     }
 
     /**
-     * Removes who answered a poll in a single statement, once the answers have been counted into the tallies. The
-     * votes are gone from the database rather than from the entity manager, so anything holding one is out of date
+     * Removes who answered a poll in a single statement, once the answers have been counted into the tallies. The votes
+     * are gone from the database rather than from the entity manager, so anything that has one loaded is out of date
      * afterwards.
      */
     public function deleteForPoll(Poll $poll): int

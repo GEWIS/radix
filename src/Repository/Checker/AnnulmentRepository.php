@@ -62,7 +62,7 @@ class AnnulmentRepository extends ServiceEntityRepository
     /**
      * Returns every annulment that annuls the given decision.
      *
-     * Looked up rather than read off `Decision::getAnnulledBy()`, which can only ever hand back one of them, and so
+     * Looked up rather than read from `Decision::getAnnulledBy()`, which can only ever return one of them, and so
      * cannot show that a decision was annulled more than once.
      *
      * @return Annulment[]

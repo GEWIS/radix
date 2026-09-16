@@ -20,7 +20,7 @@ use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
- * A vacancy as the form asks for it. The package and the labels are identifiers rather than records: this sits in
+ * A vacancy as the form collects it. The package and the labels are identifiers rather than records: this is stored in
  * the session between the steps, which a detached entity does not survive.
  */
 #[ConsistentVacancy(
@@ -37,7 +37,7 @@ final class VacancyData
     public const string STEP_DETAILS = 'details';
     public const string STEP_CONTACT = 'contact';
 
-    /** The vacancy being edited, so its own slug does not read as taken. Null while creating. */
+    /** The vacancy being edited, so its own slug does not count as taken. Null while creating. */
     public ?int $vacancyId = null;
 
     #[Assert\NotBlank(

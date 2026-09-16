@@ -36,7 +36,7 @@ use function trim;
  *
  * The stable {@see Activity} owns only the identity and the (immutable) creator; everything that may be revised and
  * reviewed (the organising organ and company, the labels, the localised texts, the schedule, the category, the facility
- * flags and the sign-up lists) lives here.
+ * flags and the sign-up lists) is on this entity.
  */
 #[Entity(repositoryClass: ActivityRevisionRepository::class)]
 #[HasLifecycleCallbacks]
@@ -256,7 +256,7 @@ class ActivityRevision extends AbstractRevision
     }
 
     /**
-     * The lists by the lineage they carry, which is how a list is told apart across revisions.
+     * The lists keyed by their lineage, which is how a list is told apart across revisions.
      *
      * @return array<string, SignupList>
      */
@@ -303,7 +303,7 @@ class ActivityRevision extends AbstractRevision
     }
 
     /**
-     * The languages this revision is written in, read off its texts: Dutch when any of them says something in Dutch,
+     * The languages this revision is written in, read from its texts: Dutch when any of them says something in Dutch,
      * English when any says something in English or none says anything in Dutch, so a revision with nothing in it
      * yet is written in English.
      *

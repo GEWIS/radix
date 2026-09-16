@@ -19,7 +19,7 @@ use function is_array;
 /**
  * Changing an organ's membership in one decision.
  *
- * The three kinds of change are numbered in a fixed order — reappointments, then discharges, then installations —
+ * The three kinds of change are numbered in a fixed order (reappointments, then discharges, then installations)
  * because the resulting decision has to read as one coherent statement.
  */
 class InstallMapper extends AbstractDecisionMapper

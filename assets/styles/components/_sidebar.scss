@@ -58,8 +58,8 @@
 }
 
 // Above its breakpoint a responsive offcanvas zeroes `.offcanvas-body` padding through `.offcanvas-lg
-// .offcanvas-body`, so this has to carry the same weight to survive. The rows and the blocks around them hold the
-// rest of the inset themselves, which keeps the hover and active fills wider than the text they sit behind.
+// .offcanvas-body`, so this has to match that specificity to take effect. The rows and the blocks around them provide
+// the rest of the inset themselves, which keeps the hover and active fills wider than the text they are behind.
 .sidebar .sidebar-body {
     display: flex;
     flex-direction: column;
@@ -145,8 +145,8 @@
 // The same row as a menu row in the navbar: both take their measurements from the `$nav-row-*` set, so neither can
 // be adjusted without the other following.
 //
-// Reboot underlines a hovered anchor, and `a:hover` outweighs a plain class, so the rows have to say again while
-// hovered what they already say at rest.
+// Reboot underlines a hovered anchor, and `a:hover` outweighs a plain class, so the rows have to declare again while
+// hovered what they already declare at rest.
 .sidebar-link {
     display: flex;
     align-items: center;

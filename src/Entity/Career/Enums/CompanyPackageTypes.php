@@ -51,7 +51,7 @@ enum CompanyPackageTypes: string
     }
 
     /**
-     * What the package is called where somebody has to pick or recognise one.
+     * What the package is called where a user has to pick or recognise one.
      */
     public function label(): TranslatableMessage
     {

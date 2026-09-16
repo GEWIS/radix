@@ -18,8 +18,8 @@ use function sprintf;
 /**
  * Emails a company's representatives what the committee decided. Runs in a worker; the email is always English.
  *
- * Everybody who can still act for the company is written to, not only whoever put the change forward: the one who
- * submitted it may be away, and a decision is the company's business rather than one person's.
+ * Every representative who can still act for the company is written to, not only the one who submitted the change: they
+ * may be away, and a decision is the company's business rather than one person's.
  */
 #[AsMessageHandler]
 class CareerReviewDecisionEmailHandler
@@ -58,7 +58,7 @@ class CareerReviewDecisionEmailHandler
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        // Somebody who has been shut out is no longer part of this.
+        // A representative whose account has been disabled is no longer written to.
         foreach ($this->companyUserRepository->findActiveForCompany($company) as $companyUser) {
             $this->mailer->send(
                 new TemplatedEmail()

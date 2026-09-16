@@ -19,7 +19,7 @@ class AnnulmentTest extends TestCase
     use BuildsDecisions;
 
     /**
-     * A decision is never edited, only annulled by a later one, so the annulment has to carry what it took back: the
+     * A decision is never edited, only annulled by a later one, so the annulment has to contain what it annulled: the
      * reference to the decision and the text that decision had.
      */
     public function testQuotesTheDecisionItTakesBack(): void

@@ -21,8 +21,8 @@ use function str_contains;
  * Who is shown a body's roll call. The page itself is public, so the members panel is what the account decides: a
  * member sees it and everybody else is offered the login instead.
  *
- * The page used to ask for `IS_AUTHENTICATED_FULLY`, which a remember-me session does not hold, so a member who had
- * not typed their password this session was told to sign in while already signed in (GH-125). Asking for the role
+ * The page used to require `IS_AUTHENTICATED_FULLY`, which a remember-me session does not have, so a member who had
+ * not entered their password this session was shown the login while already signed in (GH-125). Requiring the role
  * instead is also what keeps a company representative out, which full authentication never did.
  */
 final class BodyControllerTest extends DatabaseTestCase

@@ -10,9 +10,9 @@ use Symfony\Component\Form\FormInterface;
 /**
  * Which of a form's submit buttons was pressed.
  *
- * A form with more than one submit button decides different things depending on which one was used — confirming a
- * deletion, saving instead of previewing. `FormInterface` says nothing about being clickable and `getClickedButton()`
- * lives on the concrete `Form`, so the narrowing happens here rather than in every controller that asks.
+ * A form with more than one submit button decides different things depending on which one was used: confirming a
+ * deletion, saving instead of previewing. `FormInterface` declares nothing about being clickable and
+ * `getClickedButton()` is on the concrete `Form`, so the narrowing happens here rather than in every controller.
  */
 final class SubmitButtons
 {

@@ -28,7 +28,7 @@ final readonly class AnnouncementService
     }
 
     /**
-     * Push the announcement to every connected client, and keep it only if it was asked to stay up until `$endsAt`.
+     * Push the announcement to every connected client, and keep it only when it is sticky until `$endsAt`.
      */
     public function send(
         Announcement $announcement,
@@ -57,7 +57,7 @@ final readonly class AnnouncementService
 
     /**
      * Take the announcement down. Reports whether there was still one to take down, which is what decides if the
-     * operator is told anything happened.
+     * operator is notified anything happened.
      */
     public function remove(int $id): bool
     {

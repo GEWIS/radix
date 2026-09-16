@@ -653,7 +653,7 @@ class Member
      *
      * Serving is a matter of dates rather than of a row existing: they must have been installed, that installation
      * must have taken effect, and they must not have been relieved yet. This is what the register's administrator
-     * rights hang off, so somebody who was secretary last year does not still hold them.
+     * rights depend on, so a member who was secretary last year no longer has them.
      */
     public function isServingSecretary(): bool
     {

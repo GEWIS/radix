@@ -9,10 +9,10 @@ import { flattenFloatingLabel } from '../../js/floating_label.ts';
 
 /**
  * Writes HTML rather than the Markdown everything else on the site is written in (see
- * markdown_editor_controller.ts): a page is laid out with the tables, columns and images Markdown has no way to say.
+ * markdown_editor_controller.ts): a page is laid out with the tables, columns and images Markdown cannot express.
  *
- * An image is picked out of the browser behind the toolbar's image button (page_images_controller.ts, which answers
- * the `page-editor:browse` this dispatches), never dropped into the text.
+ * An image is picked out of the browser behind the toolbar's image button (page_images_controller.ts, which handles
+ * the `page-editor:browse` event this dispatches), never dropped into the text.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -64,7 +64,7 @@ export default class extends Controller {
         return this.element as HTMLTextAreaElement;
     }
 
-    /** The editor draws itself next to the textarea, so what the writer clicks is a sibling. */
+    /** The editor is rendered next to the textarea, so what the writer clicks is a sibling. */
     private get host(): HTMLElement {
         return this.element.parentElement ?? this.element;
     }
@@ -88,7 +88,7 @@ export default class extends Controller {
         this.editor = editor;
     }
 
-    /** Pressing the button says which editor the picture is for, cursor or no cursor. */
+    /** Pressing the button records which editor the picture is for, cursor or no cursor. */
     private browse(): void {
         this.lastFocusedAt = Date.now();
         this.dispatch('browse', { prefix: 'page-editor', bubbles: true });
@@ -141,7 +141,7 @@ export default class extends Controller {
                 'findAndReplace', 'undo', 'redo', '|',
                 'sourceEditing',
             ],
-            // Whatever a page already holds is kept as it is, so opening an old page and saving it does not throw
+            // Whatever a page already contains is kept as it is, so opening an old page and saving it does not throw
             // half of it away. The sanitizer on save is the only thing that removes anything.
             htmlSupport: {
                 allow: [{ name: /.*/, attributes: true, classes: true, styles: true }],

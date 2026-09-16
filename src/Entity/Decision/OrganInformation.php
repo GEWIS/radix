@@ -29,7 +29,7 @@ use SortDirection;
  * A body's page on the website, which is the one thing about a body that GEWIS itself writes: the organ and everything
  * about its installation comes from the decisions, and this is what its members get to say alongside that.
  *
- * The page is a stable aggregate with exactly one row per body; everything the members write lives on a chain of
+ * The page is a stable aggregate with exactly one row per body; everything the members write is on a chain of
  * {@see OrganInformationRevision}s, so the board sees what changed before the website does. What the public reads is
  * {@see self::getLiveRevision()}; what the body is working on is {@see self::getCurrentRevision()}.
  */
@@ -158,8 +158,7 @@ class OrganInformation implements RevisableInterface
     }
 
     /**
-     * Nobody but the board reviews what a body writes about itself, which is the whole point of the page going past
-     * them.
+     * Only the board reviews what a body writes about itself, which is the whole point of the page going past them.
      *
      * @inheritDoc
      */
@@ -179,7 +178,7 @@ class OrganInformation implements RevisableInterface
     }
 
     /**
-     * A page belongs to a body rather than to whoever happened to write it, so there is no creator to defer to.
+     * A page belongs to a body rather than to the member who wrote it, so there is no creator to defer to.
      */
     #[Override]
     public function getResourceCreator(): ?MemberModel
@@ -202,7 +201,7 @@ class OrganInformation implements RevisableInterface
     }
 
     /**
-     * Display proxy. The address the body is written to at, which is shown to members only.
+     * Display proxy. The body's email address, which is shown to members only.
      */
     public function getEmail(): ?string
     {

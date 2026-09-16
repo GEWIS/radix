@@ -21,16 +21,16 @@ use function is_string;
  * What the container healthcheck asks, and so what decides both whether the workers may start and whether this
  * container is reported as serving.
  *
- * Only what restarting can fix is allowed to decide that. An unreachable database is not: restarting through
- * somebody else's outage achieves nothing and costs the minutes the entrypoint spends waiting. It is reported all
- * the same, because the queue page and whatever watches this address are the ones that want to know.
+ * Only what restarting can fix is allowed to decide that. An unreachable database is not: restarting through an
+ * external outage achieves nothing and costs the minutes the entrypoint spends waiting. It is reported all the same,
+ * because the queue page and whatever watches this address are the ones that want to know.
  */
 final class HealthController extends AbstractController
 {
     /**
-     * The addresses `docker/app/healthcheck.php` reaches this from, and the only ones answered. Everything else
-     * arrives through the proxy, so this is closed to the internet: it opens two connections per request, which
-     * during an outage is two connect timeouts holding one of eight FrankenPHP worker threads for twenty seconds.
+     * The addresses `docker/app/healthcheck.php` reaches this from, and the only ones accepted. Everything else
+     * arrives through the proxy, so this is closed to the internet: it opens two connections per request, which during
+     * an outage is two connect timeouts occupying one of eight FrankenPHP worker threads for twenty seconds.
      */
     private const array PROBE = [
         '127.0.0.0/8',
@@ -55,8 +55,8 @@ final class HealthController extends AbstractController
     public function __invoke(Request $request): JsonResponse
     {
         // The peer that opened the connection, not `getClientIp()`: that one honours X-Forwarded-For from a trusted
-        // proxy, which is precisely what must not be able to speak for the loopback. A TCP source address cannot be
-        // forged from outside the host.
+        // proxy, which is precisely what must not be able to impersonate the loopback. A TCP source address cannot
+        // be forged from outside the host.
         $peer = $request->server->get('REMOTE_ADDR');
         if (
             !is_string($peer)
@@ -69,7 +69,7 @@ final class HealthController extends AbstractController
         }
 
         // Set by the entrypoint when it came up without migrating, and cleared again by the retry it leaves behind
-        // once both databases answer and neither has a migration pending.
+        // once both databases are reachable and neither has a migration pending.
         $migrated = !file_exists($this->migrationsSkippedMarker);
 
         return new JsonResponse(

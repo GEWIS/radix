@@ -9,7 +9,7 @@ use App\Entity\User\UserSettings;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The GDPR export must expose every stored preference, so a new setting cannot be added without also surfacing it to
+ * The GDPR export must expose every stored preference, so a new setting cannot be added without also exporting it to
  * the member. This pins the exported shape and values.
  */
 final class UserSettingsTest extends TestCase

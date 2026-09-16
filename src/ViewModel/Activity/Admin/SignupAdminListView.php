@@ -42,9 +42,9 @@ final readonly class SignupAdminListView
      * @param int               $visibleFieldCount number of non-hidden field columns
      * @param SignupAdminRow[]  $rows              the subscribers, narrowed by the search and the quick filter
      * @param list<RolePlaces>  $roles             the parts this activity cannot go ahead without, in the order the
-     *                                            draw makes up their shortfall, with how many people hold each
+     *                                             draw makes up their shortfall, with how many people have taken each
      * @param list<string>      $priorityOrders    the orders this list admits in, best first, one sentence each
-     * @param list<string>      $reservedPlaces    the places held back, one per thing they are held for
+     * @param list<string>      $reservedPlaces    the places reserved, one per thing they are reserved for
      */
     public function __construct(
         public int $listId,
@@ -439,8 +439,8 @@ final readonly class SignupAdminListView
     }
 
     /**
-     * The places this list holds back before it admits anybody: a number for a membership tier or for the organising
-     * body.
+     * The places this list reserves before it admits anybody: a number for a membership tier or for
+     * the organising body.
      *
      * @return list<string>
      */

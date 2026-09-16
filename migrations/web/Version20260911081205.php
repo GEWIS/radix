@@ -1026,9 +1026,9 @@ final class Version20260911081205 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // The inverse of a base is dropping every table in the database, which is not something a migration should
-        // offer: nothing that ran this needs to step back past it, and the rollup that puts an existing database on
-        // it does not run up() either. `toDropSql()` does produce a working revert, and it was verified before being
-        // withheld here, but a schema this size is a poor thing to leave one mistyped command away.
+        // offer: nothing that ran this needs to migrate down past it, and the rollup that puts an existing database
+        // on it does not run up() either. `toDropSql()` does produce a working revert, and it was verified before
+        // being withheld here, but dropping a schema this size should not be one mistyped command away.
         $this->throwIrreversibleMigrationException(
             'This migration is the schema base; reverting it would drop the entire database.',
         );

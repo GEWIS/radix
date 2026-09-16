@@ -23,7 +23,7 @@ use function sprintf;
 /**
  * Delete external sign-ups whose double-opt-in (Verify) token has expired without being confirmed. Until confirmed an
  * external sign-up is hidden everywhere, so this just clears never-completed sign-ups (and their answers + token);
- * confirmed sign-ups, which hold a long-lived Manage token instead, are never touched.
+ * confirmed sign-ups, which have a long-lived Manage token instead, are never touched.
  */
 #[AsCommand(
     name: 'app:activity:prune-unverified-signups',

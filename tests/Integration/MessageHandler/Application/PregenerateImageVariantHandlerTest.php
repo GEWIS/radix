@@ -66,7 +66,7 @@ final class PregenerateImageVariantHandlerTest extends KernelTestCase
         $container = self::getContainer();
 
         // The opposite of GenerateImageVariantHandler, which caps at the original width rather than leave a request
-        // unanswered. Nobody is waiting on a backfilled variant, so an 800px original gets no 2560px one.
+        // unanswered. No user is waiting on a backfilled variant, so an 800px original gets no 2560px one.
         $source = $this->storeSource();
         $container->get(PregenerateImageVariantHandler::class)(new PregenerateImageVariantMessage(
             $source,

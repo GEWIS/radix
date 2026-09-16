@@ -10,7 +10,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * As with sessions, every query that reads or deletes facts for a user MUST also filter by firewallName: a fact
- * recognised on `main` says nothing about the same browser arriving at `company`.
+ * recognised on `main` does not apply to the same browser arriving at `company`.
  *
  * @template T of KnownFact
  *
@@ -42,7 +42,7 @@ abstract class KnownFactRepository extends ServiceEntityRepository
     }
 
     /**
-     * The facts a user has gone longest without being seen with, oldest first.
+     * The facts least recently seen for this user, oldest first.
      *
      * @return T[]
      */

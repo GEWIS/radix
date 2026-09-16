@@ -29,12 +29,12 @@ use function strval;
 
 /**
  * Stores uploaded photos into an album, one at a time so a single bad file never aborts the batch. Each file is
- * validated (a real image), content-addressed into storage (which de-duplicates), skipped if the album already holds
- * the same bytes, and — only once its Photo is committed — queued for variant generation. After the batch the album
- * cover is queued for regeneration once.
+ * validated (a real image), content-addressed into storage (which de-duplicates), skipped if the album already contains
+ * the same bytes, and, only once its Photo is committed, queued for variant generation. After the batch the album cover
+ * is queued for regeneration once.
  *
  * Aspect ratio comes from the image header; the remaining metadata (capture time, camera, GPS, ...) is read from the
- * original's EXIF, falling back to the upload time when the image carries none.
+ * original's EXIF, falling back to the upload time when the image has none.
  */
 final readonly class PhotoUploadService
 {
@@ -85,7 +85,7 @@ final readonly class PhotoUploadService
         if ($created > 0) {
             $this->messageBus->dispatch(new GenerateAlbumCoverMessage(intval($album->id)));
             // Only genuine EXIF capture times may adjust the album's date range; a no-EXIF photo (scan, export) keeps
-            // the upload time for ordering but must never drag a board-curated range to today.
+            // the upload time for ordering but must never extend a board-curated range to today.
             $this->widenDateRange(
                 $album,
                 $captureTimes,
@@ -100,8 +100,8 @@ final readonly class PhotoUploadService
     }
 
     /**
-     * Widen the album's date range to span the given EXIF capture times, extending each bound only outward. A
-     * board-set range is never contracted, and an album whose upload carried no EXIF dates keeps its existing range.
+     * Widen the album's date range to span the given EXIF capture times, extending each bound only outward. A board-set
+     * range is never contracted, and an album whose upload had no EXIF dates keeps its existing range.
      *
      * @param DateTimeImmutable[] $captureTimes
      */
@@ -194,7 +194,7 @@ final readonly class PhotoUploadService
             $photo->album = $album;
             $photo->path = $stored->path;
             // A non-EXIF photo still needs a (non-nullable) timestamp for ordering; the upload time is the fallback,
-            // and applyTo() overrides it only when EXIF actually carried a capture time.
+            // and applyTo() overrides it only when EXIF actually contained a capture time.
             $photo->dateTime = new DateTimeImmutable();
             $photo->aspectRatio = $aspectRatio;
             $metadata->applyTo($photo);

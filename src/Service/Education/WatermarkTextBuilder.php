@@ -9,7 +9,7 @@ use App\Entity\Education\CourseDocumentDownload;
 use function sprintf;
 
 /**
- * Names who asked for the file and when, so a copy that turns up elsewhere leads back to the account that fetched it.
+ * Names who requested the file and when, so a copy that appears elsewhere identifies the account that downloaded it.
  * The wording is deliberately the same as the previous site used, so copies from either era read alike.
  */
 final readonly class WatermarkTextBuilder

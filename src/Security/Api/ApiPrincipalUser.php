@@ -12,8 +12,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Security adapter around an {@see ApiPrincipal}.
  *
  * The entity is deliberately left free of security interfaces: its natural identifier is the bearer token itself,
- * which must never end up in logs, profiler panels or exception messages as a user identifier. The adapter answers
- * with an opaque identifier instead, while the principal keeps its single responsibility.
+ * which must never end up in logs, profiler panels or exception messages as a user identifier. The adapter returns
+ * an opaque identifier instead, while the principal keeps its single responsibility.
  */
 final class ApiPrincipalUser implements UserInterface
 {
@@ -44,7 +44,7 @@ final class ApiPrincipalUser implements UserInterface
     }
 
     /**
-     * There are no credentials to hold on to; the bearer token is looked up on every request.
+     * There are no credentials to keep; the bearer token is looked up on every request.
      *
      * Intentionally without #[Override]: `UserInterface::eraseCredentials()` is deprecated as of Symfony 7.3 and
      * disappears with Symfony 8, at which point the attribute would turn this into a fatal error.

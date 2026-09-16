@@ -46,9 +46,9 @@ class MaintenanceWindowRepository extends ServiceEntityRepository
     /**
      * Every window that could still be in force at some point today, ordered as the active one is picked.
      *
-     * Cached by the day rather than by the instant, because a query parameterised on `now` is a different question
-     * every second and so can never be answered from cache. The result is a superset of what is in force at any
-     * instant within the day, which is what lets {@see findActiveAt} narrow it down without a query.
+     * Cached by the day rather than by the instant, because a query parameterised on `now` is different every second
+     * and so can never be served from cache. The result is a superset of what is in force at any instant within the
+     * day, which is what lets {@see findActiveAt} narrow it down without a query.
      *
      * @return MaintenanceWindow[]
      */

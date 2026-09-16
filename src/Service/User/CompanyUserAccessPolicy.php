@@ -11,7 +11,7 @@ use DateTimeImmutable;
 /**
  * Decides whether a representative may use the careers portal at all. Two things can take that away: the board shutting
  * the representative out, and the company's contract running out. Neither is scheduled or flagged anywhere; both are
- * worked out from the current state whenever it matters, at sign-in and on every request of a session that is already
+ * computed from the current state whenever it matters, at sign-in and on every request of a session that is already
  * running.
  */
 final readonly class CompanyUserAccessPolicy

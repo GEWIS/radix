@@ -120,8 +120,8 @@ class Organ
      *
      * Membership of a body is derived from the decisions about that body, so it cannot outlast the body itself: a
      * body whose foundation was annulled never existed, and neither did anyone's membership of it. Deleting the body
-     * therefore deletes the memberships derived from it, which the database is deliberately not told to do — what
-     * goes and what stays is the projection's to decide rather than a cascade's to settle behind its back.
+     * therefore deletes the memberships derived from it, which the database is deliberately not configured to do: what
+     * goes and what stays is for the projection to decide rather than for a database cascade to settle on its own.
      *
      * @var Collection<array-key, OrganMember>
      */
@@ -169,7 +169,7 @@ class Organ
     private Collection $subdecisions;
 
     /**
-     * The body's page on the website, or null while nobody has started one.
+     * The body's page on the website, or null while no member has started one.
      */
     #[OneToOne(
         mappedBy: 'organ',
@@ -201,7 +201,7 @@ class Organ
      * Add a member.
      *
      * Kept in step with the owning side, so that a member installed earlier in the same meeting is already part of the
-     * organ when a later decision in that meeting asks who is in it.
+     * organ when a later decision in that meeting reads its members.
      */
     public function addMember(OrganMember $member): void
     {

@@ -193,8 +193,8 @@ final class DrawManagerTest extends DatabaseTestCase
     public function testManualDrawUsesTheSameCutoffSnapshot(): void
     {
         // The board's fallback for a missed automated draw must produce what an on-time draw would have: only the two
-        // sign-ups from before the cutoff (deliberately the LAST two by id) join the lottery -- and exactly fill the
-        // two places -- while the two that arrived after the cutoff never displace them.
+        // sign-ups from before the cutoff (deliberately the LAST two by id) join the lottery (and exactly fill the
+        // two places), while the two that arrived after the cutoff never displace them.
         $ids = $this->signupIds(6);
         $this->pinSignupCreatedAt(
             $ids[2],
@@ -301,7 +301,7 @@ final class DrawManagerTest extends DatabaseTestCase
             $ranked[] = $signup;
         }
 
-        // Everybody the draw looked at holds the place it gave them, in that order.
+        // Every sign-up the draw looked at has the place it gave them, in that order.
         foreach ($ranked as $place => $signup) {
             self::assertSame(
                 $place + 1,
@@ -438,7 +438,7 @@ final class DrawManagerTest extends DatabaseTestCase
 
     public function testTheSeededListWithEverythingAtOnceAdmitsBothDrivers(): void
     {
-        // ÅLLOC-F2: closed, two drivers handed out, one place for the organising body, an order and a cohort order.
+        // ÅLLOC-F2: closed, two drivers assigned, one place for the organising body, an order and a cohort order.
         $list = $this->list(31);
 
         self::assertTrue($this->drawManager()->drawManually(
@@ -487,7 +487,7 @@ final class DrawManagerTest extends DatabaseTestCase
             endTime: '+2 days',
         );
         // The last to sign up did so after the list had closed, which puts them behind the on-time pool; the role
-        // is handed out afterwards, to anybody on the list.
+        // is assigned afterwards, to any sign-up on the list.
         $this->entityManager->getConnection()->update(
             'Signup',
             ['createdAt' => $this->sqlDateTime('-30 minutes')],

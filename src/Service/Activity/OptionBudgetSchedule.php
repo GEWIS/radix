@@ -9,12 +9,13 @@ use DateTimeImmutable;
 use function sprintf;
 
 /**
- * The two moments a reserved day is measured against, in one place so the warning and the release cannot drift apart.
+ * The two moments a reserved day is measured against, in one place so the warning and the release are always computed
+ * from the same constants.
  *
- * Association policy asks for a budget in hand early enough to be discussed at a board meeting at least four weeks
- * before the activity. Board meetings are not known in advance, so the website cannot resolve that into a date; it
- * counts the four weeks from the day itself and warns then, and gives the two further weeks the option calendar has
- * always given before letting the day go.
+ * Association policy requires a budget to be submitted early enough to be discussed at a board meeting at least four
+ * weeks before the activity. Board meetings are not known in advance, so the website cannot resolve that into a date;
+ * it counts the four weeks from the day itself and warns then, and gives the two further weeks the option calendar has
+ * always given before releasing the day.
  */
 final readonly class OptionBudgetSchedule
 {
@@ -24,8 +25,8 @@ final readonly class OptionBudgetSchedule
     public const int LEAD_DAYS = 28;
 
     /**
-     * How much longer a day is held after the warning before it is released, which is the grace the calendar has
-     * always given.
+     * How much longer a day is reserved after the warning before it is released, which is the grace the calendar
+     * has always given.
      */
     public const int GRACE_DAYS = 14;
 
@@ -41,7 +42,7 @@ final readonly class OptionBudgetSchedule
     }
 
     /**
-     * Days starting on or before this have run out of road.
+     * Days starting on or before this have used up their grace period.
      */
     public function lapseBefore(): DateTimeImmutable
     {

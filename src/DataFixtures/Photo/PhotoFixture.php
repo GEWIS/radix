@@ -60,7 +60,7 @@ use function unlink;
  * Outside the test environment a larger set of demo albums is added on top (see {@see loadDemoAlbums}) so the year
  * filter, month dividers, masonry grid and viewer paging can be browsed with realistic data.
  *
- * Images are generated on the fly rather than committed to the repository, so an album can hold two hundred photos
+ * Images are generated on the fly rather than committed to the repository, so an album can contain two hundred photos
  * without shipping any binaries. The three graduate lidnrs below drive the graduate-subtree regression suite:
  * {@see GRADUATE_TAGGED_IN_SUBTREE} is tagged in a sub-album and must therefore be able to view the parent Gala album;
  * {@see GRADUATE_TAGGED_IN_OTHER_SUBALBUM} is tagged in the sibling sub-album (so may view Gala, but not the Dinner
@@ -112,14 +112,14 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
      * How many distinct placeholders the demo albums draw between them.
      *
      * Drawing one image per photo is what the seed used to spend nearly all of its time on: close to a thousand demo
-     * photos, at some seventy milliseconds each to rasterise and encode, and none of it interesting -- they are flat
+     * photos, at some seventy milliseconds each to rasterise and encode, and none of it interesting: they are flat
      * colour, a band and a caption. So the demo albums cycle through a fixed set instead, drawn once and reused,
      * which is a few seconds of the minute and a half `make seed` took. A multiple of the number of {@see SHAPES},
      * so every shape comes round as often as it did when each photo was drawn for itself, and enough of them that
      * the whole of {@see PALETTE} is reached and an album is not visibly the same picture twice over.
      *
-     * Photos outside the demo albums -- the tree the integration tests assert against, and all there is under `test`
-     * -- keep an image of their own, so what the tests see is unchanged.
+     * Photos outside the demo albums (the tree the integration tests assert against, and all there is under `test`)
+     * keep an image of their own, so what the tests see is unchanged.
      */
     private const int DEMO_PLACEHOLDERS = 48;
 
@@ -170,7 +170,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     private int $photoCounter = 0;
 
     /**
-     * The encoded bytes of each demo placeholder, keyed by its number, drawn the first time one is asked for.
+     * The encoded bytes of each demo placeholder, keyed by its number, drawn the first time one is needed.
      *
      * @var array<int, string>
      */
@@ -268,7 +268,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         $manager->persist($afterPhoto);
         $manager->persist($this->memberTag($afterPhoto, self::GRADUATE_TAGGED_IN_OTHER_SUBALBUM, null, null));
 
-        // --- Trip album (public weekly photo lives here) ---
+        // --- Trip album (the public weekly photo is here) ---
         $tripPhoto = $this->makePhoto(
             $trip,
             '-3 months 14:00',
@@ -339,7 +339,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         // association years, so both the year filter and the month dividers have something to separate.
         $albums = [
             [
-                // Recent enough to still carry the "new album" badge on the overview.
+                // Recent enough to still show the "new album" badge on the overview.
                 'Introduction Camp',
                 3,
                 200,
@@ -508,7 +508,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
      * A photo for a demo album, drawn from the fixed set of placeholders rather than given an image of its own; see
      * {@see DEMO_PLACEHOLDERS} for why.
      *
-     * The photos of one album that land on the same placeholder store as one file, since what is stored is
+     * The photos of one album that use the same placeholder are stored as one file, since what is stored is
      * content-addressed and scoped to the album. That is the point rather than a side effect: they are the same
      * picture, and a seed has no reason to keep a thousand copies of fifty images.
      */
@@ -538,8 +538,8 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     }
 
     /**
-     * Stores encoded image bytes the way an upload would and hangs a photo off the album they belong to, which is
-     * what scopes the stored path, so the album must already have an id by the time this is called.
+     * Stores encoded image bytes the way an upload would and attaches a photo to the album it belongs to, which is what
+     * scopes the stored path, so the album must already have an id by the time this is called.
      */
     private function storePhoto(
         Album $album,

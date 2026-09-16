@@ -37,7 +37,7 @@ final class SecurityLogRepositoryTest extends DatabaseTestCase
             actor: self::USER,
         );
 
-        // The account it happened to, and the account that did it, both answer to the same search.
+        // The account it happened to, and the account that did it, are both found by the same search.
         self::assertCount(
             2,
             $this->search(
@@ -62,8 +62,8 @@ final class SecurityLogRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * A category is a set of event types, resolved before the query so the column stays a plain string the index can
-     * answer on.
+     * A category is a set of event types, resolved before the query so the column stays a plain string an
+     * index can use.
      */
     public function testTheOverviewNarrowsByCategory(): void
     {

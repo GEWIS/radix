@@ -9,11 +9,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * What a block on the option calendar stands for.
+ * What a block on the option calendar represents.
  *
- * Four things share the grid and must not be mistaken for one another: an activity the website itself holds, an item
- * from the association's own agenda that it does not, a day a body has been given, and a day a body is still asking
- * for. The paper calendar made much the same distinction with two colours of pen.
+ * Four things share the grid and must not be mistaken for one another: an activity the website itself stores, an item
+ * from the association's own agenda that it does not, a day a body has been given, and a day a body is still
+ * requesting. The paper calendar made much the same distinction with two colours of pen.
  */
 enum CalendarEntryKind: string implements TranslatableInterface
 {
@@ -23,7 +23,7 @@ enum CalendarEntryKind: string implements TranslatableInterface
     case RequestedDay = 'requested';
 
     /**
-     * The modifier its block is drawn with, so the same thing looks the same wherever the calendar is shown.
+     * The modifier its block is rendered with, so the same thing looks the same wherever the calendar is shown.
      */
     public function modifier(): string
     {

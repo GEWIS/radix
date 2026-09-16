@@ -16,12 +16,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * What the committee can do to a company's representatives: shut one out, let them back in, remove them, and decide
+ * What the committee can do to a company's representatives: disable one, enable them again, remove them, and decide
  * which of them the board writes to.
  *
- * Each is one unit of work, audit entry included, because a timeline that does not say who did it is worth less than
- * no timeline. Sessions are terminated only after the row is committed: a representative signed out while the change
- * that shut them out is still uncommitted would simply sign back in.
+ * Each is one unit of work, audit entry included, because a timeline that does not say who did it is worth less than no
+ * timeline. Sessions are terminated only after the row is committed: a representative signed out while the change that
+ * disabled them is still uncommitted would simply sign back in.
  */
 final readonly class CompanyRepresentativeService
 {
@@ -48,8 +48,8 @@ final readonly class CompanyRepresentativeService
 
         $representative->disabledAt = new DateTimeImmutable();
 
-        // Somebody who cannot sign in cannot be the contact either, so the company is left without one and the board
-        // is asked to appoint a replacement.
+        // A representative who cannot sign in cannot be the contact either, so the company is left without one and the
+        // board is asked to appoint a replacement.
         if ($company->primaryContact === $representative) {
             $company->primaryContact = null;
         }

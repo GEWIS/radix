@@ -8,8 +8,8 @@
     {% include 'partials/admin-sidebar.html.twig' %}
 {% endblock %}
 
-{# An image built outside the release pipeline carries no commit, and a link to one that is not there is
-   worse than saying so. #}
+{# An image built outside the release pipeline has no commit, and a link to one that is not there is worse
+   than saying so. #}
 {% block sidebar_footer %}
     {% if git_commit is not empty %}
         <a class="sidebar-link" href="https://github.com/GEWIS/radix/commit/{{ git_commit }}"

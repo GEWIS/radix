@@ -62,9 +62,9 @@ class AdminController extends AbstractController
     }
 
     /**
-     * Both firewalls' events in one list. It is not per account on purpose: the questions this answers -- where a
-     * burst of failed sign-ins is coming from, whether a torn-down session happened to one member or to fifty -- are
-     * the ones a per-account page cannot be asked.
+     * Both firewalls' events in one list. It is not per account on purpose: the questions this list is for (where a
+     * burst of failed sign-ins is coming from, whether a torn-down session happened to one member or to fifty) cannot
+     * be asked of a per-account page.
      */
     #[Route(
         path: '/security-log',

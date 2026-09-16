@@ -70,14 +70,14 @@ class GenerateCommand extends Command
         OutputInterface $output,
     ): int {
         // Halfway through a rebuild the projection describes a moment in the past, so nothing should be syncing
-        // from it. A pause somebody else set is left alone, including how long it still has to run.
+        // from it. A pause set elsewhere is left alone, including how long it still has to run.
         $syncWasPaused = $this->apiService->isSyncPaused();
         $this->apiService->pauseSync(self::SYNC_PAUSE_MINUTES);
 
         // The projection's entities are second-level cached, and a rebuild is entitled to assume nothing about what
-        // is in those tables -- they may have been emptied since the cache last saw them. A lookup that answers out of
-        // a stale cache reads as a row that is already there and is therefore never written, and the rows naming it
-        // then fail on a foreign key with nothing to point at.
+        // is in those tables (they may have been emptied since the cache last saw them). A lookup served from a stale
+        // cache reads as a row that is already there and is therefore never written, and the rows naming it then fail
+        // on a foreign key with nothing to point at.
         $this->entityManager->getCache()?->evictEntityRegions();
 
         try {

@@ -23,17 +23,17 @@ use function sprintf;
  * Nightly removal of work that was started and walked away from, in every revisable domain there is: activities,
  * vacancies, company profiles, bodies' pages and polls.
  *
- * Anything that is still the working head of its aggregate, was never approved and has not been written to for
- * {@see self::STALE_AFTER_DAYS} days has been abandoned, whoever's turn it was. A draft the author never finished, a
- * submission the board never got to and a rejection nobody did anything with all lapse on the same day, because a
- * month of silence about something that has already happened says the same thing in each case.
+ * Anything that is still the working head of its aggregate, was never approved and has not been written to for {@see
+ * self::STALE_AFTER_DAYS} days has been abandoned, regardless of whose turn it was. A draft the author never finished,
+ * a submission the board never got to and a rejection that was never acted on all lapse on the same day, because a
+ * month of silence about something that has already happened means the same thing in each case.
  *
- * What that means per domain, and what may not be removed regardless, is the domain's own to say through a
+ * What that means per domain, and what may not be removed regardless, is defined by the domain itself through a
  * {@see \App\Service\Application\StaleRevisionPolicyInterface}; {@see StaleRevisionCleaner} does the rest.
  *
- * A domain that refuses to let an aggregate go says whether the refusal may be overruled, and `--force` overrules the
- * ones that may be. In practice that is the activity whose sign-up lists have sign-ups on them: an activity nobody
- * ever approved is not reachable from anywhere on the site, so neither are the sign-ups on it, and the pair sits in
+ * A domain that refuses removal of an aggregate states whether the refusal may be overruled, and `--force` overrules
+ * the ones that may be. In practice that is the activity whose sign-up lists have sign-ups on them: an activity nobody
+ * ever approved is not reachable from anywhere on the site, so neither are the sign-ups on it, and the pair appears in
  * the skipped column of every nightly run for good. A vote, a comment, a sold package and a representative's account
  * are not overruled by anything, forced or not.
  */

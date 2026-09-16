@@ -37,11 +37,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use function assert;
 
 /**
- * A company's own profile: what is live, what it is working on, and how a proposal is getting on with the committee.
+ * A company's own profile: what is live, what it is working on, and the status of a proposal with the committee.
  *
  * A company never edits what is public. It works on a draft, submits it, and the committee decides; until then the
  * approved version is what visitors see. Every action here resolves the company from the signed-in representative
- * rather than from the URL, so there is nothing to point at somebody else's.
+ * rather than from the URL, so there is no parameter that can point at another company's profile.
  */
 #[IsGranted(
     attribute: UserRoles::Company->value,
@@ -306,8 +306,8 @@ class CompanyProfileController extends AbstractRevisionReviewController
     }
 
     /**
-     * How the working version is getting on: what it says, what the committee said back, and whatever the company can
-     * do about it right now.
+     * The state of the working version: what it says, what the committee replied, and what the company can do about it
+     * right now.
      */
     #[Route(
         path: '/status',
@@ -345,7 +345,7 @@ class CompanyProfileController extends AbstractRevisionReviewController
 
     /**
      * Throw away a draft and go back to what is live, for when a change turns out not to be worth making. Without it
-     * the only way out of a draft nobody wants is to submit it anyway.
+     * the only way out of a draft the company does not want is to submit it anyway.
      */
     #[Route(
         path: '/discard',
@@ -433,8 +433,8 @@ class CompanyProfileController extends AbstractRevisionReviewController
     }
 
     /**
-     * Submitting is the only decision a company gets, so the other wording is only ever reached if the workflow grows
-     * one that is theirs to make.
+     * Submitting is the only decision a company gets, so the other wording is only ever reached if the workflow is
+     * given one that is theirs to make.
      */
     #[Override]
     protected function decisionFlash(string $transition): string

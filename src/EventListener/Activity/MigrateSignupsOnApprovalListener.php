@@ -11,7 +11,7 @@ use Symfony\Component\Workflow\Event\EnteredEvent;
 
 /**
  * When an activity revision is approved it becomes the publicly live version. Because each revision owns its own
- * (cloned) sign-up lists, the existing sign-ups (which live on the outgoing live revision's lists) are migrated onto
+ * (cloned) sign-up lists, the existing sign-ups (which are on the outgoing live revision's lists) are migrated onto
  * the newly-approved revision's matching lists (matched by lineage id) before that revision is promoted, so the public
  * page keeps showing them and no sign-up is ever lost.
  *

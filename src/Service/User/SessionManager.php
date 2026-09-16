@@ -117,9 +117,9 @@ final class SessionManager
 
         // Same guard as terminateAllExceptCurrent(): if a zombie row points at the live PHP session ID, destroying it
         // would wipe the caller's session in Valkey and silently log them out (and, via remember-me, drop them back at
-        // the sudo-confirm prompt because the sudo grant is held against the wiped session). So, we must drop the DB
-        // row but skip the destroy(). No real-time revocation either: this is the caller's own device and the
-        // controller already logs it out.
+        // the sudo-confirm prompt because the sudo grant is keyed to the wiped session). So, we must drop the DB row
+        // but skip the destroy(). No real-time revocation either: this is the caller's own device and the controller
+        // already logs it out.
         $this->securityEvents->record(
             SecurityEventType::SessionTerminated,
             $user->getUserIdentifier(),
@@ -149,9 +149,9 @@ final class SessionManager
 
     /**
      * Signing every other device out also forgets the devices this account was recognised on, so the next sign-in from
-     * any of them is announced. Somebody reaches for this when they think a device is not theirs, and a recognised
-     * fingerprint left in place would keep that device quiet on its way back in. The caller's own goes with the rest;
-     * only recognition is lost, so nobody is signed out by it.
+     * any of them is announced. A member uses this when they think a device is not theirs, and a recognised fingerprint
+     * left in place would suppress the notice for that device at its next sign-in. The caller's own recognition is
+     * forgotten with the rest; only recognition is lost, so no session is signed out by it.
      */
     public function terminateAllExceptCurrent(
         UserInterface $user,
@@ -214,7 +214,7 @@ final class SessionManager
         return count($sessions);
     }
 
-    /** As {@see self::terminateAllExceptCurrent()}, recognition goes with the sessions. */
+    /** As {@see self::terminateAllExceptCurrent()}, recognition is forgotten with the sessions. */
     public function terminateAll(
         UserInterface $user,
         string $firewallName,
@@ -296,7 +296,7 @@ final class SessionManager
      * response header to clear the session cookie - regardless of which session ID was destroyed.
      *
      * So calling that here would silently log the caller out (their cookie gets deleted), then remember-me would
-     * re-auth them into a fresh session holding no sudo grant, dropping them at the sudo-confirm prompt.
+     * re-auth them into a fresh session with no sudo grant, dropping them at the sudo-confirm prompt.
      *
      * Deleting the key directly hits Valkey only and leaves the caller's cookie alone. `DEL` is a no-op if the key is
      * already gone.
@@ -308,8 +308,8 @@ final class SessionManager
         if ('' !== $phpSessionId) {
             $this->redis->del($this->sessionPrefix . $phpSessionId);
 
-            // The grant is keyed by session ID rather than held on the session, so destroying the session no longer
-            // takes it with it.
+            // The grant is keyed by session ID rather than stored on the session, so destroying the session no longer
+            // drops the grant.
             $firewall = Firewall::tryFrom($session->firewallName);
             if (null !== $firewall) {
                 $this->sudoMode->revokeSession(
@@ -325,7 +325,7 @@ final class SessionManager
 
     /**
      * Pushes an out-of-band command so any online device whose session was just revoked is signed out immediately
-     * rather than on its next request. Dispatched after the flush so a hub hiccup can never fail the revocation itself.
+     * rather than on its next request. Dispatched after the flush so a hub outage can never fail the revocation itself.
      *
      * @param string[] $series
      */

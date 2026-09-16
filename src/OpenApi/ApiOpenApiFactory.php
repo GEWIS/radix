@@ -264,7 +264,7 @@ final readonly class ApiOpenApiFactory implements OpenApiFactoryInterface
     {
         $responses = [];
         $declared = $operation->getResponses() ?? [];
-        // An operation that answers absence with 204 never answers 404; API Platform adds one to every item Get.
+        // An operation that returns 204 for absence never returns 404; API Platform adds one to every item Get.
         $absenceIsEmpty = array_key_exists(
             204,
             $declared,

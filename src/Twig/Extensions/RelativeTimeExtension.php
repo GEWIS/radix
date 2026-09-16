@@ -44,7 +44,7 @@ class RelativeTimeExtension extends AbstractExtension
 
     /**
      * How long ago something happened, for a timestamp whose exact moment matters less than its place in a
-     * conversation. Anything still to come reads as such rather than as a negative age.
+     * conversation. A future timestamp is described as such rather than as a negative age.
      */
     public function relativeTime(DateTimeInterface $moment): string
     {

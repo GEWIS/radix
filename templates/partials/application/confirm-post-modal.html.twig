@@ -1,5 +1,5 @@
 {#
-    A confirmation that posts, for anything irreversible; the browser's own dialog cannot carry the form the
+    A confirmation that posts, for anything irreversible; the browser's own dialog cannot include the form the
     action needs.
 
     {% import 'partials/application/confirm-post-modal.html.twig' as modals %}
@@ -14,7 +14,7 @@
         'gewis-primary',
     ) }}
 
-    `body` and `label` may be more than a sentence: capture them with `{% set %}` first, which yields markup
+    `body` and `label` may be more than a sentence: capture them with `{% set %}` first, which produces markup
     that is not escaped again. `fields` are extra hidden inputs the action needs beyond the token, as a map of
     name to value.
 #}

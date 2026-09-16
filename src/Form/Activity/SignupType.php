@@ -201,7 +201,7 @@ class SignupType extends AbstractType
         );
     }
 
-    /** Both links have to open for somebody without an account, which is why the two are public regulations. */
+    /** Both links have to open for a visitor without an account, which is why the two are public regulations. */
     private function agreementLabel(): string
     {
         return $this->translator->trans('I agree to the')

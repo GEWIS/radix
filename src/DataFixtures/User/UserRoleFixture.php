@@ -23,9 +23,9 @@ class UserRoleFixture extends Fixture implements DependentFixtureInterface, Fixt
     public function load(ObjectManager $manager): void
     {
         // The three administrators differ in what they administer, so the difference between the website's rights
-        // and the register's is visible without editing a row: one holds both, one only the website, one only the
-        // register. The register's role is ordinarily worked out from who the secretary is; granted here it says
-        // somebody has been given those rights without holding that office.
+        // and the register's is visible without editing a row: one has both, one only the website, one only the
+        // register. The register's role is ordinarily derived from who the Secretary is; granted here it records
+        // that a member has been given those rights without having that function.
         foreach (
             [
                 8000 => [

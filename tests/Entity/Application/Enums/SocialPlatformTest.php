@@ -12,9 +12,9 @@ use function preg_match;
 use function sprintf;
 
 /**
- * A social link stores the handle and nothing else, so this is where the reduction of whatever somebody pasted down to
+ * A social link stores the handle and nothing else, so this is where the reduction of whatever a member pasted down to
  * that handle is pinned, together with the address it is rebuilt into. The point of the exercise is that a link copied
- * out of an app arrives carrying the parameters that app added to it, and none of that may survive.
+ * out of an app arrives with the parameters that app added to it, and none of that may survive.
  */
 final class SocialPlatformTest extends TestCase
 {

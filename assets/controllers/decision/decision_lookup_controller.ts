@@ -9,7 +9,7 @@ interface DecisionMatch {
 }
 
 /**
- * The decision being recorded travels with the query, so the endpoint can leave out the decisions this one cannot
+ * The decision being recorded is passed with the query, so the endpoint can leave out the decisions this one cannot
  * annul.
  */
 /* stimulusFetch: 'lazy' */

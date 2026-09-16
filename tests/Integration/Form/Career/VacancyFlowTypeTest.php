@@ -53,7 +53,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
 
     /**
      * A vacancy is invisible once its package expires whatever its own window says, so a window that runs past the
-     * package would promise something it cannot keep.
+     * package would state a closing date the vacancy never reaches.
      */
     public function testAVacancyCannotStayOpenPastItsJobPackage(): void
     {
@@ -156,7 +156,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
     }
 
     /**
-     * A company only gets to choose among its own running job packages, so it cannot post under somebody else's
+     * A company only gets to choose among its own running job packages, so it cannot post under another company's
      * contract.
      */
     public function testTheCompanysFormOnlyOffersItsOwnRunningPackages(): void
@@ -193,7 +193,7 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
 
     /**
      * The package a vacancy is already sold under stays choosable, or the select comes up empty on edit and the only
-     * way to save is to move the vacancy to somebody else's contract.
+     * way to save is to move the vacancy to another company's contract.
      */
     public function testThePackageAVacancyIsAlreadySoldUnderStaysChoosable(): void
     {

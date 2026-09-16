@@ -12,7 +12,7 @@ use DateTimeImmutable;
  * the workflow guard ({@see \App\EventListener\Activity\PastActivityGuardListener}), the review screen and the admin
  * edit/reopen gate so the rule never diverges between the block and the explanation of it.
  *
- * Two cases, judged on different points of the schedule:
+ * Two cases, checked at different points of the schedule:
  *  - an *established* activity (it already has a live revision, distinct from the one in flight) is frozen once its
  *    live schedule has *ended*;
  *  - a *brand-new* activity awaiting its first publication (no live revision yet, or the in-flight revision is itself

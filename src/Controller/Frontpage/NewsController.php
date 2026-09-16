@@ -54,7 +54,7 @@ class NewsController extends AbstractController
                     true,
                 ) ? $year : null,
                 'years' => $years,
-                // Likewise a category nobody has heard of.
+                // Likewise an unknown category.
                 'category' => NewsCategory::tryFrom(strval($category))?->value,
             ],
         );

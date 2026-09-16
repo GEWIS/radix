@@ -11,9 +11,9 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * The answer cannot change during a request, so it is worked out once and remembered. The cache is cleared between
+ * The value cannot change during a request, so it is computed once and cached. The cache is cleared between
  * requests through {@see ResetInterface}: under FrankenPHP's worker mode this service outlives a single request and
- * would otherwise answer for the previous visitor.
+ * would otherwise return the previous visitor's value.
  */
 class EducationExtension extends AbstractExtension implements ResetInterface
 {

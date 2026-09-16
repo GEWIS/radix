@@ -5,7 +5,7 @@ framework:
 
     # Which proxies are trusted comes from SYMFONY_TRUSTED_PROXIES, which a deployment sets; this is what they
     # are allowed to tell us. The host and the port matter as much as the protocol: an absolute URL the application
-    # builds -- in mail, in a redirect -- has to name what the visitor typed rather than what the proxy used, and
+    # builds (in mail, in a redirect) has to name what the visitor typed rather than what the proxy used, and
     # behind the proxy that only survives in X-Forwarded-Host.
     trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
 
@@ -23,8 +23,8 @@ framework:
         cookie_samesite: strict
         name: GWS_SESSION
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
-        # The last-used stamp otherwise changes every second, so a request that read the session still rewrites all
-        # of it and can overwrite what another request wrote in the meantime. Nothing reads the stamp, and the TTL
+        # The last-used timestamp otherwise changes every second, so a request that read the session still rewrites all
+        # of it and can overwrite what another request wrote in the meantime. Nothing reads the timestamp, and the TTL
         # is refreshed either way.
         metadata_update_threshold: '%app.session_last_used_threshold%'
 
@@ -37,14 +37,14 @@ framework:
                 timeout: 2
                 max_duration: 4
             # The association's own pwned-passwords lookup, which takes the whole SHA-1 hash of a password (in
-            # capitals) as its path and answers with a bare `0` or `1`. Somebody is waiting on the form that asks,
+            # capitals) as its path and returns a bare `0` or `1`. A user is waiting on the form that calls it,
             # hence the short timeouts.
             pwned_passwords.client:
                 base_uri: 'https://pwned-passwords.gewis.nl/api/'
                 timeout: 2
                 max_duration: 4
-            # The association agenda the option calendar draws behind the days bodies ask for. Only the sync command
-            # ever calls it, never a page render, so the timeouts are for a cron rather than for somebody waiting.
+            # The association agenda the option calendar renders behind the days bodies request. Only the sync command
+            # ever calls it, never a page render, so the timeouts are for a cron rather than for a user waiting.
             google_calendar.client:
                 base_uri: 'https://www.googleapis.com/calendar/v3/'
                 query:

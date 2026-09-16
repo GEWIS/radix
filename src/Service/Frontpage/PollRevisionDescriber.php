@@ -20,8 +20,8 @@ use function Symfony\Component\Translation\t;
 /**
  * A poll is its question and the answers it can be given, so that is the whole of what the board reads.
  *
- * A question that is asked again after being turned down is compared answer by answer in the order they were written,
- * which is the only order there is to compare them in: an option carries no identity across revisions, because every
+ * A question that is asked again after being rejected is compared answer by answer in the order they were written,
+ * which is the only order there is to compare them in: an option has no identity across revisions, because every
  * revision writes its own. An answer that was dropped therefore reads as one that was emptied.
  */
 final class PollRevisionDescriber extends AbstractRevisionDescriber

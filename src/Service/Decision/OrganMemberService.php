@@ -21,10 +21,10 @@ use function usort;
 use const PHP_INT_MAX;
 
 /**
- * Who is in a body, read off its installations rather than stored anywhere: an installation with no discharge, or one
- * whose discharge has not come round yet, is a current membership.
+ * Who is in a body, read from its installations rather than stored anywhere: an installation with no discharge, or one
+ * whose discharge date has not passed yet, is a current membership.
  *
- * Somebody installed as an inactive member is listed apart, and a member who is still in the body never shows up among
+ * A member installed as an inactive member is listed apart, and a member who is still in the body never appears among
  * the former ones however many times they were installed and discharged before.
  */
 final readonly class OrganMemberService
@@ -58,7 +58,7 @@ final readonly class OrganMemberService
         $former = [];
 
         foreach ($organ->getMembers() as $installation) {
-            // An installation that has not taken effect yet says nothing about who is in the body today.
+            // An installation that has not taken effect yet does not affect who is in the body today.
             if ($installation->installDate > $today) {
                 continue;
             }
@@ -97,7 +97,7 @@ final readonly class OrganMemberService
             ]);
         }
 
-        // Somebody who came back is a current member, whatever an older discharge says.
+        // A member who returned to the body is a current member, whatever an older discharge records.
         foreach ($former as $lidnr => $member) {
             if (
                 !isset($active[$lidnr])

@@ -81,8 +81,8 @@ class LocalisedTextType extends AbstractType
     }
 
     /**
-     * A language that is switched off is disabled in the browser and so is never handed in. Read that absence as "no
-     * answer" rather than as an erasure, the way the flat per-language fields elsewhere keep whatever a language that
+     * A language that is switched off is disabled in the browser and so is never submitted. Read that absence as "no
+     * value" rather than as an erasure, the way the flat per-language fields elsewhere keep whatever a language that
      * is off already had.
      */
     private function keepAbsentLanguages(FormEvent $event): void

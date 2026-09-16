@@ -10,7 +10,7 @@ use function rtrim;
 use function strtr;
 
 /**
- * Shared by the remember-me handler and the known-device registry so the two token alphabets cannot drift apart.
+ * Shared by the remember-me handler and the known-device registry so the two token alphabets cannot differ.
  */
 final class UrlSafeToken
 {

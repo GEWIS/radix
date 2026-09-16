@@ -16,7 +16,7 @@ use function trim;
 
 /**
  * What the page form asks. Every field is kept as its two halves rather than as a localised text, so each language
- * can carry its own rule: a page is addressed by its own words, and the two addresses are checked separately.
+ * can have its own rule: a page is addressed by its own words, and the two addresses are checked separately.
  */
 #[UnclaimedPageAddress(
     reservedMessage: 'The website already answers to this address, so a page cannot take it.',
@@ -33,13 +33,13 @@ final class PageData
     private const string SLUG_MESSAGE = 'Use three to thirty-two lower-case letters, digits, '
         . 'underscores or hyphens, starting with a letter.';
 
-    /** The page being edited, so its own address does not read as taken. Null while creating. */
+    /** The page being edited, so its own address does not count as taken. Null while creating. */
     public ?int $pageId = null;
 
     public UserRoles $requiredRole = UserRoles::Guest;
 
-    // Each part of the address is a segment of a public URL, so it is held to what a slug may look like. An empty one
-    // is how a page higher up the tree says it has no sub-category or name, which is why the rule only applies to
+    // Each part of the address is a segment of a public URL, so it must match what a slug may look like. An empty one
+    // is how a page higher up the tree indicates it has no sub-category or name, which is why the rule only applies to
     // what was actually written.
     #[Assert\Regex(
         pattern: SlugRule::BOUNDED_PATTERN,

@@ -60,7 +60,7 @@ final class TemplateAccessorTest extends KernelTestCase
     private const string COMPONENTS = 'components/';
 
     /**
-     * The extension every template carries, which the class name behind one does not.
+     * The extension every template has, which the class name behind one does not.
      */
     private const string SUFFIX = '.html.twig';
 
@@ -241,7 +241,7 @@ final class TemplateAccessorTest extends KernelTestCase
     /**
      * Every public method and property name declared under `src/`, which is what a template can read.
      *
-     * Keyed by name rather than listed: this is asked about once per accessor a template reads, and a list of four
+     * Keyed by name rather than listed: this is looked up once per accessor a template reads, and a list of four
      * thousand names would be scanned from the start every time.
      *
      * @return array<string, true>
@@ -251,9 +251,9 @@ final class TemplateAccessorTest extends KernelTestCase
         $names = [];
 
         foreach ($this->sources() as $file) {
-            // Twig reads `x.foo` off an array as readily as off an object, so a key the code builds is a name a
-            // template may read. Written-out keys are collected for that reason, from every file rather than only
-            // from those that declare a class, because an array is built wherever it is convenient.
+            // Twig reads `x.foo` from an array as readily as from an object, so a key the code builds is a name a
+            // template may read. Written-out keys are collected for that reason, from every file rather than only from
+            // those that declare a class, because an array is built wherever it is convenient.
             //
             // Matched in key position only. Any accessor-shaped string literal would otherwise be collected, which
             // is how the operation ids in the OpenAPI factory added `getHealth` and four other names to this set.

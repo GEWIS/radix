@@ -9,17 +9,17 @@ use Symfony\Component\Translation\TranslatableMessage;
 /**
  * The states a member record can be in, as the member overview offers them.
  *
- * These are not stored anywhere: each one is a way of asking the same table a different question, so a secretary can
- * get to the records that need doing something about without writing a query.
+ * These are not stored anywhere: each one selects a different set of rows from the same table, so a secretary can get
+ * to the records that need doing something about without writing a query.
  */
 enum MemberFilter: string
 {
     case Everyone = 'everyone';
 
-    /** Holds a membership that has started and has not ended. */
+    /** Has a membership that has started and has not ended. */
     case Active = 'active';
 
-    /** Held a membership once; it has since lapsed. */
+    /** Had a membership once; it has since lapsed. */
     case Expired = 'expired';
 
     /** Complete enough to exist, not complete enough to reach: no e-mail, or ordinary without a student number. */

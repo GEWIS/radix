@@ -21,7 +21,7 @@ use function sprintf;
 
 /**
  * A web worker never encodes an image. It used to, synchronously on a miss, and a page of uncached thumbnails was
- * enough to saturate the host; a miss now queues one message and answers 503.
+ * enough to saturate the host; a miss now queues one message and returns 503.
  */
 final readonly class ImageVariantResponder
 {
@@ -88,7 +88,7 @@ final readonly class ImageVariantResponder
         return $this->retryLater();
     }
 
-    /** The marker is never cleaned up: its expiry is what re-opens the door after a failed generation. */
+    /** The marker is never cleaned up: its expiry is what allows another message after a failed generation. */
     private function requestGeneration(
         string $path,
         ImageVariant $variant,

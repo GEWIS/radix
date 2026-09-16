@@ -22,12 +22,12 @@ use function random_bytes;
  * The identifier is ours rather than the proxy's: a header a visitor can set is a header a visitor can use to make
  * two unrelated requests look like one.
  *
- * Held on the processor and cleared between requests, because under FrankenPHP's worker mode the service outlives the
+ * Kept on the processor and cleared between requests, because under FrankenPHP's worker mode the service outlives the
  * request; an identifier that stayed would file the next visitor's records under the previous one's.
  */
 final class RequestIdProcessor implements ProcessorInterface, EventSubscriberInterface, ResettableInterface
 {
-    /** Where the current request carries its own identifier, for anything that wants to name it in a response. */
+    /** Where the current request's own identifier is stored, for anything that wants to name it in a response. */
     public const string ATTRIBUTE = '_app_request_id';
 
     private ?string $requestId = null;

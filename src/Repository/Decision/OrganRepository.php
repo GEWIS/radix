@@ -196,7 +196,7 @@ class OrganRepository extends ServiceEntityRepository
     }
 
     /**
-     * Hydrate the given bodies, in the order they are asked for, with the page each one is shown by. Ids that no longer
+     * Hydrate the given bodies, in the order they are requested, with the page each one is shown by. Ids that no longer
      * resolve to a body are left out.
      *
      * @param int[] $ids
@@ -288,7 +288,7 @@ class OrganRepository extends ServiceEntityRepository
     }
 
     /**
-     * Eagerly loads what the administrative overview reads off each body: its page, the revision being worked on, the
+     * Eagerly loads what the administrative overview reads from each body: its page, the revision being worked on, the
      * one before that and the one visitors see. Without this every row lazy-loads four associations of its own, which
      * for the board, who sees every body there is, runs into the hundreds of queries.
      *

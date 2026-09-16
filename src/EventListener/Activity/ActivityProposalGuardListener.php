@@ -29,9 +29,9 @@ final readonly class ActivityProposalGuardListener
     #[AsEventListener(event: 'workflow.activity_proposal.guard')]
     public function onGuard(GuardEvent $event): void
     {
-        // No token at all means nobody is signed in anywhere, which only happens on the console: the firewall gives
+        // No token at all means no user is signed in anywhere, which only happens on the console: the firewall gives
         // even an anonymous request a token. That is the nightly sweep releasing a day whose budget was never
-        // settled, and there is nobody for it to be authorised as.
+        // settled, and there is no user for it to be authorised as.
         if (null === $this->security->getToken()) {
             return;
         }

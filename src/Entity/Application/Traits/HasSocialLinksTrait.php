@@ -9,9 +9,9 @@ use App\Entity\Application\Enums\SocialPlatform;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * A revision's social links, read and written as a handle per platform. A form asks for one box per platform and gets
- * back a map, which is the shape this turns into rows: a handle that arrived becomes or updates a link, and a platform
- * that came back empty loses the link it had.
+ * A revision's social links, read and written as a handle per platform. A form asks for one box per platform and
+ * submits a map, which is the shape this turns into rows: a submitted handle creates or updates a link, and a platform
+ * left empty removes the link it had.
  *
  * The collection itself, with its mapping and its own concrete link class, stays on the revision; so does making one,
  * which is where the foreign key back to the revision is set.

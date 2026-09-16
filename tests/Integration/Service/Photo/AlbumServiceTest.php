@@ -20,7 +20,7 @@ use function array_values;
 use function intval;
 
 /**
- * The album browsing service must only ever surface albums the current user may view: members see published albums,
+ * The album browsing service must only ever show albums the current user may view: members see published albums,
  * board and admins also see unpublished ones, and every album (including sub-albums) passes the album voter.
  */
 final class AlbumServiceTest extends DatabaseTestCase

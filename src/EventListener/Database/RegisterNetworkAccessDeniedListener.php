@@ -24,7 +24,7 @@ use function array_intersect;
 use function assert;
 
 /**
- * Explains a register denial to somebody who holds the office but is sitting off the network.
+ * Explains a register denial to a user who has the role but is not on the association's network.
  *
  * The bare 403 reads as "your account cannot do this" when the truth is "not from here", and the register's links are
  * already absent from their menus, so the denial is otherwise unexplained.
@@ -79,7 +79,7 @@ final readonly class RegisterNetworkAccessDeniedListener
             return;
         }
 
-        // The roles before the restriction takes them away: somebody who never held one gets the ordinary answer.
+        // The roles before the restriction removes them: a user who never had one gets the ordinary 403.
         if (
             [] === array_intersect(
                 self::REGISTER_ATTRIBUTES,
@@ -91,8 +91,8 @@ final readonly class RegisterNetworkAccessDeniedListener
 
         $request = $event->getRequest();
 
-        // Recorded before the response is decided, so that a denial still shows up for somebody who has no session
-        // to be told in.
+        // Recorded before the response is decided, so that a denial is still logged for a user who has no session to
+        // show a message in.
         $this->securityEvents->record(
             SecurityEventType::RegisterAccessRefused,
             $user->getUserIdentifier(),

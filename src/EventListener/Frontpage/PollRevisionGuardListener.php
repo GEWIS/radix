@@ -11,8 +11,8 @@ use Symfony\Component\Workflow\Event\GuardEvent;
 /**
  * Keeps a poll from ever having something to edit.
  *
- *  - `request_changes` is withheld outright. It exists to hand a revision back to its author as a fresh draft, and a
- *    poll has no draft to hand back: the question was written and submitted in one go. Withholding it also keeps
+ *  - `request_changes` is withheld outright. It exists to return a revision to its author as a fresh draft, and a poll
+ *    has no draft to return: the question was written and submitted in one go. Withholding it also keeps
  *    {@see \App\EventListener\Application\SpawnNextDraftListener} and the cloner registry out of a domain that has no
  *    cloner. The board says yes or no; a no is answered by asking again, which writes a new revision from scratch.
  *  - `submit` is withheld once the poll has a live revision. A question members have started answering cannot be

@@ -24,18 +24,18 @@ class CompanyBannerPackageRepository extends ServiceEntityRepository
     }
 
     /**
-     * The banners that may be shown right now: published, inside their window, and carrying an image the committee
+     * The banners that may be shown right now: published, inside their window, and with an image the committee
      * agreed to.
      *
-     * They come back shuffled. Whoever is first is the one seen by everybody who does not wait for the carousel to
+     * They come back shuffled. The first banner is the one seen by every visitor who does not wait for the carousel to
      * move on, and that should not be decided by whose contract was signed first.
      *
      * @return list<CompanyBannerPackage>
      */
     public function findActiveBanners(): array
     {
-        // The banner links through to the company it belongs to, and deciding whether it may be linked to at all
-        // reads that company's approved revision and every package it holds. All of it comes along with the banner.
+        // The banner links through to the company it belongs to, and deciding whether it may be linked to at all reads
+        // that company's approved revision and every package it has. All of it is fetched with the banner.
         $qb = $this->createQueryBuilder('p')
             ->addSelect(
                 'c',

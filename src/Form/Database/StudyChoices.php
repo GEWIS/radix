@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * `EnumType` cannot group its options, which is the one reason the study select is still built by hand: the choices
  * are the enum cases themselves, so they label and value themselves the way `EnumType` would have done, but they are
- * handed over in optgroups. The footnote below is the second reason, and the only place a study is labelled here.
+ * arranged in optgroups. The footnote below is the second reason, and the only place a study is labelled here.
  */
 class StudyChoices
 {
@@ -28,7 +28,7 @@ class StudyChoices
      * The same six labels, written out where the message extractor can see them.
      *
      * A choice list translates its optgroup labels when it renders, but by then they are array keys, and a key can
-     * only be a string -- so the constants above are what the list is built from. The extractor reads literals, not
+     * only be a string, so the constants above are what the list is built from. The extractor reads literals, not
      * constants, so without this the six would never reach the catalogue and would render untranslated in Dutch.
      *
      * @return TranslatableMessage[]
@@ -91,7 +91,7 @@ class StudyChoices
     }
 
     /**
-     * Data Science studies carry a footnote marker on the registration form. Appending it means translating the name
+     * Data Science studies have a footnote marker on the registration form. Appending it means translating the name
      * first, so only those labels are resolved here; the rest is left to the enum, which the choice list translates
      * when it renders.
      */
@@ -103,9 +103,9 @@ class StudyChoices
             return $study;
         }
 
-        // The marker is appended to a name that has already been translated, so what comes back must not be looked up
-        // again -- a translated name with a `¹` after it is not a key any catalogue holds. Handing back the pattern
-        // with the name as its parameter keeps one key for all of them, and one the extractor can see.
+        // The marker is appended to a name that has already been translated, so the result must not be looked up
+        // again: a translated name with a `¹` after it is not a key in any catalogue. Returning the pattern with the
+        // name as its parameter keeps one key for all of them, and one the extractor can see.
         return new TranslatableMessage(
             '%study%¹',
             ['%study%' => $study->getName()->trans($translator)],

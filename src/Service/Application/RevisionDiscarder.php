@@ -11,10 +11,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Throws away a draft and points its aggregate back at the version that is live. Works for any revisable domain: the
- * aggregate knows how to fall back and the registry knows where the thread lives, so nothing here has to know whether
- * it is looking at an activity, a company profile or a vacancy.
+ * aggregate knows how to fall back and the registry knows where the thread is stored, so nothing here has to know
+ * whether it is looking at an activity, a company profile or a vacancy.
  *
- * Only ever used on a draft that has a live version behind it — discarding the very first draft would take the
+ * Only ever used on a draft that has a live version behind it: discarding the very first draft would remove the
  * aggregate with it, which is a deletion rather than a discard. The caller flushes, so an on-demand discard commits
  * with whatever else it undid and the stale-revision cleanup can keep batching its removals into one flush.
  */

@@ -15,7 +15,7 @@ use function array_values;
  * centre, the toasts and the digest emails all come through here to turn that key back into something readable.
  *
  * What a key names is the domain's business, so each module registers a {@see NotificationSubjectNamerInterface} and
- * this only decides who to ask. A kind nobody answers for has no subject to name, which is the right answer for the
+ * this only decides which namer to use. A kind no namer supports has no subject to name, which is correct for the
  * notifications that stand on their own.
  *
  * Lookups are grouped per type, so showing a feed costs one query per kind of notification rather than one per row. A

@@ -14,7 +14,7 @@ use Traversable;
 use function iterator_to_array;
 
 /**
- * Builds the decision every decision form is about, and hands the sub-decisions to the form that knows them.
+ * Builds the decision every decision form is about, and delegates the sub-decisions to the form that knows them.
  *
  * Sub-decisions are not properties of the decision that property access could reach: a decision form describes an
  * event, and what that event means is a handful of sub-decisions with sequence numbers that only the form can
@@ -53,12 +53,12 @@ abstract class AbstractDecisionMapper implements DataMapperInterface
         $meeting = $children['meeting']->getData();
 
         if (!$meeting instanceof Meeting) {
-            // Without a meeting there is nothing to hang the decision off; the meeting field reports that itself.
+            // Without a meeting there is nothing to attach the decision to; the meeting field reports that itself.
             return;
         }
 
         // Setting the meeting is what gives the decision its sub-decision collection, so it has to happen before any
-        // sub-decision attaches itself to the decision.
+        // sub-decision is attached to the decision.
         $viewData->setMeeting($meeting);
         $viewData->point = (int) $children['point']->getData();
         $viewData->number = (int) $children['decision']->getData();

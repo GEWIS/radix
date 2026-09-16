@@ -9,7 +9,7 @@ use App\Form\Activity\ActivityFlow\ActivityData;
 use DateTimeImmutable;
 
 /**
- * The activity form with every question its general and details steps ask answered, standing on the given step.
+ * The activity form with every question its general and details steps ask answered, on the given step.
  */
 trait AnswersActivityForm
 {

@@ -131,7 +131,7 @@ final class AlbumAdminServiceTest extends DatabaseTestCase
         $photoId = (int) $photo->id;
         self::assertTrue($this->storage()->exists($path));
 
-        // Reload the album exactly as the controller does from a route parameter, so the delete walks fresh
+        // Reload the album exactly as the controller does from a route parameter, so the delete traverses fresh
         // (uninitialised) collections rather than the in-memory graph this test just wired up.
         $this->entityManager->clear();
         $parent = $this->albumRepository()->find($parentId);

@@ -13,14 +13,14 @@ use SortDirection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * The one query the stale-revision cleanup runs, asked of whichever revision entity it is pointed at. Every revisable
- * domain maps its chain the same way — a status, a stamp of when it was last written to — so the query is written
+ * The one query the stale-revision cleanup runs, against whichever revision entity it is pointed at. Every revisable
+ * domain maps its chain the same way (a status, a timestamp of when it was last written to), so the query is written
  * once here rather than five times in five repositories.
  *
- * Whether a row is still the working head of its aggregate is deliberately not asked of the database: the association
- * back to the aggregate is named after the domain (`activity`, `poll`, ...), and once the row is loaded the question
- * is one comparison. A superseded revision therefore comes back and is dropped by the caller, which is correct either
- * way: history behind a live version is not abandoned work.
+ * Whether a row is still the working head of its aggregate is deliberately not left to the database: the association
+ * back to the aggregate is named after the domain (`activity`, `poll`, ...), and once the row is loaded the check is
+ * one comparison. A superseded revision therefore comes back and is dropped by the caller, which is correct either way:
+ * history behind a live version is not abandoned work.
  */
 final readonly class StaleRevisionRepository
 {

@@ -295,7 +295,7 @@ class AdminPageController extends AbstractController
         return $this->pageImageStore->topic($scope);
     }
 
-    /** A page being created names none, and an id answering to nothing is treated the same way rather than trusted. */
+    /** A page being created names none, and an id that matches no page is treated the same way rather than trusted. */
     private function uploadingPage(Request $request): ?Page
     {
         $id = $request->request->getInt('page');
@@ -308,7 +308,7 @@ class AdminPageController extends AbstractController
     }
 
     /**
-     * Every page in the order its address reads, so the overview groups a category with what sits under it rather
+     * Every page in the order its address reads, so the overview groups a category with the pages under it rather
      * than listing rows in whatever order they were written.
      *
      * @return list<Page>

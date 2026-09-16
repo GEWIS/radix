@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * Writing a vacancy's draft, from either surface: the committee's admin screens and the company's own portal both
  * reach this, because what is saved and in what order does not depend on who is looking at it.
  *
- * Saving an edit and letting go of the edit lock are one operation rather than two: a save that commits but leaves the
- * lock standing blocks the author out of their own draft until the lock's TTL lapses.
+ * Saving an edit and releasing the edit lock are one operation rather than two: a save that commits but does not
+ * release the lock blocks the author out of their own draft until the lock's TTL lapses.
  */
 final readonly class VacancyDraftService
 {

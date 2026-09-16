@@ -44,7 +44,7 @@ use function assert;
  * A company's own vacancies: what it has posted, what it is working on, and where each proposal stands.
  *
  * Everything is scoped to the signed-in representative's company. A vacancy reached by id is checked against it, so a
- * crafted URL lands on a 404 rather than on somebody else's posting.
+ * crafted URL lands on a 404 rather than on another company's posting.
  */
 #[IsGranted(
     attribute: UserRoles::Company->value,
@@ -493,7 +493,7 @@ class CompanyVacancyController extends AbstractRevisionReviewController
     }
 
     /**
-     * Throw away a draft and go back to what is live, for when a proposal turns out to be a dead end.
+     * Throw away a draft and go back to what is live, for when a proposal turns out not to be worth submitting.
      */
     #[Route(
         path: '/{vacancy}/discard',
@@ -560,8 +560,8 @@ class CompanyVacancyController extends AbstractRevisionReviewController
     }
 
     /**
-     * Submitting is the only decision a company gets, so the other wording is only ever reached if the workflow grows
-     * one that is theirs to make.
+     * Submitting is the only decision a company gets, so the other wording is only ever reached if the workflow is
+     * given one that is theirs to make.
      */
     #[Override]
     protected function decisionFlash(string $transition): string

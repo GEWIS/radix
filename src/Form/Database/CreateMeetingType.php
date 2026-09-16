@@ -43,8 +43,8 @@ class CreateMeetingType extends AbstractType
                 [
                     'label' => t('Meeting Type'),
                     'class' => MeetingTypes::class,
-                    // The abbreviation the enum carries is not enough to pick a meeting type from, so this one form
-                // spells the types out instead of letting the enum label itself.
+                    // The abbreviation on the enum is not enough to pick a meeting type from, so this one form spells
+                    // the types out instead of letting the enum label itself.
                     'choice_label' => static fn (MeetingTypes $type) => match ($type) {
                         MeetingTypes::BV => t('BM (Board Meeting)'),
                         MeetingTypes::ALV => t('GMM (General Members Meeting)'),

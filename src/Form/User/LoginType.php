@@ -43,7 +43,7 @@ class LoginType extends AbstractType
         $demoPassword = $this->demoPassword ?? '';
 
         // In demo mode the credentials come from the environment: the login is shown but fixed, and the password is
-        // carried along in a hidden field instead of being asked for.
+        // passed in a hidden field instead of being asked for.
         if ('' !== $demoPassword) {
             $builder->add(
                 'login',
@@ -97,7 +97,7 @@ class LoginType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
-            // The submitted credentials never reach a controller — the firewall intercepts them — so the token this
+            // The submitted credentials never reach a controller (the firewall intercepts them), so the token this
             // form renders is the one the firewall validates, under the identifier it uses.
             'csrf_token_id' => 'authenticate',
         ]);

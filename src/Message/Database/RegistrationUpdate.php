@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Message\Database;
 
 /**
- * What happened to a registration, of the things the (prospective) member and the secretary are told about.
+ * What happened to a registration, of the things the (prospective) member and the secretary are notified about.
  *
- * Each case owns the template and the two subjects that belong to it, so the service that asks for the mail and the
+ * Each case owns the template and the two subjects that belong to it, so the service that requests the mail and the
  * handler that sends it do not have to agree on a loose string.
  */
 enum RegistrationUpdate: string

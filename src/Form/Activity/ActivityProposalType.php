@@ -40,13 +40,13 @@ use function Symfony\Component\Translation\t;
 /**
  * A body putting an activity forward with the days it could fall on.
  *
- * The rules that need more than one field live in a `POST_SUBMIT` listener, the way {@see ActivityType} does it, since
+ * The rules that need more than one field are in a `POST_SUBMIT` listener, the way {@see ActivityType} does it, since
  * this repository has no custom constraint classes. Four of them:
  *
  *  - the round has to be taking proposals, unless the board is doing the proposing;
  *  - the body has to have room left, counting everything but the proposal being edited, or a body on its last slot
  *    could never save a change to the one that used it;
- *  - every day has to fall inside the round and run forwards, and still be ahead of us;
+ *  - every day has to fall inside the round and run forwards, and still be in the future;
  *  - the body has to be one the person may act for, re-checked here because the choice list is only a list.
  *
  * The allowance is checked once more where it is written ({@see \App\Service\Activity\ActivityProposalManager}):
@@ -249,8 +249,8 @@ class ActivityProposalType extends AbstractType
     }
 
     /**
-     * The choice list is only a list; the body that ends up on a proposal is what anchors who may edit it afterwards,
-     * so it is checked again here.
+     * The choice list is only a list; the body that ends up on a proposal is what determines who may edit it
+     * afterwards, so it is checked again here.
      *
      * @param FormInterface<mixed> $form
      * @param Organ[]              $selectableOrgans
@@ -307,7 +307,7 @@ class ActivityProposalType extends AbstractType
     ): void {
         $organ = $proposal->organ;
 
-        // An activity the board hosts itself is held to nothing.
+        // No limit applies to an activity the board hosts itself.
         if (null === $organ) {
             return;
         }
@@ -334,7 +334,7 @@ class ActivityProposalType extends AbstractType
             return;
         }
 
-        // The board can see past its own limits, so tell it what it is overriding rather than only that it cannot.
+        // The board may exceed its own limits, so tell it what it is overriding rather than only that it cannot.
         $form->get('organ')->addError(new FormError($this->translator->trans(
             'The limit is %maximum% and %used% have been used.',
             [

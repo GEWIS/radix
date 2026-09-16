@@ -16,7 +16,7 @@ enum ProspectiveMemberRemoval: string
     /** The state of the checkout does not allow removal.  */
     case NotRemovable = 'not-removable';
 
-    /** We could not tell whether the membership fee was already refunded, so nothing was touched. */
+    /** It could not be determined whether the membership fee was already refunded, so nothing was changed. */
     case RefundStatusUnknown = 'refund-status-unknown';
 
     /** The refund of the membership fee could not be created. */

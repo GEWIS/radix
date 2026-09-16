@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 
 /**
- * The public activity pages, invoked directly (the codebase has no WebTestCase). The archive folds into the overview
- * via a required year, and the cross-year search is its own page reusing the overview component.
+ * The public activity pages, invoked directly (the codebase has no WebTestCase). The archive renders the overview
+ * component with a required year, and the cross-year search is its own page reusing the same component.
  */
 final class ActivityControllerTest extends DatabaseTestCase
 {

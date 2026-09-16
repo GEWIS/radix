@@ -7,7 +7,7 @@ namespace App\Message\Database;
 /**
  * Asynchronously tell a (prospective) member, and the secretary, what happened to their registration.
  *
- * Carries the membership number rather than the record, so the mail is rendered from what the register holds at the
+ * Contains the membership number rather than the record, so the mail is rendered from what is in the register at the
  * time it is sent. Every dispatch site flushes first, and a record that has since been removed is not mailed about.
  *
  * Async because these are raised from the Stripe webhook and from the secretary's approval request, where a blocking

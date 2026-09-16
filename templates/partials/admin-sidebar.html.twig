@@ -2,7 +2,7 @@
     A group renders nothing at all when the reader may reach none of its rows.
 
     Which row is highlighted is decided by route name, matched on its prefix so that a detail page keeps its
-    section lit. The admin routes carry a locale suffix (`admin/meetings/index.en`), which is why they are
+    section lit. The admin routes have a locale suffix (`admin/meetings/index.en`), which is why they are
     matched with `starts with` too rather than compared.
 #}
 {% import 'partials/application/sidebar.html.twig' as sidebar %}
@@ -83,8 +83,8 @@
                     ]) }}
                 {% endif %}
 
-                {# The serving secretary keeps the meeting and holds a board seat for as long as they do; a secretary
-                   who has been relieved keeps reading the register but has no business here. #}
+                {# The serving secretary keeps the meeting and has a board seat for as long as they do; a secretary
+                   who has been relieved keeps reading the register but should not see these rows. #}
                 {% if is_granted('ROLE_BOARD') %}
                     {% set meetingAuthorizations = route starts with 'admin/meetings/authorizations' %}
                     {% set meetingReference = route starts with 'admin/meetings/reference' %}

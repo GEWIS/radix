@@ -37,8 +37,8 @@ final class CompanyAuditVerbsTest extends TestCase
     }
 
     /**
-     * An accepted invitation is the representative's own doing, so the sentence names them rather than whoever invited
-     * them.
+     * An accepted invitation is the representative's own doing, so the sentence names them rather than the user who
+     * invited them.
      */
     public function testJoiningIsAttributedToWhoeverJoined(): void
     {

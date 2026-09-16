@@ -36,11 +36,11 @@ use Doctrine\DBAL\Types\Types;
  * The stale-revision cleanup is a GDPR cron that reaches every revisable domain, so its branches are pinned end to end
  * against a real database and the storage a run reclaims from: an abandoned re-edit is discarded back to the live
  * version, a never-approved aggregate is removed whole, a subject that has not happened yet is left alone whatever the
- * silence around it, a domain that says no is obeyed, and a dry run reports without touching anything.
+ * silence around it, a domain that refuses is obeyed, and a dry run reports without touching anything.
  *
  * Staleness is forced by backdating the head's (auto-stamped) `updatedAt` with a DQL update, which is the only way to
- * write it; the same helper moves the dates the domains judge relevance by, so a case never flushes its way past the
- * ageing it just arranged.
+ * write it; the same helper moves the dates the domains check relevance against, so a flush in a case never undoes
+ * the ageing it just arranged.
  */
 final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
 {
@@ -127,8 +127,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * A head with the board is nobody's turn in particular, but a month of silence about an evening that has since
-     * come and gone says the same thing as a month of silence from an author.
+     * A head with the board is no single member's turn in particular, but a month of silence about an evening that
+     * has since come and gone counts the same as a month of silence from an author.
      */
     public function testAHeadTheBoardNeverGotToLapsesOnTheSameCutoff(): void
     {
@@ -207,7 +207,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
 
     /**
      * The same rule in a domain that dates itself differently: a posting still open for applications is being waited
-     * on by whoever might yet apply, and only lapses once it has closed.
+     * on by anyone who might yet apply, and only lapses once it has closed.
      */
     public function testKeepsAStaleVacancyDraftWhileThePostingIsStillOpen(): void
     {
@@ -252,8 +252,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * A question the board never approved has nothing behind it to fall back to, so the poll goes with the revision
-     * that asked it.
+     * A question the board never approved has nothing behind it to fall back to, so the poll is removed with the
+     * revision that contains it.
      */
     public function testDeletesAPollThatWasNeverApproved(): void
     {
@@ -294,7 +294,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
         $live->squareLogo = $shared;
         $this->entityManager->flush();
 
-        // The clone carries the square logo forward by value; the banner is this draft's alone.
+        // The clone copies the square logo by value; the banner is this draft's alone.
         $draft = $this->cloneAsDraft($live);
         self::assertInstanceOf(
             CompanyRevision::class,
@@ -335,8 +335,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * A body's page names four files at once: an upload and the cut made from it, twice over. All four are offered
-     * back to storage, or a page that was thrown away keeps half of itself on disk forever.
+     * A body's page names four files at once: an upload and the cut made from it, twice over. All four are
+     * reclaimed, or a page that was thrown away leaves half of its images on disk forever.
      */
     public function testReclaimsEveryImageAnAbandonedBodyPageNamed(): void
     {
@@ -395,7 +395,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
 
     /**
      * The last guard before an aggregate goes is the domain's own. A company that was sold something is a real
-     * arrangement whatever its profile looks like, and the database would take its accounts and its timeline with it.
+     * arrangement whatever its profile looks like, and removing it would remove its accounts and its timeline too.
      */
     public function testKeepsANeverApprovedCompanyThatWasAlreadySoldAPackage(): void
     {
@@ -406,7 +406,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
             $live,
         );
 
-        // Made to look like a company nobody ever approved: a draft head, and nothing live behind it.
+        // Made to look like a company that was never approved: a draft head, and nothing live behind it.
         $draft = $this->cloneAsDraft($live);
         $company->setLiveRevision(null);
         $this->entityManager->flush();
@@ -429,8 +429,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * Sign-ups belong to a live revision's lists, so sign-ups on an activity nobody ever approved are a state that is
-     * not supposed to arise. A scheduled run will not guess at them: it skips the activity and says why, every night.
+     * Sign-ups belong to a live revision's lists, so sign-ups on a never-approved activity are a state that is not
+     * supposed to arise. A scheduled run will not guess at them: it skips the activity and logs why, every night.
      */
     public function testKeepsAStaleActivityThatSomehowHasSignups(): void
     {
@@ -445,8 +445,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * Forced, the same activity goes, and takes its lists, its sign-ups and the answers on them with it. The sign-ups
-     * are the point: they are not reachable from anywhere on the site once the activity they hang off was never
+     * Forced, the same activity is removed, along with its lists, its sign-ups and the answers on them. The sign-ups
+     * are the point: they are not reachable from anywhere on the site once the activity they belong to was never
      * approved, so an operator who has read a dry run may clear them out rather than have them skipped for good.
      */
     public function testForceDeletesAStaleActivityTogetherWithItsSignups(): void
@@ -472,8 +472,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * Forcing widens what may go, not how far back the cleanup looks. An activity with sign-ups that nobody has
-     * walked away from yet is nothing to do with `--force`.
+     * Forcing widens what may go, not how far back the cleanup looks. An activity with sign-ups that has not been
+     * abandoned yet is nothing to do with `--force`.
      */
     public function testForceStillOnlyReachesWhatIsAlreadyStale(): void
     {
@@ -493,8 +493,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * A forced dry run is how an operator sees what forcing would take before they answer for it, so it has to report
-     * the same removal and still change nothing.
+     * A forced dry run is how an operator sees what forcing would remove before they commit to it, so it has to
+     * report the same removal and still change nothing.
      */
     public function testAForcedDryRunReportsTheActivityButLeavesItStanding(): void
     {
@@ -532,8 +532,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * Forcing is not a way past every domain. What a company was sold is somebody else's arrangement, and the option
-     * an operator reaches for to clear out unreachable sign-ups does not touch it.
+     * Forcing is not a way past every domain. What a company was sold is a separate arrangement, and the option an
+     * operator uses to clear out unreachable sign-ups does not touch it.
      */
     public function testForceDoesNotOverruleADomainThatRefusesOutright(): void
     {
@@ -563,7 +563,7 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
 
     /**
      * Runs non-interactively by default, as the schedule does. A case that means to answer the forced run's
-     * confirmation hands in what to answer with and says so.
+     * confirmation passes in what to answer with and requests an interactive run.
      *
      * @param array<string, bool|string> $input
      * @param string[]                   $answers
@@ -582,8 +582,8 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * How many answers are still filed against a sign-up. Asked of the connection rather than the ORM, because the
-     * point is what survived in the database after the run removed the rows.
+     * How many answers are still filed against a sign-up. Queried on the connection rather than through the ORM,
+     * because the point is what survived in the database after the run removed the rows.
      */
     private function countFieldValuesFor(int $signupId): int
     {
@@ -609,14 +609,14 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * Write dates straight into a revision's row. Both the staleness stamp and the dates a domain judges relevance by
-     * have to be set this way: `updatedAt` is stamped by a lifecycle callback, so a flush that edited the entity
-     * instead would undo the ageing the test just arranged.
+     * Write dates straight into a revision's row. Both the staleness stamp and the dates a domain checks relevance
+     * against have to be set this way: `updatedAt` is stamped by a lifecycle callback, so a flush that edited the
+     * entity instead would undo the ageing the test just arranged.
      *
-     * A DQL update bypasses the unit of work, which leaves a revision the test already loaded holding the values it
-     * was hydrated with. The run itself hydrates fresh (a cron opens on nothing), but here the same manager is shared,
-     * so the row is refreshed before handing back — otherwise a domain that judges by a date would judge by the date
-     * this helper just replaced.
+     * A DQL update bypasses the unit of work, which leaves a revision the test already loaded with the values it was
+     * hydrated with. The run itself hydrates fresh (a cron opens on nothing), but here the same manager is shared, so
+     * the row is refreshed before returning: otherwise a domain that checks a date would read the value this helper
+     * just replaced.
      *
      * @param class-string                     $revisionClass
      * @param array<string, DateTimeImmutable> $dates
@@ -834,12 +834,12 @@ final class DeleteStaleRevisionsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * A stale, never-approved activity carrying a sign-up with an answer on it: the state a scheduled run refuses to
+     * A stale, never-approved activity with a sign-up that has an answer on it: the state a scheduled run refuses to
      * touch and a forced one clears.
      *
-     * The seed has none, and could not sensibly have one — sign-ups are migrated onto a revision when it is approved,
-     * so nothing in the normal course of things puts one on a chain that never was. It is built here instead, answer
-     * and all, so that the removal is asked to unlink a field value from both the sign-up and the option it chose.
+     * The seed has none, and could not sensibly have one: sign-ups are migrated onto a revision when it is approved, so
+     * nothing in the normal course of things puts one on a chain that was never approved. It is built here instead,
+     * answer and all, so that the removal has to unlink a field value from both the sign-up and the option it chose.
      */
     private function aNeverApprovedActivityDraftWithASignup(): ActivityRevision
     {

@@ -30,20 +30,20 @@ use function hash_hmac;
 use function is_string;
 
 /**
- * Which devices an account has signed in from before, and therefore which sign-ins are worth writing to somebody
- * about. A sign-in is recognised when the cookie handed out at an earlier sign-in comes back, or when the device kind
- * and the network are both already known; device and network are learned apart, or a member who moves between home
- * and campus would be announced on every pairing of the two.
+ * Which devices an account has signed in from before, and therefore which sign-ins are worth notifying the member
+ * about. A sign-in is recognised when the cookie issued at an earlier sign-in comes back, or when the device kind and
+ * the network are both already known; device and network are learned apart, or a member who moves between home and
+ * campus would be announced on every pairing of the two.
  *
  * Recognition is only ever a reason to withhold a notice. It grants nothing, it is consulted after the sign-in has
  * already succeeded, and every failure here returns false, so a device that goes unrecognised means the member is
- * told.
+ * notified.
  */
 final readonly class KnownDeviceRegistry
 {
     /**
      * Longer than the longest remember-me cookie in `config/packages/session.yaml` on purpose: were the two the same
-     * length, the forced re-login at the end of a ridden-out cookie would land just past the boundary and announce
+     * length, the forced re-login at the end of a cookie's full lifetime would fall just past the boundary and announce
      * the machine the member never left.
      */
     public const string RETENTION = '-120 days';
@@ -60,8 +60,8 @@ final readonly class KnownDeviceRegistry
     private const string REFRESH_THROTTLE = '-1 day';
 
     /**
-     * Caps each fact kind per account and firewall, so a password in the wrong hands cannot fill the table with
-     * entries that suppress everything after them.
+     * Caps each fact kind per account and firewall, so a stolen password cannot fill the table with entries that
+     * suppress everything after them.
      */
     private const int LIMIT = 20;
 
@@ -83,8 +83,8 @@ final readonly class KnownDeviceRegistry
     }
 
     /**
-     * Whether this device has signed in to this account before, recording it either way. False means the member
-     * should be told.
+     * Whether this device has signed in to this account before, recording it either way. False means the member should
+     * be notified.
      */
     public function recognise(
         string $userIdentifier,
@@ -138,8 +138,7 @@ final readonly class KnownDeviceRegistry
             $device->lastSeenAt = $now;
 
             if ([] !== $described['networks']) {
-                // Always evaluated: the networks must be learned even on a sign-in something else already vouches
-                // for.
+                // Always evaluated: the networks must be learned even on a sign-in something else already recognises.
                 $networksKnown = $this->recogniseNetworks(
                     $userIdentifier,
                     $firewallName,
@@ -180,7 +179,7 @@ final readonly class KnownDeviceRegistry
             $this->entityManager->flush();
 
             // Only after the flush: a cookie whose row was never written would name nothing. Re-issued on a match so
-            // the year the browser holds it counts from the last sign-in rather than the first.
+            // the year the browser keeps it counts from the last sign-in rather than the first.
             if (
                 null !== $firewall
                 && null !== $issue
@@ -211,8 +210,8 @@ final readonly class KnownDeviceRegistry
     /**
      * Note that the facts this account is already recognised on are still being seen. {@see self::recognise()} only
      * runs at password sign-ins, so without this a member who stays signed in for months would be announced on the
-     * machine they never stopped using. Nothing is created and nothing is revived: a lapsed fact has a notice owing
-     * on it.
+     * machine they never stopped using. Nothing is created and nothing is revived: a lapsed fact still results in a
+     * notice.
      */
     public function refresh(
         string $userIdentifier,
@@ -277,7 +276,7 @@ final readonly class KnownDeviceRegistry
                 $this->entityManager->flush();
             }
         } catch (Throwable $e) {
-            // On the request path of everybody signed in: an un-refreshed fact costs a needless notice, an exception
+            // On the request path of every signed-in user: an un-refreshed fact costs a needless notice, an exception
             // would end the session.
             $this->logger->warning(
                 'Could not note that this device is still in use.',
@@ -337,9 +336,9 @@ final readonly class KnownDeviceRegistry
     }
 
     /**
-     * Whether any name for the current network is already known, learning every name either way. Learning them all
-     * is what keeps recognition steady when the ASN database first arrives, disappears with a rebuilt volume, or
-     * comes back: whichever name was on file when a network was learned keeps answering.
+     * Whether any name for the current network is already known, learning every name either way. Learning them all is
+     * what keeps recognition steady when the ASN database first arrives, disappears with a rebuilt volume, or comes
+     * back: whichever name was on file when a network was learned continues to match.
      *
      * @param non-empty-list<string> $fingerprints
      */
@@ -433,8 +432,8 @@ final readonly class KnownDeviceRegistry
     }
 
     /**
-     * Left on the request for {@see \App\EventListener\User\KnownDeviceCookieListener}, because recognition runs
-     * inside the remember-me handler and holds no response.
+     * Left on the request for {@see \App\EventListener\User\KnownDeviceCookieListener}, because recognition runs inside
+     * the remember-me handler and has no response.
      */
     private function issueCookie(
         Request $request,
@@ -455,7 +454,8 @@ final readonly class KnownDeviceRegistry
     }
 
     /**
-     * Only ever the hash is stored, so reading the table does not yield cookies that would quiet somebody's notices.
+     * Only ever the hash is stored, so reading the table does not produce cookies that would suppress a member's
+     * notices.
      */
     private function hashToken(#[SensitiveParameter]
     string $value,): string

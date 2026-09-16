@@ -505,7 +505,7 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
                 $company,
             );
             // Everything the company has, including the vacancy whose window has closed: what the landing page shows
-            // is worked out when it is rendered, so an unshowable pick is exactly the case worth seeding.
+            // is computed when it is rendered, so an unshowable pick is exactly the case worth seeding.
             $highlightPackage->setVacancies($createdVacancies);
             $manager->persist($highlightPackage);
         }

@@ -11,8 +11,8 @@ use App\Service\Application\AbstractNotificationSubjectNamer;
 use Override;
 
 /**
- * An announced activity reads by the activity itself; one awaiting review reads by the revision, since that is what
- * the reviewer is pointed at.
+ * An announced activity is named from the activity itself; one awaiting review is named from the revision, since
+ * that is what the reviewer is pointed at.
  */
 final class ActivityNotificationSubjectNamer extends AbstractNotificationSubjectNamer
 {

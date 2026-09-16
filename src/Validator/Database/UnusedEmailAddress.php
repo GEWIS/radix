@@ -8,7 +8,7 @@ use Attribute;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Checks that no member and no other registration already answers to this e-mail address.
+ * Checks that no member and no other registration already uses this e-mail address.
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class UnusedEmailAddress extends Constraint

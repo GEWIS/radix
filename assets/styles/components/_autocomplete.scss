@@ -35,7 +35,7 @@
 // the control, and drop the wrapper's fixed height so it can grow as chips wrap onto a second row. The bottom padding
 // is smaller than Bootstrap's so an empty control still lines up with the plain inputs above it.
 //
-// The second selector repeats the one the vendor theme uses to pad a control that holds something, which is more
+// The second selector repeats the one the vendor theme uses to pad a control that has items, which is more
 // specific than the first.
 .form-floating > .ts-wrapper {
     height: auto;

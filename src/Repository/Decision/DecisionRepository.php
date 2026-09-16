@@ -33,8 +33,8 @@ class DecisionRepository extends ServiceEntityRepository
     /**
      * Search decisions: every included term must appear in the Dutch or English text, no excluded term may, and the
      * `type:` and `meeting:` filters narrow the text matches to one meeting type and one meeting. Alongside the text
-     * match, a meeting the prompt spells out ("BV 123.4.5") matches those decisions directly, and they are answered
-     * with first: the meeting asked for must not be pushed past the result cap by the decisions that mention it.
+     * match, a meeting the prompt spells out ("BV 123.4.5") matches those decisions directly, and they are returned
+     * first: the meeting requested must not be pushed past the result cap by the decisions that mention it.
      *
      * @return Decision[]
      */
@@ -56,7 +56,7 @@ class DecisionRepository extends ServiceEntityRepository
                 'd.annulledBy',
                 'annulledBy',
             )
-            // Joined rather than asked for with `d.counterpart IS NULL`: the association is keyed on the decision's
+            // Joined rather than checked with `d.counterpart IS NULL`: the association is keyed on the decision's
             // four columns, and DQL refuses a single-valued path expression to a composite key.
             ->leftJoin(
                 'd.counterpart',
@@ -125,11 +125,11 @@ class DecisionRepository extends ServiceEntityRepository
 
         if ([] !== $textParts) {
             if (null === $search->meeting) {
-                // A virtual decision that names the decision it belongs to is that decision said a second time, and
-                // showing both is what made the same organ membership turn up twice. The one taken in a real meeting
-                // is the one that answers, so the other is left out of the text match. Added inside this branch,
-                // because on its own it would match every decision there is; a prompt that asks for a meeting, either
-                // by naming it or by filtering on it, is asking for what that meeting decided and gets it.
+                // A virtual decision that names the decision it belongs to is a repeat of that decision, and showing
+                // both is what made the same organ membership appear twice. The one taken in a real meeting is the one
+                // that is returned, so the other is left out of the text match. Added inside this branch, because on
+                // its own it would match every decision there is; a prompt that specifies a meeting, either by naming
+                // it or by filtering on it, is a request for what that meeting decided, and that is returned.
                 $textParts[] = 'counterpart.number IS NULL';
             }
 
@@ -147,9 +147,9 @@ class DecisionRepository extends ServiceEntityRepository
             );
             $conditions[] = $reference;
 
-            // The decisions asked for, ahead of the ones that only mention them. Ordering by the date alone leaves
-            // the meeting itself last, where the cap can cut it off entirely: "BV 1" answers with a century of
-            // decisions that happen to contain a 1 before it reaches the meeting.
+            // The decisions requested, ahead of the ones that only mention them. Ordering by the date alone leaves the
+            // meeting itself last, where the cap can cut it off entirely: "BV 1" returns a century of decisions that
+            // happen to contain a 1 before it reaches the meeting.
             $qb->addSelect(sprintf(
                 'CASE WHEN %s THEN 0 ELSE 1 END AS HIDDEN referenceRank',
                 $reference,
@@ -262,7 +262,7 @@ class DecisionRepository extends ServiceEntityRepository
     }
 
     /**
-     * How a decision is addressed in the map {@see self::findVirtualCounterpartsOf()} answers with.
+     * How a decision is addressed in the map returned by {@see self::findVirtualCounterpartsOf()}.
      */
     public static function key(Decision $decision): string
     {

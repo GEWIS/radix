@@ -16,7 +16,8 @@
         <div class="btn-group">
             <button type="button" class="btn btn-outline-secondary dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                {# Year 0 is the "undated" bucket (albums without a start date), so it is labelled instead of "0 - 1". #}
+                {# Year 0 is the "undated" bucket (albums without a start date), so it is labelled
+                   instead of "0 - 1". #}
                 {% if year is null %}
                     {{ upcoming ? 'Upcoming'|trans : 'All years'|trans }}
                 {% else %}

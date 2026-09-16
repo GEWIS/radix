@@ -117,8 +117,8 @@ final class ExternalSignupTokenResolverTest extends TestCase
         bool $expired,
         string $verifier,
     ): ExternalSignupVerification {
-        // Built rather than stubbed: the purpose is read-only, and the expiry and the hash a stub would have
-        // answered for are exactly what the constructor is given.
+        // Built rather than stubbed: the purpose is read-only, and the expiry and the hash a stub would have returned
+        // are exactly what the constructor is given.
         return new ExternalSignupVerification(
             self::createStub(ExternalSignup::class),
             $purpose,

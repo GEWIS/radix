@@ -32,8 +32,8 @@ use function assert;
  * The board's side of a poll: the questions waiting on a decision, and a screen per question showing what it asks,
  * what it can be answered with and how that compares to a wording the board already turned down.
  *
- * Agreeing to a question is also scheduling it, so the closing date is filled in here rather than by whoever asked.
- * There is no discard route: a poll has no draft to throw away.
+ * Agreeing to a question is also scheduling it, so the closing date is filled in here rather than by the member who
+ * asked. There is no discard route: a poll has no draft to throw away.
  */
 #[Route(
     path: '/admin/polls/approvals',
@@ -117,7 +117,7 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
     }
 
     /**
-     * The decision form carries the closing date next to the approve button.
+     * The decision form contains the closing date next to the approve button.
      */
     #[Override]
     protected function createDecisionForm(RevisionActions $actions): FormInterface

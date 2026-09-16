@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * The public sign-up flow: everything between the registration form and a prospective member who is on their way to
+ * The public sign-up flow: everything between the registration form and a prospective member who is redirected to
  * the checkout.
  */
 class RegistrationService
@@ -37,7 +37,7 @@ class RegistrationService
 
     /**
      * During July an enrolment at the TU/e cannot be verified, so registration is closed to everyone who is not
-     * standing in the department.
+     * present in the department.
      */
     public function isOpen(?string $clientIp): bool
     {
@@ -49,8 +49,8 @@ class RegistrationService
             return false;
         }
 
-        // The proxy in front stands on the department's network, so believing its own address would hold the form
-        // open for everybody for the month it is meant to be shut.
+        // The reverse proxy is on the department's network, so using its address would keep the form open for
+        // everybody for the month it is meant to be closed.
         if (
             IpUtils::checkIp(
                 $clientIp,
@@ -88,7 +88,7 @@ class RegistrationService
         }
 
         // Always sent, and sent before the checkout is created: it contains a payment link of its own, which is the
-        // only way back into the flow if the checkout does not come up.
+        // only way back into the flow if the checkout cannot be created.
         $this->memberService->sendRegistrationUpdateEmail(
             $prospectiveMember,
             RegistrationUpdate::Registration,

@@ -41,7 +41,7 @@ use function substr;
  *
  * The forms are constructed rather than parsed, because whether a field is mapped and what it maps to are resolved
  * at runtime: `mapped` can arrive through an `array_merge` or from a static method, and reading the source gives the
- * wrong answer. PropertyAccessor is called rather than reimplemented for the same reason, because it camelises a
+ * wrong result. PropertyAccessor is called rather than reimplemented for the same reason, because it camelises a
  * name, writes a collection through an adder and remover, and calls magic methods.
  */
 final class FormWritabilityTest extends KernelTestCase

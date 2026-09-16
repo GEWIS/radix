@@ -31,7 +31,7 @@ use function array_unique;
 use function is_subclass_of;
 
 /**
- * The contract every revisable domain answers, exercised against all of them at once. Code that works across
+ * The contract every revisable domain implements, exercised against all of them at once. Code that works across
  * domains, the discarder, the review controllers and the voter, leans on exactly these methods, so a domain that gets
  * one of them wrong should fail here rather than at the far end of a review screen.
  */
@@ -215,7 +215,7 @@ final class RevisionContractsTest extends TestCase
     }
 
     /**
-     * Every domain answers with its own resource id, since the edit lock keys on it: two domains sharing one would
+     * Every domain returns its own resource id, since the edit lock keys on it: two domains sharing one would
      * let a body's page and an activity with the same number lock each other out.
      */
     public function testTheResourceIdsAreDistinctPerDomain(): void

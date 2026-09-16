@@ -37,7 +37,7 @@ $chainOf = static function (?MappingDriverInterface $driver): ?MappingDriverChai
         : null;
 };
 
-// The analyser is handed one manager, while the entities are divided over two: the ledger on the default connection
+// The analyser is given one manager, while the entities are divided over two: the ledger on the default connection
 // and everything else on the web one. Folding the other managers' drivers into this one's chain leaves every entity
 // resolvable from the manager that is returned, so a repository or a query on either side is still checked against
 // real mapping metadata.

@@ -18,12 +18,12 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * The watermark names who asked for a download and when, so the request is recorded before the file exists. The row
+ * The watermark names who requested a download and when, so the request is recorded before the file exists. The row
  * doubles as the handle the browser waits on while the worker builds the file, and as what a leaked copy is traced back
  * to: the same reference goes into the delivered PDF as machine-readable text.
  *
- * Who requested it is snapshotted as {@see $requestedByName} rather than read back off the association, because the
- * watermark has to keep saying what it said at the time even if the account is later renamed or removed.
+ * Who requested it is snapshotted as {@see $requestedByName} rather than read back from the association, because the
+ * watermark has to keep the name it recorded at the time even if the account is later renamed or removed.
  */
 #[Entity(repositoryClass: CourseDocumentDownloadRepository::class)]
 class CourseDocumentDownload
@@ -65,7 +65,7 @@ class CourseDocumentDownload
 
     /**
      * The address the request came from. For an anonymous request from campus this is the only thing tying the built
-     * file to whoever asked for it, so it is what the collect routes check.
+     * file to the requester, so it is what the collect routes check.
      */
     #[Column(type: Types::STRING)]
     public string $requestedFrom;
@@ -100,8 +100,8 @@ class CourseDocumentDownload
     }
 
     /**
-     * The token is unguessable, but possession of it is not enough on its own: the file it leads to names whoever
-     * requested it, so handing the link on would let somebody redistribute a document under another member's name. An
+     * The token is unguessable, but possession of it is not enough on its own: the file it leads to names the
+     * requester, so passing the link on would let another user redistribute a document under that member's name. An
      * anonymous request from campus is only identified by the address it came from, so that is what has to match.
      */
     public function isCollectableBy(

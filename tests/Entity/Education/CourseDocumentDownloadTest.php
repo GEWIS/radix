@@ -12,8 +12,8 @@ use Symfony\Component\Uid\Uuid;
 /**
  * Who may collect a built download.
  *
- * The token is unguessable, but possession of it cannot be enough on its own: the file it leads to names whoever
- * requested it, so handing it to somebody else would let them pass a document around under another member's name. That
+ * The token is unguessable, but possession of it cannot be enough on its own: the file it leads to names the member
+ * who requested it, so giving it to another user would let them pass a document around under that member's name. That
  * is precisely the attribution the watermark exists to provide, so it is pinned here.
  */
 final class CourseDocumentDownloadTest extends TestCase

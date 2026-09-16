@@ -17,7 +17,7 @@ use function Symfony\Component\Translation\t;
 /**
  * What a body says about itself: the text on its page, how it is reached, the logo it is recognised by, the banner its
  * own page leads with, and where else it can be followed. The images are described so the board sees the one being
- * proposed beside the one it replaces, which is the part of approving a page that reading the text could never answer.
+ * proposed beside the one it replaces, which is the part of approving a page that reading the text could never cover.
  */
 final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
 {

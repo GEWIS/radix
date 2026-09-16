@@ -1,6 +1,6 @@
 {#
     The header and the buttons of a form flow ({@see App\Form\Application\Flow\AbstractStepperFlowType}).
-    Everything that leaves a step unfinished carries `formnovalidate`, or the browser refuses to go back over
+    Everything that leaves a step unfinished has `formnovalidate`, or the browser refuses to go back over
     a field that has not been filled in yet.
 
         {% import 'partials/application/form-flow.html.twig' as flow %}
@@ -17,7 +17,7 @@
 {% macro stepper(form) %}
     {% import _self as self %}
     {% set stepper = form.vars.stepper %}
-    {# The jump button is drawn by hand, once per step it can reach, so form_end() must not emit it as well. #}
+    {# The jump button is rendered by hand, once per step it can reach, so form_end() must not emit it as well. #}
     {% do form.goto.setRendered %}
     <ol class="form-stepper" role="tablist">
         {% for step in stepper.top %}

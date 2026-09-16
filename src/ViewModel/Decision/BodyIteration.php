@@ -15,10 +15,10 @@ use function count;
  *
  * A body is addressed by the year it was founded, which reads well and is almost always enough. Two bodies founded in
  * the same year are addressed by their whole founding date instead, so neither is ever unreachable; {@see $key} is
- * whichever of the two applies, and {@see $sharesItsYear} says which happened so the reader is told them apart too.
+ * whichever of the two applies, and {@see $sharesItsYear} records which it is, so the label distinguishes them too.
  *
- * The list is only worth showing when there is more than one, which is what {@see self::fromOrgans()} answers with an
- * empty list for.
+ * The list is only worth showing when there is more than one, which is why {@see self::fromOrgans()} returns an empty
+ * list for a single body.
  */
 final readonly class BodyIteration
 {

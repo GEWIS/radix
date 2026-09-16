@@ -20,13 +20,13 @@ use Psr\Log\LoggerInterface;
  *
  * That last distinction is what this class is here to act on, and it acts on it by refusing. A check that lets
  * addresses through whenever it cannot perform the check has stopped being a check, and what it would let through is
- * expensive: the registration e-mail carries the payment link, so someone whose address does not work can pay and
+ * expensive: the registration e-mail contains the payment link, so someone whose address does not work can pay and
  * then have no way back into the flow. An outage is logged instead, because a resolver that cannot answer is the
- * deployment's problem to notice rather than something to read off a wave of rejected registrations.
+ * deployment's problem to notice rather than something to infer from a wave of rejected registrations.
  *
- * Note that the library walks up the domain labels, so `someone@typo.gewis.nl` is accepted on `gewis.nl`'s records.
- * A subdomain typo therefore gets through where the hand-rolled check caught it; being right about null MX and about
- * resolver failures is worth more than being right about that.
+ * Note that the library checks the parent domain labels, so `someone@typo.gewis.nl` is accepted on `gewis.nl`'s
+ * records. A subdomain typo therefore gets through where the hand-rolled check caught it; being right about null MX
+ * and about resolver failures is worth more than being right about that.
  *
  * Deliberately not final: it is the seam a test replaces to keep the network out of the suite.
  */
@@ -43,7 +43,7 @@ readonly class MailHostResolver
         $validation = new DNSCheckValidation($this->dnsGetRecordWrapper);
 
         // The library takes an address and looks at what follows the last `@`; the caller already has the host, so
-        // it is given a local part to hang it on.
+        // a local part is prefixed to it.
         if (
             $validation->isValid(
                 'postmaster@' . $hostname,

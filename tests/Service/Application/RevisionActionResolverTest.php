@@ -51,7 +51,7 @@ final class RevisionActionResolverTest extends TestCase
     }
 
     /**
-     * Only a draft that answers a "changes requested" review is a resubmission; a draft spawned off an approved
+     * Only a draft that responds to a "changes requested" review is a resubmission; a draft spawned off an approved
      * revision is an ordinary edit and needs no response.
      */
     public function testOnlyADraftAnsweringRequestedChangesCountsAsAResubmission(): void

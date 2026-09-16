@@ -34,7 +34,7 @@ final readonly class CourseDocumentDownloadService
 {
     /**
      * How long a request and anything built for it is kept. A build takes about a second and the waiting page collects
-     * it as soon as it is ready, so a minute already covers the whole exchange; asking again costs another second.
+     * it as soon as it is ready, so a minute already covers the whole exchange; requesting again costs another second.
      */
     private const string RETENTION = 'PT1M';
 

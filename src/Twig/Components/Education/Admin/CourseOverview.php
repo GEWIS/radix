@@ -19,8 +19,8 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use function array_map;
 
 /**
- * How much material a course has is counted for the visible page in one query rather than read off each course, so the
- * table costs two queries whatever the page size.
+ * How much material a course has is counted for the visible page in one query rather than read from each course, so
+ * the table costs two queries whatever the page size.
  *
  * @extends AbstractDoctrinePaginatedOverview<Course>
  */

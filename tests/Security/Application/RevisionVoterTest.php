@@ -348,8 +348,8 @@ final class RevisionVoterTest extends TestCase
     }
 
     /**
-     * An entity carries an identifier here because the voter compares bodies and companies by it. Written by
-     * reflection, because the identifier is Doctrine's to assign and the entities say so with their set visibility.
+     * An entity has an identifier here because the voter compares bodies and companies by it. Written by reflection,
+     * because the identifier is Doctrine's to assign and the entities enforce that with their set visibility.
      *
      * @param class-string $entity
      */

@@ -21,7 +21,7 @@ use function strval;
  * rectangle means the same thing whichever rendition of the original the picker happened to display.
  *
  * The four boxes are hidden: they are written by the `image-crop` Stimulus controller, never typed into. An untouched
- * field comes back as null, which is how "leave the crop alone" is said.
+ * field comes back as null, which means "leave the crop alone".
  *
  * @extends AbstractType<array<string, float>|null>
  */

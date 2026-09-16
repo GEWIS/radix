@@ -49,7 +49,7 @@ use function sprintf;
 class Meeting
 {
     /**
-     * For how many minutes the export is held off after a decision was entered.
+     * For how many minutes the export is paused after a decision was entered.
      *
      * A meeting is minuted decision by decision, and a member's organ membership is only right again once the last of
      * them is in; syncing in between would publish states that never existed.
@@ -57,8 +57,8 @@ class Meeting
     private const int SYNC_PAUSE_AFTER_DECISION = 15;
 
     /**
-     * For how many minutes the export is held off after a decision was deleted, which is longer because deleting one
-     * is always part of correcting something.
+     * For how many minutes the export is paused after a decision was deleted, which is longer because deleting one is
+     * always part of correcting something.
      */
     private const int SYNC_PAUSE_AFTER_DELETION = 60;
 
@@ -262,8 +262,8 @@ class Meeting
     }
 
     /**
-     * The export is not held off the way recording and deleting a decision hold it off: the decision keeps saying
-     * what it always said.
+     * The export is not paused the way recording and deleting a decision pause it: a translation does not change what
+     * the decision records.
      */
     public function translateDecision(Other $decision): void
     {
@@ -338,7 +338,7 @@ class Meeting
     }
 
     /**
-     * Say that a virtual decision is the counterpart of one of this meeting's decisions.
+     * Record that a virtual decision is the counterpart of one of this meeting's decisions.
      *
      * Done from the decision being given a counterpart rather than from the virtual one, because that is the decision
      * a reader comes across, and because neither of the two has to be on the record before the other: a virtual
@@ -396,7 +396,7 @@ class Meeting
     }
 
     /**
-     * Take back what a virtual decision was said to be the counterpart of.
+     * Unlink a virtual decision from the decision it is the counterpart of.
      *
      * Addressed by the virtual decision rather than by the one it belongs to, because that is the side the reference
      * is on and because a decision can be given several.
@@ -614,7 +614,7 @@ class Meeting
                     $members,
                 )
             ) {
-                // Only what it takes to say who this is: the page shows a name and hangs mutations off a membership
+                // Only what is needed to identify the member: the page shows a name and keys mutations by membership
                 // number.
                 $members[$lidnr] = [
                     'member' => [

@@ -18,14 +18,14 @@
     } only -%}
 {% endset %}
 
-{# The modals sit outside the form but inside the editor, so opening one never submits anything. #}
+{# The modals are outside the form but inside the editor, so opening one never submits anything. #}
 <div data-controller="organ-lookup install-editor"
      data-action="organ-lookup:selected->install-editor#organSelected
                   member-lookup:selected->install-editor#memberSelected"
      data-organ-lookup-url-value="{{ path('decision_organ_search') }}"
      {# The route constrains every one of these (the type to the meeting types, the rest to digits), so it cannot
         generate a template with named placeholders in them. A valid address is generated instead and the controller
-        replaces the last five segments, which is what the route says they are. #}
+        replaces the last five segments, which is what the route declares them to be. #}
      data-organ-lookup-info-url-value="{{ path('decision_organ_info', {
          'type': enum('App\\Entity\\Database\\Enums\\MeetingTypes').ALV.value,
          'number': 0,
@@ -71,8 +71,9 @@
                                 </tr>
                             </thead>
                             <tbody data-install-editor-target="currentMembers"></tbody>
-                            {# Row shapes live here rather than in the controller so their wording stays translated;
-                               the parser only handles `<tr>` inside a template that itself sits in table context. #}
+                            {# Row shapes are defined here rather than in the controller so their wording stays
+                               translated; the parser only handles `<tr>` inside a template that is itself
+                               in table context. #}
                             <template data-install-editor-target="currentRowTemplate">
                                 <tr>
                                     <td data-field="name"></td>

@@ -101,10 +101,9 @@ when@prod:
                 # `strict-dynamic` would stop Swagger UI's script tags from running; DocumentationCspListener drops it
                 # for /api-docs alone rather than weakening this.
                 script-src: ['self', 'strict-dynamic', 'https://analytics.gewis.nl/']
-                # `data:` is what draws the checkmark in a checkbox, the dot in a radio, the thumb of a switch and
-                # the chevron of a select: Bootstrap ships each as an inline SVG background image. Without it the
-                # browser blocks them and those controls render as empty boxes, with nothing to show for it server
-                # side.
+                # `data:` is what renders the checkmark in a checkbox, the dot in a radio, the thumb of a switch and the
+                # chevron of a select: Bootstrap ships each as an inline SVG background image. Without it the browser
+                # blocks them and those controls render as empty boxes, with nothing to show for it server side.
                 img-src: ['self', 'data:', 'https://images.gewis.nl']
                 connect-src: ['self', 'https://analytics.gewis.nl/']
                 child-src: ['self', 'https://analytics.gewis.nl/', 'https://www.youtube-nocookie.com/embed/', 'https://player.vimeo.com/video/']

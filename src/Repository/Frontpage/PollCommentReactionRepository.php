@@ -45,7 +45,7 @@ class PollCommentReactionRepository extends ServiceEntityRepository
     /**
      * Takes the member off every reaction underneath one poll in a single statement, leaving the counts under each
      * comment as they were. The reactions are changed in the database rather than in the entity manager, so anything
-     * holding one is out of date afterwards.
+     * that has one loaded is out of date afterwards.
      */
     public function anonymiseForPoll(Poll $poll): int
     {

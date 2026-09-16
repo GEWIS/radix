@@ -12,8 +12,8 @@ type LocalisedField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
  *                      data-action="localised-fields#apply"
  *   - the inputs:      data-localised-fields-target="dutch" | "english"
  *
- * Where the checkboxes are not on the page — a later step of a form flow answers them on an earlier one — the answer
- * is carried as data-localised-fields-dutch-value / -english-value instead. With neither, every language is on.
+ * Where the checkboxes are not on the page (a later step of a form flow where they were set on an earlier step), the
+ * value is passed as data-localised-fields-dutch-value / -english-value instead. With neither, every language is on.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -49,7 +49,7 @@ export default class extends Controller {
     }
 
     // An enabled language has to be filled in, which the label says with the same asterisk every other required field
-    // carries. The server marks nothing here, because a disabled variant is never submitted.
+    // has. The server marks nothing here, because a disabled variant is never submitted.
     enable(field: LocalisedField, enabled: boolean): void {
         field.disabled = !enabled;
         Array.from(field.labels ?? []).forEach((label) => { label.classList.toggle('required', enabled); });

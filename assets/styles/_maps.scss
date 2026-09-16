@@ -1,4 +1,4 @@
-// Bootstrap assembles these maps inside its own `variables`, which is imported before `variables` here -- so a value
+// Bootstrap assembles these maps inside its own `variables`, which is imported before `variables` here, so a value
 // this project overrides afterwards is already baked into them. Rebuilding them is what makes the override reach the
 // generated custom properties and utilities.
 //

@@ -17,7 +17,7 @@ use Throwable;
  * which is the read side.
  *
  * Saving the window and pushing everyone off their current page are one operation: a window that takes effect now and
- * leaves half the site sitting on a page it may no longer serve is only half applied.
+ * leaves half the site on a page it may no longer serve is only half applied.
  */
 final readonly class MaintenanceWindowService
 {
@@ -44,7 +44,7 @@ final readonly class MaintenanceWindowService
 
     /**
      * Take the window down. Reports whether there was still one to take down, which is what decides if the operator is
-     * told anything happened.
+     * notified anything happened.
      */
     public function remove(int $id): bool
     {

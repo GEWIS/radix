@@ -445,8 +445,8 @@ class AdminController extends AbstractController
         );
 
         if (0 === $moved) {
-            // Every selected photo already lives in the destination (e.g. a stale form still pointed at the current
-            // album), so nothing changed — say so rather than claim a move that did not happen.
+            // Every selected photo is already in the destination (e.g. a stale form still pointed at the current
+            // album), so nothing changed: report that rather than claim a move that did not happen.
             $this->addFlash(
                 AlertTypes::Warning->value,
                 $this->translator->trans('The selected photos are already in that album.'),

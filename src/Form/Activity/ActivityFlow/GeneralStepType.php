@@ -32,9 +32,9 @@ use function intval;
 use function Symfony\Component\Translation\t;
 
 /**
- * The organ choices are the ones the user may organise for, plus whichever organ the revision already carries: an
- * edit must never silently drop an organ the user cannot otherwise pick, and anything outside that list is refused
- * by the choice itself.
+ * The organ choices are the ones the user may organise for, plus whichever organ the revision already has: an edit
+ * must never silently drop an organ the user cannot otherwise pick, and anything outside that list is refused by
+ * the choice itself.
  *
  * @extends AbstractType<ActivityData>
  */
@@ -91,7 +91,7 @@ class GeneralStepType extends AbstractType
                 [
                     'label' => t('Start'),
                     'widget' => 'single_text',
-                    // Once the activity is live and under way its start is history, so it is shown but not changed.
+                    // Once the activity is live and under way its start is in the past, so it is shown but not changed.
                     'disabled' => true === $options['schedule_locked'],
                 ],
             )
@@ -151,7 +151,7 @@ class GeneralStepType extends AbstractType
 
     /**
      * Every active organ for the board, otherwise only the organs the user is currently installed in (mirroring
-     * {@see \App\Security\Application\RevisionVoter}'s rule), plus the one the revision already carries.
+     * {@see \App\Security\Application\RevisionVoter}'s rule), plus the one the revision already has.
      *
      * @return array<string, string>
      */

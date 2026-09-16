@@ -21,8 +21,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
 /**
  * One of the dates a body put forward for a proposed activity.
  *
- * Whole days, not clock times: the option calendar reserves a date, and which part of the day is wanted is what
- * {@see self::$timeOfDay} says. A body may put forward up to three of these per proposal and the board picks one.
+ * Whole days, not clock times: the option calendar reserves a date, and {@see self::$timeOfDay} records which part
+ * of the day is wanted. A body may put forward up to three of these per proposal and the board picks one.
  */
 #[Entity(repositoryClass: ActivityDateOptionRepository::class)]
 #[Index(
@@ -66,8 +66,8 @@ class ActivityDateOption
     public TimeOfDay $timeOfDay = TimeOfDay::Evening;
 
     /**
-     * Where this date sits in the body's own order of preference, counting from one. The board is not bound by it,
-     * but it is what the body would rather have.
+     * The position of this date in the body's own order of preference, counting from one. The board is not bound by
+     * it, but it records what the body prefers.
      */
     #[Column(type: Types::SMALLINT)]
     public int $position = 1;

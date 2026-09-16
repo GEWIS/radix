@@ -24,13 +24,13 @@ use function sprintf;
  * Seeds both databases in the order they depend on one another, with the projection rebuilt in between:
  *
  *   1. the ledger, which is where the members, the meetings and the decisions about them are written;
- *   2. `app:decision:generate`, which replays that into the decision projection the website reads -- the members,
+ *   2. `app:decision:generate`, which replays that into the decision projection the website reads (the members,
  *      their addresses and list memberships, and the organs, organ members, board members and keyholders the
- *      decisions imply;
+ *      decisions imply);
  *   3. the web database, whose fixtures hang activities, photos, accounts and the rest off what step 2 produced.
  *
- * Nothing fixtures the projection directly. A body exists because a decision founded it, and somebody is in it
- * because a decision installed them, so the only way to seed one is to seed the decision and replay it.
+ * Nothing fixtures the projection directly. A body exists because a decision founded it, and a member is in it because
+ * a decision installed them, so the only way to seed one is to seed the decision and replay it.
  *
  * Every fixture names the group it belongs to, and the bundle's loader takes one entity manager at a time, so the two
  * halves are executed separately. They are purged differently as well, which is the other reason this exists rather
@@ -210,7 +210,7 @@ final class LoadFixturesCommand extends Command
     }
 
     /**
-     * @return FixtureInterface[]|null the fixtures in the group, or null if it holds none
+     * @return FixtureInterface[]|null the fixtures in the group, or null if the group contains none
      */
     private function fixtures(
         SymfonyStyle $ui,

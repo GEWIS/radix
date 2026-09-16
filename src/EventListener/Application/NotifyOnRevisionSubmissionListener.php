@@ -12,9 +12,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 
 /**
- * Tells the people who review a domain that something of theirs is waiting. Which kind of notification that is, and who
- * it is addressed to, is the domain's own answer through {@see \App\Service\Application\RevisionNotificationInterface};
- * that a submission raises one at all is true everywhere, so it is said once here.
+ * Notifies the people who review a domain that something of theirs is waiting. Which kind of notification that is, and
+ * who it is addressed to, comes from the domain through {@see \App\Service\Application\RevisionNotificationInterface};
+ * that a submission raises one at all is true everywhere, so it is handled once here.
  */
 #[AsEventListener(event: 'workflow.revision.entered.submitted')]
 final readonly class NotifyOnRevisionSubmissionListener

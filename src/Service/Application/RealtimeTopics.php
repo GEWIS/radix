@@ -13,7 +13,7 @@ use function substr;
 
 /**
  * Shared by {@see RealtimeAuthorization} and {@see RealtimeNotifier}: a topic minted for the cookie that does not
- * match the one published to is a message nobody receives, and neither side fails when they drift apart.
+ * match the one published to is a message no client receives, and neither side fails when the two differ.
  */
 final class RealtimeTopics
 {
@@ -39,7 +39,7 @@ final class RealtimeTopics
     }
 
     /**
-     * Derived from the series rather than being it. Topics are rendered into the page and travel in the subscribe
+     * Derived from the series rather than being it. Topics are rendered into the page and sent in the subscribe
      * request's query string, and the series is what {@see \App\Security\User\PersistentSignatureRememberMeHandler}
      * recognises a session by.
      */

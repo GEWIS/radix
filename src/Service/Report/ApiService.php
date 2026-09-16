@@ -25,7 +25,7 @@ use function preg_replace;
 class ApiService
 {
     /**
-     * The release that introduced the function lists; consumers on an older contract are turned away.
+     * The release that introduced the function lists; consumers on an older contract are rejected.
      */
     private const string FUNCTIONS_MINIMUM_VERSION = 'v4.3.3';
 
@@ -135,7 +135,7 @@ class ApiService
     /**
      * Function that asserts that the given api version is between two bounds.
      *
-     * The version is negotiated through the `Accept` header, which is handed in verbatim.
+     * The version is negotiated through the `Accept` header, which is passed in verbatim.
      *
      * @throws VersionExpectedException if not allowed.
      */

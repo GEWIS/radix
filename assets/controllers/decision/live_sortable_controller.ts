@@ -3,7 +3,7 @@ import { getComponent } from '@symfony/ux-live-component';
 
 /**
  * Drag-reordering that persists immediately through a live component action instead of a form submit. Each direct
- * entry carries its id; on drop the new id order is sent to the named live action, merged with any extra arguments.
+ * entry has its id; on drop the new id order is sent to the named live action, merged with any extra arguments.
  *
  * ```
  * <div data-controller="live-sortable" data-live-sortable-action-value="reorderPoints"
@@ -70,7 +70,8 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // Allow dropping here and live-preview the move by slotting the dragged entry before the entry under the cursor.
+        // Allow dropping here and live-preview the move by slotting the dragged entry before the entry
+        // under the cursor.
         event.preventDefault();
 
         const after = this.entryAfter(event.clientY);

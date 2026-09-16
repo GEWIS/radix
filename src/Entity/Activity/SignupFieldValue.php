@@ -43,8 +43,8 @@ class SignupFieldValue
 
     /**
      * Signup which the value belongs to. An answer is part of the sign-up and never outlives it, which the ORM cascade
-     * on the owning collection already says; the database says it too, so that a sign-up removed by the database (as
-     * happens when the member behind it is taken out of the register) does not run into its own answers.
+     * on the owning collection already enforces; the database enforces it too, so that a sign-up removed by the
+     * database (as happens when the member behind it is taken out of the register) does not fail on its own answers.
      */
     #[ManyToOne(
         targetEntity: Signup::class,

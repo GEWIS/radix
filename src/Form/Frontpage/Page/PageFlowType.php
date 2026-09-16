@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use function Symfony\Component\Translation\t;
 
 /**
- * A custom page: where it lives in the site, who may read it and what it says, one step to a request.
+ * A custom page: where it is in the site, who may read it and what it says, one step to a request.
  */
 class PageFlowType extends AbstractStepperFlowType
 {

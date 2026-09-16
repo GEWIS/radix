@@ -20,8 +20,8 @@ use function trim;
 final class SignupListRule
 {
     /**
-     * The first section of a list that has not been answered, judged in the languages the revision is written in
-     * unless the form that is still collecting them says which.
+     * The first section of a list that has not been filled in, checked in the languages the revision is written in
+     * unless the form that is still collecting them specifies which.
      *
      * @param ?list<Languages> $languages
      *

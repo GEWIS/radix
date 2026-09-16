@@ -9,7 +9,7 @@ use DateTimeImmutable;
 /**
  * The time windows that gate the sign-ups page. Centralised here so the friendly page-level gate
  * ({@see \App\Controller\Activity\AdminController::signups()}) and the security boundary
- * ({@see \App\Twig\Components\Activity\Admin\SignupOverview}) cannot drift apart.
+ * ({@see \App\Twig\Components\Activity\Admin\SignupOverview}) cannot differ.
  */
 final class SignupAdminWindow
 {
@@ -38,9 +38,9 @@ final class SignupAdminWindow
     }
 
     /**
-     * Admission (the draw and later manual admit/un-admit) may be changed until a day after the activity ends, the
-     * same upper bound as attendance, so a draw forgotten before the activity can still be run at the door. Otherwise
-     * a never-drawn limited list would strand: no admission and, since presence needs admission, no attendance either.
+     * Admission (the draw and later manual admit/un-admit) may be changed until a day after the activity ends, the same
+     * upper bound as attendance, so a draw forgotten before the activity can still be run at the door. Otherwise a
+     * never-drawn limited list would not work: no admission and, since presence needs admission, no attendance either.
      */
     public static function canChangeAdmission(DateTimeImmutable $endTime): bool
     {

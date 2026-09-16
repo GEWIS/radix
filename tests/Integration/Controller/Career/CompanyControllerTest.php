@@ -46,8 +46,8 @@ final class CompanyControllerTest extends DatabaseTestCase
             $current,
         );
 
-        // Asking for changes leaves that revision behind as a record and hands the company a fresh draft off it, so
-        // the state the dashboard actually meets is the draft, not the request.
+        // Requesting changes leaves that revision as a record and gives the company a fresh draft based on it, so the
+        // state the dashboard actually reads is the draft, not the request.
         $current->setStatus(RevisionStatus::ChangesRequested);
         $draft = self::getContainer()->get(RevisionClonerRegistry::class)->cloneAsDraft($current);
         $this->entityManager->persist($draft);
@@ -72,7 +72,7 @@ final class CompanyControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A company sees who else acts for it, but not the ones who have been shut out.
+     * A company sees who else acts for it, but not the ones whose account has been disabled.
      */
     public function testTheRepresentativeListLeavesOutWhoeverHasMovedOn(): void
     {

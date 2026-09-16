@@ -19,7 +19,7 @@ use function strval;
 /**
  * The vacancies tab of the career overview. Every filter is a live prop rather than a query parameter read by the
  * controller, so they are exercised on a real instance with its real repositories. Each case builds its own component:
- * one instance answers for one set of filters (it holds on to its paginator), which is how a render uses it.
+ * one instance serves one set of filters (it keeps its paginator), which is how a render uses it.
  */
 final class VacancyOverviewTest extends DatabaseTestCase
 {

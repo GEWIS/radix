@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-# Waits for the Doctrine connection named in $1 to answer. Both databases are waited for before anything is migrated:
-# the ledger and the web database are equally required, and a container that comes up against one that is not ready
-# fails on its first request instead of at startup, where it can be seen.
+# Waits for the Doctrine connection named in $1 to become reachable. Both databases are waited for before anything
+# is migrated: the ledger and the web database are equally required, and a container that comes up against one that
+# is not ready fails on its first request instead of at startup, where it can be seen.
 wait_for_database() {
 	echo "Waiting for the $1 database to be ready..."
 	ATTEMPTS_LEFT_TO_REACH_DATABASE=60
@@ -31,10 +31,10 @@ wait_for_database() {
 # which wait on it, stay down.
 MIGRATIONS_SKIPPED_MARKER=/app/var/.migrations-skipped
 
-# Clears the marker above once both databases answer, but only after establishing that neither has a migration
+# Clears the marker above once both databases are reachable, but only after establishing that neither has a migration
 # pending, which outside a deploy is the normal case. So a container that started during an outage heals itself
 # without a migration ever running unattended; an interrupted deploy, which is the case that has work to do, keeps
-# the marker and waits for somebody.
+# the marker and waits for an operator.
 clear_marker_when_nothing_to_migrate() {
 	while [ -f "$MIGRATIONS_SKIPPED_MARKER" ]; do
 		sleep 60
@@ -68,7 +68,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
         rm -rf public/assets/
 
         # One watcher per compiled language. Sass alone leaves TypeScript compiled once and never again, which reads
-        # as a Stimulus controller whose changes do not take until the container is restarted.
+        # as a Stimulus controller whose changes have no effect until the container is restarted.
         php bin/console sass:build --watch > /dev/stdout 2>&1 &
         php bin/console typescript:build --watch > /dev/stdout 2>&1 &
         php bin/console importmap:install
@@ -104,8 +104,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	elif [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then
 		# One set per database, each naming its own connection; a command given no configuration finds none. Whether a
 		# set is wrapped in a single transaction is left to that configuration: --all-or-nothing overrides both sets, and
-		# the web set cannot take it. MariaDB commits DDL implicitly, so its migrations declare themselves
-		# non-transactional, and the migrator refuses a plan that holds one of those. The wrapping transaction it would
+		# the web set does not support it. MariaDB commits DDL implicitly, so its migrations declare themselves
+		# non-transactional, and the migrator refuses a plan that contains one of those. The wrapping transaction it would
 		# have opened there was destroyed by the first DDL statement in any case.
 		for set in database web; do
 			if find "./migrations/$set" -iname '*.php' -print -quit | grep --quiet .; then

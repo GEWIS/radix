@@ -41,7 +41,7 @@ use function assert;
  * The member-facing body of one sign-up list: the Sign up / Edit / Unsubscribe controls, the sign-up form (in a
  * Bootstrap modal) and the subscriber table. All of these are live, so signing up, editing answers and withdrawing
  * update the panel inline with no page reload. Members only ({@see IsGranted}); guests get the server-rendered
- * partial with the plain Altcha external form, which cannot live in a live component.
+ * partial with the plain Altcha external form, which cannot be rendered in a live component.
  *
  * A successful {@see self::submit()} dispatches a `signup:success` browser event (scoped by list id) that the
  * `modal-close` controller uses to close the modal, then the panel re-renders to the signed-up state. {@see
@@ -66,7 +66,9 @@ final class SignupList
     /** Component-local, transient: a success message shown on the render right after an action. */
     public ?string $feedback = null;
 
-    /** Per-request memoisation of {@see self::memberSignup()}; the flag distinguishes "no sign-up" from "not fetched". */
+    /**
+     * Per-request memoisation of {@see self::memberSignup()}; the flag distinguishes "no sign-up" from "not fetched".
+     */
     private ?UserSignup $memberSignupCache = null;
     private bool $memberSignupFetched = false;
 
@@ -228,7 +230,7 @@ final class SignupList
     private function memberSignup(): ?UserSignup
     {
         // Memoised for the lifetime of this (per-request) component instance: instantiateForm(), isEditing() and
-        // submit() each ask for it, and a fresh instance is created per request, so this never serves a stale sign-up.
+        // submit() each call it, and a fresh instance is created per request, so this never serves a stale sign-up.
         if ($this->memberSignupFetched) {
             return $this->memberSignupCache;
         }

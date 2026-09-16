@@ -37,12 +37,12 @@ use function sprintf;
  *
  * The seed is there to be read, not to be built on: a test that leans on which member happens to be in the fixtures
  * is a test that changes meaning when the fixtures do. So everything a test asserts about is made here, in meetings
- * of its own numbered well past the seed's, and every builder flushes — the projection listeners run on flush, which
+ * of its own numbered well past the seed's, and every builder flushes: the projection listeners run on flush, which
  * is what makes the projected side observable at all.
  *
  * Each decision gets its own point within its meeting, since the two together are half of a decision's identity.
  * Meetings are board meetings unless a test says otherwise, because that is the meeting type that may found an
- * ordinary committee — data built here should not break the regulations by accident.
+ * ordinary committee. Data built here should not break the regulations by accident.
  */
 final class LedgerBuilder
 {
@@ -266,7 +266,7 @@ final class LedgerBuilder
     }
 
     /**
-     * A budget approved by a meeting. `$date` is the date the version itself carries, which is not the meeting's.
+     * A budget approved by a meeting. `$date` is the date on the version itself, which is not the meeting's.
      */
     public function approveBudget(
         Meeting $meeting,

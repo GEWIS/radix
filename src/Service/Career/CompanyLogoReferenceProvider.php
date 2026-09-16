@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Keeps a company logo alive while any revision, in any approval chain, still points at its content-addressed path.
- * Cloning a revision carries both logo paths forward by value, so several revisions share one physical file; the file
+ * Cloning a revision copies both logo paths forward by value, so several revisions share one physical file; the file
  * may only be reclaimed once the last referencing revision is gone.
  */
 final readonly class CompanyLogoReferenceProvider implements FileReferenceProviderInterface

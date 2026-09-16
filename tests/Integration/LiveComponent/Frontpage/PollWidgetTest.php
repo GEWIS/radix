@@ -16,8 +16,9 @@ use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 use function count;
 
 /**
- * The widget is the one poll surface a passer-by sees, so it renders for anybody and gates only the answering. These
- * exercise the real component with its real services; the class has no `#[IsGranted]` to lean on, which is the point.
+ * The widget is the one poll surface an anonymous visitor sees, so it renders for every visitor and gates only the
+ * answering. These exercise the real component with its real services; the class has no `#[IsGranted]` to rely on,
+ * which is the point.
  */
 final class PollWidgetTest extends DatabaseTestCase
 {
@@ -60,7 +61,7 @@ final class PollWidgetTest extends DatabaseTestCase
     }
 
     /**
-     * A passer-by reads the poll and nothing more, so there is nothing on the panel for them to press.
+     * An anonymous visitor reads the poll and nothing more, so there is nothing on the panel for them to press.
      */
     public function testAGuestSeesThePollButCannotAnswerIt(): void
     {

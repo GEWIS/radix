@@ -9,8 +9,8 @@ use Override;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * The two things no single field can decide: no two pages may answer to the same address in the same language, and
- * no page may take an address the application already answers to itself.
+ * The two things no single field can decide: no two pages may have the same address in the same language, and no
+ * page may take an address that is already a route of the application.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 class UnclaimedPageAddress extends Constraint

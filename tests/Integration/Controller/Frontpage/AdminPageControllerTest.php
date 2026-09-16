@@ -36,7 +36,7 @@ use const JSON_THROW_ON_ERROR;
 
 /**
  * A custom page is addressed by its own words and its content is rendered as-is, which makes two things worth pinning:
- * that no two pages can answer to the same address, and that whatever is written into one has been through the
+ * that no two pages can have the same address, and that whatever is written into one has been through the
  * sanitizer before it is stored.
  *
  * The actions are invoked directly with the current user on the token storage, as the other admin tests do and for
@@ -141,8 +141,8 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A page under an address the application answers to itself would never be reached, since those routes are
-     * matched before the custom-page catch-all sees the request.
+     * A page under an address that is already a route of the application would never be reached, since those routes
+     * are matched before the custom-page catch-all sees the request.
      */
     public function testAnAddressTheWebsiteAlreadyUsesIsRefused(): void
     {
@@ -192,8 +192,8 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
-     * Nothing says where the file belongs, and an image that cannot be told apart from another page's is worse than
-     * an upload that did not happen.
+     * Nothing in the request names where the file belongs, and an image that cannot be told apart from another
+     * page's is worse than an upload that did not happen.
      */
     public function testAnUploadThatNamesNoPageIsRefused(): void
     {
@@ -305,15 +305,15 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The dialog listens for the renderer on the topic of the page it was opened for, and the layout is told to have
-     * the cookie authorize exactly that one.
+     * The dialog listens for the renderer on the topic of the page it was opened for, and the layout is configured
+     * to have the cookie authorize exactly that one.
      */
     public function testTheBrowserListensOnTheTopicOfItsOwnPage(): void
     {
         $this->write();
         $page = $this->written();
 
-        // The topic travels in the hub URL, where it is escaped as a query parameter.
+        // The topic is passed in the hub URL, where it is escaped as a query parameter.
         self::assertStringContainsString(
             'topic=' . urlencode('frontpage/page-images/' . $page->id),
             $this->browser($page),
@@ -473,7 +473,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A refused address step renders itself again rather than the content step, which is what says the flow never
+     * A refused address step renders itself again rather than the content step, which shows that the flow never
      * got past it.
      */
     private function reachedTheContentStep(Response $response): bool

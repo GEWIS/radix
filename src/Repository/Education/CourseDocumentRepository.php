@@ -81,8 +81,8 @@ class CourseDocumentRepository extends ServiceEntityRepository
     }
 
     /**
-     * The queue the education admin leads with: a document nobody can open is the one thing on those pages that needs
-     * somebody to do something.
+     * The queue the education admin leads with: a document that cannot be opened yet is the one thing on those pages
+     * that needs an administrator to act.
      *
      * @return Paginator<CourseDocument>
      */
@@ -98,8 +98,8 @@ class CourseDocumentRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many documents are still on their way to being downloadable. Counted on its own because the tile that shows
-     * it sits next to a paginated table that no longer knows the total.
+     * How many documents are not yet downloadable. Counted on its own because the tile that shows it is next to a
+     * paginated table that no longer knows the total.
      */
     public function countNotReady(): int
     {

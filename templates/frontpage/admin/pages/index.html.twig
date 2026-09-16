@@ -27,8 +27,8 @@
                     {% if pages is empty %}
                         <p class="text-muted mb-0">{{ 'There are no pages yet.'|trans }}</p>
                     {% else %}
-                        {# The pages arrive sorted by address, so a page sits directly under the one it lives beneath
-                           and the depth of its own address is all the indent needs. #}
+                        {# The pages arrive sorted by address, so a page is directly under its parent and the depth
+                           of its own address is all the indent needs. #}
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead>

@@ -14,7 +14,7 @@ use Override;
 use function sprintf;
 
 /**
- * Error for when a budget, a financial statement or a body regulation carries a date later than the meeting that
+ * Error for when a budget, a financial statement or a body regulation has a date later than the meeting that
  * approved it. A meeting can only decide on the version in front of it, so a later date describes a document that did
  * not exist yet.
  *
@@ -23,8 +23,8 @@ use function sprintf;
 class DocumentDatedAfterMeeting extends Error
 {
     /**
-     * Held again beside the parent's, which is every kind of subdecision there is: the two things this error says
-     * about the document are only on these two.
+     * Declared again beside the parent's, which is every kind of subdecision there is: the version and the date this
+     * error reports are only on these two.
      */
     public function __construct(private readonly BudgetModel|OrganRegulationModel $document)
     {

@@ -215,7 +215,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * How many applications each filter would return, so the chips can say so before they are clicked.
+     * How many applications each filter would return, so the chips can show it before they are clicked.
      *
      * @return array<string, int>
      */
@@ -245,7 +245,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
     /**
      * How many applicants a filter would return.
      *
-     * Separate from {@see self::countsForOverview()}, which answers for every filter at once: the dashboard wants one
+     * Separate from {@see self::countsForOverview()}, which counts every filter at once: the dashboard wants one
      * of them and would otherwise pay for four queries to read a single number.
      */
     public function countForFilter(ProspectiveMemberFilter $filter): int
@@ -263,7 +263,7 @@ class ProspectiveMemberRepository extends ServiceEntityRepository
 
     /**
      * Join only the applicant's most recent checkout session, since an applicant who restarted a checkout has several
-     * and only the last one says where they are.
+     * and only the last one records their current state.
      */
     private function applyLatestCheckout(QueryBuilder $qb): void
     {

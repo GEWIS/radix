@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * Wraps every AMQP transport as it is built, rather than naming each of the nine in `services.yaml`. The test
- * environment routes them all to `in-memory://`, which this factory is not asked for, so nothing there is wrapped.
+ * environment routes them all to `in-memory://`, which this factory is not used for, so nothing there is wrapped.
  *
  * @implements TransportFactoryInterface<TransportInterface>
  */

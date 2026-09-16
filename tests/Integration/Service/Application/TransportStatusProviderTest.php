@@ -29,7 +29,7 @@ final class TransportStatusProviderTest extends KernelTestCase
             'name',
         );
 
-        // The bare name, not `messenger.transport.images`, which the locator also answers to.
+        // The bare name, not `messenger.transport.images`, which the locator also accepts.
         self::assertContains(
             'images',
             $names,

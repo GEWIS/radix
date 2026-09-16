@@ -20,7 +20,7 @@ use function sprintf;
  * MariaDB named lock (`GET_LOCK`/`RELEASE_LOCK`) that SQLite cannot provide, so it is pinned against the real
  * database. Covers the full lifecycle: first acquisition, same-holder refresh, the block when another holds an alive
  * lock, the reviewer force take-over, the silent take-over of a stale (un-pinged) lock, the heartbeat, release, the
- * blocking-lock query and the unflushed purge. An activity stands in for the aggregate; the service is agnostic to the
+ * blocking-lock query and the unflushed purge. An activity is used as the aggregate; the service is agnostic to the
  * resource type.
  */
 final class EditLockServiceTest extends DatabaseTestCase
@@ -288,7 +288,7 @@ final class EditLockServiceTest extends DatabaseTestCase
             $other,
         ));
 
-        // A stale lock blocks nobody (it is up for grabs).
+        // A stale lock blocks no principal (any of them may acquire it).
         $this->makeStale($lock);
         self::assertNull($this->service()->blockingLock(
             $resource,

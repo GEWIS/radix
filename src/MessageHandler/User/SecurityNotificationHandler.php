@@ -25,14 +25,14 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use function trim;
 
 /**
- * Tells whoever an account belongs to that something happened to it: in the notification centre, as a toast to whatever
+ * Notifies the owner of an account that something happened to it: in the notification centre, as a toast to whatever
  * they have open, and by email.
  *
  * None of this is something to opt into. It goes out however the member has set their notification preferences,
- * including while they have everything paused, because a message nobody asked for is the whole point of it.
+ * including while they have everything paused, because an unsolicited message is the whole point of it.
  *
  * The notification is published first. Publishing does not throw (a channel that fails is logged and skipped), so the
- * durable record always lands; the mail is then allowed to fail quietly rather than retry. A retry would run this
+ * durable record is always written; the mail is then allowed to fail quietly rather than retry. A retry would run this
  * handler again and leave a second warning in the notification centre, which reads far worse than an email that did
  * not arrive.
  */
@@ -61,7 +61,7 @@ class SecurityNotificationHandler
             $message->getUserIdentifier(),
         );
 
-        // The account is gone, so there is nobody left to tell.
+        // The account is gone, so there is no recipient to notify.
         if (null === $account) {
             return;
         }
@@ -125,8 +125,8 @@ class SecurityNotificationHandler
      * {@see \App\Service\Application\DeviceDescription} handles it: a row reading "Browser: Unknown" tells the reader
      * nothing and makes the rest of them look less trustworthy.
      *
-     * The time is written out the way somebody reads a date, with the zone named, since a notice whose whole purpose
-     * is "was this you at that moment" is worth nothing in a format that has to be decoded first.
+     * The time is written out the way the recipient reads a date, with the zone named, since a notice whose whole
+     * purpose is "was this you at that moment" is worth nothing in a format that has to be decoded first.
      *
      * @param array{browser?: string, system?: string, address?: string, network?: string, location?: string} $origin
      *

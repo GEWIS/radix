@@ -52,8 +52,8 @@ class Annulment
     /**
      * Get the annulments that already annulled the same decision before the given one did.
      *
-     * Only the earlier ones, so that the annulment which did the work is not reported alongside the ones that had
-     * nothing left to take back.
+     * Only the earlier ones, so that the annulment which actually annulled the decision is not reported alongside
+     * the ones that had nothing left to annul.
      *
      * @return AnnulmentModel[]
      */

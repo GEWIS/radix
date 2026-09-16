@@ -30,7 +30,7 @@ class CourseDocumentDownloadRepository extends ServiceEntityRepository
 
     /**
      * Whether or not they were ever collected: a watermark names the moment it was made, so a stale artifact is not
-     * worth keeping around to hand out later.
+     * worth keeping to serve later.
      *
      * @return CourseDocumentDownload[]
      */

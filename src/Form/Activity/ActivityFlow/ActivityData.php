@@ -19,9 +19,9 @@ use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
- * What the activity form asks for. The organ, the company and the labels are identifiers rather than records: this
- * sits in the session between the steps, which a detached entity does not survive. The sign-up lists are edited on
- * the revision itself, on the last step.
+ * What the activity form asks for. The organ, the company and the labels are identifiers rather than records: this is
+ * kept in the session between the steps, which a detached entity does not survive. The sign-up lists are edited on the
+ * revision itself, on the last step.
  */
 final class ActivityData
 {
@@ -197,8 +197,8 @@ final class ActivityData
     }
 
     /**
-     * Once the activity is under way its start is locked and no longer constrains anything, so the end is held to the
-     * present instead: without that it could be moved into the past, which would make the activity immutable.
+     * Once the activity is under way its start is locked and no longer constrains anything, so the end is required to
+     * be in the future instead: without that it could be moved into the past, which would make the activity immutable.
      */
     #[Assert\Callback(groups: [self::STEP_GENERAL])]
     public function validateSchedule(ExecutionContextInterface $context): void

@@ -56,7 +56,7 @@ class WeeklyPhotoRepository extends ServiceEntityRepository
     public function getCurrentPhotoOfTheWeek(): ?WeeklyPhoto
     {
         $qb = $this->createQueryBuilder('w');
-        // Both are read off the pick by the frontpage, and would otherwise be loaded as a query each while the
+        // Both are read from the pick by the frontpage, and would otherwise be loaded as a query each while the
         // page is rendering.
         $qb->addSelect(
             'p',

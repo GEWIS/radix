@@ -28,11 +28,11 @@ class SetRoleDriver extends AbstractDriverMiddleware
         $connection = parent::connect($params);
 
         // `role` is not one of DBAL's own parameters. It survives because DsnParser merges every query parameter it
-        // does not recognise into the connection parameters, and the PostgreSQL driver leaves the ones it cannot
-        // place out of the PDO DSN it builds — the same route `charset` and `sslmode` already travel by.
+        // does not recognise into the connection parameters, and the PostgreSQL driver omits the ones it cannot
+        // place from the PDO DSN it builds, the same way `charset` and `sslmode` are passed through.
         //
         // A DSN without one is left alone: whether a deployment has a role to drop to is its own decision, and
-        // compose.yaml is where production is held to having one.
+        // compose.yaml is where production is required to have one.
         if (
             isset($params['role'])
             && is_string($params['role'])

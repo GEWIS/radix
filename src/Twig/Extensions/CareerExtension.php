@@ -28,10 +28,10 @@ use function min;
 use function shuffle;
 
 /**
- * The navigation menu asks for the counts and the featured company on every page, and the career pages ask for the
- * same things again lower down, so both are answered once per request and remembered. The cache is cleared between
- * requests through {@see ResetInterface}, which matters under FrankenPHP's worker mode where this service outlives a
- * single request and would otherwise serve yesterday's numbers.
+ * The navigation menu needs the counts and the featured company on every page, and the career pages need the same
+ * things again lower down, so both are computed once per request and cached. The cache is cleared between requests
+ * through {@see ResetInterface}, which matters under FrankenPHP's worker mode where this service outlives a single
+ * request and would otherwise serve stale numbers.
  */
 class CareerExtension extends AbstractExtension implements ResetInterface
 {
@@ -110,7 +110,7 @@ class CareerExtension extends AbstractExtension implements ResetInterface
             function (ItemInterface $item): array {
                 $now = new DateTimeImmutable();
 
-                // Expires when a package or a vacancy next starts or ends, so the badge is never behind. A write
+                // Expires when a package or a vacancy next starts or ends, so the badge is never stale. A write
                 // invalidates it outright.
                 $boundaries = array_filter([
                     $this->vacancyRepository->nextActiveBoundaryAfter($now),
@@ -158,7 +158,7 @@ class CareerExtension extends AbstractExtension implements ResetInterface
      * Everything companies with a running highlight package have chosen to put forward, and that is still showable.
      *
      * Shuffled, and cut down to $limit where one is given: the space was sold to each of these companies alike, so
-     * neither the first slot nor making the cut at all may come down to the alphabet.
+     * neither the first slot nor inclusion at all may depend on alphabetical order.
      *
      * @return Vacancy[]
      */

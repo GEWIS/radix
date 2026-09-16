@@ -7,7 +7,7 @@ namespace App\Message\Career;
 use App\Entity\Application\Enums\RevisionStatus;
 
 /**
- * Asynchronously tell a company's representatives what the committee decided. Carries the company and the outcome
+ * Asynchronously tell a company's representatives what the committee decided. Contains the company and the outcome
  * rather than the revision, because by the time this is handled the workflow may already have spawned the next draft
  * and the revision it was about is no longer the one the company is looking at.
  */

@@ -96,7 +96,7 @@ final class UnfinishedSignupListGuardListenerTest extends TestCase
     }
 
     /**
-     * Written in English alone, so a list is asked for an English name and nothing else.
+     * Written in English alone, so a list requires an English name and nothing else.
      */
     private function revision(): ActivityRevision
     {

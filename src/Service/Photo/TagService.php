@@ -17,9 +17,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Creates and removes photo tags. Authorization (who may tag or remove which tag, including the graduate rule) lives in
- * {@see \App\Security\Photo\PhotoVoter} and {@see \App\Security\Photo\TagVoter}; this service only enforces the data
- * rules: the member or organ must exist and must not already be tagged on the photo.
+ * Creates and removes photo tags. Authorization (who may tag or remove which tag, including the graduate rule) is
+ * decided by {@see \App\Security\Photo\PhotoVoter} and {@see \App\Security\Photo\TagVoter}; this service only enforces
+ * the data rules: the member or organ must exist and must not already be tagged on the photo.
  */
 final readonly class TagService
 {

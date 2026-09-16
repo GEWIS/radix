@@ -16,7 +16,7 @@ use function str_starts_with;
 
 /**
  * The Twig helpers build serving URLs: private (album) URLs are day-signed, public ones (covers) are left bare, and a
- * srcset carries each variant's width descriptor.
+ * srcset includes each variant's width descriptor.
  */
 final class ImageExtensionTest extends TestCase
 {

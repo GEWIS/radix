@@ -36,8 +36,8 @@ export interface CkEditorModule {
  * The textarea stays in the DOM as the bound source of truth: the editor's data is written back to it and a bubbling
  * `input` event is fired, so both a Symfony form POST and a Live Component `data-model` binding keep working.
  *
- * `aborted` is asked again after every await, since the controller that started this may have disconnected (or
- * already have an editor) while the bundle was on its way; nothing is left behind when it says so.
+ * `aborted` is checked again after every await, since the controller that started this may have disconnected (or
+ * already have an editor) while the bundle was loading; nothing is left behind when it returns true.
  */
 export async function createEditor(
     textarea: HTMLTextAreaElement,
@@ -71,7 +71,7 @@ export async function createEditor(
 
     editor.model.document.on('change:data', () => {
         textarea.value = editor.getData();
-        // Bubbles past a `data-live-ignore` boundary to the Live Component root, and is carried on form submit.
+        // Bubbles past a `data-live-ignore` boundary to the Live Component root; the value is submitted with the form.
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     });
 

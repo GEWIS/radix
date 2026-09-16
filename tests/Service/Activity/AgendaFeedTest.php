@@ -17,9 +17,9 @@ use function json_encode;
 /**
  * Reading the association's own agenda.
  *
- * Two things this has to get right. A page render must never wait on somebody else's server, so a miss answers with
- * nothing rather than reaching out. And an all-day event comes back ending on the day *after* it finishes, which the
- * option calendar has drawn wrong before: a Friday-only event would take the Saturday off everybody.
+ * Two things this has to get right. A page render must never depend on an external server, so a miss returns nothing
+ * rather than fetching. And an all-day event comes back ending on the day *after* it finishes, which the option
+ * calendar has drawn wrong before: a Friday-only event would also block the Saturday.
  *
  * No database in sight, so a plain unit test with a mocked client and a cache per case.
  */
@@ -192,8 +192,8 @@ final class AgendaFeedTest extends TestCase
     }
 
     /**
-     * A cache of its own per test: the real pool outlives a test, and one test refreshing the agenda would decide
-     * what the next one sees.
+     * A cache of its own per test: the real pool persists between tests, and one test refreshing the agenda would
+     * affect what the next one sees.
      */
     private function cache(): CacheItemPoolInterface
     {

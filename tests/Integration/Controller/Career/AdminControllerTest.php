@@ -26,7 +26,7 @@ final class AdminControllerTest extends DatabaseTestCase
 {
     /**
      * A company out of contract is invisible to the public but must still be findable here, which is exactly when
-     * somebody needs it. Searching and paging through the list is the component's job; see
+     * the committee needs it. Searching and paging through the list is the component's job; see
      * {@see \App\Tests\Integration\LiveComponent\Career\Admin\CompanyOverviewTest}.
      */
     public function testTheOverviewShowsCompaniesThePublicCannotSee(): void
@@ -155,8 +155,8 @@ final class AdminControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The review feedback sits beside the form, so with nothing to show the form takes the full width rather than
-     * leaving a gap where the panel would have been.
+     * The review feedback is rendered beside the form, so with nothing to show the form takes the full width rather
+     * than leaving a gap where the panel would have been.
      */
     public function testTheEditFormOnlyMakesRoomForFeedbackWhenThereIsSome(): void
     {

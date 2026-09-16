@@ -16,7 +16,7 @@ use function in_array;
 class Organ
 {
     /**
-     * The organs of the meeting most recently asked about, for the same reason as in {@see Installation}.
+     * The organs of the meeting most recently queried, for the same reason as in {@see Installation}.
      *
      * @var array<string, FoundationModel>|null
      */
@@ -41,7 +41,7 @@ class Organ
     /**
      * Get the organs that exist after $meeting, by hash.
      *
-     * Where {@see self::getAllOrgans()} hands back the hashes on their own, this keeps the foundations themselves, so
+     * Where {@see self::getAllOrgans()} returns the hashes on their own, this keeps the foundations themselves, so
      * that what a decision says about an organ can still be read.
      *
      * @return array<string, FoundationModel>

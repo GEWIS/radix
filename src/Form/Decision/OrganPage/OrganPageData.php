@@ -13,8 +13,8 @@ use function Symfony\Component\Translation\t;
 use function trim;
 
 /**
- * What a body writes about itself on one revision of its page. The two images are not here: they are files, which
- * only the controller can store, and they are asked for on the last step so they never travel through the session.
+ * What a body writes about itself on one revision of its page. The two images are not here: they are files, which only
+ * the controller can store, and they are collected on the last step so they are never passed through the session.
  */
 final class OrganPageData
 {
@@ -24,7 +24,7 @@ final class OrganPageData
     public const string STEP_CONTACT = 'contact';
     public const string STEP_IMAGES = 'images';
 
-    /** A card has room for a line or two, and a card that ran on would break the grid it sits in. */
+    /** A card has room for a line or two, and a card that ran on would break the grid it is in. */
     public const int SHORT_DESCRIPTION_MAXIMUM = 150;
 
     public const int DESCRIPTION_MAXIMUM = 10000;
@@ -85,7 +85,7 @@ final class OrganPageData
         $data->socialLinks = $revision->getSocialHandles();
 
         // A body that already wrote something in a language keeps that language on, or opening the form would
-        // silently offer to drop half of a page. One nobody has written yet starts with both on.
+        // silently offer to drop half of a page. A page that has not been written yet starts with both on.
         $dutch = null !== $data->shortDescriptionNL || null !== $data->descriptionNL;
         $english = null !== $data->shortDescriptionEN || null !== $data->descriptionEN;
 

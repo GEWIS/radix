@@ -18,12 +18,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * Writing a company's draft, from either surface: the committee's admin screens and the company's own portal both
  * reach this, because what is saved and in what order does not depend on who is looking at it.
  *
- * Storing the logos, stamping who edited, committing and letting go of the edit lock are one operation. They only look
- * like four because they used to be sequenced by a controller: a save that commits but leaves the lock standing blocks
+ * Storing the logos, recording who edited, committing and releasing the edit lock are one operation. They only look
+ * like four because they used to be sequenced by a controller: a save that commits but does not release the lock blocks
  * the author out of their own draft until the lock's TTL lapses.
  *
  * A logo that could not be stored does not cost the author their text. The rest of the edit is saved and the previous
- * logo stays in use, which is what these methods report back so they can be told.
+ * logo stays in use, which is what these methods return so the author can be notified.
  */
 final readonly class CompanyDraftService
 {
@@ -74,7 +74,7 @@ final readonly class CompanyDraftService
     }
 
     /**
-     * Save an edit to a draft. Reports whether every logo it was handed was stored; false means at least one was
+     * Save an edit to a draft. Reports whether every logo it was passed was stored; false means at least one was
      * refused and the profile still shows the previous one.
      */
     public function saveDraft(
@@ -110,8 +110,8 @@ final readonly class CompanyDraftService
     }
 
     /**
-     * Put whichever logos were handed in onto the draft, leaving the previous one in place where an upload was
-     * refused. Reports whether all of them were kept.
+     * Put whichever logos were passed in onto the draft, leaving the previous one in place where an upload was refused.
+     * Reports whether all of them were kept.
      */
     private function applyLogos(
         Company $company,

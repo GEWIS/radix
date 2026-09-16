@@ -76,7 +76,7 @@ final class SignupOverview
     public Activity $activity;
 
     /**
-     * The ticked signup ids, held as one flat set. Signup ids are globally unique, so this maps back to lists
+     * The ticked signup ids, stored as one flat set. Signup ids are globally unique, so this maps back to lists
      * unambiguously and every operation on it (the per-list "Selected" count, the email recipients, selectAll() and
      * clearSelection()) is scoped to a single sign-up list; there is no cross-list selection. Checkbox hydration
      * delivers the ids as strings while selectAll() pushes ints, so the type is mixed; read them normalised via
@@ -116,7 +116,7 @@ final class SignupOverview
     )]
     public ?int $activeListId = null;
 
-    // The backing value of a SignupFilter; held as a string so it survives hydration whatever the enum does.
+    // The backing value of a SignupFilter; stored as a string so it survives hydration whatever the enum does.
     #[LiveProp(
         writable: true,
         url: true,
@@ -137,7 +137,7 @@ final class SignupOverview
     #[LiveProp(writable: true)]
     public bool $composerOpen = false;
 
-    // Held as the backing string and converted to a RecipientScope; avoids relying on enum-prop hydration.
+    // Stored as the backing string and converted to a RecipientScope; avoids relying on enum-prop hydration.
     #[LiveProp(writable: true)]
     public string $scope = RecipientScope::All->value;
 
@@ -280,7 +280,7 @@ final class SignupOverview
     }
 
     /**
-     * Every list of the activity each person is in, so a row can say where else they are.
+     * Every list of the activity each person is in, so a row can show where else they are.
      *
      * @return array<string, list<array{listId: int, name: string, waiting: bool}>>
      */
@@ -639,7 +639,7 @@ final class SignupOverview
     }
 
     /**
-     * Where a reply lands: the organising body's public address, or Internal Affairs when it has none.
+     * Where a reply is sent: the organising body's public address, or Internal Affairs when it has none.
      */
     private function replyTo(): string
     {
@@ -677,7 +677,7 @@ final class SignupOverview
 
     /**
      * The recipients of a message to everybody on the activity: one address per person, whatever the number of
-     * lists they are in, since the same practical mail twice reads as a mistake.
+     * lists they are in, since the same practical mail twice looks like a mistake.
      *
      * @return list<array{email: string, name: string, external: bool, signup: Signup}>
      */
@@ -895,7 +895,7 @@ final class SignupOverview
     }
 
     /**
-     * Shared draw runner (board only): look up the owned list and hand it to the {@see DrawManager}, which checks the
+     * Shared draw runner (board only): look up the owned list and pass it to the {@see DrawManager}, which checks the
      * draw may run for the given method, admits up to capacity (shuffled for a lottery) and locks it. Confirmed
      * client-side by a Bootstrap modal (see the `confirm-modal` Stimulus controller); re-checked server-side because
      * a live action is independent of the page that rendered it.
@@ -1209,7 +1209,7 @@ final class SignupOverview
         $this->assertAccess();
 
         $this->composerOpen = true;
-        // A hand-picked group is what somebody who ticked rows first came for.
+        // A hand-picked group is what the organiser who ticked rows wants.
         $fallback = [] === $this->selectedIds()
             ? RecipientScope::All
             : RecipientScope::Selected;
@@ -1532,15 +1532,15 @@ final class SignupOverview
     ): void {
         // Always render the activity name in English: the email's boilerplate is English regardless of the composing
         // organiser's locale (see OrganiserAnnouncementEmail), falling back to Dutch only when there is no English
-        // name. A cancelled activity carries the (English) [CANCELLED] marker so recipients see it at a glance.
+        // name. A cancelled activity has the (English) [CANCELLED] marker so recipients see it at a glance.
         $activityName = $this->activity->getName()->getText(Languages::English) ?? '';
         if ($this->activity->isCancelled()) {
             $activityName = '[CANCELLED] ' . $activityName;
         }
 
-        // One message carrying every recipient: a single, atomic enqueue (never a half-enqueued per-recipient fan-out).
-        // The handler sends one email per recipient and tolerates an individual failure, so there is no duplicate
-        // re-send on retry either.
+        // One message containing every recipient: a single, atomic enqueue (never a half-enqueued per-recipient
+        // fan-out). The handler sends one email per recipient and tolerates an individual failure, so there is no
+        // duplicate re-send on retry either.
         $this->messageBus->dispatch(
             new OrganiserAnnouncementEmail(
                 $subject,
@@ -1553,7 +1553,7 @@ final class SignupOverview
     }
 
     /**
-     * Resolve the concrete recipients of a bulk email for a list, by scope. External and member sign-ups alike carry
+     * Resolve the concrete recipients of a bulk email for a list, by scope. External and member sign-ups alike have
      * an email; any without one is skipped.
      *
      * @return list<array{email: string, name: string, external: bool, signup: Signup}>
@@ -1562,7 +1562,7 @@ final class SignupOverview
         SignupList $signupList,
         RecipientScope $scope,
     ): array {
-        // Normalise once: the $selected LiveProp holds checkbox-supplied strings, while getId() is an int.
+        // Normalise once: the $selected LiveProp contains checkbox-supplied strings, while getId() is an int.
         $selected = $this->selectedIds();
         $recipients = [];
         foreach ($this->confirmedSignups($signupList) as $signup) {

@@ -9,8 +9,8 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The point-in-image position guard lives on the {@see \App\Entity\Photo\Tag} base and is pure logic, so it is verified
- * without a database. A concrete {@see MemberTag} stands in for the abstract base.
+ * The point-in-image position guard is defined on the {@see \App\Entity\Photo\Tag} base and is pure logic, so it is
+ * verified without a database. A concrete {@see MemberTag} is used in place of the abstract base.
  */
 final class TagPositionTest extends TestCase
 {

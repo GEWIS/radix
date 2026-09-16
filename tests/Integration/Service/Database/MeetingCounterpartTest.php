@@ -70,7 +70,7 @@ class MeetingCounterpartTest extends KernelTestCase
     }
 
     /**
-     * The reference sits on the virtual decision precisely so that one decision can be said again more than once.
+     * The reference is on the virtual decision precisely so that one decision can be repeated more than once.
      */
     public function testADecisionIsRepeatedByMoreThanOneVirtualDecision(): void
     {
@@ -125,7 +125,7 @@ class MeetingCounterpartTest extends KernelTestCase
     }
 
     /**
-     * A virtual decision that is already somebody's counterpart is spoken for, so it is not offered again.
+     * A virtual decision that is already another decision's counterpart is taken, so it is not offered again.
      */
     public function testTheLookupLeavesOutAVirtualDecisionThatIsAlreadyACounterpart(): void
     {
@@ -175,7 +175,7 @@ class MeetingCounterpartTest extends KernelTestCase
     }
 
     /**
-     * A decision of a virtual meeting is not one that is repeated: a chain of them says nothing.
+     * A decision of a virtual meeting is not one that is repeated: a chain of them has no meaning.
      */
     public function testRefusesToRepeatAVirtualDecision(): void
     {

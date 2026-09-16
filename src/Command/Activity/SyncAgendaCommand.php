@@ -19,13 +19,14 @@ use function sprintf;
 
 /**
  * Keeps a copy of the association's own agenda, so the option calendar can show the days that are already taken by
- * something the website does not hold itself.
+ * something the website does not store itself.
  *
- * This is the only place that agenda is ever fetched. A page render reads the copy and nothing else, so a reader
- * never waits on somebody else's server, and an agenda that is down costs the calendar a layer rather than a page.
+ * This is the only place that agenda is ever fetched. A page render reads the copy and nothing else, so a page
+ * request never depends on an external server, and an agenda that is down costs the calendar a layer rather than a
+ * page.
  *
- * A failed run says so and changes nothing: the copy that is already kept is a great deal more use than none, and
- * the next run is a quarter of an hour away.
+ * A failed run logs a warning and changes nothing: the copy that is already kept is more useful than none, and the
+ * next run is a quarter of an hour away.
  */
 #[AsCommand(
     name: 'app:activity:sync-agenda',

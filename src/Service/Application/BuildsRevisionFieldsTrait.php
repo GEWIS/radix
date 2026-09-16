@@ -26,8 +26,8 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 trait BuildsRevisionFieldsTrait
 {
     /**
-     * A field the author fills in per language, laid out in the language columns. A null `new` is the thing the
-     * field belongs to having been taken away, not the author having emptied it.
+     * A field the author fills in per language, laid out in the language columns. A null `new` means the entity the
+     * field belongs to was removed, not that the author emptied it.
      *
      * @param array<string, string> $options
      */
@@ -119,7 +119,7 @@ trait BuildsRevisionFieldsTrait
     }
 
     /**
-     * A field the revision holds once, laid out in a row of its own.
+     * A field written once for the revision, laid out in a row of its own.
      *
      * @param string|bool|TranslatableInterface|RevisionDateRange|DateTimeInterface|RevisionValueSet|null $old
      * @param string|bool|TranslatableInterface|RevisionDateRange|DateTimeInterface|RevisionValueSet|null $new

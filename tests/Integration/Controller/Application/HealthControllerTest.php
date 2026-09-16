@@ -12,8 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * `/health` opens both connections on every request, so an outage turns each one into two connect timeouts holding
- * a FrankenPHP worker thread. It answers the container's own probe and nothing else, and this is what says so.
+ * `/health` opens both connections on every request, so an outage turns each one into two connect timeouts occupying
+ * a FrankenPHP worker thread. It serves the container's own probe and nothing else, which is what these tests check.
  */
 #[CoversClass(HealthController::class)]
 final class HealthControllerTest extends KernelTestCase
@@ -43,8 +43,8 @@ final class HealthControllerTest extends KernelTestCase
             false,
         ];
 
-        // getClientIp() would believe this header; REMOTE_ADDR is read precisely so that nothing can claim to be
-        // the loopback that is not on it.
+        // getClientIp() would use this header; REMOTE_ADDR is read precisely so that a request from outside the
+        // loopback cannot claim to come from it.
         yield 'a visitor claiming to be the probe' => [
             [
                 'REMOTE_ADDR' => '203.0.113.9',

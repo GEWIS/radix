@@ -75,7 +75,7 @@ class Renewal
                 'isInstalled' => $isInstalled,
                 'currentExpiration' => $link->currentExpiration,
                 'newExpiration' => $link->newExpiration,
-                // The message is in English, so ask for the English page rather than whatever the router holds.
+                // The message is in English, so the locale is set explicitly rather than left to the router.
                 'url' => $this->urlGenerator->generate(
                     'join_renew',
                     [

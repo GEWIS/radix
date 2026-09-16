@@ -10,7 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for the {@see Tag} single-table-inheritance root. Handles queries that span both tag subtypes; member- and
- * organ-specific queries live on {@see MemberTagRepository} and {@see OrganTagRepository}.
+ * organ-specific queries are defined on {@see MemberTagRepository} and {@see OrganTagRepository}.
  *
  * @extends ServiceEntityRepository<Tag>
  */

@@ -36,7 +36,7 @@ use function usort;
 
 /**
  * What companies have bought: an overview of what is about to run out or start, the packages of one company, and the
- * banner of a package, both the one on the site and whatever is waiting to be taken or left.
+ * banner of a package, both the one on the site and the one waiting to be approved or rejected.
  */
 #[IsGranted(
     attribute: UserRoles::CompanyAdmin->value,
@@ -93,8 +93,8 @@ class AdminPackageController extends AbstractController
             }
         }
 
-        // Each kind of package is asked for separately, so the lists arrive grouped by kind rather than by date; what
-        // the overview is for is what happens next.
+        // Each kind of package is queried separately, so the lists are grouped by kind rather than by date, while the
+        // overview is about what happens next.
         usort(
             $expiring,
             static function (
@@ -347,7 +347,7 @@ class AdminPackageController extends AbstractController
     }
 
     /**
-     * A banner shows across the whole site, so taking one is a reviewer action, the same as every decision on a
+     * A banner shows across the whole site, so approving one is a reviewer action, the same as every decision on a
      * revision is.
      */
     #[Route(
@@ -367,7 +367,7 @@ class AdminPackageController extends AbstractController
     ): Response {
         $banner = $this->requirePendingBanner($package);
 
-        // The banner it replaced is no longer referenced by anything, so the bytes can go.
+        // The banner it replaced is no longer referenced by anything, so the file can be deleted.
         $this->packageService->settleBanner(
             $banner,
             $user,
@@ -400,7 +400,7 @@ class AdminPackageController extends AbstractController
     ): Response {
         $banner = $this->requirePendingBanner($package);
 
-        // Nothing points at the rejected proposal any more, so reclaim it rather than leave it lying around.
+        // Nothing points at the rejected proposal any more, so the file is deleted rather than kept.
         $this->packageService->settleBanner(
             $banner,
             $user,

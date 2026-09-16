@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
  * A tag identifying a member who appears in a photo. This is the GDPR-relevant tag subtype: the member's personal data
- * export walks these (never {@see OrganTag}s).
+ * export covers these (never {@see OrganTag}s).
  *
  * @phpstan-import-type PhotoGdprArrayType from Photo as ImportedPhotoGdprArrayType
  * @phpstan-type MemberTagGdprArrayType = array{
@@ -27,7 +27,7 @@ class MemberTag extends Tag
      * The tagged member. The join column is nullable at the database level only so that {@see OrganTag} rows (which
      * have no member) coexist in the single table; a MemberTag always has a member. Two things keep that true, and
      * the typed property therefore safe to read: {@see \App\Service\Photo\TagService::addMemberTag()} is the only
-     * place a MemberTag is built and it never leaves the member unset, and the cascade below takes the tag with the
+     * place a MemberTag is built and it never leaves the member unset, and the cascade below removes the tag with the
      * member rather than leaving a row behind that hydrates into an uninitialised property.
      */
     #[ManyToOne(

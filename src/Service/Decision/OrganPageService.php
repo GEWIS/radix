@@ -19,8 +19,8 @@ use function is_array;
 /**
  * Writing the page a body keeps about itself.
  *
- * Saving an edit and letting go of the edit lock are one operation rather than two: a save that commits but leaves the
- * lock standing blocks the author out of their own draft until the lock's TTL lapses.
+ * Saving an edit and releasing the edit lock are one operation rather than two: a save that commits but leaves the lock
+ * in place blocks the author out of their own draft until the lock's TTL lapses.
  *
  * A body that has no page yet gets one and its first draft together, because a page with no revision is a row nothing
  * can render and nothing can edit.
@@ -36,8 +36,8 @@ final readonly class OrganPageService
     }
 
     /**
-     * Put whichever images were handed in onto the draft, and crop the ones that were framed. Reports whether every
-     * one of them was kept; a refusal leaves the previous image in place rather than costing the author their text.
+     * Put whichever images were uploaded onto the draft, and crop the ones that were framed. Reports whether every one
+     * of them was kept; a refusal leaves the previous image in place rather than costing the author their text.
      */
     public function applyImages(
         OrganInformationRevision $revision,

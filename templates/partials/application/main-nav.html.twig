@@ -36,7 +36,7 @@
 
 {% import _self as menu %}
 
-{# Asked for rather than assumed, so an account class that answers to neither accessor cannot fatal the navigation. #}
+{# Checked rather than assumed, so an account class that has neither accessor cannot fatal the navigation. #}
 {% set user_type = null !== app.user and app.user.userType is defined ? app.user.userType : null %}
 
 <nav class="navbar navbar-expand navbar-gewis{{ is_granted('ROLE_BOARD') and not cosmetics_disabled() ? ' navbar-rainbow' : '' }}">
@@ -355,7 +355,7 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-members-text">
                             {{ menu.item(path('user_login'), 'fa-right-to-bracket', 'Login'|trans) }}
-                            {# The sign-up form is locale-less and answers on this host as well as on the sign-up
+                            {# The sign-up form is locale-less and is served on this host as well as on the sign-up
                                host, so there is no reason to send a visitor across to that name to reach it. #}
                             {{ menu.item(
                                 path('join_index'),
@@ -411,7 +411,7 @@
                             <li><hr class="dropdown-divider"></li>
                             {{ menu.item(path('members/me'), 'fa-id-card', 'My Information'|trans) }}
                             {{ menu.item(path('user_token', {app: 'sudosos'}), 'fa-beer-mug-empty', 'SudoSOS'|trans) }}
-                            {# The register's roles are named because they are held on their own: somebody who keeps
+                            {# The register's roles are named because they are granted on their own: a user who keeps
                                the register is not otherwise an active member of anything, and would have no way in. #}
                             {% if
                                 is_granted('ROLE_ACTIVE_MEMBER') or
@@ -430,7 +430,7 @@
                     <div class="vr d-flex h-100 mx-2 text-white"></div>
                 </li>
                 {# A sign-in still waiting on its second factor already has the member on the token, so the bell has to
-                   ask whether that sign-in finished rather than whether there is a user. #}
+                   check whether that sign-in finished rather than whether there is a user. #}
                 {% if
                     is_granted('IS_AUTHENTICATED_REMEMBERED') and
                     enum('App\\Entity\\User\\Enums\\UserTypes').User == user_type

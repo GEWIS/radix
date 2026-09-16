@@ -14,8 +14,8 @@ use App\Entity\Decision\Member;
  * Builds a blank activity draft: the four localised texts and the fields the mapping insists on, and nothing else.
  *
  * Two things start an activity off, the create form and a day being reserved in the option calendar, and both have to
- * hand the revision workflow the same shape. It lives here rather than in either of them so a third caller cannot get
- * it subtly wrong.
+ * pass the revision workflow the same shape. It is defined here rather than in either of them so a third caller cannot
+ * get it subtly wrong.
  */
 final readonly class ActivityDraftFactory
 {
@@ -44,8 +44,8 @@ final readonly class ActivityDraftFactory
     {
         $activity = new Activity();
 
-        // A proposal can outlive the member who handed it in, and the day the body reserved is still the body's to
-        // use, so the activity is created either way and simply carries no organiser.
+        // A proposal can outlive the member who submitted it, and the day the body reserved is still the body's to use,
+        // so the activity is created either way and simply has no organiser.
         if (null !== $creator) {
             $activity->setCreator($creator);
         }

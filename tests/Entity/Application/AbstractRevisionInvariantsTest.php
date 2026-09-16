@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  * AbstractRevision's shared workflow fields, exercised through the concrete ActivityRevision. The single-actor
  * invariant is deliberately asymmetric: a revision may be authored (or last edited) by EITHER a member or a company
  * user, or by neither (before either is assigned); only being claimed by BOTH at once is forbidden, which the setters
- * rule out by handing the revision over. The display helpers fall back member -> company -> '' for the author, and
+ * rule out by clearing the other side. The display helpers fall back member -> company -> '' for the author, and
  * member -> company -> null for the last editor.
  */
 final class AbstractRevisionInvariantsTest extends TestCase

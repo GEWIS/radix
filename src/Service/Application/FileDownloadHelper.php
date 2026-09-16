@@ -18,7 +18,7 @@ use function is_file;
  * download filename (the original name, kept in the DB, not the content-addressed storage name). Reusable across photo
  * downloads and future PDF endpoints (meeting documents, exams).
  *
- * On local storage the file is handed to Caddy via X-Sendfile (a {@see BinaryFileResponse}); on a non-local adapter the
+ * On local storage the file is passed to Caddy via X-Sendfile (a {@see BinaryFileResponse}); on a non-local adapter the
  * bytes are streamed.
  */
 final readonly class FileDownloadHelper

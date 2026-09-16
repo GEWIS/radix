@@ -11,10 +11,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 /**
- * Taking an image somebody uploaded into storage and queueing the sizes the pages will ask for, which is the same three
+ * Taking an image a user uploaded into storage and queueing the sizes the pages will request, which is the same three
  * steps whatever the image is for: store, queue, and on any failure reclaim whatever this call freshly wrote.
  *
- * A subclass only says which namespace, scope and {@see ImageProfile} its images belong to, and decides what the
+ * A subclass only declares which namespace, scope and {@see ImageProfile} its images belong to, and decides what the
  * returned path becomes. Nothing here publishes anything: a path on a draft revision still has to get through review.
  */
 abstract readonly class AbstractImageUploadService

@@ -107,7 +107,7 @@ class CompanyInviteController extends AbstractController
             return $this->redirectToRoute('company_user_login');
         }
 
-        // They have just proven they hold the address and chosen a password, so sending them to a login form to type
+        // They have just proven they control the address and chosen a password, so sending them to a login form to type
         // it again establishes nothing. Signing in programmatically skips the remember-me handler that a form login
         // goes through, and a session without its managed-session row is torn down again on the very next request, so
         // the cookie is minted here by hand.

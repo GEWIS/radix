@@ -21,9 +21,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * The projection is a copy of the ledger kept on the web connection, and it is what every page and every API
- * response about a member or a body is built from — the ledger itself is read by almost nothing. What the listeners
- * write as the ledger is written is therefore not an internal detail: it is what the rest of the application sees.
+ * The projection is a copy of the ledger kept on the web connection, and it is what every page and every API response
+ * about a member or a body is built from. The ledger itself is read by almost nothing. What the listeners write as the
+ * ledger is written is therefore not an internal detail: it is what the rest of the application sees.
  */
 #[CoversClass(DatabaseUpdateListener::class)]
 #[CoversClass(DatabaseDeletionListener::class)]
@@ -69,7 +69,7 @@ class ProjectionTest extends KernelTestCase
 
     /**
      * The study is only recorded in the ledger, so the website can only order sign-ups by program if the projection
-     * carries it along.
+     * stores it too.
      */
     public function testWritingAMemberWritesTheirStudy(): void
     {
@@ -146,7 +146,7 @@ class ProjectionTest extends KernelTestCase
     }
 
     /**
-     * The membership of a body, which is what the API hands out and what a member's page shows.
+     * The membership of a body, which is what the API returns and what a member's page shows.
      */
     public function testInstallingSomeoneDerivesTheirOrganMembership(): void
     {

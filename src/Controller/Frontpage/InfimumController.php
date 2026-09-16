@@ -12,11 +12,11 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * The infimum, asked for by the page after it has been drawn rather than while it is being drawn. It comes from the
- * Supremum's own API, and the footer is on every page of this website: fetched inline, somebody else's slow morning
- * would be a slow morning here.
+ * The infimum, requested by the page after it has been rendered rather than while it is being rendered. It comes
+ * from the Supremum's own API, and the footer is on every page of this website: fetched inline, a slow response from
+ * an external server would slow down every page here.
  *
- * The cron keeps the cache filled, so this usually answers from it; a cold cache fetches once, off the render path.
+ * The cron keeps the cache filled, so this is usually served from it; a cold cache fetches once, off the render path.
  */
 #[IsGranted(UserRoles::User->value)]
 class InfimumController extends AbstractController

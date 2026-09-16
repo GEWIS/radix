@@ -18,8 +18,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * One member's response to a poll comment. Who reacted is kept only so the member can take it back or change it, and to
- * hold them to one reaction per comment; the website shows nothing but the counts.
+ * One member's response to a poll comment. Who reacted is kept only so the member can remove it or change it, and to
+ * limit them to one reaction per comment; the website shows nothing but the counts.
  *
  * The member is dropped when the poll's votes are anonymised, which leaves the count intact and the reaction anonymous.
  */

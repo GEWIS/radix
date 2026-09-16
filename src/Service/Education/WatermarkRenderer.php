@@ -36,7 +36,7 @@ final readonly class WatermarkRenderer
     /** The share of the page width the footer line is drawn across. */
     private const float FOOTER_COVERAGE = 0.95;
 
-    /** How far down the page the footer line sits. */
+    /** How far down the page the footer line is drawn. */
     private const float FOOTER_POSITION = 0.94;
 
     /**

@@ -21,12 +21,12 @@ use function sprintf;
  * Turns a reserved day into the activity it is meant to become.
  *
  * The whole point of connecting the two. A body that has just been given a day would otherwise have to go to another
- * screen and type its own proposal in again; instead the activity is already there as a draft, carrying the body, the
+ * screen and type its own proposal in again; instead the activity is already there as a draft with the body, the
  * working title, the description and the days, and the body finishes it through the ordinary revision workflow. It is
  * also what the budget reminder measures against.
  *
- * The days carry no clock time, because the calendar reserves days rather than hours, so the draft opens at midnight
- * and the schedule is the first thing left to fill in. Inventing a time from "evening" would be making data up.
+ * The days have no clock time, because the calendar reserves days rather than hours, so the draft opens at midnight
+ * and the schedule is the first thing left to fill in. Creating a time from "evening" would be making data up.
  */
 #[AsEventListener(event: 'workflow.activity_proposal.entered.scheduled')]
 final readonly class SeedActivityFromProposalListener
@@ -51,14 +51,14 @@ final readonly class SeedActivityFromProposalListener
 
         $chosen = $proposal->chosenOption;
 
-        // Scheduling without a day picked is meaningless; whoever applied the transition owes us one.
+        // Scheduling without a day picked is meaningless; the caller that applied the transition must set one.
         if (null === $chosen) {
             return;
         }
 
-        // The statuses are settled here rather than by whoever applied the transition, so a day reserved from the
-        // queue, from a script or from a test all end up in the same state: the chosen day held, every other day the
-        // body asked for released for whoever is next in line.
+        // The statuses are settled here rather than by the caller that applied the transition, so a day reserved from
+        // the queue, from a script or from a test all end up in the same state: the chosen day reserved, every other
+        // day the body requested released for the next proposal in line.
         $proposal->declineDateOptionsOtherThan($chosen);
         $chosen->status = DateOptionStatus::Approved;
 

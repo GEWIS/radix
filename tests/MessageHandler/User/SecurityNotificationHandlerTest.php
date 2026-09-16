@@ -125,7 +125,7 @@ final class SecurityNotificationHandlerTest extends TestCase
     }
 
     /**
-     * The sentence says what happened and the block below it says where from, each fact on its own line. Somebody
+     * The sentence says what happened and the block below it says where from, each fact on its own line. A user
      * deciding whether a sign-in was theirs reads a browser and an address, not a paragraph.
      */
     public function testTheEmailSetsOutWhereItHappenedAsLabelledFacts(): void
@@ -183,7 +183,7 @@ final class SecurityNotificationHandlerTest extends TestCase
     }
 
     /**
-     * A reset is the answer whatever was changed, and the same answer every time. It is the only thing that still
+     * A reset is the remedy whatever was changed, and the same remedy every time. It is the only thing that still
      * works once a password has been changed (every session is gone and the security page asks for the password
      * again), and it doubles as signing everyone else out, since changing a password invalidates every session.
      */
@@ -247,7 +247,7 @@ final class SecurityNotificationHandlerTest extends TestCase
     }
 
     /**
-     * There is nobody left to tell, and a notification cannot be addressed to an account that has gone.
+     * There is no user left to notify, and a notification cannot be addressed to an account that has gone.
      */
     public function testAnAccountThatNoLongerExistsIsNotNotifiedAtAll(): void
     {

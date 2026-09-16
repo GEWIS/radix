@@ -28,9 +28,9 @@ use function time;
 /**
  * The serving security matrix, invoked directly (the codebase has no WebTestCase). Private album originals require a
  * valid day-signature and an authenticated session; public namespaces (covers) are served unsigned and immutably
- * cacheable. A miss on an existing original queues one generation message and answers 503, and only a missing
- * original is a 404. Storage is the in-memory adapter, so responses stream rather than X-Sendfile,
- * which does not affect the status/headers under test.
+ * cacheable. A miss on an existing original queues one generation message and returns 503, and only a missing
+ * original is a 404. Storage is the in-memory adapter, so responses stream rather than X-Sendfile, which does not
+ * affect the status/headers under test.
  */
 final class ImageControllerTest extends DatabaseTestCase
 {
@@ -227,7 +227,9 @@ final class ImageControllerTest extends DatabaseTestCase
         );
     }
 
-    /** The app cache is filesystem-backed under test and the path is content-addressed, so the marker outlives a run. */
+    /**
+     * The app cache is filesystem-backed under test and the path is content-addressed, so the marker outlives a run.
+     */
     private function forgetPendingMarker(string $path): void
     {
         $pool = self::getContainer()->get('cache.app');

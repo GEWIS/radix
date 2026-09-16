@@ -65,7 +65,7 @@ class NewsItemRepository extends ServiceEntityRepository
 
     /**
      * The archive, newest first, narrowed by the reader's filters. Nothing is pinned to the top here: the archive is
-     * read by date, and an item held above the months it belongs to would sit under the wrong one.
+     * read by date, and an item pinned above the months it belongs to would appear under the wrong one.
      *
      * @return Paginator<NewsItem>
      */
@@ -112,7 +112,7 @@ class NewsItemRepository extends ServiceEntityRepository
                 ? 'valueNL'
                 : 'valueEN';
             // Only the language being read in is searched: an item found on words the reader cannot see on the page
-            // reads as a result that does not match.
+            // appears not to match at all.
             $builder->leftJoin(
                 'newsItem.title',
                 'title',

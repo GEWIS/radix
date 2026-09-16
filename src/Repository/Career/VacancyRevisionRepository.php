@@ -35,7 +35,7 @@ class VacancyRevisionRepository extends ServiceEntityRepository
      */
     public function findForReview(): array
     {
-        // The queue says who put each one forward, which is either a member or a representative, and what is live
+        // The queue shows who put each one forward, which is either a member or a representative, and what is live
         // while it waits.
         $builder = $this->createQueryBuilder('r')
             ->addSelect(
@@ -84,7 +84,7 @@ class VacancyRevisionRepository extends ServiceEntityRepository
 
         $this->whereAwaitingReview($builder);
 
-        // A vacancy belongs to a company through the package it was posted under, so the count hops over that.
+        // A vacancy belongs to a company through the package it was posted under, so the count joins through it.
         $builder->join(
             'r.vacancy',
             'v',

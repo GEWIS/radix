@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AuditEntryRowTest extends TestCase
 {
     /**
-     * An audit entry's format string is the entity's own and carries markup, so the template prints the composed
+     * An audit entry's format string is the entity's own and contains markup, so the template prints the composed
      * result unescaped. Its arguments are not: an AuditNote's include the free text a secretary typed.
      */
     public function testEscapesArgumentsButKeepsTheFormatStringsMarkup(): void

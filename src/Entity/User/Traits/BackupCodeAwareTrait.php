@@ -27,14 +27,15 @@ use const JSON_THROW_ON_ERROR;
  *
  * Application code goes through {@see getBackupCodeSlots()} / {@see setBackupCodeSlots()} instead. Those handle the
  * JSON (de)serialization of the `{code, used}` slot array. We tried `#[Encrypted(type: 'json'|'array')]` and
- * `encrypted_json` first; both fight the typed-property model in different ways, hence the manual round-trip is needed.
+ * `encrypted_json` first; both conflict with the typed-property model in different ways, hence the manual
+ * round-trip is needed.
  */
 trait BackupCodeAwareTrait
 {
     /**
      * Persisted form: JSON-encoded array of `{code: string, used: bool}` slots, encrypted at rest by ambta.
      *
-     * Spent slots are kept (not removed) so verification time stays independent of how many codes a user has burned.
+     * Spent slots are kept (not removed) so verification time stays independent of how many codes a user has used.
      */
     #[Column(
         type: Types::TEXT,

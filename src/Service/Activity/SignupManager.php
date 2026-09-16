@@ -266,7 +266,7 @@ final readonly class SignupManager
             return;
         }
 
-        // A pending sign-up only ever holds Verify tokens, so dropping them all and issuing a fresh one is safe.
+        // A pending sign-up only ever has Verify tokens, so dropping them all and issuing a fresh one is safe.
         $this->verificationRepository->deleteAllForSignup($signup);
         $token = $this->issueToken(
             $signup,
@@ -292,9 +292,9 @@ final readonly class SignupManager
         $signup->setFullName($fullName);
         $signup->setEmail($email);
         // An unlimited list admits on sign-up; on a limited list an external starts on the waiting list even when the
-        // draw is locked: it is unverified at this point, and a never-confirmed sign-up must not hold a place. The
-        // admission decision happens at confirmation ({@see self::confirmExternalSignup()}) or, for an
-        // organiser-added external, in {@see self::addExternalSignupByOrganiser()}.
+        // draw is locked: it is unverified at this point, and a never-confirmed sign-up must not take up a place. The
+        // admission decision happens at confirmation ({@see self::confirmExternalSignup()}) or, for an organiser-added
+        // external, in {@see self::addExternalSignupByOrganiser()}.
         $signup->drawn = !$signupList->limitedCapacity;
 
         return $signup;

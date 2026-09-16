@@ -18,7 +18,7 @@ use function sprintf;
  * Resolves the subdecision referenced by a form from the five parts of its identity.
  *
  * The subdecision class narrows the lookup: a form that points at the foundation of an organ must not resolve to the
- * key code granting that happens to sit at the same position.
+ * key code granting that happens to be at the same position.
  *
  * @template T of SubDecision
  *

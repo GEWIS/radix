@@ -32,9 +32,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Drops the cached answers the layout renders on every page when what they are about is written.
+ * Drops the cached values the layout renders on every page when what they are about is written.
  *
- * Both ways those answers are cached account for time passing on their own: the queries returning rows are cached by
+ * Both ways those values are cached account for time passing on their own: the queries returning rows are cached by
  * the day and narrowed to the instant by their caller, and the career badges expire when their count changes. Neither
  * accounts for a write, which is what this listener is for.
  *
@@ -111,7 +111,7 @@ final readonly class LayoutCacheInvalidationListener
             $this->applicationCache->deleteItem(CareerExtension::MENU_COUNTS_CACHE_KEY);
         }
 
-        // A checkout session counts because whether an applicant has paid is read off their latest one.
+        // A checkout session counts because whether an applicant has paid is read from their latest one.
         $badgeKey = match (true) {
             $entity instanceof ProspectiveMember,
             $entity instanceof CheckoutSession => ApplicationExtension::PROSPECTIVES_CACHE_KEY,
@@ -147,7 +147,7 @@ final readonly class LayoutCacheInvalidationListener
             return;
         }
 
-        // Only today's entry: a later day has not been asked about yet and so has nothing cached.
+        // Only today's entry: a later day has not been queried yet and so has nothing cached.
         $resultCache->deleteItem($key);
     }
 }

@@ -166,7 +166,7 @@ final class ApiPrincipalController extends AbstractController
     }
 
     /**
-     * A principal that is gone is not worth a 404 page: the overview says so and stays reachable.
+     * A principal that is gone is not worth a 404 page: the overview shows a warning and stays reachable.
      */
     private function redirectToIndexAsUnknown(): RedirectResponse
     {

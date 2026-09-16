@@ -68,7 +68,7 @@ final class BellTest extends DatabaseTestCase
     }
 
     /**
-     * A notification that carries its own label reads by that label rather than by its subject, which is what lets the
+     * A notification that has its own label is shown by that label rather than by its subject, which is what lets the
      * account warnings that need it outlive whatever they describe.
      */
     public function testTheDeviceIsPreferredOverLookingTheSubjectUp(): void
@@ -115,7 +115,7 @@ final class BellTest extends DatabaseTestCase
     }
 
     /**
-     * The badge counts notifications, not lines: a line standing for three unread ones is three.
+     * The badge counts notifications, not lines: a line representing three unread ones is three.
      */
     public function testTheBadgeCountsWhatIsBehindTheLines(): void
     {
@@ -148,7 +148,7 @@ final class BellTest extends DatabaseTestCase
     }
 
     /**
-     * No single one of them is what the reader is after, so a line standing for several points at the list.
+     * No single one of them is what the reader is after, so a line representing several points at the list.
      */
     public function testALineStandingForSeveralPointsAtTheList(): void
     {
@@ -163,8 +163,8 @@ final class BellTest extends DatabaseTestCase
     }
 
     /**
-     * A sign-in waiting on its second factor already carries the member on the token, so the centre has to ask whether
-     * that sign-in finished. Otherwise the password on its own is enough to read what the account has been told.
+     * A sign-in waiting on its second factor already has the member on the token, so the centre has to check whether
+     * that sign-in finished. Otherwise the password on its own is enough to read the account's notifications.
      */
     public function testASignInWaitingOnItsSecondFactorIsShownNothing(): void
     {
@@ -293,7 +293,7 @@ final class BellTest extends DatabaseTestCase
 
     /**
      * The register has no notification records of its own, so what it needs doing reaches the member who administers
-     * it through their own bell. Somebody without the role is not shown any of it.
+     * it through their own bell. A member without the role is not shown any of it.
      */
     public function testTheRegistersOwnAreShownOnlyToWhoeverAdministersIt(): void
     {

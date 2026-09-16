@@ -27,7 +27,7 @@ final class MarkdownExtensionTest extends TestCase
     }
 
     /**
-     * A member explaining how the editor writes an underline is showing the tag, not using it.
+     * A tag written inside code is shown rather than used, so it stays text.
      */
     public function testLeavesTheTagAloneInsideCode(): void
     {
@@ -38,7 +38,7 @@ final class MarkdownExtensionTest extends TestCase
     }
 
     /**
-     * An opening tag whose closing tag never came would otherwise underline everything after the comment.
+     * An opening tag without a closing tag would otherwise underline everything after the comment.
      */
     public function testLeavesAnUnpairedTagAsText(): void
     {

@@ -11,8 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Which part of the day a proposed activity would take up.
  *
- * A date option books whole days, so this is what says whether the body wants the evening or the entire day. It is
- * what the board reads when two options land on the same date: a lunch break and an evening can both go ahead.
+ * A date option books whole days, so this records whether the body wants the evening or the entire day. It is what
+ * the board reads when two options are on the same date: a lunch break and an evening can both go ahead.
  */
 enum TimeOfDay: string implements TranslatableInterface
 {
@@ -24,7 +24,7 @@ enum TimeOfDay: string implements TranslatableInterface
     case MultipleDays = 'multiple-days';
 
     /**
-     * Whether options with this part of the day and another can sit on one date without getting in each other's way.
+     * Whether options with this part of the day and another can be on one date without blocking each other.
      * Anything covering a whole day collides with everything.
      */
     public function overlaps(self $other): bool

@@ -2,18 +2,18 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
-        # Anything that decides whether somebody is who they say they are, or may do what they are asking to do.
-        # Kept apart from the application's own noise because it is read for a different reason: not to find out why
-        # a page broke, but to answer what happened to an account. In production it is written unconditionally and
-        # kept far longer than the rest; see the handlers below.
+        # Anything that decides whether a user is who they say they are, or may do what they are asking to do. Kept
+        # apart from the application's own noise because it is read for a different reason: not to find out why a page
+        # broke, but to establish what happened to an account. In production it is written unconditionally and kept far
+        # longer than the rest; see the handlers below.
         - security
 
 services:
-    # The context every security record carries, gathered once here rather than spelled out at each call site. Without
+    # The context every security record contains, gathered once here rather than spelled out at each call site. Without
     # these a line saying a session was torn down would not say whose, from where, or on which request.
     #
-    # All of them are stateless or reset per request, which is what FrankenPHP's worker mode requires: a processor
-    # that remembered the previous request would attribute one member's event to the next visitor.
+    # All of them are stateless or reset per request, which is what FrankenPHP's worker mode requires: a processor that
+    # kept state from the previous request would attribute one member's event to the next visitor.
     Symfony\Bridge\Monolog\Processor\WebProcessor:
         tags:
             - { name: monolog.processor }
@@ -89,9 +89,10 @@ when@prod:
                 channels: [security]
                 members: [security_nested, security_stderr]
                 bubble: false
-            # Half a year and a bit of daily files, outliving the retention on the `SecurityLog` rows the same events
-            # are written to, so the file still answers for a period the table has already forgotten. Deliberately not
-            # `%env(LOG_NAME)%`-free: a worker signing somebody out must not rotate the web container's file.
+            # Half a year and a bit of daily files, outliving the retention on the `SecurityLog` rows the
+            # same events are written to, so the file still covers a period that has already been pruned from
+            # the table. Deliberately not `%env(LOG_NAME)%`-free: a worker signing a user out must not rotate
+            # the web container's file.
             security_nested:
                 type: rotating_file
                 max_files: 200
@@ -107,9 +108,9 @@ when@prod:
                 type: fingers_crossed
                 action_level: error
                 # Without this, everything below `error` is buffered and then dropped unless the same request also
-                # failed -- which is how every warning this application raised about a torn-down session went
-                # unrecorded. A warning is something we decided was worth saying; it is now always written, and the
-                # buffer only adds the debug and info records leading up to a failure.
+                # failed, which is how every warning this application raised about a torn-down session went unrecorded.
+                # A warning is something we decided was worth saying; it is now always written, and the buffer only adds
+                # the debug and info records leading up to a failure.
                 passthru_level: warning
                 handler: grouped
                 excluded_http_codes: [404, 405]

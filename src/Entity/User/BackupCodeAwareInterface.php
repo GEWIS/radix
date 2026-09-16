@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\User;
 
 /**
- * An account that can hold MFA backup codes. Implemented by {@see User} and {@see CompanyUser} through
+ * An account that can store MFA backup codes. Implemented by {@see User} and {@see CompanyUser} through
  * {@see \App\Entity\User\Traits\BackupCodeAwareTrait}; it exists so {@see \App\Security\User\BackupCodeManager} can
  * work with the slots behind scheb's `object $user` contract.
  */

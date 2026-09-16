@@ -30,7 +30,7 @@ class ListsStepType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
-        // Names rather than records: what is ticked here sits in the session until the last step.
+        // Names rather than records: what is ticked here is stored in the session until the last step.
         $byName = [];
 
         foreach ($options['mailing_lists'] as $list) {
@@ -52,7 +52,7 @@ class ListsStepType extends AbstractType
                     $names,
                     $names,
                 ),
-                // `MailingListLabel` stacks the list name above its description, so the choice labels carry markup.
+                // `MailingListLabel` stacks the list name above its description, so the choice labels contain markup.
                 'label_html' => true,
                 'choice_label' => static function (string $name) use ($byName): TranslatableInterface {
                     return new MailingListLabel($byName[$name]);

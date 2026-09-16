@@ -49,7 +49,7 @@ class OrganRegulationType extends AbstractType
 
         $builder
             // Every organ type is offered, but the ones without organ regulations are shown disabled and refused on
-            // submission, so that picking one is answered with an explanation rather than a missing option.
+            // submission, so that picking one results in an explanation rather than a missing option.
             ->add(
                 'type',
                 EnumType::class,
@@ -163,7 +163,7 @@ class OrganRegulationType extends AbstractType
     }
 
     /**
-     * A body regulation is approved as it stands at the meeting, so it cannot be dated after it. The date it carries
+     * A body regulation is approved as it stands at the meeting, so it cannot be dated after it. The date it records
      * is the version's own date, not when it takes effect.
      */
     public static function validateNotAfterMeeting(

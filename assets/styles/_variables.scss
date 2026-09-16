@@ -25,7 +25,7 @@ $body-color: $gewis-gray-dark;
 $body-color-dark: $gewis-gray-light;
 
 // `$primary` stays Bootstrap's blue, so its emphasis colour does too: components pair the two, and red on that blue
-// fill reads as danger. The brand red is asked for by name instead (`.text-`/`.badge-`/`.btn-gewis-primary`).
+// fill reads as danger. The brand red is referenced by name instead (`.text-`/`.badge-`/`.btn-gewis-primary`).
 $secondary-text-emphasis: #959595;
 
 $body-secondary-color-dark: #acacac;
@@ -56,8 +56,8 @@ $nav-link-padding-y: 1.75rem;
 $navbar-bg: $gewis-red;
 $navbar-bg-dark: $body-bg-dark;
 
-// Every hue is dark enough to carry white text, which is what rules out an honest yellow. The cycle is listed twice
-// over because the bar paints half the gradient at a time.
+// Every hue is dark enough for white text, which is what rules out an honest yellow. The cycle is listed twice over
+// because the bar paints half the gradient at a time.
 $navbar-rainbow-stops:
     #c40024, #c2410c, #a16207, #15803d, #0e7490, #1d4ed8, #6d28d9,
     #c40024, #c2410c, #a16207, #15803d, #0e7490, #1d4ed8, #6d28d9,
@@ -93,7 +93,7 @@ $activity-date-badge-bg: rgba($gewis-red, 0.08);
 $activity-date-badge-bg-dark: rgba($gewis-red, 0.16);
 
 // A row in a panel dropping out of the navbar and a row in the section sidebar are the same object seen in two
-// places, so one set of measurements drives both and neither can drift.
+// places, so one set of measurements drives both and neither can differ.
 $nav-row-padding-x: 0.625rem;
 $nav-row-padding-y: 0.5rem;
 $nav-row-font-size: 1rem;
@@ -165,7 +165,7 @@ $breadcrumb-bg-dark: $body-bg-dark;
 $breadcrumb-active-color-dark: $body-secondary-color-dark;
 
 // Bootstrap marks the page you are on, and rings a focused one, with its own primary, which is still the framework
-// blue on a site that is red everywhere else. The hover shade comes off the tertiary background, which the night
+// blue on a site that is red everywhere else. The hover shade is taken from the tertiary background, which the night
 // theme leaves at its light-mode value, so that one is moved onto a background both themes do set.
 $pagination-active-bg: $gewis-red;
 $pagination-active-border-color: $gewis-red;

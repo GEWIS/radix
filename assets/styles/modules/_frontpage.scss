@@ -31,7 +31,7 @@
     }
 }
 
-// A gradient sits under the name and the two ways on, so white text stays readable whatever the photo happens to
+// A gradient is drawn under the name and the two ways on, so white text stays readable whatever the photo happens to
 // show at the bottom.
 .home-hero {
     position: relative;
@@ -152,7 +152,7 @@
 }
 
 // The birthday photos are stacked so one can fade into the next without the panel changing height. The ones that are
-// not shown are hidden rather than merely transparent, so the topmost of them cannot swallow the click meant for the
+// not shown are hidden rather than merely transparent, so the topmost of them cannot intercept the click meant for the
 // photo the reader is actually looking at.
 .birthday-rotator {
     position: relative;

@@ -18,7 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * A standing exception to how many activities one body may propose per option period.
  *
- * Rows only exist where the board wants a different number than usual; every other body is answered by the ladder in
+ * Rows only exist where the board wants a different number than usual; every other body is resolved by the ladder in
  * {@see \App\Service\Activity\ProposalLimitResolver} without a row of its own. That is the whole point: the previous
  * design wrote a row per body when a period was opened and defaulted them all to zero, so a body founded afterwards
  * had no row, resolved to zero, and could not take part at all.
@@ -48,8 +48,8 @@ class ProposalLimit
     public Organ $organ;
 
     /**
-     * How many activities this body may propose in a period. Zero is a real answer here, and the only way a body ends
-     * up unable to propose anything: the board has to write it down deliberately.
+     * How many activities this body may propose in a period. Zero is a real value here, and the only way a body ends up
+     * unable to propose anything: the board has to write it down deliberately.
      */
     #[Column(type: Types::INTEGER)]
     public int $maxProposals;

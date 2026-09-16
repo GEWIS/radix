@@ -11,19 +11,19 @@ use function count;
 use function reset;
 
 /**
- * One thing a revision says about itself: what it is called, how it should be read, and what it holds now against what
- * it held before.
+ * One thing a revision says about itself: what it is called, how it should be read, and what it contains now against
+ * what it contained before.
  *
  * The label stays translatable rather than translated, so the extractor still finds it and the reader's own locale
- * still applies. {@see $options} carries the hints a renderer needs and a describer knows, such as which image variant
- * to serve or how wide the field sits.
+ * still applies. {@see $options} contains the hints a renderer needs and a describer knows, such as which image variant
+ * to serve or how wide the field is.
  */
 final readonly class RevisionField
 {
     /**
      * @param non-empty-list<RevisionFieldValue> $values
      * @param array<string, string>              $options
-     * @param TranslatableInterface|null         $emptyLabel what to say when the field holds nothing at all
+     * @param TranslatableInterface|null         $emptyLabel what to show when the field contains nothing at all
      */
     public function __construct(
         public TranslatableInterface $label,

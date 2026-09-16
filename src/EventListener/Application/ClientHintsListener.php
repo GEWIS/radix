@@ -8,13 +8,13 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * Asks the browser to send the client hints that say which device somebody is on.
+ * Asks the browser to send the client hints that say which device a user is on.
  *
  * The low-entropy hints (the browser brand, whether it is mobile, the platform) arrive unasked; these are the ones that
  * have to be requested. They are what tells Windows 11 apart from Windows 10, since the user agent says
  * `Windows NT 10.0` for both and always will.
  *
- * Only browsers that implement client hints answer, and only over a secure context, so nothing here is guaranteed to
+ * Only browsers that implement client hints send them, and only over a secure context, so nothing here is guaranteed to
  * come back. The user agent stays the fallback.
  */
 #[AsEventListener(event: ResponseEvent::class)]

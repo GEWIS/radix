@@ -42,7 +42,7 @@ class KeyholderService
         $keyholder = $this->findKeyholder($withdrawal->granting);
 
         if (null === $keyholder) {
-            // The granting this withdrawal takes back never took effect, so there is no key to withdraw. That is
+            // The granting this withdrawal undoes never took effect, so there is no key to withdraw. That is
             // what the ledger says whenever the granting was annulled before this point.
             return;
         }

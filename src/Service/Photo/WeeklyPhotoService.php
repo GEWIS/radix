@@ -226,8 +226,8 @@ final readonly class WeeklyPhotoService
     }
 
     /**
-     * Rate a photo by its vote count, up-weighted for recency (newer photos score higher) and by 50% when it carries
-     * any tags. The age is floored at one day so a same-day photo does not divide by zero.
+     * Rate a photo by its vote count, up-weighted for recency (newer photos score higher) and by 50% when it has any
+     * tags. The age is floored at one day so a same-day photo does not divide by zero.
      */
     private function ratePhoto(
         Photo $photo,

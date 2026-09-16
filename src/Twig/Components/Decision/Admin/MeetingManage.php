@@ -62,8 +62,8 @@ use function trim;
  *
  * A board member keeps a meeting: its agenda, the documents filed under it, the reference selection, the time and
  * place, and the minutes. What was decided in it belongs to the register instead, so the actions that write to the
- * ledger ask for the register administrator on top of that, and the decisions tab offers a board member nothing but
- * the list.
+ * ledger require the register administrator on top of that, and the decisions tab offers a board member nothing
+ * but the list.
  */
 #[AsLiveComponent(
     name: 'Decision:Admin:MeetingManage',
@@ -160,9 +160,9 @@ final class MeetingManage
     }
 
     /**
-     * The ledger's side of this meeting, for the decisions tab: what was decided, in the language being read, and
-     * the numbers a new decision would get, which the projection does not carry. Null when the ledger does not
-     * know the meeting, in which case there is nothing to record a decision against either.
+     * The ledger's side of this meeting, for the decisions tab: what was decided, in the language being read, and the
+     * numbers a new decision would get, which the projection does not contain. Null when the ledger has no record of
+     * the meeting, in which case there is nothing to record a decision against either.
      */
     public function getLedgerView(): ?LedgerMeetingView
     {
@@ -205,7 +205,7 @@ final class MeetingManage
      * they are before anything has been edited and again after {@see syncEdits()} clears them, the first keystroke
      * in any of those inputs fails with "Invalid model name".
      *
-     * Only missing keys are filled, never ones already there: on a re-render the arrays come back carrying what the
+     * Only missing keys are filled, never ones already there: on a re-render the arrays come back with what the
      * reader typed, and seeding over that would undo it. {@see syncEdits()} compares against what is stored before
      * writing anything, so seeding the current values does not turn into a write of every row.
      */
@@ -461,8 +461,8 @@ final class MeetingManage
     /**
      * Remove one decision of this meeting from the ledger, along with everything it recorded.
      *
-     * The ledger turns down a decision that a later one builds on, which is the whole reason this is worth an answer
-     * rather than a redirect: the reader stays on the meeting and is told why nothing was removed.
+     * The ledger rejects a decision that a later one builds on, which is the whole reason this reports feedback rather
+     * than redirecting: the reader stays on the meeting and is shown why nothing was removed.
      */
     #[LiveAction]
     public function deleteDecision(
@@ -499,7 +499,7 @@ final class MeetingManage
             return;
         }
 
-        // Two secretaries can hold this open at once, and the second one to answer it deletes nothing. Reporting
+        // Two secretaries can have this page open at once, and the second one to act on it deletes nothing. Reporting
         // success either way would have them believe they removed something they did not.
         if (!$deleted) {
             $this->feedback = new TranslatableMessage('This decision no longer exists.')->trans($this->translator);
@@ -511,10 +511,10 @@ final class MeetingManage
     }
 
     /**
-     * Say that a virtual decision is the counterpart of one of this meeting's decisions.
+     * Record that a virtual decision is the counterpart of one of this meeting's decisions.
      *
      * The virtual decision is named by its four coordinates rather than looked up here, because that is what the
-     * search it is picked from answers with.
+     * search it is picked from returns.
      */
     #[LiveAction]
     public function linkVirtualCounterpart(
@@ -553,7 +553,7 @@ final class MeetingManage
                 $virtualDecision,
             );
         } catch (CounterpartNotPossible) {
-            // The button is only offered on a meeting that is not virtual and the lookup answers with virtual
+            // The button is only offered on a meeting that is not virtual and the lookup returns virtual
             // decisions only, so the one way to arrive here is a decision removed between picking it and confirming.
             $this->feedback = $this->cannotBeCounterparts();
 
@@ -699,7 +699,7 @@ final class MeetingManage
     }
 
     /**
-     * What a write to the ledger's side of this meeting answers with.
+     * What a write to the ledger's side of this meeting reports.
      *
      * Two secretaries can have this page open at once, and the second one to act on a decision the first has removed
      * changes nothing. Reporting success either way would have them believe otherwise.
@@ -742,8 +742,8 @@ final class MeetingManage
     }
 
     /**
-     * What is decided in a meeting is the register's record rather than the board's, so writing to it asks for the
-     * register administrator where the rest of this component asks for a board seat.
+     * What is decided in a meeting is the register's record rather than the board's, so writing to it requires the
+     * register administrator where the rest of this component requires a board seat.
      */
     private function assertLedgerAccess(): void
     {

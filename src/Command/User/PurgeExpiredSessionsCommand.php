@@ -36,8 +36,8 @@ final class PurgeExpiredSessionsCommand extends Command
     use HoldsRunLockTrait;
 
     /**
-     * How long a session may go unused before it is swept, whatever its expiry says. This also signs out somebody who
-     * has not been near the site in a month rather than carrying them for the rest of the ninety days.
+     * How long a session may go unused before it is swept, whatever its expiry says. This also signs out a user who
+     * has not visited the site in a month rather than keeping their session for the rest of the ninety days.
      */
     private const string SESSION_IDLE = '-30 days';
 

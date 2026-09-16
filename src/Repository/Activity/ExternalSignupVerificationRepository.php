@@ -54,7 +54,7 @@ class ExternalSignupVerificationRepository extends ServiceEntityRepository
      */
     public function findExpiredUnverifiedSignups(): array
     {
-        // Select the sign-ups directly (DISTINCT, with the sign-up as the root alias): a sign-up that ever held more
+        // Select the sign-ups directly (DISTINCT, with the sign-up as the root alias): a sign-up that ever had more
         // than one expired Verify token must be returned once, and this avoids a lazy-load query per row in the prune
         // loop.
         /** @var list<ExternalSignup> $signups */

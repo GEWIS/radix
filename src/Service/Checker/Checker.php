@@ -484,7 +484,7 @@ class Checker
     /**
      * Checks that the annulments made during a meeting could have been made at all.
      *
-     * These are turned down when a decision is entered, so anything found here predates that or was put in by hand.
+     * These are rejected when a decision is entered, so anything found here predates that or was entered by hand.
      *
      * @param MeetingModel $meeting After which meeting do we do the validation
      *

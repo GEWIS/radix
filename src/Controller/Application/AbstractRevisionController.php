@@ -22,9 +22,9 @@ use function trim;
 
 /**
  * The parts of driving a revision that no domain does differently: reading what may be done with it, building the
- * decision form, working out which button was pressed, and starting a thread entry.
+ * decision form, determining which button was pressed, and starting a thread entry.
  *
- * Deliberately holds no routes. Every action keeps its own `#[Route]`, `#[IsGranted]` and `#[IsCsrfTokenValid]`,
+ * Deliberately defines no routes. Every action keeps its own `#[Route]`, `#[IsGranted]` and `#[IsCsrfTokenValid]`,
  * because the value resolver needs the concrete revision type to give an automatic 404, the career module serves two
  * aggregates with different route names from one class, and the company portal's token ids cannot be derived from a
  * revision argument it does not take.
@@ -78,8 +78,8 @@ abstract class AbstractRevisionController extends AbstractController
     }
 
     /**
-     * The clicked submit button names the transition to apply. `getClickedButton()` lives on the concrete Form, hence
-     * the narrowing; an unsubmitted or button-less form yields an empty string.
+     * The clicked submit button names the transition to apply. `getClickedButton()` is defined on the concrete Form,
+     * hence the narrowing; an unsubmitted or button-less form results in an empty string.
      *
      * @param FormInterface<array<string, mixed>|null> $form
      */
@@ -97,7 +97,7 @@ abstract class AbstractRevisionController extends AbstractController
     }
 
     /**
-     * The feedback or response typed alongside a decision. The field is only present for the transitions that carry
+     * The feedback or response typed alongside a decision. The field is only present for the transitions that have
      * one, so its absence is normal rather than an error.
      *
      * @param FormInterface<array<string, mixed>|null> $form

@@ -148,8 +148,8 @@ class Decision
     /**
      * The virtual decisions that are this one's counterpart.
      *
-     * The reference itself sits on the virtual decision, because one decision can be given more than one -- an
-     * installation decided once and recorded twice, for two dates of its own. Saying which virtual decision belongs
+     * The reference itself is declared on the virtual decision, because one decision can be given more than one (an
+     * installation decided once and recorded twice, for two dates of its own). Naming which virtual decision belongs
      * to this one is done from here, which is where a reader comes across it.
      *
      * @var Collection<array-key, Decision>

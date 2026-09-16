@@ -131,7 +131,7 @@
                             {{ helper.tier_modifier(fields.programTypeOrder, fields.vars.programTypeOrderTiers, 'Admit some study phases before others'|trans) }}
                             {{ helper.tier_modifier(fields.cohortTierOrder, fields.vars.cohortTierOrderTiers, 'Admit some cohorts before others'|trans) }}
                         {% else %}
-                            {# Left merely undrawn, a field comes back out of form_rest() at the foot of the form. #}
+                            {# Left merely unrendered, a field is rendered by form_rest() at the foot of the form. #}
                             {% do fields.programTypeOrder.setRendered %}
                             {% do fields.cohortTierOrder.setRendered %}
                         {% endif %}

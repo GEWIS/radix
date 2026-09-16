@@ -50,8 +50,8 @@ use function max;
 use function sprintf;
 use function Symfony\Component\Translation\t;
 
-// Deliberately without a class-level prefix: the decision list has always been served from `/export`, which cannot
-// sit under the prefix the other actions share.
+// Deliberately without a class-level prefix: the decision list has always been served from `/export`, which cannot be
+// placed under the prefix the other actions share.
 #[IsGranted(UserRoles::Board->value)]
 final class DecisionController extends AbstractController
 {
@@ -95,7 +95,7 @@ final class DecisionController extends AbstractController
     }
 
     /**
-     * The decisions a decision can refer to, such as the one an annulment takes back.
+     * The decisions a decision can refer to, such as the one an annulment annuls.
      */
     #[Route(
         path: '/meetings/decisions/search',
@@ -116,8 +116,8 @@ final class DecisionController extends AbstractController
             null === $meetingNumber ? null : (int) $meetingNumber,
             $request->query->getInt('point'),
             $request->query->getInt('decision'),
-            // Asked for by the lookup that picks a virtual counterpart: only a virtual decision is one, and one
-            // that is already somebody's counterpart is spoken for.
+            // Used by the lookup that picks a virtual counterpart: only a virtual decision is one, and one that is
+            // already the counterpart of another decision is no longer available.
             $request->query->getBoolean('only_virtual'),
         ));
     }
@@ -371,7 +371,7 @@ final class DecisionController extends AbstractController
     }
 
     /**
-     * The submitted form takes the place of the one built for its row, so its errors land on the field they were
+     * The submitted form takes the place of the one built for its row, so its errors are shown on the field they were
      * written in.
      *
      * @param ?FormInterface<array<string, mixed>|null> $submitted
@@ -463,8 +463,8 @@ final class DecisionController extends AbstractController
     }
 
     /**
-     * Named after the decision: a page holds one of these per decision, and two forms of the same name would answer
-     * for each other's fields.
+     * Named after the decision: a page contains one of these per decision, and two forms of the same name would
+     * receive each other's fields.
      *
      * @return FormInterface<array<string, mixed>|null>
      */

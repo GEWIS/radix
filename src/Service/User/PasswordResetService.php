@@ -19,9 +19,9 @@ use function random_bytes;
 /**
  * The three writes the password-reset link makes on its way to a new password.
  *
- * The emailed token is exchanged for a single-use temp hash and then redirected to, so the token itself never reaches
- * a page that may load third-party resources; the hash is spent on first use. Finishing the reset retires every
- * outstanding reset for whoever it belonged to in the same commit as the new password, so a link that was requested
+ * The emailed token is exchanged for a single-use temp hash and then redirected to, so the token itself never reaches a
+ * page that may load third-party resources; the hash is spent on first use. Finishing the reset retires every
+ * outstanding reset for the account it belonged to in the same commit as the new password, so a link that was requested
  * twice cannot be replayed against an account that has already been recovered.
  */
 final readonly class PasswordResetService
@@ -65,8 +65,8 @@ final readonly class PasswordResetService
     }
 
     /**
-     * Commit the new password — the form has already hashed and assigned it — and retire every reset outstanding for
-     * the account it belonged to.
+     * Commit the new password (the form has already hashed and assigned it) and retire every reset outstanding for the
+     * account it belonged to.
      */
     public function complete(
         PasswordReset $passwordReset,

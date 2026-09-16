@@ -353,8 +353,8 @@ abstract class AbstractSecurityController extends AbstractController
             $request,
         );
 
-        // A reset is what somebody reaches for when they think their account has been reached, so anything signed in
-        // on the old password goes, recognised devices included.
+        // A reset is requested when a user believes their account has been compromised, so every session authenticated
+        // with the old password is terminated, recognised devices included.
         $this->sessionManager->terminateAll(
             $target,
             $this->firewall($request),
@@ -704,8 +704,8 @@ abstract class AbstractSecurityController extends AbstractController
             );
         }
 
-        // Burn the backup code only after BOTH factors confirmed. An attacker with a stolen backup code but the wrong
-        // password must not be able to invalidate the code by submitting it.
+        // Invalidate the backup code only after BOTH factors confirmed. An attacker with a stolen backup code but the
+        // wrong password must not be able to invalidate the code by submitting it.
         if ($backupOk) {
             $backupCodeManager->invalidateBackupCode(
                 $user,
@@ -1113,8 +1113,8 @@ abstract class AbstractSecurityController extends AbstractController
     }
 
     /**
-     * Whether the member is securing an account they believe has been reached or an intruder got there first, nothing
-     * should stay signed in or stay trusted across a change to the way in.
+     * Whether the member is securing an account they believe has been compromised or an intruder has already taken it
+     * over, nothing should stay signed in or stay trusted across a credential change.
      */
     private function credentialsChanged(
         SecurityNotifier $securityNotifier,

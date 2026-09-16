@@ -85,7 +85,7 @@ class FoundationMapper extends AbstractDecisionMapper
                 continue;
             }
 
-            // Holding a function in an organ does not make someone a member of it; that installation is recorded
+            // Having a function in an organ does not make someone a member of it; that installation is recorded
             // separately, and only once however many functions the member ends up with.
             if (
                 InstallationFunctions::Member !== $function

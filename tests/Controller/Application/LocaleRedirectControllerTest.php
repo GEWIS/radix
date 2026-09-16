@@ -32,7 +32,7 @@ final class LocaleRedirectControllerTest extends TestCase
     }
 
     /**
-     * Losing this would leave the visitor on a page that cannot say what happened to their payment.
+     * Losing this would leave the visitor on a page that cannot show what happened to their payment.
      */
     public function testTheQueryStringIsCarriedOver(): void
     {
@@ -82,7 +82,7 @@ final class LocaleRedirectControllerTest extends TestCase
                 'nl;q=0.9,en;q=0.8',
                 'nl',
             ],
-            // Neither is on offer, so the default answers rather than nothing.
+            // Neither is on offer, so the default locale is used rather than none.
             'a language we do not speak' => [
                 'de-DE,de;q=0.9',
                 'en',
@@ -95,7 +95,7 @@ final class LocaleRedirectControllerTest extends TestCase
     }
 
     /**
-     * Where this lands depends on the request, so it must not be one a browser may remember.
+     * The redirect target depends on the request, so it must not be one a browser may cache.
      */
     public function testTheRedirectIsTemporary(): void
     {

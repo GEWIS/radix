@@ -17,7 +17,7 @@ use function json_encode;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * Reports back whatever happens: an image nobody hears about stays unplaceable until its marker expires.
+ * Reports back whatever happens: an image without a published update stays unplaceable until its marker expires.
  */
 #[AsMessageHandler]
 class ProcessPageImageHandler

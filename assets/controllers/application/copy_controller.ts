@@ -1,13 +1,13 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * What gets copied is either handed over through the `text` value or read out of the source target. Both exist
- * because a page does not always display what it offers to copy: a decision's LaTeX form, for instance, is nothing
- * like the sentence shown above the button.
+ * What gets copied is either passed in through the `text` value or read from the source target. Both exist because
+ * a page does not always display what it offers to copy: a decision's LaTeX form, for instance, is nothing like the
+ * sentence shown above the button.
  *
- * The confirmation replaces the label target when there is one, and the button itself otherwise. A button holding an
+ * The confirmation replaces the label target when there is one, and the button itself otherwise. A button with an
  * icon needs the label target: assigning to the button's own `textContent` would replace its children with a single
- * text node and take the icon with it, for good.
+ * text node and remove the icon permanently.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -83,7 +83,7 @@ export default class extends Controller {
     }
 
     /**
-     * A button may carry its own confirmation, for a list where every row has one; the value on the controller element
+     * A button may have its own confirmation, for a list where every row has one; the value on the controller element
      * covers the ordinary case of a single button.
      */
     private confirm(button: HTMLElement): void {

@@ -14,12 +14,12 @@ use DateTimeImmutable;
 use Override;
 
 /**
- * When a question put to the members has been walked away from. A poll is dated by the expiry the reviewer gave it,
- * so one still open for answers is kept whatever the silence around it; a question that was never approved never got
- * a date, and lapses on silence alone.
+ * When a question put to the members has been abandoned. A poll is dated by the expiry the reviewer gave it, so one
+ * still open for answers is kept whatever the silence around it; a question that was never approved never got a date,
+ * and lapses on silence alone.
  *
- * Everything anyone answered with stands in the way of removing it. A poll that was never approved should have
- * neither votes nor discussion, but both are wiped by the database along with the poll, so both are checked.
+ * Everything anyone answered with blocks its removal. A poll that was never approved should have neither votes nor
+ * discussion, but both are wiped by the database along with the poll, so both are checked.
  */
 final readonly class PollStaleRevisionPolicy implements StaleRevisionPolicyInterface
 {
@@ -43,7 +43,7 @@ final readonly class PollStaleRevisionPolicy implements StaleRevisionPolicyInter
         }
 
         // A poll closes at the end of its expiry date, so it is still being answered all of that day. Cloned because
-        // the date belongs to the poll, and moving it here would be an edit nobody asked for.
+        // the date belongs to the poll, and moving it here would be an unintended edit.
         return $expiryDate->setTime(
             23,
             59,

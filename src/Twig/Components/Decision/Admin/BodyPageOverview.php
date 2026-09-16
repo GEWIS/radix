@@ -23,11 +23,11 @@ use function count;
 use function ksort;
 
 /**
- * The bodies whose page a reader may write, or, for whoever administers the register, every body the association has
+ * The bodies whose page a reader may write, or, for a user who administers the register, every body the association has
  * ever had. That last list is the one worth paging: it grows with the association's history and never shrinks.
  *
  * The window is taken in PHP rather than in the query. Two of the three lists this pages over are not queries at all,
- * one being the reader's own installations read off their member, and a body count in the hundreds is not worth three
+ * one being the reader's own installations read from their member, and a body count in the hundreds is not worth three
  * fetching strategies to slice at the database.
  *
  * @extends AbstractPaginatedOverview<BodyPageRow>
@@ -73,7 +73,7 @@ final class BodyPageOverview extends AbstractPaginatedOverview
             $pageSize,
         );
 
-        // Only the page being shown is warmed; the rest would be a query per body nobody is looking at.
+        // Only the page being shown is warmed; the rest would be a query per body that is not on screen.
         $this->organRepository->warmPageAssociations($window);
 
         return new ResultPage(
@@ -87,7 +87,7 @@ final class BodyPageOverview extends AbstractPaginatedOverview
      */
     private function listableOrgans(): array
     {
-        // Whoever administers the register reads this page as the list of bodies rather than as the list of pages
+        // A user who administers the register reads this page as the list of bodies rather than as the list of pages
         // they may write, and that list includes the ones that have been abrogated.
         if ($this->security->isGranted(UserRoles::DatabaseReadOnly->value)) {
             return array_values($this->organRepository->findAll());

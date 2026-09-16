@@ -13,7 +13,7 @@ use function count;
  * The lookup the decision forms pick a decision from.
  *
  * It fires on every keystroke, and its one predicate is a reference written out and compared with LIKE, which no
- * index can serve. What it may read therefore has to be bounded by the query rather than by what somebody types.
+ * index can serve. What it may read therefore has to be bounded by the query rather than by what a user types.
  */
 class MeetingSearchTest extends KernelTestCase
 {

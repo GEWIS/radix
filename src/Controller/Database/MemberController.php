@@ -29,7 +29,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Members: the overview and the searches behind it, the record of one member, and everything that acts on that record
- * without being an entity of its own -- the Supremum opt-in, the mailing list subscriptions, and the batch of members
+ * without being an entity of its own: the Supremum opt-in, the mailing list subscriptions, and the batch of members
  * that needs attention.
  */
 #[Route(path: '/members')]
@@ -50,7 +50,7 @@ final class MemberController extends AbstractMemberController
 
     /**
      * The overview is a table the browser fills in while the secretary types, so the page itself is static and the two
-     * searches below answer in JSON.
+     * searches below return JSON.
      */
     #[Route(
         path: '',
@@ -65,8 +65,8 @@ final class MemberController extends AbstractMemberController
     /**
      * The members that can still be picked for a decision.
      *
-     * Answers JSON from behind sudo, so a grant that lapses while a decision is being composed gets the confirmation
-     * page here instead of a result and the picker goes quiet until the page is reloaded.
+     * Returns JSON from behind sudo, so a grant that lapses while a decision is being composed gets the confirmation
+     * page here instead of a result and the picker shows no results until the page is reloaded.
      */
     #[Route(
         path: '/searchFiltered',
@@ -155,8 +155,8 @@ final class MemberController extends AbstractMemberController
         int $lidnr,
     ): Response {
         $member = $this->memberService->getMemberWithDecisions($lidnr);
-        // The query that works out the organ memberships only answers for a member who has any that hold up, so a
-        // member it does not answer for is looked up plainly and their organs are not stated at all.
+        // The query that computes the organ memberships only returns a member who has installations that meet the
+        // requirements, so a member it does not return is looked up plainly and their organs are not stated at all.
         $hasCorrectInstallations = null !== $member;
 
         if (null === $member) {
@@ -282,7 +282,7 @@ final class MemberController extends AbstractMemberController
     }
 
     /**
-     * The confirmation and the removal are one route, so the confirmation is a form: it is the form that carries the
+     * The confirmation and the removal are one route, so the confirmation is a form: it is the form that contains the
      * token, which a bare POST on a page that is also reachable by GET could not.
      */
     #[Route(
@@ -349,8 +349,8 @@ final class MemberController extends AbstractMemberController
     }
 
     /**
-     * Whether a member receives the Supremum. The three answers -- yes, no, and "not stated" -- are three routes
-     * rather than a value in the path, so that the member page can post to each of them directly.
+     * Whether a member receives the Supremum. The three answers (yes, no, and "not stated") are three routes rather
+     * than a value in the path, so that the member page can post to each of them directly.
      */
     #[Route(
         path: '/{lidnr}/supremum',

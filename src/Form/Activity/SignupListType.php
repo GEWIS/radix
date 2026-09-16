@@ -577,7 +577,7 @@ class SignupListType extends AbstractType
     }
 
     /**
-     * The membership order as the control holds it: the ranks in turn, the tiers of a rank joined, and the places
+     * The membership order as the control stores it: the ranks in turn, the tiers of a rank joined, and the places
      * held for a rank written behind it. The places belong to the rank rather than to a tier, because the tiers of a
      * rank are admitted together and share what is held for them.
      */
@@ -837,7 +837,7 @@ class SignupListType extends AbstractType
             'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
             'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
             'onlyGEWIS' => $list->onlyGEWIS ?? true,
-            // The places held for each rank of the membership order, which the control asks for on the rank itself.
+            // The places held for each rank of the membership order, which the control renders on the rank itself.
             'membershipPlaces' => $list?->getHeldMembershipPlaces() ?? [],
         ];
     }
@@ -937,7 +937,7 @@ class SignupListType extends AbstractType
 
     /**
      * Whether this list, or (when it is a draft clone) the live revision's list it descends from, has sign-ups. A
-     * draft clone's own sign-ups are always empty (sign-ups live on the live revision until approval migrates them),
+     * draft clone's own sign-ups are always empty (sign-ups are on the live revision until approval migrates them),
      * so the structural freeze must look through the lineage to the live counterpart. The collection prototype has no
      * bound list (`null`), in which case nothing is frozen.
      */
@@ -1034,8 +1034,8 @@ class SignupListType extends AbstractType
 
     /**
      * Drop the priority modifiers a list cannot act on: all of them where admission is not decided here, the held
-     * places where the membership order is not applied by holding them, and the study phase and the cohort on a list
-     * anybody may sign up for.
+     * places where the membership order is not applied by reserving places, and the study phase and the cohort on a
+     * list anybody may sign up for.
      */
     private function clearInapplicablePriority(SignupList $list): void
     {

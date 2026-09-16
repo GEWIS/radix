@@ -18,9 +18,8 @@ use SortDirection;
  *   - A "terminate all" action on the `main` firewall does not touch `company` sessions.
  *   - The session management UI shows only the sessions relevant to the current user context.
  *
- * The only exception is findOneBySeries(), which is looked up globally (series
- * values are globally unique) – the firewall ownership is then verified
- * by the handler after the lookup.
+ * The only exception is findOneBySeries(), which is looked up globally (series values are globally unique). The
+ * firewall ownership is then verified by the handler after the lookup.
  */
 class SessionRepository extends ServiceEntityRepository
 {
@@ -226,14 +225,14 @@ class SessionRepository extends ServiceEntityRepository
     }
 
     /**
-     * Sessions nobody has used since `$before`, whatever their expiry says.
+     * Sessions that have not been used since `$before`, whatever their expiry is.
      *
-     * `expiresAt` is fixed when the row is written and never extended, so it says how old a session is and not how
-     * long ago somebody used it. A private window that was closed rather than signed out of leaves a row no cookie can
-     * ever reach again, which would otherwise sit in the member's device list for the rest of its ninety days.
+     * `expiresAt` is fixed when the row is written and never extended, so it records how old a session is and not
+     * when it was last used. A private window that was closed rather than signed out of leaves a row no cookie can
+     * ever reach again, which would otherwise remain in the member's device list for the rest of its ninety days.
      *
-     * `lastUsedAt` is the honest measure: {@see \App\EventListener\User\StaleSessionGuardListener} bumps it on real
-     * activity, so an abandoned row keeps the timestamp it was created with while a device in use keeps moving.
+     * `lastUsedAt` is the accurate measure: {@see \App\EventListener\User\StaleSessionGuardListener} updates it on
+     * real activity, so an abandoned row keeps the timestamp it was created with while a device in use does not.
      */
     public function deleteIdleSince(DateTimeImmutable $before): int
     {

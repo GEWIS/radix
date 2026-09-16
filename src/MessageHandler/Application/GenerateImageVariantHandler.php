@@ -28,7 +28,7 @@ class GenerateImageVariantHandler
             $message->getVariant(),
         )?->webpQuality() ?? self::FALLBACK_QUALITY;
 
-        // Not skipping upscales: this variant was asked for, so a narrower original must still yield one (capped)
+        // Not skipping upscales: this variant was requested, so a narrower original must still produce one (capped)
         // instead of an eternal miss.
         $this->variantGenerator->generateVariant(
             $message->getSourcePath(),

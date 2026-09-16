@@ -36,7 +36,7 @@ class ActivityRevisionEdit
     /**
      * The user (a member's account) who made the edit; activities are only ever edited by members. Null once that
      * account is removed: the trail belongs to the revision, which the members who own the activity still rely on, so
-     * the entry keeps when it happened and what it touched and loses only the name.
+     * the entry keeps when it happened and which fields it changed, and only the name is lost.
      */
     #[ManyToOne(targetEntity: UserModel::class)]
     #[JoinColumn(
@@ -72,8 +72,8 @@ class ActivityRevisionEdit
     }
 
     /**
-     * A human-readable name for whoever made this edit, or null once their account is removed and the entry names
-     * nobody.
+     * A human-readable name for the member who made this edit, or null once their account is removed and the entry
+     * names no member.
      */
     public function getEditorDisplayName(): ?string
     {

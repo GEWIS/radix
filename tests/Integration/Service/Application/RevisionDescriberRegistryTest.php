@@ -21,7 +21,7 @@ use function array_map;
 /**
  * Every revisable domain must describe itself, because the review screens no longer know how to read one. A domain
  * that has no describer throws where it used to render, so this pins that all three are registered and that each
- * answers with the sections its screens expect.
+ * returns the sections its screens expect.
  */
 final class RevisionDescriberRegistryTest extends DatabaseTestCase
 {

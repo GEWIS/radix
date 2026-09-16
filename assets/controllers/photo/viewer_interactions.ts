@@ -53,7 +53,7 @@ interface Candidate {
     type: 'member' | 'organ';
     id: number;
     name: string;
-    // Bodies display their abbreviation; the full name rides along as a hover title.
+    // Bodies display their abbreviation; the full name is shown as a hover title.
     title?: string;
 }
 
@@ -88,7 +88,7 @@ export function spriteIcon(spriteUrl: string, name: string): { isCustomSVG: true
  * The panel's structure is built once; only the tag list and button states are updated per slide. That keeps the
  * search field alive across photos, so a member can be tagged in one photo after another without re-focusing it.
  *
- * Every action posts to the backend and re-reads the details, so the panel always reflects the server's answer.
+ * Every action posts to the backend and re-reads the details, so the panel always reflects the server's state.
  */
 export class ViewerInteractions {
     private static readonly exifIcons: Record<string, string> = {
@@ -125,14 +125,15 @@ export class ViewerInteractions {
     // The candidate picked from the suggestions but not yet committed (awaiting a Tag or Place action).
     private activeType: 'member' | 'organ' = 'member';
     private pending: Candidate | null = null;
-    // Whether the collapsible tag list is expanded; a photo with many tags starts collapsed so the chips do not cover it.
+    // Whether the collapsible tag list is expanded; a photo with many tags starts collapsed
+    // so the chips do not cover it.
     private tagsExpanded = false;
 
     private voteButton: HTMLElement | null = null;
     private profileButton: HTMLElement | null = null;
     private metadataPanel: HTMLElement | null = null;
 
-    // The overlay that carries the point markers. It fills the PhotoSwipe root; each marker is positioned in pixels
+    // The overlay that contains the point markers. It fills the PhotoSwipe root; each marker is positioned in pixels
     // from the on-screen image rect (the zoom container itself is zero-sized), and repositioned on zoom/pan/resize.
     private markersLayer: HTMLElement | null = null;
     private readonly onViewerResize = (): void => this.positionMarkers();
@@ -153,8 +154,8 @@ export class ViewerInteractions {
             this.tagsExpanded = false;
             void this.refresh();
         });
-        // PhotoSwipe acts on 'z' and on every arrow. It stands down on a keydown its own hook prevented, which is how
-        // the tag panel claims the ones it needs.
+        // PhotoSwipe acts on 'z' and on every arrow. It ignores a keydown its own hook prevented, which is how the tag
+        // panel claims the ones it needs.
         this.lightbox.on('keydown', (event: any): void => {
             const key = event.originalEvent.key;
 
@@ -216,7 +217,7 @@ export class ViewerInteractions {
 
     /**
      * One letter each for what the toolbar offers, so a photo can be worked through without reaching for the mouse.
-     * A button that is hidden or disabled has nothing to do, and says so by not answering.
+     * A button that is hidden or disabled has nothing to do, so its shortcut returns false.
      */
     private runShortcut(key: string): boolean {
         if ('t' === key) {
@@ -275,7 +276,7 @@ export class ViewerInteractions {
             onInit: (element: HTMLElement): void => this.buildPanel(element),
         });
 
-        // order 11 sits between the built-in zoom and the share button.
+        // order 11 is between the built-in zoom and the share button.
         ui.registerElement({
             name: 'metadata-ui',
             appendTo: 'root',
@@ -285,7 +286,8 @@ export class ViewerInteractions {
         ui.registerElement({
             name: 'photo-of-the-week',
             appendTo: 'root',
-            // The photo-of-the-week badge sits on its own in the bottom-right corner, outside the bottom-centre tag panel.
+            // The photo-of-the-week badge is on its own in the bottom-right corner,
+            // outside the bottom-centre tag panel.
             onInit: (element: HTMLElement): void => {
                 element.classList.add('pswp__photo-potw');
                 element.hidden = true;
@@ -306,8 +308,8 @@ export class ViewerInteractions {
             },
         });
 
-        // Orders above the preloader (7) sit right of its margin-right:auto; 8 leads that cluster (ahead of
-        // album/zoom/info). vote registers before profile, so it sorts first on the shared order.
+        // Orders above the preloader (7) are placed right of its margin-right:auto; 8 is the first of that group
+        // (ahead of album/zoom/info). vote registers before profile, so it sorts first on the shared order.
         ui.registerElement({
             name: 'vote-button',
             order: 8,
@@ -316,8 +318,8 @@ export class ViewerInteractions {
             html: spriteIcon(this.config.iconSpriteUrl, 'thumbs-up'),
             onInit: (element: HTMLElement): void => {
                 this.voteButton = element;
-                // The "you have not voted recently" nudge dot sits on top of the icon (the sprite icon replaces the
-                // button's inner HTML, so the dot is appended rather than part of the markup).
+                // The "you have not voted recently" reminder dot is drawn on top of the icon (the sprite icon
+                // replaces the button's inner HTML, so the dot is appended rather than part of the markup).
                 const dot = document.createElement('span');
                 dot.className = 'pswp__vote-dot';
                 element.appendChild(dot);
@@ -683,7 +685,7 @@ export class ViewerInteractions {
         }
     }
 
-    // Once a photo carries more than a handful of tags the header doubles as a collapse toggle, with the list hidden by
+    // Once a photo has more than a handful of tags the header doubles as a collapse toggle, with the list hidden by
     // default so the chips do not cover it. Placed tags still show as dots on the photo regardless.
     private renderTagsHeader(count: number): void {
         if (null === this.title || null === this.list) {
@@ -929,7 +931,7 @@ export class ViewerInteractions {
     }
 
     private onSearchKeydown(event: KeyboardEvent): void {
-        // The overlay is up and takes the arrows and Enter for itself, even though the field still holds focus.
+        // The overlay is up and takes the arrows and Enter for itself, even though the field still has focus.
         if (this.placing) {
             return;
         }
@@ -1094,7 +1096,7 @@ export class ViewerInteractions {
         }
 
         const body: Record<string, string> = { type, id: String(id) };
-        // A tag placed on the photo carries its point; a plain add (no placement) tags the whole photo.
+        // A tag placed on the photo records its point; a plain add (no placement) tags the whole photo.
         if (null !== this.pendingPosition) {
             body.x = String(this.pendingPosition.x);
             body.y = String(this.pendingPosition.y);
@@ -1133,7 +1135,8 @@ export class ViewerInteractions {
         this.positionMarkers();
     }
 
-    // A single overlay that fills the PhotoSwipe root; markers are positioned inside it in pixels (see positionMarkers).
+    // A single overlay that fills the PhotoSwipe root; markers are positioned inside it
+    // in pixels (see positionMarkers).
     private ensureMarkersLayer(): HTMLElement | null {
         const root = this.lightbox.pswp?.element;
         if (!root) {
@@ -1227,7 +1230,7 @@ export class ViewerInteractions {
             // One neutral, translucent marker for every tag type; the white border and dark halo keep it legible on
             // any background, so members and organs are not distinguished by colour.
             background: 'rgba(255, 255, 255, 0.5)',
-            // Existing tags rest subtly and brighten on hover/tap; the one being placed stays prominent.
+            // Existing tags are faint and brighten on hover/tap; the one being placed stays prominent.
             opacity: pending ? '0.95' : '0.45',
             cursor: pending ? 'default' : 'pointer',
             pointerEvents: pending ? 'none' : 'auto',
@@ -1294,7 +1297,7 @@ export class ViewerInteractions {
 
         // A full-viewport overlay OUTSIDE PhotoSwipe's DOM captures the placement click, so PhotoSwipe never sees it as
         // a tap/drag (which would zoom, pan, toggle its UI or close). The critical styles are set inline so it works
-        // even before the stylesheet loads; PhotoSwipe's root sits at z-index 100000, so this must be above it. Escape
+        // even before the stylesheet loads; PhotoSwipe's root is at z-index 100000, so this must be above it. Escape
         // cancels.
         if (null === this.placingOverlay) {
             this.placingOverlay = document.createElement('div');
@@ -1310,7 +1313,8 @@ export class ViewerInteractions {
                 background: 'rgba(0, 0, 0, 0.2)',
             });
 
-            // A top bar with the instruction and a Cancel control, so placing can be abandoned on touch too (no Escape).
+            // A top bar with the instruction and a Cancel control, so placing can be abandoned
+            // on touch too (no Escape).
             const hint = document.createElement('div');
             hint.className = 'pswp__photo-place-hint';
             Object.assign(hint.style, {

@@ -18,8 +18,8 @@ use Throwable;
 use function in_array;
 
 /**
- * Intercepts an `AccessDeniedException` carrying the `SUDO` attribute and redirects to the sudo-confirmation route of
- * the firewall the request matches.
+ * Intercepts an `AccessDeniedException` with the `SUDO` attribute and redirects to the sudo-confirmation route of the
+ * firewall the request matches.
  *
  * Runs at priority 10, ahead of Symfony's per-firewall `ExceptionListener` (priority 1), which would otherwise redirect
  * an `IS_AUTHENTICATED_REMEMBERED` user to the login form. For sudo, a remember-me session must be allowed to step up

@@ -35,12 +35,12 @@ use function unlink;
 
 /**
  * Draws the artwork the career fixtures need, banner-package images and company logos, and stores it the way an upload
- * would, so the career pages serve real files instead of pointing at paths nobody ever wrote anything to.
+ * would, so the career pages serve real files instead of pointing at paths that were never written to.
  *
  * Images are generated rather than committed to the repository, as the photo fixtures do. Only the original is stored:
- * the renditions the pages ask for are generated the first time one is requested.
+ * the renditions the pages use are generated the first time one is requested.
  *
- * A banner is drawn at twice the box its format is shown in, which is what a company hands over when it wants its
+ * A banner is drawn at twice the box its format is shown in, which is what a company supplies when it wants its
  * artwork to survive a dense screen, and means both the ordinary and the retina rendition are real downscales.
  */
 final readonly class CompanyImageGenerator
@@ -95,7 +95,7 @@ final readonly class CompanyImageGenerator
     }
 
     /**
-     * A banner carrying the company name and its slogan, which is what the format describes real artwork as. The
+     * A banner with the company name and its slogan, which is what the format describes real artwork as. The
      * slogan is also what tells two banners for the same company apart, so a banner proposed alongside a new slogan
      * does not collapse onto the one it is meant to replace: stored files are content-addressed, and identical bytes
      * are one file.
@@ -126,7 +126,7 @@ final readonly class CompanyImageGenerator
             $height,
         );
 
-        // A square of flat colour on the left, where finished artwork would carry the company's own mark.
+        // A square of flat colour on the left, where finished artwork would show the company's own mark.
         $accent = $this->lighten($background);
         $this->fill(
             $image,

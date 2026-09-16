@@ -10,8 +10,8 @@ use DateTimeImmutable;
  * One message on the failure transport, flattened to what is worth showing without opening it.
  *
  * Every field is optional because a failed message is exactly the case where the stamps may be incomplete: a message
- * that died before a retry carries no `RedeliveryStamp`, and one whose handler was removed since may not decode at
- * all ({@see $class} then carries what the transport could still say about it).
+ * that failed before a retry has no `RedeliveryStamp`, and one whose handler was removed since may not decode at all
+ * ({@see $class} then contains what the transport could still report about it).
  */
 final readonly class FailedMessageRow
 {

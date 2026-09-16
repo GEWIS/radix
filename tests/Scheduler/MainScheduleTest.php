@@ -29,8 +29,8 @@ use function ksort;
 class MainScheduleTest extends KernelTestCase
 {
     /**
-     * Stated here rather than read off twenty-eight attributes. The transport decides which consumers run a job, and
-     * keeps `app:decision:generate` off the queue carrying the every-minute jobs.
+     * Stated here rather than read from twenty-eight attributes. The transport decides which consumers run a job, and
+     * keeps `app:decision:generate` off the queue with the every-minute jobs.
      */
     private const array EXPECTED = [
         'app:activity:delete-old-signups' => 'gdpr',
@@ -69,8 +69,7 @@ class MainScheduleTest extends KernelTestCase
 
         foreach ($this->schedule()->getRecurringMessages() as $recurringMessage) {
             foreach ($recurringMessage->getMessages($this->context($recurringMessage)) as $message) {
-                // Only one consumer ever advances the schedule, so anything handled here runs behind everything
-                // else.
+                // Only one consumer ever advances the schedule, so anything handled here runs behind everything else.
                 self::assertInstanceOf(
                     RedispatchMessage::class,
                     $message,
@@ -101,7 +100,7 @@ class MainScheduleTest extends KernelTestCase
         $scheduled = 0;
 
         foreach (new Application(self::bootKernel())->all() as $command) {
-            // A LazyCommand stands in for the real one and carries none of its attributes.
+            // A LazyCommand wraps the real one and has none of its attributes.
             $reflection = new ReflectionClass($command instanceof LazyCommand ? $command->getCommand() : $command);
 
             if ([] === $reflection->getAttributes(AsCronTask::class)) {
@@ -172,7 +171,7 @@ class MainScheduleTest extends KernelTestCase
     }
 
     /**
-     * What the generator hands a message provider when a run comes due.
+     * What the generator passes to a message provider when a run comes due.
      */
     private function context(RecurringMessage $recurringMessage): MessageContext
     {

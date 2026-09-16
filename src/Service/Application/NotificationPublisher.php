@@ -38,7 +38,7 @@ final class NotificationPublisher
 
     /**
      * Publish an account notice: something that happened to one account, which is never opted into and never reaches
-     * anybody else. The one way to raise one, so the callers that do cannot drift apart.
+     * any other account. The one way to raise one, so the callers that do cannot differ.
      *
      * @param array<string, string> $context
      */

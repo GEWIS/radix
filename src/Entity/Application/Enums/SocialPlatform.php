@@ -15,13 +15,13 @@ use function strtolower;
 use function trim;
 
 /**
- * The places a body or a company can be followed. What is stored is the handle, never a URL: a pasted link carries
- * whatever the app it was copied from wanted to know about the reader, and rebuilding the address from a handle leaves
- * none of that behind.
+ * The places a body or a company can be followed. What is stored is the handle, never a URL: a pasted link
+ * contains the tracking parameters the app it was copied from added, and rebuilding the address from a
+ * handle leaves none of that behind.
  *
- * Two of these are not a plain username. Discord identifies a server by an invite code, and a Mastodon account only
- * means something together with the instance it lives on, so both keep their own address template and their own idea of
- * what a valid handle looks like.
+ * Two of these are not a plain username. Discord identifies a server by an invite code, and a Mastodon account
+ * only means something together with the instance it is on, so both keep their own address template and their
+ * own pattern for a valid handle.
  */
 enum SocialPlatform: string
 {
@@ -58,7 +58,7 @@ enum SocialPlatform: string
     }
 
     /**
-     * What to write in the box, so nobody has to guess whether the at-sign belongs there.
+     * What to write in the box, so a user does not have to guess whether the at-sign belongs there.
      */
     public function placeholder(): string
     {
@@ -81,8 +81,8 @@ enum SocialPlatform: string
     }
 
     /**
-     * The address this handle points at. A Mastodon handle resolves against its own instance, which is why it has to
-     * carry one.
+     * The address this handle points at. A Mastodon handle resolves against its own instance, which
+     * is why the handle includes one.
      */
     public function urlFor(string $handle): string
     {
@@ -120,11 +120,11 @@ enum SocialPlatform: string
     }
 
     /**
-     * The handle inside whatever somebody pasted. People copy a profile link rather than type a username, and that link
+     * The handle inside whatever was pasted. People copy a profile link rather than type a username, and that link
      * arrives with the tracking parameters the app it was copied from added, so the address is thrown away here and
      * rebuilt from the handle by {@see self::urlFor()} when it is needed.
      *
-     * Anything that is not recognisable is handed back trimmed, for the validator to refuse with a message about this
+     * Anything that is not recognisable is returned trimmed, for the validator to refuse with a message about this
      * platform rather than about parsing.
      */
     public function normaliseHandle(string $input): string
@@ -134,10 +134,10 @@ enum SocialPlatform: string
             return '';
         }
 
-        // A link is only its path: the host says which platform it is, which is already known here, and the query
-        // string is the part worth losing.
+        // A link is only its path: the host indicates which platform it is, which is already known here, and the query
+        // string is the part that should be discarded.
         //
-        // A host is only read as one when a scheme or a path says so. Plenty of usernames carry a dot, and reading
+        // A host is only read as one when a scheme or a path is present. Plenty of usernames contain a dot, and reading
         // `gewis.official` as a website would leave nothing of it.
         if (
             1 === preg_match(
@@ -190,7 +190,7 @@ enum SocialPlatform: string
     }
 
     /**
-     * A Mastodon account only resolves against the instance it lives on, so its handle carries one.
+     * A Mastodon account only resolves against the instance it is on, so its handle includes one.
      */
     private function mastodonUrl(string $handle): string
     {

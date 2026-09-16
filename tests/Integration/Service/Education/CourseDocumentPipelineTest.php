@@ -100,8 +100,8 @@ final class CourseDocumentPipelineTest extends DatabaseTestCase
         );
 
         // The pages are laid out from a pixel size and a resolution, which comes out in points; FPDF measures in
-        // millimetres unless told otherwise, and getting that wrong makes every page nearly three times too large
-        // without anything else looking amiss.
+        // millimetres unless configured otherwise, and getting that wrong makes every page nearly three times too
+        // large without anything else looking amiss.
         $size = $this->pageSize($this->fileStorage->read($path));
 
         self::assertEqualsWithDelta(

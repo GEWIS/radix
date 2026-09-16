@@ -28,7 +28,7 @@ class DataExportRequest
 
     /**
      * Whose export this was. The request exists only to rate-limit that account, so it is pointless once the account
-     * is gone — and holding on to a record of who asked for their data would be the opposite of the point.
+     * is gone, and keeping a record of who requested their data would be the opposite of the point.
      */
     #[ManyToOne(targetEntity: User::class)]
     #[JoinColumn(

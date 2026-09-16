@@ -16,12 +16,12 @@ use function is_array;
 use function sort;
 
 /**
- * What one field held before this revision and what it holds now, raw. Nothing here is rendered or translated yet,
- * which is what lets the same description serve the reviewer's screen and the author's.
+ * What one field contained before this revision and what it contains now, raw. Nothing here is rendered or translated
+ * yet, which is what lets the same description serve the reviewer's screen and the author's.
  *
- * A field that exists once per language carries one of these per language; anything else carries a single value with
- * no language at all. Whether the old value means anything is {@see RevisionField::$comparable}, since a first
- * revision has nothing behind it and every old value is null for that reason alone.
+ * A field that exists once per language has one of these per language; anything else has a single value with no
+ * language at all. Whether the old value means anything is {@see RevisionField::$comparable}, since a first revision
+ * has nothing behind it and every old value is null for that reason alone.
  *
  * @phpstan-type RevisionValueSet = list<RevisionTag>|list<RevisionFlag>
  */
@@ -40,7 +40,7 @@ final readonly class RevisionFieldValue
 
     public function changeKind(bool $comparable): RevisionChangeKind
     {
-        // A set of switches carries its own before and after inside each switch, so the value itself has no side that
+        // A set of switches contains its own before and after inside each switch, so the value itself has no side that
         // is absent and would otherwise read as new every time.
         if (null !== self::flagsIn($this->new)) {
             return $comparable && $this->isChanged()
@@ -88,7 +88,7 @@ final readonly class RevisionFieldValue
         }
 
         // A translatable value is usually built fresh on every call, so identity says nothing about it. An enum that
-        // is translatable is its own singleton and falls through to the comparison below, which is what it wants.
+        // is translatable is its own singleton and falls through to the comparison below, which is correct for it.
         if (
             $this->old instanceof TranslatableMessage
             && $this->new instanceof TranslatableMessage

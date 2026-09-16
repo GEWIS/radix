@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Subclasses say how a match reads and what picking one does -- which is always to fill in hidden identifiers,
+ * Subclasses define how a match is labelled and what picking one does, which is always to fill in hidden identifiers,
  * because the text field itself is never what the form reads back.
  *
  * A monotonic token guards against a slow response replacing a newer one, and options are built through DOM APIs

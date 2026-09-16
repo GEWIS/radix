@@ -70,7 +70,7 @@ final class VacancyRepositoryTest extends DatabaseTestCase
     }
 
     /**
-     * The window applies wherever "active" is worked out, not only in the queries.
+     * The window applies wherever "active" is computed, not only in the queries.
      */
     public function testAClosedWindowAlsoMakesTheVacancyInactiveInMemory(): void
     {

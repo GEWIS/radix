@@ -82,7 +82,7 @@ class OrganService
         $abrogationDate = $ref->decision->meeting->date;
         $repOrgan->abrogationDate = $abrogationDate;
 
-        // Abolishing an organ discharges whoever is still in it; there is no separate decision for that.
+        // Abolishing an organ discharges the members still in it; there is no separate decision for that.
         foreach ($repOrgan->getMembers() as $organMember) {
             if (null !== $organMember->dischargeDate) {
                 continue;
@@ -186,7 +186,7 @@ class OrganService
         }
 
         if (null === $organMember) {
-            // The installation this discharge undoes never took effect, so there is nobody in the body to discharge.
+            // The installation this discharge undoes never took effect, so there is no member in the body to discharge.
             // That is what the ledger says whenever the installation was annulled before this point.
             return;
         }

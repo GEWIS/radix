@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * How severe a message to the user is.
  *
  * The cases are Bootstrap's contextual names, which is what lets a toast turn a level straight into a `bg-*` utility,
- * and they are the labels `addFlash()` is called with, so a flash needs no mapping on its way to the screen.
+ * and they are the labels `addFlash()` is called with, so a flash needs no mapping before it is rendered.
  */
 enum AlertTypes: string implements TranslatableInterface
 {

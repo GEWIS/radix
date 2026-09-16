@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Where a representative lands after signing in: what their company's profile and vacancies are doing, what runs out
+ * Where a representative lands after signing in: the state of their company's profile and vacancies, what runs out
  * soon, and whether anything is waiting on them.
  */
 #[IsGranted(
@@ -70,8 +70,8 @@ class CompanyController extends AbstractController
     }
 
     /**
-     * Who else acts for the company. Read-only on purpose: inviting somebody, or shutting them out, is the committee's
-     * call rather than the company's, so this only says who to ask.
+     * Who else acts for the company. Read-only on purpose: inviting a representative, or shutting them out, is the
+     * committee's call rather than the company's, so this only shows who to ask.
      */
     #[Route(
         path: '/representatives',

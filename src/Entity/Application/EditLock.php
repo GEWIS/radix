@@ -17,10 +17,11 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * An exclusive edit lock on a revisable aggregate (an activity, vacancy or company), keyed by its resource id + key so
- * a single generic lock covers every revisable domain. It is held by whoever is editing and kept alive by heartbeat
- * pings ({@see $lastPingAt}); once a ping is missed for long enough the lock is considered expired and can be taken
- * over, so an abandoned editor frees it with no cron. {@see \App\Service\Application\EditLockService} drives it.
+ * An exclusive edit lock on a revisable aggregate (an activity, vacancy or company), keyed by its resource id + key
+ * so a single generic lock covers every revisable domain. It is held by the user who is editing and kept alive by
+ * heartbeat pings ({@see $lastPingAt}); once a ping is missed for long enough the lock is considered expired and
+ * can be taken over, so an abandoned lock is freed without a cron job.
+ * {@see \App\Service\Application\EditLockService} drives it.
  */
 #[Entity(repositoryClass: EditLockRepository::class)]
 #[UniqueConstraint(
@@ -51,8 +52,8 @@ class EditLock
 
     /**
      * The user (a member's account) holding the lock. Mutually exclusive with {@see $lockedByCompanyUser}. Nulled out
-     * when the account goes, as for the company user beside it; the lock is then simply a lock nobody holds, which is
-     * what a lapsed heartbeat already makes it and which the next editor takes over.
+     * when the account goes, as for the company user beside it; the lock then simply has no holder, which is what a
+     * lapsed heartbeat already makes it and which the next editor takes over.
      */
     #[ManyToOne(targetEntity: UserModel::class)]
     #[JoinColumn(
@@ -80,7 +81,7 @@ class EditLock
     public DateTimeImmutable $lastPingAt;
 
     /**
-     * A human-readable name for whoever holds the lock, whether a member's account or a company user.
+     * A human-readable name for the holder of the lock, whether a member's account or a company user.
      */
     public function getHolderDisplayName(): string
     {

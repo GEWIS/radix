@@ -10,7 +10,7 @@ type Collection = 'installations' | 'reappointments' | 'discharges';
 
 /**
  * The rows of the three collections the form submits are built from the form's own prototypes rather than assembled
- * here, so their field names and their wording come from the server. A prototype carries two kinds of placeholder:
+ * here, so their field names and their wording come from the server. A prototype has two kinds of placeholder:
  * the ones in its sentence, which are filled with what the member and the function are called, and the ones in its
  * hidden fields, which are filled with the identifiers the form reads back. They are substituted separately, into
  * text nodes and into input values, so that a member's name is never treated as markup.
@@ -258,7 +258,7 @@ export default class extends Controller<HTMLElement> {
     private createInstallation(lidnr: string, value: string, name: string): void {
         const rows = this.rowsFor(lidnr);
 
-        // Someone can hold a function in an organ only once, so an installation that is already there is not repeated.
+        // A member can have a function in an organ only once, so an installation that is already there is not repeated.
         if (rows.some((row) => row.dataset.function === value)) {
             return;
         }
@@ -293,7 +293,7 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * A row that was added here has nothing to discharge -- it does not exist yet -- so only recorded installations
+     * A row that was added here has nothing to discharge (it does not exist yet), so only recorded installations
      * produce a discharge.
      */
     private discharge(row: HTMLTableRowElement): void {

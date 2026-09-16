@@ -63,7 +63,8 @@
         <span class="fas fa-chevron-down panel-collapse-chevron"></span>
     </button>
     <div class="collapse {% if open %}show{% endif %}" id="{{ collapseId }}">
-        {# pt-0: the .collapse wrapper defeats the panel's `.panel-heading + .panel-body` zero-top-padding rule, so the body's top padding would otherwise double. #}
+        {# pt-0: the .collapse wrapper defeats the panel's `.panel-heading + .panel-body` zero-top-padding rule, so
+           the body's top padding would otherwise double. #}
         <div class="panel-body pt-0">
             {% if is_granted('ROLE_USER') %}
                 <twig:Activity:SignupList :signupList="list.listId" />
@@ -111,7 +112,8 @@
                             </div>
                         </div>
 
-                        {# No captcha: this creates no data (only remails a pending sign-up) and always reports the same neutral result, so it never reveals whether an address is signed up. #}
+                        {# No captcha: this creates no data (only remails a pending sign-up) and always reports the
+                           same neutral result, so it never reveals whether an address is signed up. #}
                         <div class="modal fade" id="{{ resendModalId }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">

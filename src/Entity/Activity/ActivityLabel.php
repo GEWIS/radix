@@ -34,7 +34,7 @@ class ActivityLabel
     use IdentifiableTrait;
 
     /**
-     * The activity revisions this Label is assigned to (labels live on the revision so their changes are reviewable).
+     * The activity revisions this Label is assigned to (labels are on the revision so their changes are reviewable).
      *
      * @var Collection<array-key, ActivityRevision>
      */

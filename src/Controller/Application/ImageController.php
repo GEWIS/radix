@@ -18,14 +18,14 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Serves a pre-generated image variant; a cache miss queues generation and answers 503.
+ * Serves a pre-generated image variant; a cache miss queues generation and returns 503.
  *
  * Private namespaces (album photos) require a valid day-signature and pass the pluggable per-namespace access check
  * (default: an authenticated session; the photos checker additionally runs the album voter for graduates). Public
  * namespaces (covers, career, organ, page images) are served unsigned and immutably cacheable. Only a missing
  * original is a 404. The response itself comes from {@see ImageVariantResponder}.
  *
- * The route is defined non-localised in `config/routes.yaml`, so image URLs carry no `/en`|`/nl` prefix.
+ * The route is defined non-localised in `config/routes.yaml`, so image URLs have no `/en`|`/nl` prefix.
  */
 final class ImageController extends AbstractController
 {

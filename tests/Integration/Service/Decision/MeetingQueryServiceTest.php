@@ -22,7 +22,7 @@ use function array_map;
 use function count;
 
 /**
- * Pins the assembled meeting view against the seed. The GMM with minutes ("complete") carries the documents, the
+ * Pins the assembled meeting view against the seed. The GMM with minutes ("complete") has the documents, the
  * pinned reference, and the decisions that exercise the matching: exact points, the lettered "7a"/"7b" pair, and one
  * decision without an agenda point. The GMM after it is still being processed, and the soonest upcoming GMM has the
  * local time and place. GMM numbers are sequential in date order, so neighbours resolve by offset.

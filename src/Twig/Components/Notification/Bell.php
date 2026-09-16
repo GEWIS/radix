@@ -99,11 +99,11 @@ class Bell
     }
 
     /**
-     * What the register needs somebody to do, for a member who administers it.
+     * What the register needs done, for a member who administers it.
      *
-     * These are not notification records and have no read state: each one is a question about the register answered
-     * fresh, and it stops being asked by dealing with it rather than by looking at it. The register used to have an
-     * account and a bell of its own; it is administered from a membership now, so this is where they belong.
+     * These are not notification records and have no read state: each one is a check on the register computed fresh,
+     * and it stops being reported by dealing with it rather than by looking at it. The register used to have an account
+     * and a bell of its own; it is administered from a membership now, so this is where they belong.
      *
      * @return RegisterNotification[]
      */
@@ -117,16 +117,16 @@ class Bell
     }
 
     /**
-     * The notifications to show, each paired with the name it reads by and the link it points at. A notification whose
-     * subject has since been removed has nothing left to say and is dropped here, so the badge can never count more
-     * than the dropdown lists. One carrying its own frozen label is never dropped, having no subject to lose.
+     * The notifications to show, each paired with the name it is shown under and the link it points at. A notification
+     * whose subject has since been removed has no name left to show and is dropped here, so the badge can never count
+     * more than the dropdown lists. One with its own frozen label is never dropped, having no subject to lose.
      *
-     * The link is built here rather than in the template, so it can be told which firewall the reader is on. The
+     * The link is built here rather than in the template, so the firewall the reader is on can be passed to it. The
      * component only ever renders for members, so that is always the main one.
      *
-     * A run of the same kind is shown as one line, since ten separate lines saying an activity was submitted is a
-     * worse answer to "what happened" than one saying ten were. Only a run that happened at about the same time,
-     * though, and for the kinds where what the notification is about is not the point of it; see
+     * A run of the same kind is shown as one line, since ten separate lines saying an activity was submitted is a worse
+     * way to show what happened than one saying ten were. Only a run that happened at about the same time, though, and
+     * for the kinds where what the notification is about is not the point of it; see
      * {@see \App\Entity\Application\Enums\NotificationType::groupsAcrossSubjects()} and {@see self::GROUP_WINDOW}.
      *
      * @return list<array{notification: Notification, name: string, href: string, unread: int, ids: list<int>}>
@@ -243,8 +243,8 @@ class Bell
 
     /**
      * Counted from what is already loaded rather than with a second query, and counting notifications rather than
-     * lines: a line standing for three unread ones is three. The badge only distinguishes numbers up to nine, so what
-     * is in the window is enough.
+     * lines: a line that groups three unread ones counts as three. The badge only distinguishes numbers up to nine, so
+     * what is in the window is enough.
      */
     public function getUnreadCount(): int
     {
@@ -264,8 +264,8 @@ class Bell
     }
 
     /**
-     * A line standing for several points at the list they all belong to, since no single one of them is what the
-     * reader is after.
+     * A line that covers several notifications links to the list they all belong to, since no single one of them is
+     * what the reader is after.
      *
      * @param list<array{notification: Notification, name: string, href: string, unread: int, ids: list<int>}> $entries
      *
@@ -408,7 +408,7 @@ class Bell
     }
 
     /**
-     * Every role the viewer holds, hierarchy included. Security hands these out as names, and the hierarchy holds a
+     * Every role the viewer has, hierarchy included. Security provides these as names, and the hierarchy contains a
      * couple that are not roles anything can be addressed to, which drop out here.
      *
      * @return list<UserRoles>
@@ -431,10 +431,10 @@ class Bell
     }
 
     /**
-     * The member reading the centre, or null when nobody has finished signing in. The role above is only checked when
+     * The member reading the centre, or null when no user has finished signing in. The role above is only checked when
      * a live action comes back over HTTP; the first render happens inside a template, where nothing checks it. That
-     * makes this the one place both paths pass through, and a sign-in waiting on its second factor already carries the
-     * member on the token, so asking for the user alone would hand their notifications to whoever holds the password.
+     * makes this the one place both paths pass through, and a sign-in waiting on its second factor already has the
+     * member on the token, so reading the user alone would show their notifications to anyone with the password.
      */
     private function currentUser(): ?User
     {

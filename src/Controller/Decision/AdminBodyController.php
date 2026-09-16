@@ -39,9 +39,9 @@ use function assert;
  * Where a body writes its own page. A body never edits what is on the website: it works on a draft, submits it, and the
  * board decides, which is what {@see AdminBodyApprovalController} is for.
  *
- * Which bodies somebody may write for is the organs they are installed in, and the board may write for all of them.
- * That is the voter's answer rather than this controller's, because the page names the body it belongs to and the voter
- * already reads organ membership off it.
+ * Which bodies a member may write for is the organs they are installed in, and the board may write for all of them.
+ * That is decided by the voter rather than this controller, because the page names the body it belongs to and the
+ * voter already reads organ membership from it.
  */
 #[IsGranted(
     attribute: new Expression(
@@ -90,8 +90,8 @@ class AdminBodyController extends AbstractRevisionController
     public function view(Organ $organ): Response
     {
         $page = $organ->organInformation;
-        // Whoever administers the register comes here for the body's composition rather than for its page, so the
-        // page's own permissions decide what they are shown of it rather than whether they are let in at all.
+        // A register administrator comes here for the body's composition rather than for its page, so the page's own
+        // permissions decide what they are shown of it rather than whether they are let in at all.
         $register = $this->isGranted(UserRoles::DatabaseReadOnly->value);
 
         if (null !== $page) {
@@ -122,7 +122,7 @@ class AdminBodyController extends AbstractRevisionController
                 'comments' => null === $page
                     ? []
                     : $this->commentRepository->findThreadForOrganInformation($page),
-                // The page half is only shown to somebody who may write it; a register reader who may not still sees
+                // The page half is only shown to a member who may write it; a register reader who may not still sees
                 // the composition below it.
                 'showsPage' => null === $page
                     ? $this->mayStartAPage($organ)
@@ -225,7 +225,7 @@ class AdminBodyController extends AbstractRevisionController
                     'organ' => $organ,
                     'information' => $page,
                     'revision' => $draft,
-                    // The picker holds the frame to a minimum width of the original, which it cannot read off the
+                    // The picker limits the frame to a minimum width of the original, which it cannot read from the
                     // rendition it draws on.
                     'bannerSourceWidth' => $this->imageUploadService->sourceWidth($draft->bannerSource),
                     'logoSourceWidth' => $this->imageUploadService->sourceWidth($draft->logoSource),
@@ -256,8 +256,8 @@ class AdminBodyController extends AbstractRevisionController
         );
         $flow->reset();
 
-        // The text is saved either way, so what went wrong is said rather than hidden behind the usual reassurance: a
-        // body that is told its page is saved would submit it for review with the old image still on it.
+        // The text is saved either way, so what went wrong is reported rather than hidden behind the usual reassurance:
+        // a body that is notified its page is saved would submit it for review with the old image still on it.
         if ($stored) {
             $this->addFlash(
                 AlertTypes::Success->value,
@@ -331,8 +331,8 @@ class AdminBodyController extends AbstractRevisionController
     }
 
     /**
-     * Start a fresh draft off whatever the page says now, which is the only way to change something the board has
-     * already decided on.
+     * Start a fresh draft from the current revision, which is the only way to change something the board has already
+     * decided on.
      */
     #[Route(
         path: '/{organ}/revise',
@@ -446,8 +446,8 @@ class AdminBodyController extends AbstractRevisionController
     }
 
     /**
-     * Whether this member may write a page for a body that has none yet. The voter needs a page to read the body off,
-     * so before there is one the same question is answered here: the board, or somebody installed in the body.
+     * Whether this member may write a page for a body that has none yet. The voter needs a page to read the body from,
+     * so before there is one the same check is applied here: the board, or a member installed in the body.
      */
     private function mayStartAPage(Organ $organ): bool
     {

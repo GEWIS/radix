@@ -8,11 +8,11 @@ use App\Entity\Database\Member;
 use DateTimeInterface;
 
 /**
- * One member as a search answers for them.
+ * One member as a search returns them.
  *
- * The overview and the lookups on the decision forms both read this, so it carries what a result row shows and the
- * address of the member's page -- and nothing else: the member's authentication key has no business in a response
- * that only has to identify them.
+ * The overview and the lookups on the decision forms both read this, so it contains what a result row shows and the
+ * address of the member's page, and nothing else: the member's authentication key does not belong in a response that
+ * only has to identify them.
  */
 final readonly class MemberSearchResult
 {

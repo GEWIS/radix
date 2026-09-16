@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
- * The overview's year switcher must list only the association years that actually hold a published root album: a year
- * with none (a gap between two dated albums) never appears, and a year holding several albums appears once.
+ * The overview's year switcher must list only the association years that actually have a published root album: a year
+ * with none (a gap between two dated albums) never appears, and a year with several albums appears once.
  */
 final class AlbumServiceYearsTest extends TestCase
 {

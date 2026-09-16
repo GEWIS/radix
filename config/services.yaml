@@ -19,12 +19,12 @@ parameters:
     # TOTP), and `when@prod:` (hardcoded true, immutable, regardless of any environment variable).
     app.mfa.enforcement_enabled: true
     # A developer sets the variable in `.env.local`, which is not committed, so anything that compiles the development
-    # container without one — the PHPStan workflow does, to give the Symfony and Doctrine extensions a container and a
-    # mapping to read — has nothing to resolve `when@dev:` against and fails outright. Defaulted to `true` for the
-    # same reason the parameter above is: an environment that says nothing gets enforcement.
+    # container without one (the PHPStan workflow does, to give the Symfony and Doctrine extensions a container and a
+    # mapping to read) has nothing to resolve `when@dev:` against and fails outright. Defaulted to `true` for the same
+    # reason the parameter above is: an environment that says nothing gets enforcement.
     env(MFA_ENFORCEMENT): 'true'
     # The transport a message lands on once every retry is spent. Named here rather than in `messenger.yaml` alone
-    # because the administration's queue page reads the same transport back, and the two must not drift apart.
+    # because the administration's queue page reads the same transport back, and the two must not differ.
     app.messenger.failure_transport: 'failed'
     # On the shared `data` volume, so the IP databases `app:user:update-ip-databases` fetches on a worker are the
     # ones the application reads; the entrypoint seeds them from the image until that command has run once.
@@ -34,7 +34,7 @@ parameters:
     env(MAXMIND_ACCOUNT_ID): ''
     env(MAXMIND_LICENSE_KEY): ''
     # Device recognition reduces every address in these ranges to the one campus network. The internal side of the
-    # university's NAT hands out shared space (100.64.0.0/10) that no public database names and whose prefixes
+    # university's NAT assigns shared space (100.64.0.0/10) that no public database names and whose prefixes
     # rotate, so on its own it would be a new network every few days. Its own parameter rather than a reuse of
     # education's, so the two may diverge.
     app.user.campus_ranges: '%env(csv:TUE_IP_RANGES)%'
@@ -44,18 +44,18 @@ parameters:
     # Who a company writes to about its profile, vacancies, banner and package. Read by the company area templates
     # through the `external_affairs_email` Twig global.
     app.email.external_affairs: 'ceb@gewis.nl'
-    # The education officer: who a member sends a summary to, and who takes a complaint about a course to the
+    # The Education Officer: who a member sends a summary to, and who takes a complaint about a course to the
     # department. Read by the education pages through the `education_email` Twig global.
     app.email.education: 'co@gewis.nl'
-    # Whether a new password is held against the association's own pwned-passwords lookup. On in production and off
-    # in `when@dev:` and `when@test:` below: the service is not something a development machine or the test suite
-    # should be calling, and a failed lookup deliberately refuses the password rather than letting it through.
+    # Whether a new password is checked against the association's own pwned-passwords lookup. On in production and off
+    # in `when@dev:` and `when@test:` below: the service is not something a development machine or the test suite should
+    # be calling, and a failed lookup deliberately refuses the password rather than letting it through.
     app.user.compromised_password_check_enabled: true
-    # A university address stops working once somebody graduates, and the association loses touch with them the day it
-    # does. Members on one of these are told to give the board an address that outlives their studies.
+    # A university address stops working once a member graduates, and the association can no longer reach them the day
+    # it does. Members on one of these are asked to give the board an address that outlives their studies.
     app.user.student_email_domain: '@student.tue.nl'
-    # Regulations on the members-area dashboard: slug (used in the URL) to the folder holding the document inside the
-    # SFTP-mirrored public archive (`data/public-archive/`). The board keeps the current version of a policy in that
+    # Regulations on the members-area dashboard: slug (used in the URL) to the folder that contains the document inside
+    # the SFTP-mirrored public archive (`data/public-archive/`). The board keeps the current version of a policy in that
     # folder as `<slug>-latest.pdf`, so a new version replaces the old one without the link having to change.
     app.regulations:
         activity-policy: 'Policies & Regulations/Activity Policy'
@@ -68,7 +68,7 @@ parameters:
         poster-policy: 'Policies & Regulations/Poster Policy'
         privacy-policy: 'Policies & Regulations/Privacy Policy'
     # The regulations anyone may download without an account. The sign-up form for an activity makes an external agree
-    # to these two before it lets them sign up, and somebody who has no account cannot be asked to agree to something
+    # to these two before it lets them sign up, and a visitor without an account cannot be asked to agree to something
     # they are not allowed to read.
     app.regulations.public:
         - 'activity-policy'
@@ -86,9 +86,9 @@ parameters:
     # Written into every watermarked download as machine-readable text, so a copy found on an external platform can be
     # recognised as ours. Deliberately not a secret: it is meant to be found.
     env(WATERMARK_TAG): 'GEWIS-EDU'
-    # The names that travel with the addresses below. Defaulted here so a run outside the stack — a test, a container
-    # compiled for static analysis — has one, and passed as variables in compose.yaml like the addresses themselves,
-    # so a deployment that wants to sign its mail differently can say so without a code change.
+    # The names that are sent with the addresses below. Defaulted here so a run outside the stack (a test, a container
+    # compiled for static analysis) has one, and passed as variables in compose.yaml like the addresses themselves, so a
+    # deployment that wants to sign its mail differently can say so without a code change.
     env(MAIL_FROM_NAME): 'Study Association GEWIS'
     env(MAIL_REPLY_TO_SECRETARY_NAME): 'Secretary'
     env(MAIL_TO_CHECKER_RESULT_NAME): 'Secretary'
@@ -100,14 +100,14 @@ parameters:
     env(MAIL_TO_GEFLITST_NAME): 'GEFLITST'
     env(MAIL_TO_GEFLITST_PLANKA_NAME): 'GEFLITST (Planka)'
     env(MAIL_TO_TREASURER_NAME): 'Treasurer'
-    # Stripe sends a `Stripe-Notice` header when the pinned version is behind, and the SDK re-raises it as a PHP
+    # Stripe sends a `Stripe-Notice` header when the pinned version is out of date, and the SDK re-raises it as a PHP
     # warning, which the dev error handler turns into an exception. It moves when the installed SDK moves, so the
-    # default below follows this checkout; a deployment that has to pin elsewhere — testing a newer version against
-    # the live account before the SDK catches up — overrides it. The SDK is built for 2026-06-24.dahlia; both are the
-    # same major, within which Stripe only adds.
+    # default below follows this checkout; a deployment that has to pin elsewhere (testing a newer version against the
+    # live account before the SDK catches up) overrides it. The SDK is built for 2026-06-24.dahlia; both are the same
+    # major, within which Stripe only adds.
     env(STRIPE_API_VERSION): '2026-07-29.dahlia'
-    # Which REST version Mailman is spoken to on. It follows the Mailman a deployment points at, so it is a variable
-    # like the endpoint and the credentials; 3.1 is what the versions we run answer on.
+    # Which REST version of the Mailman API is used. It follows the Mailman a deployment points at, so it is a variable
+    # like the endpoint and the credentials; 3.1 is what the versions we run support.
     env(MAILMAN_API_VERSION): '3.1'
     # The Supremum's API, which the infimum on the front page and in the footer is drawn from. Without a key the
     # request is refused and the panel keeps whatever it last had, so an empty key is a working deployment rather than
@@ -118,15 +118,15 @@ parameters:
     # The face the red watermark and the generated fixture images are drawn in. Shipped by `fonts-dejavu-core`, which
     # the Dockerfile installs explicitly.
     app.font: '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
-    # The association's own agenda, which the option calendar draws behind the days bodies ask for. Defaulted so a
-    # machine without a key runs perfectly well with that layer simply absent; production requires both for real
-    # (see compose.yaml).
+    # The association's own agenda, which the option calendar draws behind the days bodies request. Defaulted
+    # so a machine without a key runs perfectly well with that layer simply absent; production requires both
+    # for real (see compose.yaml).
     env(GOOGLE_API_KEY): 'unknown'
     env(GOOGLE_CALENDAR_KEY): 'unknown'
-    # How many activities a body may put forward in one option period when nobody has said otherwise. The board can
-    # set a different number for a single period, and a standing or one-off exception for a single body; this is what
-    # answers when none of those apply, which is the usual case. No row is ever written per body, so a body founded
-    # halfway through a period lands here rather than on nothing.
+    # How many activities a body may put forward in one option period when the board has not set anything else. The
+    # board can set a different number for a single period, and a standing or one-off exception for a single body; this
+    # is the value used when none of those apply, which is the usual case. No row is ever written per body, so a body
+    # founded halfway through a period uses this value rather than none.
     app.activity.default_max_proposals: 3
     # External tools linked from the members-area dashboard.
     app.members_area_links:
@@ -156,7 +156,7 @@ services:
             $googleCalendarId: '%env(string:GOOGLE_CALENDAR_KEY)%' # string
             $googleApiKey: '%env(string:GOOGLE_API_KEY)%' # string
             # Who the register writes as, and who it writes to. The secretary signs off on membership; the checker
-            # results, the error reports and the subscription notices each land with whoever acts on them.
+            # results, the error reports and the subscription notices each go to the address responsible for them.
             $mailFromAddress: '%env(string:MAIL_FROM_ADDRESS)%' # string
             $mailFromName: '%env(string:MAIL_FROM_NAME)%' # string
             $mailReplyToSecretaryAddress: '%env(string:MAIL_REPLY_TO_SECRETARY_ADDRESS)%' # string
@@ -198,14 +198,14 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
             - '../src/Security/User/HandlerRegistry.php'
-            # Value objects the container has no business constructing: they are built from entities at the point of
-            # use, and their constructors are deliberately not public.
+            # Value objects the container should not construct: they are built from entities at the point of use, and
+            # their constructors are deliberately not public.
             - '../src/ViewModel/'
             # Data, like the entities above: registering them would autowire the scalars they are made of.
             - '../src/ApiResource/'
-            # Seeding is a development and test concern, and doctrine/doctrine-fixtures-bundle and fakerphp/faker are
-            # require-dev: the production image is built with `--no-dev`, so registering these there asks the container
-            # for classes and for a `doctrine.fixtures.loader` service that are not in it. Registered again under
+            # Seeding is a development and test concern, and doctrine/doctrine-fixtures-bundle and fakerphp/faker
+            # are require-dev: the production image is built with `--no-dev`, so registering these there references
+            # classes and a `doctrine.fixtures.loader` service that are not in it. Registered again under
             # `when@dev:` and `when@test:` below.
             - '../src/DataFixtures/'
             - '../src/Command/Application/LoadFixturesCommand.php'
@@ -273,8 +273,8 @@ when@test:
 
     services:
         <<: *fixture_services
-        # A test builds its own schema, which the least-privileged role production drops to may not do. Dropping the
-        # autoconfiguration drops the `doctrine.middleware` tag with it.
+        # A test builds its own schema, which the least-privileged role production drops to may not do. Disabling
+        # autoconfiguration also removes the `doctrine.middleware` tag.
         App\Doctrine\Middleware\SetRoleMiddleware:
             autoconfigure: false
 

@@ -13,9 +13,9 @@ use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * A cookie handed to a browser at sign-in, so the browser itself can say it has been here before, wherever it goes.
- * It is no credential: it only suppresses the notice for the one account it was minted on, so a stolen one is worth
- * nothing without the password it rode along with.
+ * A cookie issued to a browser at sign-in, so the browser is recognised on a later sign-in, whatever network it is
+ * on. It is no credential: it only suppresses the notice for the one account it was minted on, so a stolen one is
+ * worth nothing without the password it was issued with.
  *
  * @phpstan-type KnownDeviceTokenGdprArrayType = array{
  *     firewall: string,
@@ -30,7 +30,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 #[Index(fields: ['lastSeenAt'])]
 class KnownDeviceToken extends KnownFact
 {
-    /** Keyed HMAC, so reading this table yields no cookie that would quiet somebody's notices. */
+    /** Keyed HMAC, so reading this table gives no cookie that would suppress a member's notices. */
     #[Column(type: Types::STRING)]
     public string $tokenHash;
 

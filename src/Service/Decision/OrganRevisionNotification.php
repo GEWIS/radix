@@ -16,7 +16,7 @@ use function assert;
 use function sprintf;
 
 /**
- * What a body writes about itself is the board's to look at, and nobody else's.
+ * What a body writes about itself is reviewed by the board only.
  */
 final readonly class OrganRevisionNotification implements RevisionNotificationInterface
 {

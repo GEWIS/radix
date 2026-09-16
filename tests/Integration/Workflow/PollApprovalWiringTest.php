@@ -27,7 +27,7 @@ use function array_map;
 /**
  * The generic revision workflow covers a poll by instanceof, and a poll is the one domain that deliberately does not
  * use all of it. These pin both halves: a question goes all the way round and becomes what the front page shows, and
- * the two ways a poll could grow something to edit stay shut.
+ * the two ways a poll could get something to edit are both blocked.
  */
 final class PollApprovalWiringTest extends DatabaseTestCase
 {
@@ -62,7 +62,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
             );
         }
 
-        // Approving is also scheduling, which is why the date is filled in here rather than by whoever asked.
+        // Approving is also scheduling, which is why the date is filled in here rather than by the member who asked.
         $poll->expiryDate = new DateTimeImmutable('+2 weeks');
         $this->entityManager->flush();
 
@@ -107,7 +107,7 @@ final class PollApprovalWiringTest extends DatabaseTestCase
     }
 
     /**
-     * There is no draft to hand back, so the board is only ever offered yes or no.
+     * There is no draft to send back, so the board is only ever offered yes or no.
      */
     public function testTheBoardIsNotOfferedToAskForChanges(): void
     {

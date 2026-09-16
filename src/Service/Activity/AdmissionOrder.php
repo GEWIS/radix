@@ -23,9 +23,9 @@ use function usort;
  * Applies a sign-up list's priority modifiers to the pool the draw is about to admit from, as a change to the order
  * the draw admits in, so there is one place where admission is decided.
  *
- * Ranking first, where the coarsest configured order wins and the sort is stable; then the places held back, the
- * organising committee before the membership tiers; then the role minimums, only to make up a shortfall. All of it
- * acts on the pool that existed at the announced draw moment, never on the latecomers the draw appends afterwards.
+ * Ranking first, where the coarsest configured order wins and the sort is stable; then the reserved places, the
+ * organising committee before the membership tiers; then the role minimums, only to make up a shortfall. All of it acts
+ * on the pool that existed at the announced draw moment, never on the latecomers the draw appends afterwards.
  */
 final readonly class AdmissionOrder
 {
@@ -61,9 +61,9 @@ final readonly class AdmissionOrder
     }
 
     /**
-     * Whoever holds a role the activity cannot go ahead without gets a place, displacing the last person admitted
-     * without one. Separate from {@see self::arrange()} because a role is handed out after sign-up has closed, to
-     * anybody on the list, so it has to be honoured over the latecomers too and not only over the on-time pool.
+     * A sign-up with a role the activity cannot go ahead without gets a place, displacing the last person admitted
+     * without one. Separate from {@see self::arrange()} because a role is assigned after sign-up has closed, to anybody
+     * on the list, so it has to be honoured over the latecomers too and not only over the on-time pool.
      *
      * @param list<Signup> $ordered
      *
@@ -155,7 +155,7 @@ final readonly class AdmissionOrder
     }
 
     /**
-     * Where a tier sits in an order. A rank may hold several tiers, which are then admitted together.
+     * The position of a tier in an order. A rank may contain several tiers, which are then admitted together.
      *
      * @param list<list<mixed>> $order
      */
@@ -216,7 +216,7 @@ final readonly class AdmissionOrder
             );
         }
 
-        // Tiers admitted together share the places held for them: one pool per rank rather than one per tier.
+        // Tiers admitted together share the places reserved for them: one pool per rank rather than one per tier.
         foreach ($list->getMembershipTierOrder() ?? [] as $rank) {
             $this->take(
                 $ordered,
@@ -258,7 +258,7 @@ final readonly class AdmissionOrder
     /**
      * @param list<Signup>           $ordered
      * @param list<Signup>           $front
-     * @param array<int, true>       $taken   indices of $ordered already spoken for, added to here
+     * @param array<int, true>       $taken   indices of $ordered already taken, added to here
      * @param callable(Signup): bool $matches
      */
     private function take(

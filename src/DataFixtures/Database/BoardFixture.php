@@ -29,26 +29,26 @@ use function sprintf;
 /**
  * Six years of boards, each one following the association year the way a real one does.
  *
- * A board is decided on well before it starts. The general members' meeting that installs it sits in May, and the
- * installation names 1 July as the day it takes effect, so the meeting that decides and the term that follows do not
- * have to line up. A year later the board is released, again on 1 July, and it is only discharged once its annual
- * report has been dealt with -- which is a separate meeting, months after it stopped serving.
+ * A board is decided on well before it starts. The general members' meeting that installs it takes place in May, and
+ * the installation names 1 July as the day it takes effect, so the meeting that decides and the term that follows do
+ * not have to line up. A year later the board is released, again on 1 July, and it is only discharged once its annual
+ * report has been dealt with: a separate meeting, months after it stopped serving.
  *
  * That leaves three states worth seeding, and all three are here: boards that were installed, released and discharged;
  * one that was released but whose report is still outstanding, so it has no discharge; and the board that is serving
  * now, which has neither.
  *
- * Every board holds between three and nine members, which is what the statutes allow. The smallest is the bare chair,
- * secretary and treasurer; the largest fills every commissioner's seat besides.
+ * Every board has between three and nine members, which is what the statutes allow. The smallest is the bare Chair,
+ * Secretary and Treasurer; the largest fills every officer's seat besides.
  */
 final class BoardFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
     /**
      * The boards, oldest first, as an offset in association years from the one running now.
      *
-     * `$discharged` says whether the annual report has been dealt with. The board that stepped down this July has not
-     * got there yet, which is both the ordinary state of affairs a few weeks in and what puts a released board without
-     * a discharge on the books; the board serving now has neither, which is what `$termsAgo === 0` means.
+     * `$discharged` records whether the annual report has been dealt with. The board that stepped down this July has
+     * not got there yet, which is both the ordinary state of affairs a few weeks in and what puts a released board
+     * without a discharge on the books; the board serving now has neither, which is what `$termsAgo === 0` means.
      */
     private const array BOARDS = [
         [
@@ -92,7 +92,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     /**
      * The seats a board fills, in the order they are filled.
      *
-     * The first three are the ones a board cannot be without, which is also why the smallest board here holds exactly
+     * The first three are the ones a board cannot be without, which is also why the smallest board here has exactly
      * them; the rest are added as the board grows.
      */
     private const array SEATS = [
@@ -109,7 +109,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
 
     /**
      * Where this fixture's general members' meetings are numbered from. Below the series the rest of the seed uses, so
-     * the two never land on the same meeting.
+     * the two never use the same meeting number.
      */
     private const int FIRST_MEETING_NUMBER = 100;
 
@@ -162,7 +162,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
         ));
         $released = new DateTimeImmutable($takesEffect->format('Y-m-d'))->modify('+1 year');
 
-        // Decided in May, in office from 1 July. The meeting is where the decision lives; the date on the
+        // Decided in May, installed from 1 July. The meeting is where the decision is recorded; the date on the
         // installation is when it starts.
         $installations = $this->install(
             $manager,
@@ -195,7 +195,7 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
         }
 
         // The annual report takes a few months to be written and dealt with, so the discharge is its own meeting well
-        // after the board stopped serving. The projection reads the discharge date off that meeting.
+        // after the board stopped serving. The projection reads the discharge date from that meeting.
         $this->discharge(
             $manager,
             $this->meeting(
@@ -294,10 +294,10 @@ final class BoardFixture extends Fixture implements DependentFixtureInterface, F
     }
 
     /**
-     * A meeting on the given day, nudged a day further for every one already made.
+     * A meeting on the given day, moved a day later for every one already made.
      *
      * One board is released and the next installed six weeks before the same 1 July, which would otherwise put two
-     * meetings on one day; meetings that share a date leave "the oldest meeting" with no single answer.
+     * meetings on one day; meetings that share a date make "the oldest meeting" ambiguous.
      */
     private function meeting(
         ObjectManager $manager,

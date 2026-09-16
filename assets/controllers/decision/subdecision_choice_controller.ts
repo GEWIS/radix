@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * The radios themselves are not form fields: which one is checked says nothing the server needs beyond the reference
- * they carry, and leaving them out of the form keeps that reference the single source of truth.
+ * they contain, and leaving them out of the form keeps that reference the single source of truth.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
@@ -14,7 +14,7 @@ export default class extends Controller<HTMLElement> {
     declare readonly decisionPointTarget: HTMLInputElement;
     declare readonly decisionNumberTarget: HTMLInputElement;
     declare readonly sequenceTarget: HTMLInputElement;
-    // Only a key code withdrawal carries the granting it takes back, so the grantee and the expiry are optional.
+    // Only a key code withdrawal contains the granting it withdraws, so the grantee and the expiry are optional.
     declare readonly hasUntilTarget: boolean;
     declare readonly untilTarget: HTMLInputElement;
     declare readonly hasLidnrTarget: boolean;

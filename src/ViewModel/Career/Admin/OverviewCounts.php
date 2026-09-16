@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\ViewModel\Career\Admin;
 
 /**
- * How much sits behind each tab of the career overview, so the tab bar can say so without the templates counting
- * anything themselves.
+ * How many items are in each tab of the career overview, so the tab bar can show the counts without the templates
+ * counting anything themselves.
  */
 final readonly class OverviewCounts
 {

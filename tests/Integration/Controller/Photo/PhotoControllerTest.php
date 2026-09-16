@@ -112,7 +112,7 @@ final class PhotoControllerTest extends DatabaseTestCase
             Response::HTTP_OK,
             $response->getStatusCode(),
         );
-        // A photo opens in this album's own viewer rather than sending the reader off to the album it lives in, which
+        // A photo opens in this album's own viewer rather than sending the reader off to the album it is in, which
         // is what every other virtual album does; the grid and the viewer are built from the manifest.
         self::assertStringContainsString(
             '/manifest',

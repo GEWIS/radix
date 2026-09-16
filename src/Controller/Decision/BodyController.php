@@ -19,14 +19,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use function strlen;
 
 /**
- * The bodies of the association, as anybody may read them: an overview per kind, and a page per body carrying whatever
- * that body wrote about itself.
+ * The bodies of the association, as any visitor may read them: an overview per kind, and a page per body containing
+ * whatever that body wrote about itself.
  *
  * Only what the board has approved is shown; a page with nothing approved yet renders as a body with no page, which is
  * also what a body that never wrote one looks like.
  *
- * An abbreviation is reused over the years, so a body's address may carry the year it was founded. Without one the
- * newest body under those letters answers, which is what an old bookmark and a search result expect.
+ * An abbreviation is reused over the years, so a body's address may include the year it was founded. Without one the
+ * newest body under those letters is shown, which is what an old bookmark and a search result expect.
  */
 class BodyController extends AbstractController
 {
@@ -115,7 +115,7 @@ class BodyController extends AbstractController
     /**
      * A body's own page. The trailing segment is how one body under a reused abbreviation is told from another: the
      * year it was founded, or its whole founding date when two of them were founded in the same year. The overviews
-     * link with whichever of the two is unambiguous, so following one of those always lands on the body it named.
+     * link with whichever of the two is unambiguous, so following one of those always reaches the body it named.
      */
     #[Route(
         path: '/association/{type}/{abbr}/{founded}',

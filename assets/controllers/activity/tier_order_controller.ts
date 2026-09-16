@@ -57,8 +57,8 @@ export default class extends DragReorder {
     }
 
     /**
-     * Write the rank each entry sits on. The first entry cannot be tied to anything, so it starts rank one and is
-     * offered no tie of its own.
+     * Write the rank of each entry. The first entry cannot be tied to anything, so it starts rank one and is offered
+     * no tie of its own.
      */
     private number(): void {
         let rank = 0;
@@ -87,7 +87,7 @@ export default class extends DragReorder {
                 tie.classList.toggle('active', tied);
             }
 
-            // The places are held for the rank, so only the row it starts on asks for them.
+            // The places are reserved for the rank, so only the row it starts on asks for them.
             const box = entry.querySelector<HTMLElement>('[data-tier-order-target="placesBox"]');
             const places = entry.querySelector<HTMLInputElement>('[data-tier-order-target="places"]');
             if (null !== box && null !== places) {

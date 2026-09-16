@@ -17,7 +17,7 @@ body {
     }
 }
 
-// A panel carries its own top margin, and the header band its own padding, so without this the two stack into a gap
+// A panel has its own top margin, and the header band its own padding, so without this the two stack into a gap
 // twice the size of the one between the panels below.
 .page-body > .panel:first-child,
 .page-body > .row:first-child > * > .panel:first-child {

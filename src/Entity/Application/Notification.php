@@ -25,9 +25,9 @@ use function array_filter;
 use function count;
 
 /**
- * A published notification shown in the notification centre. It records only what happened and what it happened to;
- * the sentence, the link and its label all come from {@see NotificationType}, so a notification follows its subject
- * when that is renamed and reads in the language of whoever is looking at it.
+ * A published notification shown in the notification centre. It records only what happened and what it happened to; the
+ * sentence, the link and its label all come from {@see NotificationType}, so a notification follows its subject when
+ * that is renamed and reads in the language of the member reading it.
  *
  * Most notifications go to everyone, and one row then serves the whole membership. A notification may instead be
  * addressed to a single user, which is what anything about their own account has to be.
@@ -77,9 +77,9 @@ class Notification
     public ?int $subjectId = null;
 
     /**
-     * What a notification with no subject to point at has to say for itself, frozen when it was published. Such a
-     * notification outlives whatever it describes (someone signs in and then signs out again), so it cannot be left to
-     * look anything up later.
+     * What a notification with no subject to point at records instead, frozen when it was published. Such a
+     * notification still exists after what it describes is gone (a user signs in and then signs out again), so the
+     * details cannot be looked up later.
      *
      * The keys mean whatever {@see NotificationType} says they mean; a sign-in keeps the parts of the device it came
      * from. Parts rather than a finished sentence, because the words joining them are translated when read.
@@ -93,10 +93,10 @@ class Notification
     public ?array $context = null;
 
     /**
-     * Who this notification is addressed to, or nobody in particular when both are null and it goes to everyone.
+     * Who this notification is addressed to. Both are null when it goes to everyone.
      *
-     * The two kinds of account get a column each so the database can hold a real foreign key to either, which a single
-     * identifier could not. At most one is ever set.
+     * The two kinds of account get a column each so the database can enforce a real foreign key to either, which a
+     * single identifier could not. At most one is ever set.
      */
     #[ManyToOne(targetEntity: User::class)]
     #[JoinColumn(
@@ -108,8 +108,8 @@ class Notification
     public private(set) ?User $recipientUser = null;
 
     /**
-     * Addressed to whoever holds a role rather than to one account, for something a group is responsible for. Kept as
-     * the role itself because the roles that matter here are worked out per member rather than stored, so there is
+     * Addressed to every user with this role rather than to one account, for something a group is responsible for. Kept
+     * as the role itself because the roles that matter here are computed per member rather than stored, so there is
      * nothing to point a foreign key at.
      */
     #[Column(

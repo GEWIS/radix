@@ -33,8 +33,8 @@ use function str_starts_with;
  * Renders failures below `/api` as the JSON envelope other GEWIS applications parse:
  * `{"status": "...", "error": {"type": "...", "exception": "..."}}`.
  *
- * Setting a response stops propagation, so priority decides who answers: 2 beats the firewall's own listener at 1,
- * and -95 beats API Platform's at -96 and the HTML error renderer at -128.
+ * Setting a response stops propagation, so priority decides which listener responds: 2 beats the firewall's own
+ * listener at 1, and -95 beats API Platform's at -96 and the HTML error renderer at -128.
  */
 #[AsEventListener(
     event: KernelEvents::EXCEPTION,
@@ -60,10 +60,10 @@ final class ApiExceptionListener
     /**
      * How the API names each failure it can report.
      *
-     * The body has always carried the exception's class name, so consumers key on strings naming classes that no
+     * The body has always contained the exception's class name, so consumers key on strings naming classes that no
      * longer exist. Those strings are part of the contract and outlived the classes, which is why they are stated
-     * here rather than derived from `::class` — and why they live at the wire boundary rather than on the
-     * exceptions, which have no business knowing their JSON name.
+     * here rather than derived from `::class`, and why they are defined at the wire boundary rather than on the
+     * exceptions, which should not depend on their JSON name.
      */
     private const array TYPES = [
         NotAllowed::class => 'User\\Model\\Exception\\NotAllowed',

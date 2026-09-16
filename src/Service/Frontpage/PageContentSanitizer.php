@@ -11,8 +11,8 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
  * What a custom page is allowed to contain, applied on the way in.
  *
  * A page is written in a visual editor and stored as HTML, which the public template renders as-is. That makes the
- * moment of saving the only place worth checking: whatever is stored has already been through here, so a page that
- * was written before this existed, or by somebody bypassing the editor, cannot smuggle anything past the reader.
+ * moment of saving the only place worth checking: whatever is stored has already been through here, so a page that was
+ * written before this existed, or by a user bypassing the editor, cannot reach the reader unchecked.
  */
 final readonly class PageContentSanitizer
 {

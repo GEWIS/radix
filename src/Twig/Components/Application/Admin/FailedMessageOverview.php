@@ -22,10 +22,10 @@ use function count;
 /**
  * The messages that used up every retry, paged through.
  *
- * The transport takes no offset and answers in no defined order, so the readable set is fetched whole and a page is
- * cut out of it rather than queried. That is the plain overview's case rather than the Doctrine one, and it is why
- * the fetch is held: the base class asks twice when a page number turns out to be past the end, and reading a few
- * hundred envelopes off the broker is not worth doing twice to answer the same question.
+ * The transport takes no offset and returns messages in no defined order, so the readable set is fetched whole and a
+ * page is cut out of it rather than queried. That is the plain overview's case rather than the Doctrine one, and it is
+ * why the fetch is cached: the base class fetches twice when a page number turns out to be past the end, and reading a
+ * few hundred envelopes from the broker is not worth doing twice for the same result.
  *
  * @extends AbstractPaginatedOverview<FailedMessageRow>
  */
@@ -44,7 +44,7 @@ final class FailedMessageOverview extends AbstractPaginatedOverview
     }
 
     /**
-     * What the transport says it holds, which is more than what can be paged over here once the cap bites.
+     * What the transport says it contains, which is more than what can be paged over here once the cap applies.
      */
     public function getTransportTotal(): ?int
     {

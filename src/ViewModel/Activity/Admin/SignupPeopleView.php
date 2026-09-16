@@ -22,7 +22,7 @@ use function trim;
 use function uasort;
 
 /**
- * Everybody on an activity, one row per person and one column per list: the reading that shows who is in two lists,
+ * Everybody on an activity, one row per person and one column per list: the view that shows who is in two lists,
  * who is stuck on a waiting list and who only joined one part.
  *
  * @phpstan-type ListSummary array{listId: int, name: string, limited: bool}
@@ -213,7 +213,7 @@ final readonly class SignupPeopleView
     }
 
     /**
-     * One person, read off every sign-up of theirs on the activity.
+     * One person, read from every sign-up of theirs on the activity.
      *
      * @param non-empty-list<Membership> $group
      * @param int[]                      $selectedIds

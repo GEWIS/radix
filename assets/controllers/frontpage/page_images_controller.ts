@@ -16,12 +16,12 @@ declare global {
 }
 
 /**
- * The image browser behind the editor's toolbar button: what the page holds, and where a new image is uploaded.
+ * The image browser behind the editor's toolbar button: what the page contains, and where a new image is uploaded.
  *
- * An upload is not finished when the file has arrived; a worker renders the sizes the website serves and says so over
- * Mercure, and each message re-renders the listing, which is what turns a waiting thumbnail into one that can be
- * placed. This sits on the modal rather than in the live component, so a re-render neither closes the dialog nor
- * drops the connection.
+ * An upload is not finished when the file has arrived; a worker renders the sizes the website serves and reports that
+ * over Mercure, and each message re-renders the listing, which is what turns a waiting thumbnail into one that can be
+ * placed. This controller is on the modal rather than in the live component, so a re-render neither closes the dialog
+ * nor drops the connection.
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller<HTMLElement> {
@@ -68,9 +68,9 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * The two dialogs take turns rather than stand open at once: Bootstrap gives every modal the same stacking, and
-     * the one closed first takes the body's scroll handling with it. The button goes to `show()` as the related
-     * target, which is where confirm_modal_controller.ts reads what to ask and which action to run.
+     * The two dialogs are opened one at a time rather than both at once: Bootstrap gives every modal the same
+     * stacking, and the one closed first removes the body's scroll handling. The button goes to `show()` as the
+     * related target, which is where confirm_modal_controller.ts reads what to ask and which action to run.
      */
     confirm(event: Event): void {
         const trigger = event.currentTarget as HTMLElement;
@@ -83,8 +83,8 @@ export default class extends Controller<HTMLElement> {
         this.element.addEventListener(
             'hidden.bs.modal',
             () => {
-                // Registered only once the question is going up, or a press that never got there would reopen this
-                // dialog the next time somebody else asks one.
+                // Registered only once the confirm dialog is being shown, or a press that never got there would
+                // reopen this dialog the next time another confirmation is requested.
                 dialog.addEventListener('hidden.bs.modal', () => this.open(), { once: true });
                 window.bootstrap.Modal.getOrCreateInstance(dialog).show(trigger);
             },
@@ -197,7 +197,7 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        // The element carries the sentence to fall back on.
+        // The element contains the sentence to fall back on.
         if ('' !== message) {
             this.errorTarget.textContent = message;
         }

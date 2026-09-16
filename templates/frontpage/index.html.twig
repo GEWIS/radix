@@ -66,8 +66,8 @@
                     {% include 'partials/frontpage/news-pinned.html.twig' with {'item': item} %}
                 {% endfor %}
 
-                {# The banners follow what the board pinned, and where nothing is pinned they come after the second
-                   item. #}
+                {# The banners follow what the board pinned, and where nothing is pinned they come
+                   after the second item. #}
                 {% set adAfter = pinned is empty ? min(2, regular|length) : 0 %}
                 {% if 0 == adAfter %}
                     {% include 'partials/career/banner-strip.html.twig' with {'banners': company_banners()} only %}

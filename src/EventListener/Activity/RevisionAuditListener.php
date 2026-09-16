@@ -29,11 +29,11 @@ use function spl_object_id;
  *
  * A single edit can touch the revision's own columns, its localised texts, its sign-up lists (their fields and options)
  * and its label assignments; all of these are folded into one audit row per revision per flush, with the union of the
- * changed content fields (sign-up-list and label changes surface as the synthetic `signupLists` / `labels` markers).
+ * changed content fields (sign-up-list and label changes appear as the synthetic `signupLists` / `labels` markers).
  *
- * It listens on the website's connection alone. Everything it reads lives there, and its first act is to ask the
- * manager for {@see ActivityRevisionEdit}'s metadata, which the ledger's manager answers with an exception rather
- * than with a mapping.
+ * It listens on the website's connection alone. Everything it reads is stored there, and it first requests
+ * {@see ActivityRevisionEdit}'s metadata from the manager, for which the ledger's manager throws an exception rather
+ * than returning a mapping.
  */
 #[AsDoctrineListener(
     event: Events::onFlush,
@@ -129,8 +129,8 @@ final readonly class RevisionAuditListener
             $record($owner, 'labels');
         }
 
-        // A revision going away in this same flush takes its trail with it, and a row inserted against one about
-        // to be deleted is refused outright. Discarding a draft schedules its lists for deletion, which reads here
+        // A revision deleted in this same flush also deletes its audit trail, and a row inserted against one about
+        // to be deleted is refused outright. Discarding a draft schedules its lists for deletion, which counts here
         // as a change to them.
         $leaving = [];
         foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
@@ -160,7 +160,7 @@ final readonly class RevisionAuditListener
 
             if (RevisionStatus::Draft !== $revision->getStatus()) {
                 // In-place edits only ever happen on a Draft (the sole author-editable state). A later workflow flush
-                // can still carry a stale `lastEditedBy` from the last edit; scoping to Draft keeps a future
+                // can still have a stale `lastEditedBy` from the last edit; scoping to Draft keeps a future
                 // audit-worthy field written during such a flush from appending a phantom edit row attributed to it.
                 continue;
             }

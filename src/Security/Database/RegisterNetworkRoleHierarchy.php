@@ -17,11 +17,11 @@ use function array_values;
  * Withholds the register's two roles from a request that did not arrive from a network the register is open to.
  *
  * Filtering where roles are resolved covers `access_control`, `#[IsGranted]` and every `is_granted()` at once, menus
- * included. The reachable set is filtered rather than the roles handed in, so a role that one day inherits one of
+ * included. The reachable set is filtered rather than the roles passed in, so a role that one day inherits one of
  * these is covered too.
  *
- * This answers for the request in flight, so code asking what roles *another* member holds gets an answer coloured by
- * where the current visitor sits; ask {@see \App\Entity\User\User::getRoles()} there instead.
+ * This applies to the current request, so code that resolves the roles of *another* member gets a result filtered
+ * by the current visitor's network; use {@see \App\Entity\User\User::getRoles()} there instead.
  */
 #[AsDecorator(decorates: 'security.role_hierarchy')]
 final readonly class RegisterNetworkRoleHierarchy implements RoleHierarchyInterface
@@ -54,10 +54,10 @@ final readonly class RegisterNetworkRoleHierarchy implements RoleHierarchyInterf
     }
 
     /**
-     * The register's roles are not withheld here. This answers which roles reach the ones handed in, a question about
-     * the shape of the hierarchy rather than about what the visitor holds, so the withholding stays in
-     * {@see self::getReachableRoleNames()}. `#[Override]` is absent because `RoleHierarchyInterface` carries the
-     * method as an `@method` annotation and does not declare it yet.
+     * The register's roles are not withheld here. This returns which roles reach the ones passed in, a question about
+     * the shape of the hierarchy rather than about the visitor's roles, so the withholding stays in
+     * {@see self::getReachableRoleNames()}. `#[Override]` is absent because `RoleHierarchyInterface` declares the
+     * method only as an `@method` annotation.
      *
      * @param string[] $roles
      *

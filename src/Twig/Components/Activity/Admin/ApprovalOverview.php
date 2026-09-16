@@ -17,7 +17,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use function array_map;
 
 /**
- * The activity submissions waiting on the board, paged through. The rows carry the same columns the activity
+ * The activity submissions waiting on the board, paged through. The rows have the same columns the activity
  * overview's tables do, so an activity reads the same wherever it is listed.
  *
  * @extends AbstractDoctrinePaginatedOverview<ActivityRevision>

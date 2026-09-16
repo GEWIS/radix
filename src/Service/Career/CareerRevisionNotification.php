@@ -18,8 +18,8 @@ use RuntimeException;
 use function sprintf;
 
 /**
- * What a company puts forward is C4's to look at, and the board sees it too because its own role reaches through. Both
- * career aggregates answer here, so a profile and a vacancy stay distinguishable in the notification centre.
+ * What a company puts forward is C4's to look at, and the board sees it too because its own role includes C4's. Both
+ * career aggregates are handled here, so a profile and a vacancy stay distinguishable in the notification centre.
  */
 final readonly class CareerRevisionNotification implements RevisionNotificationInterface
 {
@@ -54,8 +54,8 @@ final readonly class CareerRevisionNotification implements RevisionNotificationI
     }
 
     /**
-     * External affairs and C4 both: the officer answers for the association's dealings with a company, and C4 does
-     * the reviewing.
+     * The External Affairs Officer and C4 both: the officer is responsible for the association's dealings with a
+     * company, and C4 does the reviewing.
      */
     #[Override]
     public function reviewerMailboxes(RevisionInterface $revision): array

@@ -15,7 +15,7 @@ use function sprintf;
  * Error for when an organ has fewer members than its type is allowed to have.
  *
  * A fraternity needs "tenminste 3 actieve dispuutsleden" (Internal Regulations art. 13.8) and a GMM taskforce
- * "tenminste 3 leden" (art. 16.5); every other organ needs at least someone in it.
+ * "tenminste 3 leden" (art. 16.5); every other organ needs at least one member.
  *
  * @extends Error<FoundationModel>
  */

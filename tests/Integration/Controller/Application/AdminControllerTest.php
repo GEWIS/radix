@@ -19,13 +19,13 @@ use function strval;
  * each kind of reader gets it: a queue they cannot open is worse than no queue.
  *
  * Everything waiting is one list the reader narrows with a link per area, so a queue is matched by the link that
- * narrows to it rather than by its name, which the navigation around the page answers for too.
+ * narrows to it rather than by its name, which the navigation around the page also contains.
  */
 final class AdminControllerTest extends DatabaseTestCase
 {
     /**
-     * The board reviews everything, careers included: its role carries the committee's, which is what the voter reads
-     * when it decides who may approve a company profile.
+     * The board reviews everything, careers included: its role includes the committee's, which is what the voter
+     * reads when it decides who may approve a company profile.
      */
     public function testTheBoardSeesEveryQueue(): void
     {
@@ -49,7 +49,7 @@ final class AdminControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The committee's role does not carry the board's, so what the association says about itself is not on its page.
+     * The committee's role does not include the board's, so what the association says about itself is not on its page.
      */
     public function testTheCareersCommitteeSeesItsOwnQueuesAndNoOthers(): void
     {
@@ -107,8 +107,8 @@ final class AdminControllerTest extends DatabaseTestCase
     }
 
     /**
-     * What the whole association is being told, and whether the website is in maintenance, are the administrator's to
-     * see and nobody else's.
+     * The announcements to the whole association, and whether the website is in maintenance, are the administrator's
+     * to see and no other member's.
      */
     public function testOnlyAnAdministratorSeesTheAnnouncementsAndMaintenance(): void
     {

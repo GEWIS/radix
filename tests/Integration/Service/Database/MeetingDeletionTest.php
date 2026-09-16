@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * What removing a decision from the ledger is allowed to take with it.
+ * What removing a decision from the ledger is allowed to delete with it.
  *
  * Every write is rolled back by dama/doctrine-test-bundle, so the seed these decisions are added to survives the run.
  */

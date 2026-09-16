@@ -25,7 +25,7 @@
         {% include 'partials/filter-toggle.html.twig' with { target: 'body-filters-committee-past' } only %}
     </div>
 
-    {# Dated links: an abbreviation is reused, and an old committee must not send a reader to its namesake. #}
+    {# Dated links: an abbreviation is reused, and an old committee must not link to its namesake. #}
     {{ component('Decision:BodyOverview', {
         type: enum('App\\Entity\\Database\\Enums\\OrganTypes').Committee.value,
         abrogated: true,

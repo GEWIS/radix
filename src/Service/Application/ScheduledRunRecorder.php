@@ -22,13 +22,13 @@ use function substr;
  *
  * On `cache.app`, which is Valkey and so is shared between the workers and the web containers and survives a
  * deploy. A run is a fact about the deployment rather than about one container. A record lost to a flushed cache
- * reports a task as not having run, which is the wrong answer in the direction that gets looked at.
+ * reports a task as not having run, which is wrong in the direction that gets looked at.
  */
 final readonly class ScheduledRunRecorder
 {
     private const string PREFIX = 'scheduled_run.';
 
-    /** Set the first time anything asks, so a fresh deployment measures lateness from itself rather than from 1970. */
+    /** Set the first time it is read, so a fresh deployment measures lateness from itself rather than from 1970. */
     private const string SINCE_KEY = 'scheduled_run_since';
 
     private const int EXPIRY = 5 * 365 * 86400;
@@ -82,7 +82,7 @@ final readonly class ScheduledRunRecorder
     }
 
     /**
-     * Anything but the integer this writes is treated as absent: a cache holding something else is a cache that has
+     * Anything but the integer this writes is treated as absent: a cache containing something else is a cache that has
      * been written to by something other than this, and guessing at it would report a run that never happened.
      */
     private function read(CacheItemInterface $item): ?DateTimeImmutable

@@ -9,10 +9,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * A placeholder in a bulk email that is replaced with a value taken from the activity, from whoever organises it, or
- * from the sign-up list the message is addressed to, rather than from an answer a recipient gave. The backing value
- * is the name written in the message, so these cases are the complete reserved vocabulary: a sign-up question named
- * after one of them is given a different token instead (see {@see \App\Util\Activity\AnnouncementPlaceholders}).
+ * A placeholder in a bulk email that is replaced with a value taken from the activity, from the body or company
+ * organising it, or from the sign-up list the message is addressed to, rather than from an answer a recipient gave. The
+ * backing value is the name written in the message, so these cases are the complete reserved vocabulary: a sign-up
+ * question named after one of them is given a different token instead
+ * (see {@see \App\Util\Activity\AnnouncementPlaceholders}).
  *
  * The names match the GEWIS mailings templates in ``templates/emails/'', so an organiser who has written one of
  * those writes the same names here.

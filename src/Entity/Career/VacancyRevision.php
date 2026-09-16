@@ -26,8 +26,8 @@ use Override;
 /**
  * An immutable snapshot of a {@see Vacancy}'s revisable content for one point in its revision chain. The stable
  * {@see Vacancy} owns the slug, publication flag and package; everything that may be revised and reviewed (the
- * localised texts, the contact details, the category and the labels) lives here, so label changes go through the
- * review workflow like the rest of the content.
+ * localised texts, the contact details, the category and the labels) is on this entity, so label changes go through
+ * the review workflow like the rest of the content.
  */
 #[Entity(repositoryClass: VacancyRevisionRepository::class)]
 #[HasLifecycleCallbacks]
@@ -144,8 +144,8 @@ class VacancyRevision extends AbstractRevision
     public ?string $contactEmail = null;
 
     /**
-     * Which of the four kinds of posting this is. Jobs until somebody says otherwise, so a blank revision is complete
-     * enough for a form to bind to.
+     * Which of the four kinds of posting this is. Jobs by default, so a blank revision is complete enough for a form
+     * to bind to.
      */
     #[Column(
         type: Types::STRING,
@@ -164,8 +164,8 @@ class VacancyRevision extends AbstractRevision
 
     /**
      * The last day the vacancy is shown. Required: a company knows when applications close before it knows anything
-     * else, and a posting nobody has to put an end to is one that quietly goes stale. The owning job package caps it
-     * regardless, since a vacancy cannot outlive the contract it was sold under.
+     * else, and a posting without a required closing day stays up after it is no longer relevant. The owning job
+     * package caps it regardless, since a vacancy cannot outlive the contract it was sold under.
      *
      * The window is part of the reviewed content, so moving it goes past the committee like anything else.
      *
@@ -193,7 +193,7 @@ class VacancyRevision extends AbstractRevision
     {
         $this->labels = new ArrayCollection();
 
-        // Which localised texts a revision has is its own business, and a form cannot bind to one that has none.
+        // The localised texts belong to the revision itself, and a form cannot bind to one that has none.
         // Doctrine does not run this when it hydrates a stored revision, so nothing is thrown away.
         $this->name = new CareerLocalisedText(
             null,

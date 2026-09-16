@@ -17,7 +17,7 @@ use function sprintf;
  * two albums never share one stored file. Page images are scoped the same way but only once the page they belong to
  * exists; see {@see withOptionalScope()}.
  *
- * The backing values are stable machine keys, never part of a URL; the URL always carries the full stored path.
+ * The backing values are stable machine keys, never part of a URL; the URL always contains the full stored path.
  */
 enum StorageNamespace: string
 {
@@ -170,7 +170,7 @@ enum StorageNamespace: string
 
     /**
      * The MIME types accepted for this namespace. Attachments are PDFs; everything else is a small set of raster image
-     * formats (SVG is deliberately excluded because it can carry active content).
+     * formats (SVG is deliberately excluded because it can contain active content).
      *
      * @return non-empty-list<string>
      */
@@ -218,8 +218,8 @@ enum StorageNamespace: string
     }
 
     /**
-     * Takes a scope without insisting on one, because the files the old website left were never filed under a page
-     * and are still served from the unscoped directory.
+     * The scope is optional, because the files the old website left were never filed under a page and are still
+     * served from the unscoped directory.
      */
     private function withOptionalScope(
         ?string $scope,

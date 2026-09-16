@@ -10,8 +10,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
  * A repository that can find the review thread of one revision without the caller knowing which domain it is in. The
- * `revision` association is mapped on each concrete comment class rather than on the shared superclass, so the query
- * has to live with the mapping; this is what lets {@see \App\Service\Application\RevisionDiscarder} stay domain-blind.
+ * `revision` association is mapped on each concrete comment class rather than on the shared superclass, so the query is
+ * defined alongside the mapping; this is what lets {@see \App\Service\Application\RevisionDiscarder} stay domain-blind.
  */
 #[AutoconfigureTag('app.revision_comment_repository')]
 interface RevisionCommentRepositoryInterface

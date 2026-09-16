@@ -8,10 +8,10 @@ use App\Entity\Application\Enums\NotificationType;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Turns the subject ids a run of notifications carries into names a reader recognises.
+ * Turns the subject ids in a run of notifications into names a reader recognises.
  *
- * One per module rather than a branch in a central class, so a domain that grows a notification brings its own naming
- * with it instead of everybody editing the same match and the same constructor.
+ * One per module rather than a branch in a central class, so a domain that grows a notification provides its own
+ * naming instead of everybody editing the same match and the same constructor.
  */
 #[AutoconfigureTag('app.notification_subject_namer')]
 interface NotificationSubjectNamerInterface

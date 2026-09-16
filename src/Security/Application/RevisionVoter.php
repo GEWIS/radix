@@ -100,7 +100,7 @@ final class RevisionVoter extends Voter
             // Approving, rejecting, requesting changes, starting a review and closing are reviewer-only.
             self::APPROVE => $canApprove,
             // Only a Draft is editable in place; anything submitted/approved/etc. is immutable and must be revised
-            // through a freshly spawned revision instead.
+            // through a new revision instead.
             self::EDIT => $this->isEditable($revision) && ($isOwner || $canApprove),
             self::SUBMIT => $isOwner || $canApprove,
             self::REOPEN => $isOwner || $canApprove,
@@ -111,7 +111,7 @@ final class RevisionVoter extends Voter
 
     /**
      * Who may review (approve/reject/request changes/start review/close) a chain. The board may review everything;
-     * anything beyond that is the resource's own business, so it says so through
+     * anything beyond that is defined by the resource itself, through
      * {@see RevisableInterface::getReviewerRoles()} rather than being listed here.
      */
     private function canApprove(RevisableInterface $revisable): bool

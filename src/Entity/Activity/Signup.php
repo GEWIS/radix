@@ -54,7 +54,7 @@ use function intval;
         'external' => ExternalSignup::class,
     ],
 )]
-// No member may hold two sign-ups on the same list, and no external email may appear twice on the same list. Each
+// No member may have two sign-ups on the same list, and no external email may appear twice on the same list. Each
 // constraint applies only to its own subclass: the other's discriminating column is NULL for these rows, and MySQL
 // treats NULLs as distinct in a unique index, so a user row (NULL email) and an external row (NULL user_lidnr) never
 // collide with each other.
@@ -124,7 +124,7 @@ abstract class Signup
 
     /**
      * Where the draw ranked this sign-up, admitted or not, so the waiting list keeps the order the draw gave it: who
-     * moves up when somebody drops out is a question about that moment, and re-deriving it later would answer it
+     * moves up when a subscriber drops out is a question about that moment, and re-deriving it later would answer it
      * against a pool that has since changed. Null until a draw has run, and on a list that never has one.
      */
     #[Column(
@@ -190,8 +190,8 @@ abstract class Signup
     abstract public function getEmail(): ?string;
 
     /**
-     * Who this sign-up is, the same across every list they are in: a member by their number, an external by the
-     * address they typed, so one person's sign-ups on one activity can be read side by side.
+     * Who this sign-up is, the same across every list they are in: a member by their number, an external by the address
+     * they entered, so one person's sign-ups on one activity can be read side by side.
      */
     abstract public function personKey(): string;
 

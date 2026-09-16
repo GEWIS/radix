@@ -81,7 +81,7 @@ class CompanyUser implements
     public CompanyModel $company;
 
     /**
-     * When this representative was shut out, or null while they still act for the company. Someone who has moved on
+     * When this representative was disabled, or null while they still act for the company. Someone who has moved on
      * keeps their row (the revisions and comments they left behind still point at it) but can no longer sign in; the
      * board removes the account outright once it is no longer worth keeping around.
      */

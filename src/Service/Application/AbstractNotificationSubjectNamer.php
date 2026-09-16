@@ -8,8 +8,8 @@ use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\LocalisedText;
 
 /**
- * What every namer needs whichever domain it speaks for: a name read in both languages, and one that is the same in
- * both because the subject only has the one.
+ * What every namer needs whichever domain it covers: a name read in both languages, and one that is the same in both
+ * because the subject only has the one.
  */
 abstract class AbstractNotificationSubjectNamer implements NotificationSubjectNamerInterface
 {

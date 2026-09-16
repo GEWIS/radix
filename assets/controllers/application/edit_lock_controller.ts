@@ -112,7 +112,7 @@ export default class extends Controller {
         this.lost = true;
         window.clearInterval(this.timer);
 
-        // Lock down the form so a stale editor cannot submit over whoever took over.
+        // Lock down the form so a stale editor cannot submit over the user who took over.
         this.element
             .querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement>('input, select, textarea, button')
             .forEach((field) => {

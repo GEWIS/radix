@@ -8,6 +8,6 @@ altcha:
     # at scale; left at the default since rate limiting and email verification are the stronger anti-abuse layers.
     expires: '+15 minutes'
     # Wire the widget via its Stimulus controller: on a solved challenge it writes the payload into the form input AND
-    # fires a `change` event, which is what the live-component form binding needs to pick the value up (the widget lives
-    # inside a live component, in the container `templates/form/altcha.html.twig` puts it in).
+    # fires a `change` event, which is what the live-component form binding needs to pick the value up (the widget is
+    # rendered inside a live component, in the container `templates/form/altcha.html.twig` puts it in).
     use_stimulus: true

@@ -25,8 +25,8 @@ use function trim;
 
 /**
  * Camera metadata read from a photo's EXIF, mapped onto the columns of {@see Photo}. Every column field is optional: a
- * photo without EXIF (or in a format that carries none) yields all-null columns. The orientation-derived {@see
- * $swapsAxes} flag is the exception the uploader consults to size the photo, and defaults to no swap.
+ * photo without EXIF (or in a format that has none) produces all-null columns. The orientation-derived {@see
+ * $swapsAxes} flag is the exception the uploader uses to size the photo, and defaults to no swap.
  */
 final readonly class PhotoMetadata
 {
@@ -103,7 +103,7 @@ final readonly class PhotoMetadata
 
     public function applyTo(Photo $photo): void
     {
-        // Only override the capture time when EXIF actually carried one; the column is not nullable.
+        // Only override the capture time when EXIF actually contained one; the column is not nullable.
         if (null !== $this->dateTime) {
             $photo->dateTime = $this->dateTime;
         }
@@ -122,7 +122,7 @@ final readonly class PhotoMetadata
 
     /**
      * Whether the EXIF orientation is a quarter turn (90° or 270°), which swaps the image's displayed width and height
-     * relative to its stored pixels. Values 5–8 are the transposed/rotated quarter-turn cases; anything else (no tag,
+     * relative to its stored pixels. Values 5-8 are the transposed/rotated quarter-turn cases; anything else (no tag,
      * or an unreadable value) leaves the axes as stored.
      */
     private static function orientationSwapsAxes(mixed $orientation): bool
@@ -167,7 +167,7 @@ final readonly class PhotoMetadata
             return $model;
         }
 
-        // The model usually already carries the brand (e.g. "Canon EOS 60D"), and the make sometimes spells it out
+        // The model usually already contains the brand (e.g. "Canon EOS 60D"), and the make sometimes spells it out
         // more fully than the model ("NIKON CORPORATION" for a "NIKON D3500" model). Treat the make's first word as
         // the brand and only prefix the make when the model starts with neither the whole make nor that brand.
         $brand = explode(

@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Where the register may be reached from.
  *
- * The two register roles follow the office of secretary rather than an account, so the address a request arrives from
- * is the only thing that can narrow them; {@see RegisterNetworkRoleHierarchy} is where they are withheld. Unlike
+ * The two register roles follow the Secretary rather than an account, so the address a request arrives from is the
+ * only thing that can narrow them; {@see RegisterNetworkRoleHierarchy} is where they are withheld. Unlike
  * {@see \App\Service\Education\CampusNetworkChecker} this only ever takes access away, so anything it cannot
  * establish is refused rather than allowed.
  */
@@ -36,10 +36,10 @@ final readonly class RegisterNetworkChecker
             return true;
         }
 
-        // Sub-requests are not somebody arriving from somewhere; answer on the address of the visitor who caused it.
+        // A sub-request has no visitor of its own; use the address of the visitor of the main request.
         $request = $this->requestStack->getMainRequest();
 
-        // No request means a console command, a Messenger worker or the scheduler; nobody is reaching for the register.
+        // No request means a console command, a Messenger worker or the scheduler; nobody is requesting the register.
         if (null === $request) {
             return true;
         }
@@ -57,8 +57,8 @@ final readonly class RegisterNetworkChecker
             return false;
         }
 
-        // A proxy's own address arrives when the forwarded chain is missing, and the proxies stand on the very
-        // networks the register is opened to; believing one would hand the register to everybody behind it.
+        // A proxy's own address arrives when the forwarded chain is missing, and the proxies are on the networks the
+        // register is open to; trusting one would open the register to everybody behind it.
         if (
             IpUtils::checkIp(
                 $clientIp,

@@ -38,7 +38,7 @@ final class RequestOriginTest extends TestCase
     }
 
     /**
-     * Anything that was not recognised is left out rather than recorded empty, so whoever reads it is not shown a gap.
+     * Anything that was not recognised is left out rather than recorded empty, so the notification does not show a gap.
      */
     public function testWhatIsNotRecognisedIsLeftOut(): void
     {

@@ -148,7 +148,7 @@ class MailingListType extends AbstractType
             ['label' => t('Add Mailing List')],
         );
 
-        // A list that does not exist yet is shown on the join form unless that is unchecked. The entity carries no
+        // A list that does not exist yet is shown on the join form unless that is unchecked. The entity has no
         // default for this, so it is applied here before the checkbox reads its value.
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,

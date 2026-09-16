@@ -16,11 +16,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 use function sprintf;
 
 /**
- * The nightly sweep that lets go of a day whose holder never settled the financial side.
+ * The nightly sweep that releases a day whose owner never settled the financial side.
  *
- * The two things worth pinning are that it runs at all with nobody signed in, since the transition it applies is the
+ * The two things worth pinning are that it runs at all with no user signed in, since the transition it applies is the
  * board's, and that a settled proposal is never touched however close its day is, including one settled by the board
- * saying there is no budget to approve. A free activity losing its day for a budget it was never going to hand in is
+ * saying there is no budget to approve. A free activity losing its day for a budget it was never going to submit is
  * exactly the wrong outcome.
  */
 final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
@@ -111,8 +111,8 @@ final class LapseOverdueOptionsCommandTest extends DatabaseTestCase
      */
     private function sweep(array $input = []): void
     {
-        // The kernel already booted by the base class, not a fresh one: rebooting would hand the command a second
-        // entity manager and detach everything this test is holding.
+        // The kernel already booted by the base class, not a fresh one: rebooting would give the command a second
+        // entity manager and detach everything this test has loaded.
         $command = new Application(self::getContainer()->get('kernel'))
             ->find('app:activity:lapse-overdue-options');
         $tester = new CommandTester($command);

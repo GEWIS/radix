@@ -9,8 +9,8 @@ use App\ViewModel\Application\Review\RevisionComparison;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Says what a revision of one domain holds, so the review screens do not have to know. Adding a revisable domain is
- * then a field list rather than a template.
+ * Describes what a revision of one domain contains, so the review screens do not have to know. Adding a revisable
+ * domain is then a field list rather than a template.
  */
 #[AutoconfigureTag('app.revision_describer')]
 interface RevisionDescriberInterface

@@ -28,7 +28,7 @@ class Suspension extends SubDecision
     /**
      * The first day of the suspension.
      *
-     * Named `since` rather than `from`, which is a reserved word in both of the databases this table lives in and
+     * Named `since` rather than `from`, which is a reserved word in both of the databases this table exists in and
      * would have to be quoted everywhere it is read.
      */
     #[Column(type: Types::DATE_IMMUTABLE)]
@@ -46,7 +46,7 @@ class Suspension extends SubDecision
     public function getMember(): Member
     {
         // The trait keeps the association nullable for mapping reasons; a suspension always names the member it is
-        // handed to.
+        // imposed on.
         assert(null !== $this->member);
 
         return $this->member;

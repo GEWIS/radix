@@ -14,8 +14,8 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * A photo a member has hidden from their own photo page. The flag lives here, on the (member, photo) pair, rather than
- * on the {@see MemberTag} so that removing and re-adding the tag cannot bring one back. Whether hidden photos are
+ * A photo a member has hidden from their own photo page. The flag is stored here, on the (member, photo) pair, rather
+ * than on the {@see MemberTag} so that removing and re-adding the tag cannot bring one back. Whether hidden photos are
  * actually withheld from other viewers depends on the member's {@see \App\Entity\User\Enums\PhotoVisibility}.
  */
 #[Entity(repositoryClass: HiddenPhotoRepository::class)]

@@ -16,7 +16,7 @@ use function assert;
  * Spawns the next Draft {@see VacancyRevision} from an existing one (for "changes requested", reopening, or editing
  * an approved vacancy). The localised texts are deep-copied into fresh rows so orphan-removal can never delete the
  * source revision's content; the contact details, category and posting window are copied by value. The shared wiring
- * (authorship, revision number, chain link) lives in {@see AbstractRevisionCloner}.
+ * (authorship, revision number, chain link) is defined in {@see AbstractRevisionCloner}.
  */
 final readonly class VacancyRevisionCloner extends AbstractRevisionCloner
 {

@@ -156,7 +156,8 @@ final class HighlightSearchExtension extends AbstractExtension
     }
 
     /**
-     * The Latin-ASCII shadow of a string used for matching; the original when the transliteration would shift offsets.
+     * The Latin-ASCII transliteration of a string, used for matching; the original when the transliteration would
+     * shift offsets.
      */
     private function searchable(string $value): string
     {

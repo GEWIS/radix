@@ -29,15 +29,15 @@ use function sprintf;
 use function strval;
 
 /**
- * Warn a body that the day it is holding is at risk, while it can still do something about it.
+ * Warn a body that the day it has reserved is at risk, while it can still do something about it.
  *
  * Association policy is that an organiser may not commit, spend or promote before their budget has been approved at a
  * board meeting, and that the budget has to be in hand early enough for a meeting well before the activity. The
  * website cannot work that deadline out, because board meetings are not known in advance; what it can see is whether
- * the board has recorded an outcome, and that is what this chases. An activity that costs nothing is settled by the
- * board saying so, and is never chased.
+ * the board has recorded an outcome, and that is what this checks. An activity that costs nothing is settled by the
+ * board saying so, and is never reminded.
  *
- * Once per proposal: a nightly nag is noise, and a body that has been told knows.
+ * Once per proposal: a nightly reminder is noise, and a body that has been warned once does not need another warning.
  */
 #[AsCommand(
     name: 'app:activity:remind-option-budget',
@@ -140,8 +140,8 @@ final class RemindOptionBudgetCommand extends Command
     }
 
     /**
-     * The member who handed the proposal in is the one told. Notifications reach an account or a role, never a body,
-     * and that member is the one who knows what became of the budget.
+     * The member who submitted the proposal is the one warned. Notifications reach an account or a role, never a
+     * body, and that member is the one who can find out what happened to the budget.
      */
     private function warn(ActivityProposal $proposal): void
     {
@@ -157,7 +157,7 @@ final class RemindOptionBudgetCommand extends Command
             : $this->userRepository->find($creator->lidnr);
 
         // A body whose member no longer has an account still gets its day released on time; there is simply nobody to
-        // warn first, so the stamp is set anyway rather than looking again every night.
+        // warn first, so the timestamp is set anyway rather than re-checking the proposal every night.
         $proposal->budgetRemindedAt = new DateTimeImmutable();
 
         if (null === $user) {

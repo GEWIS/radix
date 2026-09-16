@@ -26,7 +26,7 @@ use Symfony\Component\Uid\Uuid;
  * is only safe while the layouts are provably identical. These tests pin that: a faithful clone migrates, and any
  * divergence a race or request tampering could introduce past the structural freeze (a reordered or renamed
  * field/option, a changed type or bound, an added/removed field, option or whole list) hard-fails rather than silently
- * corrupting an answer. Lists carrying no sign-ups have nothing to lose, so they are exempt from the structural check.
+ * corrupting an answer. Lists with no sign-ups have nothing to lose, so they are exempt from the structural check.
  */
 final class SignupListMigratorTest extends TestCase
 {
@@ -160,7 +160,7 @@ final class SignupListMigratorTest extends TestCase
             $incoming,
         );
 
-        // Text/Number/Yes-No answers carry a raw value and no option, so migration only re-points the field to the
+        // Text/Number/Yes-No answers have a raw value and no option, so migration only re-points the field to the
         // clone's same-ordinal field and leaves the value (and the null option) untouched.
         self::assertSame(
             $clone,
@@ -268,7 +268,7 @@ final class SignupListMigratorTest extends TestCase
         $outgoing = $this->revisionWith($live);
         $this->answerFirstOption($live);
 
-        // The incoming revision carries a list on a *different* lineage, which for migration purposes is no match at
+        // The incoming revision has a list on a *different* lineage, which for migration purposes is no match at
         // all: the live sign-ups would have nowhere to go, so the migrator refuses rather than orphan them.
         $incoming = $this->revisionWith($this->choiceFieldList(
             Uuid::v4(),
@@ -381,7 +381,7 @@ final class SignupListMigratorTest extends TestCase
         );
 
         // The stored "2" was valid under max 2; widening the clone's bound is a structural change a frozen list should
-        // never present, so the migrator refuses rather than re-home an answer under different rules.
+        // never present, so the migrator refuses rather than re-point an answer under different rules.
         $incoming = $this->revisionWith($this->listWith(
             $lineageId,
             $this->field(
@@ -599,8 +599,8 @@ final class SignupListMigratorTest extends TestCase
 
     public function testIgnoresListsWithoutSignupsWhenJudgingMigratability(): void
     {
-        // A list carrying no sign-ups has nothing to carry over, so its fate is irrelevant: even dropping it outright
-        // (the incoming revision has no matching lineage) leaves the migration trivially safe and a no-op.
+        // A list with no sign-ups has nothing to migrate, so its fate is irrelevant: even dropping it outright (the
+        // incoming revision has no matching lineage) leaves the migration trivially safe and a no-op.
         $outgoing = $this->revisionWith($this->choiceFieldList(
             Uuid::v4(),
             'Colour',
@@ -704,7 +704,7 @@ final class SignupListMigratorTest extends TestCase
     }
 
     /**
-     * A sign-up list on the given lineage with a single choice field carrying the given (ordered) option labels.
+     * A sign-up list on the given lineage with a single choice field that has the given (ordered) option labels.
      *
      * @param string[] $optionLabels
      */

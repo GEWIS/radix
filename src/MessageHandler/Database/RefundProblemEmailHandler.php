@@ -10,7 +10,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Address;
 
 /**
- * Tells the secretary that a refund needs looking at. They ask the ApplicatieBeheerCommissie and/or the treasurer to
+ * Notifies the secretary that a refund needs looking at. They ask the ApplicatieBeheerCommissie and/or the treasurer to
  * work out what happened and what has to be done to settle it.
  */
 #[AsMessageHandler]

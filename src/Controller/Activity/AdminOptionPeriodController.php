@@ -30,8 +30,8 @@ use function count;
  * The board's rounds of the option calendar: when bodies may propose, which days they may propose, and the exceptions
  * that apply to one body in one round.
  *
- * Opening a round writes nothing per body. Every body is answered by {@see \App\Service\Activity\ProposalLimitResolver}
- * when it asks, so this screen only ever collects exceptions.
+ * Opening a round writes nothing per body. Every body's limit is computed by
+ * {@see \App\Service\Activity\ProposalLimitResolver} when it is needed, so this screen only ever collects exceptions.
  */
 #[IsGranted(UserRoles::Board->value)]
 #[Route(
@@ -146,8 +146,8 @@ class AdminOptionPeriodController extends AbstractController
     }
 
     /**
-     * A round with proposals in it is not deleted: the dates bodies are holding would go with it. It can be closed to
-     * new proposals by moving the window instead.
+     * A round with proposals in it is not deleted: the dates those bodies claimed would be deleted with it. It can be
+     * closed to new proposals by moving the window instead.
      */
     #[Route(
         path: '/{period}/delete',

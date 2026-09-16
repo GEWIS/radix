@@ -13,8 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use function Symfony\Component\Translation\t;
 
 /**
- * Confirmation of a membership extension. The caller must check isValid() before acting on `submit_yes`: the
- * form carries the CSRF token, and a branch on the button alone would never validate it.
+ * Confirmation of a membership extension. The caller must check isValid() before acting on `submit_yes`: the form
+ * contains the CSRF token, and a branch on the button alone would never validate it.
  */
 class MemberExpirationType extends AbstractType
 {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Message\User;
 
 /**
- * Requests an asynchronous export of the personal data GEWIS holds about a member.
+ * Requests an asynchronous export of the personal data GEWIS stores about a member.
  */
 class ExportUserDataMessage
 {

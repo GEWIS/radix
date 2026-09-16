@@ -16,7 +16,7 @@ use function is_array;
 use function sprintf;
 
 /**
- * Tells GEFLITST and the treasurer that an activity is going to need them.
+ * Notifies GEFLITST and the treasurer that an activity is going to need them.
  *
  * Sent the moment the box is ticked on a draft rather than when the activity is submitted for review, because both
  * have to arrange people or equipment and the board may take days to decide. An activity that is never approved
@@ -25,7 +25,7 @@ use function sprintf;
  * Only the flip from off to on sends: a draft cloned from a revision that already asked for a photographer is not a
  * new request, and neither is saving the same draft again.
  *
- * The GEFLITST message is addressed to their Planka board as well as to themselves, carrying the board id in an
+ * The GEFLITST message is addressed to their Planka board as well as to themselves, with the board id in an
  * `X-Planka-Board-Id` header, which is what files it as a card. The subject format, the reply-to and that header are
  * kept exactly as the old website sent them, the board keying on all three.
  */
@@ -40,7 +40,7 @@ final readonly class ActivityFacilityNotifier
     }
 
     /**
-     * The first revision of a brand-new activity: whatever it asks for, it asks for now.
+     * The first revision of a brand-new activity: whatever it requests, it requests now.
      */
     public function created(ActivityRevision $revision): void
     {
@@ -129,7 +129,7 @@ final readonly class ActivityFacilityNotifier
 
     /**
      * The subject and the reply-to are what GEFLITST's Planka board reads: it files the request under the subject and
-     * expects a reply to reach whoever asked, which is the body when it has an address of its own and the member who
+     * expects a reply to reach the requester, which is the body when it has an address of its own and the member who
      * filled the form in when it does not.
      */
     private function requestGeflitst(ActivityRevision $revision): void
@@ -166,7 +166,7 @@ final readonly class ActivityFacilityNotifier
         };
 
         // The Planka board is addressed on the same message rather than sent a copy: it files the card and GEFLITST
-        // answer by replying to all, which only works while both are recipients of the one message.
+        // respond by replying to all, which only works while both are recipients of the one message.
         $this->email->send(
             $this->mailboxes->geflitst(),
             $subject,

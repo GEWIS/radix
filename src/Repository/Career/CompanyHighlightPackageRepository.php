@@ -25,7 +25,7 @@ class CompanyHighlightPackageRepository extends ServiceEntityRepository
 
     /**
      * Every highlight package running right now, for the landing page. Whether a package's individual picks are still
-     * showable is settled by the package itself.
+     * showable is determined by the package itself.
      *
      * @return list<CompanyHighlightPackage>
      */

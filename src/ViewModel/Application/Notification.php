@@ -9,10 +9,10 @@ use Symfony\Component\Translation\TranslatableMessage;
 use function Symfony\Component\Translation\t;
 
 /**
- * One thing about the register that needs someone, as the administration dashboard states it.
+ * One thing about the register that needs attention, as the administration dashboard states it.
  *
  * Assembled from the register's figures rather than stored: each of these is a question about the register or an
- * integration that is answered fresh every time it is asked.
+ * integration that is computed fresh every time it is needed.
  */
 final readonly class Notification
 {

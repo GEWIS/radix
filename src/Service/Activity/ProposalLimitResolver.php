@@ -14,12 +14,12 @@ use App\Repository\Activity\ProposalLimitRepository;
 use App\ViewModel\Activity\ProposalAllowance;
 
 /**
- * Works out how many activities a body may put forward in an option period, and how many of those it has used.
+ * Computes how many activities a body may put forward in an option period, and how many of those it has used.
  *
  * A ladder from the most specific rule to the least: an exception the board wrote for this body in this period, then
  * one it wrote for this body full stop, then the number the board set for this period, then the number every body
  * gets. Nothing is ever written down in advance, so a rule that was never written simply does not match and the next
- * rung answers. That is the whole difference from the calendar this replaces, which wrote a row per body when a period
+ * rung applies. That is the whole difference from the calendar this replaces, which wrote a row per body when a period
  * was opened, started every one of them at zero, and read a missing row as zero as well, so a body founded after the
  * period opened was silently shut out. Here a body with no rows anywhere gets the ordinary number, and zero is only
  * ever reached by the board writing it down on purpose.
@@ -64,7 +64,7 @@ final readonly class ProposalLimitResolver
 
     /**
      * The same for a set of bodies, in a fixed number of queries however many bodies there are. The body picker lists
-     * every body somebody may act for, so this must not grow with that list.
+     * every body the user may act for, so this must not grow with that list.
      *
      * @param Organ[] $organs
      *
@@ -104,7 +104,7 @@ final readonly class ProposalLimitResolver
     }
 
     /**
-     * The ladder itself, in one place, so the single-body answer and the batch answer cannot drift apart.
+     * The ladder itself, in one place, so the single-body result and the batch result cannot differ.
      */
     private function decide(
         ?int $periodOverride,

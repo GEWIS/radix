@@ -15,8 +15,8 @@ use Override;
 use RuntimeException;
 
 /**
- * A single message in the review discussion thread of a {@see PollRevision}, which is where the board says why a
- * question was turned down. Not to be confused with {@see PollComment}, which is what members write underneath a poll
+ * A single message in the review discussion thread of a {@see PollRevision}, which is where the board records why a
+ * question was rejected. Not to be confused with {@see PollComment}, which is what members write underneath a poll
  * that is running.
  */
 #[Entity(repositoryClass: PollRevisionCommentRepository::class)]

@@ -27,7 +27,7 @@ class QueryExportType extends AbstractType
         FormBuilderInterface $builder,
         array $options,
     ): void {
-        // This form sits next to the result table and carries the executed query along, so the query is not typed
+        // This form is rendered next to the result table and includes the executed query, so the query is not typed
         // here but replayed from a hidden field.
         $builder->add(
             'query',

@@ -14,7 +14,7 @@ enum RevisionAudience: string
     case ReviewerOnly = 'reviewer';
 
     /**
-     * Whether somebody looking with this audience is shown material meant for {@see $material}.
+     * Whether a user looking with this audience is shown material meant for {@see $material}.
      */
     public function canSee(self $material): bool
     {

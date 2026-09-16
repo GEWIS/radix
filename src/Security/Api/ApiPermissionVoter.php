@@ -14,12 +14,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * Decides on {@see ApiPermissions} attributes, e.g. `#[IsGranted(ApiPermissions::MembersR->value)]`.
  *
  * The wildcard is not handled here: {@see \App\Entity\Database\User\ApiPrincipal::can()} owns that rule, so a principal
- * holding `ApiPermissions::All` is granted every permission through exactly one implementation.
+ * with `ApiPermissions::All` is granted every permission through exactly one implementation.
  */
 final class ApiPermissionVoter extends Voter
 {
     /**
-     * Roles and other string attributes are none of this voter's business.
+     * This voter does not vote on roles or other string attributes.
      */
     #[Override]
     public function supportsAttribute(string $attribute): bool
@@ -55,7 +55,7 @@ final class ApiPermissionVoter extends Voter
     }
 
     /**
-     * Attributes reach a voter as strings, so a permission travels as its backing value and is mapped back here.
+     * Attributes reach a voter as strings, so a permission is passed as its backing value and is mapped back here.
      */
     private function asPermission(string $attribute): ?ApiPermissions
     {

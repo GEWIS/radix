@@ -28,8 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use function sprintf;
 
 /**
- * For each member with queued notifications, work out which categories are due now (per that category's chosen
- * frequency), mail those in one digest, drain the sent notifications and stamp the send time. Categories that are not
+ * For each member with queued notifications, determine which categories are due now (per that category's chosen
+ * frequency), mail those in one digest, drain the sent notifications and record the send time. Categories that are not
  * yet due keep their notifications queued for a later run; a member who paused all email keeps nothing queued.
  *
  * The five-minute tick is offset by three minutes so it does not land on the same minute as the jobs scheduled on
@@ -141,8 +141,8 @@ final class RunNotificationDigestsCommand extends Command
                         $subjectId,
                     );
 
-                // Whatever this was about is gone, so there is nothing left to tell them; drop it from the queue
-                // rather than mailing a dead link.
+                // Whatever this was about is gone, so there is nothing left to notify them about; drop it from the
+                // queue rather than mailing a dead link.
                 if (
                     null === $subjectId
                     || null === $name

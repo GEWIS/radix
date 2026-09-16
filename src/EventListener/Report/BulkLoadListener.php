@@ -16,10 +16,10 @@ use function in_array;
  *
  * `DatabaseUpdateListener` projects a decision the moment it is persisted, which is right for the application, where
  * a decision is recorded on its own. Loading fixtures persists a whole register in one flush, and the order Doctrine
- * chooses within that flush is its own business — a decision can reach the projection before the subdecisions it is
- * assembled from, and what gets written is a decision that reads as nothing.
+ * chooses within that flush is not guaranteed: a decision can reach the projection before the subdecisions it is
+ * assembled from, and what gets written is a decision with no content.
  *
- * Nothing is lost by standing down: `app:decision:generate` rebuilds the projection from the finished ledger, and
+ * Nothing is lost by disabling it: `app:decision:generate` rebuilds the projection from the finished ledger, and
  * `make seed` runs it immediately after the fixtures for exactly that reason.
  */
 #[AsEventListener(event: ConsoleEvents::COMMAND)]

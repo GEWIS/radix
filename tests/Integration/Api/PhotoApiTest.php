@@ -791,7 +791,7 @@ final class PhotoApiTest extends ApiTestCase
         return (string) ob_get_clean();
     }
 
-    /** Serving never encodes: a variant must exist before the request, or the endpoint answers 503. */
+    /** Serving never encodes: a variant must exist before the request, or the endpoint returns 503. */
     private function pregenerate(
         string $path,
         ImageVariant $variant,

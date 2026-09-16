@@ -12,7 +12,7 @@ use Override;
 use function sprintf;
 
 /**
- * Error for when an organ that has members has nobody chairing it.
+ * Error for when an organ that has members has no chair.
  *
  * Every organ is led by a chair; see the Articles of Association art. 22.3 and the Internal Regulations art. 11.3.1,
  * 13, and 16.

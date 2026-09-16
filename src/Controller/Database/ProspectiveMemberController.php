@@ -33,12 +33,12 @@ use function assert;
  * that creates them to the moment they become a member or are removed again.
  *
  * The paths are on the actions rather than on the class, and the two public flows have no path here at all: they are
- * declared in config/routes.yaml, because the addresses they answer at sit outside the administrative prefix this
+ * declared in config/routes.yaml, because the addresses they are served at are outside the administrative prefix this
  * controller is imported with.
  *
- * That is also why the four administrative actions still say `#[IsGranted(SudoVoter::ATTRIBUTE)]` where the rest of
- * the administration leaves it to the path: here the prefix is a property of the action, so a second address given to
- * one of them would take it out from behind {@see \App\EventListener\User\SudoEnforcementListener}.
+ * That is also why the four administrative actions still declare `#[IsGranted(SudoVoter::ATTRIBUTE)]` where the rest
+ * of the administration leaves it to the path: here the prefix is a property of the action, so a second address given
+ * to one of them would place it outside {@see \App\EventListener\User\SudoEnforcementListener}.
  */
 final class ProspectiveMemberController extends AbstractController
 {
@@ -53,10 +53,10 @@ final class ProspectiveMemberController extends AbstractController
     }
 
     /**
-     * The address the form is reached at when nobody has said which language they want it in.
+     * The address the form is reached at when the visitor has not stated which language they want it in.
      *
-     * `/join` is on posters and behind gew.is/join, so it keeps answering, but it has no room for a language and the
-     * form is a page like any other. Nobody arriving here has said which language they want, so the browser decides.
+     * `/join` is on posters and behind gew.is/join, so it remains available, but it has no room for a language and
+     * the form is a page like any other. A visitor arriving here has not stated a language, so the browser decides.
      */
     public function subscribeUnlocalised(Request $request): Response
     {
@@ -67,9 +67,9 @@ final class ProspectiveMemberController extends AbstractController
     }
 
     /**
-     * The public sign-up form, filled in by someone who is not (yet) anyone to us.
+     * The public sign-up form, filled in by a visitor who is not (yet) known to us.
      *
-     * `join_index` is declared in config/routes.yaml; the sign-up host allowlists the address it answers at.
+     * `join_index` is declared in config/routes.yaml; the sign-up host allowlists the address it is served at.
      */
     public function subscribe(Request $request): Response
     {
@@ -116,7 +116,7 @@ final class ProspectiveMemberController extends AbstractController
                 );
             }
 
-            // Rendered rather than answered with a 303, because the Chromium CSP enforcer does not allow a
+            // Rendered rather than redirected with a 303, because the Chromium CSP enforcer does not allow a
             // redirect after a POST.
             return $this->render(
                 'database/application/redirect.html.twig',
@@ -141,11 +141,11 @@ final class ProspectiveMemberController extends AbstractController
     /**
      * Graduate renewal, reached from the link in the renewal e-mail.
      *
-     * Served from the join host and open to anyone holding the token: whoever follows the link is not signed in, and
-     * the token is what says who they are. A token that has been used or has expired is not an error — the page says
-     * the link no longer works rather than pretending it does.
+     * Served from the join host and open to anyone with the token: a user who follows the link is not signed in, and
+     * the token is what identifies them. A token that has been used or has expired is not an error: the page states
+     * that the link no longer works rather than showing the renewal form.
      *
-     * `join_renew` is declared in config/routes.yaml, along with the two addresses this used to answer at, which
+     * `join_renew` is declared in config/routes.yaml, along with the two addresses this used to be served at, which
      * redirect here because a renewal e-mail sent months ago links to one of them.
      */
     public function renew(

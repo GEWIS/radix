@@ -9,12 +9,12 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
- * `Worker::run()` iterates the receiver outside any try/catch, so a broker that stops answering ends the process
+ * `Worker::run()` iterates the receiver outside any try/catch, so a broker that stops responding ends the process
  * with the same restart loop an unwritable failure transport used to cause. Yielding nothing instead leaves the
- * worker to sleep out its `--sleep` and ask again, in the process it already has.
+ * worker to sleep out its `--sleep` and try again, in the process it already has.
  *
  * Only receiving is caught. An `ack()` that fails has to stay an error: swallowing it would report a message as
- * handled that the broker is going to hand out again.
+ * handled that the broker is going to deliver again.
  */
 trait SurvivesReceiveFailureTrait
 {

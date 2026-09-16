@@ -20,13 +20,13 @@ use function str_contains;
 use function trim;
 
 /**
- * The association's own agenda, for the things that only live there: an exam week, the intro week, a booking made
- * outside the website. A day carrying one of those is not really free however empty the option calendar looks.
+ * The association's own agenda, for the things that only exist there: an exam week, the intro week, a booking made
+ * outside the website. A day with one of those is not really free however empty the option calendar looks.
  *
  * Read from the cache and nowhere else. {@see \App\Command\Activity\SyncAgendaCommand} fills it; a page render never
- * waits on somebody else's server, and an agenda that is unreachable costs the calendar nothing but a missing layer.
- * Nothing is fetched on a miss either, deliberately: a cold cache would otherwise turn whoever happens to look first
- * into the one who waits.
+ * depends on an external server, and an agenda that is unreachable costs the calendar nothing but a missing layer.
+ * Nothing is fetched on a miss either, deliberately: a cold cache would otherwise make the first visitor wait
+ * for the fetch.
  *
  * With no key configured the whole thing is simply off, which is what a development machine wants.
  */
@@ -112,9 +112,9 @@ final readonly class AgendaFeed
 
     /**
      * Fetch the agenda and keep it. Returns how many days' worth came back, or null when the fetch failed, so the
-     * caller can say which of the two happened.
+     * caller can report which of the two happened.
      *
-     * A failed fetch leaves whatever was kept alone: a stale agenda is a great deal more use than none.
+     * A failed fetch leaves whatever was kept alone: a stale agenda is more useful than none.
      */
     public function refresh(): ?int
     {

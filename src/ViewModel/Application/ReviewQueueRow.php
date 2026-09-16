@@ -11,8 +11,8 @@ use DateTimeImmutable;
 use function intval;
 
 /**
- * One line of a review queue: what is waiting, who put it forward, which revision it is and where to go to look at it.
- * Every module's queue says the same four things, so they render through one partial rather than each writing out its
+ * One line of a review queue: what is waiting, who submitted it, which revision it is and where to go to look at it.
+ * Every module's queue shows the same four things, so they render through one partial rather than each writing out its
  * own table.
  */
 final readonly class ReviewQueueRow
@@ -26,14 +26,14 @@ final readonly class ReviewQueueRow
         public int $revisionId,
         // How long it has been waiting, which a count on its own never says.
         public DateTimeImmutable $submittedAt,
-        // The revision the public is seeing while this one waits, so a queue does not read as if nothing is up.
+        // The revision the public is seeing while this one waits, so a queue does not read as if nothing is live.
         public ?int $liveRevisionNumber = null,
     ) {
     }
 
     /**
-     * How long something has sat is what makes a queue worth looking at, so it is said in the colour the
-     * association's own service levels read in: fine the first day, pressing after one, overdue after three.
+     * How long something has been waiting is what makes a queue worth looking at, so it is shown in the colour of the
+     * association's own service levels: fine the first day, pressing after one, overdue after three.
      */
     public function waitingBadgeClass(): string
     {
@@ -47,7 +47,7 @@ final readonly class ReviewQueueRow
     }
 
     /**
-     * @param string $subject what the reader recognises this by, which the domain has to say: a localised activity
+     * @param string $subject what the reader recognises this by, which the domain has to provide: a localised activity
      *                        name, a company name, a vacancy slug
      */
     public static function fromRevision(
@@ -62,15 +62,15 @@ final readonly class ReviewQueueRow
             status: $revision->getStatus(),
             reviewRoute: $reviewRoute,
             revisionId: (int) $revision->id,
-            // Everything in a queue has been submitted; the fallback is for a revision that reached one before the
-            // moment was recorded at all.
+            // Everything in a queue has been submitted; the fallback is for a revision that reached a queue before
+            // the submission timestamp was recorded at all.
             submittedAt: $revision->getSubmittedAt() ?? $revision->getCreatedAt(),
             liveRevisionNumber: $revision->getLiveCounterpart()?->getRevisionNumber(),
         );
     }
 
     /**
-     * A whole queue at once. How a revision is named is still the domain's to say, so it hands that over as a
+     * A whole queue at once. How a revision is named is still the domain's responsibility, so it is passed in as a
      * callback rather than the loop being written out again per module.
      *
      * @param iterable<RevisionInterface>        $revisions

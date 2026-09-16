@@ -12,7 +12,7 @@ use Symfony\Component\Translation\TranslatableMessage;
  *
  * One case per thing that happened, rather than a free-text message, because these are read back: the administration
  * filters on them, a data export names them, and answering "why was this member signed out" means matching a report
- * against a case rather than grepping for a sentence somebody has since reworded.
+ * against a case rather than grepping for a sentence a developer has since reworded.
  *
  * Adding a case is cheap and expected. Renaming the *value* of one is not: the values are written to the database and
  * to half a year of log files, and a renamed value silently splits one event into two.
@@ -59,7 +59,7 @@ enum SecurityEventType: string
     case SudoGranted = 'sudo_granted';
     case SudoRefused = 'sudo_refused';
 
-    // Acting as somebody else.
+    // Acting as another user.
     case ImpersonationStarted = 'impersonation_started';
     case ImpersonationStopped = 'impersonation_stopped';
 
@@ -67,7 +67,7 @@ enum SecurityEventType: string
     case ApiTokenRejected = 'api_token_rejected';
     case ApiRateLimitExceeded = 'api_rate_limit_exceeded';
 
-    // Where the request came from, where that is what decided the answer.
+    // Where the request came from, where that is what decided the outcome.
     case RegisterAccessRefused = 'register_access_refused';
     case CompanyAccessRevoked = 'company_access_revoked';
 
@@ -128,7 +128,7 @@ enum SecurityEventType: string
      *
      * Ordinary use is `info`; something a member should look at is `notice`; something that suggests an attempt on an
      * account is `warning`; and `critical` is reserved for a token presented twice, which is either theft or a bug in
-     * our own rotation, and is the only one of these that signs somebody out of every device at once.
+     * our own rotation, and is the only one of these that signs an account out of every device at once.
      */
     public function level(): string
     {

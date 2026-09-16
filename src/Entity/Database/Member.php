@@ -294,7 +294,7 @@ class Member
 
             $mailingListMembership->toBeDeleted = true;
             $newMembership = new MailingListMember();
-            // Takes the address with it: the member's own is what was just set.
+            // `setMember()` also sets the email address, which is the new one set above.
             $newMembership->setMember($this);
             $newMembership->mailingList = $mailingListMembership->mailingList;
             $this->addList($newMembership);
@@ -362,8 +362,8 @@ class Member
     /**
      * The date on which the membership of the member will have ended, or null if they never were a formal member.
      *
-     * {@see self::getMembershipEndsOn()} answers the same question with a sentinel date, which reads as a real answer
-     * where it is shown.
+     * {@see self::getMembershipEndsOn()} computes the same date but returns a sentinel instead of null, which is
+     * displayed as a real date.
      */
     public function getMembershipEndDate(): ?DateTimeImmutable
     {

@@ -41,7 +41,7 @@ class OrganRegulationMapper extends AbstractDecisionMapper
         }
 
         // Only organs that can have organ regulations at all. The form rejects the others with a message of their
-        // own, so building nothing here leaves that message to do the talking.
+        // own, so building nothing here leaves that message as the only error.
         if (!$organType->hasOrganRegulations()) {
             return;
         }

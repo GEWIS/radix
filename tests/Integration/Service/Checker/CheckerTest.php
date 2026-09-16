@@ -118,7 +118,7 @@ class CheckerTest extends KernelTestCase
     }
 
     /**
-     * An organ that nobody is in is an organ that should have been abolished.
+     * An organ with no members is an organ that should have been abolished.
      */
     public function testReportsAnOrganWithNobodyInIt(): void
     {
@@ -187,7 +187,7 @@ class CheckerTest extends KernelTestCase
     }
 
     /**
-     * Only fraternities keep members who hold no function (HR art. 13); everywhere else they are discharged.
+     * Only fraternities keep members who have no function (HR art. 13); everywhere else they are discharged.
      */
     public function testReportsAnInactiveMemberInAnOrganThatHasNone(): void
     {
@@ -240,7 +240,7 @@ class CheckerTest extends KernelTestCase
     }
 
     /**
-     * Holding a function in a body means being in it: a chair who is not a member of their own committee is a gap in
+     * Having a function in a body means being in it: a chair who is not a member of their own committee is a gap in
      * the record rather than an arrangement.
      */
     public function testReportsSomeoneHoldingAFunctionWithoutBeingAMemberOfTheOrgan(): void
@@ -422,7 +422,7 @@ class CheckerTest extends KernelTestCase
     }
 
     /**
-     * An annulment has no effects of its own to take back, so annulling one means nothing.
+     * An annulment has no effects of its own to undo, so annulling one means nothing.
      */
     public function testReportsAnAnnulmentOfAnAnnulment(): void
     {

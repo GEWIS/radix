@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * How long something has been waiting on the board is what a review queue is read by, and a draft can be written long
- * before it is handed over. These pin that the moment recorded is the handing over rather than the writing.
+ * before it is submitted. These pin that the moment recorded is the submission rather than the writing.
  */
 final class RevisionSubmissionStampTest extends DatabaseTestCase
 {
@@ -45,7 +45,7 @@ final class RevisionSubmissionStampTest extends DatabaseTestCase
     }
 
     /**
-     * Any draft the seed left behind: what is in it does not matter here, only that nobody has submitted it.
+     * Any draft the seed left behind: what is in it does not matter here, only that it has not been submitted.
      */
     private function draft(): ActivityRevision
     {
@@ -64,7 +64,7 @@ final class RevisionSubmissionStampTest extends DatabaseTestCase
     }
 
     /**
-     * As whoever wrote it: submitting is the author's own move, and the workflow guards it as such.
+     * As the member who wrote it: submitting is the author's own action, and the workflow guards it as such.
      */
     private function authenticate(ActivityRevision $draft): void
     {

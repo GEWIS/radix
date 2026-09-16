@@ -125,7 +125,7 @@ class MailingListMember
     {
         $this->member = $member;
         // A membership is entered against an address, so a member without one has nothing to be entered on a list
-        // with. Assigning it was already a type error; saying so names what went wrong.
+        // with. Assigning it was already a type error; throwing here reports what went wrong.
         $this->email = $member->email ?? throw new LogicException('member without an e-mail address');
     }
 

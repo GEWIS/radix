@@ -25,7 +25,7 @@ use function intval;
 use function sprintf;
 
 /**
- * A month after a poll has closed, how it was answered stops being anybody's in particular: each option keeps its
+ * A month after a poll has closed, how it was answered is no longer attributable to a member: each option keeps its
  * tally and the rows saying who gave which answer are removed, along with the members behind the reactions underneath
  * it. What the poll asked, and what the association answered, survives all of it.
  *
@@ -88,7 +88,7 @@ final class AnonymisePollVotesCommand extends Command
             ++$polls;
 
             // A poll at a time, so a run that stops half way leaves every poll it did reach with its tallies, its
-            // votes gone and its date set, rather than a backlog of tallies that were never paid for.
+            // votes gone and its date set, rather than a backlog of tallies whose votes were never removed.
             $this->entityManager->wrapInTransaction(
                 function () use ($poll, &$votes, &$reactions): void {
                     $votes += $this->anonymiseVotes($poll);

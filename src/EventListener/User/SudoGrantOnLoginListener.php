@@ -14,12 +14,12 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 /**
  * Grants sudo to a session that has just signed in, so a password typed a moment ago is not asked for again.
  *
- * It keys on the credentials the passport carried rather than on the authenticator, because Symfony reports the
+ * It keys on the credentials the passport contains rather than on the authenticator, because Symfony reports the
  * remember-me authenticator as interactive: neither `InteractiveLoginEvent` nor the authenticator itself tells a
  * fresh login apart from one restored from a cookie, which presents nothing to check.
  *
  * A login with a second factor pending arrives here twice; the first leaves a `TwoFactorToken`, which is not a login
- * yet, and the second carries the code as its credentials. Priority -64 runs after the session strategy has migrated
+ * yet, and the second has the code as its credentials. Priority -64 runs after the session strategy has migrated
  * the session the grant is written to.
  */
 #[AsEventListener(

@@ -9,7 +9,7 @@ use NoDiscard;
 
 /**
  * One member of a body, with whatever they were installed as beyond simply being a member. The functions are already
- * named in the reader's language, the way {@see \App\Service\Decision\MemberInfoService} hands them over too.
+ * named in the reader's language, the way {@see \App\Service\Decision\MemberInfoService} returns them too.
  */
 final readonly class OrganMembership
 {

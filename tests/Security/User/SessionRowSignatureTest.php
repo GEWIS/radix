@@ -92,7 +92,7 @@ final class SessionRowSignatureTest extends TestCase
     /**
      * Rows signed before the firewall and the fingerprint were covered still verify, so that deploying this does not
      * sign everybody out at once. Each is re-signed in the new shape by the rotation that follows, which is what lets
-     * the second branch go once every row has rotated.
+     * the second branch be removed once every row has rotated.
      */
     public function testARowSignedBeforeTheShapeChangedStillVerifies(): void
     {

@@ -12,7 +12,7 @@
                 <span class="badge badge-gewis-primary font-monospace">
                     {{ meeting_label }}.{{ decision.point }}.{{ decision.number }}
                 </span>
-                {# The reference sits on the virtual decision, which is why one decision can carry several of these. #}
+                {# The reference is on the virtual decision, which is why one decision can have several of these. #}
                 {% if decision.counterpart is not null %}
                     <span class="badge badge-secondary">
                         {{ 'Counterpart of %type% %number%.%point%.%decision%'|trans({
@@ -31,8 +31,8 @@
                             '%point%': virtual.point,
                             '%decision%': virtual.number,
                         }) }}
-                        {# The shared confirmation sits outside this component so the re-render that follows cannot
-                           leave a backdrop behind. #}
+                        {# The shared confirmation is rendered outside this component so the re-render that
+                           follows cannot leave a backdrop behind. #}
                         {% if is_granted('ROLE_DATABASE_ADMIN') %}
                             <button type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline text-reset"
                                     data-bs-toggle="modal" data-bs-target="#confirm-modal"
@@ -75,7 +75,7 @@
                         <span class="fas fa-copy" aria-hidden="true"></span>
                         <span data-copy-target="label">{{ 'Copy Decision'|trans }}</span>
                     </button>
-                    {# Said here rather than while either is entered: neither has to be on the record before the
+                    {# Linked here rather than while either is entered: neither has to be on the record before the
                        other, and the virtual one often is not. #}
                     {% if is_granted('ROLE_DATABASE_ADMIN') and ledgerMeeting.type != enum('App\\Entity\\Database\\Enums\\MeetingTypes').VIRT %}
                         <button type="button" class="btn btn-sm btn-outline-secondary"
@@ -85,8 +85,8 @@
                             {{ 'Link virtual counterpart'|trans }}
                         </button>
                     {% endif %}
-                    {# The shared confirmation sits outside this component so the re-render that follows cannot leave
-                       a backdrop behind. #}
+                    {# The shared confirmation is rendered outside this component so the re-render that follows cannot
+                       leave a backdrop behind. #}
                     {% if is_granted('ROLE_DATABASE_ADMIN') %}
                         <button type="button" class="btn btn-sm btn-outline-danger"
                                 data-bs-toggle="modal" data-bs-target="#confirm-modal"

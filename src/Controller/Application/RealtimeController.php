@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Hands the browser a fresh subscribe cookie, so a tab whose own has expired need not reload the page for one.
+ * Gives the browser a fresh subscribe cookie, so a tab whose own has expired need not reload the page for one.
  *
- * Open to anyone: what it grants is read from whoever is asking, which is also why it answers at one address per
+ * Open to anyone: what it grants is read from the current user, which is also why it is served at one address per
  * firewall. See {@see \App\Security\User\Firewall::realtimeGrantRoute()}.
  */
 final class RealtimeController extends AbstractController

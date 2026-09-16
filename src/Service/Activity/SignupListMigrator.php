@@ -191,7 +191,7 @@ final readonly class SignupListMigrator
     }
 
     /**
-     * Whether two fields carry the same options, in the same order and with the same labels.
+     * Whether two fields have the same options, in the same order and with the same labels.
      */
     private function optionsMatch(
         SignupField $oldField,
@@ -234,7 +234,7 @@ final readonly class SignupListMigrator
         $newFields = $newList->getFields()->getValues();
         $newRoles = $newList->getRoles()->getValues();
 
-        // The roles map across by ordinal for the same reason the fields do, and a sign-up that holds one must keep it:
+        // The roles map across by ordinal for the same reason the fields do, and a sign-up that has one must keep it:
         // the old revision's role rows go away with it.
         $roleIndex = [];
         foreach ($oldList->getRoles()->getValues() as $i => $oldRole) {

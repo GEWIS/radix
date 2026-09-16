@@ -259,7 +259,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
             Request::class,
             $request,
         );
-        // A sudo grant is only read back off a session the request already carried, so the cookie has to be there.
+        // A sudo grant is only read from a session the request already has, so the cookie has to be there.
         $request->cookies->set(
             $session->getName(),
             'test',
@@ -303,7 +303,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A request carrying a session must be on the stack for the controller's flash messages to land somewhere.
+     * A request with a session must be on the stack for the controller's flash messages to land somewhere.
      */
     private function pushRequestWithSession(): FlashBagAwareSessionInterface
     {

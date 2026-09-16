@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use function Symfony\Component\Translation\t;
 
 /**
- * Public sign-up, one step to a request.
+ * Public sign-up with one step per request.
  */
 class RegistrationFlowType extends AbstractStepperFlowType
 {

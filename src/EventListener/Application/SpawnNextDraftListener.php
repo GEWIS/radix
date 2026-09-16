@@ -38,7 +38,7 @@ final readonly class SpawnNextDraftListener
         $source = $event->getSubject();
         assert($source instanceof RevisionInterface);
 
-        // The cloner carries the original author forward, so they can address the requested changes and resubmit.
+        // The cloner copies the original author to the draft, so they can address the requested changes and resubmit.
         $draft = $this->clonerRegistry->cloneAsDraft($source);
 
         $this->entityManager->persist($draft);

@@ -20,7 +20,7 @@
         {% do form.token.setRendered %}
     {% endif %}
     {{ form_row(form.expiresAt) }}
-    {# The footnote marks the permissions whose label carries a ¹. #}
+    {# The footnote marks the permissions whose label contains a ¹. #}
     {{ form_row(form.permissions, {
         'help': '¹ This permission will add more properties to existing entities that can already be requested.'|trans,
     }) }}

@@ -20,7 +20,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Asking the association a question: the question itself and the answers it can be given. A poll is written and
- * submitted in one go, so this form is the whole of what the board is handed.
+ * submitted in one go, so this form is the whole of what the board receives.
  *
  * Both languages are required. A poll is put to every member at once and there is no second one in the other
  * language, so a question written in only one leaves half the association unable to answer it. That is why there are

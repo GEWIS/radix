@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
  * service consults every implementation before unlinking.
  *
  * Implementations must be worker-safe and side-effect free, and must reflect the committed state. Callers remove
- * their own entity and flush before asking, so a provider that returns `false` means no one else needs it.
+ * their own entity and flush before calling this, so a provider that returns `false` means no one else needs it.
  */
 #[AutoconfigureTag('app.file_reference_provider')]
 interface FileReferenceProviderInterface

@@ -10,7 +10,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * The page's way to {@see RealtimeAuthorization}.
+ * Exposes {@see RealtimeAuthorization} to templates.
  */
 class RealtimeExtension extends AbstractExtension
 {

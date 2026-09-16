@@ -52,9 +52,9 @@ class PollController extends AbstractController
     )]
     public function index(): Response
     {
-        // The archive component keeps the whole of this page's state in the query string, so the only thing handed to
-        // this page is what is running: it sits above the archive and is the same whatever is searched for, which is
-        // why it is not the component's to fetch again on every keystroke.
+        // The archive component keeps the whole of this page's state in the query string, so the only thing passed to
+        // this page is what is running: it is rendered above the archive and is the same whatever is searched for,
+        // which is why it is not the component's to fetch again on every keystroke.
         return $this->render(
             'frontpage/poll/index.html.twig',
             ['activePolls' => $this->pollRepository->findActivePolls()],
@@ -144,8 +144,8 @@ class PollController extends AbstractController
         #[CurrentUser]
         ?User $user,
     ): Response {
-        // A question the board has not agreed to is not on the website yet. Whoever asked it still gets to see where
-        // it stands, and so does the board; to everybody else the poll does not exist.
+        // A question the board has not agreed to is not on the website yet. The member who asked it can still see its
+        // status, and so can the board; to everyone else the poll does not exist.
         if (
             null === $poll->getLiveRevision()
             && !$this->isGranted(
@@ -174,7 +174,7 @@ class PollController extends AbstractController
     }
 
     /**
-     * A few questions from around the same time, so a poll sits in the archive rather than on its own.
+     * A few questions from around the same time, so a poll is shown in the archive rather than on its own.
      *
      * @return Poll[]
      */
@@ -188,7 +188,7 @@ class PollController extends AbstractController
 
     /**
      * The poll this request continues, when the reader came from one of their own that was turned down. Anything else
-     * starts a new poll, since a chain belongs to whoever asked and only carries on where the board said no.
+     * starts a new poll, since a chain belongs to the member who asked and only continues where the board said no.
      */
     private function resubmittablePoll(
         Request $request,
@@ -234,8 +234,8 @@ class PollController extends AbstractController
     }
 
     /**
-     * Start the new question off with what the previous one said, so a rejection is answered by editing rather than by
-     * typing it all again. The texts are copied rather than shared: the revision they came from is a record now.
+     * Start the new question off with what the previous one said, so a rejected question is edited rather than typed
+     * again from scratch. The texts are copied rather than shared: the revision they came from is a record now.
      */
     private function prefillFrom(
         PollRevision $revision,

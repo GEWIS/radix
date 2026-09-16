@@ -12,7 +12,7 @@ use function sprintf;
 use function trim;
 
 /**
- * Names a device in a way somebody can recognise: "Chrome 124 on Windows (192.0.2.1)".
+ * Names a device in a way a user can recognise: "Chrome 124 on Windows (192.0.2.1)".
  *
  * Whatever was not recognised is left out rather than shown empty, and the joining word is translated here rather than
  * frozen into the text, which is why notifications keep the parts instead of a finished sentence.

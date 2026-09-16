@@ -39,7 +39,7 @@ final readonly class WatermarkedPdfBuilder
     private const string TAG_FONT = 'Times';
     private const int TAG_FONT_SIZE = 6;
 
-    /** How far the tag sits from the top-left corner, in points. */
+    /** How far the tag is from the top-left corner, in points. */
     private const int TAG_MARGIN = 3;
 
     public function __construct(
@@ -95,7 +95,7 @@ final readonly class WatermarkedPdfBuilder
             : PdfRasterizer::DPI_DIGITAL;
 
         // Points, because that is what a page size derived from pixels and a resolution comes out in. FPDF measures in
-        // millimetres unless told otherwise, which would silently make every page nearly three times too large.
+        // millimetres unless configured otherwise, which would silently make every page nearly three times too large.
         $pdf = new FPDF(
             'P',
             'pt',

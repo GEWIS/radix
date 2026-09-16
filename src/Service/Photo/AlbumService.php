@@ -52,7 +52,7 @@ final readonly class AlbumService
     }
 
     /**
-     * The association years (as their first year, e.g. 2024 for '2024-2025') that hold at least one viewable root
+     * The association years (as their first year, e.g. 2024 for '2024-2025') that contain at least one viewable root
      * album, most recent first. Used to populate the year filter on the overview. Only years that actually have an
      * album appear, so the switcher never offers an empty year.
      *
@@ -60,7 +60,7 @@ final readonly class AlbumService
      */
     public function getViewableRootAlbumYears(): array
     {
-        // Public browsing is published-only for everyone (drafts live in the admin), so the year list is too.
+        // Public browsing is published-only for everyone (drafts appear only in the admin), so the year list is too.
         $years = [];
         foreach ($this->albumRepository->getPublishedRootAlbumStartDates() as $row) {
             $years[AssociationYear::fromDate($row['startDateTime'])->getYear()] = true;
@@ -75,8 +75,8 @@ final readonly class AlbumService
     /**
      * The viewable root albums of one association year, grouped by month (keyed 'Y-m', most recent month first) so the
      * overview can print a month divider before each group. An optional search narrows the albums to those whose name
-     * contains it. Only published albums are surfaced (drafts live in the admin, even for the board); graduates only
-     * see the albums the voter allows them.
+     * contains it. Only published albums are surfaced (drafts appear only in the admin, even for the board); graduates
+     * only see the albums the voter allows them.
      *
      * @return array<string, Album[]>
      */

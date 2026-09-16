@@ -60,8 +60,8 @@ final class RequireSudoToImpersonateListenerTest extends TestCase
     }
 
     /**
-     * Leaving an impersonation carries the original token rather than a switched one. Somebody whose grant ran out
-     * while impersonating has to be able to get back to their own account.
+     * Leaving an impersonation uses the original token rather than a switched one. An administrator whose grant ran
+     * out while impersonating has to be able to get back to their own account.
      */
     public function testLeavingAnImpersonationIsNotRefused(): void
     {

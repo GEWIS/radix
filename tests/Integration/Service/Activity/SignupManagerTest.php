@@ -80,7 +80,7 @@ final class SignupManagerTest extends DatabaseTestCase
 
     public function testCreateUserSignupAfterALockedDrawIsAdmittedWhileCapacityRemains(): void
     {
-        // Once the draw is locked, a limited list hands out its remaining places first-come-first-served: with nobody
+        // Once the draw is locked, a limited list assigns its remaining places first-come-first-served: with none
         // admitted yet, a new member sign-up is admitted immediately instead of joining the waiting list.
         $list = $this->lockedLimitedList();
 
@@ -125,8 +125,8 @@ final class SignupManagerTest extends DatabaseTestCase
     {
         $list = $this->lockedLimitedList();
 
-        // Born unverified: even with places free the sign-up stays waitlisted -- a never-confirmed ghost must not hold
-        // a place ...
+        // Born unverified: even with places free the sign-up stays waitlisted, because a never-confirmed sign-up must
+        // not take up a place ...
         $signup = $this->signupManager()->createExternalSignup(
             $list,
             'Prompt Guest',
@@ -234,7 +234,7 @@ final class SignupManagerTest extends DatabaseTestCase
             ),
         );
 
-        // The organiser vouches for the subscriber, and the sign-up is flagged as such ...
+        // The organiser added the subscriber themselves, and the sign-up is flagged as such ...
         self::assertTrue($signup->addedManually);
         // ... and there is no double opt-in, so no token and no confirmation e-mail; the sign-up is a participant
         // from the moment it was added.
@@ -447,7 +447,7 @@ final class SignupManagerTest extends DatabaseTestCase
     }
 
     /**
-     * The seeded sign-up list that carries extra fields (a text field and a choice field), so answer mapping is
+     * The seeded sign-up list that has extra fields (a text field and a choice field), so answer mapping is
      * exercised across both a free-text and an option-reference value.
      */
     private function listWithFields(): SignupList
@@ -528,7 +528,7 @@ final class SignupManagerTest extends DatabaseTestCase
     }
 
     /**
-     * Mark the list's earliest sign-ups as admitted, directly in the database, until its capacity is reached -- so a
+     * Mark the list's earliest sign-ups as admitted, directly in the database, until its capacity is reached, so a
      * subsequent sign-up faces a full list. The admitted-count checks query the database, so no refresh is needed.
      */
     private function admitExistingUpToCapacity(SignupList $list): void
@@ -652,7 +652,7 @@ final class SignupManagerTest extends DatabaseTestCase
 
     /**
      * Assert the sign-up's stored value rows mirror the submitted answers exactly as {@see SignupManager} maps them:
-     * one row per field, a choice held as an option reference (no scalar) and any other type as its raw string (no
+     * one row per field, a choice stored as an option reference (no scalar) and any other type as its raw string (no
      * option).
      *
      * @param array<int, int|string> $answers
@@ -729,7 +729,7 @@ final class SignupManagerTest extends DatabaseTestCase
 
     private function selectorOf(ExternalSignupTokenEmail $email): string
     {
-        // The plaintext token travels as `selector.verifier`; only the selector locates the stored row.
+        // The plaintext token is passed as `selector.verifier`; only the selector locates the stored row.
         return explode(
             '.',
             $email->getToken(),
@@ -740,7 +740,7 @@ final class SignupManagerTest extends DatabaseTestCase
         DateTimeImmutable $expiresAt,
         string $modifier,
     ): void {
-        // A one-minute window absorbs the wall-clock gap between the service stamping the expiry and this assertion.
+        // A one-minute window accounts for the wall-clock gap between the service stamping the expiry and this check.
         self::assertGreaterThanOrEqual(
             new DateTimeImmutable($modifier . ' -1 minute'),
             $expiresAt,

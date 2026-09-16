@@ -2,8 +2,8 @@ import { Controller } from '@hotwired/stimulus';
 import type { ActionEvent } from '@hotwired/stimulus';
 
 /**
- * It sits above the form rather than on the textarea, because running the query needs the "Execute" button (the form
- * carries a second submit button that saves the query instead, so a submit without a submitter would be ambiguous)
+ * It is placed above the form rather than on the textarea, because running the query needs the "Execute" button (the
+ * form has a second submit button that saves the query instead, so a submit without a submitter would be ambiguous)
  * and because the entity list is outside the form.
  *
  *     <div data-controller="query-editor">
@@ -151,7 +151,7 @@ export default class extends Controller<HTMLElement> {
         const editor = this.editorTarget;
         const spaces = ' '.repeat(this.indentValue);
 
-        // A caret indents where it stands; a selection indents every line it touches, so that indenting a block does
+        // A caret indents at its position; a selection indents every line it touches, so that indenting a block does
         // not replace the block.
         if (editor.selectionStart === editor.selectionEnd) {
             this.replace(editor.selectionStart, editor.selectionEnd, spaces);
@@ -197,8 +197,8 @@ export default class extends Controller<HTMLElement> {
         editor.setSelectionRange(start, end);
 
         // `insertText` is deprecated, but it is the only way to change the value that leaves the browser's own undo
-        // stack intact; `setRangeText` empties it. Where the command is refused the edit still lands, only undoing it
-        // does not work.
+        // stack intact; `setRangeText` empties it. Where the command is refused the edit is still applied, only
+        // undoing it does not work.
         if (document.execCommand('insertText', false, text)) {
             return;
         }

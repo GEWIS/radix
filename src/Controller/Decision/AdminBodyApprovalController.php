@@ -26,7 +26,7 @@ use function assert;
 /**
  * The review surface for what bodies write about themselves: a queue of the pages waiting on the board, and a screen
  * per revision showing what changed against the one before it, the discussion, and whichever transitions the workflow
- * allows whoever is looking.
+ * allows the current user.
  *
  * The same screen serves the board and the body that submitted, which is why only the queue is board-only. Which
  * buttons appear is left to the workflow guards rather than decided here, so the screen never has to tell a reviewer
@@ -114,7 +114,7 @@ class AdminBodyApprovalController extends AbstractRevisionReviewController
     }
 
     /**
-     * Throw a draft away and point the page back at what is on the website, which is how a body abandons a change it
+     * Discard a draft and point the page back at what is on the website, which is how a body abandons a change it
      * thought better of.
      */
     #[Route(

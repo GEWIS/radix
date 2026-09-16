@@ -14,8 +14,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Who is told their address will stop working. A member on a university address is; anybody else is not, and being
- * told wrongly is worse than not being told, since the notice asks them to go and change something.
+ * Who is notified that their address will stop working. A member on a university address is; anybody else is not, and
+ * being notified wrongly is worse than not being notified, since the notice asks them to go and change something.
  */
 final class StudentEmailExtensionTest extends TestCase
 {
@@ -40,7 +40,7 @@ final class StudentEmailExtensionTest extends TestCase
             true,
         ];
 
-        // Whoever typed it in decides the case, not the check.
+        // The person who entered it decides the case, not the check.
         yield 'the same one shouted' => [
             'SOMEBODY@STUDENT.TUE.NL',
             true,
@@ -51,7 +51,7 @@ final class StudentEmailExtensionTest extends TestCase
             false,
         ];
 
-        // The staff domain outlives a degree, so its holder has nothing to change.
+        // The staff domain outlives a degree, so its owner has nothing to change.
         yield 'a staff address' => [
             'somebody@tue.nl',
             false,

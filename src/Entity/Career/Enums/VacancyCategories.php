@@ -38,7 +38,7 @@ enum VacancyCategories: string implements TranslatableInterface
     }
 
     /**
-     * The singular name is what a category is called when it stands on its own, so it is also what a select renders
+     * The singular name is what a category is called when it is shown on its own, so it is also what a select renders
      * for the category field.
      */
     #[Override]

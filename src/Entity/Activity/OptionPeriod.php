@@ -23,12 +23,12 @@ use SortDirection;
 /**
  * A round of the option calendar, opened by the board before a quartile.
  *
- * Two windows, which are not the same thing and were never told apart before: bodies may hand in proposals between
+ * Two windows, which are not the same thing and were never told apart before: bodies may submit proposals between
  * {@see self::$submissionOpensAt} and {@see self::$submissionClosesAt}, and the dates they propose have to fall
- * between {@see self::$startsAt} and {@see self::$endsAt}. Handing in usually happens well before the quartile the
+ * between {@see self::$startsAt} and {@see self::$endsAt}. Submission usually happens well before the quartile the
  * dates are in.
  *
- * A period may carry its own default number of proposals per body. It never carries a list of bodies: which bodies
+ * A period may have its own default number of proposals per body. It never contains a list of bodies: which bodies
  * exist is not this period's business, and a body founded after the period was opened has to be able to take part.
  */
 #[Entity(repositoryClass: OptionPeriodRepository::class)]
@@ -59,13 +59,13 @@ class OptionPeriod
     public string $name;
 
     /**
-     * From when bodies may hand in proposals for this period.
+     * From when bodies may submit proposals for this period.
      */
     #[Column(type: Types::DATETIME_IMMUTABLE)]
     public DateTimeImmutable $submissionOpensAt;
 
     /**
-     * Until when bodies may hand in proposals for this period.
+     * Until when bodies may submit proposals for this period.
      */
     #[Column(type: Types::DATETIME_IMMUTABLE)]
     public DateTimeImmutable $submissionClosesAt;
@@ -114,7 +114,7 @@ class OptionPeriod
     }
 
     /**
-     * Whether bodies may hand in proposals at the given moment.
+     * Whether bodies may submit proposals at the given moment.
      */
     public function isOpenAt(DateTimeInterface $moment): bool
     {

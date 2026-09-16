@@ -30,7 +30,7 @@ export interface OrganInfo extends OrganMatch {
 }
 
 /**
- * Choosing an organ fills in the reference to its foundation -- which is what the form reads back -- and then loads
+ * Choosing an organ fills in the reference to its foundation (which is what the form reads back) and then loads
  * who is currently installed in it, announced as `organ-lookup:selected` so the page around it can show the
  * consequences before the decision is taken.
  */

@@ -29,8 +29,8 @@ use function sprintf;
 final class OrganDecisionFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
     /**
-     * The board decision a virtual meeting says again further down, which is what the two halves of this fixture
-     * hand between themselves.
+     * The board decision a virtual meeting repeats further down, which is what the two halves of this fixture
+     * pass between themselves.
      */
     private const string REPEATED_DECISION = 'ledger-decision-repeated';
 
@@ -247,8 +247,8 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
 
         $manager->persist($foundation);
 
-        // Abrogated, which is what makes this the former body of that name rather than a second one standing beside
-        // the first. In the ledger that is a decision like any other, not a date written onto the body.
+        // Abrogated, which is what makes this the former body of that name rather than a second one alongside the
+        // first. In the ledger that is a decision like any other, not a date written onto the body.
         $closing = new Decision();
         $closing->setMeeting($this->getReference(
             'ledger-meeting-BV-1806',
@@ -362,7 +362,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
                 $contentEN,
             );
 
-            // Said again by a virtual meeting further down, which is what the counterpart there points back at.
+            // Repeated by a virtual meeting further down, which is what the counterpart there points back at.
             if ('ledger-meeting-BV-1805' === $meetingReference) {
                 $this->addReference(
                     self::REPEATED_DECISION,
@@ -451,8 +451,8 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
             . ' association year.',
         );
 
-        // A virtual meeting saying again what a board meeting decided, and naming the decision it repeats. Without
-        // that link the two are two answers to the same search, which is what the seed is here to show.
+        // A virtual meeting repeating what a board meeting decided, and naming the decision it repeats. Without
+        // that link the two are two results for the same search, which is what the seed is here to show.
         $repeat = $this->createTextDecision(
             $manager,
             'ledger-meeting-Virt-1',
@@ -486,7 +486,7 @@ final class OrganDecisionFixture extends Fixture implements DependentFixtureInte
         $decision->number = $number;
 
         // A decision says what its subdecisions say, so free text is a subdecision rather than a field on the
-        // decision; the replay reads the projection's content off it.
+        // decision; the replay reads the projection's content from it.
         $other = new Other();
         $other->contentNL = $contentNL;
         $other->contentEN = $contentEN;

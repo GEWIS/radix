@@ -61,8 +61,8 @@ class PollVote
     /**
      * The member who submitted this vote. It identifies the row, so there is nothing to null out: a vote that can no
      * longer be attributed is removed the way {@see \App\Command\Frontpage\AnonymisePollVotesCommand} removes one,
-     * except that the tally is not rolled into {@see PollOption::$anonymousVotes} first — a member who is taken out
-     * of the register is taken out of the counts with it.
+     * except that the tally is not rolled into {@see PollOption::$anonymousVotes} first. A member who is removed from
+     * the register is removed from the counts as well.
      */
     #[Id]
     #[ManyToOne(

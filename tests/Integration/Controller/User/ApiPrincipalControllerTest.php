@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
- * The bearer tokens the API is read with, and who holds them.
+ * The bearer tokens the API is read with, and who has them.
  *
- * Their pages were lost when the two applications were merged -- the controller survived and its templates did not,
- * so every one of its actions rendered a template that was not there. These render them.
+ * Their pages were lost when the two applications were merged: the controller survived and its templates did not, so
+ * every one of its actions rendered a template that was not there. These render them.
  */
 final class ApiPrincipalControllerTest extends DatabaseTestCase
 {

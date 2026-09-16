@@ -69,7 +69,7 @@ class ActivityFlowType extends AbstractStepperFlowType
             );
 
         if (true !== $options['lists']) {
-            // Finishing a run without the lists leaves it standing on them, so the editor that picks it up opens there.
+            // Finishing a run without the lists leaves its stored step on them, so a later edit opens there.
             $builder->add(
                 'finish',
                 FinishFlowType::class,
@@ -178,7 +178,7 @@ class ActivityFlowType extends AbstractStepperFlowType
                                 $this->translator,
                             ),
                             'number' => $position,
-                            // Named in every language the activity is written in, which the form still holds here.
+                            // Named in every language the activity is written in, which the form still has here.
                             'complete' => static fn (mixed $data): bool => $section->isFilledIn(
                                 $list,
                                 $data instanceof ActivityData ? $data->languages() : [],

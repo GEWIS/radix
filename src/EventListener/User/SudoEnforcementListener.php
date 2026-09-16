@@ -16,16 +16,16 @@ use function preg_match;
 use function sprintf;
 
 /**
- * Requires a live sudo grant on every address in {@see self::AREAS}, rather than on the actions somebody remembered
- * to mark.
+ * Requires a live sudo grant on every address in {@see self::AREAS}, rather than on the actions a developer
+ * remembered to mark.
  *
- * Priority 7 is just below the firewall (8), so `access_control` decides the roles first and somebody who may not be
- * here at all is sent to the login page instead of a password prompt. {@see SudoAccessDeniedListener} turns the
+ * Priority 7 is just below the firewall (8), so `access_control` decides the roles first and a user who may not have
+ * access at all is sent to the login page instead of a password prompt. {@see SudoAccessDeniedListener} turns the
  * denial into the redirect to the confirmation form.
  *
- * Signing in, resetting a password and confirming sudo answer under `/user` and `/company` but outside `/security`,
- * which is what keeps somebody without a grant able to go and get one. Live components answer under `/_components`
- * and carry `#[IsGranted(SudoVoter::ATTRIBUTE)]` themselves.
+ * Signing in, resetting a password and confirming sudo are served under `/user` and `/company` but outside
+ * `/security`, which is what lets a user without a grant obtain one. Live components are served under `/_components`
+ * and declare `#[IsGranted(SudoVoter::ATTRIBUTE)]` themselves.
  */
 #[AsEventListener(
     event: RequestEvent::class,

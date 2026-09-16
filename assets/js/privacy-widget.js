@@ -26,7 +26,6 @@ const trackingRequest = (action) => {
 
     // Function to clean up data after the Promise is resolved or rejected.
     let clean = () => {
-        // If script is present remove it.
         if (script && script.parentNode) {
             script.parentNode.removeChild(script);
         }
@@ -36,13 +35,11 @@ const trackingRequest = (action) => {
             delete window[id];
         }
 
-        // If timeout timer is present clear it.
         if (timer) {
             clearTimeout(timer);
         }
     };
 
-    // Create the Promise for the request.
     promise = new Promise((resolve, reject) => {
         // Make sure the request can time out.
         timer = setTimeout(() => {
@@ -58,7 +55,6 @@ const trackingRequest = (action) => {
 
         url += action + '&callback=' + id;
 
-        // Create the script.
         script = document.createElement('script');
         script.src = url;
         script.onerror = () => {
@@ -66,7 +62,6 @@ const trackingRequest = (action) => {
             reject(new Error('Unknown error occurred during request.'));
         };
 
-        // Add script to DOM.
         target.parentNode.insertBefore(script, target);
     });
 

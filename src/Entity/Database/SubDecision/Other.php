@@ -22,7 +22,7 @@ class Other extends SubDecision
     #[Column(type: 'text')]
     public string $contentNL;
 
-    /** Null for the decisions recorded before the form asked for a translation. */
+    /** Null for the decisions recorded before the form collected a translation. */
     #[Column(
         type: 'text',
         nullable: true,

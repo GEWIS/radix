@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\OneToOne;
 
 /**
  * Locally-owned details of a meeting. The {@see Meeting} itself is projected from the ledger and read-only here
- * (only the date is carried over), so anything the board manages on the website lives here.
+ * (only the date is carried over), so anything the board manages on the website is stored here.
  */
 #[Entity]
 #[HasLifecycleCallbacks]

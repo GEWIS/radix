@@ -18,8 +18,8 @@ use function array_filter;
 use function count;
 
 /**
- * The reminder is the last chance a member has to withdraw, so what matters is that everybody on the list hears about
- * it exactly once and that a list nowhere near closing stays quiet.
+ * The reminder is the last chance a member has to withdraw, so what matters is that every member on the list is
+ * reminded exactly once and that a list nowhere near closing stays quiet.
  */
 final class RemindClosingSignupsCommandTest extends DatabaseTestCase
 {
@@ -94,7 +94,7 @@ final class RemindClosingSignupsCommandTest extends DatabaseTestCase
     }
 
     /**
-     * Every list but the one under test is pushed well out of the window, so the seed's own lists cannot answer for it.
+     * Every list but the one under test is pushed well out of the window, so the seed's lists produce no reminders.
      */
     private function aListClosingIn(string $offset): SignupList
     {

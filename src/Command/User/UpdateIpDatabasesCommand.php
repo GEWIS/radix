@@ -33,12 +33,12 @@ use function sprintf;
 use function unlink;
 
 /**
- * Fetches fresh copies of the IP databases {@see IpNetworkResolver} answers from. With MaxMind credentials these are
+ * Fetches fresh copies of the IP databases {@see IpNetworkResolver} reads from. With MaxMind credentials these are
  * the GeoLite ASN and City editions, which is what puts a city in the security notices; MaxMind caps downloads per
  * day, and two editions twice a week stays far under it. Without credentials they are IPLocate's free files (CC BY-SA
  * 4.0, attribution on the security page), which name networks and countries but no cities. Twice a week is fresh
- * enough; which AS announces an address changes on the timescale of contracts, and a stale answer costs one notice
- * somebody did not need.
+ * enough; which AS announces an address changes on the timescale of contracts, and a stale result costs one notice
+ * a member did not need.
  */
 #[AsCommand(
     name: 'app:user:update-ip-databases',
@@ -66,7 +66,7 @@ final class UpdateIpDatabasesCommand extends Command
 
     private const string MAXMIND_URL = 'https://download.maxmind.com/geoip/databases/%s/download?suffix=tar.gz';
 
-    /** An address every edition is certain to answer for: the university's own range, which we can vouch for. */
+    /** An address every edition is certain to include: the university's own range, which we know is listed. */
     private const string PROOF_ADDRESS = '131.155.0.1';
 
     public function __construct(
@@ -180,8 +180,8 @@ final class UpdateIpDatabasesCommand extends Command
     }
 
     /**
-     * MaxMind serves a tar.gz holding a dated directory with the database inside, so the archive is unpacked beside
-     * the target and only the database file is kept.
+     * MaxMind serves a tar.gz containing a dated directory with the database inside, so the archive is unpacked
+     * beside the target and only the database file is kept.
      */
     private function downloadMaxMind(
         string $edition,

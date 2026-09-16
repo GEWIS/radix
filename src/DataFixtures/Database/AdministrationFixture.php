@@ -26,7 +26,7 @@ use Override;
  * The decisions a board takes that are not about bodies: minutes, money and key codes.
  *
  * Without these the meeting pages and the decision export only ever show installations, and the kinds of decision
- * that are hardest to get right are the ones nobody has an example of.
+ * that are hardest to get right are the ones without an example.
  */
 class AdministrationFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
@@ -39,7 +39,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         $meeting = new Meeting();
         $meeting->type = MeetingTypes::BV;
         $meeting->setNumber(4);
-        // Later than the board meeting DecisionFixture holds, because meetings of a type are numbered in the
+        // Later than the board meeting DecisionFixture creates, because meetings of a type are numbered in the
         // order they are held.
         $meeting->date = new DateTimeImmutable()->modify('-3 days');
         $manager->persist($meeting);
@@ -96,7 +96,7 @@ class AdministrationFixture extends Fixture implements DependentFixtureInterface
         $decision->addSubdecision($budget);
         $manager->persist($budget);
 
-        // A statement, approved with changes — the other half of the pair, and the case where `changes` is true.
+        // A statement, approved with changes: the other half of the pair, and the case where `changes` is true.
         $decision = $this->decision(
             $manager,
             $meeting,

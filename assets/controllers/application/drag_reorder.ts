@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * Reordering a vertical list of entries by dragging: while an entry is dragged it is slotted live before the entry
- * under the cursor, and once it is let go the controller is told the order changed. Only DIRECT entries of the
+ * under the cursor, and once it is let go the controller is notified that the order changed. Only DIRECT entries of the
  * wrapper move, so a list nested in an entry reorders on its own. Not a controller in its own right (no `_controller`
  * suffix, so it is not registered); the `sortable` and `tier-order` controllers build on it.
  */
@@ -17,7 +17,7 @@ export default abstract class DragReorder extends Controller {
     protected abstract entrySelector(): string;
 
     /**
-     * What to do once the entries stand in a new order (or an entry was added and the order has to be written out).
+     * What to do once the entries are in a new order (or an entry was added and the order has to be written out).
      */
     protected abstract reordered(): void;
 

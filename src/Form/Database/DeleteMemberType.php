@@ -14,7 +14,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Confirmation of a member removal. Which button was clicked decides the outcome; the form itself exists so that the
- * confirmation carries a token.
+ * confirmation has a token.
  */
 class DeleteMemberType extends AbstractType
 {

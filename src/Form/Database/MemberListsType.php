@@ -95,8 +95,8 @@ class MemberListsType extends AbstractType
         // unticked. Left alone, saving any change to this form reads every locked list as an unsubscribe and queues it
         // for removal; putting them back is what makes 'locked' mean unchanged.
         //
-        // Ahead of ChoiceType's own PRE_SUBMIT, which sits at 0: that one rewrites the submitted list into a map from
-        // child name to value, and a list of names appended after it no longer lines up with anything.
+        // Ahead of ChoiceType's own PRE_SUBMIT, which has priority 0: that one rewrites the submitted list into a
+        // map from child name to value, and a list of names appended after it no longer lines up with anything.
         $builder->get('lists')->addEventListener(
             FormEvents::PRE_SUBMIT,
             static function (PreSubmitEvent $event) use ($locked): void {

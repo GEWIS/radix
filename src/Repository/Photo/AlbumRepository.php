@@ -135,7 +135,7 @@ class AlbumRepository extends ServiceEntityRepository
 
     /**
      * The start date of every published, dated root album, in one query, so the overview can derive the association
-     * years that actually hold albums (a year with none never reaches the year switcher).
+     * years that actually have albums (a year with none never reaches the year switcher).
      *
      * @return list<array{startDateTime: DateTimeImmutable}>
      */
@@ -154,7 +154,7 @@ class AlbumRepository extends ServiceEntityRepository
     }
 
     /**
-     * The number of direct sub-albums each of the given albums has, keyed by album id, in a single query — so a grid of
+     * The number of direct sub-albums each of the given albums has, keyed by album id, in a single query, so a grid of
      * album cards does not issue one `COUNT(*) ... WHERE parent_id = ?` per card. Albums with no sub-albums are absent.
      * Public overviews pass `$publishedOnly` so a draft sub-album is not counted against a published parent.
      *

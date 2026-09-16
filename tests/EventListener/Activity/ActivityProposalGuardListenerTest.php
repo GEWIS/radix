@@ -17,12 +17,12 @@ use function implode;
 /**
  * Which attribute the option calendar's guard asks for, per transition.
  *
- * Every case here has somebody signed in, which is what a token stands for. With no token at all the guard steps
- * aside, because that only happens on the console: see the nightly sweep's own test.
+ * Every case here has a user signed in, which is what a token represents. With no token at all the guard does not
+ * block, because that only happens on the console: see the nightly sweep's own test.
  *
- * Only taking a proposal back is the body's own; deciding which date is reserved, turning a proposal down, recording
- * that the financial side is settled and letting a date lapse are all the board's. The guard asks the generic event
- * rather than one transition at a time, so a transition added later is locked to the board rather than open to
+ * Only withdrawing a proposal is the body's own; deciding which date is reserved, declining a proposal, recording
+ * that the financial side is settled and letting a date lapse are all the board's. The guard listens to the generic
+ * event rather than one transition at a time, so a transition added later is locked to the board rather than open to
  * everybody, and that is what the last case pins.
  */
 final class ActivityProposalGuardListenerTest extends TestCase

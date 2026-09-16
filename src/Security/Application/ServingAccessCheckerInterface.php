@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\StorageNamespace;
 
 /**
  * Decides whether the current request may be served a file from a given {@see StorageNamespace}. The
- * {@see \App\Controller\Application\ImageController} consults, in priority order, the first checker whose
+ * {@see \App\Controller\Application\ImageController} uses, in priority order, the first checker whose
  * {@see supports()} matches the namespace; a namespace-specific checker (e.g. the photos one, which short-circuits for
  * full members and runs the per-photo album voter for graduates) overrides the low-priority
  * {@see DefaultServingAccessChecker}.

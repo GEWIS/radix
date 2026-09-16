@@ -14,8 +14,8 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 /**
- * Which Mercure topics a page may subscribe to decides what the hub is allowed to push at whoever is holding the
- * browser, so this runs over the real firewall map and the real voters rather than a stand-in for them.
+ * Which Mercure topics a page may subscribe to decides what the hub is allowed to push to the user in that browser,
+ * so this runs over the real firewall map and the real voters rather than a stand-in for them.
  */
 final class RealtimeAuthorizationTest extends KernelTestCase
 {
@@ -68,8 +68,8 @@ final class RealtimeAuthorizationTest extends KernelTestCase
     }
 
     /**
-     * A sign-in still waiting on its second factor has the member on the token but has not signed in yet. Handing it
-     * their topic would push their notifications to whoever holds the password.
+     * A sign-in still waiting on its second factor has the member on the token but has not signed in yet. Granting
+     * it their topic would push their notifications to anyone who has the password.
      */
     public function testASignInWaitingOnItsSecondFactorGetsNoTopicOfItsOwn(): void
     {
@@ -89,7 +89,7 @@ final class RealtimeAuthorizationTest extends KernelTestCase
     }
 
     /**
-     * A browser holds one authorization cookie whatever page minted it, so what it grants cannot be allowed to depend
+     * A browser has one authorization cookie whatever page minted it, so what it grants cannot be allowed to depend
      * on which page did. The topics the shared connection subscribes to stay the narrower list.
      */
     public function testTheBoardIsGrantedThePagesItWatchesFromWhicheverPageItIsOn(): void

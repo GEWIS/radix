@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * ({@see \App\Command\Activity\RunDueDrawsCommand}); the board can still run it by hand once the moment has passed.
  *
  * - {@see self::IfFullBefore}: draw at a given moment, regardless of fullness. When the list is oversubscribed by then
- *   it is a real lottery; when it is not, everyone so far is admitted and the locked list hands out its remaining
+ *   it is a real lottery; when it is not, everyone so far is admitted and the locked list assigns its remaining
  *   places first-come-first-served.
  * - {@see self::AfterDurationOpen}: draw once it has been open for a number of hours (possibly before it closes).
  * - {@see self::OnClose}: draw when the sign-up list closes.

@@ -54,7 +54,8 @@
                                 <span class="fas fa-download"></span> {{ 'Download my latest export'|trans }}
                             </a>
                         {% else %}
-                            {# Downloading the export needs sudo; re-authenticate first and return straight to the download. #}
+                            {# Downloading the export needs sudo; re-authenticate first and return
+                               straight to the download. #}
                             <a class="btn btn-outline-gewis-primary"
                                href="{{ path('user_sudo_confirm', {'next': path('user_settings_data_export_download')}) }}">
                                 <span class="fas fa-download"></span> {{ 'Download my latest export'|trans }}
@@ -84,7 +85,7 @@
         </div>
     </div>
 
-    {# Removing existing tags is a separate, irreversible POST action, so it lives in its own panel with a
+    {# Removing existing tags is a separate, irreversible POST action, so it is rendered in its own panel with a
        confirmation modal. #}
     <div class="row">
         <div class="col-lg-6">

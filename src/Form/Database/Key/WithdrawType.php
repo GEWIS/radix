@@ -44,7 +44,7 @@ class WithdrawType extends AbstractType
                 ['subdecision_class' => Granting::class],
             )
             // The granting's member and expiry, shown alongside the date being picked. The withdrawal itself is
-            // built from the granting the reference above resolves to, so nothing is read back off these.
+            // built from the granting the reference above resolves to, so nothing is read back from these.
             ->add(
                 'granting',
                 GrantingType::class,
@@ -78,7 +78,7 @@ class WithdrawType extends AbstractType
     }
 
     /**
-     * A key code cannot be taken back before the decision that takes it back was made.
+     * A key code cannot be withdrawn before the decision that withdraws it was made.
      */
     public static function validateNotInThePast(
         mixed $value,

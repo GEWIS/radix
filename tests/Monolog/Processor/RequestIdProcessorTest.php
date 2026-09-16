@@ -56,8 +56,8 @@ final class RequestIdProcessorTest extends TestCase
     }
 
     /**
-     * So that anything answering the request -- an error page, a support reply -- can name the same identifier the
-     * log lines carry.
+     * So that anything responding to the request (an error page, a support reply) can name the same identifier the
+     * log lines contain.
      */
     public function testTheRequestIsToldWhatItIsCalled(): void
     {

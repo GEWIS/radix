@@ -12,10 +12,10 @@ use Symfony\Component\HtmlSanitizer\Visitor\AttributeSanitizer\AttributeSanitize
 /**
  * An image on a custom page is served from the site's own image pipeline or it is not served at all.
  *
- * The pipeline is what resizes an image to the variant a page asks for and hands it out with the caching the rest of
- * the site's images get. An image that points anywhere else (a file somewhere on the internet, a data URI pasted into
- * the editor) skips all of that: it is fetched at whatever size it happens to be, from a host that can change or
- * remove it, and the page has no say in either. So the source is kept only when it addresses the pipeline; the editor
+ * The pipeline is what resizes an image to the variant a page asks for and serves it with the caching the rest of the
+ * site's images get. An image that points anywhere else (a file somewhere on the internet, a data URI pasted into the
+ * editor) skips all of that: it is fetched at whatever size it happens to be, from a host that can change or remove it,
+ * and the page has no control over either. So the source is kept only when it addresses the pipeline; the editor
  * uploads into it, which is how an image gets there in the first place.
  */
 final readonly class PageImageSourceSanitizer implements AttributeSanitizerInterface

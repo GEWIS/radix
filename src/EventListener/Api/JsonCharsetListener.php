@@ -15,7 +15,7 @@ use function str_starts_with;
  *
  * Consumers have been reading `application/json; charset=utf-8` since the API existed, and a client that matches the
  * header exactly would stop recognising the response without it. Symfony's JsonResponse states the media type alone,
- * which says the same thing — JSON is always UTF-8 — but not in the same bytes.
+ * which means the same thing (JSON is always UTF-8) but not in the same bytes.
  */
 #[AsEventListener(event: KernelEvents::RESPONSE)]
 final readonly class JsonCharsetListener

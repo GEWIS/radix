@@ -27,8 +27,8 @@ use function sprintf;
  * Choose and store the photo of the week from a week's votes.
  *
  * Runs Monday before the board's hide window (00:00-11:59): the freshly chosen photo must exist before then so the
- * board can decide whether to hide it. The scheduler is stateful with processOnlyLastMissedRun, so downtime yields a
- * single catch-up run rather than a backlog. No votes that week is not a failure; the command reports it and exits 0.
+ * board can decide whether to hide it. The scheduler is stateful with processOnlyLastMissedRun, so downtime results in
+ * a single catch-up run rather than a backlog. No votes that week is not a failure; the command reports it and exits 0.
  *
  * An admin can pass --week to (re)generate for another week, and --photo to pick a specific photo by hand instead of
  * the vote-based selection.

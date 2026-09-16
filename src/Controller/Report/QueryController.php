@@ -102,7 +102,7 @@ final class QueryController extends AbstractController
     /**
      * The query page, which is the same whether it was reached with a stored query or without one.
      *
-     * Both the editor and the export sit on this page and post back to it; they are told apart by the form their
+     * Both the editor and the export are on this page and post back to it; they are distinguished by the form their
      * fields arrive under.
      */
     private function page(
@@ -168,8 +168,8 @@ final class QueryController extends AbstractController
             try {
                 $result = $this->queryService->execute($query);
             } catch (ORMException $e) {
-                // Whatever the parser objected to is the only thing that tells the author what is wrong with the
-                // query, so it is reported on the field it was typed in.
+                // Whatever the parser objected to is the only information about what is wrong with the query, so it
+                // is reported on the field it was typed in.
                 $form->get('query')->addError(new FormError($e->getMessage()));
                 $query = null;
             }

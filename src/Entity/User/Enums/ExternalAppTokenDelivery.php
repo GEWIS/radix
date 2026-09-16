@@ -10,7 +10,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * How the token is handed back to an external application. Legacy applications receive it as a query parameter; modern
+ * How the token is returned to an external application. Legacy applications receive it as a query parameter; modern
  * applications require the URL fragment, since those are not logged or cached the way query strings can be.
  */
 enum ExternalAppTokenDelivery: string implements TranslatableInterface

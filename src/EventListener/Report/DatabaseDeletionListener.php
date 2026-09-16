@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Takes out of the projection what is taken out of the ledger.
  *
- * Before the removal rather than after it, because what has to go from the projection is worked out from the entity
- * while its relations are still readable.
+ * Before the removal rather than after it, because what has to be removed from the projection is determined from the
+ * entity while its relations are still readable.
  */
 #[AsDoctrineListener(
     event: Events::preRemove,
@@ -58,8 +58,8 @@ final class DatabaseDeletionListener
 
             case $entity instanceof Member:
                 // A member any decision still names is stripped of their data rather than deleted, so what arrives
-                // here is a member the projection is free to drop; the rest of what the site holds on them goes with
-                // the row.
+                // here is a member the projection is free to drop; the rest of what the site stores about them is
+                // removed with the row.
                 $this->memberService->deleteMember($entity);
                 break;
 

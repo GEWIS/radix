@@ -19,7 +19,7 @@ use function sprintf;
  * stubs; this proves the real wiring against the seed: a member of the organising organ may see and (while it is a
  * Draft) edit the revision, a member of a different organ may not, and only a Draft is editable.
  *
- * The authenticated members carry plain `ROLE_USER` (no board), so the reviewer short-circuit never fires and the
+ * The authenticated members have plain `ROLE_USER` (no board), so the reviewer short-circuit never fires and the
  * decision rests purely on ownership.
  */
 final class RevisionVoterOrganMembershipTest extends DatabaseTestCase

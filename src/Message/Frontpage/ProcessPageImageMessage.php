@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Message\Frontpage;
 
 /**
- * Like {@see \App\Message\Photo\ProcessImageVariantsMessage}, but the browser waits on the outcome, so the scope
- * travels along as the topic to answer on.
+ * Like {@see \App\Message\Photo\ProcessImageVariantsMessage}, but the browser waits on the outcome, so the scope is
+ * passed along as the topic to publish on.
  */
 class ProcessPageImageMessage
 {

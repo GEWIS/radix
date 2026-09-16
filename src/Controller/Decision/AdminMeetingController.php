@@ -41,8 +41,8 @@ use function trim;
  * endpoints its dropzones post to. Everything else on the management page goes through the
  * {@see \App\Twig\Components\Decision\Admin\MeetingManage} live component.
  *
- * The upload endpoints deliberately carry no CSRF token: they are not form submits but XHR calls, and access is
- * guarded by the board requirement each of them carries (the photo upload endpoint set this precedent).
+ * The upload endpoints deliberately have no CSRF token: they are not form submits but XHR calls, and access is guarded
+ * by the board requirement each of them declares (the photo upload endpoint set this precedent).
  *
  * Keeping a meeting is the board's job: its agenda, the documents filed under it and its minutes. What was decided in
  * it is the register's record instead, so the decisions the management component offers are the register

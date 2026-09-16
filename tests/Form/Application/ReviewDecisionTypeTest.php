@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Validation;
  * The review form must offer exactly one button per enabled workflow transition and a message field whose presence and
  * mandatory-ness depend on context: it is the reviewer's feedback (mandatory to reject/request changes) when a decision
  * is on offer, the organiser's mandatory response when resubmitting, and absent for actions that need no message (a
- * fresh submit, start review, close). Mandatory-ness rides on each button's validation group, so these tests pin which
- * group every button activates; the form's entire correctness contract depends on that wiring.
+ * fresh submit, start review, close). Mandatory-ness is set by each button's validation group, so these tests pin
+ * which group every button activates; the form's entire correctness contract depends on that wiring.
  */
 // TypeTestCase creates an unconfigured EventDispatcher mock internally; opt out of the no-expectations notice.
 #[AllowMockObjectsWithoutExpectations]

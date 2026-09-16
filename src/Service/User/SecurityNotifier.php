@@ -15,11 +15,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 /**
- * The one way to tell an account's owner that something happened to it.
+ * The one way to notify an account's owner that something happened to it.
  *
- * Raising the notice is best effort on purpose. Every caller has already done the thing being reported (the password
- * is changed, the session exists), so a broker that is down must not turn a completed action into an error the member
- * sees, and must never cost somebody their sign-in.
+ * Raising the notice is best effort on purpose. Every caller has already performed the action being reported (the
+ * password is changed, the session exists), so a broker that is down must not turn a completed action into an error the
+ * member sees, and must never cost a member their sign-in.
  */
 final readonly class SecurityNotifier
 {

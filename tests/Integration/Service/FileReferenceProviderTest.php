@@ -59,7 +59,7 @@ final class FileReferenceProviderTest extends DatabaseTestCase
 
     /**
      * A proposal is not on show anywhere yet, but the committee has to be able to look at it, so the bytes behind it
-     * are as spoken for as the ones behind the banner that is up.
+     * are as referenced as the ones behind the banner that is up.
      */
     public function testAProposedBannerIsReferencedTooWhileItAwaitsADecision(): void
     {

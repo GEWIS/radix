@@ -11,11 +11,11 @@ use App\Repository\Checker\InstallationRepository;
 class Installation
 {
     /**
-     * The installations of the meeting most recently asked about.
+     * The installations of the meeting most recently queried.
      *
-     * A single slot rather than a full cache: the checker asks four separate questions about one meeting before it
-     * moves on, and the set for one meeting spans the whole ledger up to that point, so keeping every meeting's set
-     * would grow without bound.
+     * A single slot rather than a full cache: the checker runs four separate checks on one meeting before it moves
+     * on, and the set for one meeting spans the whole ledger up to that point, so keeping every meeting's set would
+     * grow without bound.
      *
      * @var array<string, InstallationModel>|null
      */

@@ -11,14 +11,14 @@ use Symfony\Component\Mime\Address;
 /**
  * Sending one of the application's e-mails.
  *
- * Every template extends `email/_base.html.twig` and fills its blocks, so the branding lives in one file and a
- * message cannot go out without it. The template is named here and rendered by the mailer, rather than rendered to a
- * string first and handed to a wrapper — that arrangement let a caller send a body on its own, which is how five of
- * these went out unbranded.
+ * Every template extends `email/_base.html.twig` and fills its blocks, so the branding is in one file and a message
+ * cannot go out without it. The template is named here and rendered by the mailer, rather than rendered to a string
+ * first and passed to a wrapper. That arrangement let a caller send a body on its own, which is how five of these
+ * went out unbranded.
  *
- * A message carries no reply-to unless the caller asks for one. The register's mail about a member or a prospective
- * member does, {@see self::secretary()} being the secretary who answers for it; everything else is the association
- * writing, and a reply to it belongs wherever the message itself says.
+ * A message has no reply-to unless the caller provides one. The register's mail about a member or a prospective
+ * member does, {@see self::secretary()} being the secretary who is responsible for it; everything else is the
+ * association writing, and a reply to it belongs wherever the message itself says.
  */
 class Email
 {
@@ -80,8 +80,8 @@ class Email
     }
 
     /**
-     * The secretary, who answers for what the register sends about a member, and the only reply-to the application
-     * has: every other message is the association writing, and says in its own words where an answer belongs.
+     * The secretary, who is responsible for what the register sends about a member, and the only reply-to the
+     * application has: every other message is the association writing, and says in its own words where a reply belongs.
      */
     public function secretary(): Address
     {

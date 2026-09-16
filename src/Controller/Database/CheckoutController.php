@@ -15,11 +15,11 @@ use Symfony\Component\Routing\Attribute\Route;
 use function is_string;
 
 /**
- * Where the payment provider drops a prospective member off: the pages they return to after the checkout, the link
- * that puts them back on it, and the webhook that tells us what actually happened.
+ * Where a prospective member comes back from the payment provider: the pages they return to after the checkout, the
+ * link that sends them back to it, and the webhook that reports what actually happened.
  *
  * The webhook keeps both of its plain addresses because Stripe calls it from what is configured in their dashboard.
- * The pages carry a language like every page somebody reads; the addresses they used to answer at are declared in
+ * The pages have a language like every page a user reads; the addresses they used to be served at are declared in
  * config/routes.yaml and redirect here.
  */
 final class CheckoutController extends AbstractController

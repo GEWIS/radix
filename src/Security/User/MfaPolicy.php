@@ -8,14 +8,14 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 
 /**
- * Canonical "is MFA required for this user" check, consulted by the disable controller, the access-denied listener,
+ * Canonical "is MFA required for this user" check, used by the disable controller, the access-denied listener,
  * and the security index template.
  *
  * In scope:
  *  - Users with an active `ROLE_ADMIN` {@see \App\Entity\User\UserRole}.
  *  - Users currently installed on the board (per `Member::isBoardMember()`).
  *
- * The entity-side filtering in {@see User::getRoles()} duplicates the rule (it cannot inject services) but consults
+ * The entity-side filtering in {@see User::getRoles()} duplicates the rule (it cannot inject services) but reads
  * the same {@see MfaEnforcementSwitch} as this service, so the two paths agree.
  */
 final class MfaPolicy

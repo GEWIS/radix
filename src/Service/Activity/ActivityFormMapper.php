@@ -62,7 +62,7 @@ class ActivityFormMapper
     }
 
     /**
-     * The record a choice points at, or null where the answer was that there is no organiser.
+     * The record a choice points at, or null where no organiser was chosen.
      */
     private static function identifier(?string $choice): ?int
     {

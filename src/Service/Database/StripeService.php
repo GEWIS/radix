@@ -147,7 +147,7 @@ class StripeService
                 return null;
             }
 
-            // The Checkout Session is not completely dead yet, so return the recovery URL.
+            // The Checkout Session is not completely abandoned yet, so return the recovery URL.
             return $lastCheckoutStub->getRecoveryUrl();
         }
 
@@ -283,7 +283,7 @@ class StripeService
 
     /**
      * Handle a webhook call from Stripe. The signature is the only thing that authenticates the call, so a payload
-     * that does not carry a valid one is discarded before anything looks at its contents.
+     * without a valid one is discarded before its contents are read.
      *
      * Returns whether the payload was accepted.
      */
@@ -605,7 +605,7 @@ class StripeService
 
     /**
      * The identifier of a payment intent. Stripe types an expandable field as either the id it was returned as or the
-     * object that id stands for, and what is stored here is the id.
+     * object that id refers to, and what is stored here is the id.
      */
     private static function paymentIntentId(string|PaymentIntent|null $paymentIntent): ?string
     {

@@ -63,7 +63,7 @@ class MailingListMembershipFixture extends Fixture implements DependentFixtureIn
         $carried->lastSyncSuccess = true;
         $manager->persist($carried);
 
-        // A membership on its way out: the record stays until the servers have been told.
+        // A membership on its way out: the record stays until the servers have been updated.
         $leaving = $this->subscribe(
             $activities,
             $graduate,

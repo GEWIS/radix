@@ -15,7 +15,7 @@ use Override;
 use function sprintf;
 
 /**
- * Agenda points on the GMMs and CMs; BMs never have them. The complete GMM carries an exact-numbered point plus a
+ * Agenda points on the GMMs and CMs; BMs never have them. The complete GMM has an exact-numbered point plus a
  * lettered "7a"/"7b" pair and misses a point for one of its decisions, so the decision matching (exact wins, first
  * lettered variant wins, unmatched decisions) can be exercised against the decisions seeded by {@see DecisionFixture}.
  */

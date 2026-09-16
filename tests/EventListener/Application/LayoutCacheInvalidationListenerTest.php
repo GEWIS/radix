@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * What is asserted is the cache key. A wrong key leaves the banner on yesterday's answer until the day rolls over,
+ * What is asserted is the cache key. A wrong key leaves the banner stale until the day rolls over,
  * which fails silently.
  */
 final class LayoutCacheInvalidationListenerTest extends TestCase
@@ -121,7 +121,7 @@ final class LayoutCacheInvalidationListenerTest extends TestCase
             ApplicationExtension::PROSPECTIVES_CACHE_KEY,
         ];
 
-        // Whether an applicant has paid is read off their latest checkout session rather than off the applicant.
+        // Whether an applicant has paid is read from their latest checkout session rather than from the applicant.
         yield 'checkout session' => [
             new CheckoutSession(),
             ApplicationExtension::PROSPECTIVES_CACHE_KEY,

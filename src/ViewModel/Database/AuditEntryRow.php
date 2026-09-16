@@ -19,9 +19,9 @@ use const ENT_SUBSTITUTE;
  * One row of a member's audit trail, with its body already safe to print unescaped.
  *
  * An audit entry is a translatable format string owned by the entity, filled with arguments that are not: an
- * AuditNote's arguments include the free text a secretary typed. The format string carries markup and so has to
- * reach the template unescaped, which means the arguments must be escaped before they are interpolated — doing it
- * the other way round escapes the markup, and doing neither lets note text inject into the page.
+ * AuditNote's arguments include the free text a secretary typed. The format string contains markup and so has to reach
+ * the template unescaped, which means the arguments must be escaped before they are interpolated. Doing it the other
+ * way round escapes the markup, and doing neither lets note text inject into the page.
  */
 final readonly class AuditEntryRow
 {

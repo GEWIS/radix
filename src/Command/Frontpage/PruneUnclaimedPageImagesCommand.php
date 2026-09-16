@@ -20,7 +20,7 @@ use function sprintf;
 
 /**
  * Every arrival at the create form gets a run of its own, so what was uploaded to an abandoned one would pile up
- * for good. A day is longer than a run lives, which is as long as the form is open.
+ * for good. A day is longer than a run lasts, which is as long as the form is open.
  */
 #[AsCommand(
     name: 'app:page:prune-images',

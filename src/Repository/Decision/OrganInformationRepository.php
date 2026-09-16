@@ -23,7 +23,7 @@ class OrganInformationRepository extends ServiceEntityRepository
     }
 
     /**
-     * The page belonging to this body, or null while nobody has started one.
+     * The page belonging to this body, or null while no page has been created.
      */
     public function findForOrgan(Organ $organ): ?OrganInformation
     {

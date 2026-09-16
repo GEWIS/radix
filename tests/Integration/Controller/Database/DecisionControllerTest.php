@@ -20,7 +20,7 @@ use function sprintf;
 
 /**
  * The page that offers every kind of decision for one place in a meeting. It renders a dozen forms at once, three of
- * which hand their collection prototype to a Stimulus controller before the form theme gets to it, so rendering it at
+ * which pass their collection prototype to a Stimulus controller before the form theme is applied, so rendering it at
  * all is the thing worth asserting.
  */
 final class DecisionControllerTest extends DatabaseTestCase
@@ -177,8 +177,8 @@ final class DecisionControllerTest extends DatabaseTestCase
     }
 
     /**
-     * The page extends the register's layout, which asks the current request for the language it renders in and
-     * the session for the language switch.
+     * The page extends the register's layout, which reads the language it renders in from the current request and
+     * the language switch from the session.
      */
     private function pushRequest(?Request $request = null): void
     {

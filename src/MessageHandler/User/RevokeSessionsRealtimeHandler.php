@@ -27,7 +27,7 @@ class RevokeSessionsRealtimeHandler
         }
 
         // The worker has no request locale; English matches the house convention for system-generated content and the
-        // login page carries a language switcher.
+        // login page has a language switcher.
         $redirect = $this->urlGenerator->generate(
             $loginRoute,
             [

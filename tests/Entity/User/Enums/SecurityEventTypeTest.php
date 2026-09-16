@@ -30,8 +30,8 @@ final class SecurityEventTypeTest extends TestCase
     ];
 
     /**
-     * Every case answers all three questions. A `match` without a default arm throws on a case somebody added and
-     * did not finish, and this is what turns that into a failing test rather than a 500 on the day it first happens.
+     * Every case implements all three methods. A `match` without a default arm throws on a case that was added but not
+     * finished, and this is what turns that into a failing test rather than a 500 on the day it first happens.
      */
     public function testEveryEventIsFullyDescribed(): void
     {
@@ -58,7 +58,7 @@ final class SecurityEventTypeTest extends TestCase
 
     /**
      * The values are written to the database and to half a year of log files. A duplicate would merge two events into
-     * one; a rename would split one into two, which is worse, because nothing would say it had happened.
+     * one; a rename would split one into two, which is worse, because nothing would record that it had happened.
      */
     public function testValuesAreUniqueAndStable(): void
     {
@@ -99,8 +99,8 @@ final class SecurityEventTypeTest extends TestCase
     }
 
     /**
-     * A token presented twice signs an account out on every device. It is the most severe thing this application
-     * does on its own, and if it is not recorded, nobody finds out why somebody was signed out everywhere.
+     * A token presented twice signs an account out on every device. It is the most severe thing this application does
+     * on its own, and if it is not recorded, there is no way to find out why an account was signed out everywhere.
      */
     public function testAReplayedTokenIsCritical(): void
     {

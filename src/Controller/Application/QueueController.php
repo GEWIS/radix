@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * What the message transports are holding, for an administrator who would otherwise have to open a shell on a
+ * What the message transports contain, for an administrator who would otherwise have to open a shell on a
  * container to run `messenger:stats`. Read-only: nothing here acknowledges, retries or removes a message.
  *
  * The failure list is `Application:Admin:FailedMessageOverview`, which pages over it like every other overview.

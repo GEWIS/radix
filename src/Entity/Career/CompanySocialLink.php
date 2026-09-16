@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
- * Somewhere a company can be followed, as said by one revision of its profile.
+ * Somewhere a company can be followed, as recorded on one revision of its profile.
  */
 #[Entity]
 class CompanySocialLink extends AbstractSocialLink

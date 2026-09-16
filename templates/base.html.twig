@@ -98,7 +98,7 @@
                 {% if not cosmetics_disabled() %}
                     {% set today_md = 'now'|date('m-d') %}
                     {% set today_yd = 'now'|date('j n') %}
-                    {# A company user is signed in but is not a member, so the type is asked for rather than
+                    {# A company user is signed in but is not a member, so the user type is checked rather than
                        assumed. #}
                     {% set userBirthdayMd = app.user.userType is defined
                         and enum('App\\Entity\\User\\Enums\\UserTypes').User === app.user.userType

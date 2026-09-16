@@ -5,8 +5,8 @@
     abbreviation has been reused. The historical overviews always do; the current ones do not.
 #}
 {% set information = organ.organInformation %}
-{# A dated link carries the whole founding date: two bodies founded in the same year share a year but never a date,
-   and a card knows nothing about its namesakes to tell which case it is in. #}
+{# A dated link contains the whole founding date: two bodies founded in the same year share a year but never a date,
+   and a card has no information about its namesakes to determine which case it is in. #}
 {% set url = path('association/body', {
     'type': organ.type.value,
     'abbr': organ.abbr,

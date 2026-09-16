@@ -34,9 +34,9 @@ final class PruneSecurityLogCommand extends Command
      *
      * Half a year covers the questions this table exists to answer: a member asking about a sign-in they do not
      * recognise, the board looking into an account months after the fact, and a pattern of failed sign-ins that
-     * only becomes visible over a long window. Nothing here is worth keeping past the point where somebody could
-     * still reasonably ask. The log files are kept a little longer than this on purpose (see
-     * `config/packages/monolog.yaml`), so the file can still be read for a period the table has already forgotten.
+     * only becomes visible over a long window. Nothing here is worth keeping past the point where a member or the board
+     * could still reasonably ask. The log files are kept a little longer than this on purpose (see
+     * `config/packages/monolog.yaml`), so the file can still be read for a period the table no longer covers.
      */
     private const string RETENTION = '-180 days';
 

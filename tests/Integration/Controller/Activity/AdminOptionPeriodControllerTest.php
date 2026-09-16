@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  * logs out any synthetic browser session, so the `#[IsGranted]` board gate and the CSRF attributes are enforced by the
  * framework at the HTTP boundary rather than here.
  *
- * The one thing worth pinning beyond the ordinary create/edit is that a round holding proposals cannot be removed out
- * from under the bodies that are holding dates in it.
+ * The one thing worth pinning beyond the ordinary create/edit is that a round with proposals cannot be removed out
+ * from under the bodies that have reserved dates in it.
  */
 final class AdminOptionPeriodControllerTest extends DatabaseTestCase
 {

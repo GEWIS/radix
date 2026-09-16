@@ -17,7 +17,7 @@ final readonly class StaleRevisionCleanupReport
         public int $deleted,
         /**
          * How many of {@see self::$deleted} only went because the run was forced. Counted separately because these
-         * are the removals nobody asked for on a schedule, and an operator reading the summary should see whether
+         * are the removals a scheduled run would not have made, and an operator reading the summary should see whether
          * their `--force` did anything at all.
          */
         public int $forced,

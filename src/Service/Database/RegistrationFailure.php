@@ -9,7 +9,7 @@ namespace App\Service\Database;
  */
 enum RegistrationFailure: string
 {
-    /** The address was taken between the step that asks for it and the last one. */
+    /** The address was taken between the step that collects it and the last one. */
     case EmailTaken = 'email-taken';
 
     /** The prospective member is on file, but no Checkout Session could be created for them. */

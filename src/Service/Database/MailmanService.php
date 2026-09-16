@@ -469,8 +469,8 @@ class MailmanService
             'pre_confirmed' => true,
             'pre_approved' => true,
             // Mailman's own welcome message is never wanted: a subscription here follows from something the
-            // association already told the member about -- a registration, a renewal, a change they asked for -- and
-            // the mail Mailman would send says none of that. This asked for one on every subscription.
+            // association already told the member about (a registration, a renewal, a change they requested), and
+            // the mail Mailman would send says none of that. This used to request one on every subscription.
             'send_welcome_message' => false,
             'delivery_mode' => self::MM_DELIVERYMODE_REGULAR,
             'delivery_status' => self::MM_DELIVERYSTATUS_ENABLED,

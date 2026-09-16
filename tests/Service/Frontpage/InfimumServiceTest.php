@@ -15,9 +15,9 @@ use function json_encode;
 use function strval;
 
 /**
- * The infimum comes from somebody else's server, so what matters is what happens when that server is unhelpful: a page
- * load must never wait on it twice in a row, and a failed fetch must leave whoever is reading with what they had
- * rather than with an apology.
+ * The infimum comes from an external server, so what matters is what happens when that server is unhelpful: a page load
+ * must never wait on it twice in a row, and a failed fetch must leave the reader with what was already kept rather than
+ * with an error message.
  */
 final class InfimumServiceTest extends TestCase
 {
@@ -78,8 +78,8 @@ final class InfimumServiceTest extends TestCase
     }
 
     /**
-     * A server that cannot answer is asked once and then left alone for a while: the footer is on every page, so
-     * asking again on each of them would make somebody else's outage this website's.
+     * An unhelpful server is contacted once and then left alone for a while: the footer is on every page, so contacting
+     * it again on each of them would make an external server's outage this website's.
      *
      * @param callable():MockResponse $response
      */
@@ -135,7 +135,7 @@ final class InfimumServiceTest extends TestCase
     }
 
     /**
-     * A failed refresh leaves what was kept alone, so a hiccup in the rotation does not blank the panel.
+     * A failed refresh leaves what was kept alone, so a failure in the rotation does not blank the panel.
      */
     public function testAFailedRefreshKeepsWhatWasThere(): void
     {

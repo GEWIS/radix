@@ -22,17 +22,17 @@ use function substr;
 use function ucfirst;
 
 /**
- * Twig resolves `x.foo` to a public property `foo` first and only then to `getFoo()`, so a class holding both makes
- * the two spellings of one read mean two different things, and which one a template gets depends on a detail nobody
- * writing the template can see.
+ * Twig resolves `x.foo` to a public property `foo` first and only then to `getFoo()`, so a class that declares both
+ * makes the two spellings of one read mean two different things, and which one a template gets depends on a detail the
+ * template author cannot see.
  *
  * A predicate counts too, and that is not a nicety. PropertyAccessor resolves a path by trying `getFoo()`, then
- * `isFoo()`, `hasFoo()` and `canFoo()`, then a method named `foo()`, and only then the property, so a `hasFoo()`
- * beside a public `$foo` is what a form reads for `foo` — a boolean where the thing itself was meant. That is how
- * the mailing-list form came to hand Symfony `false` where it wanted an entity.
+ * `isFoo()`, `hasFoo()` and `canFoo()`, then a method named `foo()`, and only then the property, so a `hasFoo()` beside
+ * a public `$foo` is what a form reads for `foo`: a boolean where the thing itself was meant. That is how the
+ * mailing-list form ended up passing Symfony `false` where it wanted an entity.
  *
- * Enums are exempt because every one of them has `name` and `value` of its own, which is exactly why a template asks
- * an enum for `getName()` in full rather than for `.name`.
+ * Enums are exempt because every one of them has `name` and `value` of its own, which is exactly why a template reads
+ * `getName()` in full from an enum rather than `.name`.
  *
  * @see Environment::getAttribute() for the resolution order this rests on
  */
@@ -87,8 +87,8 @@ final class PropertyAccessorAmbiguityTest extends TestCase
                             continue;
                         }
 
-                        // A pair a vendor trait brought with it — `$formName` beside `getFormName()` is Symfony UX's
-                        // own — is not ours to name differently.
+                        // A pair a vendor trait brought with it (`$formName` beside `getFormName()` is Symfony UX's
+                        // own) is not ours to name differently.
                         if (
                             !$this->isOurs($method->getFileName())
                             || !$this->isOurs($property->getDeclaringClass()->getFileName())

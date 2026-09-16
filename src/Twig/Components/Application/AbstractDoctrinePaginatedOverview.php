@@ -13,8 +13,8 @@ use function array_map;
 use function iterator_to_array;
 
 /**
- * The paging above, for the overviews whose repository already answers with a Doctrine {@see Paginator}, which is
- * most of them. Subclasses write the query and nothing else.
+ * The paging above, for the overviews whose repository already returns a Doctrine {@see Paginator}, which is most of
+ * them. Subclasses write the query and nothing else.
  *
  * Both halves of the paginator are read at once. Every overview renders the pagination partial, which wants the
  * total as much as the rows, and the paginator caches each of its two queries, so nothing is asked for twice.

@@ -36,7 +36,7 @@ use function sprintf;
  * An activity a body would like to host, put forward during an option period with up to three dates it could be on.
  *
  * The board picks one of the dates, which reserves it and starts the real activity off as a draft
- * ({@see self::$activity}). From there it is the ordinary activity workflow; this entity only holds the date until
+ * ({@see self::$activity}). From there it is the ordinary activity workflow; this entity only reserves the date until
  * then, and records whether the financial side has been settled in time to keep it.
  */
 #[Entity(repositoryClass: ActivityProposalRepository::class)]
@@ -54,13 +54,13 @@ class ActivityProposal
     use TimestampableTrait;
 
     /**
-     * How many dates a body may put forward for one activity. A house rule as old as the paper calendar.
+     * How many dates a body may put forward for one activity. A house rule that dates from the paper calendar.
      */
     public const int MAX_DATE_OPTIONS = 3;
 
     /**
-     * The round this proposal was handed in for. A real association, so counting a body's proposals in a period is a
-     * matter of following it; the previous design had none and inferred period membership from creation timestamps.
+     * The round this proposal was submitted for. A real association, so counting a body's proposals in a period is a
+     * query on it; the previous design had none and inferred period membership from creation timestamps.
      */
     #[ManyToOne(
         targetEntity: OptionPeriod::class,
@@ -74,7 +74,7 @@ class ActivityProposal
 
     /**
      * The body hosting the activity, or null when the board is hosting it itself. The board is not a body, so it
-     * cannot be named here, and it is not held to a proposal limit either.
+     * cannot be named here, and no proposal limit applies to it either.
      */
     #[ManyToOne(targetEntity: Organ::class)]
     #[JoinColumn(
@@ -102,8 +102,8 @@ class ActivityProposal
     public ?string $description = null;
 
     /**
-     * The member who handed the proposal in, or null once that member has been removed from the register. The
-     * proposal stays: the day it reserves belongs to the body that asked for it, not to the person who typed it in.
+     * The member who submitted the proposal, or null once that member has been removed from the register. The
+     * proposal stays: the day it reserves belongs to the body that requested it, not to the person who entered it.
      */
     #[ManyToOne(targetEntity: Member::class)]
     #[JoinColumn(
@@ -135,7 +135,7 @@ class ActivityProposal
 
     /**
      * The date the board reserved. A unique association rather than a status anybody has to count, so a proposal
-     * cannot end up holding two dates however the transitions are applied.
+     * cannot end up with two dates however the transitions are applied.
      */
     #[OneToOne(targetEntity: ActivityDateOption::class)]
     #[JoinColumn(
@@ -149,7 +149,7 @@ class ActivityProposal
      *
      * `SET NULL` on delete because abandoned drafts really are removed
      * ({@see \App\Command\Activity\DeleteStaleDraftsCommand}), and the proposal has to survive that: it is the record
-     * of who held the date.
+     * of who reserved the date.
      */
     #[OneToOne(targetEntity: Activity::class)]
     #[JoinColumn(
@@ -174,8 +174,8 @@ class ActivityProposal
     public ?DateTimeImmutable $decidedAt = null;
 
     /**
-     * How the financial side was settled, or null while it has not been. Null is what the reminder and the lapse
-     * chase; either outcome stops them.
+     * How the financial side was settled, or null while it has not been. The reminder and the lapse act on null;
+     * either outcome stops them.
      */
     #[Column(
         type: Types::STRING,
@@ -200,7 +200,8 @@ class ActivityProposal
     public ?DateTimeImmutable $budgetClearedAt = null;
 
     /**
-     * When the body was last told the date is at risk, so a nightly run does not tell them again every night.
+     * When the body was last notified that the date is at risk, so a nightly run does not notify them again every
+     * night.
      */
     #[Column(
         type: Types::DATETIME_IMMUTABLE,
@@ -249,7 +250,7 @@ class ActivityProposal
     }
 
     /**
-     * The dates that still stand in somebody else's way, in the body's own order of preference.
+     * The dates that still block other proposals, in the body's own order of preference.
      *
      * @return ActivityDateOption[]
      */
@@ -269,7 +270,7 @@ class ActivityProposal
     }
 
     /**
-     * Turn every date that was not picked down, which is what releases those dates for whoever is next in line.
+     * Turns every date that was not picked down, which releases those dates for the next proposal in line.
      */
     public function declineDateOptionsOtherThan(?ActivityDateOption $keep): void
     {
@@ -283,11 +284,11 @@ class ActivityProposal
     }
 
     /**
-     * A proposal is handed in with its dates in one go, so the count is settled at insert.
+     * A proposal is submitted with its dates in one go, so the count is checked at insert.
      *
      * There is deliberately no `PreUpdate` counterpart: Doctrine only raises that event when a field of the entity
-     * itself changed, so an edit that only added a date would slip past it. Editing goes through the form, where
-     * `Count` says the same thing and can point at the field that is wrong.
+     * itself changed, so an edit that only added a date would not trigger it. Editing goes through the form, where
+     * `Count` applies the same check and can report the field that is wrong.
      */
     #[PrePersist]
     public function assertDateOptionCount(): void

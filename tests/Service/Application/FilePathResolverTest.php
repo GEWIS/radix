@@ -81,7 +81,7 @@ final class FilePathResolverTest extends TestCase
         $resolver = new FilePathResolver();
         $path = 'career/42/images/x.png';
 
-        // A banner is asked for at one of its own two boxes; everything else on a company is the logo.
+        // A banner is requested at one of its own two boxes; everything else on a company is the logo.
         self::assertSame(
             ImageProfile::CompanyLogo,
             $resolver->profileForPath(

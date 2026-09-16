@@ -8,12 +8,12 @@ use App\Entity\Application\Enums\NotificationType;
 use DateTimeImmutable;
 
 /**
- * Something happened to an account that whoever owns it should be told about: it was signed in, its password changed,
+ * Something happened to an account that its owner should be notified about: it was signed in, its password changed,
  * its second factor was turned on or off.
  *
- * Everything the warning needs travels with the message. Keep it that way: narrowing this down to the id of a row that
- * was written moments ago would let the worker run the lookup before the request has committed, and the warning would
- * quietly go missing.
+ * Everything the warning needs is included in the message. Keep it that way: narrowing this down to the id of a row
+ * that was written moments ago would let the worker run the lookup before the request has committed, and the warning
+ * would quietly go missing.
  */
 final readonly class SecurityNotificationMessage
 {

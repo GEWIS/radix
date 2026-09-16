@@ -11,9 +11,9 @@ use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Keeps a body's image alive while any revision of any page still points at its content-addressed path. All four
- * columns count: an uploaded original is what a crop is moved against later, and a revision that was cloned shares both
- * the original and the cut with the one it came from, so any of them referencing the path vetoes its deletion.
+ * Prevents deletion of a body's image while any revision of any page still points at its content-addressed path. All
+ * four columns count: an uploaded original is what a crop is moved against later, and a revision that was cloned shares
+ * both the original and the cut with the one it came from, so any of them referencing the path vetoes its deletion.
  */
 final readonly class OrganImageReferenceProvider implements FileReferenceProviderInterface
 {

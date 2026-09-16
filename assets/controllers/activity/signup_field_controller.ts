@@ -12,7 +12,7 @@ import { Controller } from '@hotwired/stimulus';
  * ```
  *
  * A field tagged `required` is one its block exists to ask for, so it is required exactly while that block is shown;
- * the server holds a question to the same rule (see SignupFieldType::validateBounds).
+ * the server applies the same rule to a question (see SignupFieldType::validateBounds).
  */
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -57,8 +57,8 @@ export default class extends Controller {
         this.markRequired();
     }
 
-    // Only the label is marked, with the same asterisk every other required field carries: a field that is not asked
-    // for is still submitted (hidden, not disabled) and is cleared server-side, so the browser must not refuse it.
+    // Only the label is marked, with the same asterisk every other required field has: a field that is not asked for
+    // is still submitted (hidden, not disabled) and is cleared server-side, so the browser must not refuse it.
     markRequired(): void {
         this.requiredTargets.forEach((field) => {
             const asked = null === field.closest('[hidden]');

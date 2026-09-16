@@ -27,9 +27,9 @@ use function tempnam;
 use function unlink;
 
 /**
- * A batch of exams arrives named however the sender felt like naming them, so an upload is not filed straight away: it
- * lands in staging with everything guessed from its filename, and is published once an administrator has confirmed the
- * guesses. Nothing is visible to a member in between.
+ * A batch of exams arrives named to no particular standard, so an upload is not filed straight away: it lands in
+ * staging with everything guessed from its filename, and is published once an administrator has confirmed the guesses.
+ * Nothing is visible to a member in between.
  */
 final readonly class DocumentStagingService
 {
@@ -63,7 +63,7 @@ final readonly class DocumentStagingService
         $staged->path = $this->fileStorage->store(
             StorageNamespace::EducationDocument,
             $file->getPathname(),
-            // The course is only a guess at this point, so a staged file is filed under a holding scope and moves when
+            // The course is only a guess at this point, so a staged file is filed under a staging scope and moves when
             // it is published and the course is known.
             'staging',
         )->path;

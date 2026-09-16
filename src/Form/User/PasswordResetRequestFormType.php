@@ -45,7 +45,6 @@ class PasswordResetRequestFormType extends AbstractType
             AltchaType::class,
         );
 
-        // Add membership number only when required.
         if (true !== $options['require_membership']) {
             return;
         }

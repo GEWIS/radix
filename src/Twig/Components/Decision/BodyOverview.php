@@ -28,8 +28,8 @@ use function random_int;
  * link. Infinite scroll grows `limit` through the loadMore action, as on the career overviews.
  *
  * The fraternities are shown in a random order, so no fraternity is structurally favoured by where its name falls in
- * the alphabet. The order is drawn once, at mount, and carried along as a seed for as long as the visitor stays on the
- * page; without that, every keystroke would reshuffle the list under the reader.
+ * the alphabet. The order is drawn once, at mount, and kept as a seed for as long as the visitor stays on the page;
+ * without that, every keystroke would reshuffle the list under the reader.
  */
 #[AsLiveComponent(
     name: 'Decision:BodyOverview',
@@ -44,7 +44,7 @@ final class BodyOverview extends AbstractInfiniteScrollOverview
     public bool $abrogated = false;
 
     /**
-     * Whether a link to a body carries the year it was founded. An abbreviation is reused, so the overviews that list
+     * Whether a link to a body includes the year it was founded. An abbreviation is reused, so the overviews that list
      * what is gone say which one they mean; the ones listing what is around never have to.
      */
     #[LiveProp]
@@ -67,8 +67,8 @@ final class BodyOverview extends AbstractInfiniteScrollOverview
     )]
     public string $search = '';
 
-    // Neither is client-writable: they travel in the signed props, so a crafted request can neither reshuffle the list
-    // mid-page nor ask for an arbitrarily large page.
+    // Neither is client-writable: they are passed in the signed props, so a crafted request can neither reshuffle the
+    // list mid-page nor ask for an arbitrarily large page.
     #[LiveProp]
     public int $seed = 0;
 
@@ -136,7 +136,7 @@ final class BodyOverview extends AbstractInfiniteScrollOverview
             return $this->matchingIds();
         }
 
-        // A seeded Mt19937 rather than the global generator, so drawing this hand leaves the rest of the request's
+        // A seeded Mt19937 rather than the global generator, so drawing this order leaves the rest of the request's
         // randomness alone.
         return new Randomizer(new Mt19937($this->seed))->shuffleArray($this->matchingIds());
     }

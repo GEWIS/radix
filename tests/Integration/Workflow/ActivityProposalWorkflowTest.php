@@ -16,11 +16,11 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * The `activity_proposal` state machine against the seeded calendar: that the marking really is the proposal's status
- * column, that a date goes from waiting to held to settled, and that nothing is a dead end.
+ * column, that a date goes from waiting to reserved to settled, and that nothing is a dead end.
  *
- * The last part is the one worth pinning. A lapsed date, a proposal the board turned down and one a body took back can
- * all be put back in the running, and a clearance recorded by mistake can be taken back, so no state the board can
- * reach leaves them with nothing to do but ask an administrator.
+ * The last part is the one worth pinning. A lapsed date, a proposal the board turned down and one a body withdrew can
+ * all be put back in the running, and a clearance recorded by mistake can be revoked, so no state the board can reach
+ * leaves them with nothing to do but ask an administrator.
  */
 final class ActivityProposalWorkflowTest extends DatabaseTestCase
 {
@@ -172,7 +172,7 @@ final class ActivityProposalWorkflowTest extends DatabaseTestCase
             'The seed is expected to hold a proposal in every state.',
         );
 
-        // A settled proposal is settled either way; the seed holds one of each and both must be immune to lapsing.
+        // A settled proposal is settled either way; the seed has one of each and both must be immune to lapsing.
         if (ProposalStatus::Cleared === $status) {
             self::assertInstanceOf(
                 BudgetClearance::class,

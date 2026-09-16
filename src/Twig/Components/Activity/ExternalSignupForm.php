@@ -38,8 +38,8 @@ use function strval;
 
 /**
  * The guest (non-member) external sign-up form for one list. A live component so an invalid submit re-renders the form
- * inline (no full-page reload, no re-opening the modal), like the member flow. The Altcha widget can live here because
- * `templates/form/altcha.html.twig` renders it in a container the live morph skips: the loading-directive
+ * inline (no full-page reload, no re-opening the modal), like the member flow. The Altcha widget can be rendered here
+ * because `templates/form/altcha.html.twig` renders it in a container the live morph skips: the loading-directive
  * scanner skips it (so it no longer throws on the widget's own `data-loading`) and the solved proof-of-work survives
  * the re-render that every field change triggers.
  *
@@ -151,7 +151,7 @@ final class ExternalSignupForm
                 $email,
             )
         ) {
-            // Already signed up: re-send the confirmation asynchronously rather than dead-ending. The handler decides
+            // Already signed up: re-send the confirmation asynchronously rather than dead-ending. The handler checks
             // whether anything is still pending; the flash below is identical to a fresh sign-up, so resubmitting never
             // reveals that the address was already used.
             $this->messageBus->dispatch(

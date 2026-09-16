@@ -13,8 +13,8 @@ use function array_key_first;
 
 /**
  * A flow whose tail is built from records remembers a step that may no longer exist: the record was removed, here or
- * in another tab, after the step was stored. Symfony refuses to build a flow on such a step, so this answers with a
- * step that is always there instead, and writes it back so the flow carries on from it.
+ * in another tab, after the step was stored. Symfony refuses to build a flow on such a step, so this returns a step
+ * that is always there instead, and writes it back so the flow carries on from it.
  */
 final readonly class KnownStepAccessor implements StepAccessorInterface
 {

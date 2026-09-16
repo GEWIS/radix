@@ -9,7 +9,7 @@ interface DecisionMatch {
 }
 
 /**
- * Unlike the annulment lookup this gates nothing: the modal reads the hidden fields it fills in, and answers for
+ * Unlike the annulment lookup this gates nothing: the modal reads the hidden fields it fills in, and determines
  * whether one was picked at all.
  */
 /* stimulusFetch: 'lazy' */
@@ -32,7 +32,7 @@ export default class extends LookupController<DecisionMatch> {
     }
 
     /**
-     * Only a virtual decision repeats one, so the endpoint answers with nothing else.
+     * Only a virtual decision repeats one, so the endpoint returns nothing else.
      */
     protected parameters(): Record<string, string> {
         return { only_virtual: '1' };

@@ -27,10 +27,10 @@ trait HandlesFormFlowTrait
 
     /**
      * The key the flow being filled in is kept under. Every arrival gets one of its own, or opening a form that was
-     * abandoned half-way would carry on where it was left off rather than start over. It travels in the address, so
-     * reloading a step stays in the same run.
+     * abandoned half-way would carry on where it was left off rather than start over. It is passed in the address,
+     * so reloading a step stays in the same run.
      *
-     * Answers a redirect on the first arrival, which the caller has to return.
+     * Returns a redirect on the first arrival, which the caller has to return.
      */
     private function flowRun(Request $request): string|RedirectResponse
     {
@@ -49,7 +49,7 @@ trait HandlesFormFlowTrait
     }
 
     /**
-     * `createForm()` answers the base interface as far as static analysis is concerned, and every caller here needs
+     * `createForm()` returns the base interface as far as static analysis is concerned, and every caller here needs
      * the flow's own methods.
      *
      * @param class-string<FormFlowTypeInterface> $type

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Message\Education;
 
 /**
- * The watermark names who asked and when, so the result belongs to one request and is never reused for another.
+ * The watermark names who requested it and when, so the result belongs to one request and is never reused for another.
  */
 class BuildWatermarkedDocumentMessage
 {

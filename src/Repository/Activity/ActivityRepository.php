@@ -126,9 +126,9 @@ class ActivityRepository extends ServiceEntityRepository
     /**
      * Warm the associations the edit form reads, in one query rather than one per field.
      *
-     * The route resolver hands the controller a bare Activity, so its working revision and each of that revision's
-     * four localised texts would otherwise be loaded one lazy SELECT at a time. Nothing is returned: the entities land
-     * in the identity map, which is where the form finds them.
+     * The route resolver passes the controller a bare Activity, so its working revision and each of that revision's
+     * four localised texts would otherwise be loaded one lazy SELECT at a time. Nothing is returned: the entities are
+     * added to the identity map, which is where the form finds them.
      */
     public function warmForEditing(Activity $activity): void
     {
@@ -480,7 +480,7 @@ class ActivityRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         if ([] !== $labelIds) {
-            // Labels live on the revision now; the public overview filters by the live (approved) revision's labels.
+            // Labels are on the revision now; the public overview filters by the live (approved) revision's labels.
             $labelSubquery = $entityManager->createQueryBuilder()
                 ->select('1')
                 ->from(
@@ -612,8 +612,8 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find a company's upcoming, publicly visible activities — the ones whose live (approved) revision names this
-     * company as its organiser — soonest first. Used by the company detail page's activities panel.
+     * Find a company's upcoming, publicly visible activities, the ones whose live (approved) revision names this
+     * company as its organiser, soonest first. Used by the company detail page's activities panel.
      *
      * @return Activity[]
      */
@@ -702,7 +702,7 @@ class ActivityRepository extends ServiceEntityRepository
     /**
      * The upcoming activities, soonest first, for the panels that only list what is coming: the frontpage agenda, and
      * (narrowed to the career category) the events on the career landing page. Three is what fits such a panel beside
-     * the page it sits next to, so that is what a caller gets unless it asks for something else.
+     * the page content, so that is what a caller gets unless it requests something else.
      *
      * @return Activity[]
      */
@@ -756,8 +756,8 @@ class ActivityRepository extends ServiceEntityRepository
      * The activities that are already fixed in the agenda anywhere in the given stretch of days, whether they start
      * before it, end after it, or cover it whole.
      *
-     * This is what the option calendar draws behind the days bodies are asking for: a day that already carries the
-     * weekly drink or an exam week is not really free, however empty the option side of it looks.
+     * This is what the option calendar draws behind the days bodies are requesting: a day that already has the weekly
+     * drink or an exam week is not really free, however empty the option side of it looks.
      *
      * @return Activity[]
      */

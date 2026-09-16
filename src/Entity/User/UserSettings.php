@@ -17,10 +17,10 @@ use Doctrine\ORM\Mapping\OneToOne;
 /**
  * Per-member, app-owned settings and privacy preferences.
  *
- * These live on the `User` side (keyed by `lidnr`, via a derived/shared identity to {@see User}) and never on
+ * These are on the `User` side (keyed by `lidnr`, via a derived/shared identity to {@see User}) and never on
  * `Member`, because the `Member` table is projected from the ledger and read-only here. A member has at most one
  * row; a missing row means "all defaults", which is what {@see User::hasDisabledCosmetics()} and the reads beside it
- * apply by answering from the property of a row that may not be there, so rows are only created the first time a
+ * apply by reading from the property of a row that may not be there, so rows are only created the first time a
  * member touches their settings.
  *
  * @phpstan-type UserSettingsGdprArrayType = array{

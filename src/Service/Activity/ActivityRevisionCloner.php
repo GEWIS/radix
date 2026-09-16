@@ -23,7 +23,7 @@ use function assert;
  * source revision's content; the schedule, category and flags are copied by value, and the organ, company and labels
  * (reference entities) are carried over by reference. The sign-up lists (with their fields and options) are
  * deep-cloned too, carrying their lineage id forward but never their sign-ups; on approval the sign-ups are migrated
- * from the outgoing live revision's lists onto these clones. The shared workflow wiring lives in
+ * from the outgoing live revision's lists onto these clones. The shared workflow wiring is defined in
  * {@see AbstractRevisionCloner}.
  */
 final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
@@ -67,7 +67,7 @@ final readonly class ActivityRevisionCloner extends AbstractRevisionCloner
         $draft->requireGEFLITST = $source->requireGEFLITST;
         $draft->requireZettle = $source->requireZettle;
         // Organ and company are reference entities, copied by reference; the labels (also references) are re-assigned
-        // to the draft. Without this the draft would lose the organiser and labels carried by the source revision.
+        // to the draft. Without this the draft would lose the organiser and labels of the source revision.
         $draft->organ = $source->organ;
         $draft->company = $source->company;
         $draft->addLabels($source->getLabels()->toArray());

@@ -15,7 +15,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * The password an invited representative chooses. Unlike the other password forms this one has no account to hash into
- * yet, so the plain password is read off the form and the account is built around it.
+ * yet, so the plain password is read from the form and the account is built around it.
  *
  * @extends AbstractType<null>
  */

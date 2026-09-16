@@ -7,9 +7,9 @@ namespace App\ViewModel\Application;
 /**
  * One page of an overview: the rows on it and how many rows there are in total.
  *
- * This is all a paginated overview ever needs from whatever it lists. A Doctrine `Paginator` is one way of saying
+ * This is all a paginated overview ever needs from whatever it lists. A Doctrine `Paginator` is one way of producing
  * it, an array a repository built by hand is another, and a list sliced in PHP because the source takes no offset is
- * a third; the paging itself does not care which, so it asks for this instead.
+ * a third; the paging itself does not depend on which, so it takes this instead.
  *
  * @template T
  */

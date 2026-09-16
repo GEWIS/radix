@@ -9,10 +9,10 @@ use App\Entity\Activity\Enums\ProposalLimitSource;
 use function max;
 
 /**
- * How many activities a body may still put forward in one option period, and which rule said so.
+ * How many activities a body may still put forward in one option period, and which rule set that number.
  *
- * The rule is carried alongside the number because a body that is told it may propose no more wants to know who
- * decided that. The old calendar answered zero with no explanation, and zero was usually nobody's decision at all.
+ * The rule is recorded alongside the number because a body that may propose no more needs to know which rule decided
+ * that. The old calendar showed zero with no explanation, and zero was usually not a decision anybody had made.
  */
 final readonly class ProposalAllowance
 {

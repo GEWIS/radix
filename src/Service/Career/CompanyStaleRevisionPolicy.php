@@ -18,13 +18,13 @@ use function array_filter;
 use function array_values;
 
 /**
- * When a company profile has been walked away from. Nothing about a profile is dated, so silence is all there is to
- * go on: a company and the first draft of it only exist together, and one nobody has come back to in a month is a
- * company that was entered and then thought better of.
+ * When a company profile has been walked away from. Nothing about a profile is dated, so silence is all there is to go
+ * on: a company and the first draft of it only exist together, and one that has not been edited in a month is a company
+ * that was entered and then abandoned.
  *
  * Which is why the guards below are worth having. Both a company's accounts and its administrative timeline are wiped
- * by the database along with the company row, so anything that says the arrangement became real — a package it was
- * sold, an account somebody signs in with — has to keep it standing.
+ * by the database along with the company row, so anything that says the arrangement became real (a package it was sold,
+ * an account a representative signs in with) has to block its deletion.
  */
 final readonly class CompanyStaleRevisionPolicy implements StaleRevisionPolicyInterface
 {

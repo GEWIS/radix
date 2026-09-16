@@ -7,10 +7,10 @@ namespace App\Entity\Database;
 /**
  * A sub-decision that names a member of its own.
  *
- * The distinction this draws is the one the `lidnr` column draws: a discharge or a withdrawal answers who it is about
- * as well, but by asking the installation or the granting it undoes, and it is that decision that names them. Only
- * the ones marked here keep a member on the record, which is what decides whether a decision may be removed once that
- * member has been deleted.
+ * The distinction this draws is the one the `lidnr` column draws: a discharge or a withdrawal is also about a member,
+ * but it identifies them through the installation or the granting it undoes, and it is that decision that names them.
+ * Only the ones marked here keep a member on the record, which is what decides whether a decision may be removed once
+ * that member has been deleted.
  */
 interface NamesMember
 {

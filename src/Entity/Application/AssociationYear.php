@@ -13,12 +13,12 @@ use function sprintf;
 /**
  * The association year, which runs from July 1st to June 30th.
  *
- * Mirrors {@see \App\Entity\Decision\AssociationYear}, so a year is named the same thing everywhere: after the
- * calendar year it *starts* in, the first half of "2026-2027". The rollover halfway through the calendar year is the
- * single most repeated rule in the ledger, and it lives here so that every place that needs it states it the same way.
+ * Mirrors {@see \App\Entity\Decision\AssociationYear}, so a year is named the same thing everywhere: after the calendar
+ * year it *starts* in, the first half of "2026-2027". The rollover halfway through the calendar year is the single most
+ * repeated rule in the ledger, and it is defined here so that every place that needs it states it the same way.
  *
  * What that class does not have is added on top: the exclusive end, which is what a date column should be compared
- * against, and the September 1st the key policy hangs off.
+ * against, and the September 1st the key policy is based on.
  */
 final readonly class AssociationYear
 {
@@ -99,7 +99,7 @@ final readonly class AssociationYear
      * The last moment of this association year: June 30th, a microsecond before midnight.
      *
      * Prefer {@see AssociationYear::endsOn()} for anything a stored date is compared against: this one only holds if
-     * the other side of the comparison carries microseconds too, which a `date` column does not.
+     * the other side of the comparison has microseconds too, which a `date` column does not.
      */
     public function getEndDate(): DateTimeImmutable
     {
@@ -125,7 +125,7 @@ final readonly class AssociationYear
     /**
      * September 1st of the calendar year this association year ends in, at midnight.
      *
-     * The key policy hangs off this date rather than off the year's own boundary.
+     * The key policy is based on this date rather than on the year's own boundary.
      */
     public function septemberFirst(): DateTimeImmutable
     {

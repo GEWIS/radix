@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use function Symfony\Component\Translation\t;
 
 /**
- * The membership of one member: which type they hold, and how long it still runs.
+ * The membership of one member: which type they have, and how long it still runs.
  */
 #[Route(
     path: '/members/{lidnr}/edit',
@@ -104,7 +104,7 @@ final class MembershipController extends AbstractMemberController
         $form = $this->createForm(MemberExpirationType::class);
         $form->handleRequest($request);
 
-        // `isValid()` before the button: a clicked button says nothing about the token, which is only weighed when
+        // `isValid()` before the button: a clicked button says nothing about the token, which is only checked when
         // the form as a whole is validated.
         if (
             $form->isSubmitted()

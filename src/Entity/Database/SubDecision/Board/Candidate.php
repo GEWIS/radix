@@ -19,7 +19,7 @@ use function assert;
 /**
  * One candidate the board puts forward.
  *
- * It names neither the year nor the association: the {@see Candidacy} it follows says both once, and the
+ * It names neither the year nor the association: the {@see Candidacy} it follows names both once, and the
  * constitutional order the candidates are put forward in is the order of the sub-decisions.
  */
 #[Entity(repositoryClass: CandidateRepository::class)]

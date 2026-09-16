@@ -8,8 +8,8 @@ use App\Service\Application\RealtimeAuthorization;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
- * The hub validates the subscribe cookie by itself and is told nothing when a session ends, so a browser keeps
- * receiving what the account is sent until the cookie runs out.
+ * The hub validates the subscribe cookie by itself and is not notified when a session ends, so a browser keeps
+ * receiving the account's messages until the cookie expires.
  *
  * `LogoutEvent` is dispatched on the firewall's own dispatcher, so this is wired per firewall in
  * `config/services.yaml` rather than through `#[AsEventListener]`, which cannot name one.

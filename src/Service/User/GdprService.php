@@ -28,9 +28,9 @@ use function array_map;
 use function strval;
 
 /**
- * Gathers everything the association holds about a member into a single structure for a self-service data export. Each
- * domain entity describes itself through its own `toGdprArray()`; this service only walks the relations and collects
- * them.
+ * Gathers everything the association stores about a member into a single structure for a self-service data export. Each
+ * domain entity describes itself through its own `toGdprArray()`; this service only traverses the relations and
+ * collects them.
  */
 class GdprService
 {

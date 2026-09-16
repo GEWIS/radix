@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 /**
  * A download is rebuilt from these rather than from the uploaded PDF, so no text from the original ends up in the
  * delivered file. The pixel dimensions are kept alongside the path because the rebuilt PDF sizes each of its pages from
- * them, and reading them back off disk for every download would mean decoding every page twice.
+ * them, and reading them back from disk for every download would mean decoding every page twice.
  */
 #[Entity(repositoryClass: CourseDocumentPageRepository::class)]
 #[UniqueConstraint(columns: ['document_id', 'pageNumber'])]

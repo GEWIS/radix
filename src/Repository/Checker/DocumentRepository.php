@@ -14,7 +14,7 @@ use Doctrine\ORM\QueryBuilder;
  * Queries over the documents a meeting approved: budgets, financial statements and body regulations.
  *
  * Neither of the two owns the other, so this is a query service rather than a repository bound to one of them. A
- * financial statement is a Budget as far as the mapping is concerned, so asking for one asks for both, which is what
+ * financial statement is a Budget as far as the mapping is concerned, so a query for one returns both, which is what
  * the checks over them want anyway.
  */
 class DocumentRepository

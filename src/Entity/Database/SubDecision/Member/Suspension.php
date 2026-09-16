@@ -31,7 +31,7 @@ class Suspension extends SubDecision implements NamesMember
     /**
      * The first day of the suspension.
      *
-     * Named `since` rather than `from`, which is a reserved word in both of the databases this table lives in and
+     * Named `since` rather than `from`, which is a reserved word in both of the databases this table is in and
      * would have to be quoted everywhere it is read.
      */
     #[Column(type: 'date_immutable')]
@@ -49,7 +49,7 @@ class Suspension extends SubDecision implements NamesMember
     public function getMember(): Member
     {
         // The trait keeps the association nullable for mapping reasons; a suspension always names the member it is
-        // handed to.
+        // imposed on.
         assert(null !== $this->member);
 
         return $this->member;

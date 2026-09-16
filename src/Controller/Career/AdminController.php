@@ -40,7 +40,7 @@ use function assert;
 /**
  * Companies, from the board's side: the list, adding one, what a company looks like right now, and revising its
  * profile. The profile goes through the same review chain a company's own proposal does, so even a board edit is a
- * draft until somebody approves it.
+ * draft until a reviewer approves it.
  */
 #[IsGranted(
     attribute: UserRoles::CompanyAdmin->value,
@@ -211,8 +211,8 @@ class AdminController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        // While the profile is with the committee it belongs to the committee; editing it again would pull the ground
-        // out from under the review that is running.
+        // While the profile is with the committee it belongs to the committee; editing it again would change what is
+        // under review.
         if (!$current->getStatus()->isEditableByAuthor()) {
             $this->addFlash(
                 AlertTypes::Warning->value,
@@ -416,7 +416,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * The two logo uploads the revision form carries, in the order the draft service takes them.
+     * The two logo uploads on the revision form, in the order the draft service takes them.
      *
      * @param FormInterface<Company> $form
      *

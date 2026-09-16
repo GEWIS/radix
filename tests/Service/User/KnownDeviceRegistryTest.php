@@ -40,8 +40,8 @@ final class KnownDeviceRegistryTest extends TestCase
         . '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
     /**
-     * The remember-me cookie on the main firewall lives 90 days, so a member who signs in once and stays signed in
-     * comes back for their next sign-in on day 90. Retention has to reach past that or they are told about a new
+     * The remember-me cookie on the main firewall lasts 90 days, so a member who signs in once and stays signed in
+     * comes back for their next sign-in on day 90. Retention has to reach past that or they are notified about a new
      * device on the machine they never left.
      */
     public function testADeviceAndNetworkLastSeenWhenTheLongestCookieRunsOutAreStillRecognised(): void
@@ -99,8 +99,8 @@ final class KnownDeviceRegistryTest extends TestCase
     }
 
     /**
-     * An address that does not parse is a network recognition cannot vouch for, so even a known device on it is
-     * announced: the address is what an attacker would vary.
+     * An address that does not parse is a network that cannot be recognised, so even a known device on it is announced:
+     * the address is what an attacker would vary.
      */
     public function testAKnownDeviceOnAnUnnameableNetworkIsNotRecognised(): void
     {
@@ -115,7 +115,7 @@ final class KnownDeviceRegistryTest extends TestCase
     }
 
     /**
-     * The cookie is the one exact answer: wherever the browser goes, presenting it is being the same browser.
+     * The cookie is the one exact match: wherever the browser goes, presenting it is being the same browser.
      */
     public function testAPresentedDeviceCookieIsRecognisedOnItsOwn(): void
     {
@@ -136,7 +136,7 @@ final class KnownDeviceRegistryTest extends TestCase
     }
 
     /**
-     * A first sign-in without a cookie leaves with one, and what the browser holds is never what the table holds.
+     * A first sign-in without a cookie leaves with one, and what the browser keeps is never what the table keeps.
      */
     public function testASignInWithoutACookieIsHandedOneWhoseHashIsStored(): void
     {
@@ -187,7 +187,7 @@ final class KnownDeviceRegistryTest extends TestCase
     }
 
     /**
-     * Re-issued so the year the browser holds it counts from the last sign-in rather than the first.
+     * Re-issued so the year the browser keeps it counts from the last sign-in rather than the first.
      */
     public function testAMatchedCookieIsHandedBackRatherThanReplaced(): void
     {
@@ -210,7 +210,7 @@ final class KnownDeviceRegistryTest extends TestCase
     }
 
     /**
-     * A cookie whose row was never written would name nothing, so nothing may be handed out when the flush fails.
+     * A cookie whose row was never written would name nothing, so no cookie may be issued when the flush fails.
      */
     public function testNoCookieIsHandedOutWhenNothingWasWritten(): void
     {
@@ -279,7 +279,7 @@ final class KnownDeviceRegistryTest extends TestCase
     }
 
     /**
-     * A fact that has already lapsed has a notice owing on it, and quietly marking it current would take that away.
+     * A lapsed fact still results in a new-device notice, and quietly marking it current would suppress it.
      */
     public function testALapsedDeviceIsNotRevivedByUsingIt(): void
     {

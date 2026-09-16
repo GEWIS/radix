@@ -25,7 +25,7 @@ use Override;
 /**
  * An immutable snapshot of a {@see Company}'s revisable content for one point in its revision chain. The stable
  * {@see Company} owns its name, slug, representative details, packages and publication flag; everything that may be
- * revised and reviewed (the localised texts, the logo and the contact details) lives here.
+ * revised and reviewed (the localised texts, the logo and the contact details) is on this entity.
  */
 #[Entity(repositoryClass: CompanyRevisionRepository::class)]
 #[HasLifecycleCallbacks]
@@ -133,7 +133,7 @@ class CompanyRevision extends AbstractRevision
 
     /**
      * Where else this company can be followed. Owned by the revision, so adding or dropping one is reviewed like
-     * anything else the profile says.
+     * any other part of the profile.
      *
      * @var Collection<array-key, CompanySocialLink>
      */
@@ -152,7 +152,7 @@ class CompanyRevision extends AbstractRevision
     {
         $this->socialLinks = new ArrayCollection();
 
-        // Which localised texts a revision has is its own business, and a form cannot bind to one that has none.
+        // The localised texts belong to the revision itself, and a form cannot bind to one that has none.
         // Doctrine does not run this when it hydrates a stored revision, so nothing is thrown away.
         $this->slogan = new CareerLocalisedText(
             null,

@@ -368,8 +368,8 @@ final class MaintenanceListenerTest extends TestCase
     }
 
     /**
-     * A factory that knows the one component the tests ask about. {@see ComponentFactory} is final, so it is built
-     * rather than stubbed; `metadataFor()` answers out of the config it is given and reaches for nothing else.
+     * A factory configured with the one component the tests use. {@see ComponentFactory} is final, so it is built
+     * rather than stubbed; `metadataFor()` reads from the config it is given and uses nothing else.
      */
     private function components(): ComponentFactory
     {

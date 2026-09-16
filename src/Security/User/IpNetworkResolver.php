@@ -22,19 +22,19 @@ use function strlen;
 use function substr;
 
 /**
- * Reduces an IP address to names for the network it sits on: the autonomous system announcing it (the whole
+ * Reduces an IP address to names for the network it is on: the autonomous system announcing it (the whole
  * university is one AS, a home ISP another) and the raw address prefix. The lookups are against local databases
  * fetched by {@see \App\Command\User\UpdateIpDatabasesCommand}, so no address leaves this machine; without them only
- * the prefix answers, which is also why the readers are opened per lookup rather than held across requests.
+ * the prefix is available, which is also why the readers are opened per lookup rather than kept across requests.
  *
  * The databases are MaxMind's GeoLite editions where a deployment has credentials and IPLocate's free files where it
- * does not, and the two spell their records differently, which is what the field lists below absorb.
+ * does not, and the two spell their records differently, which is what the field lists below account for.
  */
 final readonly class IpNetworkResolver
 {
     public const string ASN_DATABASE = 'ip-to-asn.mmdb';
 
-    /** Display only, never part of recognition: a "network" as wide as a country would vouch for every attacker in it. */
+    /** Display only, never part of recognition: a "network" as wide as a country would match every attacker in it. */
     public const string LOCATION_DATABASE = 'ip-to-location.mmdb';
 
     private const string MAPPED_V4_PREFIX = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff";
@@ -56,9 +56,9 @@ final readonly class IpNetworkResolver
     }
 
     /**
-     * Every name for the network this address sits on, widest first: `as:` and the AS number when the database
-     * answers, always the `pfx:` prefix (three octets of IPv4, the first four groups of IPv6), and nothing at all
-     * for an address that does not parse. An attacker varies the address, so a malformed one must not read as a
+     * Every name for the network this address is on, widest first: `as:` and the AS number when the database has a
+     * record, always the `pfx:` prefix (three octets of IPv4, the first four groups of IPv6), and nothing at all
+     * for an address that does not parse. An attacker varies the address, so a malformed one must not count as a
      * network of its own.
      *
      * @return list<string>
@@ -82,7 +82,7 @@ final readonly class IpNetworkResolver
         // Both sides of the campus NAT reduce to one name before anything else: the internal side's CGNAT addresses
         // (RFC 6598) are in no database and rotate through prefixes, so without this a member on the internal Wi-Fi
         // would be a new network every few days. Prepended rather than replacing, so what was learned by AS or
-        // prefix keeps answering.
+        // prefix is kept.
         if (
             IpUtils::checkIp(
                 $canonical,
@@ -172,7 +172,7 @@ final readonly class IpNetworkResolver
 
     /**
      * Where an address is, as somebody would recognise it in a security notice: "Eindhoven, The Netherlands" from a
-     * city database, the country alone from a country-only one, null when neither answers.
+     * city database, the country alone from a country-only one, null when neither has a record.
      */
     public function locationName(?string $address): ?string
     {
@@ -287,7 +287,7 @@ final readonly class IpNetworkResolver
     }
 
     /**
-     * The first of the spellings the record answers to, GeoLite's integers included.
+     * The value of the first of the given field names present in the record, GeoLite's integers included.
      */
     private static function field(
         mixed $record,

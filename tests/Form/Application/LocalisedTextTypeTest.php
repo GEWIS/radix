@@ -14,9 +14,9 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
 /**
- * A language that is switched off is disabled in the browser and so never handed in at all. That absence is no answer
- * rather than an erasure, which is what lets an activity's sign-up lists keep their Dutch names while the activity is
- * written in English alone.
+ * A language that is switched off is disabled in the browser and so never submitted at all. That absence is a
+ * missing value rather than an erasure, which is what lets an activity's sign-up lists keep their Dutch names while
+ * the activity is written in English alone.
  */
 // TypeTestCase creates an unconfigured EventDispatcher mock internally; opt out of the no-expectations notice.
 #[AllowMockObjectsWithoutExpectations]

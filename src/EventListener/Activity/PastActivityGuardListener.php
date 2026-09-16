@@ -21,8 +21,8 @@ use Symfony\Component\Workflow\Event\GuardEvent;
  *    re-dates the draft into the future and resubmits.
  *
  * The controller already refuses to open a passed live activity for editing
- * ({@see \App\Controller\Activity\AdminController::edit()}); this closes the loop for a revision still in flight
- * when its deadline passed. Activity-scoped, additive to the authorization guards in
+ * ({@see \App\Controller\Activity\AdminController::edit()}); this blocks a revision still in flight when its deadline
+ * passed. Activity-scoped, additive to the authorization guards in
  * {@see \App\EventListener\Application\RevisionGuardListener} and {@see SignupMigrationGuardListener}; all must pass.
  */
 final readonly class PastActivityGuardListener
@@ -55,10 +55,10 @@ final readonly class PastActivityGuardListener
             return;
         }
 
-        // An established activity (it already has a live revision) is judged by its live schedule's *end*: the end
-        // stays editable while it runs, so its content is frozen only once it has ended. A brand-new activity
-        // awaiting its first publication is judged by its own *start*: one that has already started can never debut,
-        // since its sign-up lists close before it begins, so it could never be joined.
+        // An established activity (it already has a live revision) is checked against its live schedule's *end*: the
+        // end stays editable while it runs, so its content is frozen only once it has ended. A brand-new activity
+        // awaiting its first publication is checked against its own *start*: one that has already started can never
+        // debut, since its sign-up lists close before it begins, so it could never be joined.
         $live = $revision->activity->getLiveRevision();
 
         if (

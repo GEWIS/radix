@@ -27,7 +27,7 @@ use function unlink;
  * The two halves of putting an image on a body's page: taking the file that was uploaded, and cutting the part of it
  * the body chose out into an image of its own.
  *
- * The original is kept as well as the cut, so the crop can be moved later without asking for the file again. The crop
+ * The original is kept as well as the cut, so the crop can be moved later without uploading the file again. The crop
  * arrives as fractions of the original rather than pixels, which is what lets the picker work on whatever rendition
  * of the original happened to be shown.
  */
@@ -65,7 +65,7 @@ final readonly class OrganImageUploadService extends AbstractImageUploadService
 
     /**
      * Cut the chosen part out of a stored original and store that as an image of its own, so what the page is served
-     * has the shape it is shown in and no rendition has to guess at a crop.
+     * has the shape it is shown in and no rendition has to apply a crop.
      *
      * @param array<string, float> $crop         x, y, width and height as fractions of the original
      * @param int                  $minimumWidth the narrowest the cut may come out, which is what the upload had to be
@@ -90,8 +90,8 @@ final readonly class OrganImageUploadService extends AbstractImageUploadService
                 ->decodeBinary($this->fileStorage->read($sourcePath))
                 ->orient();
 
-            // The fractions are the picker's, so they are held to the image rather than trusted: a rectangle that ran
-            // off an edge is pulled back inside it, and one that came out empty is refused.
+            // The fractions are the picker's, so they are limited to the image rather than trusted: a rectangle that
+            // ran off an edge is pulled back inside it, and one that came out empty is refused.
             $width = $this->pixels(
                 $crop['width'] ?? 1.0,
                 $image->width(),
@@ -108,8 +108,8 @@ final readonly class OrganImageUploadService extends AbstractImageUploadService
             }
 
             // An upload has to be of a certain width, so a rectangle that would cut out less than that is grown, in
-            // shape, until it is. The picker holds itself to the same floor, so this only ever meets a hand-made
-            // request, and growing beats storing something the upload itself would have been refused for.
+            // shape, until it is. The picker applies the same minimum, so this only ever happens for a hand-made
+            // request, and growing it is better than storing something the upload itself would have been refused for.
             if ($width < $minimumWidth) {
                 $grow = min(
                     $minimumWidth / $width,
@@ -170,8 +170,8 @@ final readonly class OrganImageUploadService extends AbstractImageUploadService
     }
 
     /**
-     * How wide a stored original is. The crop picker needs it to say how small a frame may get: it is drawn on a
-     * rendition, and a rendition says nothing about the original beyond being no wider than it.
+     * How wide a stored original is. The crop picker needs it to determine how small a frame may get: it is drawn on a
+     * rendition, and a rendition gives no information about the original beyond being no wider than it.
      *
      * @return int|null the width in pixels, or null when the file cannot be read
      */

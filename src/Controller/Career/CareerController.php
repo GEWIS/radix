@@ -29,7 +29,7 @@ class CareerController extends AbstractController
     private const int COMPANY_ACTIVITY_LIMIT = 3;
 
     /**
-     * How much of the landing page's taste of the vacancies is shown before it sends the reader on to the full list.
+     * How many vacancies the landing page shows before it sends the reader on to the full list.
      */
     private const int LATEST_VACANCY_LIMIT = 4;
 
@@ -46,7 +46,7 @@ class CareerController extends AbstractController
     }
 
     /**
-     * Where somebody who is thinking about what comes after their degree lands: what GEWIS does about that, the events
+     * Where a visitor who is thinking about what comes after their degree lands: what GEWIS does about that, the events
      * that go with it, the company in the spotlight and the vacancies companies have put forward.
      */
     #[Route(
@@ -57,7 +57,7 @@ class CareerController extends AbstractController
     {
         $companies = $this->companyRepository->findAllPublic();
 
-        // Randomise before slicing, so the strip is not a standing showcase for whoever is early in the alphabet.
+        // Randomise before slicing, so the strip is not a standing showcase for the companies early in the alphabet.
         shuffle($companies);
 
         return $this->render(

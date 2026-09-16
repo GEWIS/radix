@@ -76,13 +76,13 @@ final readonly class MaintenanceListener
     private const string LIVE_COMPONENT_ROUTE = 'ux_live_component';
 
     /**
-     * The action a live component request carries when it is only re-rendering itself against changed props. It runs
+     * The action a live component request specifies when it is only re-rendering itself against changed props. It runs
      * no method of the component's own, so there is nothing for it to write.
      */
     private const string LIVE_COMPONENT_RENDER = 'get';
 
     /**
-     * The action a live component request carries when it holds several actions the browser fired while an earlier
+     * The action a live component request specifies when it contains several actions the browser fired while an earlier
      * one was still in flight. What it may do is what those actions may do.
      */
     private const string LIVE_COMPONENT_BATCH = '_batch';
@@ -128,7 +128,7 @@ final readonly class MaintenanceListener
 
         // A logged-out admin must still reach the sign-in flow (login, MFA, sudo) to authenticate and lift
         // maintenance. Under full maintenance a non-admin who reaches it is refused at the credential check by the
-        // user checker. The sudo form is a page of the application's own rather than one the firewall answers, so
+        // user checker. The sudo form is a page of the application's own rather than one the firewall handles, so
         // read-only has to say this as well or confirming a password is refused as a write.
         if ($this->isAuthenticationRoute($request)) {
             return;
@@ -144,7 +144,7 @@ final readonly class MaintenanceListener
             return;
         }
 
-        // Read-only: keep the user on the site and tell them the write was refused, rather than dropping them on the
+        // Read-only: keep the user on the site and show them the write was refused, rather than dropping them on the
         // maintenance page.
         $this->flashReadOnly($request);
         $event->setResponse(new RedirectResponse(
@@ -154,8 +154,8 @@ final readonly class MaintenanceListener
     }
 
     /**
-     * Whether the request only reads. The method answers for everything a browser navigates to, and for everything a
-     * form posts; a live component sends paging and filtering as a POST like it sends a write, so those say for
+     * Whether the request only reads. The method is enough for everything a browser navigates to, and for everything a
+     * form posts; a live component sends paging and filtering as a POST like it sends a write, so those declare it
      * themselves with {@see ReadOnlySafe}.
      */
     private function isRead(Request $request): bool
@@ -236,8 +236,8 @@ final readonly class MaintenanceListener
     }
 
     /**
-     * The actions a batched request holds, by name. An empty list for anything that cannot be read as one, so a body
-     * this does not understand is refused rather than waved through.
+     * The actions a batched request contains, by name. An empty list for anything that cannot be read as one, so a body
+     * this does not understand is refused rather than accepted.
      *
      * @return list<string>
      */
@@ -310,10 +310,10 @@ final readonly class MaintenanceListener
     }
 
     /**
-     * Where the refused write is sent back to, as a path rather than as an address of its own. What the visitor typed
+     * Where the refused write is sent back to, as a path rather than as an address of its own. What the visitor entered
      * only survives the proxy in `X-Forwarded-Proto` and `X-Forwarded-Host`, and a deployment that does not name that
-     * proxy in `SYMFONY_TRUSTED_PROXIES` has neither: naming the host here would send somebody on HTTPS to `http://`
-     * and leave them to be bounced back, and comparing the referer against it would never match its own site.
+     * proxy in `SYMFONY_TRUSTED_PROXIES` has neither: naming the host here would send a user on HTTPS to `http://` and
+     * leave them to be redirected back, and comparing the referer against it would never match its own site.
      */
     private function returnUrl(Request $request): string
     {

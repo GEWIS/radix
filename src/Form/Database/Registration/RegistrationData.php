@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use function implode;
 
 /**
- * Everything the public sign-up asks for. The flow keeps this in the session while it is being filled in, so nothing
+ * Everything the public sign-up collects. The flow keeps this in the session while it is being filled in, so nothing
  * here is an entity; the prospective member is built from it once the last step is accepted.
  */
 final class RegistrationData
@@ -132,7 +132,7 @@ final class RegistrationData
     public string $phone = '';
 
     /**
-     * Names rather than records: this sits in the session between the steps.
+     * Names rather than records: this is kept in the session between the steps.
      *
      * @var string[]
      */

@@ -66,7 +66,7 @@ class NewsItemType extends AbstractType
                 LocalisedTextType::class,
                 $localised + [
                     'label' => t('Title'),
-                    // Both languages are held to the same rule, because a limit on what a title may say is a property
+                    // Both languages follow the same rule, because a limit on what a title may say is a property
                     // of the title rather than of the language it is written in.
                     'value_constraints' => [
                         new NotBlank(message: 'Enter the title in both languages.'),

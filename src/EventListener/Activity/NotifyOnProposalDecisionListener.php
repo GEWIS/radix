@@ -15,13 +15,13 @@ use Symfony\Component\Workflow\Event\Event;
 use function strval;
 
 /**
- * Tells the body what the board decided about its proposal.
+ * Notifies the body of what the board decided about its proposal.
  *
- * A body that has asked for a day and hears nothing has no way of knowing whether to plan around it, which is how the
- * old calendar left everybody: the decision existed only as a colour on a page somebody had to remember to open.
+ * A body that has requested a day and is not notified has no way of knowing whether to plan around it, which is how the
+ * old calendar left everybody: the decision existed only as a colour on a page a member had to remember to open.
  *
- * The member who handed it in is the one told. Notifications reach an account or a role, never a body, and that member
- * is the one who will be finishing the activity.
+ * The member who submitted it is the one notified. Notifications reach an account or a role, never a body, and that
+ * member is the one who will be finishing the activity.
  */
 final readonly class NotifyOnProposalDecisionListener
 {
@@ -37,8 +37,8 @@ final readonly class NotifyOnProposalDecisionListener
     #[AsEventListener(event: 'workflow.activity_proposal.entered.scheduled')]
     public function onScheduled(Event $event): void
     {
-        // The board taking a clearance back also lands here, and that is not news about a decision: the body already
-        // knows it has the day.
+        // The board withdrawing a clearance also triggers this listener, and that is not a new decision: the body
+        // already knows it has the day.
         if ('schedule' !== $event->getTransition()?->getName()) {
             return;
         }

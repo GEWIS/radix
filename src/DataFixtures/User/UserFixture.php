@@ -20,7 +20,7 @@ class UserFixture extends Fixture implements DependentFixtureInterface, FixtureG
     public function load(ObjectManager $manager): void
     {
         // Every member the replay produced gets an account, rather than a fixed run of numbers: the population is
-        // numbered in blocks with gaps between them, and a gap is not somebody to make an account for.
+        // numbered in blocks with gaps between them, and a gap is not a member to make an account for.
         foreach ($manager->getRepository(Member::class)->findAll() as $member) {
             $lidnr = $member->lidnr;
 

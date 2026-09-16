@@ -46,7 +46,7 @@ final class ExpressionAccessorTest extends TestCase
     private const string ROOT = __DIR__ . '/../../src';
 
     /**
-     * Attribute arguments that hold an ExpressionLanguage string: `#[Assert\When(expression: ...)]` and the
+     * Attribute arguments that contain an ExpressionLanguage string: `#[Assert\When(expression: ...)]` and the
      * `security:` of an API Platform operation. These are strings in argument position rather than `new Expression()`
      * calls, so the token walk looks for them by name.
      */
@@ -119,7 +119,7 @@ final class ExpressionAccessorTest extends TestCase
 
     /**
      * The string fragments every expression in a file is written from, whether it is constructed as
-     * `new Expression()` or handed to an attribute as a named argument.
+     * `new Expression()` or passed to an attribute as a named argument.
      *
      * Read from the token stream rather than matched in the source text. An expression is not always a single quoted
      * string on one line: several are concatenations around an enum value, and a pattern that stops at the first
@@ -241,9 +241,9 @@ final class ExpressionAccessorTest extends TestCase
     }
 
     /**
-     * The expressions an attribute holds as a named argument, between the `#[` at `$open` and the `]` closing it.
+     * The expressions an attribute contains as a named argument, between the `#[` at `$open` and the `]` closing it.
      *
-     * The whole region is walked rather than the attribute's own argument list, so that an operation nested in
+     * The whole region is traversed rather than the attribute's own argument list, so that an operation nested in
      * `#[ApiResource(operations: [new Get(security: '...')])]` is read as readily as an argument of the attribute
      * itself.
      *

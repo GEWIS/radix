@@ -46,8 +46,8 @@ export default class extends DragReorder {
     }
 
     private reindex(): void {
-        // positionTargets are in document order, one per direct entry -- a nested collection's position inputs bind to its
-        // own inner sortable controller, not this one.
+        // positionTargets are in document order, one per direct entry: a nested collection's position inputs bind
+        // to its own inner sortable controller, not this one.
         this.positionTargets.forEach((input, index) => {
             input.value = String(index);
         });

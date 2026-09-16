@@ -39,7 +39,7 @@ class RegistrationServiceTest extends TestCase
     private StripeService $stripeService;
 
     /**
-     * Enrolment at the TU/e cannot be verified in July, so the form closes to everyone who is not standing in the
+     * Enrolment at the TU/e cannot be verified in July, so the form closes to everyone who is not present in the
      * department.
      */
     #[DataProvider('momentsAndAddresses')]
@@ -64,7 +64,7 @@ class RegistrationServiceTest extends TestCase
     }
 
     /**
-     * The proxy stands on the department's network, and its address is what arrives when nothing is forwarded.
+     * The reverse proxy is on the department's network, and its address is what arrives when nothing is forwarded.
      */
     public function testTheProxyItselfDoesNotHoldTheFormOpen(): void
     {
@@ -175,7 +175,7 @@ class RegistrationServiceTest extends TestCase
     }
 
     /**
-     * The e-mail carries a payment link of its own, so it is worth having even when the checkout does not come up.
+     * The e-mail contains a payment link of its own, so it is worth having even when the checkout cannot be created.
      */
     public function testStillSendsTheEmailWhenNoCheckoutPageCanBeMade(): void
     {
@@ -257,8 +257,8 @@ class RegistrationServiceTest extends TestCase
     }
 
     /**
-     * Money first: a prospective member who is off the books can no longer be refunded, so nothing is removed until
-     * the refund is settled.
+     * Money first: a prospective member who has been deleted can no longer be refunded, so nothing is removed until the
+     * refund is settled.
      */
     public function testRefundsBeforeRemovingSomeoneWhoHadAlreadyPaid(): void
     {
@@ -363,7 +363,7 @@ class RegistrationServiceTest extends TestCase
      * A Stripe service whose refund does not go through.
      *
      * Hand-written rather than a double: `createRefund()` is typed `?true`, and PHPUnit's generated double declares
-     * that as plain `true`, so the failing answer cannot be configured on one.
+     * that as plain `true`, so the failing return value cannot be configured on one.
      */
     private function stripeThatCannotRefund(): StripeService
     {

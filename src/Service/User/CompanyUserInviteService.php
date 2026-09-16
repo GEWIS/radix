@@ -24,11 +24,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Invites somebody to represent a company, and turns an accepted invitation into an account.
+ * Invites a person to represent a company, and turns an accepted invitation into an account.
  *
  * An address can belong to at most one representative, so an invitation is refused when an account or another pending
  * invitation already claims it. Inviting the same address twice reissues the existing invitation rather than leaving
- * two links in the wild.
+ * two usable links.
  */
 final readonly class CompanyUserInviteService
 {
@@ -52,7 +52,7 @@ final readonly class CompanyUserInviteService
     }
 
     /**
-     * @throws RuntimeException when the address is already spoken for.
+     * @throws RuntimeException when the address is already in use.
      */
     public function invite(
         Company $company,
@@ -144,8 +144,8 @@ final readonly class CompanyUserInviteService
     }
 
     /**
-     * Turns the invitation into an account with the password its holder just chose. Signing them in is left to the
-     * caller, which is the only place that has a request to sign them in on.
+     * Turns the invitation into an account with the password the invited representative just chose. Signing them in is
+     * left to the caller, which is the only place that has a request to sign them in on.
      */
     public function accept(
         CompanyUserInvite $invite,

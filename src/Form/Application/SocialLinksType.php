@@ -16,16 +16,16 @@ use Symfony\Component\Validator\Constraints\Regex;
 use function sprintf;
 
 /**
- * The social links on a revision, as one box per platform rather than a list somebody adds rows to. A body is either on
- * a platform or it is not, and asking which platform a row is for is a question with an obvious answer, so the platform
+ * The social links on a revision, as one box per platform rather than a list rows are added to. A body is either on a
+ * platform or it is not, and asking which platform a row is for is a question with an obvious answer, so the platform
  * is fixed per box and an empty box means "not there".
  *
  * The form's data is the handle per platform, which is how a revision reads and writes them
  * ({@see \App\Entity\Application\Traits\HasSocialLinksTrait}); turning that map into rows is the revision's business,
- * because that is the side the foreign key lives on.
+ * because that is the side the foreign key is on.
  *
- * A pasted profile link is reduced to a handle before it is judged, so the box that comes back after an error already
- * says what would be stored.
+ * A pasted profile link is reduced to a handle before it is checked, so the box that comes back after an error already
+ * shows what would be stored.
  *
  * @extends AbstractType<array<string, string>>
  */
@@ -50,7 +50,7 @@ class SocialLinksType extends AbstractType
                 ],
             );
 
-            // The constraint has to judge what will be stored rather than what was pasted, so the reduction to a handle
+            // The constraint has to check what will be stored rather than what was pasted, so the reduction to a handle
             // happens here and not in the entity's setter alone.
             $builder->get($platform->value)->addModelTransformer(new CallbackTransformer(
                 static fn (?string $handle): string => $handle ?? '',

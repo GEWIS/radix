@@ -16,7 +16,7 @@ use function count;
 
 /**
  * The meetings overview pages over a row shape of the repository's own rather than a `Paginator`, so it cannot
- * inherit the shared paging and carries its own. These are the parts of it that went wrong (GH-119).
+ * inherit the shared paging and has its own. These are the parts of it that went wrong (GH-119).
  */
 #[CoversClass(MeetingOverview::class)]
 final class MeetingOverviewTest extends TestCase
@@ -25,8 +25,8 @@ final class MeetingOverviewTest extends TestCase
     private array $pagesAskedFor = [];
 
     /**
-     * The reported bug: clicking a page changed the number and nothing else. Working out the last page ran the query
-     * while the page being left behind was still the current one, and the answer was cached under it.
+     * The reported bug: clicking a page changed the number and nothing else. Computing the last page ran the query
+     * while the page being left behind was still the current one, and the result was cached under it.
      */
     public function testGoingToAPageQueriesThatPage(): void
     {
@@ -45,7 +45,7 @@ final class MeetingOverviewTest extends TestCase
     {
         $overview = $this->overview(50);
 
-        // Reading the first page is what used to poison everything after it.
+        // Reading the first page is what used to break every page after it.
         $overview->getRows();
         $overview->gotoPage(2);
         $overview->getRows();

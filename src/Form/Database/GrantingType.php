@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Carries the grantee and the expiration of the key code granting a withdrawal points at.
+ * Contains the grantee and the expiration of the key code granting a withdrawal points at.
  *
  * Both are filled in by the page from the granting that was picked, and neither is stored: the expiration is only
  * there so a withdrawal can be checked against it. The data of this type is therefore a plain array, keyed `member`

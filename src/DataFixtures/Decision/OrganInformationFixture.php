@@ -25,7 +25,7 @@ use function strtolower;
  * and real images rather than an empty state everywhere.
  *
  * Statuses are set directly rather than driven through the state machine: the guards want an authenticated reviewer,
- * which a fixture has no business inventing, and what this seeds is the resulting state rather than the route to it.
+ * which a fixture has no business creating, and what this seeds is the resulting state rather than the route to it.
  */
 class OrganInformationFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
@@ -120,8 +120,8 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
             $descriptionEn,
             $descriptionNl,
         );
-        // An abbreviation is a name, not an address: GETÉST carries an accent that the validator rejects in a local
-        // part, which would make the seeded page unsaveable until somebody edited the field.
+        // An abbreviation is a name, not an address: GETÉST has an accent that the validator rejects in a local
+        // part, which would make the seeded page unsaveable until the field was edited by hand.
         $revision->email = $this->slugger->slug($abbr)->lower() . '@gewis.nl';
         $revision->website = $website;
         $revision->updateSocialLinks($social);

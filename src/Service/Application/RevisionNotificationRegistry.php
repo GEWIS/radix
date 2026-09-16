@@ -8,8 +8,8 @@ use App\Entity\Application\RevisionInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
- * Finds the module that wants to be told about a revision. A domain that registered nothing raises no notification,
- * which is the right answer for one whose reviewers hear about submissions some other way.
+ * Finds the module that wants to be notified about a revision. A domain that registered nothing raises no
+ * notification, which is correct for one whose reviewers hear about submissions some other way.
  */
 final readonly class RevisionNotificationRegistry
 {

@@ -26,7 +26,7 @@ final class DeviceFingerprintTest extends TestCase
 
     /**
      * The reason versions are left out. Chrome moves a major version every few weeks, and were it part of the key
-     * every member would be told about a new device each time their browser updated itself.
+     * every member would be notified about a new device each time their browser updated itself.
      */
     public function testABrowserUpdateIsTheSameDevice(): void
     {
@@ -79,7 +79,7 @@ final class DeviceFingerprintTest extends TestCase
     }
 
     /**
-     * A router handing out a different address on the same network is the same place.
+     * A router assigning a different address on the same network is the same place.
      */
     public function testAnotherAddressOnTheSameNetworkIsTheSameNetwork(): void
     {
@@ -91,7 +91,7 @@ final class DeviceFingerprintTest extends TestCase
 
     /**
      * An address that does not parse is no network at all rather than a network of its own: it is what an attacker
-     * would vary to look like somebody else's network, and recognition must not vouch for it.
+     * would vary to look like another user's network, and a network that cannot be named cannot be recognised.
      */
     public function testAMalformedAddressIsNoNetworkAtAll(): void
     {
@@ -107,7 +107,7 @@ final class DeviceFingerprintTest extends TestCase
 
     /**
      * The two hashes are fed the same secret, so they must never be able to collide: a network fingerprint that could
-     * equal a device fingerprint would let one table vouch for the other.
+     * equal a device fingerprint would let a row in one table be accepted in the other.
      */
     public function testADeviceFingerprintIsNeverANetworkFingerprint(): void
     {
@@ -123,7 +123,7 @@ final class DeviceFingerprintTest extends TestCase
     }
 
     /**
-     * What tells apart two people who are otherwise the same browser on the same system.
+     * What distinguishes two users who otherwise have the same browser on the same system.
      */
     public function testAnotherSetOfLanguagesIsADifferentDevice(): void
     {
@@ -141,7 +141,7 @@ final class DeviceFingerprintTest extends TestCase
 
     /**
      * The same preferences spelled differently are the same preferences, which is why they are read through Symfony's
-     * parsing rather than off the header.
+     * parsing rather than from the header.
      */
     public function testTheLanguagesAreReadIndependentlyOfHowTheyAreSpelled(): void
     {
@@ -158,8 +158,8 @@ final class DeviceFingerprintTest extends TestCase
     }
 
     /**
-     * A header left out, sent empty, or sent with nothing but spaces in it all say the same thing, and have to land in
-     * the same place.
+     * A header left out, sent empty, or sent with nothing but spaces in it all mean the same thing, and have to produce
+     * the same device key.
      */
     public function testABrowserThatAsksForNoLanguagesIsStillOneDevice(): void
     {
@@ -185,7 +185,7 @@ final class DeviceFingerprintTest extends TestCase
     }
 
     /**
-     * Asking for nothing is a state of its own rather than one that matches whoever does ask.
+     * Asking for nothing is a state of its own rather than one that matches a browser that does ask.
      */
     public function testAskingForNoLanguagesIsNotTheSameAsAskingForSome(): void
     {
@@ -202,7 +202,7 @@ final class DeviceFingerprintTest extends TestCase
     }
 
     /**
-     * A header nobody can parse is carried as it stands. It cannot be turned to anyone's advantage, the languages
+     * A header that cannot be parsed is used as it stands. It cannot be turned to anyone's advantage, the languages
      * being one more thing that has to match, so a strange header only gets its own sign-in announced.
      */
     public function testAnUnparseableSetOfLanguagesIsCarriedWithoutUpset(): void

@@ -20,8 +20,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * The news the association puts out. Written directly rather than through the review workflow: what the board says is
- * the board's to say, and it says it in its own name.
+ * The news the association puts out. Written directly rather than through the review workflow: what the board
+ * publishes is the board's own responsibility, and it publishes in its own name.
  */
 #[Route(
     path: '/admin/news',

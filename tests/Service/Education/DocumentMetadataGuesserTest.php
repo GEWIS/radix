@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * What can be read out of a filename, pinned against the shapes the department and members actually send. The previous
  * site did this inline and untested, and the whole point of guessing is that it is right often enough to save typing;
- * a change that quietly stops recognising course codes would only show up as somebody filling in dozens of forms.
+ * a change that quietly stops recognising course codes would only show up as a member filling in dozens of forms.
  */
 final class DocumentMetadataGuesserTest extends TestCase
 {
@@ -177,7 +177,7 @@ final class DocumentMetadataGuesserTest extends TestCase
             null,
         ];
 
-        // Nothing in the name says what it is, and an exam is what the archive mostly holds.
+        // Nothing in the name says what it is, and an exam is what the archive mostly contains.
         yield 'unmarked' => [
             '2IL50-2024.pdf',
             CourseDocumentTypes::Exam,
@@ -198,8 +198,8 @@ final class DocumentMetadataGuesserTest extends TestCase
     }
 
     /**
-     * A summary usually carries the name of whoever wrote it. An exam does not, and guessing one there would put a
-     * random word in front of a member as an author.
+     * A summary usually contains the name of its author. An exam does not, and guessing one there would put a random
+     * word in front of a member as an author.
      */
     public function testItPicksAnAuthorOutOfASummaryOnly(): void
     {

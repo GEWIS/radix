@@ -16,9 +16,9 @@ use function is_array;
 use function sprintf;
 
 /**
- * Resolves the meeting a decision belongs to from the type and number carried in the form.
+ * Resolves the meeting a decision belongs to from the type and number in the form.
  *
- * The date is only carried along for the templates and for the key code date checks; the meeting is identified by its
+ * The date is only passed along for the templates and for the key code date checks; the meeting is identified by its
  * type and number alone, so whatever date was submitted is never written back onto it.
  *
  * @implements DataTransformerInterface<Meeting, array{

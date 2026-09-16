@@ -18,10 +18,10 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 /**
  * Fetches a fresh infimum and pushes it to every member who has a page open, so the panel changes on its own rather
- * than waiting for somebody to reload.
+ * than waiting for a member to reload.
  *
- * A failed fetch publishes nothing at all: whoever is reading keeps the infimum they already had, which is a better
- * answer than blanking the panel because somebody else's server had a bad minute.
+ * A failed fetch publishes nothing at all: a member who is reading keeps the infimum they already had, which is better
+ * than blanking the panel because an external server was briefly unavailable.
  */
 #[AsCommand(
     name: 'app:infimum:rotate',

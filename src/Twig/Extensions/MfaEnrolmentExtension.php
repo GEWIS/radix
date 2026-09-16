@@ -13,7 +13,7 @@ use Twig\TwigFunction;
 
 /**
  * Exposes `mfa_enrolment_required()` to templates: true when the current user is in scope per {@see MfaPolicy} but
- * has not yet enrolled. Lets layouts surface the enrolment nag even though `is_granted('ROLE_ADMIN')` returns false
+ * has not yet enrolled. Lets layouts show the enrolment notice even though `is_granted('ROLE_ADMIN')` returns false
  * for these users (the role is stripped until they enrol).
  */
 class MfaEnrolmentExtension extends AbstractExtension

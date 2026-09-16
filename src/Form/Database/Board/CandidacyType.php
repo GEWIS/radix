@@ -64,7 +64,7 @@ class CandidacyType extends AbstractType
             )
             // The row order is the constitutional order the candidates are put forward in, and it is what decides
             // the order of the sub-decisions this form records. A board may put candidates forward across several
-            // meetings, so nothing here asks for a whole board at once.
+            // meetings, so nothing here requires a whole board at once.
             ->add(
                 'candidates',
                 CollectionType::class,

@@ -12,7 +12,7 @@ use NoDiscard;
  * Counted rather than hydrated: loading every course with its documents would fetch thousands of rows to display two
  * numbers per line.
  *
- * {@see $similarCourses} is filled only for courses that hold nothing, which is often the same course under a code it
+ * {@see $similarCourses} is filled only for courses with no documents, which is often the same course under a code it
  * had before.
  */
 final readonly class CourseOverviewRow

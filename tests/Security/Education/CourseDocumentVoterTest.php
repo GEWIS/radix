@@ -66,8 +66,7 @@ final class CourseDocumentVoterTest extends TestCase
     }
 
     /**
-     * A download is rebuilt from the document's rendered pages, so until it has been rasterized there is nothing to
-     * hand over, whoever is asking.
+     * A download is rebuilt from the document's rendered pages, so no user can download one until it is rasterized.
      */
     public function testNobodyMayDownloadADocumentThatHasNotBeenProcessed(): void
     {

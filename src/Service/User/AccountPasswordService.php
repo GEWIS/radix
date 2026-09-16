@@ -12,10 +12,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Changing the password of somebody who is signed in and still knows the old one. The reset-link route is
+ * Changing the password of a user who is signed in and still knows the old one. The reset-link route is
  * {@see PasswordResetService} instead.
  *
- * When the password changed is stamped in the same commit as the password itself, because that stamp is what every
+ * When the password changed is recorded in the same commit as the password itself, because that timestamp is what every
  * session issued before it is measured against.
  */
 final readonly class AccountPasswordService

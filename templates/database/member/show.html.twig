@@ -273,7 +273,7 @@
                     {% for note in notes %}
                         <div class="member-note">
                             {# Safe to print unescaped: AuditEntryRow escapes the arguments before interpolating them
-                               into the entry's own format string, which is what carries the markup. #}
+                               into the entry's own format string, which is what contains the markup. #}
                             <p class="mb-1">{{ note.body|raw }}</p>
                             <p class="small text-secondary mb-0">
                                 {{ note.user ? note.user : '-' }} · {{ note.updatedAt|date('j M Y H:i') }}

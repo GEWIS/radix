@@ -23,8 +23,8 @@ use function strtoupper;
 use const PATHINFO_FILENAME;
 
 /**
- * Exams arrive from the department named to no particular standard, but they do tend to carry the course code and the
- * date somewhere. Everything here is a guess an administrator corrects before publishing, so being wrong is cheap.
+ * Exams arrive from the department named to no particular standard, but they do tend to contain the course code and
+ * the date somewhere. Everything here is a guess an administrator corrects before publishing, so being wrong is cheap.
  */
 final readonly class DocumentMetadataGuesser
 {
@@ -32,8 +32,8 @@ final readonly class DocumentMetadataGuesser
      * A course code: a digit, a letter, then three or four more alphanumerics. `2IL50`, `2WBB0`, `2IMF20`.
      *
      * It has to stand on its own rather than run into a neighbouring word, because the length is not fixed and a code
-     * jammed against one would swallow its first letter. `exam2WF50final` yields nothing rather than `2WF50F`, which
-     * would look right at a glance and name a course that does not exist.
+     * jammed against one would include that word's first letter. `exam2WF50final` matches nothing rather than `2WF50F`,
+     * which would look right at a glance and name a course that does not exist.
      */
     private const string COURSE_CODE = '/(?<![0-9a-zA-Z])\d[a-zA-Z][0-9a-zA-Z]{3,4}(?![0-9a-zA-Z])/';
 
@@ -49,7 +49,7 @@ final readonly class DocumentMetadataGuesser
     /** A day, once the year and month have been taken out. */
     private const string DAY = '/(?<![0-9])(0[1-9]|[12]\d|3[01])(?![0-9])/';
 
-    /** Filenames that say what they hold. Checked in order, so the more specific ones come first. */
+    /** Filenames that say what they contain. Checked in order, so the more specific ones come first. */
     private const array TYPE_MARKERS = [
         'antwoord' => ExamTypes::Answers,
         'answer' => ExamTypes::Answers,
@@ -222,7 +222,7 @@ final readonly class DocumentMetadataGuesser
     }
 
     /**
-     * A summary usually carries its author's name as one of the dot- or underscore-separated parts of its filename.
+     * A summary usually contains its author's name as one of the dot- or underscore-separated parts of its filename.
      * Anything long enough and free of digits is taken for one.
      */
     private function guessAuthor(string $stem): ?string

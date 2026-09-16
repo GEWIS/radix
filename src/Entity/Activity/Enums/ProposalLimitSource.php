@@ -11,8 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Which rule decided how many activities a body may propose in a period.
  *
- * Resolving a limit is a ladder from the most specific rule to the least, and this says which rung answered. It is
- * carried alongside the number so a body is told why it may propose what it may, rather than being handed a bare
+ * Resolving a limit is a ladder from the most specific rule to the least, and this records which rung applied.
+ * It is returned alongside the number so a body is shown why it may propose what it may, rather than a bare
  * figure it cannot argue with.
  */
 enum ProposalLimitSource: string implements TranslatableInterface

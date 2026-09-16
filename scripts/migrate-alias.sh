@@ -7,7 +7,7 @@ set -e
 read -rp "Enter EM_ALIAS (default or web): " alias
 ([ "$alias" = "default" ] || [ "$alias" = "web" ]) || (echo "Not a valid alias, expected default or web, exiting..."; exit 1)
 
-# Each set names its own connection, so the configuration is the whole of what tells the two apart.
+# Each set names its own connection, so the configuration is the only thing that distinguishes the two.
 if [ "$alias" = "web" ]; then
     configuration="--configuration=config/packages/migrations/web.yaml"
 else

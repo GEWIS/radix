@@ -97,7 +97,7 @@ class ExternalAppService
 
     /**
      * The public keys external applications fetch from the JWKS endpoint to verify a modern token. Only the public part
-     * of each association key is exposed; the shared secrets never live in this set.
+     * of each association key is exposed; the shared secrets are never part of this set.
      */
     public function publicKeySet(): JWKSet
     {

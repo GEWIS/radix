@@ -41,9 +41,9 @@ class ExternalSignupController extends AbstractController
 
     /**
      * Show the double opt-in confirmation page for a freshly-created external sign-up. This is a pure read: it only
-     * resolves the token (consumption lives in {@see SignupManager::confirmExternalSignup}), so email clients and link
-     * scanners that fetch the URL do not accidentally confirm the sign-up. The actual confirmation is a POST from the
-     * form on this page ({@see self::confirm()}).
+     * resolves the token (consumption happens in {@see SignupManager::confirmExternalSignup}), so email clients and
+     * link scanners that fetch the URL do not accidentally confirm the sign-up. The actual confirmation is a POST from
+     * the form on this page ({@see self::confirm()}).
      */
     #[Route(
         path: '/verify/{token}',

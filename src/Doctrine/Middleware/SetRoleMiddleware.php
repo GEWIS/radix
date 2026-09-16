@@ -10,8 +10,8 @@ use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 /**
- * Tagged for `default` alone: `SET ROLE` is spelled here the way PostgreSQL spells it, and the website's MariaDB
- * connection has no role of its own to drop to. {@see SetRoleDriver} for what a connection is dropped to.
+ * Tagged for `default` alone: `SET ROLE` is written here in PostgreSQL syntax, and the website's MariaDB connection
+ * has no role of its own to drop to. {@see SetRoleDriver} for what a connection is dropped to.
  */
 #[Autoconfigure(tags: [
     [

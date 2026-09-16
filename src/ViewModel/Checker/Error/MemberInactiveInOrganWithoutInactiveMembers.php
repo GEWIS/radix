@@ -17,7 +17,7 @@ use function sprintf;
  * Error for when someone is an inactive member of an organ that does not have those.
  *
  * Only fraternities keep members who no longer study (Internal Regulations art. 13); every other organ discharges
- * whoever is no longer part of it.
+ * members who are no longer part of it.
  *
  * @extends Error<InstallationModel>
  */

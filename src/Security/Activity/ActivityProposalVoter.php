@@ -22,7 +22,7 @@ use function in_array;
  * Authorises what can be done to an activity proposal in the option calendar.
  *
  * A proposal belongs to the body hosting the activity, so whoever is installed in that body may look at it, change it
- * while it is still waiting, and take it back. Deciding which of its dates is reserved, turning it down and recording
+ * while it is still waiting, and withdraw it. Deciding which of its dates is reserved, turning it down and recording
  * that the financial side is settled are the board's, and so is everything about a proposal the board is hosting
  * itself, which names no body at all.
  *
@@ -86,8 +86,8 @@ final class ActivityProposalVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => $isBoard || $isOwner,
-            // Only a proposal still waiting for a decision may be changed. Once a date is held, changing the dates
-            // would mean holding one nobody approved, so the way out is to withdraw and propose again.
+            // Only a proposal still waiting for a decision may be changed. Once a date is reserved, changing the dates
+            // would mean reserving one nobody approved, so the way out is to withdraw and propose again.
             self::EDIT => $subject->status->isEditableByAuthor() && ($isBoard || $isOwner),
             self::WITHDRAW => $isBoard || $isOwner,
             self::DECIDE => $isBoard,
@@ -96,7 +96,7 @@ final class ActivityProposalVoter extends Voter
     }
 
     /**
-     * Whoever is currently installed in the body hosting the activity, or the member who handed the proposal in. A
+     * Whoever is currently installed in the body hosting the activity, or the member who submitted the proposal. A
      * proposal with no body is the board's own, which only the board can be said to own.
      */
     private function isOwner(

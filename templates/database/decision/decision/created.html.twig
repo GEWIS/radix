@@ -54,8 +54,8 @@
                     </span>
                 </div>
                 <div class="panel-body">
-                    {# `contents` is the decision as it reads in each language; a template cannot hand the entity the
-                       translator that needs. #}
+                    {# `contents` is the decision as it reads in each language; a template cannot pass the entity the
+                       translator it needs. #}
                     {% for content in contents %}
                         <p{{ loop.last ? ' class="mb-0"' : '' }}>{{ content }}</p>
                     {% endfor %}

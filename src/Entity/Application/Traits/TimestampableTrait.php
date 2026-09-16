@@ -26,8 +26,8 @@ trait TimestampableTrait
     /**
      * The date at which the entity was updated.
      */
-    // Written by the class that is persisted rather than by the one that declares the column: an audit entry is
-    // stamped by whichever kind of entry it is.
+    // Written by the class that is persisted rather than by the one that declares the column: the timestamp on an
+    // audit entry is set by its concrete subclass.
     #[Column(type: Types::DATETIME_IMMUTABLE)]
     public protected(set) DateTimeImmutable $updatedAt;
 

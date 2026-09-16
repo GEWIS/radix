@@ -21,7 +21,7 @@ use function in_array;
  * never changes when a new version is approved.
  *
  * Outside {@see MemberController} because not every regulation is members-only: the two policies an external has to
- * agree to before they may sign up for an activity have to be readable by somebody who has no account at all.
+ * agree to before they may sign up for an activity have to be readable by a visitor who has no account at all.
  */
 class RegulationController extends AbstractController
 {

@@ -49,9 +49,9 @@ final readonly class PhotoService
     }
 
     /**
-     * The viewer manifest for a virtual album: the photos it gathers, each carrying a deep link to its real album so
-     * the viewer can offer a "go to the original album" button rather than sending the reader there on every click.
-     * Used by the photos of the week and by a body's tagged photos. Access is checked by the caller.
+     * The viewer manifest for a virtual album: the photos it gathers, each with a deep link to its real album so the
+     * viewer can offer a "go to the original album" button rather than navigating there on every click. Used by the
+     * photos of the week and by a body's tagged photos. Access is checked by the caller.
      *
      * @param Photo[] $photos
      *
@@ -71,7 +71,7 @@ final readonly class PhotoService
     }
 
     /**
-     * The viewer manifest for a member's virtual album (the photos they are tagged in): each carries a deep link to its
+     * The viewer manifest for a member's virtual album (the photos they are tagged in): each has a deep link to its
      * real album, and the ones the member has hidden are flagged so their own view can grey them out. Access and the
      * hidden set are decided by the caller.
      *

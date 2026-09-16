@@ -15,7 +15,7 @@ use function strval;
 
 /**
  * Stores a logo or a banner a company uploaded, scoped to that company, and queues its variants so the sizes the pages
- * ask for exist before anyone asks.
+ * need exist before a visitor requests one.
  *
  * The caller decides what the returned path becomes. A logo goes onto a draft revision and only reaches the public
  * page through review; a banner goes into the package's pending slot and waits for the committee there, unless the

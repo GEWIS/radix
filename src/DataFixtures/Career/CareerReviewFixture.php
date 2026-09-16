@@ -30,11 +30,11 @@ use function hash;
 use function random_bytes;
 
 /**
- * Puts the career review surfaces in every state somebody has to look at, so the approval queue, the status pages and
- * the timeline all have something to show without anybody having to click a company through the workflow by hand.
+ * Puts the career review surfaces in every state a reviewer has to look at, so the approval queue, the status pages
+ * and the timeline all have something to show without anybody having to click a company through the workflow by hand.
  *
  * Statuses are set directly rather than driven through the state machine: the guards want an authenticated reviewer,
- * which a fixture has no business inventing, and what these seed is the resulting state rather than the route to it.
+ * which a fixture has no business creating, and what these seed is the resulting state rather than the route to it.
  */
 class CareerReviewFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
@@ -200,7 +200,7 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
     }
 
     /**
-     * New artwork waiting for the committee next to the banner that is still running. It carries the slogan the
+     * New artwork waiting for the committee next to the banner that is still running. It has the slogan the
      * company submitted along with it, which is the ordinary reason to redo a banner in the first place.
      */
     private function proposeABanner(

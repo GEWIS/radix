@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * The shape a banner is bought in. Both are ordinary display-advertising sizes, so a company hands over the artwork it
+ * The shape a banner is bought in. Both are ordinary display-advertising sizes, so a company provides the artwork it
  * already has rather than having something made for us.
  *
  * The format fixes the box the banner is shown in, which is why an image is only accepted at exactly those
@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 enum CompanyBannerFormats: string implements TranslatableInterface
 {
-    /** The wide, shallow strip that sits between two news items without pushing them apart. */
+    /** The wide, shallow strip that is shown between two news items without pushing them apart. */
     case Leaderboard = 'leaderboard';
 
     /** The taller block, for a company that wants to be harder to scroll past. */

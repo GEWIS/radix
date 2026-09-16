@@ -120,7 +120,7 @@ class ApiTokenAuthenticatorTest extends TestCase
     }
 
     /**
-     * The token is the whole credential, so a token nobody knows is where authentication ends.
+     * The token is the whole credential, so a token that is not known is where authentication ends.
      */
     public function testRefusesATokenThatIsNotKnown(): void
     {
@@ -187,8 +187,8 @@ class ApiTokenAuthenticatorTest extends TestCase
     }
 
     /**
-     * The challenge is the same whether the request carried no token or one that could not be resolved, so neither
-     * answer says anything about which tokens exist.
+     * The challenge is the same whether the request had no token or one that could not be resolved, so neither
+     * response says anything about which tokens exist.
      */
     public function testChallengesWithoutSayingAnything(): void
     {

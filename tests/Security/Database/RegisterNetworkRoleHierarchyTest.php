@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 /**
  * The register's roles are taken away here, which is what `access_control`, `#[IsGranted]` and every `is_granted()`
- * ultimately ask through. What happens to the other roles matters as much: a secretary at home is still a member.
+ * ultimately resolve through. What happens to the other roles matters as much: a secretary at home is still a member.
  */
 final class RegisterNetworkRoleHierarchyTest extends TestCase
 {
@@ -43,7 +43,7 @@ final class RegisterNetworkRoleHierarchyTest extends TestCase
         );
     }
 
-    /** Both, not only the one handed to the account: read-only is reached through the administrator's. */
+    /** Both, not only the one assigned to the account: read-only is reached through the administrator's. */
     public function testBothOfThemAreGoneOffTheNetwork(): void
     {
         $reachable = $this->hierarchyFor('8.8.8.8')->getReachableRoleNames([

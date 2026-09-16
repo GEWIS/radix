@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\Registry;
 use function strval;
 
 /**
- * Approving a poll also schedules it, so the poll's decision form carries a closing date next to the approve button.
+ * Approving a poll also schedules it, so the poll's decision form has a closing date next to the approve button.
  * These pin that the date has to be a real date in the future, and that a decision that is refused leaves the poll
  * exactly as it was.
  *
@@ -279,7 +279,7 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
 
         $session = self::getContainer()->get('session.factory')->createSession();
         $request->setSession($session);
-        // A sudo grant is only read back off a session the request already carried, so the cookie has to be there.
+        // A sudo grant is only read from a session the request already has, so the cookie has to be there.
         $request->cookies->set(
             $session->getName(),
             'test',

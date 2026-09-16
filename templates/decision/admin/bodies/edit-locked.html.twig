@@ -15,7 +15,7 @@
 {% block contents %}
     <div class="row">
         <div class="col-md-8">
-            {# Nobody forces this lock open: the other holder is a fellow member of the same body, or the board. #}
+            {# This lock cannot be forced open: the other holder is a fellow member of the same body, or the board. #}
             {% include 'partials/application/edit-lock-notice.html.twig' with {
                 'lock': lock,
                 'subject': 'this page'|trans,

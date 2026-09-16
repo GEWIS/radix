@@ -23,7 +23,7 @@ abstract class AbstractMemberController extends AbstractController
     }
 
     /**
-     * The member the page is about, or the notice that stands in for them.
+     * The member the page is about, or the notice that replaces them.
      */
     protected function resolveMember(int $lidnr): Member|Response
     {

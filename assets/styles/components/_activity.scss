@@ -85,7 +85,7 @@
         color: var(--#{$prefix}secondary-color);
     }
 
-    // Multi-day / cross-month ranges carry more text ("31 - 02", "Jul - Aug"), so shrink the day figure to fit.
+    // Multi-day / cross-month ranges have more text ("31 - 02", "Jul - Aug"), so shrink the day figure to fit.
     &.activity-date-badge-range .activity-date-badge-day {
         font-size: 0.95rem;
         letter-spacing: -0.02em;

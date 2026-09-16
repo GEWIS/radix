@@ -4,12 +4,12 @@ type Rectangle = { x: number; y: number; width: number; height: number };
 
 /**
  * Fractions rather than pixels: the frame is drawn on whichever rendition of the original fits on the page, or on
- * the file the browser has just been handed, and the server applies it to the original either way. Everything is
- * measured against the image's own box within the canvas, so it does not matter how the image sits in there.
+ * the file the user has just selected, and the server applies it to the original either way. Everything is measured
+ * against the image's own box within the canvas, so it does not matter how the image is positioned in there.
  *
  * The frame cannot leave the image. Cropper draws it on the canvas, which is the wider box the image is fitted into,
  * so without refusing the changes that would take it off the picture it can be dragged onto the empty margins beside
- * it and ask for a crop of nothing.
+ * it and produce a crop of nothing.
  *
  * The markup:
  *
@@ -64,15 +64,17 @@ export default class extends Controller<HTMLElement> {
 
     private observer?: ResizeObserver;
 
-    /** How wide the file the reader picked is, which beats anything the server said about the stored one. */
+    /**
+     * How wide the file the user picked is, which takes precedence over what the server reported about the stored one.
+     */
     private picked?: number;
 
     /** Set while the frame is being put back on the image, so that correction is not itself corrected. */
     private correcting = false;
 
     connect(): void {
-        // Only an image that is already there is framed on connect; a file the reader picks is handled by choose().
-        // An image with nothing to show carries no src at all, which reads as null rather than as an empty one.
+        // Only an image that is already there is framed on connect; a file the user picks is handled by choose().
+        // An image with nothing to show has no src at all, so getAttribute returns null rather than an empty string.
         if (!this.hasImageTarget || !this.imageTarget.getAttribute('src')) {
             return;
         }
@@ -92,8 +94,8 @@ export default class extends Controller<HTMLElement> {
 
         this.say(false);
 
-        // Read into a data URL rather than handing over an object URL: the policy the site sends allows images from
-        // data: but not from blob:, and the browser would refuse to show the one thing the reader just picked.
+        // Read into a data URL rather than creating an object URL: the policy the site sends allows images from
+        // data: but not from blob:, and the browser would refuse to show the file the user just picked.
         const reader = new FileReader();
         reader.addEventListener('load', () => {
             void this.show(String(reader.result));
@@ -102,15 +104,15 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Framing an image the server is going to turn away for being too narrow reads as a promise that it was fine.
+     * Framing an image the server is going to reject for being too narrow would suggest that it is acceptable.
      */
     private async show(source: string): Promise<void> {
         const probe = new Image();
         probe.src = source;
         await probe.decode().catch(() => undefined);
 
-        // Nothing else changes on a refusal, so a frame that was already drawn keeps standing and the crop it holds is
-        // still the one that is saved.
+        // Nothing else changes on a refusal, so a frame that was already drawn stays and the crop it contains is still
+        // the one that is saved.
         if (probe.naturalWidth > 0 && this.tooSmall(probe)) {
             this.fileTarget.value = '';
             this.say(true);
@@ -147,19 +149,19 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Build the cropper once the image knows its own size, which is what every measurement here depends on.
+     * Build the cropper once the image's own size is known, which is what every measurement here depends on.
      */
     private async frame(restore: boolean): Promise<void> {
         const saved = restore ? this.stored() : null;
 
         await this.imageLoaded();
 
-        // The images sit on a step of the form that starts out closed, where nothing has a size to measure and every
+        // The images are on a step of the form that starts out closed, where nothing has a size to measure and every
         // box would come out empty. Framing waits for the step to be opened, which also means the library is only
-        // fetched once somebody goes looking for it.
+        // fetched once a user opens that step.
         await this.laidOut();
 
-        // Lazily imported: a page with nothing to frame should not pay for the library.
+        // Lazily imported: a page with nothing to frame should not download the library.
         const { default: Cropper } = await import('cropperjs');
 
         this.cropper = new Cropper(this.imageTarget, { template: this.template() });
@@ -296,7 +298,7 @@ export default class extends Controller<HTMLElement> {
         };
     }
 
-    /** Where the image sits within the canvas, which is what the frame is confined to and what the fractions are of. */
+    /** The image's box within the canvas, which is what the frame is confined to and what the fractions are of. */
     private imageBounds(): Rectangle | null {
         const image = this.cropper?.getCropperImage();
         const canvas = this.selection?.parentElement;
@@ -339,7 +341,7 @@ export default class extends Controller<HTMLElement> {
     /**
      * The narrowest the frame may be drawn, so that what is cut out is never narrower than what was demanded of the
      * upload. Measured against the original rather than against what is on screen: the frame is drawn on a rendition,
-     * and a rendition is capped at the very width being asked for, which would put the floor at the whole image.
+     * and a rendition is capped at the very width that is required, which would put the floor at the whole image.
      */
     private smallestWidth(bounds: Rectangle): number {
         const source = this.source();
@@ -355,7 +357,7 @@ export default class extends Controller<HTMLElement> {
 
     /**
      * How wide the original is. Falling back to the rendition on screen only keeps the frame usable if neither the
-     * picked file nor the server has said.
+     * picked file nor the server has given a width.
      */
     private source(): number {
         return this.picked
@@ -377,8 +379,8 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * Drawn from the same fractions that are written above, which is what the server cuts by, rather than from anything
-     * the frame knows: the two cannot drift apart that way.
+     * Drawn from the same fractions that are written above, which is what the server cuts by, rather than from the
+     * frame itself: the two cannot differ that way.
      */
     private paint(fractions: Rectangle): void {
         if (!this.hasPreviewTarget) {
@@ -426,9 +428,9 @@ export default class extends Controller<HTMLElement> {
     }
 
     /**
-     * The crop that is in force. It arrives beside the frame rather than in the boxes that are submitted: those are only
-     * ever written here, so a form saved without a frame having been drawn carries no rectangle at all, and the server
-     * leaves the crop alone rather than cutting an old one out of a new image.
+     * The crop that is in force. It arrives beside the frame rather than in the boxes that are submitted: those are
+     * only ever written here, so a form saved without a frame having been drawn contains no rectangle at all, and the
+     * server leaves the crop alone rather than cutting an old one out of a new image.
      */
     private stored(): Rectangle | null {
         const frame = {

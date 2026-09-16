@@ -34,8 +34,8 @@
                         {{ form_row(form.en_description) }}
                         {{ form_row(form.onForm) }}
                         {{ form_row(form.defaultSub) }}
-                        {# Mailman is on its way out: a list can still be shown and unbound, but a new binding is not
-                           offered. #}
+                        {# Mailman is being phased out: a list can still be shown and unbound, but a new binding
+                           is not offered. #}
                         {% if form.mailmanList.vars.value is not empty %}
                             {{ form_row(form.mailmanList) }}
                         {% else %}

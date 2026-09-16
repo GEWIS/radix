@@ -45,7 +45,7 @@ final class ActivityOverview extends AbstractDoctrinePaginatedOverview
     #[LiveProp(writable: true)]
     public bool $showAll = false;
 
-    // The approved table can hold thousands of rows, so it is collapsed by default. Driven as a live prop (not a
+    // The approved table can contain thousands of rows, so it is collapsed by default. Driven as a live prop (not a
     // client-side Bootstrap collapse) so the state survives the Ajax re-render that pagination triggers.
     #[LiveProp(writable: true)]
     public bool $expanded = false;

@@ -27,7 +27,7 @@ use function sprintf;
 use function usleep;
 
 /**
- * Walks in-process on purpose: queueing thousands of documents onto the `images` transport would starve the variant
+ * Runs in-process on purpose: queueing thousands of documents onto the `images` transport would starve the variant
  * generation the serving path waits on. Fresh uploads still go through the queue one at a time.
  */
 #[AsCommand(
@@ -111,7 +111,7 @@ final class FlattenDocumentsCommand extends Command
             ]
             : [DocumentFlattenStatus::Pending];
 
-        // Ids up front, re-found per turn: the identity map is cleared between documents, detaching anything held.
+        // Ids up front, re-found per turn: the identity map is cleared between documents, detaching everything in it.
         $documentIds = [];
         foreach (
             $this->documentRepository->findByFlattenStatus(

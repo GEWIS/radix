@@ -23,15 +23,15 @@ use function sprintf;
  * The paging every overview does the same way: a page number, a clamped page size, the totals the pagination partial
  * renders, and one query per set of inputs.
  *
- * Subclasses answer {@see self::fetchPage()} with the rows and the total for a page and keep their own filter props;
+ * Subclasses return the rows and the total for a page from {@see self::fetchPage()} and keep their own filter props;
  * everything else here is deliberately not theirs to write. Every overview that did write its own got the same two
- * things wrong, so the abstraction asks for as little as it can: not a `Paginator`, only what one would have said.
- * {@see AbstractDoctrinePaginatedOverview} is the flavour for the ones that do have a `Paginator` to hand.
+ * things wrong, so the abstraction requires as little as it can: not a `Paginator`, only the values one would have
+ * provided. {@see AbstractDoctrinePaginatedOverview} is the variant for the ones that already have a `Paginator`.
  *
  * An overview that shows more than one table names the others in {@see self::otherTables()} and reads them through
  * the same methods with the name as their argument. That is all a second table needs, because one written out by
  * hand repeated the same two mistakes: the administrative activity overview clamped in its own action, which ran the
- * query for the page being left and then rendered that page again in place of the one asked for.
+ * query for the page being left and then rendered that page again instead of the one requested.
  *
  * `#[AsLiveComponent]` and `#[IsGranted]` stay on the concrete component: the factory registers by attribute on the
  * class it finds, and each overview is gated differently.
@@ -48,7 +48,7 @@ abstract class AbstractPaginatedOverview
     use DefaultActionTrait;
     use PageSizeTrait;
 
-    /** The table an overview is of, which is the one {@see self::fetchPage()} answers for. */
+    /** The table an overview is of, which is the one {@see self::fetchPage()} fetches. */
     protected const string MAIN = '';
 
     #[LiveProp(
@@ -76,8 +76,7 @@ abstract class AbstractPaginatedOverview
     private array $results = [];
 
     /**
-     * What each of {@see self::$results} was fetched for, so a cached page cannot outlive the inputs that asked for
-     * it.
+     * What each of {@see self::$results} was fetched for, so a cached page is not reused after the inputs change.
      *
      * @var array<string, array{int, int, list<mixed>}>
      */
@@ -94,8 +93,8 @@ abstract class AbstractPaginatedOverview
     ): ResultPage;
 
     /**
-     * The tables besides the one {@see self::fetchPage()} answers for, as a query per name. An overview with one
-     * table, which is almost all of them, does not override this.
+     * The tables besides the one {@see self::fetchPage()} fetches, as a query per name. An overview with one table,
+     * which is almost all of them, does not override this.
      *
      * @return array<string, Closure(int, int): ResultPage<T>>
      */
@@ -105,7 +104,7 @@ abstract class AbstractPaginatedOverview
     }
 
     /**
-     * Anything besides the page and its size that decides what a page holds, so filters belong here. Leaving them
+     * Anything besides the page and its size that decides what a page contains, so filters belong here. Leaving them
      * out is only safe while nothing reads a page before the filter has finished being applied, which is an ordering
      * an overview should not have to know it depends on.
      *
@@ -153,7 +152,7 @@ abstract class AbstractPaginatedOverview
         #[LiveArg]
         string $table = self::MAIN,
     ): void {
-        // Only the lower bound belongs here. Working out the last page runs the query, and running it while the page
+        // Only the lower bound belongs here. Computing the last page runs the query, and running it while the page
         // being left behind is still the current one is how an overview ends up serving the page it just left;
         // {@see self::result()} clamps to the last page for every way a page number arrives, this action included.
         $this->setPageNumber(
@@ -188,7 +187,7 @@ abstract class AbstractPaginatedOverview
 
         // A page number arrives from the URL as well as from `gotoPage()`, so a hand-written `?page=999` would
         // otherwise render an empty table with no control to get back out of it. Counting does not depend on the
-        // offset, so the last page is known from the page just fetched, and asking again costs a second query only
+        // offset, so the last page is known from the page just fetched, and fetching again costs a second query only
         // when the number really was past the end.
         $lastPage = $this->lastPage($result->total);
         if ($page > $lastPage) {

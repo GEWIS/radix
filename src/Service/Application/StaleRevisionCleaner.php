@@ -30,14 +30,14 @@ use function sprintf;
  * removing a revision. Nothing here knows what an activity, a vacancy or a poll is.
  *
  * A forced run overrules the objections a domain marked {@see StaleRevisionDeletionBlock::forceable()} and leaves the
- * rest standing, which is why an objection carries that answer rather than the caller deciding per domain. Nothing
- * else about the run changes: a forced run still only reaches heads that are stale, unapproved and never approved,
- * so `--force` widens what may go and never how far back the cleanup looks.
+ * rest standing, which is why an objection states whether it may be overruled rather than the caller deciding per
+ * domain. Nothing else about the run changes: a forced run still only reaches heads that are stale, unapproved and
+ * never approved, so `--force` widens what may go and never how far back the cleanup looks.
  *
- * Files are reclaimed last, after the rows that named them are committed, because {@see FileStorage::remove()} asks
- * every domain whether the path is still referenced and must be answered from committed state. A crash between the
- * two leaves a file nothing points at, which costs disk and nothing else; the opposite order would take the bytes
- * out from under a revision that survived.
+ * Files are reclaimed last, after the rows that named them are committed, because {@see FileStorage::remove()} checks
+ * with every domain whether the path is still referenced, which must be determined from committed state. A crash
+ * between the two leaves a file nothing points at, which costs disk and nothing else; the opposite order would delete
+ * the bytes a revision that survived still references.
  */
 final readonly class StaleRevisionCleaner
 {
@@ -209,9 +209,8 @@ final readonly class StaleRevisionCleaner
     {
         // Atomic per aggregate: the FK-nulling and the row removals are two separate flushes (the nulls must reach
         // the database first so the deletes are unambiguous), so wrap both in a single transaction. Otherwise a crash
-        // between the flushes would commit the half-deleted state — an aggregate pointing at no revision while its
-        // revisions still exist, which every "what do I display" accessor then fails on — until the next run repairs
-        // it.
+        // between the flushes would commit the half-deleted state (an aggregate pointing at no revision while its
+        // revisions still exist, which every "what do I display" accessor then fails on) until the next run repairs it.
         $this->entityManager->wrapInTransaction(function () use ($revisable): void {
             // The edit lock (if any) has no foreign key to the aggregate, so drop it explicitly before it goes.
             $this->editLockService->purge($revisable);
@@ -234,7 +233,7 @@ final readonly class StaleRevisionCleaner
     }
 
     /**
-     * Hand every path the removed rows named back to storage, which unlinks the ones no domain claims any more.
+     * Pass every path the removed rows named back to storage, which unlinks the ones no domain claims any more.
      *
      * @param list<string> $paths
      */

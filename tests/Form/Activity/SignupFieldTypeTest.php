@@ -18,7 +18,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
 /**
- * A number question is answered within bounds, so both are asked for and only for that type; the editor draws the
+ * A number question is answered within bounds, so both are asked for and only for that type; the editor shows the
  * same rule by revealing the pair for the number type alone. These pin it on the server, where a submission that
  * skipped the editor also lands.
  */

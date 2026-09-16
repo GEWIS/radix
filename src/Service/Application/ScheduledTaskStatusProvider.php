@@ -23,9 +23,9 @@ use function usort;
  * without being registered here. A task is late when the run its own trigger places after the last one recorded is
  * further in the past than the grace period below.
  *
- * A schedule that stops dispatching produces the same empty queues as a schedule with nothing due, which is why
- * this is needed at all. {@see IpDatabaseStatusProvider} answers the same question for one task from the file that
- * command writes; this answers it for every task from the schedule, and neither depends on the other.
+ * A schedule that stops dispatching produces the same empty queues as a schedule with nothing due, which is why this
+ * is needed at all. {@see IpDatabaseStatusProvider} performs the same check for one task from the file that command
+ * writes; this performs it for every task from the schedule, and neither depends on the other.
  */
 final readonly class ScheduledTaskStatusProvider
 {

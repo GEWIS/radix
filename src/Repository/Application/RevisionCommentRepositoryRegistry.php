@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use function sprintf;
 
 /**
- * Hands out the review thread of a revision, whichever domain it belongs to. Mirrors
+ * Returns the review thread of a revision, whichever domain it belongs to. Mirrors
  * {@see \App\Workflow\RevisionClonerRegistry}: a new revisable domain registers a repository and needs no change here.
  */
 final readonly class RevisionCommentRepositoryRegistry

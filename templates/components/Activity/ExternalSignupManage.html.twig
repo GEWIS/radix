@@ -16,7 +16,8 @@
         }) }}
             {{ form_errors(form) }}
             {{ form_row(form.fullName) }}
-            {# Email is disabled in manage mode: it is the verified identity, and changing it would bypass verification. #}
+            {# Email is disabled in manage mode: it is the verified identity, and changing it
+               would bypass verification. #}
             {{ form_row(form.email) }}
             {% include 'partials/activity/signup-fields.html.twig' with { form: form } only %}
 

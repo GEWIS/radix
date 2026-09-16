@@ -31,7 +31,7 @@ use function strcmp;
 use function usort;
 
 /**
- * Reads what the messenger transports currently hold, for the administration's queue page. Read-only: it counts and
+ * Reads what the messenger transports currently contain, for the administration's queue page. Read-only: it counts and
  * lists, and never acknowledges, retries or removes anything.
  *
  * This is the same information `messenger:stats` and `messenger:failed:show` print, which on this deployment means
@@ -41,9 +41,9 @@ use function usort;
 final readonly class TransportStatusProvider
 {
     /**
-     * How many failed messages are read before paging over them. The transport decodes every envelope it hands out
-     * and cannot be asked for an offset, so the whole page set is read on every view; the cap is what keeps an
-     * administrator opening this page from deserialising an unbounded backlog.
+     * How many failed messages are read before paging over them. The transport decodes every envelope it returns and
+     * does not accept an offset, so the whole page set is read on every view; the cap is what keeps an administrator
+     * opening this page from deserialising an unbounded backlog.
      */
     private const int MAX_INSPECTED = 500;
 
@@ -74,7 +74,7 @@ final readonly class TransportStatusProvider
                     $waiting = $transport->getMessageCount();
                 } catch (Throwable $throwable) {
                     // A broker that is down must not take the page down with it: the row then reads "unknown",
-                    // which is the honest answer and is itself the thing worth seeing.
+                    // which is accurate and is itself the thing worth seeing.
                     $this->logger->warning(
                         'Could not count transport "{transport}": {message}',
                         [
@@ -112,9 +112,9 @@ final readonly class TransportStatusProvider
     }
 
     /**
-     * Everything readable off the failure transport, newest first, capped at {@see MAX_INSPECTED}.
+     * Everything readable from the failure transport, newest first, capped at {@see MAX_INSPECTED}.
      *
-     * The transport answers `all()` in no defined order and takes no offset, so the cap takes an arbitrary
+     * The transport's `all()` returns messages in no defined order and takes no offset, so the cap takes an arbitrary
      * {@see MAX_INSPECTED} rather than the most recent ones; what is read is then sorted, which is the order worth
      * reading a failure list in. Whatever pages over this slices it, so the sort has to happen before that or the
      * pages would reshuffle under the reader.
@@ -150,8 +150,8 @@ final readonly class TransportStatusProvider
                     $rows[] = $this->row($envelope);
                 }
             } catch (Throwable $throwable) {
-                // `all()` decodes as it walks, so one message whose class no longer exists ends the walk. Show what
-                // was read rather than nothing, and leave the reason in the log.
+                // `all()` decodes as it iterates, so one message whose class no longer exists ends the iteration.
+                // Show what was read rather than nothing, and leave the reason in the log.
                 $this->logger->warning(
                     'Could not read the whole failure transport: {message}',
                     ['message' => $throwable->getMessage()],
@@ -223,7 +223,7 @@ final readonly class TransportStatusProvider
     }
 
     /**
-     * The bare transport names. The locator holds every transport twice, under its service id and under its
+     * The bare transport names. The locator contains every transport twice, under its service id and under its
      * configured name, both pointing at the same instance; the configured name is registered second, so keeping the
      * last name seen for each instance leaves the readable one (which is what `messenger:stats` shows too).
      *

@@ -21,7 +21,7 @@ use function sys_get_temp_dir;
 use function tempnam;
 use function unlink;
 
-/** The seed only holds Ready documents, so the walk sees exactly what each test creates. */
+/** The seed only contains Ready documents, so the command only processes what each test creates. */
 final class FlattenDocumentsCommandTest extends DatabaseTestCase
 {
     public function testFlattensPendingDocumentsAndMarksAnUnreadableOneFailed(): void

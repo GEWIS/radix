@@ -29,7 +29,7 @@ class PollRevisionRepository extends ServiceEntityRepository
 
     /**
      * The questions waiting on the board, oldest first. A queue row names the poll by its question and says what is
-     * live while it waits, so both come along with it.
+     * live while it waits, so both are loaded with it.
      *
      * @return PollRevision[]
      */
@@ -68,7 +68,7 @@ class PollRevisionRepository extends ServiceEntityRepository
 
     /**
      * The questions this member decided on, for their data export. Reviewing is something the member did, so it is
-     * theirs to be told about regardless of what the decision was.
+     * included in their export regardless of what the decision was.
      *
      * @return PollRevision[]
      */

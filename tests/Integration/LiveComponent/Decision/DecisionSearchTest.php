@@ -16,8 +16,8 @@ use function array_map;
 final class DecisionSearchTest extends DatabaseTestCase
 {
     /**
-     * A prompt naming a meeting is asking for that meeting. It used to be answered with the decisions elsewhere that
-     * mention it and nothing else, which is no answer at all when the meeting took no decisions of its own.
+     * A prompt naming a meeting is a request for that meeting. It used to return the decisions elsewhere that mention
+     * it and nothing else, which is no result at all when the meeting took no decisions of its own.
      */
     public function testTheMeetingAskedForIsShownEvenWhenNothingInItMatches(): void
     {
@@ -53,7 +53,7 @@ final class DecisionSearchTest extends DatabaseTestCase
     }
 
     /**
-     * Without a type there is no telling which meeting is meant, so every meeting carrying that number is shown.
+     * Without a type there is no telling which meeting is meant, so every meeting with that number is shown.
      */
     public function testANumberWithoutATypeNamesEveryMeetingWithIt(): void
     {
@@ -73,7 +73,7 @@ final class DecisionSearchTest extends DatabaseTestCase
     }
 
     /**
-     * The meeting asked for leads the answer; the decisions that only mention it follow.
+     * The meeting asked for leads the results; the decisions that only mention it follow.
      */
     public function testTheMeetingAskedForLeadsTheResults(): void
     {

@@ -9,7 +9,7 @@ import NotificationsController from './controllers/application/notifications_con
 const app = startStimulusApp();
 
 // Registered with flat identifiers so the templates keep using `data-controller="localised-fields"` etc. despite the
-// subdirectories -- the path-based autoload would otherwise namespace them (e.g. `application--localised-fields`). The
+// subdirectories: the path-based autoload would otherwise namespace them (e.g. `application--localised-fields`). The
 // framework-scaffolded csrf_protection controller stays at the controllers/ root and autoloads as `csrf-protection`.
 //
 // The rest are imported dynamically: the asset mapper preloads whatever an entrypoint imports statically, so a static

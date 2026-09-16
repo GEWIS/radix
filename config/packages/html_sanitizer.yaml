@@ -10,7 +10,7 @@ framework:
         sanitizers:
             app.page_sanitizer:
                 # A page can be long. The default of 20000 characters silently truncates one that is, which would lose
-                # the end of somebody's work without saying so.
+                # the end of the author's work without reporting it.
                 max_input_length: 500000
                 allow_elements:
                     # Structure and text.

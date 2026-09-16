@@ -92,7 +92,6 @@ class AnnulledSubDecisionFilter
      */
     private function isValid(Annulment $d): bool
     {
-        // Get the decision
         $decision = $d->decision;
 
         $annulment = $decision->annulledBy;

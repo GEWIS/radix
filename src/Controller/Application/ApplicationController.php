@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The pages that belong to the application itself rather than to any of its domains: the reference list of the
- * functions someone can be installed in.
+ * functions a member can be installed in.
  */
 final class ApplicationController extends AbstractController
 {

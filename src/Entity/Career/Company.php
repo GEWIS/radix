@@ -40,8 +40,8 @@ use function count;
 /**
  * Company aggregate root.
  *
- * The stable identity, the name, slug, primary contact, packages and publication flag live here and survive
- * across edits. The revisable, reviewable content (localised texts, logo and contact details) lives on the chain of
+ * The stable identity, the name, slug, primary contact, packages and publication flag are on this entity and survive
+ * across edits. The revisable, reviewable content (localised texts, logo and contact details) is on the chain of
  * {@see CompanyRevision}s. The publicly live version is {@see self::getLiveRevision()} (the latest approved revision);
  * the working head is {@see self::getCurrentRevision()}.
  */
@@ -73,8 +73,9 @@ class Company implements RevisableInterface
     public string $slugName;
 
     /**
-     * The representative the board writes to when it needs one answer from the company. Null when nobody has been
-     * appointed yet, or when whoever held it was removed; the admin interface then asks for a new one.
+     * The representative the board writes to when it needs a single point of contact at the company. Null when no
+     * representative has been appointed yet, or when the previous one was removed; the admin interface then prompts
+     * for a new one.
      */
     #[ManyToOne(targetEntity: CompanyUserModel::class)]
     #[JoinColumn(
@@ -433,8 +434,8 @@ class Company implements RevisableInterface
     }
 
     /**
-     * The company's running package of one kind, or null when it holds none. A company is not stopped from buying the
-     * same kind twice, so this answers with the first one that is running.
+     * The company's running package of one kind, or null when it has none. A company is not stopped from buying the
+     * same kind twice, so this returns the first one that is running.
      *
      * @template T of CompanyPackage
      *
@@ -467,8 +468,8 @@ class Company implements RevisableInterface
     }
 
     /**
-     * The company's running featured package, which carries the article written about it, or null when it is not being
-     * featured right now.
+     * The company's running featured package, which contains the article written about it, or null when it is not
+     * being featured right now.
      */
     public function getFeaturedPackage(): ?CompanyFeaturedPackage
     {

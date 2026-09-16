@@ -246,7 +246,7 @@ final class PersistentSignatureRememberMeHandlerTest extends DatabaseTestCase
         return RememberMeDetails::fromRawCookie($issued);
     }
 
-    /** The identity map has to go, or the next call reads the row as it was rather than as it is. */
+    /** The identity map has to be cleared, or the next call reads the row as it was rather than as it is. */
     private function nextRequest(): void
     {
         $this->clearIssuedCookie();

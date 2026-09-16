@@ -5,20 +5,20 @@ framework:
 
         transports:
             # Kept on the website database rather than on the ledger: a message that could not be handled is the
-            # application's own bookkeeping, and the ledger only holds what the association decided and who it is
-            # made up of.
+            # application's own bookkeeping, and the ledger only contains what the association decided and who it
+            # is made up of.
             #
             # `auto_setup` is off because the table is owned by the website migrations, and because leaving it on
-            # breaks building the schemas from the mapping metadata: this transport hangs off `web` while the default
-            # manager is the ledger, so `doctrine:schema:create --em=default` asks the transport whether the two
-            # connections are the same database by running a statement through it. That statement hits a table that
+            # breaks building the schemas from the mapping metadata: this transport is on `web` while the default
+            # manager is the ledger, so `doctrine:schema:create --em=default` checks through the transport whether the
+            # two connections are the same database by running a statement on it. That statement queries a table that
             # only exists on the ledger, the resulting `TableNotFoundException` is taken for a missing transport
-            # table, and the transport helpfully creates `messenger_messages` on the website database — which the
-            # subsequent `--em=web` then trips over.
+            # table, and the transport creates `messenger_messages` on the website database, which the subsequent
+            # `--em=web` then fails on.
             failed: 'doctrine://web?queue_name=failed&auto_setup=false'
-            # Where a failure goes when `failed` cannot be written to, which is whenever the website database is
-            # itself what failed. Nothing consumes it; `app:messenger:recover-failures` moves what is held here into
-            # `failed` once that answers again.
+            # Where a failure goes when `failed` cannot be written to, which is whenever the website database is itself
+            # what failed. Nothing consumes it; `app:messenger:recover-failures` moves what is stored here into `failed`
+            # once that is available again.
             failed_fallback:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -140,13 +140,13 @@ framework:
             'App\Message\Career\CareerReviewDecisionEmail': normal_priority
             # The register's transactional mail: the registration confirmation, the approval, and everything Stripe
             # reports back about a membership fee. Raised from the Stripe webhook and from the secretary's approval
-            # request, where a blocking SMTP round-trip buys the sender nothing and costs a webhook redelivery (which
-            # Stripe answers with a repeat of the same event) or a page that hangs on the MTA.
+            # request, where a blocking SMTP round-trip buys the sender nothing and costs a webhook redelivery (for
+            # which Stripe repeats the same event) or a page that hangs on the MTA.
             'App\Message\Database\RegistrationUpdateEmail': high_priority
             'App\Message\Database\RefundProblemEmail': high_priority
             'App\Message\User\ExportUserDataMessage': bulk
             'App\Message\User\RevokeSessionsRealtimeMessage': high_priority
-            # A security notice is worth little late, and it must not hold up whatever raised it.
+            # A security notice is worth little late, and it must not delay whatever raised it.
             'App\Message\User\SecurityNotificationMessage': high_priority
 
 when@test:

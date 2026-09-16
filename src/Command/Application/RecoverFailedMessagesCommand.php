@@ -21,7 +21,7 @@ use Throwable;
 use function sprintf;
 
 /**
- * Moves what {@see \App\EventListener\Messenger\TolerantFailureTransportListener} held on `failed_fallback` into
+ * Moves what {@see \App\EventListener\Messenger\TolerantFailureTransportListener} stored on `failed_fallback` into
  * `failed`, so a failure that happened while the website database was down still ends up where the administration's
  * queue page reads it.
  *
@@ -40,7 +40,7 @@ final class RecoverFailedMessagesCommand extends Command
 {
     use HoldsRunLockTrait;
 
-    /** Bounds one run, so a backlog is drained over several rather than holding the maintenance worker. */
+    /** Bounds one run, so a backlog is drained over several rather than occupying the maintenance worker. */
     private const int PER_RUN = 1000;
 
     public function __construct(
@@ -84,7 +84,7 @@ final class RecoverFailedMessagesCommand extends Command
                 $received = true;
 
                 try {
-                    // The fallback's own id would otherwise travel with the envelope into a store that assigns one.
+                    // The fallback's own id would otherwise be passed with the envelope into a store that assigns one.
                     $this->failed->send($envelope->withoutAll(TransportMessageIdStamp::class));
                 } catch (Throwable $e) {
                     $io->warning(sprintf(

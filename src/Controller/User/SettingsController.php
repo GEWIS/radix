@@ -246,9 +246,9 @@ class SettingsController extends AbstractController
     }
 
     /**
-     * The topics a member is always told about, listed so they can see what those are even though there is nothing to
-     * decide about them. Grouped, because several kinds under one topic are one thing to whoever reads them, and what
-     * goes to a role is left out: it is not about them.
+     * The topics a member is always notified about, listed so they can see what those are even though there is nothing
+     * to decide about them. Grouped, because several kinds under one topic are one thing to the member reading them,
+     * and what goes to a role is left out: it is not about them.
      *
      * @return list<NotificationCategory>
      */
@@ -406,8 +406,8 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        // Everything the association records about somebody, in one file: worth a line of its own, and the one
-        // thing in this table a member would want to see if it happened without them.
+        // Everything the association records about a member, in one file: worth a line of its own, and the one thing in
+        // this table they would want to see if it happened without them.
         $this->securityEvents->record(
             SecurityEventType::DataExportDownloaded,
             $user->getUserIdentifier(),

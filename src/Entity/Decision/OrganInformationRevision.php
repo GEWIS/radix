@@ -27,7 +27,7 @@ use Override;
  * and its card are shown by, and where else it can be followed. The stable {@see OrganInformation} keeps only the
  * identity and which revision is which, so a change to any of this goes past the board before the website shows it.
  *
- * Each image is kept twice over: the original that was uploaded, so the crop can be adjusted again without asking for
+ * Each image is kept twice over: the original that was uploaded, so the crop can be adjusted again without uploading
  * the file a second time, and the cropped result that is actually served. The crop itself is stored as fractions of the
  * original, which means it survives the original being served at any size.
  */
@@ -195,7 +195,7 @@ class OrganInformationRevision extends AbstractRevision
     }
 
     /**
-     * The body this revision describes, which the aggregate holds because it never changes.
+     * The body this revision describes, which the aggregate stores because it never changes.
      */
     public function getOrgan(): Organ
     {
