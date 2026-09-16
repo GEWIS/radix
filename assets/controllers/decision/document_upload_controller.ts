@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { confirmSudoIfRequired } from '../../js/sudo.ts';
 
 /**
  * On success a bubbling `decision-upload:success` event lets the surrounding live component re-render.
@@ -97,6 +98,10 @@ export default class extends Controller<HTMLElement> {
             body,
             headers: { Accept: 'application/json' },
         });
+
+        if (await confirmSudoIfRequired(response)) {
+            return;
+        }
 
         if (!response.ok) {
             const payload = (await response.json().catch(() => null)) as { error?: string } | null;

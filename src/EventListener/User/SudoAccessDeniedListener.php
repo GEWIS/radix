@@ -9,7 +9,10 @@ use App\Security\User\SudoVoter;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -25,6 +28,10 @@ use function in_array;
  * an `IS_AUTHENTICATED_REMEMBERED` user to the login form. For sudo, a remember-me session must be allowed to step up
  * by re-typing the password instead. `stopPropagation()` ensures the built-in listener does not run for sudo denials;
  * other denials fall through unchanged.
+ *
+ * A request issued by script is answered differently, because `fetch` follows a redirect transparently and returns
+ * the confirmation page to a caller expecting a result. That is why an upload reported success for a file that was
+ * never stored.
  */
 #[AsEventListener(
     event: ExceptionEvent::class,
@@ -67,19 +74,39 @@ final class SudoAccessDeniedListener
             return;
         }
 
-        // Only carry the original URL forward for safe (idempotent) methods. A POST/DELETE cannot be replayed via a
-        // 302, so for those we send the user to the bare confirm page; they will retry the action after sudo.
-        $params = $request->isMethodSafe()
-            ? ['next' => $request->getRequestUri()]
-            : [];
+        // A status the caller can test, rather than a page it cannot distinguish from a result.
+        if ($this->isBackgroundRequest($request)) {
+            $event->setResponse(new JsonResponse(
+                [
+                    'error' => 'sudo_required',
+                    'confirmUrl' => $this->urlGenerator->generate($confirmRoute),
+                ],
+                Response::HTTP_UNAUTHORIZED,
+            ));
+            $event->stopPropagation();
 
+            return;
+        }
+
+        // The path is included for every method. A redirect cannot resubmit a form, so the submitted values are
+        // still lost, but the user returns to the page instead of to the front page.
         $event->setResponse(new RedirectResponse(
             $this->urlGenerator->generate(
                 $confirmRoute,
-                $params,
+                ['next' => $request->getRequestUri()],
             ),
         ));
         $event->stopPropagation();
+    }
+
+    /**
+     * Whether the request was issued by script rather than by a navigation. Live components and the hand-written
+     * fetch controllers both set a header.
+     */
+    private function isBackgroundRequest(Request $request): bool
+    {
+        return $request->isXmlHttpRequest()
+            || $request->headers->has('X-Live-Url');
     }
 
     private function findAccessDenied(?Throwable $throwable): ?AccessDeniedException

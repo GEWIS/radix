@@ -142,6 +142,15 @@ export default class extends Controller<HTMLElement> {
 
         request.addEventListener('load', () => {
             this.requests.delete(request);
+
+            // A window that ran out mid-batch is not a rejected file: every remaining row would report a failure it
+            // cannot explain, so the browser is sent to confirm instead.
+            if (401 === request.status) {
+                window.location.assign(this._confirmUrl(request) ?? window.location.href);
+
+                return;
+            }
+
             this._settle(row, request.status >= 200 && request.status < 300, this._reason(request));
         });
 
@@ -158,6 +167,17 @@ export default class extends Controller<HTMLElement> {
     }
 
     // The error the server reported, so a rejected file shows why rather than only that it failed.
+    /** Where to confirm, from the 401 returned for a sudo window that has run out. */
+    private _confirmUrl(request: XMLHttpRequest): string | null {
+        try {
+            const payload = JSON.parse(request.responseText) as { confirmUrl?: string };
+
+            return payload.confirmUrl ?? null;
+        } catch {
+            return null;
+        }
+    }
+
     private _reason(request: XMLHttpRequest): string | null {
         try {
             const data: unknown = JSON.parse(request.responseText);
