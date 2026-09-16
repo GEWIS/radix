@@ -49,6 +49,18 @@ trait HandlesFormFlowTrait
     }
 
     /**
+     * Whether the request submitted a step, which is followed by a redirect rather than a page: refreshing a page
+     * reached by a POST sends that POST again, and a submission the flow cannot place is applied to whichever step it
+     * has since moved to, clearing every field of a step no user filled in.
+     */
+    private function stepWasHandedIn(FormFlowInterface $flow): bool
+    {
+        return $flow->isSubmitted()
+            && $flow->isValid()
+            && !$flow->isFinished();
+    }
+
+    /**
      * `createForm()` returns the base interface as far as static analysis is concerned, and every caller here needs
      * the flow's own methods.
      *

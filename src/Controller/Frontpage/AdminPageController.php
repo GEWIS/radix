@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Frontpage;
 
-use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ImageVariant;
@@ -79,7 +78,6 @@ class AdminPageController extends AbstractController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function create(Request $request): Response
     {
         $page = new Page();
@@ -122,6 +120,18 @@ class AdminPageController extends AbstractController
             return $this->redirectToRoute('admin/frontpage/pages/index');
         }
 
+        // Reading the step form is what acts on the clicked button and so moves the flow on, which has to happen
+        // before it is asked whether the step was handed in. Not on the finished path: the handler of the finish
+        // button clears the flow, and what was entered is still read there.
+        $form = $flow->getStepForm();
+
+        if ($this->stepWasHandedIn($flow)) {
+            return $this->redirectToRoute(
+                'admin/frontpage/pages/create',
+                [self::FLOW_RUN => $run],
+            );
+        }
+
         $this->flashRejectedStep(
             $flow,
             $this->translator,
@@ -130,7 +140,7 @@ class AdminPageController extends AbstractController
         return $this->render(
             'frontpage/admin/pages/create.html.twig',
             [
-                'form' => $flow->getStepForm(),
+                'form' => $form,
                 'imageTopic' => $this->imageTopic(
                     null,
                     $run,
@@ -148,7 +158,6 @@ class AdminPageController extends AbstractController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Page $page,
@@ -188,6 +197,21 @@ class AdminPageController extends AbstractController
             return $this->redirectToRoute('admin/frontpage/pages/index');
         }
 
+        // Reading the step form is what acts on the clicked button and so moves the flow on, which has to happen
+        // before it is asked whether the step was handed in. Not on the finished path: the handler of the finish
+        // button clears the flow, and what was entered is still read there.
+        $form = $flow->getStepForm();
+
+        if ($this->stepWasHandedIn($flow)) {
+            return $this->redirectToRoute(
+                'admin/frontpage/pages/edit',
+                [
+                    'page' => $page->id,
+                    self::FLOW_RUN => $run,
+                ],
+            );
+        }
+
         $this->flashRejectedStep(
             $flow,
             $this->translator,
@@ -196,7 +220,7 @@ class AdminPageController extends AbstractController
         return $this->render(
             'frontpage/admin/pages/edit.html.twig',
             [
-                'form' => $flow->getStepForm(),
+                'form' => $form,
                 'customPage' => $page,
                 'imageTopic' => $this->imageTopic(
                     $page,

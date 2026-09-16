@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
-use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\Enums\UserRoles;
@@ -71,7 +70,6 @@ class AdminExternalAppController extends AbstractController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function create(Request $request): Response
     {
         $run = $this->flowRun($request);
@@ -104,6 +102,18 @@ class AdminExternalAppController extends AbstractController
             return $this->redirectToRoute('admin/users/apps/index');
         }
 
+        // Reading the step form is what acts on the clicked button and so moves the flow on, which has to happen
+        // before it is asked whether the step was handed in. Not on the finished path: the handler of the finish
+        // button clears the flow, and what was entered is still read there.
+        $form = $flow->getStepForm();
+
+        if ($this->stepWasHandedIn($flow)) {
+            return $this->redirectToRoute(
+                'admin/users/apps/create',
+                [self::FLOW_RUN => $run],
+            );
+        }
+
         $this->flashRejectedStep(
             $flow,
             $this->translator,
@@ -112,7 +122,7 @@ class AdminExternalAppController extends AbstractController
         return $this->render(
             'user/admin/external-app/form.html.twig',
             [
-                'form' => $flow->getStepForm(),
+                'form' => $form,
                 'externalApp' => null,
             ],
         );
@@ -127,7 +137,6 @@ class AdminExternalAppController extends AbstractController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function edit(
         Request $request,
         ExternalApp $externalApp,
@@ -161,6 +170,21 @@ class AdminExternalAppController extends AbstractController
             return $this->redirectToRoute('admin/users/apps/index');
         }
 
+        // Reading the step form is what acts on the clicked button and so moves the flow on, which has to happen
+        // before it is asked whether the step was handed in. Not on the finished path: the handler of the finish
+        // button clears the flow, and what was entered is still read there.
+        $form = $flow->getStepForm();
+
+        if ($this->stepWasHandedIn($flow)) {
+            return $this->redirectToRoute(
+                'admin/users/apps/edit',
+                [
+                    'externalApp' => $externalApp->id,
+                    self::FLOW_RUN => $run,
+                ],
+            );
+        }
+
         $this->flashRejectedStep(
             $flow,
             $this->translator,
@@ -169,7 +193,7 @@ class AdminExternalAppController extends AbstractController
         return $this->render(
             'user/admin/external-app/form.html.twig',
             [
-                'form' => $flow->getStepForm(),
+                'form' => $form,
                 'externalApp' => $externalApp,
             ],
         );

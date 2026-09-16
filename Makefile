@@ -109,9 +109,15 @@ test: ## Start tests with phpunit, pass the parameter "c=" to add options to php
 	@$(eval c ?=)
 	@$(DOCKER_COMP) exec -T -e APP_ENV=test app bin/phpunit $(c)
 
-test-browser: ## Run the browser tests, which drive Chromium against a server of their own (excluded from `make test`)
+# The server the browser drives uses a connection of its own, outside the transaction every other test is rolled
+# back with, so signing in leaves security events behind that the rest of the suite counts. The seed is put back when
+# the run ends, passed or failed, because otherwise `make test` fails afterwards on rows it cannot account for.
+test-browser: ## Run the browser tests, which drive Chromium against a server of their own (excluded from `make test`, reseeds afterwards)
 	@$(eval c ?=)
-	@$(DOCKER_COMP) exec -T -e APP_ENV=test -e XDG_CONFIG_HOME=/tmp/radix-browser/config -e XDG_DATA_HOME=/tmp/radix-browser/data app bin/phpunit --testsuite "Browser Test Suite" $(c)
+	@$(DOCKER_COMP) exec -T -e APP_ENV=test -e XDG_CONFIG_HOME=/tmp/radix-browser/config -e XDG_DATA_HOME=/tmp/radix-browser/data app bin/phpunit --testsuite "Browser Test Suite" $(c); \
+		status=$$?; \
+		$(MAKE) --no-print-directory test-prepare; \
+		exit $$status
 
 test-coverage: ## Run the tests and write an HTML coverage report to ./coverage
 	@$(DOCKER_COMP) exec -T -e APP_ENV=test -e XDEBUG_MODE=coverage app bin/phpunit --coverage-html ./coverage

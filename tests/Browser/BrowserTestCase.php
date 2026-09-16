@@ -31,7 +31,8 @@ use function sprintf;
  * `dama/doctrine-test-bundle` wraps each test in a transaction on this process's connection. The server has its own,
  * so it cannot see anything written here, and nothing it writes is rolled back. Read the seeded fixtures rather than
  * building data, exactly as {@see \App\Tests\Integration\DatabaseTestCase} asks, and treat anything a test does write
- * as permanent: `make test-prepare` is what puts the seed back.
+ * as permanent. Signing in alone records security events that the rest of the suite counts, so `make test-browser`
+ * loads the seed again when it finishes, passed or failed.
  *
  * The browser signs in through the real form, because {@see \App\Tests\Support\SignsInThroughTheKernel} authenticates
  * through container services in this process and none of that reaches the server.

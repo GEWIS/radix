@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Decision;
 
-use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\AbstractRevisionController;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
@@ -155,7 +154,6 @@ class AdminBodyController extends AbstractRevisionController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Organ $organ,
@@ -215,6 +213,21 @@ class AdminBodyController extends AbstractRevisionController
         $flow->handleRequest($request);
 
         if (!$flow->isFinished()) {
+            // Reading the step form is what acts on the clicked button and so moves the flow on, which has to
+            // happen before it is asked whether the step was handed in. Not on the finished path: the handler of
+            // the finish button clears the flow, and what was entered is still read there.
+            $form = $flow->getStepForm();
+
+            if ($this->stepWasHandedIn($flow)) {
+                return $this->redirectToRoute(
+                    'admin/bodies/edit',
+                    [
+                        'organ' => $organ->id,
+                        self::FLOW_RUN => $run,
+                    ],
+                );
+            }
+
             $this->flashRejectedStep(
                 $flow,
                 $this->translator,
@@ -223,7 +236,7 @@ class AdminBodyController extends AbstractRevisionController
             return $this->render(
                 'decision/admin/bodies/edit.html.twig',
                 [
-                    'form' => $flow->getStepForm(),
+                    'form' => $form,
                     'organ' => $organ,
                     'information' => $page,
                     'revision' => $draft,

@@ -182,6 +182,8 @@ jobs:
                 # Nothing has to be installed or started for them: the runner image ships Chrome and ChromeDriver, and
                 # Panther starts a web server of its own.
                 #
-                # They come last because that server answers on a connection of its own, outside the transaction every
-                # other test is rolled back with, so whatever they write stays written for the rest of the job.
+                # They come last because that server uses a connection of its own, outside the transaction every
+                # other test is rolled back with, so whatever they write stays written for the rest of the job. Nothing
+                # runs after them here, so the seed is left as they leave it; `make test-browser` loads it again
+                # locally, where the next run is not a fresh database.
                 run: bin/phpunit --testsuite "Browser Test Suite"

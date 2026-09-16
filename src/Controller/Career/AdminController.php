@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
-use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
@@ -87,7 +86,6 @@ class AdminController extends AbstractController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function create(
         Request $request,
         #[CurrentUser]
@@ -119,6 +117,18 @@ class AdminController extends AbstractController
         $flow->handleRequest($request);
 
         if (!$flow->isFinished()) {
+            // Reading the step form is what acts on the clicked button and so moves the flow on, which has to
+            // happen before it is asked whether the step was handed in. Not on the finished path: the handler of
+            // the finish button clears the flow, and what was entered is still read there.
+            $form = $flow->getStepForm();
+
+            if ($this->stepWasHandedIn($flow)) {
+                return $this->redirectToRoute(
+                    'admin/career/companies/create',
+                    [self::FLOW_RUN => $run],
+                );
+            }
+
             $this->flashRejectedStep(
                 $flow,
                 $this->translator,
@@ -126,7 +136,7 @@ class AdminController extends AbstractController
 
             return $this->render(
                 'career/admin/create.html.twig',
-                ['form' => $flow->getStepForm()],
+                ['form' => $form],
             );
         }
 
@@ -197,7 +207,6 @@ class AdminController extends AbstractController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function edit(
         Request $request,
         Company $company,
@@ -266,6 +275,21 @@ class AdminController extends AbstractController
         $flow->handleRequest($request);
 
         if (!$flow->isFinished()) {
+            // Reading the step form is what acts on the clicked button and so moves the flow on, which has to
+            // happen before it is asked whether the step was handed in. Not on the finished path: the handler of
+            // the finish button clears the flow, and what was entered is still read there.
+            $form = $flow->getStepForm();
+
+            if ($this->stepWasHandedIn($flow)) {
+                return $this->redirectToRoute(
+                    'admin/career/companies/edit',
+                    [
+                        'company' => $company->id,
+                        self::FLOW_RUN => $run,
+                    ],
+                );
+            }
+
             $this->flashRejectedStep(
                 $flow,
                 $this->translator,
@@ -274,7 +298,7 @@ class AdminController extends AbstractController
             return $this->render(
                 'career/admin/edit.html.twig',
                 [
-                    'form' => $flow->getStepForm(),
+                    'form' => $form,
                     'company' => $company,
                     'comments' => $this->commentRepository->findThreadForCompany($company),
                 ],

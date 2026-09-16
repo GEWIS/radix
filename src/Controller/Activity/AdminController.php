@@ -196,18 +196,6 @@ class AdminController extends AbstractController
         );
     }
 
-    /**
-     * Whether the request submitted a step, which is followed by a redirect rather than a page: refreshing a page
-     * reached by a POST sends that POST again, and a submission the flow cannot place lands on whichever step it has
-     * since moved to, emptying every field of a step no user filled in.
-     */
-    private function stepWasHandedIn(FormFlowInterface $flow): bool
-    {
-        return $flow->isSubmitted()
-            && $flow->isValid()
-            && !$flow->isFinished();
-    }
-
     #[Route(
         path: '/{activity}/signup-lists/add',
         name: 'signup_list_add',

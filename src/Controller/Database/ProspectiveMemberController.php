@@ -129,14 +129,31 @@ final class ProspectiveMemberController extends AbstractController
             );
         }
 
+        // Reading the step form is what acts on the clicked button and so moves the flow on, which has to happen
+        // before it is asked whether the step was handed in. Not on the finished path: the handler of the finish
+        // button clears the flow, and what was entered is still read there.
+        $form = $flow->getStepForm();
+
+        if ($this->stepWasHandedIn($flow)) {
+            return $this->redirectToRoute(
+                'join_index',
+                ['_locale' => $request->getLocale()],
+            );
+        }
+
         $this->flashRejectedStep(
             $flow,
             $this->translator,
         );
 
+        // This action declares RendersOnSuccess for the page above, so nothing else sets the status on a rejected
+        // step. Without a submission this is the form being opened, which is not a rejection.
         return $this->render(
             'database/join/subscribe.html.twig',
-            ['form' => $flow->getStepForm()],
+            ['form' => $form],
+            $flow->isSubmitted()
+                ? new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+                : null,
         );
     }
 
@@ -195,9 +212,14 @@ final class ProspectiveMemberController extends AbstractController
             }
         }
 
+        // As with the registration above: this action renders its own success page, so it sets the status itself
+        // when the response is a rejection rather than the form being opened.
         return $this->render(
             'database/join/renew.html.twig',
             ['form' => $form],
+            $form->isSubmitted()
+                ? new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+                : null,
         );
     }
 

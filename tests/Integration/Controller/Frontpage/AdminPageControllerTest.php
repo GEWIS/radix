@@ -13,6 +13,7 @@ use App\Repository\Frontpage\PageRepository;
 use App\Service\Frontpage\PageImageStore;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -25,7 +26,6 @@ use function imagefilledrectangle;
 use function imagejpeg;
 use function json_decode;
 use function preg_replace;
-use function str_contains;
 use function str_replace;
 use function strval;
 use function sys_get_temp_dir;
@@ -326,15 +326,37 @@ final class AdminPageControllerTest extends DatabaseTestCase
      */
     private function browser(Page $page): string
     {
-        return strval($this->controller()->edit(
+        $session = $this->session();
+
+        // Handing the address step in returns a redirect, so the step it moved to is read the way a browser reads
+        // it: by asking for the page the redirect leads to.
+        $this->controller()->edit(
             $this->step(
-                $this->session(),
+                $session,
                 'address',
                 $this->address([]),
                 'next',
             ),
             $page,
+        );
+
+        return strval($this->controller()->edit(
+            $this->openStep($session),
+            $page,
         )->getContent());
+    }
+
+    /**
+     * A plain request for whichever step the flow has moved to, which is what the redirect after a handed-in step
+     * leads to.
+     */
+    private function openStep(FlashBagAwareSessionInterface $session): Request
+    {
+        $request = new Request(query: ['flow' => self::RUN]);
+        $request->setSession($session);
+        $this->authenticateAsBoard($request);
+
+        return $request;
     }
 
     /**
@@ -430,7 +452,7 @@ final class AdminPageControllerTest extends DatabaseTestCase
             'next',
         ));
 
-        if (!$this->reachedTheContentStep($response)) {
+        if (!$this->passedTheAddressStep($response)) {
             return $response;
         }
 
@@ -473,15 +495,12 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
-     * A refused address step renders itself again rather than the content step, which shows that the flow never
-     * got past it.
+     * A step that was handed in returns a redirect to the one the flow moved to, and a refused one renders itself
+     * again, which is what shows that the flow never got past it.
      */
-    private function reachedTheContentStep(Response $response): bool
+    private function passedTheAddressStep(Response $response): bool
     {
-        return str_contains(
-            strval($response->getContent()),
-            'page_flow[content]',
-        );
+        return $response instanceof RedirectResponse;
     }
 
     /**

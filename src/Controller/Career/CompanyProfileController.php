@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
-use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\AbstractRevisionReviewController;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
@@ -92,7 +91,6 @@ class CompanyProfileController extends AbstractRevisionReviewController
             'POST',
         ],
     )]
-    #[RendersOnSuccess]
     public function edit(
         Request $request,
         #[CurrentUser]
@@ -159,6 +157,18 @@ class CompanyProfileController extends AbstractRevisionReviewController
         $flow->handleRequest($request);
 
         if (!$flow->isFinished()) {
+            // Reading the step form is what acts on the clicked button and so moves the flow on, which has to
+            // happen before it is asked whether the step was handed in. Not on the finished path: the handler of
+            // the finish button clears the flow, and what was entered is still read there.
+            $form = $flow->getStepForm();
+
+            if ($this->stepWasHandedIn($flow)) {
+                return $this->redirectToRoute(
+                    'company/profile/edit',
+                    [self::FLOW_RUN => $run],
+                );
+            }
+
             $this->flashRejectedStep(
                 $flow,
                 $this->translator,
@@ -167,7 +177,7 @@ class CompanyProfileController extends AbstractRevisionReviewController
             return $this->render(
                 'career/company/profile-edit.html.twig',
                 [
-                    'form' => $flow->getStepForm(),
+                    'form' => $form,
                     'company' => $company,
                     'comments' => $this->commentRepository->findThreadForCompany($company),
                 ],
