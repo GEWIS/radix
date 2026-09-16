@@ -10,7 +10,7 @@ use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\CompanyRevision;
 use App\Entity\Career\VacancyRevision;
 use App\Entity\User\Enums\UserRoles;
-use App\Service\Application\OfficeMailboxes;
+use App\Service\Application\AssociationMailboxes;
 use App\Service\Application\RevisionNotificationInterface;
 use Override;
 use RuntimeException;
@@ -23,7 +23,7 @@ use function sprintf;
  */
 final readonly class CareerRevisionNotification implements RevisionNotificationInterface
 {
-    public function __construct(private OfficeMailboxes $mailboxes)
+    public function __construct(private AssociationMailboxes $mailboxes)
     {
     }
 

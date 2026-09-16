@@ -11,9 +11,9 @@ use App\Entity\Application\Enums\NotificationType;
 use App\Repository\Activity\ActivityProposalRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Activity\OptionBudgetSchedule;
+use App\Service\Application\AssociationMailboxes;
 use App\Service\Application\Email;
 use App\Service\Application\NotificationPublisher;
-use App\Service\Application\OfficeMailboxes;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Psr\Log\LoggerInterface;
@@ -56,7 +56,7 @@ final class LapseOverdueOptionsCommand extends Command
 
     public function __construct(
         private readonly Email $email,
-        private readonly OfficeMailboxes $mailboxes,
+        private readonly AssociationMailboxes $mailboxes,
         private readonly ActivityProposalRepository $activityProposalRepository,
         private readonly UserRepository $userRepository,
         private readonly NotificationPublisher $publisher,

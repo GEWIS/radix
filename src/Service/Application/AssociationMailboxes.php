@@ -13,7 +13,7 @@ use Symfony\Component\Mime\Address;
  * Defined here rather than at each send site so a deployment names each address once, and so who reviews what is
  * decided by the domain that raises the message instead of by the author of the template.
  */
-final readonly class OfficeMailboxes
+final readonly class AssociationMailboxes
 {
     public function __construct(
         private string $mailToInternalAffairsAddress,

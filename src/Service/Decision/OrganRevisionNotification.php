@@ -8,7 +8,7 @@ use App\Entity\Application\Enums\NotificationType;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Decision\OrganInformationRevision;
 use App\Entity\User\Enums\UserRoles;
-use App\Service\Application\OfficeMailboxes;
+use App\Service\Application\AssociationMailboxes;
 use App\Service\Application\RevisionNotificationInterface;
 use Override;
 
@@ -20,7 +20,7 @@ use function sprintf;
  */
 final readonly class OrganRevisionNotification implements RevisionNotificationInterface
 {
-    public function __construct(private OfficeMailboxes $mailboxes)
+    public function __construct(private AssociationMailboxes $mailboxes)
     {
     }
 

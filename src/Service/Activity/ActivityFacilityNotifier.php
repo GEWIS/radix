@@ -6,8 +6,8 @@ namespace App\Service\Activity;
 
 use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\Enums\Languages;
+use App\Service\Application\AssociationMailboxes;
 use App\Service\Application\Email;
-use App\Service\Application\OfficeMailboxes;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mime\Address;
@@ -33,7 +33,7 @@ final readonly class ActivityFacilityNotifier
 {
     public function __construct(
         private Email $email,
-        private OfficeMailboxes $mailboxes,
+        private AssociationMailboxes $mailboxes,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {

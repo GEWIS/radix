@@ -11,7 +11,7 @@ use App\Entity\Decision\Member;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityRevisionRepository;
 use App\Security\User\MfaEnforcementSwitch;
-use App\Service\Application\OfficeMailboxes;
+use App\Service\Application\AssociationMailboxes;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
 use Symfony\Component\Mime\Email;
@@ -26,7 +26,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
 {
-    public function testSubmittingWritesToTheOfficeThatReviewsIt(): void
+    public function testSubmittingWritesToTheMailboxThatReviewsIt(): void
     {
         $draft = $this->draft();
         $this->authenticateAuthorOf(
@@ -73,7 +73,7 @@ final class MailReviewersOnRevisionSubmissionTest extends DatabaseTestCase
      */
     private function internalAffairs(): string
     {
-        return self::getContainer()->get(OfficeMailboxes::class)->internalAffairs()->getAddress();
+        return self::getContainer()->get(AssociationMailboxes::class)->internalAffairs()->getAddress();
     }
 
     /**

@@ -8,7 +8,7 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Repository\Activity\ActivityRevisionRepository;
 use App\Service\Activity\ActivityFacilityNotifier;
-use App\Service\Application\OfficeMailboxes;
+use App\Service\Application\AssociationMailboxes;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\Mime\Email;
 
@@ -28,7 +28,7 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
 
         self::getContainer()->get(ActivityFacilityNotifier::class)->created($revision);
 
-        $mailboxes = self::getContainer()->get(OfficeMailboxes::class);
+        $mailboxes = self::getContainer()->get(AssociationMailboxes::class);
         $message = $this->onlyMessage();
 
         // Against the configured mailboxes rather than literal addresses: what matters is that both are written to,
