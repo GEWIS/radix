@@ -123,6 +123,15 @@ RUN <<-EOF
     git config --system --add safe.directory /app
 EOF
 
+###> symfony/panther ###
+# The browser the tests drive. There is no sandbox inside the container, and /dev/shm is small enough by default that
+# Chromium crashes part-way through a page without this.
+ENV PANTHER_NO_SANDBOX=1
+ENV PANTHER_CHROME_ARGUMENTS='--disable-dev-shm-usage'
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends chromium chromium-driver && rm -rf /var/lib/apt/lists/*
+###< symfony/panther ###
+
 COPY --link docker/app/frankenphp/conf.d/20-radix.dev.ini $PHP_INI_DIR/app.conf.d/
 
 ARG GIT_COMMIT

@@ -9,6 +9,7 @@
          failOnWarning="true"
          bootstrap="tests/bootstrap.php"
          cacheDirectory=".phpunit.cache"
+         defaultTestSuite="Project Test Suite"
 >
     <php>
         <ini name="display_errors" value="1" />
@@ -22,6 +23,13 @@
             <directory>tests</directory>
             <exclude>tests/bootstrap.php</exclude>
             <exclude>tests/object-manager.php</exclude>
+            <exclude>tests/Browser</exclude>
+        </testsuite>
+
+        <!-- Each of these starts Chromium and a web server, so they are not part of an ordinary run: the suite above
+             is the default one and this is reached by name. `make test-browser` is what runs them. -->
+        <testsuite name="Browser Test Suite">
+            <directory>tests/Browser</directory>
         </testsuite>
     </testsuites>
 
@@ -42,6 +50,7 @@
     </source>
 
     <extensions>
+        <bootstrap class="Symfony\Component\Panther\ServerExtension" />
         <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
             <parameter name="clock-mock-namespaces" value="App" />
             <parameter name="dns-mock-namespaces" value="App" />

@@ -174,3 +174,14 @@ jobs:
                 env:
                     APP_ENV: test
                 run: bin/phpunit
+
+            -   name: Run the browser tests
+                env:
+                    APP_ENV: test
+                # Excluded from the run above by the `browser` group, and run separately here rather than not at all.
+                # Nothing has to be installed or started for them: the runner image ships Chrome and ChromeDriver, and
+                # Panther starts a web server of its own.
+                #
+                # They come last because that server answers on a connection of its own, outside the transaction every
+                # other test is rolled back with, so whatever they write stays written for the rest of the job.
+                run: bin/phpunit --testsuite "Browser Test Suite"

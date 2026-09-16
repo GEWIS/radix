@@ -27,7 +27,7 @@ SYMFONY_TEST = $(DOCKER_COMP) exec -T -e APP_ENV=test app bin/console
 # Misc
 .DEFAULT_GOAL   = help
 .PHONY          : help seed translations igor openapi lint lint-fix lint-fix-all lint-twig phpstan phpstan-pr \
-                  test test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
+                  test test-browser test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
                   buildmatomo buildpgadmin setuplocalenv up upprod start startprod stop logs bash exec composer \
                   sf cc migrate migrate-to migration-up \
                   migration-down migration-diff preparemailman preparelistmonk stripewebhooksecret
@@ -108,6 +108,10 @@ phpstan-pr: ## Regenerate the baseline against main, then analyse this branch ag
 test: ## Start tests with phpunit, pass the parameter "c=" to add options to phpunit, example: make test c="--group e2e --stop-on-failure"
 	@$(eval c ?=)
 	@$(DOCKER_COMP) exec -T -e APP_ENV=test app bin/phpunit $(c)
+
+test-browser: ## Run the browser tests, which drive Chromium against a server of their own (excluded from `make test`)
+	@$(eval c ?=)
+	@$(DOCKER_COMP) exec -T -e APP_ENV=test -e XDG_CONFIG_HOME=/tmp/radix-browser/config -e XDG_DATA_HOME=/tmp/radix-browser/data app bin/phpunit --testsuite "Browser Test Suite" $(c)
 
 test-coverage: ## Run the tests and write an HTML coverage report to ./coverage
 	@$(DOCKER_COMP) exec -T -e APP_ENV=test -e XDEBUG_MODE=coverage app bin/phpunit --coverage-html ./coverage

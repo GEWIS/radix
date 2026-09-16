@@ -324,6 +324,15 @@
             "config/packages/monolog.yaml"
         ]
     },
+    "symfony/panther": {
+        "version": "2.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "814d444c2b82ec0d6dce87ecec32b06c2e89458f"
+        }
+    },
     "symfony/phpunit-bridge": {
         "version": "8.1",
         "recipe": {

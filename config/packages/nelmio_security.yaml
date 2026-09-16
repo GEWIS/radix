@@ -125,3 +125,16 @@ when@dev:
                 img-src: ['self', 'data:', 'http://localhost:*', 'https://images.test.gewis.nl']
                 connect-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/']
                 child-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/', 'https://www.youtube-nocookie.com/embed/', 'https://player.vimeo.com/video/']
+
+when@test:
+    nelmio_security:
+        csp:
+            enforce:
+                # Without this the test environment inherits `default-src 'none'` with no `script-src` at all, so a
+                # browser driving the application loads no Stimulus, no live components and no CSRF token, and no form
+                # on the site can be submitted. Every source is the application's own origin: analytics, the images
+                # host and the hot reload client are all left out, so a test cannot pass on a page that reaches them.
+                script-src: ['self']
+                img-src: ['self', 'data:']
+                connect-src: ['self']
+                child-src: ['self']
