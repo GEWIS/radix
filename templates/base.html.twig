@@ -20,10 +20,17 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
         {% endblock %}
+        {# Turbo re-inserts the scripts of a page it renders, and without this it copies the nonce from the fetched
+           document, which the policy of the document already open does not list. The nonce is read from here
+           instead. #}
+        <meta name="csp-nonce" content="{{ csp_nonce('script') }}">
         {# Load critical JS #}
         {% block javascripts %}
-            {# Inlined so the theme is set before the first paint. #}
-            <script nonce="{{ csp_nonce('script') }}">{{ source('@js/color-modes.js') }}</script>
+            {# Inlined so the theme is set before the first paint. `data-turbo-eval="false"` because this is setup
+               for the document rather than for the page: re-evaluating it on every render adds a second listener for
+               the system colour scheme, and the nonce on a re-created element is not the one this document's policy
+               lists. #}
+            <script nonce="{{ csp_nonce('script') }}" data-turbo-eval="false">{{ source('@js/color-modes.js') }}</script>
             {# Before the importmap: deferred scripts and modules run in document order, and the controllers use
                `window.bootstrap`. #}
             <script src="{{ asset('js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce('script') }}" defer></script>
@@ -31,7 +38,7 @@
         {% endblock %}
         {% if app.request.server.has('FRANKENPHP_HOT_RELOAD') %}
             <meta name="frankenphp-hot-reload:url" content="{{ app.request.server.get('FRANKENPHP_HOT_RELOAD') }}">
-            <script src="https://cdn.jsdelivr.net/npm/idiomorph" nonce="{{ csp_nonce('script') }}"></script>
+            <script src="https://cdn.jsdelivr.net/npm/idiomorph/dist/idiomorph.min.js" nonce="{{ csp_nonce('script') }}"></script>
             <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module" nonce="{{ csp_nonce('script') }}"></script>
             {#
                 The client swaps a stylesheet by matching the changed file against the ones the page links, on the
@@ -41,7 +48,7 @@
 
                 The event arrives after Sass has written the file, so what the reload fetches is the new stylesheet.
             #}
-            <script nonce="{{ csp_nonce('script') }}">
+            <script nonce="{{ csp_nonce('script') }}" data-turbo-eval="false">
                 (() => {
                     const url = document.querySelector('meta[name="frankenphp-hot-reload:url"]')?.content;
 
@@ -57,7 +64,9 @@
                 })();
             </script>
         {% endif %}
-        <script type="text/javascript" nonce="{{ csp_nonce('script') }}">
+        {# `data-turbo-eval="false"` because this declares a `const` and would throw on a second evaluation, and
+           because the page views of later renders are counted by assets/js/matomo.js instead. #}
+        <script type="text/javascript" nonce="{{ csp_nonce('script') }}" data-turbo-eval="false">
             var _paq = window._paq = window._paq || [];
             const matomoDomain = '{{ matomo_domain }}';
             _paq.push(['trackPageView']);

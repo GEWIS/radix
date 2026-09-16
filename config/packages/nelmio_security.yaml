@@ -113,7 +113,7 @@ when@prod:
 when@dev:
     nelmio_security:
         csp:
-            enforce:
+            enforce: &development_csp
                 # jsDelivr is where FrankenPHP's hot reload client, and the idiomorph it pulls in, are fetched from: it
                 # injects them as script tags and has no option to serve them itself. Without the host the browser
                 # refuses both, nothing subscribes to the hub, and a file change publishes a reload that no page is
@@ -126,15 +126,10 @@ when@dev:
                 connect-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/']
                 child-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/', 'https://www.youtube-nocookie.com/embed/', 'https://player.vimeo.com/video/']
 
+# The same policy as development, by reference rather than by a second copy. A browser test drives the application the
+# way a developer does, and a policy of its own would either refuse what development allows or allow what it does not,
+# and in both cases report the environment rather than a defect.
 when@test:
     nelmio_security:
         csp:
-            enforce:
-                # Without this the test environment inherits `default-src 'none'` with no `script-src` at all, so a
-                # browser driving the application loads no Stimulus, no live components and no CSRF token, and no form
-                # on the site can be submitted. Every source is the application's own origin: analytics, the images
-                # host and the hot reload client are all left out, so a test cannot pass on a page that reaches them.
-                script-src: ['self']
-                img-src: ['self', 'data:']
-                connect-src: ['self']
-                child-src: ['self']
+            enforce: *development_csp
