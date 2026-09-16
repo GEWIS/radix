@@ -14,12 +14,15 @@ use function is_string;
  *
  * The credentials are the seed's, read from the environment rather than written down again here. Member 8000 is an
  * administrator in the fixtures, and signing in grants sudo mode for as long as it lasts, so the administrative pages
- * are reachable afterwards without a second prompt.
+ * are reachable afterwards without a second prompt. Every seeded member has the same password, so naming another one
+ * is what a test needs to be two people at once.
  */
 trait SignsInThroughTheBrowser
 {
-    private function signIn(Client $client): void
-    {
+    private function signIn(
+        Client $client,
+        ?string $login = null,
+    ): void {
         $client->request(
             'GET',
             '/en/user/login',
@@ -34,7 +37,7 @@ trait SignsInThroughTheBrowser
         $client->submitForm(
             'Sign in',
             [
-                '_username' => self::seededCredential('DEMO_CREDENTIALS_USERNAME'),
+                '_username' => $login ?? self::seededCredential('DEMO_CREDENTIALS_USERNAME'),
                 '_password' => self::seededCredential('DEMO_CREDENTIALS_PASSWORD'),
             ],
         );

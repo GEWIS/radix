@@ -13,6 +13,7 @@ use App\Entity\Decision\OrganInformation;
 use App\Entity\Decision\OrganInformationRevision;
 use App\Entity\Decision\OrganInformationRevisionComment;
 use App\Entity\User\User;
+use App\Service\Decision\OrganInformationRevisionCloner;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
@@ -30,8 +31,10 @@ use Override;
  */
 class BodyReviewFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    public function __construct(private readonly OrganImageGenerator $imageGenerator)
-    {
+    public function __construct(
+        private readonly OrganImageGenerator $imageGenerator,
+        private readonly OrganInformationRevisionCloner $cloner,
+    ) {
     }
 
     #[Override]
@@ -97,7 +100,37 @@ class BodyReviewFixture extends Fixture implements DependentFixtureInterface, Fi
         $comment->body = 'We rewrote the description and moved from Discord to Instagram.';
         $manager->persist($comment);
 
+        $this->leaveADraft(
+            $manager,
+            $author,
+        );
+
         $manager->flush();
+    }
+
+    /**
+     * A page still being written. Only a draft is editable, so without one neither the editor nor its edit lock can
+     * be reached.
+     */
+    private function leaveADraft(
+        ObjectManager $manager,
+        MemberModel $author,
+    ): void {
+        $information = $this->getReference(
+            'organ-information-getÉst',
+            OrganInformation::class,
+        );
+        $live = $information->getLiveRevision();
+        if (null === $live) {
+            return;
+        }
+
+        // Through the cloner the application itself uses, so the seeded draft is the draft an editor would have
+        // produced. Copying the fields here left the social links behind.
+        $draft = $this->cloner->cloneAsDraft($live);
+        $draft->setAuthor($author);
+
+        $manager->persist($draft);
     }
 
     /**

@@ -95,8 +95,35 @@ class CareerReviewFixture extends Fixture implements DependentFixtureInterface, 
             $delta,
             $reviewer,
         );
+        $this->leaveAProfileInDraft(
+            $manager,
+            $this->getReference(
+                'career-company-halcyon-mobility',
+                Company::class,
+            ),
+            $this->getReference(
+                'career-company-user-recruitment@halcyon-mobility.example.com',
+                CompanyUser::class,
+            ),
+        );
 
         $manager->flush();
+    }
+
+    /**
+     * A profile still being written. Only a draft is editable, so without one neither the editor nor its edit lock
+     * can be reached.
+     */
+    private function leaveAProfileInDraft(
+        ObjectManager $manager,
+        Company $company,
+        CompanyUser $author,
+    ): void {
+        $draft = $this->nextProfileDraft($company);
+        $draft->setStatus(RevisionStatus::Draft);
+        $draft->setAuthorCompanyUser($author);
+
+        $manager->persist($draft);
     }
 
     /**

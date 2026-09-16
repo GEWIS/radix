@@ -43,6 +43,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
     private const array ORGANS = [
         'organ-getest' => 'GETÉST',
         'organ-keur' => 'KEUR',
+        'organ-kcc' => 'KCC',
     ];
 
     // Members whose number the ledger draws from a sequence, so the web seeds name them by what stays the same.

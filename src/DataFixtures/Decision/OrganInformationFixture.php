@@ -84,6 +84,25 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
             social: [SocialPlatform::Discord->value => 'keurKEUR1'],
         );
 
+        // A third page left at its approved revision, so one page still has its current revision equal to its live
+        // revision once BodyReviewFixture adds a draft to another.
+        $this->createPage(
+            $manager,
+            $this->getReference(
+                'organ-kcc',
+                Organ::class,
+            ),
+            $reviewer,
+            shortDescriptionEn: 'The committee that keeps the coffee coming.',
+            shortDescriptionNl: 'De commissie die zorgt dat de koffie blijft komen.',
+            descriptionEn: 'KCC keeps the machines running and the beans in stock, and will tell anybody who asks '
+                . 'far more about roasting than they wanted to know.',
+            descriptionNl: 'KCC houdt de machines draaiend en de bonen op voorraad, en vertelt iedereen die het '
+                . 'vraagt veel meer over branden dan ze wilden weten.',
+            website: null,
+            social: [],
+        );
+
         $manager->flush();
     }
 
