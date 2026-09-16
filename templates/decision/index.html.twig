@@ -211,7 +211,7 @@
                             'privacy-policy': 'Privacy Policy'|trans,
                         } %}
                             <div class="col">
-                                <a href="{{ path('regulations', {'regulation': slug}) }}"
+                                <a href="{{ path('regulations', {'regulation': slug}) }}" data-turbo="false"
                                    class="d-flex align-items-center gap-2 py-1 text-body fw-semibold">
                                     <span class="far fa-file-lines text-muted" aria-hidden="true"></span>
                                     {{ label }}

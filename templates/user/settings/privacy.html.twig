@@ -50,7 +50,7 @@
                     </p>
                     {% if hasDataExport %}
                         {% if sudoActive %}
-                            <a class="btn btn-outline-gewis-primary" href="{{ path('user_settings_data_export_download') }}">
+                            <a class="btn btn-outline-gewis-primary" href="{{ path('user_settings_data_export_download') }}" data-turbo="false">
                                 <span class="fas fa-download"></span> {{ 'Download my latest export'|trans }}
                             </a>
                         {% else %}

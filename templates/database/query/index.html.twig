@@ -100,7 +100,13 @@
                         <span class="badge badge-success">
                             {{ '%number% rows'|trans({'%number%': result|length}) }}
                         </span>
-                        {{ form_start(export_form, {attr: {'class': 'ms-auto d-flex flex-wrap gap-2'}}) }}
+                        {# The response to this submission is the result as a file, and Turbo renders neither a
+                           download nor any other response that is not HTML, so the browser submits this rather than
+                           Turbo. Fetched, the submission succeeded and the file was discarded unread. #}
+                        {{ form_start(export_form, {attr: {
+                            'class': 'ms-auto d-flex flex-wrap gap-2',
+                            'data-turbo': 'false',
+                        }}) }}
                             {{ form_widget(export_form.query) }}
                             {{ form_widget(export_form.name) }}
                             {# One export format exists, so the picker would be a list of one; it is still submitted

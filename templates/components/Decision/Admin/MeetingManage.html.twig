@@ -37,7 +37,7 @@
                         </button>
                     {% endif %}
                     {% if latest %}
-                        <a href="{{ path('meetings/document_download', {'version': latest.id}) }}"
+                        <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false"
                            class="btn btn-sm btn-outline-secondary" aria-label="{{ 'Download'|trans }}">
                             <span class="fas fa-download" aria-hidden="true"></span>
                         </a>
@@ -391,7 +391,7 @@
                                             {{ 'History'|trans }}
                                         </button>
                                     {% endif %}
-                                    <a href="{{ path('meetings/minutes_download', {'version': minutesLatest.id}) }}"
+                                    <a href="{{ path('meetings/minutes_download', {'version': minutesLatest.id}) }}" data-turbo="false"
                                        class="btn btn-sm btn-outline-secondary" aria-label="{{ 'Download'|trans }}">
                                         <span class="fas fa-download" aria-hidden="true"></span>
                                     </a>

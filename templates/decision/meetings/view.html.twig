@@ -41,14 +41,14 @@
         {% block header_title %}{{ ordinalNumber }} {{ meeting.type.label|trans }}{% endblock %}
         {% block header_actions %}
             {% if not isVirtual and (view.points is not empty or view.meetingLevelDocuments is not empty) %}
-                <a href="{{ path('meetings/documents_zip', {'type': meeting.type.urlToken, 'number': meeting.number}) }}"
+                <a href="{{ path('meetings/documents_zip', {'type': meeting.type.urlToken, 'number': meeting.number}) }}" data-turbo="false"
                    class="btn btn-outline-gewis-primary">
                     <span class="fas fa-file-zipper" aria-hidden="true"></span>
                     {{ 'Download all documents'|trans }}
                 </a>
             {% endif %}
             {% if minutesLatest %}
-                <a href="{{ path('meetings/minutes_download', {'version': minutesLatest.id}) }}"
+                <a href="{{ path('meetings/minutes_download', {'version': minutesLatest.id}) }}" data-turbo="false"
                    class="btn btn-outline-gewis-primary"
                    title="{{ minutesLatest.versionLabel }}{% if minutesLatest.uploadedAt %} &middot; {{ minutesLatest.uploadedAt|format_date('medium') }}{% endif %}">
                     <span class="fas fa-file-pdf" aria-hidden="true"></span>
@@ -82,7 +82,7 @@
         <div class="border rounded p-2" data-version-count="{{ versionCount }}">
             <div class="d-flex align-items-center gap-3">
                 <span class="fas fa-file-pdf" aria-hidden="true"></span>
-                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" class="flex-grow-1 text-body">
+                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false" class="flex-grow-1 text-body">
                     <span class="fw-semibold d-block">{{ document.name }}</span>
                     <span class="small text-muted">
                         {{ latest.versionLabel }}
@@ -97,7 +97,7 @@
                         {{ 'History'|trans }}
                     </button>
                 {% endif %}
-                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" class="text-muted"
+                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false" class="text-muted"
                    aria-label="{{ 'Download'|trans }}">
                     <span class="fas fa-download" aria-hidden="true"></span>
                 </a>
@@ -313,7 +313,7 @@
                         {% for selection in view.references %}
                             {% set effective = selection.pinnedVersion %}
                             {% if effective %}
-                                <a href="{{ path('meetings/reference_download', {'version': effective.id}) }}"
+                                <a href="{{ path('meetings/reference_download', {'version': effective.id}) }}" data-turbo="false"
                                    class="d-flex align-items-center gap-2 py-2 text-body {% if not loop.first %}border-top{% endif %}">
                                     <span class="fas fa-file-pdf" aria-hidden="true"></span>
                                     <span class="flex-grow-1">

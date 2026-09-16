@@ -28,6 +28,7 @@ use Symfony\UX\Autocomplete\AutocompleteBundle;
 use Symfony\UX\CalendarLink\UXCalendarLinkBundle;
 use Symfony\UX\LiveComponent\LiveComponentBundle;
 use Symfony\UX\StimulusBundle\StimulusBundle;
+use Symfony\UX\Turbo\TurboBundle;
 use Symfony\UX\TwigComponent\TwigComponentBundle;
 use Symfonycasts\SassBundle\SymfonycastsSassBundle;
 use Tito10047\AltchaBundle\AltchaBundle;
@@ -73,4 +74,5 @@ return [
     AltchaBundle::class => ['all' => true],
     FlysystemBundle::class => ['all' => true],
     JoseFrameworkBundle::class => ['all' => true],
+    TurboBundle::class => ['all' => true],
 ];

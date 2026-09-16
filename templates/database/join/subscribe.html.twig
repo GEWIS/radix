@@ -34,8 +34,12 @@
 
     {# Creating the Stripe session is slow. A second submit finishes first and has no checkout URL to redirect to,
        so the button is disabled as soon as the form is submitted. #}
+    {# The last step returns a page that redirects to the payment provider, because the content security policy
+       restricts form submissions to this origin. Turbo only renders a form response that redirects or has an error
+       status, so this form is submitted by the browser rather than fetched. #}
     {{ form_start(form, {attr: {
         'id': 'form-subscribe',
+        'data-turbo': 'false',
         'data-controller': 'submit-once',
         'data-action': 'submit->submit-once#lock',
         'data-submit-once-label-value': 'Processing...'|trans,

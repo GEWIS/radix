@@ -1,0 +1,6 @@
+turbo:
+    # Nothing broadcasts: no entity declares `#[Broadcast]` and no template renders a `<turbo-stream-source>`.
+    # Left enabled, its Doctrine listener walks the change set of every flush in the application looking for the
+    # attribute. Realtime updates go over Mercure through `RealtimeNotifier` instead.
+    broadcast:
+        enabled: false

@@ -53,4 +53,5 @@ return [
     'tom-select/dist/css/tom-select.default.css' => ['version' => '2.6.2', 'type' => 'css'],
     'tom-select/dist/css/tom-select.bootstrap4.css' => ['version' => '2.6.2', 'type' => 'css'],
     'tom-select/dist/css/tom-select.default.min.css' => ['version' => '2.6.2', 'type' => 'css'],
+    '@hotwired/turbo' => ['version' => '8.0.23'],
 ];

@@ -22,7 +22,9 @@
                             <li>{{ claim.label|trans }}</li>
                         {% endfor %}
                     </ul>
-                    {{ form_start(form) }}
+                    {# Consent redirects back to the application through a document-level refresh, for the same
+                       reason the registration form does, so the browser submits this rather than Turbo. #}
+                    {{ form_start(form, {attr: {'data-turbo': 'false'}}) }}
                     <div class="d-flex gap-2">
                         {% if reminder %}
                             {{ form_widget(form.continue, {'attr': {'class': 'btn btn-gewis-primary'}}) }}

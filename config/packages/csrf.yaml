@@ -12,6 +12,9 @@ framework:
             - submit
             - authenticate
             - logout
+        # Turbo submits a form by fetch, and `assets/controllers/csrf_protection_controller.js` sends the token in a
+        # header on that submission as well as in the field.
+        check_header: true
 
 # `/member/subscribe/checkout/webhook` must stay outside CSRF protection and outside any form-login firewall. It is
 # an unauthenticated server-to-server POST from Stripe with no session, cookie or token, authenticated instead by

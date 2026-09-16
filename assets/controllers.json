@@ -20,6 +20,19 @@
                 }
             }
         },
+        "@symfony/ux-turbo": {
+            "turbo-core": {
+                "enabled": true,
+                "fetch": "eager",
+                "autoimport": {
+                    "@symfony/ux-turbo/dist/mercure_stream_source_element.js": false
+                }
+            },
+            "mercure-turbo-stream": {
+                "enabled": false,
+                "fetch": "eager"
+            }
+        },
         "@tito10047/altcha-bundle": {
             "altcha": {
                 "enabled": true,

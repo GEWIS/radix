@@ -55,4 +55,39 @@ final class AdministrationTest extends BrowserTestCase
 
         self::assertSelectorExists('.ck-editor');
     }
+
+    /**
+     * A back navigation is rendered from a snapshot Turbo makes before leaving, and that snapshot is made before
+     * Stimulus is disconnected, so an editor that injects its own markup is part of it. That did not turn out to
+     * leave a second editor behind, and nothing here works around it; this is the guard that says so, because the
+     * editor is the heaviest thing on any page here and the one whose duplication would be least obvious.
+     */
+    public function testTheEditorIsNotDuplicatedWhenThePageIsRestoredFromTheCache(): void
+    {
+        $client = static::createPantherClient();
+        $this->signIn($client);
+
+        $client->request(
+            'GET',
+            '/en/admin/news/create',
+        );
+        $client->waitFor('.ck-editor');
+
+        // The form is written in two languages side by side, so what matters is that the number does not grow, not
+        // what the number is.
+        $opened = $client->getCrawler()->filter('.ck-editor')->count();
+
+        // Driven through Turbo rather than by asking for the address, so it is a visit with a snapshot behind it
+        // rather than a fresh document.
+        $client->executeScript('Turbo.visit("/en/admin/news");');
+        $client->waitForInvisibility('.ck-editor');
+
+        $client->back();
+        $client->waitFor('.ck-editor');
+
+        self::assertCount(
+            $opened,
+            $client->getCrawler()->filter('.ck-editor'),
+        );
+    }
 }

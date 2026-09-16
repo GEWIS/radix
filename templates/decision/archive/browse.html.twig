@@ -78,7 +78,11 @@
                 <p class="text-center text-muted py-5 mb-0">{{ 'This folder is empty.'|trans }}</p>
             {% else %}
                 {% for entry in entries %}
+                    {# One address serves both: a directory is a page and a file is an attachment. Turbo cannot swap
+                       in an attachment, and reloads the address to let the browser have it, which reads it from the
+                       mirror a second time. #}
                     <a href="{{ path('members/archive', {'path': entry.path}) }}"
+                       {% if not entry.isDirectory %}data-turbo="false"{% endif %}
                        class="d-flex align-items-center gap-3 py-2 text-body {% if not loop.first or path != '' %}border-top{% endif %}">
                         {% if entry.isDirectory %}
                             <span class="fas fa-folder text-warning" aria-hidden="true"></span>
