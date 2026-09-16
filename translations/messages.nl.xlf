@@ -417,6 +417,10 @@
         <source>%count% summary|%count% summaries</source>
         <target state="translated">%count% samenvatting|%count% samenvattingen</target>
       </trans-unit>
+      <trans-unit id="xI0RWY6" resname="%count% tasks have not run when they should have.">
+        <source>%count% tasks have not run when they should have.</source>
+        <target>%count% taken zijn niet uitgevoerd terwijl dat wel had gemoeten.</target>
+      </trans-unit>
       <trans-unit id="ajBXKtO" resname="%count% unfinished draft|%count% unfinished drafts">
         <source>%count% unfinished draft|%count% unfinished drafts</source>
         <target state="translated">%count% onafgerond concept|%count% onafgeronde concepten</target>
@@ -3665,6 +3669,10 @@
         <source>Every question the association has been asked, and how it answered.</source>
         <target state="translated">Elke vraag die aan de vereniging is gesteld, en hoe zij die beantwoordde.</target>
       </trans-unit>
+      <trans-unit id="frMX98t" resname="Every task is running to schedule.">
+        <source>Every task is running to schedule.</source>
+        <target>Elke taak loopt op schema.</target>
+      </trans-unit>
       <trans-unit id="f7vALKX" resname="Everybody admitted">
         <source>Everybody admitted</source>
         <target>Iedereen toegelaten</target>
@@ -4057,13 +4065,13 @@
         <source>Focal length</source>
         <target>Brandpuntsafstand</target>
       </trans-unit>
-      <trans-unit id="E7k20Y1" resname="For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 30 minutes.">
-        <source>For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 30 minutes.</source>
-        <target state="translated">Voor jouw veiligheid moet je bij gevoelige handelingen opnieuw je wachtwoord en een verificatiecode invoeren. Deze bevestiging blijft 30 minuten geldig.</target>
+      <trans-unit id="zwnWbzQ" resname="For your protection, sensitive actions require you to re-enter your password and a verification code. The confirmation lasts %minutes% minutes, and working keeps it open.">
+        <source>For your protection, sensitive actions require you to re-enter your password and a verification code. The confirmation lasts %minutes% minutes, and working keeps it open.</source>
+        <target>Ter bescherming moet je voor gevoelige handelingen je wachtwoord en een verificatiecode opnieuw invoeren. De bevestiging duurt %minutes% minuten en blijft gelden zolang je bezig bent.</target>
       </trans-unit>
-      <trans-unit id="M8j6j9o" resname="For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 30 minutes.">
-        <source>For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 30 minutes.</source>
-        <target state="translated">Voor jouw veiligheid moet je bij gevoelige handelingen opnieuw je wachtwoord invoeren. Deze bevestiging blijft 30 minuten geldig.</target>
+      <trans-unit id=".qYqO.P" resname="For your protection, sensitive actions require you to re-enter your password. The confirmation lasts %minutes% minutes, and working keeps it open.">
+        <source>For your protection, sensitive actions require you to re-enter your password. The confirmation lasts %minutes% minutes, and working keeps it open.</source>
+        <target>Ter bescherming moet je voor gevoelige handelingen je wachtwoord opnieuw invoeren. De bevestiging duurt %minutes% minuten en blijft gelden zolang je bezig bent.</target>
       </trans-unit>
       <trans-unit id="dpBHSVe" resname="Forbidden">
         <source>Forbidden</source>
@@ -8329,6 +8337,10 @@
         <source>Scheduled</source>
         <target>Gepland</target>
       </trans-unit>
+      <trans-unit id="1Uwdn.e" resname="Scheduled tasks">
+        <source>Scheduled tasks</source>
+        <target>Geplande taken</target>
+      </trans-unit>
       <trans-unit id="SdNWA5t" resname="Search">
         <source>Search</source>
         <target state="translated">Zoeken</target>
@@ -12073,6 +12085,10 @@
         <source>goedgekeurd</source>
         <target state="translated">goedgekeurd</target>
       </trans-unit>
+      <trans-unit id="Zy4CLRc" resname="has not been seen at all.">
+        <source>has not been seen at all.</source>
+        <target>is nog helemaal niet gezien.</target>
+      </trans-unit>
       <trans-unit id="Y2mxPzh" resname="https://gewis.nl/association/regulations">
         <source>https://gewis.nl/association/regulations</source>
         <target state="translated">https://gewis.nl/nl/vereniging/reglementen</target>
@@ -12116,6 +12132,10 @@
       <trans-unit id="sxaP9KU" resname="just now">
         <source>just now</source>
         <target>zojuist</target>
+      </trans-unit>
+      <trans-unit id="XYFNie." resname="last ran %date%.">
+        <source>last ran %date%.</source>
+        <target>is voor het laatst uitgevoerd op %date%.</target>
       </trans-unit>
       <trans-unit id="M72VBbi" resname="latest of %count% versions">
         <source>latest of %count% versions</source>

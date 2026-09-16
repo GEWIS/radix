@@ -10,13 +10,12 @@ use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Decision\MeetingActivityLogRepository;
 use App\Repository\Decision\ReferenceDocumentRepository;
-use App\Security\User\SudoVoter;
 use App\Service\Decision\ReferenceDocumentService;
 use App\Service\Decision\VersionLabelSuggester;
+use App\Twig\Components\Application\RequiresBoardWithSudoTrait;
 use DateTimeImmutable;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -43,6 +42,7 @@ use function trim;
 final class ReferenceLibrary
 {
     use DefaultActionTrait;
+    use RequiresBoardWithSudoTrait;
 
     /**
      * Pending inline renames, keyed by document id: `{name?: string}`.
@@ -162,17 +162,5 @@ final class ReferenceLibrary
         assert($user instanceof User);
 
         return $user;
-    }
-
-    private function assertAccess(): void
-    {
-        if (
-            $this->security->isGranted(UserRoles::Board->value)
-            && $this->security->isGranted(SudoVoter::ATTRIBUTE)
-        ) {
-            return;
-        }
-
-        throw new AccessDeniedException();
     }
 }

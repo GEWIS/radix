@@ -20,11 +20,14 @@
                         </p>
                     </div>
                 {% endif %}
+                {# The window is stated in minutes from the parameter that decides it, so the two cannot drift apart
+                   the way a written-out "30 minutes" did. #}
+                {% set sudo_minutes = (sudo_idle_seconds / 60)|round %}
                 <p class="text-muted mb-3">
                     {% if app.user and app.user.totpAuthenticationEnabled %}
-                        {{ 'For your protection, sensitive actions require you to re-enter your password and a verification code. This confirmation stays active for 30 minutes.'|trans }}
+                        {{ 'For your protection, sensitive actions require you to re-enter your password and a verification code. The confirmation lasts %minutes% minutes, and working keeps it open.'|trans({'%minutes%': sudo_minutes}) }}
                     {% else %}
-                        {{ 'For your protection, sensitive actions require you to re-enter your password. This confirmation stays active for 30 minutes.'|trans }}
+                        {{ 'For your protection, sensitive actions require you to re-enter your password. The confirmation lasts %minutes% minutes, and working keeps it open.'|trans({'%minutes%': sudo_minutes}) }}
                     {% endif %}
                 </p>
                 {{ form_start(form, {'action': path(sudoConfirmRoute, {'next': next}), 'attr': {'novalidate': 'novalidate'}}) }}

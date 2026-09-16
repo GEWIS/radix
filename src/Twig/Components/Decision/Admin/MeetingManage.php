@@ -21,7 +21,6 @@ use App\Repository\Decision\MeetingActivityLogRepository;
 use App\Repository\Decision\MeetingDocumentRepository;
 use App\Repository\Decision\MeetingPointRepository;
 use App\Repository\Decision\ReferenceDocumentRepository;
-use App\Security\User\SudoVoter;
 use App\Service\Database\Meeting as DatabaseMeetingService;
 use App\Service\Decision\MeetingDocumentService;
 use App\Service\Decision\MeetingLocalDetailsService;
@@ -29,6 +28,7 @@ use App\Service\Decision\MeetingMinutesService;
 use App\Service\Decision\MeetingQueryService;
 use App\Service\Decision\ReferenceDocumentService;
 use App\Service\Decision\VersionLabelSuggester;
+use App\Twig\Components\Application\RequiresBoardWithSudoTrait;
 use App\ViewModel\Database\MeetingView as LedgerMeetingView;
 use App\ViewModel\Decision\MeetingReadiness;
 use App\ViewModel\Decision\MeetingView;
@@ -73,6 +73,7 @@ use function trim;
 final class MeetingManage
 {
     use DefaultActionTrait;
+    use RequiresBoardWithSudoTrait;
 
     #[LiveProp]
     public MeetingTypes $type;
@@ -727,18 +728,6 @@ final class MeetingManage
         assert($user instanceof User);
 
         return $user;
-    }
-
-    private function assertAccess(): void
-    {
-        if (
-            $this->security->isGranted(UserRoles::Board->value)
-            && $this->security->isGranted(SudoVoter::ATTRIBUTE)
-        ) {
-            return;
-        }
-
-        throw new AccessDeniedException();
     }
 
     /**

@@ -20,6 +20,9 @@ twig:
         matomo_domain: '%env(MATOMO_DOMAIN)%'
         external_affairs_email: '%app.email.external_affairs%'
         education_email: '%app.email.education%'
+        # The sudo window, so the confirmation page states the expiration without repeating the number that
+        # decides it. It was written out as "30 minutes" in two sentences and two languages.
+        sudo_idle_seconds: '%app.sudo_idle_ttl%'
         # The build the container was made from. Read through the container rather than from `$_SERVER`, which never
         # contains it: `variables_order` is GPCS, so no environment variable reaches the superglobal.
         git_commit: '%env(string:default::GIT_COMMIT)%'

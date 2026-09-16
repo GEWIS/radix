@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security\User;
 
+use App\Twig\Components\Application\RequiresBoardWithSudoTrait;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
@@ -12,13 +13,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\TwigComponent\ComponentFactory;
 
+use function in_array;
 use function is_string;
 
 /**
  * The live components that are behind sudo.
  *
  * A component is served under `/_components`, outside the addresses {@see SudoArea} names, so one that is only
- * reachable from the administration requires the grant itself with `#[IsGranted(SudoVoter::ATTRIBUTE)]`.
+ * reachable from the administration requires the grant itself: with `#[IsGranted(SudoVoter::ATTRIBUTE)]` on the
+ * class, or, where a board seat is required beside it, through {@see RequiresBoardWithSudoTrait}.
  *
  * Read by {@see \App\EventListener\User\SudoRefreshListener}, which extends a grant for a write to one of these and
  * not for a write to any other component: a vote or a sign-up is a write like any other, and a page holding one would
@@ -52,6 +55,10 @@ final readonly class SudoComponents
             }
         }
 
-        return false;
+        return in_array(
+            RequiresBoardWithSudoTrait::class,
+            $component->getTraitNames(),
+            true,
+        );
     }
 }
