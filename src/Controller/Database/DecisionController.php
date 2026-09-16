@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Database;
 
 use App\Attribute\Application\RendersOnSuccess;
+use App\Controller\Application\RendersRejectedSubmissionTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\MeetingTypes;
@@ -56,6 +57,8 @@ use function Symfony\Component\Translation\t;
 #[IsGranted(UserRoles::Board->value)]
 final class DecisionController extends AbstractController
 {
+    use RendersRejectedSubmissionTrait;
+
     /**
      * Every kind of decision that can be recorded, keyed by the name it is entered and posted under.
      *
@@ -272,6 +275,10 @@ final class DecisionController extends AbstractController
                 'grants' => $options->keyGrants,
                 'member_function_form' => $this->memberFunctionForm(),
             ],
+            // This action declares RendersOnSuccess for the page a recorded decision returns, so a rejected one must
+            // set the status itself. An impossible annulment adds its reason to the form after validity was first
+            // read, which is why validity is read again.
+            $this->rejectedSubmission($decisionForm),
         );
     }
 
@@ -565,6 +572,9 @@ final class DecisionController extends AbstractController
                 'form' => $form,
                 'latex' => $latex,
             ],
+            // This action declares RendersOnSuccess, because the exported document is displayed on this page rather
+            // than downloaded, so a rejected submission must set the status itself.
+            $this->rejectedSubmission($form),
         );
     }
 

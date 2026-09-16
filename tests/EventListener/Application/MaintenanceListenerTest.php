@@ -8,6 +8,7 @@ use App\Entity\Application\Enums\MaintenanceStatus;
 use App\Entity\Application\MaintenanceWindow;
 use App\EventListener\Application\MaintenanceListener;
 use App\Repository\Application\MaintenanceWindowRepository;
+use App\Service\Application\LiveComponentAction;
 use App\Service\Application\MaintenanceStatusProvider;
 use App\Tests\Support\LiveActionsDouble;
 use PHPUnit\Framework\TestCase;
@@ -358,7 +359,7 @@ final class MaintenanceListenerTest extends TestCase
             $maintenanceStatus,
             $security,
             self::createStub(TranslatorInterface::class),
-            $this->components(),
+            new LiveComponentAction($this->components()),
             $environmentFlag,
             dirname(
                 __DIR__,

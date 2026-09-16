@@ -6,6 +6,7 @@ namespace App\Controller\Database;
 
 use App\Attribute\Application\RendersOnSuccess;
 use App\Controller\Application\HandlesFormFlowTrait;
+use App\Controller\Application\RendersRejectedSubmissionTrait;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Form\Database\MemberApproveType;
 use App\Form\Database\MemberRenewalType;
@@ -44,6 +45,7 @@ use function assert;
 final class ProspectiveMemberController extends AbstractController
 {
     use HandlesFormFlowTrait;
+    use RendersRejectedSubmissionTrait;
 
     public function __construct(
         private readonly MemberService $memberService,
@@ -147,13 +149,11 @@ final class ProspectiveMemberController extends AbstractController
         );
 
         // This action declares RendersOnSuccess for the page above, so nothing else sets the status on a rejected
-        // step. Without a submission this is the form being opened, which is not a rejection.
+        // step.
         return $this->render(
             'database/join/subscribe.html.twig',
             ['form' => $form],
-            $flow->isSubmitted()
-                ? new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY)
-                : null,
+            $this->rejectedSubmission($flow),
         );
     }
 
@@ -217,9 +217,7 @@ final class ProspectiveMemberController extends AbstractController
         return $this->render(
             'database/join/renew.html.twig',
             ['form' => $form],
-            $form->isSubmitted()
-                ? new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY)
-                : null,
+            $this->rejectedSubmission($form),
         );
     }
 

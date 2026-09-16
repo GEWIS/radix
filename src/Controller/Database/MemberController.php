@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Database;
 
 use App\Attribute\Application\RendersOnSuccess;
+use App\Controller\Application\RendersRejectedSubmissionTrait;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Form\Database\AuditNoteType;
@@ -36,6 +37,8 @@ use function Symfony\Component\Translation\t;
 #[Route(path: '/members')]
 final class MemberController extends AbstractMemberController
 {
+    use RendersRejectedSubmissionTrait;
+
     /**
      * How far ahead an expiring membership is worth acting on.
      */
@@ -140,6 +143,9 @@ final class MemberController extends AbstractMemberController
                     ),
                 ),
             ],
+            // This action declares RendersOnSuccess, because both a preview and a completed renewal return this
+            // page, so rejected membership numbers must set the status here.
+            $this->rejectedSubmission($form),
         );
     }
 

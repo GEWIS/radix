@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace App\EventListener\Application;
 
-use App\Attribute\Application\ReadOnlySafe;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\MaintenanceStatus;
+use App\Service\Application\LiveComponentAction;
 use App\Service\Application\MaintenanceStatusProvider;
-use InvalidArgumentException;
-use JsonException;
-use ReflectionException;
-use ReflectionMethod;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -21,17 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\UX\TwigComponent\ComponentFactory;
 
 use function file_get_contents;
 use function in_array;
-use function is_array;
 use function is_string;
-use function json_decode;
 use function parse_url;
 use function str_starts_with;
 
-use const JSON_THROW_ON_ERROR;
 use const PHP_URL_HOST;
 use const PHP_URL_PATH;
 use const PHP_URL_QUERY;
@@ -72,27 +64,11 @@ final readonly class MaintenanceListener
     /** The container healthcheck, which reports on maintenance rather than being subject to it. */
     private const string HEALTH_ROUTE = 'app_health';
 
-    /** Where every live component request lands, whichever component and action it is for. */
-    private const string LIVE_COMPONENT_ROUTE = 'ux_live_component';
-
-    /**
-     * The action a live component request specifies when it is only re-rendering itself against changed props. It runs
-     * no method of the component's own, so there is nothing for it to write.
-     */
-    private const string LIVE_COMPONENT_RENDER = 'get';
-
-    /**
-     * The action a live component request specifies when it contains several actions the browser fired while an earlier
-     * one was still in flight. What it may do is what those actions may do.
-     */
-    private const string LIVE_COMPONENT_BATCH = '_batch';
-
     public function __construct(
         private MaintenanceStatusProvider $maintenanceStatus,
         private Security $security,
         private TranslatorInterface $translator,
-        #[Autowire(service: 'ux.twig_component.component_factory')]
-        private ComponentFactory $components,
+        private LiveComponentAction $liveComponentAction,
         #[Autowire('%env(bool:MAINTENANCE)%')]
         private bool $maintenanceEnv,
         #[Autowire('%kernel.project_dir%')]
@@ -156,129 +132,14 @@ final readonly class MaintenanceListener
     /**
      * Whether the request only reads. The method is enough for everything a browser navigates to, and for everything a
      * form posts; a live component sends paging and filtering as a POST like it sends a write, so those declare it
-     * themselves with {@see ReadOnlySafe}.
+     * themselves with {@see \App\Attribute\Application\ReadOnlySafe}, which
+     * {@see \App\Service\Application\LiveComponentAction} reads.
      */
     private function isRead(Request $request): bool
     {
         return $request->isMethodSafe()
-            || $this->isReadOnlySafeLiveAction($request);
-    }
-
-    private function isReadOnlySafeLiveAction(Request $request): bool
-    {
-        if (self::LIVE_COMPONENT_ROUTE !== $request->attributes->get('_route')) {
-            return false;
-        }
-
-        $component = $request->attributes->get('_live_component');
-        $action = $request->attributes->get(
-            '_live_action',
-            self::LIVE_COMPONENT_RENDER,
-        );
-        if (
-            !is_string($component)
-            || !is_string($action)
-        ) {
-            return false;
-        }
-
-        // A re-render runs no method of the component's own: it rehydrates the props it was sent and renders again.
-        if (self::LIVE_COMPONENT_RENDER === $action) {
-            return true;
-        }
-
-        try {
-            $class = $this->components->metadataFor($component)->getClass();
-        } catch (InvalidArgumentException) {
-            return false;
-        }
-
-        if (self::LIVE_COMPONENT_BATCH !== $action) {
-            return $this->isReadOnlySafe(
-                $class,
-                $action,
-            );
-        }
-
-        $batched = $this->batchedActions($request);
-        if ([] === $batched) {
-            return false;
-        }
-
-        foreach ($batched as $name) {
-            if (
-                !$this->isReadOnlySafe(
-                    $class,
-                    $name,
-                )
-            ) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function isReadOnlySafe(
-        string $class,
-        string $action,
-    ): bool {
-        try {
-            $method = new ReflectionMethod(
-                $class,
-                $action,
-            );
-        } catch (ReflectionException) {
-            return false;
-        }
-
-        return [] !== $method->getAttributes(ReadOnlySafe::class);
-    }
-
-    /**
-     * The actions a batched request contains, by name. An empty list for anything that cannot be read as one, so a body
-     * this does not understand is refused rather than accepted.
-     *
-     * @return list<string>
-     */
-    private function batchedActions(Request $request): array
-    {
-        $data = $request->request->get('data');
-        if (!is_string($data)) {
-            return [];
-        }
-
-        try {
-            $decoded = json_decode(
-                $data,
-                true,
-                512,
-                JSON_THROW_ON_ERROR,
-            );
-        } catch (JsonException) {
-            return [];
-        }
-
-        if (
-            !is_array($decoded)
-            || !is_array($decoded['actions'] ?? null)
-        ) {
-            return [];
-        }
-
-        $names = [];
-        foreach ($decoded['actions'] as $batched) {
-            if (
-                !is_array($batched)
-                || !is_string($batched['name'] ?? null)
-            ) {
-                return [];
-            }
-
-            $names[] = $batched['name'];
-        }
-
-        return $names;
+            // Undecided counts as a write here, so a request this cannot classify is refused rather than allowed.
+            || false === $this->liveComponentAction->writes($request);
     }
 
     private function flashReadOnly(Request $request): void

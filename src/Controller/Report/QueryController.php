@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Report;
 
 use App\Attribute\Application\RendersOnSuccess;
+use App\Controller\Application\RendersRejectedSubmissionTrait;
 use App\Entity\Database\SavedQuery;
 use App\Form\Report\QueryExportType;
 use App\Form\Report\QuerySaveType;
@@ -25,6 +26,8 @@ use function str_replace;
 #[Route(path: '/query')]
 final class QueryController extends AbstractController
 {
+    use RendersRejectedSubmissionTrait;
+
     public function __construct(private readonly QueryService $queryService)
     {
     }
@@ -196,6 +199,10 @@ final class QueryController extends AbstractController
                 'current_query' => $savedQuery,
                 'result' => $result,
             ],
+            // The actions this serves declare RendersOnSuccess, because a query returns its result on this page, so
+            // a rejected submission must set the status here. The parser's error is added to the form above, after
+            // validity was first read, which is why validity is read again.
+            $this->rejectedSubmission($form),
         );
     }
 
