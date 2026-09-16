@@ -194,8 +194,8 @@ final class AlbumServiceTest extends DatabaseTestCase
         // The afterparty starts four hours after the dinner, so a chronological listing puts the dinner first.
         self::assertSame(
             [
-                'Gala 2024 – Dinner',
-                'Gala 2024 – Afterparty',
+                'Gala 2024 - Dinner',
+                'Gala 2024 - Afterparty',
             ],
             array_map(
                 static fn (Album $album): string => $album->name,

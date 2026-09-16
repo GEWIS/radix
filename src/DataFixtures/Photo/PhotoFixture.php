@@ -52,8 +52,8 @@ use function unlink;
  *
  * The core tree below is always seeded and is what the integration tests assert against:
  *   Gala 2024                (published)
- *     ├─ Gala 2024 – Dinner       (published)   a graduate is tagged here
- *     └─ Gala 2024 – Afterparty   (published)   a different graduate is tagged here
+ *     ├─ Gala 2024 - Dinner       (published)   a graduate is tagged here
+ *     └─ Gala 2024 - Afterparty   (published)   a different graduate is tagged here
  *   Trip 2024                (published)         has the visible weekly photo
  *   Draft Album              (unpublished)
  *
@@ -199,7 +199,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         $manager->persist($gala);
 
         $dinner = $this->makeAlbum(
-            'Gala 2024 – Dinner',
+            'Gala 2024 - Dinner',
             true,
             $gala,
             '-6 months',
@@ -207,7 +207,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         $manager->persist($dinner);
 
         $afterparty = $this->makeAlbum(
-            'Gala 2024 – Afterparty',
+            'Gala 2024 - Afterparty',
             true,
             $gala,
             '-6 months 4 hours',
@@ -216,7 +216,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
 
         // A draft sub-album under a published parent, so counts can assert drafts are public-invisible.
         $galaDraft = $this->makeAlbum(
-            'Gala 2024 – Draft',
+            'Gala 2024 - Draft',
             false,
             $gala,
             '-6 months 8 hours',
@@ -443,7 +443,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
 
         foreach (['Main Stage', 'Camping', 'After Movie'] as $day => $stage) {
             $subAlbum = $this->makeAlbum(
-                'Summer Festival – ' . $stage,
+                'Summer Festival - ' . $stage,
                 true,
                 $festival,
                 sprintf(

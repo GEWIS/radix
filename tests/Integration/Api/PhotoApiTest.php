@@ -307,8 +307,8 @@ final class PhotoApiTest extends ApiTestCase
         // The seed's afterparty starts four hours after its dinner, so a chronological listing puts the dinner first.
         self::assertSame(
             [
-                'Gala 2024 – Dinner',
-                'Gala 2024 – Afterparty',
+                'Gala 2024 - Dinner',
+                'Gala 2024 - Afterparty',
             ],
             array_column(
                 $body['data']['children'],
