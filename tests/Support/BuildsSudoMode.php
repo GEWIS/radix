@@ -27,13 +27,22 @@ trait BuildsSudoMode
 {
     use StandsInForValkey;
 
+    /** The two windows, as `config/packages/session.yaml` sets them. */
+    private const int IDLE_SECONDS = 1800;
+    private const int ABSOLUTE_SECONDS = 7200;
+
     private function sudoMode(
         SessionInterface $session,
         TokenStorageInterface $tokenStorage,
         string $firewall = 'main',
         ?MockClock $clock = null,
         ?Redis $valkey = null,
+        int $idleSeconds = self::IDLE_SECONDS,
+        int $absoluteSeconds = self::ABSOLUTE_SECONDS,
     ): SudoMode {
+        // One clock for the grant and for the store it lives in, or a key would expire against a different now.
+        $clock ??= new MockClock();
+
         // The key of a grant is built from the session ID, so the session needs one.
         $request = new Request(cookies: [$session->getName() => $session->getId()]);
         $request->setSession($session);
@@ -49,10 +58,12 @@ trait BuildsSudoMode
 
         return new SudoMode(
             $requestStack,
-            $clock ?? new MockClock(),
+            $clock,
             $firewallMap,
             $tokenStorage,
-            $valkey ?? $this->valkey(),
+            $valkey ?? $this->valkey($clock),
+            $idleSeconds,
+            $absoluteSeconds,
         );
     }
 

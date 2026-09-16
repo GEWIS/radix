@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\EventListener\User;
 
 use App\EventListener\User\SudoEnforcementListener;
+use App\Security\User\SudoArea;
 use App\Security\User\SudoVoter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -119,7 +120,7 @@ final class SudoEnforcementListenerTest extends TestCase
 
         return new SudoEnforcementListener(
             $authorizationChecker,
-            'en|nl',
+            new SudoArea('en|nl'),
         );
     }
 

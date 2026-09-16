@@ -5,19 +5,25 @@ declare(strict_types=1);
 namespace App\Tests\Support;
 
 use ArrayObject;
+use Psr\Clock\ClockInterface;
 use Redis;
+use Symfony\Component\Clock\MockClock;
 
 /**
  * In-memory stand-in for Valkey.
  *
- * TTLs are not implemented because the callers read expiry from the stored value rather than from the key.
+ * Expiry is kept, because a key whose own expiry has passed is gone whatever its value says, and a grant writes that
+ * expiry from a window that moves. The clock is the same one the caller reads, so a test that moves time forward sees
+ * a key disappear at the moment the real one would.
  */
 trait StandsInForValkey
 {
-    private function valkey(): Redis
+    private function valkey(?ClockInterface $clock = null): Redis
     {
-        /** @var ArrayObject<string, string> $store */
+        /** @var ArrayObject<string, array{string, int}> $store */
         $store = new ArrayObject();
+        $clock ??= new MockClock();
+        $now = static fn (): int => $clock->now()->getTimestamp();
 
         $valkey = self::createStub(Redis::class);
         $valkey->method('setex')->willReturnCallback(
@@ -25,14 +31,34 @@ trait StandsInForValkey
                 string $key,
                 int $expire,
                 mixed $value,
-            ) use ($store): bool {
-                $store[$key] = (string) $value;
+            ) use ($store, $now): bool {
+                $store[$key] = [
+                    (string) $value,
+                    $now() + $expire,
+                ];
 
                 return true;
             },
         );
         $valkey->method('get')->willReturnCallback(
-            static fn (string $key): string|false => $store[$key] ?? false,
+            static function (string $key) use ($store, $now): string|false {
+                $entry = $store[$key] ?? null;
+                if (null === $entry) {
+                    return false;
+                }
+
+                [
+                    $value, $expiresAt
+                ] = $entry;
+
+                if ($expiresAt <= $now()) {
+                    $store->offsetUnset($key);
+
+                    return false;
+                }
+
+                return $value;
+            },
         );
         $valkey->method('del')->willReturnCallback(
             static function (

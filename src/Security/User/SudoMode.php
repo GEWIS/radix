@@ -18,9 +18,14 @@ use function explode;
 use function hash_equals;
 use function is_string;
 use function max;
+use function min;
 
 /**
  * Time-bounded "sudo mode" grant, stored in Valkey under the firewall and PHP session it was given on.
+ *
+ * Two expirations. The first is extended by every guarded write, so a long edit is not interrupted by a prompt part
+ * of the way through it; a GET does not extend it, so an idle page still expires. The second is measured from the
+ * confirmation and is never extended, so a browser in use all day still requires a new confirmation.
  *
  * Granted by the sudo-confirmation flow after the user re-proves identity; either by providing their password or their
  * password + MFA if that is enabled for their account. Checked by {@see SudoVoter} on the 'SUDO' attribute.
@@ -41,8 +46,11 @@ final class SudoMode
 {
     private const string KEY_PREFIX = 'gws_sudo_';
 
-    /** A user identifier can contain a colon, so it goes last and the value is split on the first one only. */
+    /** A user identifier can contain a colon, so it goes last and the value is split into three parts only. */
     private const string VALUE_DELIMITER = ':';
+
+    /** The fields of the stored value, in order: the confirmation timestamp, the last extension, the identifier. */
+    private const int VALUE_PARTS = 3;
 
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -52,7 +60,10 @@ final class SudoMode
         private readonly TokenStorageInterface $tokenStorage,
         #[Autowire(service: 'Redis')]
         private readonly Redis $redis,
-        private readonly int $ttlSeconds = 1800,
+        #[Autowire(param: 'app.sudo_idle_ttl')]
+        private readonly int $idleSeconds,
+        #[Autowire(param: 'app.sudo_absolute_ttl')]
+        private readonly int $absoluteSeconds,
     ) {
     }
 
@@ -63,21 +74,42 @@ final class SudoMode
 
     public function grant(): void
     {
-        $identifier = $this->userIdentifier();
-        if (null === $identifier) {
+        $now = $this->clock->now()->getTimestamp();
+
+        $this->write(
+            $now,
+            $now,
+        );
+    }
+
+    /**
+     * Extends the first expiration, leaving the confirmation timestamp unchanged.
+     *
+     * Called only for a guarded write. A GET does not extend it, because a component that re-renders on a timer would
+     * otherwise keep a grant valid without user interaction.
+     *
+     * An expired grant is not revived, and nothing is written where there is no grant: this runs on every
+     * authenticated write, and would otherwise create a key for a user who never confirmed.
+     */
+    public function touch(): void
+    {
+        $grant = $this->read();
+        if (null === $grant) {
             return;
         }
 
-        $key = $this->key();
-        if (null === $key) {
+        [
+            $grantedAt,
+        ] = $grant;
+
+        $now = $this->clock->now()->getTimestamp();
+        if ($now >= $this->expiresAt($grant)) {
             return;
         }
 
-        // The TTL only removes the key. Whether a grant still counts is decided by the timestamp in the value.
-        $this->redis->setex(
-            $key,
-            $this->ttlSeconds,
-            $this->clock->now()->getTimestamp() . self::VALUE_DELIMITER . $identifier,
+        $this->write(
+            $grantedAt,
+            $now,
         );
     }
 
@@ -112,48 +144,114 @@ final class SudoMode
         );
     }
 
+    /**
+     * The seconds until the earlier of the two expirations.
+     */
     public function remainingSeconds(): int
     {
-        $identifier = $this->userIdentifier();
-        if (null === $identifier) {
-            return 0;
-        }
-
-        $key = $this->key();
-        if (null === $key) {
-            return 0;
-        }
-
-        $grant = $this->redis->get($key);
-        if (!is_string($grant)) {
-            return 0;
-        }
-
-        $parts = explode(
-            self::VALUE_DELIMITER,
-            $grant,
-            2,
-        );
-        if (2 !== count($parts)) {
-            return 0;
-        }
-
-        [
-            $grantedAt, $grantedTo
-        ] = $parts;
-        if (
-            !ctype_digit($grantedAt)
-            || !hash_equals(
-                $grantedTo,
-                $identifier,
-            )
-        ) {
+        $grant = $this->read();
+        if (null === $grant) {
             return 0;
         }
 
         return max(
             0,
-            (int) $grantedAt + $this->ttlSeconds - $this->clock->now()->getTimestamp(),
+            $this->expiresAt($grant) - $this->clock->now()->getTimestamp(),
+        );
+    }
+
+    /**
+     * The earlier of the two expirations, which is the one that decides the grant.
+     *
+     * @param array{int, int} $grant
+     */
+    private function expiresAt(array $grant): int
+    {
+        [
+            $grantedAt, $lastActiveAt
+        ] = $grant;
+
+        return min(
+            $lastActiveAt + $this->idleSeconds,
+            $grantedAt + $this->absoluteSeconds,
+        );
+    }
+
+    /**
+     * The two timestamps of this session's grant, or null when there is no valid grant.
+     *
+     * @return array{int, int}|null
+     */
+    private function read(): ?array
+    {
+        $identifier = $this->userIdentifier();
+        if (null === $identifier) {
+            return null;
+        }
+
+        $key = $this->key();
+        if (null === $key) {
+            return null;
+        }
+
+        $grant = $this->redis->get($key);
+        if (!is_string($grant)) {
+            return null;
+        }
+
+        $parts = explode(
+            self::VALUE_DELIMITER,
+            $grant,
+            self::VALUE_PARTS,
+        );
+        if (self::VALUE_PARTS !== count($parts)) {
+            return null;
+        }
+
+        [
+            $grantedAt,
+            $lastActiveAt, $grantedTo
+        ] = $parts;
+        if (
+            !ctype_digit($grantedAt)
+            || !ctype_digit($lastActiveAt)
+            || !hash_equals(
+                $grantedTo,
+                $identifier,
+            )
+        ) {
+            return null;
+        }
+
+        return [
+            (int) $grantedAt,
+            (int) $lastActiveAt,
+        ];
+    }
+
+    private function write(
+        int $grantedAt,
+        int $lastActiveAt,
+    ): void {
+        $identifier = $this->userIdentifier();
+        if (null === $identifier) {
+            return;
+        }
+
+        $key = $this->key();
+        if (null === $key) {
+            return;
+        }
+
+        // The key expiration is the upper bound; validity is decided by the timestamps in the value. It is derived
+        // from the second expiration, so a grant extended late in its life is still removed on time.
+        $this->redis->setex(
+            $key,
+            max(
+                1,
+                $grantedAt + $this->absoluteSeconds - $this->clock->now()->getTimestamp(),
+            ),
+            $grantedAt . self::VALUE_DELIMITER . $lastActiveAt . self::VALUE_DELIMITER . $identifier,
         );
     }
 

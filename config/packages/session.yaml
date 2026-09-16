@@ -1,5 +1,10 @@
 # yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 parameters:
+    # Sudo mode has two expirations. The first is extended by every guarded write; the second is measured from the
+    # confirmation and is never extended, so a browser in use all day still requires a new confirmation. The session
+    # outlives both and is extended by reads as well, so the second expiration is what ends a grant in practice.
+    app.sudo_idle_ttl: 1800
+    app.sudo_absolute_ttl: 7200
     app.session_prefix: 'gws_sess_'
     # Named rather than left to `session.gc_maxlifetime`, whose twenty-four minutes had an ordinary break ending in
     # a remember-me re-authentication, and a token rotation with it.

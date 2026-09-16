@@ -262,4 +262,84 @@ final class SudoModeTest extends TestCase
             valkey: $valkey,
         )->isActive());
     }
+
+    public function testAWriteKeepsTheGrantAliveBeyondTheIdleWindow(): void
+    {
+        $clock = new MockClock();
+        $sudo = $this->sudoMode(
+            $this->session(),
+            $this->tokenStorage('8025'),
+            clock: $clock,
+        );
+        $sudo->grant();
+
+        // Working: something is handed in before the window runs out, over and over.
+        for ($i = 0; $i < 4; ++$i) {
+            $clock->sleep(self::IDLE_SECONDS - 60);
+            $sudo->touch();
+        }
+
+        self::assertTrue($sudo->isActive());
+    }
+
+    public function testAGrantNothingPushesForwardRunsOut(): void
+    {
+        $clock = new MockClock();
+        $sudo = $this->sudoMode(
+            $this->session(),
+            $this->tokenStorage('8025'),
+            clock: $clock,
+        );
+        $sudo->grant();
+
+        $clock->sleep(self::IDLE_SECONDS + 1);
+
+        self::assertFalse($sudo->isActive());
+    }
+
+    public function testTheAbsoluteLimitEndsAGrantThatIsStillBeingUsed(): void
+    {
+        $clock = new MockClock();
+        $sudo = $this->sudoMode(
+            $this->session(),
+            $this->tokenStorage('8025'),
+            clock: $clock,
+        );
+        $sudo->grant();
+
+        // Busy all day: the idle window never lapses, and the limit from the moment the password was typed does.
+        for ($i = 0; $i < 20; ++$i) {
+            $clock->sleep(self::IDLE_SECONDS - 60);
+            $sudo->touch();
+        }
+
+        self::assertFalse($sudo->isActive());
+    }
+
+    public function testAGrantThatHasRunOutIsNotBroughtBackByAWrite(): void
+    {
+        $clock = new MockClock();
+        $sudo = $this->sudoMode(
+            $this->session(),
+            $this->tokenStorage('8025'),
+            clock: $clock,
+        );
+        $sudo->grant();
+
+        $clock->sleep(self::IDLE_SECONDS + 1);
+        $sudo->touch();
+
+        self::assertFalse($sudo->isActive());
+    }
+
+    public function testAWriteWithoutAGrantLeavesNothingBehind(): void
+    {
+        $sudo = $this->sudoMode(
+            $this->session(),
+            $this->tokenStorage('8025'),
+        );
+        $sudo->touch();
+
+        self::assertFalse($sudo->isActive());
+    }
 }
