@@ -52,6 +52,7 @@ class MainScheduleTest extends KernelTestCase
         'app:public-archive:sync' => 'cron',
         'app:user:prune-expired-data-exports' => 'gdpr',
         'app:user:prune-security-log' => 'gdpr',
+        'app:user:prune-sudo-stashes' => 'maintenance',
         'app:user:purge-expired-sessions' => 'gdpr',
         'app:user:update-ip-databases' => 'maintenance',
         'app:users:force-relogin' => 'cron',

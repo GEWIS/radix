@@ -60,6 +60,9 @@ enum StorageNamespace: string
     /** A watermarked course document built for one download, deleted once collected or expired. */
     case EducationDownload = 'education-download';
 
+    /** The uploads of a write that was refused for want of a sudo grant, scoped per stash and never served. */
+    case SudoStash = 'sudo-stash';
+
     private const int MEGABYTE = 1024 * 1024;
 
     /**
@@ -122,6 +125,10 @@ enum StorageNamespace: string
                 $scope,
                 'education/downloads',
             ),
+            self::SudoStash => sprintf(
+                'sudo-stash/%s',
+                $this->requireScope($scope),
+            ),
         };
     }
 
@@ -140,7 +147,8 @@ enum StorageNamespace: string
             self::MeetingDocument,
             self::MeetingMinutes,
             self::EducationDocument,
-            self::EducationDocumentPage => true,
+            self::EducationDocumentPage,
+            self::SudoStash => true,
             default => false,
         };
     }
@@ -163,7 +171,8 @@ enum StorageNamespace: string
             self::ReferenceDocument,
             self::EducationDocument,
             self::EducationDocumentPage,
-            self::EducationDownload => true,
+            self::EducationDownload,
+            self::SudoStash => true,
             default => false,
         };
     }
@@ -210,6 +219,14 @@ enum StorageNamespace: string
      */
     public function acceptsMimeType(string $mimeType): bool
     {
+        // A stash is written as it was received, because which types are accepted depends on the action the write
+        // was addressed to and that action has not run yet. It applies its own namespace on the replay, so nothing
+        // reaches storage for good without the check it would have had. Refusing every type here keeps the stash out
+        // of store(), which is the path that would otherwise accept it on this list.
+        if (self::SudoStash === $this) {
+            return false;
+        }
+
         return in_array(
             $mimeType,
             $this->allowedMimeTypes(),

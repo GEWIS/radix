@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { sudoConfirmUrl } from '../../js/sudo.ts';
 
 /**
  * One request per file, like the album upload, so a file the server rejects reports itself on its own row and the rest
@@ -145,8 +146,9 @@ export default class extends Controller<HTMLElement> {
 
             // A window that ran out mid-batch is not a rejected file: every remaining row would report a failure it
             // cannot explain, so the browser is sent to confirm instead.
-            if (401 === request.status) {
-                window.location.assign(this._confirmUrl(request) ?? window.location.href);
+            const confirmUrl = sudoConfirmUrl(request.status, request.responseText);
+            if (null !== confirmUrl) {
+                window.location.assign(confirmUrl);
 
                 return;
             }
@@ -167,17 +169,6 @@ export default class extends Controller<HTMLElement> {
     }
 
     // The error the server reported, so a rejected file shows why rather than only that it failed.
-    /** Where to confirm, from the 401 returned for a sudo window that has run out. */
-    private _confirmUrl(request: XMLHttpRequest): string | null {
-        try {
-            const payload = JSON.parse(request.responseText) as { confirmUrl?: string };
-
-            return payload.confirmUrl ?? null;
-        } catch {
-            return null;
-        }
-    }
-
     private _reason(request: XMLHttpRequest): string | null {
         try {
             const data: unknown = JSON.parse(request.responseText);

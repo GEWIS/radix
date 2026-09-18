@@ -5,6 +5,9 @@ parameters:
     # outlives both and is extended by reads as well, so the second expiration is what ends a grant in practice.
     app.sudo_idle_ttl: 1800
     app.sudo_absolute_ttl: 7200
+    # How long a write refused for want of a grant is kept for. Longer than the prompt takes to fill in, including
+    # finding a phone for the second factor, and short enough that an abandoned one is gone within the hour.
+    app.sudo_stash_ttl: 3600
     app.session_prefix: 'gws_sess_'
     # Named rather than left to `session.gc_maxlifetime`, whose twenty-four minutes had an ordinary break ending in
     # a remember-me re-authentication, and a token rotation with it.

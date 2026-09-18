@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\EventListener\Application;
 
 use App\Attribute\Application\RendersOnSuccess;
-use ReflectionException;
-use ReflectionMethod;
+use App\Service\Application\LiveComponentAction;
+use App\Util\Application\ControllerAttribute;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
-use function explode;
 use function is_string;
-use function str_contains;
 use function str_starts_with;
 
 /**
@@ -38,8 +36,10 @@ use function str_starts_with;
 )]
 final class InvalidSubmissionStatusListener
 {
-    /** Live components return a rendered 200 for every action, including the ones that write. */
-    private const string LIVE_COMPONENT_ROUTE = 'ux_live_component';
+    public function __construct(
+        private readonly LiveComponentAction $liveComponentAction,
+    ) {
+    }
 
     public function __invoke(ResponseEvent $event): void
     {
@@ -62,8 +62,9 @@ final class InvalidSubmissionStatusListener
             return;
         }
 
+        // A live component returns a rendered 200 for every action, including the ones that write.
         if (
-            self::LIVE_COMPONENT_ROUTE === $request->attributes->get('_route')
+            $this->liveComponentAction->isRequest($request)
             || $this->rendersOnSuccess($request)
         ) {
             return;
@@ -90,37 +91,9 @@ final class InvalidSubmissionStatusListener
 
     private function rendersOnSuccess(Request $request): bool
     {
-        $controller = $request->attributes->get('_controller');
-        if (!is_string($controller)) {
-            return false;
-        }
-
-        // An invokable controller is identified by its class alone; everything else appends `::method`.
-        [
-            $class, $method
-        ] = str_contains(
-            $controller,
-            '::',
-        )
-            ? explode(
-                '::',
-                $controller,
-                2,
-            )
-            : [
-                $controller,
-                '__invoke',
-            ];
-
-        try {
-            $action = new ReflectionMethod(
-                $class,
-                $method,
-            );
-        } catch (ReflectionException) {
-            return false;
-        }
-
-        return [] !== $action->getAttributes(RendersOnSuccess::class);
+        return ControllerAttribute::isPresent(
+            $request->attributes->get('_controller'),
+            RendersOnSuccess::class,
+        );
     }
 }

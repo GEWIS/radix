@@ -6,11 +6,7 @@ namespace App\Security\User;
 
 use Psr\Clock\ClockInterface;
 use Redis;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 
 use function count;
 use function ctype_digit;
@@ -53,11 +49,8 @@ final class SudoMode
     private const int VALUE_PARTS = 3;
 
     public function __construct(
-        private readonly RequestStack $requestStack,
         private readonly ClockInterface $clock,
-        #[Autowire(service: 'security.firewall.map')]
-        private readonly FirewallMap $firewallMap,
-        private readonly TokenStorageInterface $tokenStorage,
+        private readonly SudoSession $session,
         #[Autowire(service: 'Redis')]
         private readonly Redis $redis,
         #[Autowire(param: 'app.sudo_idle_ttl')]
@@ -137,8 +130,8 @@ final class SudoMode
         }
 
         $this->redis->del(
-            $this->keyFor(
-                $firewall->value,
+            self::KEY_PREFIX . $this->session->of(
+                $firewall,
                 $phpSessionId,
             ),
         );
@@ -184,7 +177,7 @@ final class SudoMode
      */
     private function read(): ?array
     {
-        $identifier = $this->userIdentifier();
+        $identifier = $this->session->userIdentifier();
         if (null === $identifier) {
             return null;
         }
@@ -233,7 +226,7 @@ final class SudoMode
         int $grantedAt,
         int $lastActiveAt,
     ): void {
-        $identifier = $this->userIdentifier();
+        $identifier = $this->session->userIdentifier();
         if (null === $identifier) {
             return;
         }
@@ -257,68 +250,10 @@ final class SudoMode
 
     private function key(): ?string
     {
-        $request = $this->requestStack->getMainRequest();
-        if (
-            null === $request
-            || !$request->hasSession()
-        ) {
-            return null;
-        }
+        $suffix = $this->session->current();
 
-        // The API firewall is stateless and has no session to key a grant on.
-        $firewall = $this->firewallMap->getFirewallConfig($request)?->getName();
-        if (
-            null === $firewall
-            || null === Firewall::tryFrom($firewall)
-        ) {
-            return null;
-        }
-
-        // An unstarted session has no ID, which would leave grant() doing nothing at all. Callers are signed in and
-        // already have one, so in practice this only fires for tests that build the request themselves.
-        $session = $request->getSession();
-        if (!$session->isStarted()) {
-            $session->start();
-        }
-
-        $sessionId = $session->getId();
-        if ('' === $sessionId) {
-            return null;
-        }
-
-        return $this->keyFor(
-            $firewall,
-            $sessionId,
-        );
-    }
-
-    private function keyFor(
-        string $firewall,
-        string $phpSessionId,
-    ): string {
-        return self::KEY_PREFIX . $firewall . '_' . $phpSessionId;
-    }
-
-    private function userIdentifier(): ?string
-    {
-        $token = $this->tokenStorage->getToken();
-
-        // While impersonating, the account on the token is the impersonated one rather than the one that authenticated.
-        // The grant belongs to the administrator behind the switch, who is the only one that entered a password, so
-        // read through to them.
-        while ($token instanceof SwitchUserToken) {
-            $token = $token->getOriginalToken();
-        }
-
-        $identifier = $token?->getUserIdentifier();
-
-        if (
-            null === $identifier
-            || '' === $identifier
-        ) {
-            return null;
-        }
-
-        return $identifier;
+        return null === $suffix
+            ? null
+            : self::KEY_PREFIX . $suffix;
     }
 }

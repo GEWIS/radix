@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventListener\User;
 
 use App\Security\User\Firewall;
+use App\Security\User\SudoStash;
 use App\Security\User\SudoVoter;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -29,9 +30,12 @@ use function in_array;
  * by re-typing the password instead. `stopPropagation()` ensures the built-in listener does not run for sudo denials;
  * other denials fall through unchanged.
  *
- * A request issued by script is answered differently, because `fetch` follows a redirect transparently and returns
- * the confirmation page to a caller expecting a result. That is why an upload reported success for a file that was
- * never stored.
+ * A request issued by script receives a different response, because `fetch` follows a redirect transparently and
+ * returns the confirmation page to a caller expecting a result. That is why an upload reported success for a file
+ * that was never stored.
+ *
+ * The refused write is kept first ({@see SudoStash}), because this is the last place that has it, and the id it is
+ * found again by goes to the prompt beside the address to return to.
  */
 #[AsEventListener(
     event: ExceptionEvent::class,
@@ -43,6 +47,7 @@ final class SudoAccessDeniedListener
         private readonly UrlGeneratorInterface $urlGenerator,
         #[Autowire(service: 'security.firewall.map')]
         private readonly FirewallMap $firewallMap,
+        private readonly SudoStash $stash,
     ) {
     }
 
@@ -74,12 +79,24 @@ final class SudoAccessDeniedListener
             return;
         }
 
+        // Before the response, because the request is what is kept and the listener is the last place that has it.
+        $parameters = ['next' => $request->getRequestUri()];
+        $stashed = $this->stash->stash($request);
+        if (null !== $stashed) {
+            $parameters['stash'] = $stashed;
+        }
+
+        $confirmUrl = $this->urlGenerator->generate(
+            $confirmRoute,
+            $parameters,
+        );
+
         // A status the caller can test, rather than a page it cannot distinguish from a result.
         if ($this->isBackgroundRequest($request)) {
             $event->setResponse(new JsonResponse(
                 [
                     'error' => 'sudo_required',
-                    'confirmUrl' => $this->urlGenerator->generate($confirmRoute),
+                    'confirmUrl' => $confirmUrl,
                 ],
                 Response::HTTP_UNAUTHORIZED,
             ));
@@ -88,14 +105,7 @@ final class SudoAccessDeniedListener
             return;
         }
 
-        // The path is included for every method. A redirect cannot resubmit a form, so the submitted values are
-        // still lost, but the user returns to the page instead of to the front page.
-        $event->setResponse(new RedirectResponse(
-            $this->urlGenerator->generate(
-                $confirmRoute,
-                ['next' => $request->getRequestUri()],
-            ),
-        ));
+        $event->setResponse(new RedirectResponse($confirmUrl));
         $event->stopPropagation();
     }
 
