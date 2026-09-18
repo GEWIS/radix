@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Photo;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\NotificationType;
 use App\Entity\Photo\Album;
@@ -155,6 +156,7 @@ class AdminController extends AbstractController
             && 12 > (int) $now->format('G');
     }
 
+    #[Replayable]
     #[Route(
         path: '/albums/create',
         name: 'albums_create',
@@ -206,6 +208,7 @@ class AdminController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/albums/{album}/edit',
         name: 'albums_edit',

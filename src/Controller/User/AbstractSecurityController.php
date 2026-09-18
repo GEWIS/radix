@@ -629,6 +629,8 @@ abstract class AbstractSecurityController extends AbstractController
                 $form,
                 $sudoConfirmRouteName,
                 $next,
+                $stash,
+                $sudoReplay,
             );
         }
 
@@ -658,6 +660,8 @@ abstract class AbstractSecurityController extends AbstractController
                 $form,
                 $sudoConfirmRouteName,
                 $next,
+                $stash,
+                $sudoReplay,
             );
         }
 
@@ -709,6 +713,8 @@ abstract class AbstractSecurityController extends AbstractController
                 $form,
                 $sudoConfirmRouteName,
                 $next,
+                $stash,
+                $sudoReplay,
             );
         }
 
@@ -1119,6 +1125,8 @@ abstract class AbstractSecurityController extends AbstractController
         FormInterface $form,
         string $sudoConfirmRouteName,
         string $next,
+        string $stash,
+        SudoReplay $sudoReplay,
     ): Response {
         return $this->render(
             'user/sudo-confirm.html.twig',
@@ -1126,6 +1134,8 @@ abstract class AbstractSecurityController extends AbstractController
                 'form' => $form,
                 'sudoConfirmRoute' => $sudoConfirmRouteName,
                 'next' => $next,
+                'stash' => $stash,
+                'pending' => $sudoReplay->outcomeFor($stash),
             ],
         );
     }

@@ -6,8 +6,10 @@ namespace App\Entity\Application\Enums;
 
 use InvalidArgumentException;
 
+use function array_any;
 use function in_array;
 use function sprintf;
+use function str_contains;
 
 /**
  * The domains that {@see \App\Service\Application\FileStorage} stores files for. Each case maps a domain onto its
@@ -64,6 +66,13 @@ enum StorageNamespace: string
     case SudoStash = 'sudo-stash';
 
     private const int MEGABYTE = 1024 * 1024;
+
+    /** What makes a scope a path rather than the single segment {@see requireScope()} requires it to be. */
+    private const array PATH_SEPARATORS = [
+        '/',
+        '\\',
+        '..',
+    ];
 
     /**
      * The directory prefix (no leading or trailing slash) this namespace stores into, relative to the storage root.
@@ -266,6 +275,28 @@ enum StorageNamespace: string
                 sprintf(
                     'Storage namespace "%s" requires a scope.',
                     $this->value,
+                ),
+            );
+        }
+
+        // A scope names one entity: an album, a company, a meeting, a course. It is a segment of the path and never
+        // a path itself, so a separator or a dot segment in it would address a directory of another namespace, or of
+        // none. Every caller derives one from an id, so this only ever applies to one that reaches here from a
+        // request.
+        if (
+            array_any(
+                self::PATH_SEPARATORS,
+                static fn (string $separator): bool => str_contains(
+                    $scope,
+                    $separator,
+                ),
+            )
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Storage namespace "%s" was given a scope that is a path: "%s".',
+                    $this->value,
+                    $scope,
                 ),
             );
         }

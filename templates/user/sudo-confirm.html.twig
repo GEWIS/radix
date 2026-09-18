@@ -20,6 +20,22 @@
                         </p>
                     </div>
                 {% endif %}
+                {# Confirming is not only about identity when a submission was refused on the way here: it either
+                   completes that submission or it does not, and which of the two is not something to leave the user
+                   to find out afterwards. #}
+                {% if pending == enum('App\\Security\\User\\RefusedWrite').SentOnConfirmation %}
+                    <div class="alert alert-info" role="alert">
+                        <p class="mb-0">
+                            {{ 'Your submission was kept. Confirming below sends it, so you do not have to fill it in again.'|trans }}
+                        </p>
+                    </div>
+                {% elseif pending == enum('App\\Security\\User\\RefusedWrite').SubmittedByHand %}
+                    <div class="alert alert-warning" role="alert">
+                        <p class="mb-0">
+                            {{ 'Your submission was not sent. Confirming below returns you to the page, where you can submit it again.'|trans }}
+                        </p>
+                    </div>
+                {% endif %}
                 {# The window is stated in minutes from the parameter that decides it, so the two cannot drift apart
                    the way a written-out "30 minutes" did. #}
                 {% set sudo_minutes = (sudo_idle_seconds / 60)|round %}
@@ -30,7 +46,9 @@
                         {{ 'For your protection, sensitive actions require you to re-enter your password. The confirmation lasts %minutes% minutes, and working keeps it open.'|trans({'%minutes%': sudo_minutes}) }}
                     {% endif %}
                 </p>
-                {{ form_start(form, {'action': path(sudoConfirmRoute, {'next': next}), 'attr': {'novalidate': 'novalidate'}}) }}
+                {# The stash is part of the address on the way in and has to be part of the submission as well, or
+                   confirming arrives without the write it was asked for. #}
+                {{ form_start(form, {'action': path(sudoConfirmRoute, {'next': next, 'stash': stash}), 'attr': {'novalidate': 'novalidate'}}) }}
                     {{ form_errors(form) }}
                     {{ form_row(form.password) }}
                     {% if form.mfaCode is defined %}

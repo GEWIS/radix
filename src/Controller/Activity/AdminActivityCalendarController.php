@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Activity;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Activity\ActivityDateOption;
 use App\Entity\Activity\ActivityProposal;
 use App\Entity\Application\Enums\AlertTypes;
@@ -97,6 +98,7 @@ class AdminActivityCalendarController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/propose',
         name: 'propose',
@@ -185,6 +187,7 @@ class AdminActivityCalendarController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/proposals/{proposal}/edit',
         name: 'proposal_edit',

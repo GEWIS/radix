@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Support;
 
+use App\Security\User\ReplayableAction;
 use App\Security\User\SudoArea;
 use App\Security\User\SudoMode;
 use App\Security\User\SudoSession;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -110,6 +112,9 @@ trait BuildsSudoMode
                 $tokenStorage,
             ),
             new SudoArea(self::LOCALES),
+            // The router is only read for a path on its own, which the stash never has: it is handed the request
+            // the listener refused, and reads the action the router already named on it.
+            new ReplayableAction(self::createStub(RouterInterface::class)),
             $storage ?? new FileStorage(new Filesystem(new InMemoryFilesystemAdapter())),
             new NullLogger(),
             $valkey ?? $this->valkey($clock),

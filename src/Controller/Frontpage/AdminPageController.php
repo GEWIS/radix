@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Frontpage;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\ImageVariant;
@@ -70,6 +71,7 @@ class AdminPageController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/create',
         name: 'create',
@@ -149,6 +151,7 @@ class AdminPageController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{page}/edit',
         name: 'edit',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Frontpage;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\AbstractRevisionReviewController;
 use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\RevisionInterface;
@@ -91,6 +92,7 @@ class AdminPollApprovalController extends AbstractRevisionReviewController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{revision}/comment',
         name: 'comment',

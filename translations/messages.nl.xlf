@@ -11913,6 +11913,14 @@
         <source>Your student number is a 7-digit number, for example 1234560. You have received this in an email when you enrolled and it is printed on your campus card. Go to &lt;a href="%url%"&gt;this page&lt;/a&gt; if you need help finding it. Your student number will be used to verify you are studying at the department of M&amp;CS.</source>
         <target state="translated"><![CDATA[Je studentnummer is een getal van 7 cijfers, bijvoorbeeld 1234560. Je hebt dit per e-mail gekregen toen je je inschreef en het staat op je campuskaart. Ga naar <a href="%url%">deze pagina</a> als je het niet kunt vinden. Je studentnummer wordt gebruikt om te controleren of je bij de faculteit W&I studeert.]]></target>
       </trans-unit>
+      <trans-unit id="L2wWgbL" resname="Your submission was kept. Confirming below sends it, so you do not have to fill it in again.">
+        <source>Your submission was kept. Confirming below sends it, so you do not have to fill it in again.</source>
+        <target>Je inzending is bewaard. Als je hieronder bevestigt wordt hij alsnog verstuurd, zodat je hem niet opnieuw hoeft in te vullen.</target>
+      </trans-unit>
+      <trans-unit id="fWydCRU" resname="Your submission was not sent. Confirming below returns you to the page, where you can submit it again.">
+        <source>Your submission was not sent. Confirming below returns you to the page, where you can submit it again.</source>
+        <target>Je inzending is niet verstuurd. Als je hieronder bevestigt kom je terug op de pagina, waar je hem opnieuw kunt indienen.</target>
+      </trans-unit>
       <trans-unit id="GNnZfox" resname="Your vacancies">
         <source>Your vacancies</source>
         <target state="translated">Je vacatures</target>

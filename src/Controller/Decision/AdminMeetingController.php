@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Decision;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingDocument;
@@ -229,6 +230,7 @@ class AdminMeetingController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{type}/{number}/documents/upload',
         name: 'document_upload',
@@ -292,6 +294,7 @@ class AdminMeetingController extends AbstractController
         return new JsonResponse(['ok' => true]);
     }
 
+    #[Replayable]
     #[Route(
         path: '/documents/{document}/versions',
         name: 'document_version_upload',
@@ -322,6 +325,7 @@ class AdminMeetingController extends AbstractController
         return new JsonResponse(['ok' => true]);
     }
 
+    #[Replayable]
     #[Route(
         path: '/{type}/{number}/minutes',
         name: 'minutes_upload',

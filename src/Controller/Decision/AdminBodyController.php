@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Decision;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\AbstractRevisionController;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
@@ -145,6 +146,7 @@ class AdminBodyController extends AbstractRevisionController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{organ}/edit',
         name: 'edit',

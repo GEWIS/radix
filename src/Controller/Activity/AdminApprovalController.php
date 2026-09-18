@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Activity;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\AbstractRevisionReviewController;
 use App\Entity\Activity\ActivityRevision;
 use App\Entity\Application\RevisionInterface;
@@ -89,6 +90,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{revision}/comment',
         name: 'comment',

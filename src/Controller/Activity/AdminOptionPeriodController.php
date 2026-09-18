@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Activity;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Activity\OptionPeriod;
 use App\Entity\Activity\PeriodProposalLimit;
 use App\Entity\Application\Enums\AlertTypes;
@@ -65,6 +66,7 @@ class AdminOptionPeriodController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/create',
         name: 'create',
@@ -104,6 +106,7 @@ class AdminOptionPeriodController extends AbstractController
         return $this->redirectToRoute('admin/activities/calendar/periods/index');
     }
 
+    #[Replayable]
     #[Route(
         path: '/{period}/edit',
         name: 'edit',
@@ -187,6 +190,7 @@ class AdminOptionPeriodController extends AbstractController
      * The exceptions that apply in this round alone. A body without a row here falls back to its standing exception,
      * then to the round's own number, then to the number every body gets.
      */
+    #[Replayable]
     #[Route(
         path: '/{period}/limits',
         name: 'limits',

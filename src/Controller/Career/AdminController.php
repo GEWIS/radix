@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
@@ -78,6 +79,7 @@ class AdminController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/companies/create',
         name: 'companies/create',
@@ -198,6 +200,7 @@ class AdminController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/companies/{company}/edit',
         name: 'companies/edit',

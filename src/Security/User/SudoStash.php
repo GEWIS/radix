@@ -6,6 +6,7 @@ namespace App\Security\User;
 
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Service\Application\FileStorage;
+use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use Redis;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -14,16 +15,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
 use function bin2hex;
+use function dirname;
 use function fclose;
 use function fopen;
 use function hash_equals;
 use function in_array;
 use function is_array;
+use function is_int;
 use function is_resource;
 use function is_string;
 use function json_decode;
 use function json_encode;
+use function max;
 use function parse_url;
+use function preg_match;
+use function preg_quote;
 use function random_bytes;
 use function str_contains;
 use function strlen;
@@ -77,8 +83,18 @@ final readonly class SudoStash
 
     private const int MAX_FILES = 20;
 
+    /** Across the uploads of one stash, so that being refused repeatedly cannot be used to fill the storage. */
+    private const int MAX_TOTAL_BYTES = 64 * 1024 * 1024;
+
+    /** What {@see stash()} generates, and the only shape any other method acts on. */
+    private const string ID_BODY = '[0-9a-f]{32}';
+
+    private const string ID_PATTERN = '/^' . self::ID_BODY . '$/';
+
     public function __construct(
         private SudoSession $session,
+        private SudoArea $area,
+        private ReplayableAction $replayable,
         private FileStorage $fileStorage,
         private LoggerInterface $logger,
         #[Autowire(service: 'Redis')]
@@ -99,6 +115,11 @@ final readonly class SudoStash
             return null;
         }
 
+        // A heartbeat has no body worth keeping, and one arrives every interval for as long as the tab is open.
+        if ($this->area->isKeepalive($request)) {
+            return null;
+        }
+
         if (!$this->cameFromThisSite($request)) {
             return null;
         }
@@ -113,7 +134,10 @@ final readonly class SudoStash
         }
 
         $id = bin2hex(random_bytes(16));
-        $key = self::KEY_PREFIX . $suffix . '_' . $id;
+        $key = $this->key(
+            $suffix,
+            $id,
+        );
 
         /** @var array<array-key, mixed> $parameters */
         $parameters = $this->withoutCredentials($request->request->all());
@@ -124,10 +148,14 @@ final readonly class SudoStash
                 'method' => $request->getMethod(),
                 'uri' => $request->getRequestUri(),
                 'parameters' => $parameters,
-                'files' => $this->keepUploads(
-                    $request->files->all(),
-                    $id,
-                ),
+                // The uploads are read back only where the write is sent again, so a refusal of any other action
+                // keeps the fields and none of the bytes ({@see ReplayableAction}).
+                'files' => $this->replayable->covers($request)
+                    ? $this->keepUploads(
+                        $request->files->all(),
+                        $id,
+                    )
+                    : [],
             ],
             JSON_THROW_ON_ERROR,
         );
@@ -198,8 +226,29 @@ final readonly class SudoStash
     }
 
     /**
+     * Where an upload of this stash was written.
+     *
+     * Derived here rather than kept in the record, so that what is read back cannot address a file outside the
+     * stash it belongs to. The id is checked against the shape {@see stash()} generates, which is what keeps a
+     * directory of another namespace out of the path.
+     */
+    public function uploadPath(
+        string $id,
+        int $index,
+    ): ?string {
+        if (
+            !$this->isWellFormed($id)
+            || $index < 0
+        ) {
+            return null;
+        }
+
+        return StorageNamespace::SudoStash->directory($id) . '/' . $index;
+    }
+
+    /**
      * Removes a stash once it has been acted on. The key expires on its own; the uploads do not, which is why
-     * {@see \App\Command\User\PruneSudoStashesCommand} exists for the ones that are never collected.
+     * {@see prune()} exists for the ones that are never collected.
      */
     public function discard(string $id): void
     {
@@ -209,6 +258,73 @@ final readonly class SudoStash
         }
 
         $this->discardUploads($id);
+    }
+
+    /**
+     * Throws away the uploads of every stash last written before $before, and returns how many stashes that was.
+     *
+     * Here rather than in {@see \App\Command\User\PruneSudoStashesCommand} because the layout being swept is the one
+     * {@see uploadPath()} writes: the id shape and the position under it are stated once. A caller that restated them
+     * would match nothing, and report success, the first time either changed.
+     *
+     * @return int the number of stashes thrown away
+     */
+    public function prune(DateTimeImmutable $before): int
+    {
+        $root = $this->uploadRoot();
+        // Only what this class writes. Deriving the directory from the path alone would throw away every stash at
+        // once for a file that sits directly under the root, which is not a shape anything writes but is one the
+        // sweep must not act on.
+        $upload = '{^' . preg_quote(
+            $root,
+            '{',
+        ) . '/(' . self::ID_BODY . ')/\d+$}';
+
+        /** @var array<string, int> $newest */
+        $newest = [];
+        foreach (
+            $this->fileStorage->listFiles(
+                $root,
+                true,
+            ) as $path
+        ) {
+            if (
+                1 !== preg_match(
+                    $upload,
+                    $path,
+                    $matches,
+                )
+            ) {
+                continue;
+            }
+
+            $directory = $root . '/' . $matches[1];
+
+            try {
+                $modified = $this->fileStorage->lastModified($path);
+            } catch (Throwable) {
+                // Collected while the listing was being walked, which is a stash the sweep no longer has to
+                // account for. Reading on would end the run and leave every stash after this one where it is.
+                continue;
+            }
+
+            $newest[$directory] = max(
+                $newest[$directory] ?? 0,
+                $modified,
+            );
+        }
+
+        $pruned = 0;
+        foreach ($newest as $directory => $modified) {
+            if ($modified > $before->getTimestamp()) {
+                continue;
+            }
+
+            $this->fileStorage->deleteDirectory($directory);
+            ++$pruned;
+        }
+
+        return $pruned;
     }
 
     /**
@@ -301,6 +417,7 @@ final readonly class SudoStash
         array $files,
         string $id,
         int &$written = 0,
+        int &$bytes = 0,
     ): array {
         $kept = [];
 
@@ -311,6 +428,7 @@ final readonly class SudoStash
                     $file,
                     $id,
                     $written,
+                    $bytes,
                 );
 
                 continue;
@@ -320,13 +438,27 @@ final readonly class SudoStash
                 !$file instanceof UploadedFile
                 || !$file->isValid()
                 || $written >= self::MAX_FILES
-                || $file->getSize() > StorageNamespace::SudoStash->maxFileSizeBytes()
-                || 0 === $file->getSize()
             ) {
                 continue;
             }
 
-            $path = StorageNamespace::SudoStash->directory($id) . '/' . $written;
+            $size = $file->getSize();
+            if (
+                !is_int($size)
+                || $size <= 0
+                || $size > StorageNamespace::SudoStash->maxFileSizeBytes()
+                || $bytes + $size > self::MAX_TOTAL_BYTES
+            ) {
+                continue;
+            }
+
+            $path = $this->uploadPath(
+                $id,
+                $written,
+            );
+            if (null === $path) {
+                continue;
+            }
 
             $stream = fopen(
                 $file->getPathname(),
@@ -354,13 +486,14 @@ final readonly class SudoStash
                 }
             }
 
-            ++$written;
-
             $kept[$name] = [
-                'path' => $path,
+                'index' => $written,
                 'name' => $file->getClientOriginalName(),
                 'type' => $file->getClientMimeType(),
             ];
+
+            ++$written;
+            $bytes += $size;
         }
 
         return $kept;
@@ -368,12 +501,22 @@ final readonly class SudoStash
 
     private function discardUploads(string $id): void
     {
+        if (!$this->isWellFormed($id)) {
+            return;
+        }
+
         $this->fileStorage->deleteDirectory(StorageNamespace::SudoStash->directory($id));
+    }
+
+    /** The namespace is scoped per stash, so the root is the parent of the directory one stash writes into. */
+    private function uploadRoot(): string
+    {
+        return dirname(StorageNamespace::SudoStash->directory('any'));
     }
 
     private function keyFor(string $id): ?string
     {
-        if ('' === $id) {
+        if (!$this->isWellFormed($id)) {
             return null;
         }
 
@@ -381,6 +524,25 @@ final readonly class SudoStash
 
         return null === $suffix
             ? null
-            : self::KEY_PREFIX . $suffix . '_' . $id;
+            : $this->key(
+                $suffix,
+                $id,
+            );
+    }
+
+    /** Stated once, because the layout of the key is what scopes a stash to one session and one firewall. */
+    private function key(
+        string $suffix,
+        string $id,
+    ): string {
+        return self::KEY_PREFIX . $suffix . '_' . $id;
+    }
+
+    private function isWellFormed(string $id): bool
+    {
+        return 1 === preg_match(
+            self::ID_PATTERN,
+            $id,
+        );
     }
 }

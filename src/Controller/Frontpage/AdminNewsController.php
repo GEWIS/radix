@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Frontpage;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Frontpage\NewsItem;
 use App\Entity\User\Enums\UserRoles;
@@ -46,6 +47,7 @@ class AdminNewsController extends AbstractController
         return $this->render('frontpage/admin/news/index.html.twig');
     }
 
+    #[Replayable]
     #[Route(
         path: '/create',
         name: 'create',
@@ -85,6 +87,7 @@ class AdminNewsController extends AbstractController
         return $this->redirectToRoute('admin/frontpage/news/index');
     }
 
+    #[Replayable]
     #[Route(
         path: '/{item}/edit',
         name: 'edit',

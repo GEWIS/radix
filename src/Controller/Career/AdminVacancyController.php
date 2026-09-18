@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Application\Enums\AlertTypes;
@@ -78,6 +79,7 @@ class AdminVacancyController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/create',
         name: 'create',
@@ -206,6 +208,7 @@ class AdminVacancyController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{vacancy}/edit',
         name: 'edit',

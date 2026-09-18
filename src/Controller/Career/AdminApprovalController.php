@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\AbstractRevisionReviewController;
 use App\Entity\Application\RevisionInterface;
 use App\Entity\Career\CompanyRevision;
@@ -133,6 +134,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/company/{revision}/comment',
         name: 'company/comment',
@@ -156,6 +158,7 @@ class AdminApprovalController extends AbstractRevisionReviewController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/vacancy/{revision}/comment',
         name: 'vacancy/comment',

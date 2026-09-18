@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Activity;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\HoldsEditLockTrait;
 use App\Entity\Activity\Activity;
@@ -80,6 +81,7 @@ class AdminController extends AbstractController
         return $this->render('activity/admin/index.html.twig');
     }
 
+    #[Replayable]
     #[Route(
         path: '/create',
         name: 'create',
@@ -196,6 +198,7 @@ class AdminController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{activity}/signup-lists/add',
         name: 'signup_list_add',
@@ -311,6 +314,7 @@ class AdminController extends AbstractController
         return $revision;
     }
 
+    #[Replayable]
     #[Route(
         path: '/{activity}/edit',
         name: 'edit',
@@ -932,6 +936,7 @@ class AdminController extends AbstractController
      * checkbox) and creates the sign-up already-verified (no double opt-in email). Allowed only while the list is
      * open, mirroring the public sign-up window.
      */
+    #[Replayable]
     #[Route(
         path: '/{activity}/signups/{signupList}/add-external',
         name: 'add_external_signup',

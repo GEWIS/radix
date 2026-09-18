@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Application;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Announcement;
 use App\Entity\Application\ApplicationLocalisedText;
 use App\Entity\Application\Enums\AlertTypes;
@@ -46,6 +47,7 @@ class AnnouncementController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/admin/announcement/create',
         name: 'admin/announcement/create',

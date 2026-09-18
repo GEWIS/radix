@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Attribute\User\Replayable;
 use App\Controller\Application\HandlesFormFlowTrait;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\Enums\UserRoles;
@@ -62,6 +63,7 @@ class AdminExternalAppController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/create',
         name: 'create',
@@ -128,6 +130,7 @@ class AdminExternalAppController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{externalApp}/edit',
         name: 'edit',

@@ -31,7 +31,10 @@ trait StandsInForValkey
                 string $key,
                 int $expire,
                 mixed $value,
-            ) use ($store, $now): bool {
+            ) use (
+                $store,
+                $now,
+            ): bool {
                 $store[$key] = [
                     (string) $value,
                     $now() + $expire,

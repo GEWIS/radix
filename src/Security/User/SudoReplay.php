@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace App\Security\User;
 
-use App\Attribute\User\Replayable;
 use App\Service\Application\FileStorage;
-use App\Util\Application\ControllerAttribute;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
-use Symfony\Component\Routing\RouterInterface;
 use Throwable;
 
 use function fclose;
 use function fopen;
 use function is_array;
 use function is_file;
+use function is_int;
 use function is_resource;
 use function is_string;
 use function parse_url;
@@ -34,8 +31,8 @@ use const PHP_URL_PATH;
 /**
  * Re-runs a write that was refused for want of a sudo grant, once the grant has been given.
  *
- * Only for an action that declares {@see Replayable}. Everything else returns null, and the caller returns the user
- * to the page instead.
+ * Only for an action that declares {@see \App\Attribute\User\Replayable}. Everything else returns null, and the
+ * caller returns the user to the page instead.
  *
  * The write is run as a request of its own, which is what allows the uploads to be part of it: a form returned to
  * the browser cannot include a file. It is handled as a main request rather than a sub-request, because the
@@ -65,8 +62,9 @@ final readonly class SudoReplay
 
     public function __construct(
         private SudoStash $stash,
+        private SudoArea $area,
+        private ReplayableAction $replayable,
         private RequestStack $requestStack,
-        private RouterInterface $router,
         private FileStorage $fileStorage,
         private HttpKernelInterface $kernel,
         private LoggerInterface $logger,
@@ -83,7 +81,17 @@ final readonly class SudoReplay
             return null;
         }
 
-        if (!$this->isReplayable($write->uri)) {
+        $path = parse_url(
+            $write->uri,
+            PHP_URL_PATH,
+        );
+        if (!is_string($path)) {
+            return null;
+        }
+
+        // Tested before the uploads are copied out of storage, which a record that does not match what wrote it
+        // would otherwise be charged for.
+        if (!$this->canReplay($path)) {
             return null;
         }
 
@@ -102,6 +110,7 @@ final readonly class SudoReplay
                 $current->cookies->all(),
                 $this->restoreUploads(
                     $write->files,
+                    $id,
                     $temporary,
                 ),
                 $current->server->all(),
@@ -143,36 +152,48 @@ final readonly class SudoReplay
         } finally {
             $this->stash->discard($id);
 
-            foreach ($temporary as $path) {
-                if (!is_file($path)) {
+            foreach ($temporary as $local) {
+                if (!is_file($local)) {
                     continue;
                 }
 
-                unlink($path);
+                unlink($local);
             }
         }
     }
 
-    private function isReplayable(string $uri): bool
+    /**
+     * What confirming will do with the stash, for the prompt to state before the user presses anything.
+     */
+    public function outcomeFor(string $id): RefusedWrite
     {
+        $write = $this->stash->read($id);
+        if (null === $write) {
+            return RefusedWrite::None;
+        }
+
         $path = parse_url(
-            $uri,
+            $write->uri,
             PHP_URL_PATH,
         );
-        if (!is_string($path)) {
-            return false;
-        }
 
-        try {
-            $route = $this->router->match($path);
-        } catch (RoutingException) {
-            return false;
-        }
+        return is_string($path) && $this->canReplay($path)
+            ? RefusedWrite::SentOnConfirmation
+            : RefusedWrite::SubmittedByHand;
+    }
 
-        return ControllerAttribute::isPresent(
-            $route['_controller'] ?? null,
-            Replayable::class,
-        );
+    /**
+     * Whether a kept write is sent again: it was refused behind sudo, and the action declares
+     * {@see \App\Attribute\User\Replayable}.
+     *
+     * Both halves stated once, because the prompt says which of the two things confirming will do and confirming
+     * has to do the one it said. Only a request behind sudo is kept, so a record naming anything else does not
+     * match what wrote it.
+     */
+    private function canReplay(string $path): bool
+    {
+        return $this->area->coversPath($path)
+            && $this->replayable->coversPath($path);
     }
 
     /**
@@ -186,6 +207,7 @@ final readonly class SudoReplay
      */
     private function restoreUploads(
         array $files,
+        string $id,
         array &$temporary,
     ): array {
         $restored = [];
@@ -196,16 +218,28 @@ final readonly class SudoReplay
                 continue;
             }
 
-            if (!is_string($file['path'] ?? null)) {
+            $index = $file['index'] ?? null;
+            if (!is_int($index)) {
                 $restored[$name] = $this->restoreUploads(
                     $file,
+                    $id,
                     $temporary,
                 );
 
                 continue;
             }
 
-            $local = $this->copyOut($file['path']);
+            // The path is derived from the id and the position rather than read from the record, so a record that
+            // was tampered with cannot name a file of another namespace to be copied out and handed to the action.
+            $path = $this->stash->uploadPath(
+                $id,
+                $index,
+            );
+            if (null === $path) {
+                continue;
+            }
+
+            $local = $this->copyOut($path);
             if (null === $local) {
                 continue;
             }

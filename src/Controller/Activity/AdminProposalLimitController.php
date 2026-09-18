@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Activity;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Activity\ProposalLimit;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\Enums\UserRoles;
@@ -43,6 +44,7 @@ class AdminProposalLimitController extends AbstractController
     ) {
     }
 
+    #[Replayable]
     #[Route(
         path: '',
         name: 'index',
@@ -83,6 +85,7 @@ class AdminProposalLimitController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{limit}/edit',
         name: 'edit',

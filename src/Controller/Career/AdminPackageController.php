@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyBannerPackage;
@@ -139,6 +140,7 @@ class AdminPackageController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/company/{company}/create/{type}',
         name: 'create',
@@ -200,6 +202,7 @@ class AdminPackageController extends AbstractController
         return $this->backToCompany($company);
     }
 
+    #[Replayable]
     #[Route(
         path: '/{package}/edit',
         name: 'edit',
@@ -283,6 +286,7 @@ class AdminPackageController extends AbstractController
      * representative to upload something on its behalf; the only difference is that what C4 uploads is already
      * decided on and goes straight up.
      */
+    #[Replayable]
     #[Route(
         path: '/{package}/banner',
         name: 'banner',

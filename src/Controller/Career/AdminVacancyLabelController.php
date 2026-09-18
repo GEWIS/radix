@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Career\CareerLocalisedText;
 use App\Entity\Career\VacancyLabel;
@@ -41,6 +42,7 @@ class AdminVacancyLabelController extends AbstractController
     ) {
     }
 
+    #[Replayable]
     #[Route(
         path: '',
         name: 'index',
@@ -85,6 +87,7 @@ class AdminVacancyLabelController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/{label}/edit',
         name: 'edit',

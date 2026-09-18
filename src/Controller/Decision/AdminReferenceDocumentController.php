@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Decision;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
@@ -51,6 +52,7 @@ class AdminReferenceDocumentController extends AbstractController
         return $this->render('decision/admin/reference/index.html.twig');
     }
 
+    #[Replayable]
     #[Route(
         path: '/upload',
         name: 'upload',
@@ -87,6 +89,7 @@ class AdminReferenceDocumentController extends AbstractController
         return new JsonResponse(['ok' => true]);
     }
 
+    #[Replayable]
     #[Route(
         path: '/{document}/versions',
         name: 'version_upload',

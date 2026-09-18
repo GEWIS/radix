@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\NotificationAddressing;
 use App\Entity\Application\Enums\NotificationCategory;
@@ -74,6 +75,7 @@ class SettingsController extends AbstractController
      */
     private const string EXPORT_PENDING_WINDOW = '-15 minutes';
 
+    #[Replayable]
     #[Route(
         path: '/privacy',
         name: 'privacy',
@@ -132,6 +134,7 @@ class SettingsController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '',
         name: 'index',
@@ -171,6 +174,7 @@ class SettingsController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/notifications',
         name: 'notifications',

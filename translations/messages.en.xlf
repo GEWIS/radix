@@ -11913,6 +11913,14 @@
         <source>Your student number is a 7-digit number, for example 1234560. You have received this in an email when you enrolled and it is printed on your campus card. Go to &lt;a href="%url%"&gt;this page&lt;/a&gt; if you need help finding it. Your student number will be used to verify you are studying at the department of M&amp;CS.</source>
         <target state="translated"><![CDATA[Your student number is a 7-digit number, for example 1234560. You have received this in an email when you enrolled and it is printed on your campus card. Go to <a href="%url%">this page</a> if you need help finding it. Your student number will be used to verify you are studying at the department of M&CS.]]></target>
       </trans-unit>
+      <trans-unit id="L2wWgbL" resname="Your submission was kept. Confirming below sends it, so you do not have to fill it in again.">
+        <source>Your submission was kept. Confirming below sends it, so you do not have to fill it in again.</source>
+        <target>Your submission was kept. Confirming below sends it, so you do not have to fill it in again.</target>
+      </trans-unit>
+      <trans-unit id="fWydCRU" resname="Your submission was not sent. Confirming below returns you to the page, where you can submit it again.">
+        <source>Your submission was not sent. Confirming below returns you to the page, where you can submit it again.</source>
+        <target>Your submission was not sent. Confirming below returns you to the page, where you can submit it again.</target>
+      </trans-unit>
       <trans-unit id="GNnZfox" resname="Your vacancies">
         <source>Your vacancies</source>
         <target state="translated">Your vacancies</target>

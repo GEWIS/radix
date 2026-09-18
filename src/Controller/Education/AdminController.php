@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Education;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Education\Course;
 use App\Entity\Education\CourseDocument;
@@ -70,6 +71,7 @@ class AdminController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/courses/add',
         name: 'courses/add',
@@ -110,6 +112,7 @@ class AdminController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/courses/{code}/edit',
         name: 'courses/edit',

@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Command\User;
 
 use App\Command\HoldsRunLockTrait;
-use App\Entity\Application\Enums\StorageNamespace;
-use App\Service\Application\FileStorage;
+use App\Security\User\SudoStash;
+use DateTimeImmutable;
 use Override;
-use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,9 +17,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
-use function count;
-use function dirname;
-use function max;
 use function sprintf;
 
 /**
@@ -46,8 +42,7 @@ final class PruneSudoStashesCommand extends Command
     use HoldsRunLockTrait;
 
     public function __construct(
-        private readonly FileStorage $fileStorage,
-        private readonly ClockInterface $clock,
+        private readonly SudoStash $stash,
         private readonly LoggerInterface $logger,
         #[Autowire(param: 'app.sudo_stash_ttl')]
         private readonly int $ttlSeconds,
@@ -78,40 +73,14 @@ final class PruneSudoStashesCommand extends Command
             $output,
         );
 
-        $cutoff = $this->clock->now()->getTimestamp() - (2 * $this->ttlSeconds);
-
-        // The namespace is scoped per stash, so the root is the parent of what a stash writes into.
-        $root = dirname(StorageNamespace::SudoStash->directory('any'));
-
-        /** @var array<string, int> $newest */
-        $newest = [];
-        foreach (
-            $this->fileStorage->listFiles(
-                $root,
-                true,
-            ) as $path
-        ) {
-            $directory = dirname($path);
-
-            $newest[$directory] = max(
-                $newest[$directory] ?? 0,
-                $this->fileStorage->lastModified($path),
-            );
-        }
-
-        $pruned = [];
-        foreach ($newest as $directory => $modified) {
-            if ($modified > $cutoff) {
-                continue;
-            }
-
-            $this->fileStorage->deleteDirectory($directory);
-            $pruned[] = $directory;
-        }
+        $pruned = $this->stash->prune(new DateTimeImmutable(sprintf(
+            '-%d seconds',
+            2 * $this->ttlSeconds,
+        )));
 
         $message = sprintf(
             'Threw away the uploads of %d refused write(s) that were never re-run.',
-            count($pruned),
+            $pruned,
         );
 
         $this->logger->info($message);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Career;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Career\Company;
 use App\Entity\User\CompanyUser;
@@ -56,6 +57,7 @@ class AdminRepresentativeController extends AbstractController
     ) {
     }
 
+    #[Replayable]
     #[Route(
         path: '/representatives',
         name: 'representatives',

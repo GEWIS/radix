@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Application;
 
+use App\Attribute\User\Replayable;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\MaintenanceWindow;
 use App\Entity\User\Enums\UserRoles;
@@ -48,6 +49,7 @@ class MaintenanceController extends AbstractController
         );
     }
 
+    #[Replayable]
     #[Route(
         path: '/admin/maintenance/create',
         name: 'admin/maintenance/create',
