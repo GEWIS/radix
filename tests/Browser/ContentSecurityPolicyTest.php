@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace App\Tests\Browser;
 
 use App\Tests\Browser\Support\SignsInThroughTheBrowser;
+use Symfony\Component\Panther\Client;
 
 use function intval;
-use function str_contains;
 use function strval;
 
 /**
  * Whether a page rendered by Turbo still satisfies the policy of the document it was rendered into.
  *
- * Turbo re-inserts the scripts of the page it renders. The nonce on those elements comes from the response it
- * fetched, and every response carries a nonce of its own, so the document already open lists a different one and
- * refuses them. `<meta name="csp-nonce">` in the head is what Turbo reads instead.
+ * A document is subject to the policy of the response it was loaded from, and that policy lists the nonce of that one
+ * response. Turbo renders every later response into that same document, re-creating the script elements of the
+ * response it fetched, and the `nonce` attribute it copies onto them is the one that response was written with
+ * (hotwired/turbo#294). None of those elements is permitted by its nonce, so what permits them is `strict-dynamic`:
+ * a script element created by an already-trusted script is allowed under it whatever its nonce. That is what these
+ * two check, because nothing else in the policy applies to them once `strict-dynamic` makes a host source inert.
  *
  * A refusal is reported to the console and nowhere else, so nothing fails: the page renders with its scripts missing.
  * The browser also fires an event for it, which is what this counts.
@@ -34,15 +37,7 @@ final class ContentSecurityPolicyTest extends BrowserTestCase
         );
         $client->waitFor('[data-controller~="notifications"]');
 
-        $probe = [];
-        $client->executeScript(<<<'JS'
-            window.__violations = [];
-            document.addEventListener('securitypolicyviolation', (event) => {
-                window.__violations.push(
-                    event.violatedDirective + ' ' + event.blockedURI + ' @' + event.sourceFile + ':' + event.lineNumber,
-                );
-            });
-        JS);
+        $this->recordViolations($client);
 
         // The activity editor is the heaviest page here: a stepper, an editor and several controllers of its own.
         foreach (
@@ -60,33 +55,57 @@ final class ContentSecurityPolicyTest extends BrowserTestCase
             );
         }
 
-        // Moving between the steps of a stepper is the case that showed this: the submission redirects and Turbo
-        // renders the answer, which is when the scripts of the new page are put into the document already open.
-        $client->executeScript('Turbo.visit("/en/admin/activities/45/edit");');
-        $client->wait()->until(
-            static fn (): bool => str_contains(
-                strval($client->executeScript('return window.location.pathname;')),
-                '/edit',
-            ),
+        self::assertSame(
+            [],
+            $client->executeScript('return window.__violations;'),
         );
+    }
 
-        $client->waitFor('button[name$="[next]"], [data-flow-step]');
+    /**
+     * The same, for a response to a submission rather than to a visit. It is the path a refusal was reported on, and
+     * it reaches the renderer differently: the step buttons of a stepper submit the form, and what is rendered is the
+     * page the redirect after it leads to.
+     */
+    public function testSubmittingAStepViolatesNoPolicy(): void
+    {
+        $client = static::createPantherClient();
+        $this->signIn($client);
+        $client->request(
+            'GET',
+            '/en/admin/activities/45/edit',
+        );
+        $client->waitFor('button.form-stepper__btn');
+
+        $this->recordViolations($client);
         $client->executeScript(<<<'JS'
-            const next = document.querySelector('button[name$="[next]"]');
-
-            if (null !== next) {
-                next.click();
-            }
+            window.__renders = 0;
+            document.addEventListener('turbo:render', () => { window.__renders += 1; });
+            document.querySelector('button.form-stepper__btn').click();
         JS);
 
         $client->wait()->until(
-            static fn (): bool => 0 < intval($client->executeScript('return window.__violations.length;'))
-                || null === $client->executeScript('return document.querySelector(".turbo-progress-bar");'),
+            static fn (): bool => 0 < intval($client->executeScript('return window.__renders;')),
         );
 
         self::assertSame(
             [],
-            (array) $client->executeScript('return window.__violations;'),
+            $client->executeScript('return window.__violations;'),
         );
+    }
+
+    /**
+     * Records every policy violation the page reports from here on, so the assertion can read them back. Stated once
+     * because a difference between the two tests would be a difference in what they report, not in what they cover.
+     */
+    private function recordViolations(Client $client): void
+    {
+        $client->executeScript(<<<'JS'
+            window.__violations = [];
+            document.addEventListener('securitypolicyviolation', (event) => {
+                window.__violations.push(
+                    event.violatedDirective + ' ' + event.blockedURI + ' @' + event.sourceFile + ':' + event.lineNumber,
+                );
+            });
+        JS);
     }
 }

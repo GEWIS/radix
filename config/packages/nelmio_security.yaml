@@ -114,14 +114,18 @@ when@dev:
     nelmio_security:
         csp:
             enforce: &development_csp
-                # jsDelivr is where FrankenPHP's hot reload client, and the idiomorph it pulls in, are fetched from: it
-                # injects them as script tags and has no option to serve them itself. Without the host the browser
-                # refuses both, nothing subscribes to the hub, and a file change publishes a reload that no page is
-                # listening for.
+                # `strict-dynamic` for the reason production states it, and so that a script tag written without a
+                # nonce is refused here rather than only once it is deployed. Under it a host source is not consulted
+                # at all, and a script element created by an already-trusted script is permitted whatever its nonce;
+                # that second part covers the scripts Turbo re-creates when it renders a page, the web debug
+                # toolbar's two inline ones among them.
                 #
-                # The local hosts are wildcarded on the port rather than naming Matomo's 82: the ports the development
-                # stack publishes are variables, so a checkout on rootless Docker moves them off the privileged ones.
-                script-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/', 'https://cdn.jsdelivr.net']
+                # The hosts are stated regardless, because DocumentationCspListener strips `strict-dynamic` from
+                # /api-docs and they are consulted again there. jsDelivr is where FrankenPHP's hot reload client, and
+                # the idiomorph it pulls in, are fetched from. The local ones are wildcarded on the port rather than
+                # naming Matomo's 82: the ports the development stack publishes are variables, so a checkout on
+                # rootless Docker moves them off the privileged ones.
+                script-src: ['self', 'strict-dynamic', 'http://localhost:*', 'https://analytics.test.gewis.nl/', 'https://cdn.jsdelivr.net']
                 img-src: ['self', 'data:', 'http://localhost:*', 'https://images.test.gewis.nl']
                 connect-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/']
                 child-src: ['self', 'http://localhost:*', 'https://analytics.test.gewis.nl/', 'https://www.youtube-nocookie.com/embed/', 'https://player.vimeo.com/video/']

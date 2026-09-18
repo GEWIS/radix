@@ -20,9 +20,10 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
         {% endblock %}
-        {# Turbo re-inserts the scripts of a page it renders, and without this it copies the nonce from the fetched
-           document, which the policy of the document already open does not list. The nonce is read from here
-           instead. #}
+        {# Turbo reads the nonce from here when it re-creates the scripts of a page it renders, and then copies the
+           `nonce` attribute of the fetched document over it (hotwired/turbo#294), so for a script that states one
+           this has no effect and the value is one the open document's policy does not list. `strict-dynamic` is
+           what permits the result. This stays for the scripts that state no nonce of their own. #}
         <meta name="csp-nonce" content="{{ csp_nonce('script') }}">
         {# Load critical JS #}
         {% block javascripts %}
