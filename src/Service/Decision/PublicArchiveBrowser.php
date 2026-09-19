@@ -7,12 +7,14 @@ namespace App\Service\Decision;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 use function explode;
+use function in_array;
 use function is_dir;
 use function is_file;
 use function realpath;
 use function scandir;
 use function str_starts_with;
 use function strcasecmp;
+use function strtolower;
 use function usort;
 
 /**
@@ -22,6 +24,17 @@ use function usort;
  */
 final readonly class PublicArchiveBrowser
 {
+    // Windows Explorer and Finder create these in every folder they show. The OS hides them, the SFTP mirror does
+    // not. The other macOS files start with a dot and are already hidden as dot entries.
+    private const array HIDDEN_NAMES = [
+        'thumbs.db',
+        'ehthumbs.db',
+        'ehthumbs_vista.db',
+        'desktop.ini',
+        '$recycle.bin',
+        "icon\r",
+    ];
+
     public function __construct(
         #[Autowire('%kernel.project_dir%/data/public-archive')]
         private string $root,
@@ -58,12 +71,7 @@ final readonly class PublicArchiveBrowser
 
         $entries = [];
         foreach ($names as $name) {
-            if (
-                str_starts_with(
-                    $name,
-                    '.',
-                )
-            ) {
+            if ($this->isHidden($name)) {
                 continue;
             }
 
@@ -114,10 +122,7 @@ final readonly class PublicArchiveBrowser
             ) {
                 if (
                     '' === $segment
-                    || str_starts_with(
-                        $segment,
-                        '.',
-                    )
+                    || $this->isHidden($segment)
                 ) {
                     return null;
                 }
@@ -145,5 +150,17 @@ final readonly class PublicArchiveBrowser
         }
 
         return $resolved;
+    }
+
+    private function isHidden(string $name): bool
+    {
+        return str_starts_with(
+            $name,
+            '.',
+        ) || in_array(
+            strtolower($name),
+            self::HIDDEN_NAMES,
+            true,
+        );
     }
 }

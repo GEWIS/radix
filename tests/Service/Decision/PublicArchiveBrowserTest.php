@@ -38,6 +38,22 @@ final class PublicArchiveBrowserTest extends TestCase
             $this->root . '/.hidden',
             'secret',
         );
+        $filesystem->dumpFile(
+            $this->root . '/Thumbs.db',
+            '',
+        );
+        $filesystem->dumpFile(
+            $this->root . '/Policies & Regulations/desktop.ini',
+            '[.ShellClassInfo]',
+        );
+        $filesystem->dumpFile(
+            $this->root . '/Policies & Regulations/.DS_Store',
+            '',
+        );
+        $filesystem->dumpFile(
+            $this->root . "/Policies & Regulations/Icon\r",
+            '',
+        );
 
         $this->browser = new PublicArchiveBrowser($this->root);
     }
@@ -48,7 +64,7 @@ final class PublicArchiveBrowserTest extends TestCase
         new Filesystem()->remove($this->root);
     }
 
-    public function testListsFoldersFirstAndHidesDotEntries(): void
+    public function testListsFoldersFirstAndHidesDotAndOsMetadataEntries(): void
     {
         $entries = $this->browser->listDirectory('');
         self::assertNotNull($entries);
@@ -71,6 +87,10 @@ final class PublicArchiveBrowserTest extends TestCase
     {
         $entries = $this->browser->listDirectory('Policies & Regulations');
         self::assertNotNull($entries);
+        self::assertCount(
+            1,
+            $entries,
+        );
         self::assertSame(
             'Policies & Regulations/Key Policy.pdf',
             $entries[0]['path'],
@@ -84,6 +104,10 @@ final class PublicArchiveBrowserTest extends TestCase
         self::assertNull($this->browser->listDirectory('Policies & Regulations/..'));
         self::assertNull($this->browser->listDirectory('nope'));
         self::assertFalse($this->browser->isFile('.hidden'));
+        self::assertFalse($this->browser->isFile('Thumbs.db'));
+        self::assertFalse($this->browser->isFile('Policies & Regulations/desktop.ini'));
+        self::assertFalse($this->browser->isFile('Policies & Regulations/.DS_Store'));
+        self::assertFalse($this->browser->isFile("Policies & Regulations/Icon\r"));
         self::assertFalse($this->browser->isFile('../etc/passwd'));
         self::assertFalse($this->browser->isFile('Policies & Regulations'));
     }
