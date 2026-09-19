@@ -1,0 +1,31 @@
+name: Dependabot auto-merge
+
+# Approves a Dependabot pull request and enables auto-merge on it, so it merges on its own once the required checks
+# have passed. The ruleset on main asks for one approving review and for the status checks: the approval is the
+# review, and auto-merge waits for the checks. A stale approval is dismissed on push, and the reusable workflow only
+# runs for Dependabot's own pull requests, so a push by anyone else leaves the pull request waiting for a review as
+# usual.
+on:
+    pull_request:
+        branches:
+            - main
+
+# Cancel running jobs that have become stale through updates to the ref (e.g., pushes to a pull request).
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+    dependabot:
+        permissions:
+            actions: write
+            contents: write
+            pull-requests: write
+        uses: 'GEWIS/actions/.github/workflows/dependabot-auto-merge.yml@4ca17949275ff7c4475e5bb24046c1fd39209f8e' # v1.17.1
+        with:
+            auto-approve: true
+            auto-merge: true
+            # The only merge method the ruleset on main allows.
+            merge-method: 'squash'
