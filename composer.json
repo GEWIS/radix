@@ -89,7 +89,7 @@
         "symfony/twig-bundle": "8.1.*",
         "symfony/uid": "8.1.*",
         "symfony/ux-autocomplete": "3.4.0",
-        "symfony/ux-calendar-link": "3.4.0",
+        "symfony/ux-calendar-link": "3.5.0",
         "symfony/ux-live-component": "3.4.0",
         "symfony/ux-turbo": "^3.4",
         "symfony/ux-twig-component": "^3.4",
