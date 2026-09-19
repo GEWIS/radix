@@ -407,7 +407,7 @@ services:
         # Long enough for Postfix to hand over what it has already accepted before the container goes away.
         stop_grace_period: 60s
     valkey:
-        image: valkey/valkey:9.1-alpine
+        image: valkey/valkey:9.2-alpine
         restart: unless-stopped
         hostname: valkey
         volumes:

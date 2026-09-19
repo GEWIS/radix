@@ -5,7 +5,7 @@ ARG FRANKENPHP_VERSION=1.12
 # host. They live outside /app/data because the volume mounts over it; the entrypoint seeds that volume from them
 # and app:user:update-ip-databases keeps it fresh. Pinned to a commit so the layer caches, as IPLocate rebuilds
 # daily. Keep this above the first `FROM`, or the stage below redeclares it empty and the URL 404s.
-ARG IPLOCATE_REVISION=8d999672f98f983a88462a50969d7d2389dea36e
+ARG IPLOCATE_REVISION=1edefd96a5746a6e522786a56073e836f6597582
 
 FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_upstream
 
@@ -61,8 +61,8 @@ EOF
 # Builders for AssetMapper. The binaries are arch-specific, so select them based on the build target (set by BuildKit)
 # to avoid pulling linux-x64 binaries that only run through (failing) emulation on arm64 hosts (e.g. Apple Silicon).
 ARG TARGETARCH
-ARG SASS_VERSION=1.103.1
-ARG SWC_VERSION=v1.16.1
+ARG SASS_VERSION=1.104.1
+ARG SWC_VERSION=v1.16.2
 
 RUN <<-EOF
     case "$TARGETARCH" in
