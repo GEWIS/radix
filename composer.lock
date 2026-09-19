@@ -14932,16 +14932,16 @@
         },
         {
             "name": "igor-php/igor-php",
-            "version": "v0.9.5",
+            "version": "v0.9.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/igor-php/igor-php.git",
-                "reference": "35673901813ca9f2092fe062cbfd274e7a3aba89"
+                "reference": "b56d7e237d7eeeacce598bf4dc22547337b489be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/igor-php/igor-php/zipball/35673901813ca9f2092fe062cbfd274e7a3aba89",
-                "reference": "35673901813ca9f2092fe062cbfd274e7a3aba89",
+                "url": "https://api.github.com/repos/igor-php/igor-php/zipball/b56d7e237d7eeeacce598bf4dc22547337b489be",
+                "reference": "b56d7e237d7eeeacce598bf4dc22547337b489be",
                 "shasum": ""
             },
             "require": {
@@ -14976,9 +14976,9 @@
             ],
             "support": {
                 "issues": "https://github.com/igor-php/igor-php/issues",
-                "source": "https://github.com/igor-php/igor-php/tree/v0.9.5"
+                "source": "https://github.com/igor-php/igor-php/tree/v0.9.6"
             },
-            "time": "2026-08-12T10:38:29+00:00"
+            "time": "2026-09-03T18:31:27+00:00"
         },
         {
             "name": "league/flysystem-memory",
