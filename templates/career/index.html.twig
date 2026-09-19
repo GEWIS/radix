@@ -4,6 +4,7 @@
 {% set thesis = enum('App\\Entity\\Career\\Enums\\VacancyCategories').ThesisProjects %}
 
 {% block page_title %}{{ 'Career'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Internships, graduation projects and full-time positions, all of them from companies that know what a GEWIS member studies.'|trans }}{% endblock %}
 
 {% block pre_body %}
     <div class="career-hero">

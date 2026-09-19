@@ -3,6 +3,7 @@
 {% set plural = enum('App\\Entity\\Database\\Enums\\OrganTypes').Fraternity.pluralLabel|trans %}
 
 {% block page_title %}{{ plural|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Fraternities are groups of members who share an interest and organise around it themselves.'|trans }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item">

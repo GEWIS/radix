@@ -112,6 +112,33 @@ final class ActivityControllerTest extends DatabaseTestCase
         );
     }
 
+    /**
+     * A link to an activity shared on social media gets a card with the activity's own text rather than the site's.
+     */
+    public function testViewDescribesTheActivityForSharing(): void
+    {
+        $this->pushRequest();
+
+        $content = (string) $this->controller()->view($this->approvedActivityId(false))->getContent();
+
+        self::assertMatchesRegularExpression(
+            '/<meta property="og:title" content="[^"]+">/',
+            $content,
+        );
+        self::assertStringNotContainsString(
+            'GEWIS is the study association',
+            $content,
+        );
+        self::assertMatchesRegularExpression(
+            '/<meta property="og:description" content="[^"]+">/',
+            $content,
+        );
+        self::assertMatchesRegularExpression(
+            '/<meta property="og:image" content="http[^"]+">/',
+            $content,
+        );
+    }
+
     private function controller(): ActivityController
     {
         return self::getContainer()->get(ActivityController::class);

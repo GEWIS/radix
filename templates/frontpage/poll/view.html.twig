@@ -4,6 +4,7 @@
 {% set question = (poll.question ?? head.question)|localise_text %}
 
 {% block page_title %}{{ question|page_title }}{{ 'Polls'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Cast your vote and see how the association answered.'|trans }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}

@@ -1,6 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block page_title %}{{ 'Vacancies'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Internships, graduation projects and full-time positions, all of them from companies that know what a GEWIS member studies.'|trans }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('career/index') }}">{{ 'Career'|trans }}</a></li>

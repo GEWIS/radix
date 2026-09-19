@@ -1,6 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block page_title %}{{ 'Activities'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'The activities of GEWIS in the association year %year%.'|trans({'%year%': year}) }}{% endblock %}
 
 {% block contents %}
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">

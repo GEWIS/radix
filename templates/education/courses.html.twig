@@ -1,6 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block page_title %}{{ 'Courses'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Summaries and past exams shared by members, plus course books, tutoring and where to reach the education officer.'|trans }}{% endblock %}
 
 {% block special_notices %}{% include 'partials/education/access-notice.html.twig' %}{% endblock %}
 

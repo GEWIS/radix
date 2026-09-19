@@ -48,6 +48,36 @@ final class MarkdownExtensionTest extends TestCase
         );
     }
 
+    /**
+     * The excerpt is what a share card and a list row show, so it is one line of text however the source was laid out.
+     */
+    public function testAnExcerptIsPlainTextOnOneLine(): void
+    {
+        $extension = new MarkdownExtension();
+
+        self::assertSame(
+            'Tom & Jerry meet at the bar. Bring a friend.',
+            $extension->htmlExcerpt(
+                "<h1>Tom &amp; Jerry</h1>\n<p>meet at   the <em>bar</em>.</p>\n\n<p>Bring a\nfriend.</p>",
+                200,
+            ),
+        );
+        self::assertSame(
+            'Tom & Jerry meet at the bar. Bring a friend.',
+            $extension->markdownExcerpt(
+                "# Tom & Jerry\n\nmeet at   the *bar*.\n\nBring a\nfriend.",
+                200,
+            ),
+        );
+        self::assertSame(
+            'Tom & Jerry…',
+            $extension->htmlExcerpt(
+                '<p>Tom &amp; Jerry meet at the bar.</p>',
+                12,
+            ),
+        );
+    }
+
     public function testAdmitsNoAttributesAndNoOtherTags(): void
     {
         self::assertSame(

@@ -1,6 +1,10 @@
 {% extends 'layout.html.twig' %}
 
+{% set slogan = company.slogan|localise_text %}
+
 {% block page_title %}{{ company.name|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ slogan is not empty ? slogan : company.description|localise_text|markdown_excerpt(200) }}{% endblock %}
+{% block meta_image %}{{ company.squareLogo is not null ? absolute_url(image_url(company.squareLogo, 'w640')) : parent() }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">

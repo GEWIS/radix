@@ -3,6 +3,7 @@
 {% set filter = enum('App\\Entity\\Education\\Enums\\CourseFilter') %}
 
 {% block page_title %}{{ 'Education'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Summaries and past exams shared by members, plus course books, tutoring and where to reach the education officer.'|trans }}{% endblock %}
 
 {% block special_notices %}{% include 'partials/education/access-notice.html.twig' %}{% endblock %}
 

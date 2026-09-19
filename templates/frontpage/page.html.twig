@@ -1,6 +1,9 @@
 {% extends 'layout.html.twig' %}
 
 {% block page_title %}{{ page.title|localise_text|page_title }}{{ parent() }}{% endblock %}
+{% block meta_type %}article{% endblock %}
+{% block meta_description %}{{ page.content|localise_text|html_excerpt(200) }}{% endblock %}
+{% block meta_tags %}<meta property="article:modified_time" content="{{ page.updatedAt|date('c') }}">{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">

@@ -4,6 +4,9 @@
 {% set body = item.content|localise_text %}
 
 {% block page_title %}{{ title|page_title }}{{ 'News'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_type %}article{% endblock %}
+{% block meta_description %}{{ body|markdown_excerpt(200) }}{% endblock %}
+{% block meta_tags %}<meta property="article:published_time" content="{{ item.date|date('c') }}">{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item"><a href="{{ path('news/index') }}">{{ 'News'|trans }}</a></li>

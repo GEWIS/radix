@@ -3,6 +3,7 @@
 {% import 'partials/application/form-flow.html.twig' as flow %}
 
 {% block page_title %}{{ 'GEWIS Registration'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Welcome! With this form you can register for a membership of GEWIS. Becoming a member of the assocation costs a one-time fee of 20 euros and your membership is valid as long as you study.'|trans }}{% endblock %}
 
 {% macro review_row(label, value, step, form) %}
     <div class="registration-review-row">

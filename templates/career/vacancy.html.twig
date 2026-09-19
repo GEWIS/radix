@@ -3,6 +3,8 @@
 {% set company = vacancy.company %}
 
 {% block page_title %}{{ vacancy.name|localise_text|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ vacancy.description|localise_text|markdown_excerpt(200) }}{% endblock %}
+{% block meta_image %}{{ company.squareLogo is not null ? absolute_url(image_url(company.squareLogo, 'w640')) : parent() }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">

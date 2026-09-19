@@ -3,6 +3,7 @@
 {% set plural = enum('App\\Entity\\Database\\Enums\\OrganTypes').Committee.pluralLabel|trans %}
 
 {% block page_title %}{{ plural|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'GEWIS has many different committees, learn more about them below!'|trans }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item">

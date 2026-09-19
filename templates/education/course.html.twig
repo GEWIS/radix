@@ -6,6 +6,7 @@
 {% set similar = course.getSimilarCourses %}
 
 {% block page_title %}{{ ('%code% - %name%'|trans({'%code%': course.code, '%name%': course.name}))|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Summaries and past exams shared by members for %code% %name%.'|trans({'%code%': course.code, '%name%': course.name}) }}{% endblock %}
 
 {% block special_notices %}{% include 'partials/education/access-notice.html.twig' %}{% endblock %}
 

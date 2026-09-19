@@ -21,6 +21,7 @@ use Twig\TwigFilter;
 use function html_entity_decode;
 use function mb_strlen;
 use function mb_substr;
+use function preg_replace;
 use function preg_replace_callback;
 use function strip_tags;
 use function trim;
@@ -57,6 +58,10 @@ final class MarkdownExtension extends AbstractExtension
                 'markdown_excerpt',
                 $this->markdownExcerpt(...),
             ),
+            new TwigFilter(
+                'html_excerpt',
+                $this->htmlExcerpt(...),
+            ),
         ];
     }
 
@@ -72,13 +77,37 @@ final class MarkdownExtension extends AbstractExtension
         int $length,
     ): string {
         // Only the opening of the article is converted: a list row should not need a full render of a long one.
-        $body = trim(html_entity_decode(strip_tags($this->markdown(
-            mb_substr(
-                $text ?? '',
-                0,
-                self::EXCERPT_SOURCE_LENGTH,
+        return $this->htmlExcerpt(
+            $this->markdown(
+                mb_substr(
+                    $text ?? '',
+                    0,
+                    self::EXCERPT_SOURCE_LENGTH,
+                ),
             ),
-        ))));
+            $length,
+        );
+    }
+
+    /**
+     * The opening words of a piece of HTML as plain text, on one line. The same as {@see markdownExcerpt()} for
+     * content that is stored as HTML, such as a custom page.
+     */
+    public function htmlExcerpt(
+        ?string $html,
+        int $length,
+    ): string {
+        // A line break or the end of a block separates words, which stripping the tag alone would glue together.
+        $text = preg_replace(
+            '#<br[^>]*>|</(?:p|div|li|h[1-6]|blockquote|tr|td|th)>#i',
+            ' ',
+            $html ?? '',
+        ) ?? '';
+        $body = trim(preg_replace(
+            '/\s+/u',
+            ' ',
+            html_entity_decode(strip_tags($text)),
+        ) ?? '');
 
         if (mb_strlen($body) <= $length) {
             return $body;

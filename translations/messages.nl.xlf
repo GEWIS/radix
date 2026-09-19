@@ -2081,6 +2081,10 @@
         <source>Cast your vote</source>
         <target state="translated">Breng je stem uit</target>
       </trans-unit>
+      <trans-unit id="qgvVJad" resname="Cast your vote and see how the association answered.">
+        <source>Cast your vote and see how the association answered.</source>
+        <target state="translated">Breng je stem uit en zie hoe de vereniging antwoordde.</target>
+      </trans-unit>
       <trans-unit id="tceoGZr" resname="Category">
         <source>Category</source>
         <target state="translated">Categorie</target>
@@ -4172,6 +4176,10 @@
       <trans-unit id="gBJeL5Y" resname="GEWIS has many different committees, learn more about them below!">
         <source>GEWIS has many different committees, learn more about them below!</source>
         <target state="translated">GEWIS heeft veel verschillende commissies, lees hieronder meer over ze!</target>
+      </trans-unit>
+      <trans-unit id="M5kUte1" resname="GEWIS is the study association of the department of Mathematics and Computer Science at Eindhoven University of Technology.">
+        <source>GEWIS is the study association of the department of Mathematics and Computer Science at Eindhoven University of Technology.</source>
+        <target state="translated">GEWIS is de studievereniging van de faculteit Wiskunde en Informatica aan de Technische Universiteit Eindhoven.</target>
       </trans-unit>
       <trans-unit id="6g3Y1xQ" resname="GEWIS mailboxes">
         <source>GEWIS mailboxes</source>
@@ -9173,6 +9181,10 @@
         <source>Summaries and exams</source>
         <target state="translated">Samenvattingen en tentamens</target>
       </trans-unit>
+      <trans-unit id="gd1LPso" resname="Summaries and past exams shared by members for %code% %name%.">
+        <source>Summaries and past exams shared by members for %code% %name%.</source>
+        <target state="translated">Samenvattingen en oude tentamens gedeeld door leden voor %code% %name%.</target>
+      </trans-unit>
       <trans-unit id="eouJrPf" resname="Summaries and past exams shared by members, plus course books, tutoring and where to reach the education officer.">
         <source>Summaries and past exams shared by members, plus course books, tutoring and where to reach the education officer.</source>
         <target>Samenvattingen en oude tentamens gedeeld door leden, plus studieboeken, bijles en waar je de onderwijscommissaris bereikt.</target>
@@ -9344,6 +9356,10 @@
       <trans-unit id="aOJuyHz" resname="The account of %name% is deleted. Their name disappears from the drafts and comments they left behind. Shutting them out instead keeps that history readable.">
         <source>The account of %name% is deleted. Their name disappears from the drafts and comments they left behind. Shutting them out instead keeps that history readable.</source>
         <target state="translated">Het account van %name% wordt verwijderd. Hun naam verdwijnt uit de concepten en opmerkingen die zij achterlieten. Toegang ontzeggen houdt die geschiedenis wel leesbaar.</target>
+      </trans-unit>
+      <trans-unit id="2Q35f7_" resname="The activities of GEWIS in the association year %year%.">
+        <source>The activities of GEWIS in the association year %year%.</source>
+        <target state="translated">De activiteiten van GEWIS in het verenigingsjaar %year%.</target>
       </trans-unit>
       <trans-unit id="n5Ir.cP" resname="The activity &quot;%name%&quot; has been submitted for review.">
         <source>The activity "%name%" has been submitted for review.</source>
@@ -9697,6 +9713,10 @@
         <source>The last day the vacancy is shown.</source>
         <target state="translated">De laatste dag dat de vacature getoond wordt.</target>
       </trans-unit>
+      <trans-unit id="gDi1BbM" resname="The latest news from GEWIS.">
+        <source>The latest news from GEWIS.</source>
+        <target state="translated">Het laatste nieuws van GEWIS.</target>
+      </trans-unit>
       <trans-unit id="q7pqMIL" resname="The library is still empty.">
         <source>The library is still empty.</source>
         <target state="translated">De bibliotheek is nog leeg.</target>
@@ -9896,6 +9916,10 @@
       <trans-unit id="wJ7LeGz" resname="The type and the number together address the meeting and everything decided at it.">
         <source>The type and the number together address the meeting and everything decided at it.</source>
         <target state="translated">Het type en het nummer vormen samen het adres van de vergadering en alles wat daar besloten is.</target>
+      </trans-unit>
+      <trans-unit id="Ew5Fx5p" resname="The upcoming activities of GEWIS, its committees and its fraternities.">
+        <source>The upcoming activities of GEWIS, its committees and its fraternities.</source>
+        <target state="translated">De aankomende activiteiten van GEWIS, haar commissies en haar disputen.</target>
       </trans-unit>
       <trans-unit id="rGGsc2C" resname="The upload was discarded.">
         <source>The upload was discarded.</source>

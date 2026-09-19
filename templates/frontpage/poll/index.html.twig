@@ -1,6 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block page_title %}{{ 'Polls'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'Every question the association has been asked, and how it answered.'|trans }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">{{ 'Polls'|trans }}</li>

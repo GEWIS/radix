@@ -1,6 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block page_title %}{{ 'News'|trans|page_title }}{{ parent() }}{% endblock %}
+{% block meta_description %}{{ 'The latest news from GEWIS.'|trans }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item active" aria-current="page">{{ 'News'|trans }}</li>

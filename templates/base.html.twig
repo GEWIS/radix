@@ -4,13 +4,30 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
-        <title>
-            {% block page_title %}
-                {{ 'Study Association GEWIS'|trans }}
-            {% endblock %}
-        </title>
-        {# Generate alternate hreflang links. NOTE: `app.current_route` is not defined for error pages. #}
+        <title>{% block page_title %}{{ 'Study Association GEWIS'|trans }}{% endblock %}</title>
+        <meta name="description" content="{% block meta_description %}{{ 'GEWIS is the study association of the department of Mathematics and Computer Science at Eindhoven University of Technology.'|trans }}{% endblock %}">
+        {# The output of a block is escaped already, so it is printed raw rather than escaped a second time. #}
+        {% set site_name = 'Study Association GEWIS'|trans %}
+        {% set title = block('page_title')|trim %}
+        {% set share_title = title ends with (' - ' ~ site_name) ? title|slice(0, -(3 + site_name|length))|trim : title %}
+        {% set description = block('meta_description')|trim %}
+        {% set language = enum('App\\Entity\\Application\\Enums\\Languages').fromLangParam(app.request.locale) %}
+        <meta property="og:site_name" content="{{ site_name }}">
+        <meta property="og:type" content="{% block meta_type %}website{% endblock %}">
+        <meta property="og:title" content="{{ share_title|raw }}">
+        <meta property="og:description" content="{{ description|raw }}">
+        <meta property="og:image" content="{% block meta_image %}{{ absolute_url(asset('images/gewis.png')) }}{% endblock %}">
+        <meta property="og:locale" content="{{ language.locale }}">
+        {% for locale in supported_locales|filter(locale => locale != app.request.locale) %}
+            <meta property="og:locale:alternate" content="{{ enum('App\\Entity\\Application\\Enums\\Languages').fromLangParam(locale).locale }}">
+        {% endfor %}
+        {% block meta_tags %}{% endblock %}
+        <meta name="twitter:card" content="{% block meta_card %}summary{% endblock %}">
+        {# `app.current_route` is not defined for error pages. #}
         {% if null !== app.current_route %}
+            {% set canonical_url = absolute_url(page is not defined ? path(app.current_route, app.current_route_parameters) : localised_page_path(page, app.request.locale)) %}
+            <link rel="canonical" href="{{ canonical_url }}">
+            <meta property="og:url" content="{{ canonical_url }}">
             {% for locale in supported_locales %}
                 {% set hreflang_url = page is not defined ? path(app.current_route, app.current_route_parameters|merge({_locale: locale})) : localised_page_path(page, locale) %}
                 <link rel="alternate" hreflang="{{ locale }}" href="{{ absolute_url(hreflang_url) }}" />
