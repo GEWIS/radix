@@ -8873,6 +8873,14 @@
         <source>Sign-ups are frozen for this activity, so you cannot add a subscriber.</source>
         <target state="translated">Inschrijvingen voor deze activiteit zijn bevroren, dus je kunt geen deelnemer toevoegen.</target>
       </trans-unit>
+      <trans-unit id="d9lp39y" resname="Sign-ups close">
+        <source>Sign-ups close</source>
+        <target state="translated">Inschrijvingen sluiten</target>
+      </trans-unit>
+      <trans-unit id="MyzFws3" resname="Sign-ups closed">
+        <source>Sign-ups closed</source>
+        <target state="translated">Inschrijvingen gesloten</target>
+      </trans-unit>
       <trans-unit id="tCgPQWl" resname="Sign-ups for &quot;%name%&quot; close soon. You will not be able to withdraw after that.">
         <source>Sign-ups for "%name%" close soon. You will not be able to withdraw after that.</source>
         <target state="translated">De inschrijving voor "%name%" sluit binnenkort. Daarna kun je je niet meer uitschrijven.</target>
@@ -8880,6 +8888,10 @@
       <trans-unit id="HqlKK3f" resname="Sign-ups for &quot;%name%&quot; close soon. You will not be able to withdraw or change your answers after that.">
         <source>Sign-ups for "%name%" close soon. You will not be able to withdraw or change your answers after that.</source>
         <target state="translated">De inschrijving voor "%name%" sluit binnenkort. Daarna kun je je niet meer uitschrijven of je antwoorden wijzigen.</target>
+      </trans-unit>
+      <trans-unit id="xwv7APi" resname="Sign-ups open">
+        <source>Sign-ups open</source>
+        <target state="translated">Inschrijvingen openen</target>
       </trans-unit>
       <trans-unit id="VCNBYQu" resname="Sign-ups: %count%">
         <source>Sign-ups: %count%</source>

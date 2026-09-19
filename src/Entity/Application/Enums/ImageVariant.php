@@ -7,7 +7,8 @@ namespace App\Entity\Application\Enums;
 /**
  * A pre-generated rendition of a source image. Width-fit variants preserve aspect ratio and are never upscaled (a
  * narrower original skips them); fixed-crop variants are cropped to fill an exact box. Every variant is encoded
- * as WebP with metadata stripped. The backing value is the URL segment used when serving (`/img/{variant}/{path}`).
+ * as WebP with metadata stripped, except the share card, which is PNG because WhatsApp shows no preview for a WebP
+ * image. The backing value is the URL segment used when serving (`/img/{variant}/{path}`).
  */
 enum ImageVariant: string
 {
@@ -31,6 +32,9 @@ enum ImageVariant: string
     case Billboard = 'billboard';
     case Billboard2x = 'billboard2x';
 
+    // The card a link to a page shows when it is shared, at the size Open Graph consumers ask for.
+    case Share = 'share';
+
     /**
      * The target width, in pixels.
      */
@@ -49,6 +53,7 @@ enum ImageVariant: string
             self::Leaderboard2x => 1456,
             self::Billboard => 970,
             self::Billboard2x => 1940,
+            self::Share => 1200,
         };
     }
 
@@ -67,7 +72,24 @@ enum ImageVariant: string
             self::Leaderboard2x => 180,
             self::Billboard => 250,
             self::Billboard2x => 500,
+            self::Share => 630,
             default => null,
+        };
+    }
+
+    public function mimeType(): string
+    {
+        return match ($this) {
+            self::Share => 'image/png',
+            default => 'image/webp',
+        };
+    }
+
+    public function extension(): string
+    {
+        return match ($this) {
+            self::Share => 'png',
+            default => 'webp',
         };
     }
 

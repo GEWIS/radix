@@ -41,6 +41,9 @@ enum StorageNamespace: string
     /** Organ cover and thumbnail images (public). */
     case OrganImage = 'organ-image';
 
+    /** The share cards drawn for activities (public). */
+    case ActivityShareImage = 'activity-share-image';
+
     /** Images embedded in custom pages/markdown, scoped per page once one exists (public). */
     case PageImage = 'page-image';
 
@@ -97,6 +100,10 @@ enum StorageNamespace: string
             self::OrganImage => $this->rejectScope(
                 $scope,
                 'organs/images',
+            ),
+            self::ActivityShareImage => $this->rejectScope(
+                $scope,
+                'activities/share',
             ),
             self::PageImage => $this->withOptionalScope(
                 $scope,

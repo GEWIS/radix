@@ -36,6 +36,7 @@ class MainScheduleTest extends KernelTestCase
         'app:activity:delete-old-signups' => 'gdpr',
         'app:activity:lapse-overdue-options' => 'cron',
         'app:activity:prune-unverified-signups' => 'gdpr',
+        'app:activity:redraw-stale-share-images' => 'cron',
         'app:activity:remind-closing-signups' => 'cron',
         'app:activity:remind-option-budget' => 'cron',
         'app:activity:run-due-draws' => 'cron',

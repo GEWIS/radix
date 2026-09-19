@@ -118,6 +118,8 @@ parameters:
     # The face the red watermark and the generated fixture images are drawn in. Shipped by `fonts-dejavu-core`, which
     # the Dockerfile installs explicitly.
     app.font: '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+    # The faces the activity share cards are drawn in. Shipped by `fonts-inter`, which the Dockerfile installs.
+    app.share_card_font_dir: '/usr/share/fonts/opentype/inter'
     # The association's own agenda, which the option calendar draws behind the days bodies request. Defaulted
     # so a machine without a key runs perfectly well with that layer simply absent; production requires both
     # for real (see compose.yaml).

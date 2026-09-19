@@ -44,6 +44,10 @@ final readonly class FilePathResolver
             ) => StorageNamespace::OrganImage,
             str_starts_with(
                 $path,
+                'activities/share/',
+            ) => StorageNamespace::ActivityShareImage,
+            str_starts_with(
+                $path,
                 'pages/images/',
             ) => StorageNamespace::PageImage,
             str_starts_with(
@@ -108,6 +112,7 @@ final readonly class FilePathResolver
             StorageNamespace::PhotoOriginal, StorageNamespace::PhotoWeekly => ImageProfile::AlbumPhoto,
             StorageNamespace::PhotoCover => ImageProfile::AlbumCover,
             StorageNamespace::OrganImage => ImageProfile::OrganImage,
+            StorageNamespace::ActivityShareImage => ImageProfile::ActivityShare,
             StorageNamespace::PageImage => ImageProfile::PageImage,
             StorageNamespace::CompanyImage => match ($variant) {
                 ImageVariant::Leaderboard, ImageVariant::Leaderboard2x => ImageProfile::CompanyBannerLeaderboard,

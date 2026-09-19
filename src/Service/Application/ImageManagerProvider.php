@@ -6,6 +6,7 @@ namespace App\Service\Application;
 
 use Intervention\Image\Drivers\Vips\Driver as VipsDriver;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\FontProcessorInterface;
 
 /**
  * Provides an Intervention {@see ImageManager} on libvips, which streams tiles instead of decoding whole frames. It is
@@ -20,5 +21,13 @@ final readonly class ImageManagerProvider
     public function create(): ImageManager
     {
         return new ImageManager(new VipsDriver());
+    }
+
+    /**
+     * Measures text the way the driver draws it, for a layout that has to know how wide a line is drawn.
+     */
+    public function fontProcessor(): FontProcessorInterface
+    {
+        return new VipsDriver()->fontProcessor();
     }
 }

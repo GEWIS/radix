@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Activity;
 
 use App\Entity\Activity\Enums\ActivityCategories;
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\LocalisedText;
 use App\Entity\Application\RevisableInterface;
 use App\Entity\Application\RevisionInterface;
@@ -18,6 +19,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -175,6 +177,28 @@ class Activity implements RevisableInterface
     )]
     public private(set) ?MemberModel $unpublishedBy = null;
 
+    /**
+     * The share cards drawn when a revision was approved, one per language, keyed by the language parameter. Drawn
+     * from the revision rather than reviewed with it, so they are on the activity like an album's cover.
+     *
+     * @var ?array<string, string>
+     */
+    #[Column(
+        type: Types::JSON,
+        nullable: true,
+    )]
+    public ?array $shareImagePaths = null;
+
+    /**
+     * When a sign-up list next opens or closes, after which the cards are out of date, or null when no list does.
+     * The cron redraws the cards that are due.
+     */
+    #[Column(
+        type: 'datetime_immutable',
+        nullable: true,
+    )]
+    public ?DateTimeImmutable $shareImageStaleAt = null;
+
     public function __construct()
     {
         $this->revisions = new ArrayCollection();
@@ -214,6 +238,11 @@ class Activity implements RevisableInterface
     public function getLiveRevision(): ?ActivityRevision
     {
         return $this->liveRevision;
+    }
+
+    public function getShareImagePath(Languages $language): ?string
+    {
+        return $this->shareImagePaths[$language->getLangParam()] ?? null;
     }
 
     public function setLiveRevision(?ActivityRevision $liveRevision): void
@@ -278,31 +307,10 @@ class Activity implements RevisableInterface
      */
     public function getRelevantSignupList(): ?SignupList
     {
-        $now = new DateTimeImmutable('now');
-        $open = null;
-        $upcoming = null;
-
-        foreach ($this->getLiveSignupLists() as $signupList) {
-            if ($signupList->closeDate <= $now) {
-                continue;
-            }
-
-            if ($signupList->openDate <= $now) {
-                if (
-                    null === $open
-                    || $signupList->closeDate < $open->closeDate
-                ) {
-                    $open = $signupList;
-                }
-            } elseif (
-                null === $upcoming
-                || $signupList->openDate < $upcoming->openDate
-            ) {
-                $upcoming = $signupList;
-            }
-        }
-
-        return $open ?? $upcoming;
+        return SignupList::relevantAmong(
+            $this->getLiveSignupLists(),
+            new DateTimeImmutable('now'),
+        );
     }
 
     /**

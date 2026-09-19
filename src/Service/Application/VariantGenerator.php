@@ -6,6 +6,7 @@ namespace App\Service\Application;
 
 use App\Entity\Application\Enums\ImageProfile;
 use App\Entity\Application\Enums\ImageVariant;
+use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 
 use function bin2hex;
@@ -106,7 +107,14 @@ final readonly class VariantGenerator
             $image->scaleDown(width: $variant->width());
         }
 
-        $encoded = $image->encode(new WebpEncoder(quality: $quality, strip: true));
+        $encoded = $image->encode(
+            'image/png' === $variant->mimeType()
+                ? new PngEncoder()
+                : new WebpEncoder(
+                    quality: $quality,
+                    strip: true,
+                ),
+        );
         $this->writeAtomically(
             $cachePath,
             $encoded->toString(),
@@ -141,16 +149,17 @@ final readonly class VariantGenerator
 
     /**
      * The cache path a variant of the given source is stored at, i.e.
-     * `cache/images/{variant}/<source without extension>.webp`.
+     * `cache/images/{variant}/<source without extension>.<extension of the variant>`.
      */
     public function cachePath(
         string $sourcePath,
         ImageVariant $variant,
     ): string {
         return sprintf(
-            'cache/images/%s/%s.webp',
+            'cache/images/%s/%s.%s',
             $variant->value,
             $this->withoutExtension($sourcePath),
+            $variant->extension(),
         );
     }
 

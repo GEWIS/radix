@@ -34,6 +34,7 @@ RUN <<-EOF
         ca-certificates \
         file \
         fonts-dejavu-core \
+        fonts-inter \
         git \
         libicu-dev \
         libvips42t64 \
@@ -238,10 +239,10 @@ EOF
 # `poppler-utils` provides `pdftoppm`, which rasterizes course documents before they are watermarked. It is invoked as
 # a subprocess rather than linked, so it has to be installed here too. `fonts-dejavu-core` supplies the face the
 # watermark is drawn in; fontconfig already pulls it in, but the watermark would silently stop rendering if that ever
-# changed, so it is named here as well.
+# changed, so it is named here as well. `fonts-inter` supplies the faces the activity share cards are drawn in.
 RUN <<-EOF
     apt-get update
-    apt-get install -y --no-install-recommends fonts-dejavu-core libvips42t64 poppler-utils
+    apt-get install -y --no-install-recommends fonts-dejavu-core fonts-inter libvips42t64 poppler-utils
     rm -rf /var/lib/apt/lists/*
 EOF
 

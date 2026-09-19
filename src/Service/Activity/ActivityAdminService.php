@@ -9,11 +9,13 @@ use App\Entity\Activity\ActivityRevision;
 use App\Entity\Activity\SignupList;
 use App\Entity\Decision\Member;
 use App\Entity\User\User;
+use App\Message\Activity\RenderActivityShareImageMessage;
 use App\Service\Application\EditLockService;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Writing an activity from the admin screens, and the four standing decisions that can be taken about one that is
@@ -29,6 +31,7 @@ final readonly class ActivityAdminService
         private EditLockService $editLockService,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private EntityManagerInterface $entityManager,
+        private MessageBusInterface $messageBus,
     ) {
     }
 
@@ -134,6 +137,7 @@ final readonly class ActivityAdminService
         $activity->cancel($member);
 
         $this->entityManager->flush();
+        $this->redrawShareImages($activity);
     }
 
     public function uncancel(Activity $activity): void
@@ -141,6 +145,21 @@ final readonly class ActivityAdminService
         $activity->uncancel();
 
         $this->entityManager->flush();
+        $this->redrawShareImages($activity);
+    }
+
+    /**
+     * The cards show whether the activity is cancelled, so both changes redraw them. After the flush, since the
+     * handler reads the activity from the database.
+     */
+    private function redrawShareImages(Activity $activity): void
+    {
+        $id = $activity->getLiveRevision()?->id;
+        if (null === $id) {
+            return;
+        }
+
+        $this->messageBus->dispatch(new RenderActivityShareImageMessage($id));
     }
 
     public function unpublish(

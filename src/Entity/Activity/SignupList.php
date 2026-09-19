@@ -406,6 +406,72 @@ class SignupList
     #[Column(type: Types::BOOLEAN)]
     public bool $promoted = false;
 
+    /**
+     * The list whose deadline is the one to show: among the lists that have not closed, the open one closing soonest,
+     * otherwise the one opening soonest. Null when every list has closed.
+     *
+     * @param iterable<SignupList> $signupLists
+     */
+    public static function relevantAmong(
+        iterable $signupLists,
+        DateTimeImmutable $now,
+    ): ?SignupList {
+        $open = null;
+        $upcoming = null;
+
+        foreach ($signupLists as $signupList) {
+            if ($signupList->closeDate <= $now) {
+                continue;
+            }
+
+            if ($signupList->openDate <= $now) {
+                if (
+                    null === $open
+                    || $signupList->closeDate < $open->closeDate
+                ) {
+                    $open = $signupList;
+                }
+            } elseif (
+                null === $upcoming
+                || $signupList->openDate < $upcoming->openDate
+            ) {
+                $upcoming = $signupList;
+            }
+        }
+
+        return $open ?? $upcoming;
+    }
+
+    /**
+     * The next moment a list opens or closes, or null when none of them does.
+     *
+     * @param iterable<SignupList> $signupLists
+     */
+    public static function nextTransitionAmong(
+        iterable $signupLists,
+        DateTimeImmutable $now,
+    ): ?DateTimeImmutable {
+        $next = null;
+        foreach ($signupLists as $signupList) {
+            foreach ([$signupList->openDate, $signupList->closeDate] as $moment) {
+                if (
+                    null === $moment
+                    || $moment <= $now
+                    || (
+                        null !== $next
+                        && $moment >= $next
+                    )
+                ) {
+                    continue;
+                }
+
+                $next = $moment;
+            }
+        }
+
+        return $next;
+    }
+
     public function __construct()
     {
         $this->signUps = new ArrayCollection();

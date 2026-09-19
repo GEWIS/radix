@@ -9,8 +9,7 @@ namespace App\Entity\Application\Enums;
  *
  * A role is finer-grained than a {@see StorageNamespace} on purpose. Company logos and banners share the
  * `career/{id}/images` namespace but need different renditions (small near-lossless logos versus a banner at the exact
- * box its format is shown in), which a namespace alone cannot express. A future consumer (e.g. an og:image) would be
- * one more case here.
+ * box its format is shown in), which a namespace alone cannot express.
  */
 enum ImageProfile: string
 {
@@ -37,6 +36,9 @@ enum ImageProfile: string
 
     /** Images embedded in custom pages/markdown. */
     case PageImage = 'page-image';
+
+    /** The share card drawn for an activity: already at the size it is served at. */
+    case ActivityShare = 'activity-share';
 
     /**
      * Default WebP quality for photographic content. The Sprint-1 A/B test may retune it (80 to 90).
@@ -91,6 +93,7 @@ enum ImageProfile: string
                 ImageVariant::W1280,
                 ImageVariant::W1920,
             ],
+            self::ActivityShare => [ImageVariant::Share],
         };
     }
 
@@ -100,7 +103,7 @@ enum ImageProfile: string
     public function webpQuality(): int
     {
         return match ($this) {
-            self::CompanyLogo => self::FLAT_QUALITY,
+            self::CompanyLogo, self::ActivityShare => self::FLAT_QUALITY,
             default => self::PHOTO_QUALITY,
         };
     }

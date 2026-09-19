@@ -72,6 +72,7 @@ final readonly class ImageVariantResponder
         if ($this->fileStorage->exists($cachePath)) {
             return $this->serveVariant(
                 $cachePath,
+                $variant,
                 $namespace,
             );
         }
@@ -136,6 +137,7 @@ final readonly class ImageVariantResponder
 
     private function serveVariant(
         string $cachePath,
+        ImageVariant $variant,
         StorageNamespace $namespace,
     ): Response {
         $absolutePath = $this->storageRootDir . '/' . $cachePath;
@@ -151,7 +153,7 @@ final readonly class ImageVariantResponder
 
         $response->headers->set(
             'Content-Type',
-            'image/webp',
+            $variant->mimeType(),
         );
 
         if ($namespace->isPrivate()) {
