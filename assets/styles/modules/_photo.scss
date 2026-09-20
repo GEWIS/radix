@@ -52,10 +52,9 @@ $potw-foil-gold: #ffc107;
     font-size: 1.1rem;
 }
 
-.album-search .dropdown-menu {
-    top: 100%;
-    max-height: 16rem;
-    overflow-y: auto;
+// The picker sits in a toolbar, where the select's full width would push the buttons onto their own row.
+.album-search {
+    width: 16rem;
 }
 
 // The upload controller toggles `is-dragging` while a drag is over the panel.

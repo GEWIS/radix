@@ -84,7 +84,6 @@ loadControllers(
         'study-notice': () => import('./controllers/join/study_notice_controller.ts'),
 
         // Photo-specific controllers.
-        'album-search': () => import('./controllers/photo/album_search_controller.ts'),
         'photo-cover': () => import('./controllers/photo/cover_controller.ts'),
         'gallery': () => import('./controllers/photo/gallery_controller.ts'),
         'photo-upload': () => import('./controllers/photo/upload_controller.ts'),

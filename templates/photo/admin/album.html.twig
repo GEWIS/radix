@@ -158,15 +158,15 @@
                     <form method="post" id="photo-admin-form" data-gallery-target="selectionForm"
                           class="d-flex flex-wrap gap-2 align-items-center mb-0">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('photo_admin_bulk') }}">
-                        <div class="album-search position-relative" data-controller="album-search"
-                             data-album-search-url-value="{{ path('admin/photos/albums_search') }}"
-                             data-album-search-exclude-value="{{ album.id }}">
-                            <input type="text" class="form-control form-control-sm" autocomplete="off"
-                                   placeholder="{{ 'Move selected to…'|trans }}"
-                                   data-album-search-target="input"
-                                   data-action="input->album-search#search keydown->album-search#keydown blur->album-search#close">
-                            <input type="hidden" name="destination" data-album-search-target="destination">
-                            <div class="dropdown-menu w-100" data-album-search-target="menu"></div>
+                        <div class="album-search">
+                            <select name="destination" class="form-select form-select-sm"
+                                    placeholder="{{ 'Move selected to…'|trans }}"
+                                    data-controller="symfony--ux-autocomplete--autocomplete"
+                                    data-symfony--ux-autocomplete--autocomplete-url-value="{{ path('ux_autocomplete', { alias: 'album', exclude: album.id }) }}"
+                                    data-symfony--ux-autocomplete--autocomplete-min-characters-value="2"
+                                    data-symfony--ux-autocomplete--autocomplete-loading-more-text-value="{{ 'Loading more results...'|trans }}"
+                                    data-symfony--ux-autocomplete--autocomplete-no-results-found-text-value="{{ 'No results found'|trans }}"
+                                    data-symfony--ux-autocomplete--autocomplete-no-more-results-text-value="{{ 'No more results'|trans }}"></select>
                         </div>
                         <button type="submit" class="btn btn-sm btn-outline-secondary"
                                 formaction="{{ path('admin/photos/photos_move', { album: album.id }) }}">

@@ -39,8 +39,6 @@ use function array_keys;
 use function array_map;
 use function in_array;
 use function intval;
-use function mb_strlen;
-use function trim;
 
 #[IsGranted(
     attribute: UserRoles::Board->value,
@@ -320,39 +318,6 @@ class AdminController extends AbstractController
     public function albumManifest(Album $album): JsonResponse
     {
         return new JsonResponse($this->photoService->getAlbumManifest($album));
-    }
-
-    /**
-     * Album name search for the move-photos destination picker. Kept off the album page itself so a set of thousands of
-     * albums is never loaded up front.
-     */
-    #[Route(
-        path: '/albums/search',
-        name: 'albums_search',
-        methods: ['GET'],
-    )]
-    public function searchAlbums(
-        #[MapQueryParameter]
-        string $q = '',
-    ): JsonResponse {
-        $query = trim($q);
-        if (mb_strlen($query) < 2) {
-            return new JsonResponse([]);
-        }
-
-        return new JsonResponse(array_map(
-            static function (Album $album): array {
-                $parent = $album->getParent();
-
-                return [
-                    'id' => $album->id,
-                    'label' => null === $parent
-                        ? $album->name
-                        : $parent->name . ' / ' . $album->name,
-                ];
-            },
-            $this->albumRepository->searchForMove($query),
-        ));
     }
 
     #[Route(

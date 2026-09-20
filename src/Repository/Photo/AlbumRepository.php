@@ -100,41 +100,6 @@ class AlbumRepository extends ServiceEntityRepository
     }
 
     /**
-     * Albums matching a name fragment, for the admin move-photos picker. Unlike the public cross-year search
-     * ({@see self::searchPublishedAlbums}) this is not restricted to published, dated, root albums: a photo can be
-     * moved into any album, drafts and sub-albums included. The parent is fetch-joined for a disambiguating label, and
-     * the result is capped so the typeahead stays light.
-     *
-     * @return Album[]
-     */
-    public function searchForMove(
-        string $query,
-        int $limit = 25,
-    ): array {
-        return $this->createQueryBuilder('a')
-            ->leftJoin(
-                'a.parent',
-                'parent',
-            )
-            ->addSelect('parent')
-            ->where('a.name LIKE :query')
-            ->setParameter(
-                'query',
-                '%' . addcslashes(
-                    $query,
-                    '%_',
-                ) . '%',
-            )
-            ->orderBy(
-                'a.name',
-                SortDirection::Ascending,
-            )
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * The start date of every published, dated root album, in one query, so the overview can derive the association
      * years that actually have albums (a year with none never reaches the year switcher).
      *
