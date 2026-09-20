@@ -26,12 +26,21 @@
             <h2 class="mb-0">{{ album.name }}</h2>
             {% include 'partials/photo/album-dates.html.twig' with { 'album': album } only %}
         </div>
-        {% if album.parent %}
-            <a class="btn btn-outline-secondary btn-sm"
-               href="{{ path('photo/album', { type: 'album', album: album.parent.id }) }}">
-                <span class="fa-solid fa-arrow-left me-1"></span>{{ 'Back to parent album'|trans }}
-            </a>
-        {% endif %}
+        <div class="d-flex flex-wrap gap-2">
+            {% if album.parent %}
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="{{ path('photo/album', { type: 'album', album: album.parent.id }) }}">
+                    <span class="fa-solid fa-arrow-left me-1"></span>{{ 'Back to parent album'|trans }}
+                </a>
+            {% endif %}
+            {% set activity = album.linkedActivity %}
+            {% if activity is not null and activity.isPubliclyVisible %}
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="{{ path('activity/view', { activity: activity.id }) }}">
+                    <span class="fa-solid fa-calendar-day me-1"></span>{{ 'View activity'|trans }}
+                </a>
+            {% endif %}
+        </div>
     </div>
 
     {% if children is not empty %}

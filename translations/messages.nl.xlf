@@ -4301,6 +4301,10 @@
         <source>Go to security</source>
         <target>Ga naar beveiliging</target>
       </trans-unit>
+      <trans-unit id="rTNc9.i" resname="Go to the activity">
+        <source>Go to the activity</source>
+        <target state="translated">Ga naar de activiteit</target>
+      </trans-unit>
       <trans-unit id="ZHObb2W" resname="Go to the body">
         <source>Go to the body</source>
         <target state="translated">Naar het orgaan</target>
@@ -5576,6 +5580,10 @@
       <trans-unit id="XYcy9Dt" resname="Members area">
         <source>Members area</source>
         <target state="translated">Ledengedeelte</target>
+      </trans-unit>
+      <trans-unit id="cujeX3U" resname="Members can go from the activity to this album and back.">
+        <source>Members can go from the activity to this album and back.</source>
+        <target state="translated">Leden kunnen van de activiteit naar dit album gaan en terug.</target>
       </trans-unit>
       <trans-unit id="AAqppub" resname="Members only">
         <source>Members only</source>
@@ -8792,6 +8800,10 @@
       <trans-unit id="ahVmjap" resname="Sign in to read and join the discussion.">
         <source>Sign in to read and join the discussion.</source>
         <target state="translated">Log in om de discussie te lezen en eraan mee te doen.</target>
+      </trans-unit>
+      <trans-unit id="A2Z4WMi" resname="Sign in to see the photos of this activity.">
+        <source>Sign in to see the photos of this activity.</source>
+        <target state="translated">Log in om de foto's van deze activiteit te zien.</target>
       </trans-unit>
       <trans-unit id="w9L0BYB" resname="Sign it as">
         <source>Sign it as</source>

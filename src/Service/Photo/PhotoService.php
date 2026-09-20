@@ -107,6 +107,22 @@ final readonly class PhotoService
         ) . '#pid=' . intval($photo->id);
     }
 
+    private function activityUrl(Album $album): ?string
+    {
+        $activity = $album->getLinkedActivity();
+        if (
+            null === $activity
+            || !$activity->isPubliclyVisible()
+        ) {
+            return null;
+        }
+
+        return $this->urlGenerator->generate(
+            'activity/view',
+            ['activity' => intval($activity->id)],
+        );
+    }
+
     private function manifestEntry(
         Photo $photo,
         ?string $albumUrl = null,
@@ -142,6 +158,7 @@ final readonly class PhotoService
                 ],
             ),
             albumUrl: $albumUrl,
+            activityUrl: $this->activityUrl($photo->album),
             hidden: $hidden,
             potw: null !== $photo->weeklyPhoto,
         );

@@ -4301,6 +4301,10 @@
         <source>Go to security</source>
         <target>Go to security</target>
       </trans-unit>
+      <trans-unit id="rTNc9.i" resname="Go to the activity">
+        <source>Go to the activity</source>
+        <target state="translated">Go to the activity</target>
+      </trans-unit>
       <trans-unit id="ZHObb2W" resname="Go to the body">
         <source>Go to the body</source>
         <target state="translated">Go to the body</target>
@@ -5576,6 +5580,10 @@
       <trans-unit id="XYcy9Dt" resname="Members area">
         <source>Members area</source>
         <target state="translated">Members area</target>
+      </trans-unit>
+      <trans-unit id="cujeX3U" resname="Members can go from the activity to this album and back.">
+        <source>Members can go from the activity to this album and back.</source>
+        <target state="translated">Members can go from the activity to this album and back.</target>
       </trans-unit>
       <trans-unit id="AAqppub" resname="Members only">
         <source>Members only</source>
@@ -8792,6 +8800,10 @@
       <trans-unit id="ahVmjap" resname="Sign in to read and join the discussion.">
         <source>Sign in to read and join the discussion.</source>
         <target state="translated">Sign in to read and join the discussion.</target>
+      </trans-unit>
+      <trans-unit id="A2Z4WMi" resname="Sign in to see the photos of this activity.">
+        <source>Sign in to see the photos of this activity.</source>
+        <target state="translated">Sign in to see the photos of this activity.</target>
       </trans-unit>
       <trans-unit id="w9L0BYB" resname="Sign it as">
         <source>Sign it as</source>

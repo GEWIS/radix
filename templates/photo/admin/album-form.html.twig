@@ -31,6 +31,7 @@
                             <div class="col-md-6">{{ form_row(form.startDateTime) }}</div>
                             <div class="col-md-6">{{ form_row(form.endDateTime) }}</div>
                         </div>
+                        {{ form_row(form.activity) }}
                         {{ form_row(form.published) }}
                         <div class="d-flex justify-content-end gap-2">
                             <a href="{{ path('admin/photos/index') }}" class="btn btn-link">

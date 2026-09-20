@@ -138,6 +138,28 @@
                             </p>
                         </div>
                     {% endif %}
+                    {% if albums is not empty %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ 'Photos'|trans }}</h6>
+                            <ul class="list-unstyled small mb-0">
+                                {% for album in albums %}
+                                    <li>
+                                        <a href="{{ path('photo/album', { type: 'album', album: album.id }) }}">
+                                            <span class="fa-solid fa-images me-1"></span>{{ album.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% elseif hasAlbums and app.user is null %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ 'Photos'|trans }}</h6>
+                            <p class="text-muted small mb-2">
+                                <span class="fas fa-lock me-1" aria-hidden="true"></span>{{ 'Sign in to see the photos of this activity.'|trans }}
+                            </p>
+                            <a href="{{ path('user_login') }}" class="btn btn-gewis-primary btn-sm">{{ 'Sign in'|trans }}</a>
+                        </div>
+                    {% endif %}
                     {% if isCareer %}
                         <a class="list-group-item list-group-item-action" href="https://myfuture.tue.nl/"
                            target="_blank" rel="noopener">

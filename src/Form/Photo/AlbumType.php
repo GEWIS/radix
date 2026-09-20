@@ -61,6 +61,15 @@ final class AlbumType extends AbstractType
                 ],
             )
             ->add(
+                'activity',
+                ActivityAutocompleteType::class,
+                [
+                    'label' => t('Activity'),
+                    'help' => t('Members can go from the activity to this album and back.'),
+                    'required' => false,
+                ],
+            )
+            ->add(
                 'published',
                 CheckboxType::class,
                 [

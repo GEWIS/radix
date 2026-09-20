@@ -11,6 +11,7 @@ interface ManifestEntry {
     xlargeUrl: string;
     downloadUrl: string;
     albumUrl: string | null;
+    activityUrl: string | null;
     hidden: boolean;
     potw: boolean;
 }
@@ -22,6 +23,7 @@ interface SlideData {
     width: number;
     height: number;
     albumUrl: string | null;
+    activityUrl: string | null;
     msrc: string;
     downloadUrl: string;
 }
@@ -178,6 +180,7 @@ export default class extends Controller<HTMLElement> {
             msrc: entry.thumbUrl,
             downloadUrl: entry.downloadUrl,
             albumUrl: entry.albumUrl,
+            activityUrl: entry.activityUrl,
         }));
     }
 
@@ -616,6 +619,27 @@ export default class extends Controller<HTMLElement> {
                         element.hidden = null === albumUrl;
                         if (null !== albumUrl) {
                             element.href = albumUrl;
+                        }
+                    });
+                },
+            });
+
+            // Per slide rather than per page, so a member's or a body's tagged photos link to each photo's own
+            // activity.
+            this.lightbox.pswp.ui.registerElement({
+                name: 'activity-button',
+                order: 8,
+                isButton: true,
+                tagName: 'a',
+                html: spriteIcon(this.iconSpriteUrlValue, 'calendar-day'),
+                onInit: (element: HTMLAnchorElement): void => {
+                    element.title = this.labelsValue.goToActivity ?? '';
+                    element.hidden = true;
+                    this.lightbox.pswp.on('change', (): void => {
+                        const activityUrl = this.slides[this.lightbox.pswp.currIndex]?.activityUrl ?? null;
+                        element.hidden = null === activityUrl;
+                        if (null !== activityUrl) {
+                            element.href = activityUrl;
                         }
                     });
                 },

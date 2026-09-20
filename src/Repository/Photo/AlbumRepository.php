@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository\Photo;
 
+use App\Entity\Activity\Activity;
 use App\Entity\Photo\Album;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -262,6 +263,28 @@ class AlbumRepository extends ServiceEntityRepository
             ->setParameter(
                 'parent',
                 $album,
+            )
+            ->orderBy(
+                'a.startDateTime',
+                SortDirection::Ascending,
+            )
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * The published albums linked directly to an activity, oldest first.
+     *
+     * @return Album[]
+     */
+    public function findPublishedByActivity(Activity $activity): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.activity = :activity')
+            ->andWhere('a.published = TRUE')
+            ->setParameter(
+                'activity',
+                $activity,
             )
             ->orderBy(
                 'a.startDateTime',

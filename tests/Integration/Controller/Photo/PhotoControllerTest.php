@@ -60,6 +60,52 @@ final class PhotoControllerTest extends DatabaseTestCase
         );
     }
 
+    public function testAlbumPageLinksToTheActivity(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $response = $this->controller()->album(
+            AlbumType::Regular,
+            $this->albumId('Movie Night'),
+        );
+
+        self::assertStringContainsString(
+            $this->activityUrl('Movie Night'),
+            (string) $response->getContent(),
+        );
+    }
+
+    public function testManifestCarriesTheActivityOfEachPhoto(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $response = $this->controller()->manifest($this->albumId('Movie Night'));
+        $entries = json_decode(
+            (string) $response->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+
+        self::assertIsArray($entries);
+        self::assertNotEmpty($entries);
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            self::assertSame(
+                $this->activityUrl('Movie Night'),
+                $entry['activityUrl'],
+            );
+        }
+    }
+
     public function testIndexRendersTheYearGroupedAlbumOverview(): void
     {
         $this->authenticate(
@@ -419,6 +465,20 @@ final class PhotoControllerTest extends DatabaseTestCase
     private function controller(): PhotoController
     {
         return self::getContainer()->get(PhotoController::class);
+    }
+
+    private function activityUrl(string $album): string
+    {
+        $activity = self::getContainer()->get(AlbumRepository::class)->findOneBy(['name' => $album])?->activity;
+        self::assertNotNull(
+            $activity,
+            'The seed is expected to link the album to an activity.',
+        );
+
+        return self::getContainer()->get('router')->generate(
+            'activity/view',
+            ['activity' => $activity->id],
+        );
     }
 
     private function albumId(string $name): int

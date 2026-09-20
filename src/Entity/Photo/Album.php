@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Photo;
 
+use App\Entity\Activity\Activity;
 use App\Entity\Application\Traits\IdentifiableTrait;
 use App\Entity\Application\Traits\TimestampableTrait;
 use DateTimeImmutable;
@@ -121,6 +122,19 @@ class Album
     #[Column(type: Types::BOOLEAN)]
     public bool $published = false;
 
+    /**
+     * The activity the photos were taken at. Set by the photo admin rather than reviewed with the activity, because
+     * the album only exists once the activity is over.
+     */
+    #[ManyToOne(targetEntity: Activity::class)]
+    #[JoinColumn(
+        name: 'activity_id',
+        referencedColumnName: 'id',
+        nullable: true,
+        onDelete: 'SET NULL',
+    )]
+    public ?Activity $activity = null;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
@@ -172,6 +186,24 @@ class Album
     public function setParent(?Album $parent): void
     {
         $this->parent = $parent;
+    }
+
+    /**
+     * The activity of this album or, for a sub-album without one, of the nearest ancestor that has one, so a weekend
+     * is linked once rather than once per day.
+     */
+    public function getLinkedActivity(): ?Activity
+    {
+        $album = $this;
+        while (null !== $album) {
+            if (null !== $album->activity) {
+                return $album->activity;
+            }
+
+            $album = $album->parent;
+        }
+
+        return null;
     }
 
     /**

@@ -35,6 +35,14 @@
                        class="text-decoration-none">{{ album.parent.name }}</a>
                 </span>
             {% endif %}
+            {% set activity = album.linkedActivity %}
+            {% if activity is not null %}
+                <span class="text-muted small">
+                    <span class="fa-solid fa-calendar-day me-1"></span>
+                    <a href="{{ path('activity/view', { activity: activity.id }) }}"
+                       class="text-decoration-none">{{ activity_title(activity) }}</a>
+                </span>
+            {% endif %}
         </div>
         <div class="d-flex gap-2">
             <a href="{{ path('admin/photos/albums_edit', { album: album.id }) }}" class="btn btn-outline-secondary">

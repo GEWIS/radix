@@ -81,6 +81,7 @@ use function sprintf;
  *     externals?: list<array<string, mixed>>,
  * }
  * @phpstan-type ActivitySeedType = array{
+ *     reference?: string,
  *     creator: int,
  *     status: RevisionStatus,
  *     beginTime: string,
@@ -102,6 +103,8 @@ use function sprintf;
  */
 class ActivityFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public const string REFERENCE_MOVIE_NIGHT = 'activity-movie-night';
+
     /** @var list<array{Signup, DateTimeImmutable}> the sign-ups whose moment is written once they have an id */
     private array $signedUpAt = [];
 
@@ -185,6 +188,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
             ],
             // Past (already happened), approved, organised by a discharged member.
             [
+                'reference' => self::REFERENCE_MOVIE_NIGHT,
                 'creator' => 8021,
                 'status' => RevisionStatus::Approved,
                 'beginTime' => '-2 months 20:00',
@@ -1009,6 +1013,13 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
 
             $manager->persist($activity);
             $manager->persist($revision);
+
+            if (isset($data['reference'])) {
+                $this->addReference(
+                    $data['reference'],
+                    $activity,
+                );
+            }
 
             foreach ($data['signupLists'] ?? [] as $signupListData) {
                 $signupList = $this->createSignupList($signupListData);

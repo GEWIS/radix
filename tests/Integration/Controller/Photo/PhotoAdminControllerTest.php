@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller\Photo;
 
 use App\Controller\Photo\AdminController;
+use App\Entity\Activity\Activity;
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Photo\Album;
@@ -141,6 +142,49 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         self::assertSame(
             $gala->id,
             $photo->album->id,
+        );
+    }
+
+    public function testEditAlbumLinksTheActivity(): void
+    {
+        $this->authenticateBoard();
+        $trip = $this->album('Trip 2024');
+        $activity = $this->album('Movie Night')->activity;
+        self::assertInstanceOf(
+            Activity::class,
+            $activity,
+        );
+
+        $request = Request::create(
+            '/en/admin/photos/albums/' . $trip->id . '/edit',
+            'POST',
+            [
+                'album' => [
+                    '_csrf_token' => 'csrf-token',
+                    'name' => 'Trip 2024',
+                    'activity' => (string) $activity->id,
+                    'published' => '1',
+                ],
+            ],
+        );
+        $request->headers->set(
+            'Sec-Fetch-Site',
+            'same-origin',
+        );
+        $this->pushRequest($request);
+
+        $response = $this->controller()->editAlbum(
+            $trip,
+            $request,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertSame(
+            $activity,
+            $trip->activity,
         );
     }
 
@@ -283,7 +327,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         return $photo;
     }
 
-    private function pushRequest(): void
+    private function pushRequest(?Request $request = null): void
     {
         $session = self::getContainer()->get('session.factory')->createSession();
         self::assertInstanceOf(
@@ -291,7 +335,7 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
             $session,
         );
 
-        $request = new Request();
+        $request ??= new Request();
         $request->setSession($session);
         self::getContainer()->get('request_stack')->push($request);
     }

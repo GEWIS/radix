@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Photo;
 
+use App\Entity\Activity\Activity;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Photo\Album;
 use App\Repository\Photo\AlbumRepository;
@@ -207,20 +208,38 @@ final readonly class AlbumService
      */
     public function getViewableChildren(Album $album): array
     {
-        $children = [];
-        foreach ($album->getChildren() as $child) {
+        return $this->filterViewable($album->getChildren()->toArray());
+    }
+
+    /**
+     * @return Album[]
+     */
+    public function getViewableActivityAlbums(Activity $activity): array
+    {
+        return $this->filterViewable($this->albumRepository->findPublishedByActivity($activity));
+    }
+
+    /**
+     * @param Album[] $albums
+     *
+     * @return Album[]
+     */
+    private function filterViewable(array $albums): array
+    {
+        $viewable = [];
+        foreach ($albums as $album) {
             if (
                 !$this->security->isGranted(
                     AlbumVoter::VIEW,
-                    $child,
+                    $album,
                 )
             ) {
                 continue;
             }
 
-            $children[] = $child;
+            $viewable[] = $album;
         }
 
-        return $children;
+        return $viewable;
     }
 }

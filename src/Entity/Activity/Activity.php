@@ -389,6 +389,15 @@ class Activity implements RevisableInterface
     }
 
     /**
+     * Whether the activity has a public page: approved at least once and not taken out of view by the board.
+     */
+    public function isPubliclyVisible(): bool
+    {
+        return null !== $this->liveRevision
+            && !$this->isUnpublished();
+    }
+
+    /**
      * Whether all sign-up interaction (signing up, editing, withdrawing, draws, verification) is frozen. True whenever
      * the activity is cancelled or unpublished; both are board actions that take the activity out of active use.
      */

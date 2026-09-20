@@ -9,6 +9,8 @@ use App\Entity\Application\Enums\Languages;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityRepository;
+use App\Repository\Photo\AlbumRepository;
+use App\Service\Photo\AlbumService;
 use App\ViewModel\Activity\SignupListView;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +29,8 @@ class ActivityController extends AbstractController
 {
     public function __construct(
         private readonly ActivityRepository $activityRepository,
+        private readonly AlbumRepository $albumRepository,
+        private readonly AlbumService $albumService,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -172,6 +176,9 @@ class ActivityController extends AbstractController
                 'activity' => $entity,
                 'signupListViews' => $signupListViews,
                 'calendarEvent' => $calendarEvent,
+                'albums' => $this->albumService->getViewableActivityAlbums($entity),
+                // Whether there is anything to sign in for. A visitor is not told which albums exist.
+                'hasAlbums' => [] !== $this->albumRepository->findPublishedByActivity($entity),
             ],
         );
     }

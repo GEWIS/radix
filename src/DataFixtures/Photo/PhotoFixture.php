@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\DataFixtures\Photo;
 
+use App\DataFixtures\Activity\ActivityFixture;
 use App\DataFixtures\Decision\ProjectionReferenceFixture;
+use App\Entity\Activity\Activity;
 use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
@@ -239,6 +241,18 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         );
         $manager->persist($secret);
 
+        $movieNight = $this->makeAlbum(
+            'Movie Night',
+            true,
+            null,
+            '-2 months 21:00',
+        );
+        $movieNight->activity = $this->getReference(
+            ActivityFixture::REFERENCE_MOVIE_NIGHT,
+            Activity::class,
+        );
+        $manager->persist($movieNight);
+
         // Flush the albums first so their ids exist: photo originals are stored scoped per album.
         $manager->flush();
 
@@ -294,6 +308,12 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         );
         $manager->persist($secretPhoto);
         $manager->persist($this->memberTag($secretPhoto, 8030, null, null));
+
+        // --- Movie night album, linked to the activity ---
+        $manager->persist($this->makePhoto(
+            $movieNight,
+            '-2 months 21:00',
+        ));
 
         // The visible weekly photo (from the trip) and an older hidden one (from the dinner), so the anonymous
         // frontpage visibility rule has both cases to exercise.
@@ -733,7 +753,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     {
         return [
             ProjectionReferenceFixture::class,
-            ProjectionReferenceFixture::class,
+            ActivityFixture::class,
         ];
     }
 

@@ -8,11 +8,16 @@ use App\Controller\Activity\ActivityController;
 use App\Entity\Activity\Activity;
 use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\Decision\AssociationYear;
+use App\Entity\Photo\Album;
+use App\Entity\User\Enums\UserRoles;
+use App\Entity\User\User;
+use App\Repository\Photo\AlbumRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
  * The public activity pages, invoked directly (the codebase has no WebTestCase). The archive renders the overview
@@ -136,6 +141,83 @@ final class ActivityControllerTest extends DatabaseTestCase
         self::assertMatchesRegularExpression(
             '/<meta property="og:image" content="http[^"]+">/',
             $content,
+        );
+    }
+
+    public function testViewListsTheLinkedAlbumsForAMember(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+        $album = $this->linkedAlbum();
+
+        $response = $this->controller()->view((int) $album->activity?->id);
+
+        self::assertStringContainsString(
+            $this->albumUrl($album),
+            (string) $response->getContent(),
+        );
+    }
+
+    public function testViewAsksAVisitorToSignInForThePhotos(): void
+    {
+        $this->pushRequest();
+        $album = $this->linkedAlbum();
+
+        $content = (string) $this->controller()->view((int) $album->activity?->id)->getContent();
+
+        self::assertStringContainsString(
+            'Sign in to see the photos of this activity.',
+            $content,
+        );
+        self::assertStringNotContainsString(
+            $this->albumUrl($album),
+            $content,
+        );
+    }
+
+    private function albumUrl(Album $album): string
+    {
+        return self::getContainer()->get('router')->generate(
+            'photo/album',
+            [
+                'type' => 'album',
+                'album' => $album->id,
+            ],
+        );
+    }
+
+    private function linkedAlbum(): Album
+    {
+        $album = self::getContainer()->get(AlbumRepository::class)->findOneBy(['name' => 'Movie Night']);
+        self::assertInstanceOf(
+            Album::class,
+            $album,
+            'The seed is expected to contain the album linked to an activity.',
+        );
+
+        return $album;
+    }
+
+    private function authenticate(
+        int $lidnr,
+        UserRoles $role,
+    ): void {
+        $user = $this->entityManager->getRepository(User::class)->find($lidnr);
+        self::assertInstanceOf(
+            User::class,
+            $user,
+            'The seed is expected to contain a user for the member.',
+        );
+
+        self::getContainer()->get('security.token_storage')->setToken(
+            new UsernamePasswordToken(
+                $user,
+                'main',
+                [$role->value],
+            ),
         );
     }
 
