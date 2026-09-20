@@ -26,7 +26,7 @@
                     <form method="post">
                         {% if app.user %}
                             <div class="mb-3">
-                                {{ 'You are logged in as'|trans }} {{ app.user.userIdentifier }}, <a href="{{ path('user_logout') }}">{{ 'Logout'|trans }}</a>
+                                {{ 'You are logged in as'|trans }} {{ app.user.userIdentifier }}, <a href="{{ path('user_logout') }}" data-turbo-prefetch="false">{{ 'Logout'|trans }}</a>
                             </div>
                         {% else %}
                             <div class="form-floating mb-2">

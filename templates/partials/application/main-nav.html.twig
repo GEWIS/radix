@@ -1,7 +1,10 @@
-{% macro item(href, icon, label, count, active) %}
+{# `prefetch` is false for a link whose GET has a side effect, because Turbo fetches a link while the pointer is
+   over it. #}
+{% macro item(href, icon, label, count, active, prefetch) %}
     <li>
         <a href="{{ href }}" class="dropdown-item {{ active|default(false) ? 'active' : '' }}"
-           {% if active|default(false) %}aria-current="page"{% endif %}>
+           {% if active|default(false) %}aria-current="page"{% endif %}
+           {% if prefetch is same as(false) %}data-turbo-prefetch="false"{% endif %}>
             <span class="nav-menu-icon fas {{ icon }}" aria-hidden="true"></span>
             <span class="nav-menu-label">{{ label }}</span>
             {% if count|default(null) is not null %}
@@ -384,7 +387,7 @@
                             <li><hr class="dropdown-divider"></li>
                             {{ menu.item(path('company/index'), 'fa-building', 'My Company'|trans) }}
                             <li><hr class="dropdown-divider"></li>
-                            {{ menu.item(path('company_user_logout'), 'fa-arrow-right-from-bracket', 'Logout'|trans) }}
+                            {{ menu.item(path('company_user_logout'), 'fa-arrow-right-from-bracket', 'Logout'|trans, null, false, false) }}
                         </ul>
                     {% elseif enum('App\\Entity\\User\\Enums\\UserTypes').User === user_type %}
                         {% set member = app.user.member %}
@@ -410,7 +413,7 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             {{ menu.item(path('members/me'), 'fa-id-card', 'My Information'|trans) }}
-                            {{ menu.item(path('user_token', {app: 'sudosos'}), 'fa-beer-mug-empty', 'SudoSOS'|trans) }}
+                            {{ menu.item(path('user_token', {app: 'sudosos'}), 'fa-beer-mug-empty', 'SudoSOS'|trans, null, false, false) }}
                             {# The register's roles are named because they are granted on their own: a user who keeps
                                the register is not otherwise an active member of anything, and would have no way in. #}
                             {% if
@@ -422,7 +425,7 @@
                                 {{ menu.item(path('admin/index'), 'fa-screwdriver-wrench', 'Admin'|trans) }}
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            {{ menu.item(path('user_logout'), 'fa-arrow-right-from-bracket', 'Logout'|trans) }}
+                            {{ menu.item(path('user_logout'), 'fa-arrow-right-from-bracket', 'Logout'|trans, null, false, false) }}
                         </ul>
                     {% endif %}
                 </li>
