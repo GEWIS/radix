@@ -20,14 +20,50 @@
 {% endblock %}
 
 {% block contents %}
+    {% set suggestion_island = {} %}
+    {% for suggestion in suggestions %}
+        {% set suggestion_island = suggestion_island|merge({
+            (suggestion.type.value): {
+                name: suggestion.type|trans,
+                next: suggestion.next,
+                latest: suggestion.latestNumber,
+                date: suggestion.latestDate is null ? null : suggestion.latestDate|format_date('long'),
+                isoDate: suggestion.datesFollowNumbers and suggestion.latestDate is not null ? suggestion.latestDate|date('Y-m-d') : null,
+                missing: suggestion.missingNumbers,
+            },
+        }) %}
+    {% endfor %}
+
     <div class="row g-3">
         <div class="col-12 col-xl-6">
             <div class="panel">
                 <div class="panel-body">
-                    {{ form_start(form) }}
-                        {{ form_row(form.type) }}
-                        {{ form_row(form.number) }}
-                        {{ form_row(form.date) }}
+                    {{ form_start(form, {attr: {
+                        'data-controller': 'meeting-number',
+                        'data-meeting-number-suggestions-value': suggestion_island|json_encode,
+                        'data-meeting-number-latest-message-value': 'The last %type% on record is %type% %number%, held on %date%.'|trans,
+                        'data-meeting-number-none-message-value': 'No %type% has been recorded yet.'|trans,
+                        'data-meeting-number-missing-message-value': 'Not recorded yet:'|trans,
+                        'data-meeting-number-use-label-value': 'Use %number%'|trans,
+                        'data-meeting-number-date-warning-message-value': '%type% %number% was held on %date%, which is after the date entered.'|trans,
+                    }}) }}
+                        {{ form_row(form.type, {attr: {
+                            'data-meeting-number-target': 'type',
+                            'data-action': 'meeting-number#suggest',
+                        }}) }}
+                        {{ form_row(form.number, {
+                            attr: {
+                                'data-meeting-number-target': 'number',
+                                'data-action': 'meeting-number#checkDate',
+                            },
+                            help: 'Filled in from the last meeting of the type on record.'|trans,
+                            help_attr: {'data-meeting-number-target': 'hint'},
+                        }) }}
+                        {{ form_row(form.date, {attr: {
+                            'data-meeting-number-target': 'date',
+                            'data-action': 'meeting-number#checkDate',
+                        }}) }}
+                        <div class="form-text text-warning mb-2" data-meeting-number-target="dateWarning" hidden></div>
                         {{ form_widget(form.submit, {'attr': {'class': 'btn-gewis-primary'}}) }}
                     {{ form_end(form) }}
                 </div>

@@ -33,17 +33,21 @@ use App\ViewModel\Database\DecisionReference;
 use App\ViewModel\Database\DecisionRow;
 use App\ViewModel\Database\ExportCategories;
 use App\ViewModel\Database\ExportedDecision;
+use App\ViewModel\Database\MeetingNumberSuggestion;
 use App\ViewModel\Database\MeetingView;
 use App\ViewModel\Database\RecordedDecision;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function array_diff;
 use function array_key_exists;
 use function array_map;
 use function array_values;
 use function explode;
 use function implode;
 use function intval;
+use function max;
+use function range;
 use function sprintf;
 
 class Meeting
@@ -61,6 +65,9 @@ class Meeting
      * always part of correcting something.
      */
     private const int SYNC_PAUSE_AFTER_DELETION = 60;
+
+    // Meetings are entered late and out of order by a few at most. Older gaps are permanent.
+    private const int MISSING_NUMBERS_WINDOW = 5;
 
     public function __construct(
         private readonly Annulment $annulmentService,
@@ -145,6 +152,57 @@ class Meeting
             $decisions,
             $nextDecisionNumbers,
         );
+    }
+
+    /**
+     * @return MeetingNumberSuggestion[]
+     */
+    public function getMeetingNumberSuggestions(): array
+    {
+        $suggestions = [];
+
+        foreach (MeetingTypes::cases() as $type) {
+            $latest = $this->meetingRepository->findLatestOfType($type);
+
+            if (null === $latest) {
+                $suggestions[] = new MeetingNumberSuggestion(
+                    $type,
+                    null,
+                    null,
+                    [],
+                );
+
+                continue;
+            }
+
+            $from = max(
+                1,
+                $latest->getNumber() - self::MISSING_NUMBERS_WINDOW,
+            );
+            $to = $latest->getNumber() - 1;
+            $recorded = $to < $from
+                ? []
+                : $this->meetingRepository->findNumbersOfType(
+                    $type,
+                    $from,
+                    $to,
+                );
+
+            $suggestions[] = new MeetingNumberSuggestion(
+                $type,
+                $latest->getNumber(),
+                $latest->date,
+                array_values(array_diff(
+                    range(
+                        $from,
+                        $to,
+                    ),
+                    $recorded,
+                )),
+            );
+        }
+
+        return $suggestions;
     }
 
     /**

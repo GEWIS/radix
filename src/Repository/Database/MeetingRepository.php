@@ -27,6 +27,7 @@ use SortDirection;
 use function array_map;
 use function array_values;
 use function implode;
+use function intval;
 use function sprintf;
 use function str_replace;
 use function strtolower;
@@ -288,6 +289,60 @@ class MeetingRepository extends ServiceEntityRepository
             );
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function findLatestOfType(MeetingTypes $type): ?Meeting
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.type = :type')
+            ->setParameter(
+                'type',
+                $type,
+            )
+            ->orderBy(
+                'm.number',
+                SortDirection::Descending,
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return int[]
+     */
+    public function findNumbersOfType(
+        MeetingTypes $type,
+        int $from,
+        int $to,
+    ): array {
+        $rows = $this->createQueryBuilder('m')
+            ->select('m.number')
+            ->where('m.type = :type')
+            ->andWhere('m.number BETWEEN :from AND :to')
+            ->setParameter(
+                'type',
+                $type,
+            )
+            ->setParameter(
+                'from',
+                $from,
+            )
+            ->setParameter(
+                'to',
+                $to,
+            )
+            ->orderBy(
+                'm.number',
+                SortDirection::Ascending,
+            )
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return array_map(
+            intval(...),
+            $rows,
+        );
     }
 
     /**

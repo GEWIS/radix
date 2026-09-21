@@ -72,6 +72,7 @@ loadControllers(
         'install-editor': () => import('./controllers/decision/install_editor_controller.ts'),
         'live-sortable': () => import('./controllers/decision/live_sortable_controller.ts'),
         'meeting-lookup': () => import('./controllers/decision/meeting_lookup_controller.ts'),
+        'meeting-number': () => import('./controllers/decision/meeting_number_controller.ts'),
         'member-lookup': () => import('./controllers/decision/member_lookup_controller.ts'),
         'member-search': () => import('./controllers/decision/member_search_controller.ts'),
         'organ-lookup': () => import('./controllers/decision/organ_lookup_controller.ts'),

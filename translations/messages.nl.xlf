@@ -601,6 +601,10 @@
         <source>%type% %membership% member expiring soon</source>
         <target state="translated">%type% %membership% lid verloopt binnenkort</target>
       </trans-unit>
+      <trans-unit id="hD0iFQm" resname="%type% %number% was held on %date%, which is after the date entered.">
+        <source>%type% %number% was held on %date%, which is after the date entered.</source>
+        <target state="translated">%type% %number% was op %date%, wat na de ingevoerde datum is.</target>
+      </trans-unit>
       <trans-unit id="s4eJWBv" resname="%valid% changes, %issues% issues">
         <source>%valid% changes, %issues% issues</source>
         <target state="translated">%valid% wijzigingen, %issues% problemen</target>
@@ -3985,6 +3989,10 @@
         <source>Fill in the username, not the whole link. Pasting a link works too, everything after the username is thrown away.</source>
         <target state="translated">Vul de gebruikersnaam in, niet de hele link. Een link plakken werkt ook, alles na de gebruikersnaam wordt weggelaten.</target>
       </trans-unit>
+      <trans-unit id="Ro.Us3z" resname="Filled in from the last meeting of the type on record.">
+        <source>Filled in from the last meeting of the type on record.</source>
+        <target state="translated">Ingevuld op basis van de laatste geregistreerde vergadering van dit type.</target>
+      </trans-unit>
       <trans-unit id="o7tHpZ5" resname="Filter">
         <source>Filter</source>
         <target>Filter</target>
@@ -6025,6 +6033,10 @@
         <source>No</source>
         <target>Nee</target>
       </trans-unit>
+      <trans-unit id="91x0XfH" resname="No %type% has been recorded yet.">
+        <source>No %type% has been recorded yet.</source>
+        <target state="translated">Er is nog geen %type% geregistreerd.</target>
+      </trans-unit>
       <trans-unit id="vhsY1Xp" resname="No API principals">
         <source>No API principals</source>
         <target state="translated">Geen API-principals</target>
@@ -6448,6 +6460,10 @@
       <trans-unit id="iEciM2M" resname="Not picked">
         <source>Not picked</source>
         <target state="translated">Niet gekozen</target>
+      </trans-unit>
+      <trans-unit id="9shmfPF" resname="Not recorded yet:">
+        <source>Not recorded yet:</source>
+        <target state="translated">Nog niet geregistreerd:</target>
       </trans-unit>
       <trans-unit id="a52vJdQ" resname="Not refreshed since %date%.">
         <source>Not refreshed since %date%.</source>
@@ -9745,6 +9761,10 @@
         <source>The label was saved.</source>
         <target state="translated">Het label is opgeslagen.</target>
       </trans-unit>
+      <trans-unit id="xg9vqtZ" resname="The last %type% on record is %type% %number%, held on %date%.">
+        <source>The last %type% on record is %type% %number%, held on %date%.</source>
+        <target state="translated">De laatste geregistreerde %type% is %type% %number%, gehouden op %date%.</target>
+      </trans-unit>
       <trans-unit id="ZLjn5eL" resname="The last day the vacancy is shown.">
         <source>The last day the vacancy is shown.</source>
         <target state="translated">De laatste dag dat de vacature getoond wordt.</target>
@@ -10896,6 +10916,10 @@
       <trans-unit id="t4DWPKY" resname="Uploads appear here with their details guessed, ready to be checked.">
         <source>Uploads appear here with their details guessed, ready to be checked.</source>
         <target state="translated">Uploads verschijnen hier met geraden gegevens, klaar om te worden gecontroleerd.</target>
+      </trans-unit>
+      <trans-unit id="Gnt82Cb" resname="Use %number%">
+        <source>Use %number%</source>
+        <target state="translated">Gebruik %number%</target>
       </trans-unit>
       <trans-unit id="dd.2oLj" resname="Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.">
         <source>Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.</source>

@@ -63,7 +63,10 @@ final class MeetingController extends AbstractController
 
         return $this->render(
             'database/decision/meeting/create.html.twig',
-            ['form' => $form],
+            [
+                'form' => $form,
+                'suggestions' => $this->meetingService->getMeetingNumberSuggestions(),
+            ],
         );
     }
 

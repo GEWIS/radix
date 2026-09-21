@@ -601,6 +601,10 @@
         <source>%type% %membership% member expiring soon</source>
         <target state="translated">%type% %membership% member expiring soon</target>
       </trans-unit>
+      <trans-unit id="hD0iFQm" resname="%type% %number% was held on %date%, which is after the date entered.">
+        <source>%type% %number% was held on %date%, which is after the date entered.</source>
+        <target state="translated">%type% %number% was held on %date%, which is after the date entered.</target>
+      </trans-unit>
       <trans-unit id="s4eJWBv" resname="%valid% changes, %issues% issues">
         <source>%valid% changes, %issues% issues</source>
         <target state="translated">%valid% changes, %issues% issues</target>
@@ -3985,6 +3989,10 @@
         <source>Fill in the username, not the whole link. Pasting a link works too, everything after the username is thrown away.</source>
         <target state="translated">Fill in the username, not the whole link. Pasting a link works too, everything after the username is thrown away.</target>
       </trans-unit>
+      <trans-unit id="Ro.Us3z" resname="Filled in from the last meeting of the type on record.">
+        <source>Filled in from the last meeting of the type on record.</source>
+        <target state="translated">Filled in from the last meeting of the type on record.</target>
+      </trans-unit>
       <trans-unit id="o7tHpZ5" resname="Filter">
         <source>Filter</source>
         <target>Filter</target>
@@ -6025,6 +6033,10 @@
         <source>No</source>
         <target>No</target>
       </trans-unit>
+      <trans-unit id="91x0XfH" resname="No %type% has been recorded yet.">
+        <source>No %type% has been recorded yet.</source>
+        <target state="translated">No %type% has been recorded yet.</target>
+      </trans-unit>
       <trans-unit id="vhsY1Xp" resname="No API principals">
         <source>No API principals</source>
         <target state="translated">No API principals</target>
@@ -6448,6 +6460,10 @@
       <trans-unit id="iEciM2M" resname="Not picked">
         <source>Not picked</source>
         <target state="translated">Not picked</target>
+      </trans-unit>
+      <trans-unit id="9shmfPF" resname="Not recorded yet:">
+        <source>Not recorded yet:</source>
+        <target state="translated">Not recorded yet:</target>
       </trans-unit>
       <trans-unit id="a52vJdQ" resname="Not refreshed since %date%.">
         <source>Not refreshed since %date%.</source>
@@ -9745,6 +9761,10 @@
         <source>The label was saved.</source>
         <target state="translated">The label was saved.</target>
       </trans-unit>
+      <trans-unit id="xg9vqtZ" resname="The last %type% on record is %type% %number%, held on %date%.">
+        <source>The last %type% on record is %type% %number%, held on %date%.</source>
+        <target state="translated">The last %type% on record is %type% %number%, held on %date%.</target>
+      </trans-unit>
       <trans-unit id="ZLjn5eL" resname="The last day the vacancy is shown.">
         <source>The last day the vacancy is shown.</source>
         <target state="translated">The last day the vacancy is shown.</target>
@@ -10896,6 +10916,10 @@
       <trans-unit id="t4DWPKY" resname="Uploads appear here with their details guessed, ready to be checked.">
         <source>Uploads appear here with their details guessed, ready to be checked.</source>
         <target state="translated">Uploads appear here with their details guessed, ready to be checked.</target>
+      </trans-unit>
+      <trans-unit id="Gnt82Cb" resname="Use %number%">
+        <source>Use %number%</source>
+        <target state="translated">Use %number%</target>
       </trans-unit>
       <trans-unit id="dd.2oLj" resname="Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.">
         <source>Use “quotes” for exact phrases, -word to exclude, type:bm to limit to one meeting type, and meeting:1805 to limit to one meeting.</source>
