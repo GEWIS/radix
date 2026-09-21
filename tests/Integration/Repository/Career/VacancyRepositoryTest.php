@@ -57,13 +57,16 @@ final class VacancyRepositoryTest extends DatabaseTestCase
         );
     }
 
+    /**
+     * The window closes at the start of the closing day, so that day itself is already too late.
+     */
     public function testTheDetailPageIsGoneOnceTheWindowCloses(): void
     {
         self::assertNotNull($this->publicVacancy('backend-engineer', VacancyCategories::Jobs));
 
         $live = $this->vacancy('backend-engineer')->getLiveRevision();
         self::assertNotNull($live);
-        $live->endDate = new DateTimeImmutable('-1 day');
+        $live->endDate = new DateTimeImmutable('today');
         $this->entityManager->flush();
 
         self::assertNull($this->publicVacancy('backend-engineer', VacancyCategories::Jobs));

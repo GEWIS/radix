@@ -47,7 +47,7 @@ class ConsistentVacancyValidator extends ConstraintValidator
         if (
             null !== $value->startDate
             && null !== $value->endDate
-            && $value->endDate < $value->startDate
+            && $value->endDate <= $value->startDate
         ) {
             $this->context->buildViolation($constraint->closesBeforeOpeningMessage)
                 ->atPath('endDate')
@@ -65,11 +65,10 @@ class ConsistentVacancyValidator extends ConstraintValidator
         }
 
         // A vacancy is invisible once its package expires whatever its own window says, so a window that runs past the
-        // package would promise something it cannot keep. A package is already gone on the day it expires while a
-        // vacancy is still open on its closing day, so the two dates cannot be the same either.
+        // package would promise something it cannot keep.
         if (
             null !== $value->endDate
-            && $value->endDate >= $package->getExpirationDate()
+            && $value->endDate > $package->getExpirationDate()
         ) {
             $this->context->buildViolation($constraint->outlivesPackageMessage)
                 ->atPath('endDate')

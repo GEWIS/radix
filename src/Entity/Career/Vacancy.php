@@ -267,7 +267,7 @@ class Vacancy implements RevisableInterface
     }
 
     /**
-     * Display proxy. The last day the vacancy is shown.
+     * Display proxy. The day from which the vacancy is no longer shown.
      */
     public function getEndDate(): ?DateTimeImmutable
     {

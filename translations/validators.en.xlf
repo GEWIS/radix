@@ -457,13 +457,13 @@
         <source>The sign-up list must open in the future.</source>
         <target state="translated">The sign-up list must open in the future.</target>
       </trans-unit>
-      <trans-unit id="oNTbiHD" resname="The vacancy cannot close before it opens.">
-        <source>The vacancy cannot close before it opens.</source>
-        <target state="translated">The vacancy cannot close before it opens.</target>
-      </trans-unit>
       <trans-unit id=".UQQM7H" resname="The vacancy cannot stay open past the job package it belongs to.">
         <source>The vacancy cannot stay open past the job package it belongs to.</source>
         <target state="translated">The vacancy cannot stay open past the job package it belongs to.</target>
+      </trans-unit>
+      <trans-unit id="kcNXe_q" resname="The vacancy has to close after the day it opens.">
+        <source>The vacancy has to close after the day it opens.</source>
+        <target state="translated">The vacancy has to close after the day it opens.</target>
       </trans-unit>
       <trans-unit id="OhNUwCI" resname="The website already answers to this address, so a page cannot take it.">
         <source>The website already answers to this address, so a page cannot take it.</source>

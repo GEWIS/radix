@@ -9765,10 +9765,6 @@
         <source>The last %type% on record is %type% %number%, held on %date%.</source>
         <target state="translated">The last %type% on record is %type% %number%, held on %date%.</target>
       </trans-unit>
-      <trans-unit id="ZLjn5eL" resname="The last day the vacancy is shown.">
-        <source>The last day the vacancy is shown.</source>
-        <target state="translated">The last day the vacancy is shown.</target>
-      </trans-unit>
       <trans-unit id="gDi1BbM" resname="The latest news from GEWIS.">
         <source>The latest news from GEWIS.</source>
         <target state="translated">The latest news from GEWIS.</target>
@@ -9984,6 +9980,10 @@
       <trans-unit id="bk_VUo5" resname="The vacancy &quot;%name%&quot; has been submitted for review.">
         <source>The vacancy "%name%" has been submitted for review.</source>
         <target state="translated">The vacancy "%name%" has been submitted for review.</target>
+      </trans-unit>
+      <trans-unit id="Nxfapnw" resname="The vacancy is no longer shown from this day.">
+        <source>The vacancy is no longer shown from this day.</source>
+        <target state="translated">The vacancy is no longer shown from this day.</target>
       </trans-unit>
       <trans-unit id="F5Nbvyc" resname="The vacancy was saved as a draft. Submit it for review when you are ready.">
         <source>The vacancy was saved as a draft. Submit it for review when you are ready.</source>

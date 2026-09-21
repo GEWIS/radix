@@ -600,17 +600,16 @@ class VacancyRepository extends ServiceEntityRepository
                 0,
                 0,
             ),
-            // `endDate >= today` only turns false the day after the closing day.
             $this->earliest(
                 VacancyRevision::class,
                 'p.endDate',
-                'p.endDate >= :bound',
+                'p.endDate > :bound',
                 $today,
                 Types::DATE_IMMUTABLE,
             )?->setTime(
                 0,
                 0,
-            )?->modify('+1 day'),
+            ),
         ];
 
         $future = array_filter(
@@ -674,7 +673,7 @@ class VacancyRepository extends ServiceEntityRepository
             // No start date means the vacancy appears as soon as it is approved; the closing day is always set, and
             // the package's own expiry above caps it regardless.
             ->andWhere('lr.startDate IS NULL OR lr.startDate <= :today')
-            ->andWhere('lr.endDate >= :today')
+            ->andWhere('lr.endDate > :today')
             ->setParameter(
                 'now',
                 new DateTimeImmutable(),

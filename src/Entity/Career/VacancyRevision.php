@@ -298,8 +298,9 @@ class VacancyRevision extends AbstractRevision
     }
 
     /**
-     * Whether today falls inside the posting window. The last day counts. A revision without a closing day has not
-     * been saved yet, so there is nothing to have fallen outside of.
+     * Whether today falls inside the posting window, which closes at the start of the closing day like everything
+     * else that expires. A revision without a closing day has not been saved yet, so there is nothing to have fallen
+     * outside of.
      */
     public function isWithinPostingWindow(): bool
     {
@@ -313,6 +314,6 @@ class VacancyRevision extends AbstractRevision
         }
 
         return null === $this->endDate
-            || $today <= $this->endDate;
+            || $today < $this->endDate;
     }
 }

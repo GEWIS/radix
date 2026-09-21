@@ -121,7 +121,7 @@ class GeneralStepType extends AbstractType
                 DateType::class,
                 [
                     'label' => t('Closes on'),
-                    'help' => t('The last day the vacancy is shown.'),
+                    'help' => t('The vacancy is no longer shown from this day.'),
                     'widget' => 'single_text',
                 ],
             );

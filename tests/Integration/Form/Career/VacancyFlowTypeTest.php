@@ -67,12 +67,29 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
     }
 
     /**
-     * A package is already gone on the day it expires, while a vacancy is still shown on its closing day, so the two
-     * dates being the same would advertise a vacancy that cannot be opened.
+     * A package is gone at the start of its expiry day and a vacancy at the start of its closing day, so a vacancy
+     * closing on the day its package expires is gone at the same moment.
      */
-    public function testAVacancyCannotCloseOnTheDayItsJobPackageExpires(): void
+    public function testAVacancyMayCloseOnTheDayItsJobPackageExpires(): void
     {
         $flow = $this->submitGeneral(['endDate' => '2100-01-01']);
+
+        self::assertTrue(
+            $flow->isValid(),
+            (string) $flow->getErrors(true),
+        );
+    }
+
+    /**
+     * A vacancy is shown from its opening day and gone from its closing day, so opening and closing on the same day
+     * would never show it at all.
+     */
+    public function testAVacancyCannotCloseOnTheDayItOpens(): void
+    {
+        $flow = $this->submitGeneral([
+            'startDate' => '2027-06-01',
+            'endDate' => '2027-06-01',
+        ]);
 
         self::assertFalse($flow->isValid());
         self::assertCount(

@@ -24,7 +24,7 @@ use function trim;
  * the session between the steps, which a detached entity does not survive.
  */
 #[ConsistentVacancy(
-    closesBeforeOpeningMessage: 'The vacancy cannot close before it opens.',
+    closesBeforeOpeningMessage: 'The vacancy has to close after the day it opens.',
     outlivesPackageMessage: 'The vacancy cannot stay open past the job package it belongs to.',
     slugTakenMessage: 'Another vacancy of this company already uses this slug in this category.',
     groups: [VacancyData::STEP_GENERAL],

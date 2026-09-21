@@ -32,18 +32,7 @@ final readonly class VacancyStaleRevisionPolicy implements StaleRevisionPolicyIn
             return null;
         }
 
-        $endDate = $revision->endDate;
-        if (null === $endDate) {
-            return null;
-        }
-
-        // The closing day counts in full: a vacancy shown until Friday is still open all of Friday. Cloned because the
-        // date belongs to the revision, and moving it here would be an edit the company did not request.
-        return $endDate->setTime(
-            23,
-            59,
-            59,
-        );
+        return $revision->endDate;
     }
 
     #[Override]
