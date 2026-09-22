@@ -1,0 +1,22 @@
+{#
+    {% include 'partials/application/label-form.html.twig' with {
+        'form': form,
+        'cancelRoute': 'admin/activities/labels/index',
+    } only %}
+#}
+<div class="row">
+    <div class="col-md-6">
+        <h3 class="mb-3">{{ 'Edit label'|trans }}</h3>
+        <div class="panel">
+            <div class="panel-body">
+                {{ form_start(form, {'method': 'POST'}) }}
+                    {{ form_row(form.name) }}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-gewis-primary">{{ 'Save'|trans }}</button>
+                        <a href="{{ path(cancelRoute) }}" class="btn btn-secondary">{{ 'Cancel'|trans }}</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>

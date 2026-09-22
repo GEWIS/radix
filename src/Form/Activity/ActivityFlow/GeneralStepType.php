@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Form\Activity\ActivityFlow;
 
-use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\Enums\ActivityCategories;
-use App\Entity\Application\Enums\Languages;
 use App\Entity\Career\Company;
 use App\Entity\Decision\Organ;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
+use App\Form\Application\BuildsLabelChoicesTrait;
 use App\Repository\Activity\ActivityLabelRepository;
+use App\Repository\Application\LabelRepositoryInterface;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Decision\OrganRepository;
 use Override;
@@ -40,6 +40,8 @@ use function Symfony\Component\Translation\t;
  */
 class GeneralStepType extends AbstractType
 {
+    use BuildsLabelChoicesTrait;
+
     public function __construct(
         private readonly Security $security,
         private readonly OrganRepository $organRepository,
@@ -112,19 +114,14 @@ class GeneralStepType extends AbstractType
                     'choices' => ActivityCategories::selectableCases(),
                     'placeholder' => t('Select a category'),
                 ],
-            )
-            ->add(
-                'labelIds',
-                ChoiceType::class,
-                [
-                    'label' => t('Labels'),
-                    'choices' => $this->labelChoices(),
-                    'multiple' => true,
-                    'expanded' => false,
-                    'autocomplete' => true,
-                    'required' => false,
-                ],
-            )
+            );
+
+        $this->addLabelField(
+            $builder,
+            $options['current_label_ids'],
+        );
+
+        $builder
             ->add(
                 'requireGEFLITST',
                 CheckboxType::class,
@@ -229,20 +226,10 @@ class GeneralStepType extends AbstractType
         return $choices;
     }
 
-    /**
-     * @return array<string, int>
-     */
-    private function labelChoices(): array
+    #[Override]
+    protected function labelRepository(): LabelRepositoryInterface
     {
-        $language = Languages::current();
-        $choices = [];
-
-        foreach ($this->activityLabelRepository->findAllWithName() as $label) {
-            assert($label instanceof ActivityLabel);
-            $choices[$label->name->getText($language) ?? ''] = intval($label->id);
-        }
-
-        return $choices;
+        return $this->activityLabelRepository;
     }
 
     #[Override]
@@ -254,6 +241,8 @@ class GeneralStepType extends AbstractType
             'company_editable' => true,
             'bound_organ_id' => null,
         ]);
+
+        self::configureLabelOptions($resolver);
 
         $resolver->setAllowedTypes(
             'schedule_locked',

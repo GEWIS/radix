@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Repository\Career;
 
 use App\Entity\Career\VacancyLabel;
+use App\Repository\Application\FindsLabelsTrait;
+use App\Repository\Application\LabelRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<VacancyLabel>
  */
-class VacancyLabelRepository extends ServiceEntityRepository
+class VacancyLabelRepository extends ServiceEntityRepository implements LabelRepositoryInterface
 {
+    use FindsLabelsTrait;
+
     public function __construct(
         ManagerRegistry $registry,
     ) {
@@ -21,57 +24,5 @@ class VacancyLabelRepository extends ServiceEntityRepository
             $registry,
             VacancyLabel::class,
         );
-    }
-
-    /**
-     * Every label with its localised name fetch-joined, so rendering the label checkboxes on the overview's filter
-     * panel does not lazy-load one name per label.
-     *
-     * @return VacancyLabel[]
-     */
-    public function findAllWithName(): array
-    {
-        return $this->createQueryBuilder('l')
-            ->select(
-                'l',
-                'n',
-            )
-            ->leftJoin(
-                'l.name',
-                'n',
-            )
-            ->orderBy(
-                'l.id',
-                SortDirection::Ascending,
-            )
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Every label with the number of vacancy revisions using it, which determines whether it may still be removed.
-     * Counted in the query: the overview only ever shows the number, and reading it from each label's collection would
-     * load every revision of every label to do it.
-     *
-     * @return list<array{label: VacancyLabel, usage: int}>
-     */
-    public function findAllWithUsage(): array
-    {
-        return $this->createQueryBuilder('l')
-            ->select(
-                'l AS label',
-                'COUNT(r.id) AS usage',
-            )
-            ->leftJoin(
-                'l.revisions',
-                'r',
-            )
-            ->groupBy('l.id')
-            ->orderBy(
-                'l.id',
-                SortDirection::Ascending,
-            )
-            ->getQuery()
-            ->getResult();
     }
 }

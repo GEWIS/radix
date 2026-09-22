@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Form\Career\VacancyProfile;
 
-use App\Entity\Application\Enums\Languages;
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyJobPackage;
 use App\Entity\Career\Enums\VacancyCategories;
-use App\Entity\Career\VacancyLabel;
+use App\Form\Application\BuildsLabelChoicesTrait;
+use App\Repository\Application\LabelRepositoryInterface;
 use App\Repository\Career\CompanyJobPackageRepository;
 use App\Repository\Career\VacancyLabelRepository;
 use Doctrine\DBAL\Types\Types;
@@ -36,6 +36,8 @@ use function Symfony\Component\Translation\t;
  */
 class GeneralStepType extends AbstractType
 {
+    use BuildsLabelChoicesTrait;
+
     public function __construct(
         private readonly CompanyJobPackageRepository $packageRepository,
         private readonly VacancyLabelRepository $vacancyLabelRepository,
@@ -93,19 +95,14 @@ class GeneralStepType extends AbstractType
                     'label' => t('Category'),
                     'class' => VacancyCategories::class,
                 ],
-            )
-            ->add(
-                'labelIds',
-                ChoiceType::class,
-                [
-                    'label' => t('Labels'),
-                    'choices' => $this->labelChoices(),
-                    'multiple' => true,
-                    'expanded' => false,
-                    'autocomplete' => true,
-                    'required' => false,
-                ],
-            )
+            );
+
+        $this->addLabelField(
+            $builder,
+            $options['current_label_ids'],
+        );
+
+        $builder
             ->add(
                 'startDate',
                 DateType::class,
@@ -182,20 +179,10 @@ class GeneralStepType extends AbstractType
         );
     }
 
-    /**
-     * @return array<string, int>
-     */
-    private function labelChoices(): array
+    #[Override]
+    protected function labelRepository(): LabelRepositoryInterface
     {
-        $language = Languages::current();
-        $choices = [];
-
-        foreach ($this->vacancyLabelRepository->findAll() as $label) {
-            assert($label instanceof VacancyLabel);
-            $choices[$label->name->getText($language) ?? ''] = (int) $label->id;
-        }
-
-        return $choices;
+        return $this->vacancyLabelRepository;
     }
 
     #[Override]
@@ -208,6 +195,8 @@ class GeneralStepType extends AbstractType
             'company' => null,
             'current_package_id' => null,
         ]);
+
+        self::configureLabelOptions($resolver);
 
         $resolver->setAllowedTypes(
             'admin',

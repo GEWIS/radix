@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Twig\Components\Activity;
 
 use App\Entity\Activity\Activity;
-use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Decision\Member;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityLabelRepository;
 use App\Repository\Activity\ActivityRepository;
+use App\Repository\Application\LabelRepositoryInterface;
 use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use App\Twig\Components\Application\FiltersLabelsTrait;
 use App\ViewModel\Activity\BodyOption;
 use DateTimeImmutable;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -45,6 +46,8 @@ use function trim;
 )]
 final class ActivityOverview extends AbstractInfiniteScrollOverview
 {
+    use FiltersLabelsTrait;
+
     #[LiveProp]
     public bool $subscribed = false;
 
@@ -106,9 +109,6 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     /** @var Activity[]|null */
     private ?array $activities = null;
 
-    /** @var ActivityLabel[]|null */
-    private ?array $labels = null;
-
     /** @var list<BodyOption>|null */
     private ?array $bodyOptions = null;
 
@@ -147,7 +147,7 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
                 strval($raw),
             );
 
-        $this->labelFilters = self::positiveIntIds($values);
+        $this->labelFilters = $this->offeredLabelIds(self::positiveIntIds($values));
     }
 
     /**
@@ -211,15 +211,10 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
         return $this->getTotalCount() > count($this->getActivities());
     }
 
-    /**
-     * The filter panel reads this twice (once to check whether to render the block, once for the checkboxes), so it is
-     * fetched once per render, with the localised names the checkboxes are labelled with.
-     *
-     * @return ActivityLabel[]
-     */
-    public function getLabels(): array
+    #[Override]
+    protected function labelRepository(): LabelRepositoryInterface
     {
-        return $this->labels ??= $this->activityLabelRepository->findAllWithName();
+        return $this->activityLabelRepository;
     }
 
     /**

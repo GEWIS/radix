@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Form\Career;
 
+use App\Entity\Career\CareerLocalisedText;
 use App\Entity\Career\Company;
 use App\Entity\Career\CompanyJobPackage;
 use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
+use App\Entity\Career\VacancyLabel;
 use App\Form\Career\VacancyProfile\VacancyData;
 use App\Form\Career\VacancyProfile\VacancyFlowType;
 use App\Repository\Career\CompanyRepository;
@@ -242,6 +244,90 @@ final class VacancyFlowTypeTest extends DatabaseTestCase
             $current,
             $values,
         );
+    }
+
+    /**
+     * A retired label the vacancy already carries stays choosable beside an active label that took over its name, or
+     * saving the vacancy would drop the retired one off a revision nobody is reviewing.
+     */
+    public function testARetiredLabelStaysChoosableBesideAnActiveLabelOfTheSameName(): void
+    {
+        $retired = $this->label(
+            'Sponsored',
+            retired: true,
+        );
+        $active = $this->label(
+            'Sponsored',
+            retired: false,
+        );
+
+        $data = new VacancyData();
+        $data->step = VacancyData::STEP_GENERAL;
+        $data->labelIds = [(int) $retired->id];
+
+        $choices = self::getContainer()->get(FormFactoryInterface::class)->create(
+            VacancyFlowType::class,
+            $data,
+            [
+                'csrf_protection' => false,
+                'data_storage' => new NullDataStorage(),
+                'admin' => true,
+            ],
+        )->get(VacancyData::STEP_GENERAL)->get('labelIds')->createView()->vars['choices'];
+
+        $values = [];
+
+        foreach ($choices as $choice) {
+            $values[] = (int) $choice->value;
+        }
+
+        self::assertContains(
+            (int) $retired->id,
+            $values,
+        );
+        self::assertContains(
+            (int) $active->id,
+            $values,
+        );
+    }
+
+    public function testASubmittedLabelLandsOnTheVacancy(): void
+    {
+        $label = $this->label(
+            'Sponsored',
+            retired: false,
+        );
+
+        $flow = $this->submitGeneral(['labelIds' => [(string) $label->id]]);
+
+        self::assertTrue(
+            $flow->isValid(),
+            (string) $flow->getErrors(true),
+        );
+        self::assertSame(
+            [(int) $label->id],
+            $flow->getData()->labelIds,
+        );
+    }
+
+    private function label(
+        string $name,
+        bool $retired,
+    ): VacancyLabel {
+        $label = new VacancyLabel();
+        $label->name = new CareerLocalisedText(
+            $name,
+            $name,
+        );
+
+        if ($retired) {
+            $label->retire();
+        }
+
+        $this->entityManager->persist($label);
+        $this->entityManager->flush();
+
+        return $label;
     }
 
     /**

@@ -133,7 +133,7 @@ final class AdminVacancyControllerTest extends DatabaseTestCase
     private function labelInUse(): VacancyLabel
     {
         foreach ($this->entityManager->getRepository(VacancyLabel::class)->findAll() as $label) {
-            if ($label->getRevisions()->isEmpty()) {
+            if (!$label->isInUse()) {
                 continue;
             }
 

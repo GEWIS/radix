@@ -253,6 +253,10 @@
         <source>Enter the moment the list must be full by.</source>
         <target state="translated">Vul in wanneer de lijst vol moet zijn.</target>
       </trans-unit>
+      <trans-unit id="NQcoaLP" resname="Enter the name in both languages.">
+        <source>Enter the name in both languages.</source>
+        <target>Vul de naam in beide talen in.</target>
+      </trans-unit>
       <trans-unit id="lTUvqlg" resname="Enter the title in both languages.">
         <source>Enter the title in both languages.</source>
         <target state="translated">Vul de titel in beide talen in.</target>
@@ -496,6 +500,10 @@
       <trans-unit id="2l0C8FY" resname="This is not a valid username.">
         <source>This is not a valid username.</source>
         <target state="translated">Dit is geen geldige gebruikersnaam.</target>
+      </trans-unit>
+      <trans-unit id="8hBQEk2" resname="This name is too similar to the category &quot;%category%&quot;. A label must not be a category.">
+        <source>This name is too similar to the category "%category%". A label must not be a category.</source>
+        <target>Deze naam lijkt te veel op de categorie "%category%". Een label mag geen categorie zijn.</target>
       </trans-unit>
       <trans-unit id="KqkVsGc" resname="This round is not taking proposals at the moment.">
         <source>This round is not taking proposals at the moment.</source>

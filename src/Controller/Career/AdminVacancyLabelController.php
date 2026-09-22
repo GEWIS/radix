@@ -5,26 +5,22 @@ declare(strict_types=1);
 namespace App\Controller\Career;
 
 use App\Attribute\User\Replayable;
-use App\Entity\Application\Enums\AlertTypes;
-use App\Entity\Career\CareerLocalisedText;
+use App\Controller\Application\AbstractLabelController;
+use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\VacancyLabel;
 use App\Entity\User\Enums\UserRoles;
-use App\Form\Career\VacancyLabelType;
+use App\Repository\Application\LabelRepositoryInterface;
 use App\Repository\Career\VacancyLabelRepository;
-use App\Service\Career\VacancyLabelService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Override;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * The labels a vacancy can be tagged with. Shared reference data rather than revisable content, so these are edited
- * directly; a label already in use cannot be removed, since that would quietly rewrite vacancies approved with it.
- */
+use function array_map;
+
 #[IsGranted(
     attribute: UserRoles::CompanyAdmin->value,
     message: 'You are not allowed to administer companies.',
@@ -33,13 +29,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     path: '/admin/career/vacancies/labels',
     name: 'admin/career/vacancies/labels/',
 )]
-class AdminVacancyLabelController extends AbstractController
+class AdminVacancyLabelController extends AbstractLabelController
 {
-    public function __construct(
-        private readonly VacancyLabelRepository $labelRepository,
-        private readonly TranslatorInterface $translator,
-        private readonly VacancyLabelService $vacancyLabelService,
-    ) {
+    public function __construct(private readonly VacancyLabelRepository $labelRepository)
+    {
     }
 
     #[Replayable]
@@ -53,38 +46,7 @@ class AdminVacancyLabelController extends AbstractController
     )]
     public function index(Request $request): Response
     {
-        $label = new VacancyLabel();
-        $label->name = new CareerLocalisedText(
-            null,
-            null,
-        );
-
-        $form = $this->createForm(
-            VacancyLabelType::class,
-            $label,
-        )->handleRequest($request);
-
-        if (
-            $form->isSubmitted()
-            && $form->isValid()
-        ) {
-            $this->vacancyLabelService->save($label);
-
-            $this->addFlash(
-                AlertTypes::Success->value,
-                $this->translator->trans('The label was added.'),
-            );
-
-            return $this->redirectToRoute('admin/career/vacancies/labels/index');
-        }
-
-        return $this->render(
-            'career/admin/vacancies/labels/index.html.twig',
-            [
-                'labels' => $this->labelRepository->findAllWithUsage(),
-                'form' => $form,
-            ],
-        );
+        return $this->handleIndex($request);
     }
 
     #[Replayable]
@@ -101,32 +63,10 @@ class AdminVacancyLabelController extends AbstractController
         Request $request,
         VacancyLabel $label,
     ): Response {
-        $form = $this->createForm(
-            VacancyLabelType::class,
+        return $this->handleEdit(
+            $request,
             $label,
-        )->handleRequest($request);
-
-        if (
-            !$form->isSubmitted()
-            || !$form->isValid()
-        ) {
-            return $this->render(
-                'career/admin/vacancies/labels/edit.html.twig',
-                [
-                    'form' => $form,
-                    'label' => $label,
-                ],
-            );
-        }
-
-        $this->vacancyLabelService->save($label);
-
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('The label was saved.'),
         );
-
-        return $this->redirectToRoute('admin/career/vacancies/labels/index');
     }
 
     #[Route(
@@ -141,24 +81,82 @@ class AdminVacancyLabelController extends AbstractController
     )]
     public function delete(VacancyLabel $label): Response
     {
-        // Removing a label that revisions still use would change what was approved without anybody reviewing it, so it
-        // has to be taken off those vacancies first.
-        if (!$label->getRevisions()->isEmpty()) {
-            $this->addFlash(
-                AlertTypes::Warning->value,
-                $this->translator->trans('This label is still used by a vacancy, so it cannot be removed.'),
-            );
+        return $this->handleDelete($label);
+    }
 
-            return $this->redirectToRoute('admin/career/vacancies/labels/index');
-        }
+    #[Route(
+        path: '/{label}/retire',
+        name: 'retire',
+        requirements: ['label' => '\d+'],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        id: new Expression('"vacancy_label_retire-" ~ args["label"].id'),
+        tokenKey: '_csrf_token',
+    )]
+    public function retire(VacancyLabel $label): Response
+    {
+        return $this->handleRetire($label);
+    }
 
-        $this->vacancyLabelService->delete($label);
+    #[Route(
+        path: '/{label}/restore',
+        name: 'restore',
+        requirements: ['label' => '\d+'],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        id: new Expression('"vacancy_label_restore-" ~ args["label"].id'),
+        tokenKey: '_csrf_token',
+    )]
+    public function restore(VacancyLabel $label): Response
+    {
+        return $this->handleRestore($label);
+    }
 
-        $this->addFlash(
-            AlertTypes::Success->value,
-            $this->translator->trans('The label was removed.'),
-        );
+    #[Override]
+    protected function labelRepository(): LabelRepositoryInterface
+    {
+        return $this->labelRepository;
+    }
 
-        return $this->redirectToRoute('admin/career/vacancies/labels/index');
+    #[Override]
+    protected function labelClass(): string
+    {
+        return VacancyLabel::class;
+    }
+
+    /**
+     * A vacancy category is named in the singular on a vacancy and in the plural in the menu, and a label may be
+     * similar to neither.
+     */
+    #[Override]
+    protected function categories(): array
+    {
+        return [
+            ...VacancyCategories::cases(),
+            ...array_map(
+                static fn (VacancyCategories $category) => $category->pluralLabel(),
+                VacancyCategories::cases(),
+            ),
+        ];
+    }
+
+    #[Override]
+    protected function indexRoute(): string
+    {
+        return 'admin/career/vacancies/labels/index';
+    }
+
+    #[Override]
+    protected function indexTemplate(): string
+    {
+        return 'career/admin/vacancies/labels/index.html.twig';
+    }
+
+    #[Override]
+    protected function editTemplate(): string
+    {
+        return 'career/admin/vacancies/labels/edit.html.twig';
     }
 }

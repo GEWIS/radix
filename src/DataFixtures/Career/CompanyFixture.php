@@ -158,7 +158,7 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
                         . 'modellen die wij in productie draaien. Je krijgt toegang tot geanonimiseerde datasets, een '
                         . 'vaste begeleider en de kans om je resultaten aan het eind te publiceren. Sterke '
                         . 'Python-vaardigheden en een achtergrond in machine learning zijn vereist.',
-                    'labels' => [],
+                    'labels' => ['onsite'],
                 ],
             ],
         );
@@ -376,6 +376,11 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
                 'en' => 'Remote',
                 'nl' => 'Op afstand',
             ],
+            'onsite' => [
+                'en' => 'On site',
+                'nl' => 'Op locatie',
+                'retired' => true,
+            ],
         ];
 
         foreach ($definitions as $key => $definition) {
@@ -384,6 +389,11 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
                 $definition['en'],
                 $definition['nl'],
             );
+
+            if (true === ($definition['retired'] ?? false)) {
+                $label->retire();
+            }
+
             $manager->persist($label);
 
             $this->labels[$key] = $label;

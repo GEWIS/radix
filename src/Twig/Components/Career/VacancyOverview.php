@@ -7,11 +7,12 @@ namespace App\Twig\Components\Career;
 use App\Entity\Career\Company;
 use App\Entity\Career\Enums\VacancyCategories;
 use App\Entity\Career\Vacancy;
-use App\Entity\Career\VacancyLabel;
+use App\Repository\Application\LabelRepositoryInterface;
 use App\Repository\Career\CompanyRepository;
 use App\Repository\Career\VacancyLabelRepository;
 use App\Repository\Career\VacancyRepository;
 use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use App\Twig\Components\Application\FiltersLabelsTrait;
 use Override;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
@@ -49,6 +50,8 @@ use function strval;
 )]
 final class VacancyOverview extends AbstractInfiniteScrollOverview
 {
+    use FiltersLabelsTrait;
+
     #[LiveProp(
         writable: true,
         url: true,
@@ -92,9 +95,6 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
     /** @var Vacancy[]|null */
     private ?array $highlighted = null;
 
-    /** @var VacancyLabel[]|null */
-    private ?array $labels = null;
-
     public function __construct(
         private readonly VacancyRepository $vacancyRepository,
         private readonly VacancyLabelRepository $vacancyLabelRepository,
@@ -133,7 +133,7 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
                 strval($raw),
             );
 
-        $this->labelFilters = self::positiveIntIds($values);
+        $this->labelFilters = $this->offeredLabelIds(self::positiveIntIds($values));
     }
 
     /**
@@ -203,15 +203,10 @@ final class VacancyOverview extends AbstractInfiniteScrollOverview
         return $this->companyRepository->findAllPublic();
     }
 
-    /**
-     * The filter panel reads this twice (once to check whether to render the block, once for the checkboxes), so it is
-     * fetched once per render, with the localised names the checkboxes are labelled with.
-     *
-     * @return VacancyLabel[]
-     */
-    public function getLabels(): array
+    #[Override]
+    protected function labelRepository(): LabelRepositoryInterface
     {
-        return $this->labels ??= $this->vacancyLabelRepository->findAllWithName();
+        return $this->vacancyLabelRepository;
     }
 
     /**

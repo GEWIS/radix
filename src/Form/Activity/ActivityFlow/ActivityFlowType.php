@@ -53,6 +53,10 @@ class ActivityFlowType extends AbstractStepperFlowType
             $options,
         );
 
+        // Read from the run rather than passed in beside it, so an edit cannot open without the labels the revision
+        // already carries and save them away.
+        $data = $builder->getData();
+
         $builder
             ->addStep(
                 ActivityData::STEP_GENERAL,
@@ -61,6 +65,7 @@ class ActivityFlowType extends AbstractStepperFlowType
                     'schedule_locked' => $options['schedule_locked'],
                     'company_editable' => $options['company_editable'],
                     'bound_organ_id' => $options['bound_organ_id'],
+                    'current_label_ids' => $data instanceof ActivityData ? $data->labelIds : [],
                 ],
             )
             ->addStep(

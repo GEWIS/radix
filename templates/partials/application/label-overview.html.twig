@@ -1,0 +1,137 @@
+{#
+    {% include 'partials/application/label-overview.html.twig' with {
+        'heading': 'Activity labels'|trans,
+        'intro': 'Labels are shared by every organiser, ...'|trans,
+        'labels': labels,
+        'form': form,
+        'editRoute': 'admin/activities/labels/edit',
+        'retireRoute': 'admin/activities/labels/retire',
+        'restoreRoute': 'admin/activities/labels/restore',
+        'deleteRoute': 'admin/activities/labels/delete',
+        'retireToken': 'activity_label_retire-',
+        'restoreToken': 'activity_label_restore-',
+        'deleteToken': 'activity_label_delete-',
+    } only %}
+
+    `labels` is a list of {label, usage}. The routes and token ids are written out by the domain, so a rename is
+    found by grepping for the name rather than for the half of it that is put together here.
+#}
+{% import 'partials/application/confirm-target-modal.html.twig' as modals %}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <h3 class="mb-0">{{ heading }}</h3>
+        <p class="text-muted mb-0">
+            {{ intro }}
+            {{ 'A label that is in use cannot be removed. Retire it instead: it is kept where it is already used, but is no longer offered.'|trans }}
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel">
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>{{ 'Name'|trans }}</th>
+                                <th>{{ 'In use by'|trans }}</th>
+                                <th class="text-end">{{ 'Actions'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in labels %}
+                                {% set label = row.label %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ label.name|localise_text }}</strong>
+                                        {% if label.retired %}
+                                            <span class="badge badge-secondary ms-1">{{ 'Retired'|trans }}</span>
+                                        {% endif %}
+                                        <div class="text-muted small">
+                                            {{ label.name.valueNL }} / {{ label.name.valueEN }}
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small">
+                                        {{ 'used by %count% revision|used by %count% revisions'|trans({'%count%': row.usage}) }}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="{{ path(editRoute, {'label': label.id}) }}"
+                                               class="btn btn-sm btn-outline-secondary">{{ 'Edit'|trans }}</a>
+                                            {% if label.retired %}
+                                                <form method="post" action="{{ path(restoreRoute, {'label': label.id}) }}">
+                                                    <input type="hidden" name="_csrf_token"
+                                                           value="{{ csrf_token(restoreToken ~ label.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                        {{ 'Restore'|trans }}
+                                                    </button>
+                                                </form>
+                                            {% elseif row.usage > 0 %}
+                                                <form method="post" action="{{ path(retireRoute, {'label': label.id}) }}">
+                                                    <input type="hidden" name="_csrf_token"
+                                                           value="{{ csrf_token(retireToken ~ label.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        {{ 'Retire'|trans }}
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            {% if row.usage == 0 %}
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        data-bs-toggle="modal" data-bs-target="#modal-delete-label"
+                                                        data-action="{{ path(deleteRoute, {'label': label.id}) }}"
+                                                        data-csrf-token="{{ csrf_token(deleteToken ~ label.id) }}"
+                                                        data-name="{{ label.name|localise_text }}">
+                                                    {{ 'Remove'|trans }}
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3">
+                                        {% include 'partials/application/empty-state.html.twig' with {
+                                            icon: 'fa-tags',
+                                            title: 'There are no labels yet.'|trans,
+                                        } only %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3>{{ 'Add a label'|trans }}</h3>
+            </div>
+            <div class="panel-body">
+                {{ form_start(form, {'method': 'POST'}) }}
+                    {{ form_row(form.name) }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-gewis-primary">{{ 'Add label'|trans }}</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% set delete_body %}
+    <p class="mb-2">{{ 'This label is not in use. Removing it cannot be undone.'|trans }}</p>
+    <p class="mb-0"><strong data-modal-form-target-target="name"></strong></p>
+{% endset %}
+{{ modals.confirm_modal(
+    'modal-delete-label',
+    'Remove this label?'|trans,
+    delete_body,
+    'Remove'|trans,
+    'danger',
+) }}

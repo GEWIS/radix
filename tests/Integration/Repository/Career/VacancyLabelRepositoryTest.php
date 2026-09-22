@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Repository\Career;
 
+use App\Entity\Career\VacancyLabel;
 use App\Repository\Career\VacancyLabelRepository;
 use App\Tests\Integration\DatabaseTestCase;
 
@@ -28,6 +29,10 @@ final class VacancyLabelRepositoryTest extends DatabaseTestCase
 
         $counted = 0;
         foreach ($rows as $row) {
+            self::assertInstanceOf(
+                VacancyLabel::class,
+                $row['label'],
+            );
             self::assertSame(
                 count($row['label']->getRevisions()),
                 $row['usage'],

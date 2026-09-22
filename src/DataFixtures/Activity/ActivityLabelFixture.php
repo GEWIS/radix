@@ -20,6 +20,7 @@ class ActivityLabelFixture extends Fixture implements FixtureGroupInterface
     public const string REFERENCE_DUTCH_ONLY = 'activity-label-dutch-only';
     public const string REFERENCE_ENGLISH_ONLY = 'activity-label-english-only';
     public const string REFERENCE_EXTERNALS = 'activity-label-externals';
+    public const string REFERENCE_RETIRED = 'activity-label-retired';
 
     #[Override]
     public function load(ObjectManager $manager): void
@@ -55,6 +56,11 @@ class ActivityLabelFixture extends Fixture implements FixtureGroupInterface
                 'en' => 'Open to externals',
                 'nl' => 'Open voor externen',
             ],
+            self::REFERENCE_RETIRED => [
+                'en' => 'Corona-proof',
+                'nl' => 'Coronaproof',
+                'retired' => true,
+            ],
         ];
 
         foreach ($labels as $reference => $data) {
@@ -63,6 +69,10 @@ class ActivityLabelFixture extends Fixture implements FixtureGroupInterface
                 $data['en'],
                 $data['nl'],
             );
+
+            if (true === ($data['retired'] ?? false)) {
+                $label->retire();
+            }
 
             $manager->persist($label);
             $this->addReference(

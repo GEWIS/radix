@@ -31,6 +31,10 @@ class VacancyFlowType extends AbstractStepperFlowType
             $options,
         );
 
+        // Read from the run rather than passed in beside it, so an edit cannot open without the labels the revision
+        // already carries and save them away.
+        $data = $builder->getData();
+
         $builder
             ->addStep(
                 VacancyData::STEP_GENERAL,
@@ -40,6 +44,7 @@ class VacancyFlowType extends AbstractStepperFlowType
                     'identity_editable' => $options['identity_editable'],
                     'company' => $options['company'],
                     'current_package_id' => $options['current_package_id'],
+                    'current_label_ids' => $data instanceof VacancyData ? $data->labelIds : [],
                 ],
             )
             ->addStep(

@@ -170,6 +170,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
                 ],
                 'labels' => [
                     ActivityLabelFixture::REFERENCE_DUTCH_ONLY,
+                    ActivityLabelFixture::REFERENCE_RETIRED,
                 ],
                 'signupLists' => [
                     [

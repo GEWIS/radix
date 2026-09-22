@@ -469,10 +469,6 @@
         <source>%from% until %until%</source>
         <target state="translated">%from% until %until%</target>
       </trans-unit>
-      <trans-unit id="4O9JbHV" resname="%label% disappears from the label picker. Vacancies that already carry it keep it.">
-        <source>%label% disappears from the label picker. Vacancies that already carry it keep it.</source>
-        <target state="translated">%label% disappears from the label picker. Vacancies that already carry it keep it.</target>
-      </trans-unit>
       <trans-unit id="IXsFOWz" resname="%name% has been a member of a body, or has budgets or statements to their name, so their name stays on record: we have a legal basis under the GDPR to keep it, and the decisions that mention them have to stay correct.">
         <source>%name% has been a member of a body, or has budgets or statements to their name, so their name stays on record: we have a legal basis under the GDPR to keep it, and the decisions that mention them have to stay correct.</source>
         <target state="translated">%name% has been a member of a body, or has budgets or statements to their name, so their name stays on record: we have a legal basis under the GDPR to keep it, and the decisions that mention them have to stay correct.</target>
@@ -668,6 +664,10 @@
       <trans-unit id="o8mlHI1" resname="A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.">
         <source>A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.</source>
         <target state="translated">A highlight puts one of your vacancies at the top of the career page, above every other posting. Ask your contact at GEWIS what a highlight package would cost you.</target>
+      </trans-unit>
+      <trans-unit id="B39L3Uq" resname="A label that is in use cannot be removed. Retire it instead: it is kept where it is already used, but is no longer offered.">
+        <source>A label that is in use cannot be removed. Retire it instead: it is kept where it is already used, but is no longer offered.</source>
+        <target>A label that is in use cannot be removed. Retire it instead: it is kept where it is already used, but is no longer offered.</target>
       </trans-unit>
       <trans-unit id="P4fTk.T" resname="A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.">
         <source>A list that guarantees a role is therefore never drawn automatically: the moment above only decides who is in the draw, and the draw itself is run by hand afterwards.</source>
@@ -952,6 +952,10 @@
       <trans-unit id="jnVAzRZ" resname="Activity is being edited">
         <source>Activity is being edited</source>
         <target state="translated">Activity is being edited</target>
+      </trans-unit>
+      <trans-unit id="ZXBvVmN" resname="Activity labels">
+        <source>Activity labels</source>
+        <target>Activity labels</target>
       </trans-unit>
       <trans-unit id="5rGNJkS" resname="Activity submitted for review.">
         <source>Activity submitted for review.</source>
@@ -3601,10 +3605,6 @@
         <source>Enter the email address you signed up with and we will send you a new confirmation link.</source>
         <target state="translated">Enter the email address you signed up with and we will send you a new confirmation link.</target>
       </trans-unit>
-      <trans-unit id="NQcoaLP" resname="Enter the name in both languages.">
-        <source>Enter the name in both languages.</source>
-        <target state="translated">Enter the name in both languages.</target>
-      </trans-unit>
       <trans-unit id="u5DskYm" resname="Entered by the applicant">
         <source>Entered by the applicant</source>
         <target state="translated">Entered by the applicant</target>
@@ -5052,6 +5052,10 @@
       <trans-unit id="jyKCtav" resname="Labels are shared by every company, so renaming one changes it everywhere it is used.">
         <source>Labels are shared by every company, so renaming one changes it everywhere it is used.</source>
         <target state="translated">Labels are shared by every company, so renaming one changes it everywhere it is used.</target>
+      </trans-unit>
+      <trans-unit id="lP0ysXw" resname="Labels are shared by every organiser, so renaming one changes it everywhere it is used.">
+        <source>Labels are shared by every organiser, so renaming one changes it everywhere it is used.</source>
+        <target>Labels are shared by every organiser, so renaming one changes it everywhere it is used.</target>
       </trans-unit>
       <trans-unit id="5q6OTdQ" resname="Language">
         <source>Language</source>
@@ -8161,6 +8165,10 @@
         <source>Respond to the requested changes</source>
         <target state="translated">Respond to the requested changes</target>
       </trans-unit>
+      <trans-unit id="ZuasJDY" resname="Restore">
+        <source>Restore</source>
+        <target>Restore</target>
+      </trans-unit>
       <trans-unit id="BbK2K6u" resname="Result">
         <source>Result</source>
         <target state="translated">Result</target>
@@ -8168,6 +8176,14 @@
       <trans-unit id="IMl5bXs" resname="Results">
         <source>Results</source>
         <target state="translated">Results</target>
+      </trans-unit>
+      <trans-unit id="_aF2WsG" resname="Retire">
+        <source>Retire</source>
+        <target>Retire</target>
+      </trans-unit>
+      <trans-unit id="ykx9sVi" resname="Retired">
+        <source>Retired</source>
+        <target>Retired</target>
       </trans-unit>
       <trans-unit id="pFenPP_" resname="Retired fraternities">
         <source>Retired fraternities</source>
@@ -9761,6 +9777,10 @@
         <source>The item disappears from the website and the archive. This cannot be undone.</source>
         <target state="translated">The item disappears from the website and the archive. This cannot be undone.</target>
       </trans-unit>
+      <trans-unit id="0b6V2LA" resname="The label is offered again.">
+        <source>The label is offered again.</source>
+        <target>The label is offered again.</target>
+      </trans-unit>
       <trans-unit id="2gIWC.K" resname="The label was added.">
         <source>The label was added.</source>
         <target state="translated">The label was added.</target>
@@ -9768,6 +9788,10 @@
       <trans-unit id="i3_7_VO" resname="The label was removed.">
         <source>The label was removed.</source>
         <target state="translated">The label was removed.</target>
+      </trans-unit>
+      <trans-unit id="tazkS5X" resname="The label was retired. It is kept where it is already used and is no longer offered.">
+        <source>The label was retired. It is kept where it is already used and is no longer offered.</source>
+        <target>The label was retired. It is kept where it is already used and is no longer offered.</target>
       </trans-unit>
       <trans-unit id="S2SG2Fs" resname="The label was saved.">
         <source>The label was saved.</source>
@@ -10365,9 +10389,25 @@
         <source>This is your first version, so there is nothing to compare it against.</source>
         <target state="translated">This is your first version, so there is nothing to compare it against.</target>
       </trans-unit>
-      <trans-unit id="VUwNvf3" resname="This label is still used by a vacancy, so it cannot be removed.">
-        <source>This label is still used by a vacancy, so it cannot be removed.</source>
-        <target state="translated">This label is still used by a vacancy, so it cannot be removed.</target>
+      <trans-unit id="D6saQgG" resname="This label is already offered.">
+        <source>This label is already offered.</source>
+        <target>This label is already offered.</target>
+      </trans-unit>
+      <trans-unit id="eQvdFfm" resname="This label is not in use, so it can be removed instead.">
+        <source>This label is not in use, so it can be removed instead.</source>
+        <target>This label is not in use, so it can be removed instead.</target>
+      </trans-unit>
+      <trans-unit id="Z.hsG8_" resname="This label is not in use. Removing it cannot be undone.">
+        <source>This label is not in use. Removing it cannot be undone.</source>
+        <target>This label is not in use. Removing it cannot be undone.</target>
+      </trans-unit>
+      <trans-unit id="Tf7dnfe" resname="This label is still in use, so it can only be retired.">
+        <source>This label is still in use, so it can only be retired.</source>
+        <target>This label is still in use, so it can only be retired.</target>
+      </trans-unit>
+      <trans-unit id="60tLPzn" resname="This label was already retired.">
+        <source>This label was already retired.</source>
+        <target>This label was already retired.</target>
       </trans-unit>
       <trans-unit id="zRRdI4A" resname="This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.">
         <source>This list already has subscribers, so its structure is fixed. The closing moment and the texts can still be changed.</source>
@@ -12513,9 +12553,9 @@
         <source>uploaded %date%</source>
         <target state="translated">uploaded %date%</target>
       </trans-unit>
-      <trans-unit id="3E7FIgI" resname="used by %count% revisions">
-        <source>used by %count% revisions</source>
-        <target state="translated">used by %count% revisions</target>
+      <trans-unit id="hHE2ypN" resname="used by %count% revision|used by %count% revisions">
+        <source>used by %count% revision|used by %count% revisions</source>
+        <target>used by %count% revision|used by %count% revisions</target>
       </trans-unit>
       <trans-unit id="yqfaihZ" resname="waiting">
         <source>waiting</source>

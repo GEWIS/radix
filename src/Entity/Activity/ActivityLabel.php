@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Entity\Activity;
 
+use App\Entity\Application\LabelInterface;
 use App\Entity\Application\LocalisedText as LocalisedTextModel;
 use App\Entity\Application\Traits\IdentifiableTrait;
+use App\Entity\Application\Traits\RetirableTrait;
 use App\Repository\Activity\ActivityLabelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,6 +15,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\OneToOne;
+use Override;
 
 /**
  * Activity Label model.
@@ -29,9 +32,10 @@ use Doctrine\ORM\Mapping\OneToOne;
  * }
  */
 #[Entity(repositoryClass: ActivityLabelRepository::class)]
-class ActivityLabel
+class ActivityLabel implements LabelInterface
 {
     use IdentifiableTrait;
+    use RetirableTrait;
 
     /**
      * The activity revisions this Label is assigned to (labels are on the revision so their changes are reviewable).
@@ -42,6 +46,7 @@ class ActivityLabel
         targetEntity: ActivityRevision::class,
         mappedBy: 'labels',
         cascade: ['persist'],
+        fetch: 'EXTRA_LAZY',
     )]
     private Collection $revisions;
 
@@ -67,6 +72,13 @@ class ActivityLabel
     public function __construct()
     {
         $this->revisions = new ArrayCollection();
+        $this->name = new ActivityLocalisedText();
+    }
+
+    #[Override]
+    public static function textClass(): string
+    {
+        return ActivityLocalisedText::class;
     }
 
     public function addRevision(ActivityRevision $revision): void
@@ -87,12 +99,10 @@ class ActivityLabel
         $this->revisions->removeElement($revision);
     }
 
-    /**
-     * @return ActivityRevision[]
-     */
-    public function getRevisions(): array
+    #[Override]
+    public function isInUse(): bool
     {
-        return $this->revisions->toArray();
+        return !$this->revisions->isEmpty();
     }
 
     /**
