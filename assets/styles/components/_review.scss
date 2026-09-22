@@ -44,19 +44,86 @@
     color: $white;
 }
 
+// Orange has no subtle and emphasis tokens of its own in Bootstrap; these use the same shades as the theme colours.
+:root {
+    --#{$prefix}orange-bg-subtle: #{$orange-100};
+    --#{$prefix}orange-border-subtle: #{$orange-200};
+    --#{$prefix}orange-text-emphasis: #{$orange-800};
+}
+
+@include color-mode(gewis-night) {
+    --#{$prefix}orange-bg-subtle: #{$orange-900};
+    --#{$prefix}orange-border-subtle: #{$orange-700};
+    --#{$prefix}orange-text-emphasis: #{$orange-300};
+}
+
+// The colours a review uses for added and removed. The attribute is set on the body from the member's setting, and
+// on each tile of that setting so the tile previews its own pair. Each palette is a pair the deficiency it is named
+// for can tell apart. Orange rather than the warning yellow, so a removal is not coloured like an edit.
+:root,
+[data-colour-vision='default'] {
+    --#{$prefix}review-added-bg: var(--#{$prefix}success-bg-subtle);
+    --#{$prefix}review-added-border: var(--#{$prefix}success-border-subtle);
+    --#{$prefix}review-added-color: var(--#{$prefix}success-text-emphasis);
+    --#{$prefix}review-removed-bg: var(--#{$prefix}danger-bg-subtle);
+    --#{$prefix}review-removed-border: var(--#{$prefix}danger-border-subtle);
+    --#{$prefix}review-removed-color: var(--#{$prefix}danger-text-emphasis);
+}
+
+[data-colour-vision='red-green'] {
+    --#{$prefix}review-added-bg: var(--#{$prefix}primary-bg-subtle);
+    --#{$prefix}review-added-border: var(--#{$prefix}primary-border-subtle);
+    --#{$prefix}review-added-color: var(--#{$prefix}primary-text-emphasis);
+    --#{$prefix}review-removed-bg: var(--#{$prefix}orange-bg-subtle);
+    --#{$prefix}review-removed-border: var(--#{$prefix}orange-border-subtle);
+    --#{$prefix}review-removed-color: var(--#{$prefix}orange-text-emphasis);
+}
+
+[data-colour-vision='blue-yellow'] {
+    --#{$prefix}review-added-bg: var(--#{$prefix}primary-bg-subtle);
+    --#{$prefix}review-added-border: var(--#{$prefix}primary-border-subtle);
+    --#{$prefix}review-added-color: var(--#{$prefix}primary-text-emphasis);
+    --#{$prefix}review-removed-bg: var(--#{$prefix}danger-bg-subtle);
+    --#{$prefix}review-removed-border: var(--#{$prefix}danger-border-subtle);
+    --#{$prefix}review-removed-color: var(--#{$prefix}danger-text-emphasis);
+}
+
+@mixin review-removed-mark {
+    background-color: var(--#{$prefix}review-removed-bg);
+    color: var(--#{$prefix}review-removed-color);
+    text-decoration: line-through;
+}
+
+@mixin review-added-mark {
+    background-color: var(--#{$prefix}review-added-bg);
+    color: var(--#{$prefix}review-added-color);
+}
+
 // Two classes, and declared after the night block, which is no less specific: the same as .panel-accent above.
 .panel.review-pane--added {
-    --#{$prefix}panel-border-color: var(--#{$prefix}success-border-subtle);
-    --#{$prefix}panel-bg: var(--#{$prefix}success-bg-subtle);
-    --#{$prefix}border-color: var(--#{$prefix}success-border-subtle);
-    --#{$prefix}border-color-translucent: var(--#{$prefix}success-border-subtle);
+    --#{$prefix}panel-border-color: var(--#{$prefix}review-added-border);
+    --#{$prefix}panel-bg: var(--#{$prefix}review-added-bg);
+    --#{$prefix}border-color: var(--#{$prefix}review-added-border);
+    --#{$prefix}border-color-translucent: var(--#{$prefix}review-added-border);
 }
 
 .panel.review-pane--removed {
-    --#{$prefix}panel-border-color: var(--#{$prefix}danger-border-subtle);
-    --#{$prefix}panel-bg: var(--#{$prefix}danger-bg-subtle);
-    --#{$prefix}border-color: var(--#{$prefix}danger-border-subtle);
-    --#{$prefix}border-color-translucent: var(--#{$prefix}danger-border-subtle);
+    --#{$prefix}panel-border-color: var(--#{$prefix}review-removed-border);
+    --#{$prefix}panel-bg: var(--#{$prefix}review-removed-bg);
+    --#{$prefix}border-color: var(--#{$prefix}review-removed-border);
+    --#{$prefix}border-color-translucent: var(--#{$prefix}review-removed-border);
+}
+
+.review-pane .badge-success {
+    --#{$prefix}badge-color: var(--#{$prefix}review-added-color);
+
+    background-color: var(--#{$prefix}review-added-bg);
+}
+
+.review-pane .badge-danger {
+    --#{$prefix}badge-color: var(--#{$prefix}review-removed-color);
+
+    background-color: var(--#{$prefix}review-removed-bg);
 }
 
 .review-pane--added hr,
@@ -166,14 +233,12 @@
     }
 
     &__box .diff-wrapper.diff.diff-html .change del {
-        background-color: var(--#{$prefix}danger-bg-subtle);
-        color: var(--#{$prefix}danger-text-emphasis);
-        text-decoration: line-through;
+        @include review-removed-mark;
     }
 
     &__box .diff-wrapper.diff.diff-html .change ins {
-        background-color: var(--#{$prefix}success-bg-subtle);
-        color: var(--#{$prefix}success-text-emphasis);
+        @include review-added-mark;
+
         font-weight: 600;
     }
 
@@ -188,14 +253,11 @@
     }
 
     &__box--lines .diff-wrapper.diff.diff-html .change:not(.change-eq) .old {
-        background-color: var(--#{$prefix}danger-bg-subtle);
-        color: var(--#{$prefix}danger-text-emphasis);
-        text-decoration: line-through;
+        @include review-removed-mark;
     }
 
     &__box--lines .diff-wrapper.diff.diff-html .change:not(.change-eq) .new {
-        background-color: var(--#{$prefix}success-bg-subtle);
-        color: var(--#{$prefix}success-text-emphasis);
+        @include review-added-mark;
     }
 
     &__box--lines .diff-wrapper.diff td.old,
@@ -203,5 +265,49 @@
         padding: 0.05rem 0.25rem;
         border-radius: 0.25rem;
     }
+
+    &__old {
+        color: var(--#{$prefix}review-removed-color);
+    }
 }
 
+.colour-vision-tile {
+    cursor: pointer;
+
+    &__preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-bottom: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+        border-start-start-radius: var(--#{$prefix}card-inner-border-radius);
+        border-start-end-radius: var(--#{$prefix}card-inner-border-radius);
+        background-color: var(--#{$prefix}tertiary-bg);
+        font-size: $font-size-sm;
+
+        del,
+        ins {
+            padding: 0.05rem 0.25rem;
+            border-radius: 0.25rem;
+            text-decoration: none;
+        }
+
+        del {
+            @include review-removed-mark;
+        }
+
+        ins {
+            @include review-added-mark;
+
+            font-weight: 600;
+        }
+    }
+}
+
+.btn-check:checked + .colour-vision-tile {
+    border-color: $gewis-red;
+}
+
+.btn-check:focus-visible + .colour-vision-tile {
+    box-shadow: 0 0 0 0.25rem var(--#{$prefix}focus-ring-color);
+}

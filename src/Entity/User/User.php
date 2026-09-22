@@ -7,6 +7,7 @@ namespace App\Entity\User;
 use Ambta\DoctrineEncryptBundle\Configuration\Encrypted;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Decision\Member as MemberModel;
+use App\Entity\User\Enums\ColourVision;
 use App\Entity\User\Enums\PhotoVisibility;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\Enums\UserTypes;
@@ -360,6 +361,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function hasDisabledCosmetics(): bool
     {
         return $this->settings->disableCosmetics ?? false;
+    }
+
+    /**
+     * Which palette this member reviews a revision in. The default palette when no settings row exists yet.
+     */
+    public function getColourVision(): ColourVision
+    {
+        return $this->settings->colourVision ?? ColourVision::Default;
     }
 
     /**

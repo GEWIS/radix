@@ -24,6 +24,7 @@
                 </div>
                 <div class="panel-body">
                     {{ form_row(form.disableCosmetics) }}
+                    {{ form_row(form.colourVision, {required: false}) }}
                     <button type="submit" class="btn btn-gewis-primary mt-2">
                         <span class="fas fa-save"></span> {{ 'Save settings'|trans }}
                     </button>

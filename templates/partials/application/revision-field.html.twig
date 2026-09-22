@@ -35,7 +35,7 @@
 {% elseif 'reference' == field.kind.value %}
     {{ value.new is empty ? empty : value.new }}
     {% if field.comparable and value.isChanged and value.old is not empty %}
-        <del class="small text-danger-emphasis ms-2">{{ value.old }}</del>
+        <del class="small review-cell__old ms-2">{{ value.old }}</del>
     {% endif %}
 {% elseif 'badge' == field.kind.value %}
     {% if value.new is null %}
@@ -44,7 +44,7 @@
         <span class="badge {{ field.option('badgeClass')|default('badge-tag') }}">{{ value.new|trans }}</span>
     {% endif %}
     {% if field.comparable and value.isChanged and value.old is not null %}
-        <del class="small text-danger-emphasis ms-2">{{ value.old|trans }}</del>
+        <del class="small review-cell__old ms-2">{{ value.old|trans }}</del>
     {% endif %}
 {% elseif 'tags' == field.kind.value %}
     {% set oldIds = value.old|default([])|map(tag => tag.id) %}
@@ -81,7 +81,7 @@
         {{ value.new|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
     {% endif %}
     {% if field.comparable and value.isChanged and value.old is not null %}
-        <del class="small text-danger-emphasis ms-2">
+        <del class="small review-cell__old ms-2">
             {{ value.old|format_datetime(pattern: 'EEE d MMM. yyyy HH:mm', locale: app.request.locale) }}
         </del>
     {% endif %}
@@ -94,7 +94,7 @@
         {{ value.new.end is not null ? value.new.end|date('j M Y') : '-' }}
     {% endif %}
     {% if field.comparable and value.old is not null and value.isChanged %}
-        <del class="small text-danger-emphasis ms-2">
+        <del class="small review-cell__old ms-2">
             {% if 'activity' == field.option('format') %}
                 {{ activity_date_range(value.old.start, value.old.end) }}
             {% else %}

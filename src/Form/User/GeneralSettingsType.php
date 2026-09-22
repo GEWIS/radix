@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Form\User;
 
+use App\Entity\User\Enums\ColourVision;
 use App\Entity\User\UserSettings;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -30,6 +32,17 @@ class GeneralSettingsType extends AbstractType
                 'label' => t('Disable festive effects'),
                 'help' => t('Turn off the balloons, snow, and fireworks across the website.'),
                 'required' => false,
+            ],
+        );
+        $builder->add(
+            'colourVision',
+            EnumType::class,
+            [
+                'class' => ColourVision::class,
+                'label' => t('Colour vision'),
+                'help' => t('The colours a revision review uses to mark what was added and what was removed.'),
+                'expanded' => true,
+                'block_prefix' => 'colour_vision',
             ],
         );
     }

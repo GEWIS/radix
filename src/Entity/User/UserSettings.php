@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\User;
 
+use App\Entity\User\Enums\ColourVision;
 use App\Entity\User\Enums\PhotoVisibility;
 use App\Repository\User\UserSettingsRepository;
 use DateTimeImmutable;
@@ -25,6 +26,7 @@ use Doctrine\ORM\Mapping\OneToOne;
  *
  * @phpstan-type UserSettingsGdprArrayType = array{
  *     disableCosmetics: bool,
+ *     colourVision: string,
  *     photoTaggingOptOut: bool,
  *     photoVisibility: string,
  *     hideYearOfBirth: bool,
@@ -59,6 +61,16 @@ class UserSettings
         options: ['default' => false],
     )]
     public bool $disableCosmetics = false;
+
+    /**
+     * Which pair of colours a revision review marks additions and removals with.
+     */
+    #[Column(
+        type: Types::STRING,
+        enumType: ColourVision::class,
+        options: ['default' => ColourVision::Default->value],
+    )]
+    public ColourVision $colourVision = ColourVision::Default;
 
     /**
      * Whether this member has opted out of being tagged in photos.
@@ -131,6 +143,7 @@ class UserSettings
     {
         return [
             'disableCosmetics' => $this->disableCosmetics,
+            'colourVision' => $this->colourVision->value,
             'photoTaggingOptOut' => $this->photoTaggingOptOut,
             'photoVisibility' => $this->photoVisibility->value,
             'hideYearOfBirth' => $this->hideYearOfBirth,

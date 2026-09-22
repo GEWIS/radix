@@ -23,6 +23,7 @@ final class UserSettingsTest extends TestCase
         self::assertSame(
             [
                 'disableCosmetics' => false,
+                'colourVision' => 'default',
                 'photoTaggingOptOut' => true,
                 'photoVisibility' => 'selected',
                 'hideYearOfBirth' => true,

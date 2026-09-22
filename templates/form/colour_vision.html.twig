@@ -1,0 +1,21 @@
+{% block colour_vision_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        <div class="row g-2">
+            {% for child in form %}
+                {% do child.setRendered %}
+                <div class="col-sm-4">
+                    <input type="radio" class="btn-check" id="{{ child.vars.id }}" name="{{ child.vars.full_name }}"
+                           value="{{ child.vars.value }}" autocomplete="off"{{ child.vars.checked ? ' checked' }}>
+                    <label class="card colour-vision-tile w-100 h-100 mb-0" for="{{ child.vars.id }}"
+                           data-colour-vision="{{ child.vars.value }}">
+                        <span class="colour-vision-tile__preview" aria-hidden="true">
+                            <del>{{ 'removed'|trans }}</del>
+                            <ins>{{ 'added'|trans }}</ins>
+                        </span>
+                        <span class="card-body py-2 px-3 fw-semibold">{{ child.vars.label|trans }}</span>
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

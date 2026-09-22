@@ -97,7 +97,7 @@
         {% block head %}{% endblock %}
         {% block structured_data %}{% endblock %}
     </head>
-    <body class="d-flex flex-column min-vh-100">
+    <body class="d-flex flex-column min-vh-100"{% if colour_vision() is not null %} data-colour-vision="{{ colour_vision() }}"{% endif %}>
         {% block main_nav %}
             {% include 'partials/application/main-nav.html.twig' %}
         {% endblock %}

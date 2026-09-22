@@ -2301,6 +2301,10 @@
         <source>Collects the payment</source>
         <target>Collects the payment</target>
       </trans-unit>
+      <trans-unit id="HRxmmRD" resname="Colour vision">
+        <source>Colour vision</source>
+        <target>Colour vision</target>
+      </trans-unit>
       <trans-unit id="5THj8oK" resname="Columns">
         <source>Columns</source>
         <target>Columns</target>
@@ -7593,6 +7597,10 @@
         <source>Prospective members</source>
         <target state="translated">Prospective members</target>
       </trans-unit>
+      <trans-unit id="7FUIq1b" resname="Protanopia and deuteranopia">
+        <source>Protanopia and deuteranopia</source>
+        <target>Protanopia and deuteranopia</target>
+      </trans-unit>
       <trans-unit id="WmGTMUE" resname="Provided Data">
         <source>Provided Data</source>
         <target state="translated">Provided Data</target>
@@ -9561,6 +9569,10 @@
         <source>The closing date schedules the poll; it closes on this date.</source>
         <target state="translated">The closing date schedules the poll; it closes on this date.</target>
       </trans-unit>
+      <trans-unit id="Q6iTO57" resname="The colours a revision review uses to mark what was added and what was removed.">
+        <source>The colours a revision review uses to mark what was added and what was removed.</source>
+        <target>The colours a revision review uses to mark what was added and what was removed.</target>
+      </trans-unit>
       <trans-unit id="QqMTrxG" resname="The companies GEWIS works with, what they have on offer, and what they pay for.">
         <source>The companies GEWIS works with, what they have on offer, and what they pay for.</source>
         <target state="translated">The companies GEWIS works with, what they have on offer, and what they pay for.</target>
@@ -10668,6 +10680,10 @@
       <trans-unit id="09V_UUH" resname="Transports">
         <source>Transports</source>
         <target state="translated">Transports</target>
+      </trans-unit>
+      <trans-unit id="i_rPWvz" resname="Tritanopia">
+        <source>Tritanopia</source>
+        <target>Tritanopia</target>
       </trans-unit>
       <trans-unit id="fhVR..D" resname="Try a different filter, or clear the search.">
         <source>Try a different filter, or clear the search.</source>
