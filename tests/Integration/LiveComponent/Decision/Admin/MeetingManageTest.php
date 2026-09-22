@@ -19,9 +19,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function array_reverse;
 use function count;
+use function explode;
+use function html_entity_decode;
+use function is_array;
+use function json_decode;
+use function preg_match;
+use function preg_match_all;
+use function sprintf;
+use function str_starts_with;
 
 /**
  * Exercises the meeting management component as the framework does (the real instance with its real services) after
@@ -82,9 +92,13 @@ final class MeetingManageTest extends DatabaseTestCase
             'Agenda (final)',
             $document->name,
         );
+        // The pending edit is cleared and replaced by the current values of the point.
         self::assertSame(
-            [],
-            $component->pointEdits,
+            [
+                'number' => '9',
+                'title' => 'Renumbered',
+            ],
+            $component->pointEdits[(string) $point->id],
         );
         self::assertNotNull($component->savedAt);
     }
@@ -359,41 +373,62 @@ final class MeetingManageTest extends DatabaseTestCase
 
     /**
      * The inline inputs bind to a path inside one of the pending-edit arrays, and the client rejects a model path
-     * whose every level does not already exist among the props. Empty arrays are what "Invalid model name" was.
+     * whose every level does not already exist among the props. They are dehydrated before the template runs, so
+     * this renders the component rather than reading the arrays off it: seeding them during the render is what
+     * "Invalid model name" was.
      */
-    public function testTheInlineEditsHaveAModelPathToBindTo(): void
+    public function testEveryInlineInputHasAModelPathAmongTheProps(): void
+    {
+        $this->authenticate();
+
+        $html = $this->renderManage();
+        $props = $this->propsOf($html);
+        $paths = $this->modelPathsOf($html);
+
+        self::assertContains(
+            'details.startTime',
+            $paths,
+        );
+        self::assertNotEmpty(array_filter(
+            $paths,
+            static fn (string $path) => str_starts_with(
+                $path,
+                'pointEdits.',
+            ),
+        ));
+
+        foreach ($paths as $path) {
+            self::assertNotNull(
+                $this->resolve(
+                    $props,
+                    $path,
+                ),
+                sprintf(
+                    'The model path "%s" is not among the props.',
+                    $path,
+                ),
+            );
+        }
+    }
+
+    /**
+     * A point added during the visit is only on screen from the re-render that follows, which is the one render the
+     * initial seeding does not cover.
+     */
+    public function testAPointAddedDuringTheVisitIsSeededToo(): void
     {
         $this->authenticate();
         $component = $this->manageFor();
 
-        // Rendering is what seeds them, as it is what puts the inputs on screen.
-        $view = $component->getView();
-        self::assertNotEmpty($view->points);
+        $component->addPoint();
+        $component->syncEdits();
 
-        foreach ($view->points as $pointView) {
-            $id = (string) $pointView->point->id;
-
-            self::assertArrayHasKey(
-                $id,
-                $component->pointEdits,
-            );
-            self::assertArrayHasKey(
-                'number',
-                $component->pointEdits[$id],
-            );
-            self::assertArrayHasKey(
-                'title',
-                $component->pointEdits[$id],
-            );
-        }
+        $points = $component->getView()->points;
+        $added = $points[count($points) - 1]->point;
 
         self::assertArrayHasKey(
-            'startTime',
-            $component->details,
-        );
-        self::assertArrayHasKey(
-            'location',
-            $component->details,
+            (string) $added->id,
+            $component->pointEdits,
         );
     }
 
@@ -412,6 +447,91 @@ final class MeetingManageTest extends DatabaseTestCase
             $component->savedAt,
             'Nothing was edited, so nothing was saved.',
         );
+    }
+
+    /**
+     * The component as the page renders it, which is the only way to read the props sent to the client.
+     */
+    private function renderManage(): string
+    {
+        return self::getContainer()->get('twig')->createTemplate(
+            "{{ component('Decision:Admin:MeetingManage', {type: type, number: number}) }}",
+        )->render([
+            'type' => MeetingTypes::ALV,
+            'number' => $this->completeGmmNumber(),
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function propsOf(string $html): array
+    {
+        self::assertSame(
+            1,
+            preg_match(
+                '/data-live-props-value="([^"]*)"/',
+                $html,
+                $matches,
+            ),
+        );
+
+        $props = json_decode(
+            html_entity_decode($matches[1]),
+            true,
+        );
+        self::assertIsArray($props);
+
+        return $props;
+    }
+
+    /**
+     * The model of every input that binds to one, without the modifiers that may precede it.
+     *
+     * @return list<string>
+     */
+    private function modelPathsOf(string $html): array
+    {
+        preg_match_all(
+            '/data-model="(?:[^"]*\|)?([^"]*)"/',
+            $html,
+            $matches,
+        );
+
+        return $matches[1];
+    }
+
+    /**
+     * Resolves a model path the way the client does: walk the props level by level, and return null when one of
+     * those levels is missing.
+     *
+     * @param array<string, mixed> $props
+     */
+    private function resolve(
+        array $props,
+        string $path,
+    ): mixed {
+        $current = $props;
+        $parts = explode(
+            '.',
+            $path,
+        );
+
+        foreach ($parts as $part) {
+            if (
+                !is_array($current)
+                || !array_key_exists(
+                    $part,
+                    $current,
+                )
+            ) {
+                return null;
+            }
+
+            $current = $current[$part];
+        }
+
+        return $current;
     }
 
     /**

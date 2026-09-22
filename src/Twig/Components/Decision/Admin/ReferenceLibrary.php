@@ -23,6 +23,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Attribute\PreReRender;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\TwigComponent\Attribute\PostMount;
 
 use function assert;
 use function strval;
@@ -72,17 +73,26 @@ final class ReferenceLibrary
     {
         $this->assertAccess();
 
-        $rows = $this->referenceDocumentRepository->findAllWithUsageCounts();
+        return $this->referenceDocumentRepository->findAllWithUsageCounts();
+    }
 
-        // The rename input binds to `nameEdits.<id>.name`, and a model path is only valid to the client if every
-        // level of it already exists among this component's props. Left empty, as it is before anything has been
-        // renamed and again after syncEdits() clears it, the first keystroke fails with "Invalid model name".
-        // Only missing keys are filled: on a re-render the array comes back with what the reader typed.
-        foreach ($rows as [$document]) {
+    /**
+     * Fill the pending renames with the names on screen.
+     *
+     * The rename input binds to `nameEdits.<id>.name`, and a model path is only valid to the client if every level
+     * of it already exists among this component's props. Left empty, as it is before anything has been renamed and
+     * again after {@see syncEdits()} clears it, the first change fails with "Invalid model name". The props are
+     * dehydrated before the template runs, so seeding during the render comes too late: this covers the first
+     * render of the page, and {@see syncEdits()} covers every render after it.
+     *
+     * Only missing keys are filled: on a re-render the array comes back with what the reader typed.
+     */
+    #[PostMount]
+    public function seedEdits(): void
+    {
+        foreach ($this->getDocuments() as [$document]) {
             $this->nameEdits[(string) $document->id]['name'] ??= $document->name;
         }
-
-        return $rows;
     }
 
     /**
@@ -128,11 +138,13 @@ final class ReferenceLibrary
 
         $this->nameEdits = [];
 
-        if (!$applied) {
-            return;
+        if ($applied) {
+            $this->savedAt = new DateTimeImmutable()->format('H:i');
         }
 
-        $this->savedAt = new DateTimeImmutable()->format('H:i');
+        // Seeded again with the current names, because the render that follows is what the client binds its
+        // inputs to.
+        $this->seedEdits();
     }
 
     #[LiveAction]

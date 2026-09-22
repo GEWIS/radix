@@ -45,6 +45,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Attribute\PreReRender;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\TwigComponent\Attribute\PostMount;
 
 use function array_map;
 use function array_values;
@@ -193,9 +194,19 @@ final class MeetingManage
         }
 
         $this->view = $view;
-        $this->seedEdits($view);
 
         return $view;
+    }
+
+    /**
+     * The props are dehydrated before the template renders, so filling these arrays during the render leaves them
+     * empty for the client. This covers the first render of the page; {@see syncEdits()} covers every render after
+     * it.
+     */
+    #[PostMount]
+    public function seedInitialEdits(): void
+    {
+        $this->seedEdits($this->getView());
     }
 
     /**
@@ -203,8 +214,8 @@ final class MeetingManage
      *
      * The inline inputs bind to a path inside one of them, `pointEdits.<id>.title` and the like, and a model path
      * is only valid to the client if every level of it already exists among the component's props. Left empty, as
-     * they are before anything has been edited and again after {@see syncEdits()} clears them, the first keystroke
-     * in any of those inputs fails with "Invalid model name".
+     * they are before anything has been edited and again after {@see syncEdits()} clears them, the first change in
+     * any of those inputs fails with "Invalid model name".
      *
      * Only missing keys are filled, never ones already there: on a re-render the arrays come back with what the
      * reader typed, and seeding over that would undo it. {@see syncEdits()} compares against what is stored before
@@ -371,11 +382,13 @@ final class MeetingManage
         $this->pins = [];
         $this->details = [];
 
-        if (!$applied) {
-            return;
+        if ($applied) {
+            $this->markSaved();
         }
 
-        $this->markSaved();
+        // Seeded again with the current values, because the render that follows is what the client binds its
+        // inputs to, and an action may have added or deleted a point.
+        $this->seedEdits($this->getView());
     }
 
     #[LiveAction]
