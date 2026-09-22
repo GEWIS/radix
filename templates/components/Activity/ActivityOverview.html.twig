@@ -27,11 +27,30 @@
                     <label class="form-label" for="activity-overview-organ">{{ 'Organising party'|trans }}</label>
                     <select class="form-select" id="activity-overview-organ" data-model="organFilter">
                         <option value="">{{ 'Any'|trans }}</option>
-                        {% for organ in this.organs %}
-                            <option value="{{ organ.id }}" {% if this.organFilter == organ.id %}selected{% endif %}>
-                                {{ organ.abbr }}
-                            </option>
-                        {% endfor %}
+                        {% if this.crossYear %}
+                            <optgroup label="{{ 'Active'|trans }}">
+                                {% for body in this.activeBodyOptions %}
+                                    <option value="{{ body.id }}" {% if this.organFilter == body.id %}selected{% endif %}>
+                                        {{ body.label }}
+                                    </option>
+                                {% endfor %}
+                            </optgroup>
+                            {% if this.abrogatedBodyOptions is not empty %}
+                                <optgroup label="{{ 'Abrogated'|trans }}">
+                                    {% for body in this.abrogatedBodyOptions %}
+                                        <option value="{{ body.id }}" {% if this.organFilter == body.id %}selected{% endif %}>
+                                            {{ body.label }}
+                                        </option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endif %}
+                        {% else %}
+                            {% for body in this.bodyOptions %}
+                                <option value="{{ body.id }}" {% if this.organFilter == body.id %}selected{% endif %}>
+                                    {{ body.label }}
+                                </option>
+                            {% endfor %}
+                        {% endif %}
                     </select>
                 </div>
                 <div class="col-md-4">

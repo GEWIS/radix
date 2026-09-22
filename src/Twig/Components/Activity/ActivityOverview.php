@@ -9,11 +9,11 @@ use App\Entity\Activity\ActivityLabel;
 use App\Entity\Activity\Enums\ActivityCategories;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Decision\Member;
-use App\Entity\Decision\Organ;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityLabelRepository;
 use App\Repository\Activity\ActivityRepository;
 use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
+use App\ViewModel\Activity\BodyOption;
 use DateTimeImmutable;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Override;
@@ -28,6 +28,7 @@ use function array_map;
 use function array_values;
 use function count;
 use function explode;
+use function in_array;
 use function is_array;
 use function iterator_to_array;
 use function strval;
@@ -107,6 +108,9 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
 
     /** @var ActivityLabel[]|null */
     private ?array $labels = null;
+
+    /** @var list<BodyOption>|null */
+    private ?array $bodyOptions = null;
 
     private bool $memberResolved = false;
     private ?Member $member = null;
@@ -219,11 +223,45 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     }
 
     /**
-     * @return Organ[]
+     * The bodies with a published activity in the page's window: upcoming, the selected year, or everything on the
+     * cross-year search page. The from/until filters are not applied, because the filter panel is `data-live-ignore`
+     * and a change to them would not re-render the list.
+     *
+     * @return list<BodyOption>
      */
-    public function getOrgans(): array
+    public function getBodyOptions(): array
     {
-        return $this->activityRepository->findOrganisingOrgans();
+        return $this->bodyOptions ??= BodyOption::fromOrgans($this->activityRepository->findOrganisingOrgans(
+            past: $this->timePast(),
+            from: null !== $this->year
+                ? AssociationYear::fromYear($this->year)->getStartDate()
+                : null,
+            until: null !== $this->year
+                ? AssociationYear::fromYear($this->year)->getEndDate()
+                : null,
+        ));
+    }
+
+    /**
+     * @return list<BodyOption>
+     */
+    public function getActiveBodyOptions(): array
+    {
+        return array_values(array_filter(
+            $this->getBodyOptions(),
+            static fn (BodyOption $option): bool => !$option->abrogated,
+        ));
+    }
+
+    /**
+     * @return list<BodyOption>
+     */
+    public function getAbrogatedBodyOptions(): array
+    {
+        return array_values(array_filter(
+            $this->getBodyOptions(),
+            static fn (BodyOption $option): bool => $option->abrogated,
+        ));
     }
 
     /**
@@ -256,13 +294,37 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
                 ? ActivityCategories::tryFrom($this->category)
                 : null,
             labelIds: $this->selectedLabelIds(),
-            organId: $this->organFilter,
+            organId: $this->effectiveBodyId(),
             openSignupOnly: $this->openSignupOnly,
             from: $this->effectiveFrom(),
             until: $this->effectiveUntil(),
             limit: $this->limit,
             offset: 0,
         );
+    }
+
+    /**
+     * A shared link may name a body without an activity in this window. The filter is then dropped, so the select
+     * does not show "Any" while the list is filtered.
+     */
+    private function effectiveBodyId(): ?int
+    {
+        if (null === $this->organFilter) {
+            return null;
+        }
+
+        $offered = array_map(
+            static fn (BodyOption $option): int => $option->id,
+            $this->getBodyOptions(),
+        );
+
+        return in_array(
+            $this->organFilter,
+            $offered,
+            true,
+        )
+            ? $this->organFilter
+            : null;
     }
 
     /**

@@ -6,13 +6,17 @@ namespace App\Tests\Integration\Repository\Activity;
 
 use App\Entity\Activity\Activity;
 use App\Entity\Decision\AssociationYear;
+use App\Entity\Decision\Organ;
 use App\Repository\Activity\ActivityRepository;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTimeImmutable;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+use function array_filter;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function array_values;
 use function iterator_to_array;
 
 /**
@@ -94,6 +98,51 @@ final class ActivityOverviewQueryTest extends DatabaseTestCase
     }
 
     /**
+     * The organising-party filter offers exactly the bodies that organised something in the window the page shows, so
+     * an abrogated body without an upcoming activity is not offered on the upcoming overview.
+     */
+    public function testTheBodyFilterOffersOnlyBodiesWithAnActivityInTheWindow(): void
+    {
+        $repository = $this->repository();
+
+        $upcoming = $this->bodyIds($this->overview(false));
+        self::assertNotEmpty($upcoming);
+        self::assertEqualsCanonicalizing(
+            $upcoming,
+            $this->bodyIdsOf($repository->findOrganisingOrgans(
+                false,
+                null,
+                null,
+            )),
+        );
+        self::assertEqualsCanonicalizing(
+            $this->bodyIds($this->overview(true)),
+            $this->bodyIdsOf($repository->findOrganisingOrgans(
+                true,
+                null,
+                null,
+            )),
+        );
+        self::assertEqualsCanonicalizing(
+            $this->bodyIds($this->overview(null)),
+            $this->bodyIdsOf($repository->findOrganisingOrgans(
+                null,
+                null,
+                null,
+            )),
+        );
+
+        self::assertSame(
+            [],
+            $repository->findOrganisingOrgans(
+                null,
+                new DateTimeImmutable('1990-09-01'),
+                new DateTimeImmutable('1991-08-31 23:59:59'),
+            ),
+        );
+    }
+
+    /**
      * @return Paginator<Activity>
      */
     private function overview(?bool $past): Paginator
@@ -127,6 +176,38 @@ final class ActivityOverviewQueryTest extends DatabaseTestCase
                 $paginator->getIterator(),
                 false,
             ),
+        );
+    }
+
+    /**
+     * @param Paginator<Activity> $paginator
+     *
+     * @return int[]
+     */
+    private function bodyIds(Paginator $paginator): array
+    {
+        return array_values(array_unique(array_filter(
+            array_map(
+                static fn (Activity $activity): ?int => $activity->getLiveRevision()?->organ?->id,
+                iterator_to_array(
+                    $paginator->getIterator(),
+                    false,
+                ),
+            ),
+            static fn (?int $id): bool => null !== $id,
+        )));
+    }
+
+    /**
+     * @param Organ[] $organs
+     *
+     * @return int[]
+     */
+    private function bodyIdsOf(array $organs): array
+    {
+        return array_map(
+            static fn (Organ $organ): int => (int) $organ->id,
+            $organs,
         );
     }
 

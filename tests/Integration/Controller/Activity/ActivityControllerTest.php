@@ -58,9 +58,15 @@ final class ActivityControllerTest extends DatabaseTestCase
             Response::HTTP_OK,
             $response->getStatusCode(),
         );
+        $content = (string) $response->getContent();
         self::assertStringContainsString(
             'activity-overview-search',
-            (string) $response->getContent(),
+            $content,
+        );
+        // The cross-year page groups the bodies by whether they still exist.
+        self::assertStringContainsString(
+            '<optgroup label="Active">',
+            $content,
         );
     }
 

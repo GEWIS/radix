@@ -878,14 +878,18 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the distinct organs that organise at least one live (approved) activity, for the overview's organ
-     * filter.
+     * The bodies of the published activities in a window of the overview, for its organising-party filter. The window
+     * is the one {@see self::findForOverview()} applies, so a body without an activity in it is not offered: an
+     * abrogated committee is left out of the upcoming overview but is still offered in an old archive.
      *
      * @return Organ[]
      */
-    public function findOrganisingOrgans(): array
-    {
-        $rows = $this->createQueryBuilder('a')
+    public function findOrganisingOrgans(
+        ?bool $past,
+        ?DateTimeImmutable $from,
+        ?DateTimeImmutable $until,
+    ): array {
+        $qb = $this->createQueryBuilder('a')
             ->select('DISTINCT IDENTITY(lr.organ) AS organId')
             ->join(
                 'a.liveRevision',
@@ -893,9 +897,36 @@ class ActivityRepository extends ServiceEntityRepository
             )
             ->where('lr.organ IS NOT NULL')
             // Unpublished activities are hidden from the overview, so they must not seed its organ filter either.
-            ->andWhere('a.unpublishedAt IS NULL')
-            ->getQuery()
-            ->getScalarResult();
+            ->andWhere('a.unpublishedAt IS NULL');
+
+        if (null !== $past) {
+            $qb->andWhere($past ? 'lr.endTime < :now' : 'lr.endTime > :now')
+                ->setParameter(
+                    'now',
+                    new DateTimeImmutable(),
+                    Types::DATETIME_IMMUTABLE,
+                );
+        }
+
+        if (null !== $from) {
+            $qb->andWhere('lr.beginTime >= :from')
+                ->setParameter(
+                    'from',
+                    $from,
+                    Types::DATETIME_IMMUTABLE,
+                );
+        }
+
+        if (null !== $until) {
+            $qb->andWhere('lr.beginTime <= :until')
+                ->setParameter(
+                    'until',
+                    $until,
+                    Types::DATETIME_IMMUTABLE,
+                );
+        }
+
+        $rows = $qb->getQuery()->getScalarResult();
 
         $organIds = array_map(
             static fn (array $row): int => (int) $row['organId'],
@@ -908,7 +939,10 @@ class ActivityRepository extends ServiceEntityRepository
 
         return $this->getEntityManager()->getRepository(Organ::class)->findBy(
             ['id' => $organIds],
-            ['abbr' => 'ASC'],
+            [
+                'abbr' => 'ASC',
+                'foundationDate' => 'ASC',
+            ],
         );
     }
 }
