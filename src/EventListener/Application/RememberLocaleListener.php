@@ -6,18 +6,17 @@ namespace App\EventListener\Application;
 
 use App\Service\Application\LocalePreference;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * After the session listener at 128, because the session is read.
+ * After the router, because `_locale` is a route parameter.
  */
 #[AsEventListener(
     event: KernelEvents::REQUEST,
-    priority: 100,
+    priority: 15,
 )]
-final readonly class LocaleRedirectListener
+final readonly class RememberLocaleListener
 {
     public function __construct(
         private LocalePreference $localePreference,
@@ -26,13 +25,10 @@ final readonly class LocaleRedirectListener
 
     public function __invoke(RequestEvent $event): void
     {
-        $request = $event->getRequest();
-        if ('/' !== $request->getPathInfo()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
-        $event->setResponse(new RedirectResponse(
-            '/' . $this->localePreference->resolve($request) . '/',
-        ));
+        $this->localePreference->remember($event->getRequest());
     }
 }

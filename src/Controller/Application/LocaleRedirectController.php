@@ -17,7 +17,7 @@ use function array_replace;
  * move: links already sent, return addresses passed with an open checkout session, and whatever an external
  * application is configured with.
  *
- * A 302 rather than a 301, because the target depends on `Accept-Language`.
+ * A 302 rather than a 301, because the target depends on the session and on `Accept-Language`.
  */
 final class LocaleRedirectController extends AbstractController
 {

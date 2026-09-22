@@ -59,7 +59,8 @@ final class ProspectiveMemberController extends AbstractController
      * The address the form is reached at when the visitor has not stated which language they want it in.
      *
      * `/join` is on posters and behind gew.is/join, so it remains available, but it has no room for a language and
-     * the form is a page like any other. A visitor arriving here has not stated a language, so the browser decides.
+     * the form is a page like any other. The language in the session is used, and otherwise the one the browser asks
+     * for.
      */
     public function subscribeUnlocalised(Request $request): Response
     {
