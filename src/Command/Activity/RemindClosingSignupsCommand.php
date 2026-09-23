@@ -124,7 +124,8 @@ final class RemindClosingSignupsCommand extends Command
      */
     private function remind(SignupList $list): int
     {
-        $activityId = $list->getActivity()->id;
+        $activity = $list->getActivity();
+        $activityId = $activity->id;
         if (null === $activityId) {
             return 0;
         }
@@ -135,6 +136,7 @@ final class RemindClosingSignupsCommand extends Command
 
         $context = [
             'activity' => strval($activityId),
+            'activityName' => $activity->getName()->getText(Languages::English) ?? '',
             'list' => $list->name->getText(Languages::English) ?? '',
         ];
 

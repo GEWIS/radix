@@ -7,6 +7,8 @@ namespace App\Service\Application;
 use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\Enums\NotificationType;
 
+use function sprintf;
+
 /**
  * Turns the context a notification contains into the words its sentence is built around.
  *
@@ -47,7 +49,7 @@ final readonly class NotificationContextResolver
             // Nothing to fill in: the sentence says all of it on its own.
             NotificationType::DataExportReady => '',
             NotificationType::SignupClosing,
-            NotificationType::SignupClosingWithFields => $context['list'] ?? null,
+            NotificationType::SignupClosingWithFields => $this->closingSignupList($context),
             NotificationType::SignIn, NotificationType::PasswordChanged, NotificationType::MfaEnabled,
             NotificationType::MfaDisabled, NotificationType::BackupCodesRegenerated => $this->deviceDescription->render(
                 $context['browser'] ?? null,
@@ -55,6 +57,29 @@ final readonly class NotificationContextResolver
                 $context['address'] ?? null,
                 $language,
             ),
+        };
+    }
+
+    /**
+     * A list is often named no further than "Sign-up", which on its own does not say what is closing, so the name of
+     * the activity it belongs to comes first.
+     *
+     * @param array<string, string> $context
+     */
+    private function closingSignupList(array $context): ?string
+    {
+        $activity = $context['activityName'] ?? '';
+        $list = $context['list'] ?? '';
+
+        return match (true) {
+            '' !== $activity && '' !== $list => sprintf(
+                '%s (%s)',
+                $activity,
+                $list,
+            ),
+            '' !== $activity => $activity,
+            '' !== $list => $list,
+            default => null,
         };
     }
 }

@@ -7,6 +7,7 @@ namespace App\Tests\Integration\Command\Activity;
 use App\Entity\Activity\Signup;
 use App\Entity\Activity\SignupList;
 use App\Entity\Activity\UserSignup;
+use App\Entity\Application\Enums\Languages;
 use App\Entity\Application\Enums\NotificationType;
 use App\Entity\Application\Notification;
 use App\Repository\Application\NotificationRepository;
@@ -90,6 +91,21 @@ final class RemindClosingSignupsCommandTest extends DatabaseTestCase
         self::assertSame(
             $expected,
             $this->reminders()[0]->type,
+        );
+    }
+
+    public function testTheReminderCarriesTheActivityName(): void
+    {
+        $list = $this->aListClosingIn('+6 hours');
+        $expected = $list->getActivity()->getName()->getText(Languages::English) ?? '';
+
+        $this->executeCommand();
+
+        $context = $this->reminders()[0]->context;
+        self::assertNotNull($context);
+        self::assertSame(
+            $expected,
+            $context['activityName'] ?? null,
         );
     }
 

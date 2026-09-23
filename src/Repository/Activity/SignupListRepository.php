@@ -27,7 +27,8 @@ class SignupListRepository extends ServiceEntityRepository
     }
 
     /**
-     * Open sign-up lists on a live activity that close within the window and have not been reminded about yet.
+     * Open sign-up lists on a live activity that close within the window and have not been reminded about yet. The
+     * revision and its activity come along, since the reminder names both the activity and the list.
      *
      * @return SignupList[]
      */
@@ -36,6 +37,10 @@ class SignupListRepository extends ServiceEntityRepository
         DateTimeImmutable $until,
     ): array {
         return $this->createQueryBuilder('sl')
+            ->addSelect(
+                'r',
+                'a',
+            )
             ->innerJoin(
                 'sl.revision',
                 'r',
