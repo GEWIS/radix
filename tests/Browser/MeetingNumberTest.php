@@ -227,7 +227,7 @@ final class MeetingNumberTest extends BrowserTestCase
         $latest = $this->latest(MeetingTypes::BV);
         $client->executeScript(sprintf(
             <<<'JS'
-                const form = document.querySelector('[data-controller="meeting-number"]');
+                const form = document.querySelector('[data-controller~="meeting-number"]');
                 const island = JSON.parse(form.dataset.meetingNumberSuggestionsValue);
                 island.BV.missing = [%d];
                 form.dataset.meetingNumberSuggestionsValue = JSON.stringify(island);

@@ -1,6 +1,22 @@
 {% use 'bootstrap_5_layout.html.twig' %}
 
 {#
+    The warning before a form with changes that were not saved is left
+    ({@see assets/controllers/application/unsaved_changes_controller.ts}) is put on every form here rather than in
+    each template, so a form added later is covered as well. A GET form is a filter or a search and has nothing to
+    lose; a form that must not warn renders `data-unsaved-changes="off"`, which the password prompts do.
+#}
+{% block form_start %}
+    {% if 'POST' == method|upper and 'off' != attr['data-unsaved-changes']|default('') %}
+        {% set attr = attr|merge({
+            'data-controller': ('unsaved-changes ' ~ attr['data-controller']|default(''))|trim,
+            'data-unsaved-changes-message-value': 'There are unsaved changes on this page. Leave without saving?'|trans,
+        }) %}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
+{#
     Two rows cannot float, and both stay readable rather than collapsing:
 
     - A compound row (a fieldset, a repeated password, an embedded type) and an expanded choice are not single

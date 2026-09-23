@@ -45,6 +45,7 @@ loadControllers(
         'print': () => import('./controllers/application/print_controller.ts'),
         'sortable': () => import('./controllers/application/sortable_controller.ts'),
         'submit-once': () => import('./controllers/application/submit_once_controller.ts'),
+        'unsaved-changes': () => import('./controllers/application/unsaved_changes_controller.ts'),
 
         // User-specific controllers.
         'external-app-signing': () => import('./controllers/user/external_app_signing_controller.ts'),

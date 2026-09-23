@@ -38,8 +38,9 @@ final class MeetingControllerTest extends DatabaseTestCase
         );
 
         self::assertNotNull($latest);
-        self::assertStringContainsString(
-            'data-controller="meeting-number"',
+        // The form theme puts a controller of its own on every POST form, so the attribute is a list.
+        self::assertMatchesRegularExpression(
+            '/data-controller="[^"]{0,64}meeting-number/',
             $content,
         );
         self::assertStringContainsString(

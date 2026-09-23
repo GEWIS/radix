@@ -24,7 +24,7 @@
                     {{ secret }}
                 </code>
                 <hr class="my-3">
-                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'data-unsaved-changes': 'off'}}) }}
                     <div class="form-floating mb-3">
                         <input type="text"
                                id="mfa_code"

@@ -10133,6 +10133,10 @@
         <source>There are no saved queries.</source>
         <target state="translated">Er zijn geen opgeslagen queries.</target>
       </trans-unit>
+      <trans-unit id="8ZpldlI" resname="There are unsaved changes on this page. Leave without saving?">
+        <source>There are unsaved changes on this page. Leave without saving?</source>
+        <target state="translated">Er zijn wijzigingen op deze pagina die niet zijn opgeslagen. Wil je de pagina verlaten zonder op te slaan?</target>
+      </trans-unit>
       <trans-unit id="RBfT3i8" resname="There is already a draft to work on.">
         <source>There is already a draft to work on.</source>
         <target state="translated">Er is al een concept om aan te werken.</target>

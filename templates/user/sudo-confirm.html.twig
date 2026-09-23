@@ -48,7 +48,10 @@
                 </p>
                 {# The stash is part of the address on the way in and has to be part of the submission as well, or
                    confirming arrives without the write it was asked for. #}
-                {{ form_start(form, {'action': path(sudoConfirmRoute, {'next': next, 'stash': stash}), 'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_start(form, {
+                    'action': path(sudoConfirmRoute, {'next': next, 'stash': stash}),
+                    'attr': {'novalidate': 'novalidate', 'data-unsaved-changes': 'off'},
+                }) }}
                     {{ form_errors(form) }}
                     {{ form_row(form.password) }}
                     {% if form.mfaCode is defined %}
