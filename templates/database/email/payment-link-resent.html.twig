@@ -1,0 +1,20 @@
+{% extends 'database/email/_base.html.twig' %}
+
+{% block emailTitle %}Action Required to Complete GEWIS Registration{% endblock %}
+{% block preheader %}{% endblock %}
+{% block heading %}Update on your registration{% endblock %}
+{% block subheading %}Here is your payment link{% endblock %}
+{% block body %}
+    <p>Dear {{ firstName }},</p>
+    <p>
+        You have not yet paid the one-time membership fee. Without the payment we cannot approve your membership. Any
+        earlier link no longer works, so please use the following one to start again:
+        <a href="{{ restartUrl }}" style="color: #C40000; text-decoration: none;" target="_blank" rel="noopener nofollow">{{ restartUrl }}</a>.
+    </p>
+    {% include 'database/partials/email/payment-alternatives.html.twig' %}
+    <p>
+        With kind regards,
+        <br>The board of GEWIS
+    </p>
+{% endblock %}
+{% block footerNote %}You received this email because the board sent you your membership fee payment link again.{% endblock %}

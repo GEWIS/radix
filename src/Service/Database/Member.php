@@ -281,6 +281,7 @@ class Member
      *     member: ?ProspectiveMemberModel,
      *     canBeApproved: ?bool,
      *     canDelete: ?bool,
+     *     canResendPaymentLink: ?bool,
      *     approveMessages: ?array<array-key, string[]>,
      * }
      */
@@ -293,6 +294,7 @@ class Member
                 'member' => null,
                 'canBeApproved' => null,
                 'canDelete' => null,
+                'canResendPaymentLink' => null,
                 'approveMessages' => null,
             ];
         }
@@ -332,6 +334,7 @@ class Member
             'member' => $member,
             'canBeApproved' => $member->canBeApproved(),
             'canDelete' => $member->canBeDeleted(),
+            'canResendPaymentLink' => $member->canResendPaymentLink(),
             'approveMessages' => $approveMessages,
         ];
     }

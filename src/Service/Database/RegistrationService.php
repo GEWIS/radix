@@ -114,6 +114,24 @@ class RegistrationService
     }
 
     /**
+     * Send a prospective member their payment link again, which generates a new token and invalidates the previous
+     * one. False when the fee is already settled, so there is nothing to pay.
+     */
+    public function resendPaymentLink(ProspectiveMemberModel $prospectiveMember): bool
+    {
+        if (!$prospectiveMember->canResendPaymentLink()) {
+            return false;
+        }
+
+        $this->memberService->sendRegistrationUpdateEmail(
+            $prospectiveMember,
+            RegistrationUpdate::PaymentLinkResent,
+        );
+
+        return true;
+    }
+
+    /**
      * Send a prospective member back to the checkout with their payment link, returning the URL to continue at.
      */
     public function restartCheckout(PaymentLinkModel $paymentLink): string|CheckoutRestartFailure

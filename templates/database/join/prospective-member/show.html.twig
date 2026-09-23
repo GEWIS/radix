@@ -132,6 +132,35 @@
                 </div>
             </div>
 
+            {% if canResendPaymentLink %}
+                <div class="panel">
+                    <div class="panel-body d-flex flex-wrap align-items-center gap-3">
+                        <span class="flex-grow-1">
+                            <span class="d-block fw-semibold">{{ 'Payment link'|trans }}</span>
+                            <span class="text-secondary small">
+                                {{ 'Sends the applicant a new link to pay the membership fee. Any link they were given before stops working.'|trans }}
+                            </span>
+                        </span>
+                        <button type="button" class="btn btn-outline-secondary"
+                                data-bs-toggle="modal" data-bs-target="#payment-link-resend">
+                            {{ 'Send Payment Link Again'|trans }}
+                        </button>
+                    </div>
+                </div>
+
+                {{ modals.confirm_modal(
+                    'payment-link-resend',
+                    path('join_prospective_member_resend', {'id': member.lidnr}),
+                    csrf_token('prospective_member_resend-' ~ member.lidnr),
+                    'Send Payment Link Again'|trans,
+                    'Are you sure that you want to send %name% a new payment link? The link they were given before stops working.'|trans({
+                        '%name%': member.fullName,
+                    }),
+                    'Send Payment Link Again'|trans,
+                    'outline-secondary',
+                ) }}
+            {% endif %}
+
             {% if canDelete %}
                 <div class="panel border-danger">
                     <div class="panel-body d-flex flex-wrap align-items-center gap-3">

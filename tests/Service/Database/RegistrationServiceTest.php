@@ -221,6 +221,49 @@ class RegistrationServiceTest extends TestCase
         );
     }
 
+    /**
+     * Only a hash of the token is stored, so the secretary cannot send the link as it was. Sending it again is what
+     * generates a new one.
+     */
+    public function testSendsAnApplicantTheirPaymentLinkAgain(): void
+    {
+        $prospectiveMember = $this->applicantWithAPaymentLink();
+
+        $memberService = $this->createMock(MemberService::class);
+        $memberService->expects(self::once())
+            ->method('sendRegistrationUpdateEmail')
+            ->with(
+                $prospectiveMember,
+                RegistrationUpdate::PaymentLinkResent,
+            );
+        $this->memberService = $memberService;
+
+        self::assertTrue($this->service()->resendPaymentLink($prospectiveMember));
+    }
+
+    public function testDoesNotSendAPaymentLinkWhenThereIsNothingLeftToPay(): void
+    {
+        $prospectiveMember = $this->applicantWithAPaymentLink();
+        $paymentLink = $prospectiveMember->getPaymentLink();
+        self::assertNotNull($paymentLink);
+        $paymentLink->used = true;
+
+        $memberService = $this->createMock(MemberService::class);
+        $memberService->expects(self::never())->method('sendRegistrationUpdateEmail');
+        $this->memberService = $memberService;
+
+        self::assertFalse($this->service()->resendPaymentLink($prospectiveMember));
+    }
+
+    public function testDoesNotSendAPaymentLinkToAnApplicantWhoHasNone(): void
+    {
+        $memberService = $this->createMock(MemberService::class);
+        $memberService->expects(self::never())->method('sendRegistrationUpdateEmail');
+        $this->memberService = $memberService;
+
+        self::assertFalse($this->service()->resendPaymentLink(new ProspectiveMember()));
+    }
+
     public function testRefusesAPaymentLinkThatWasAlreadyUsed(): void
     {
         $used = $this->paymentLink();
@@ -402,6 +445,16 @@ class RegistrationServiceTest extends TestCase
         $paymentLink->prospectiveMember = new ProspectiveMember();
 
         return $paymentLink;
+    }
+
+    private function applicantWithAPaymentLink(): ProspectiveMember
+    {
+        $prospectiveMember = new ProspectiveMember();
+        $paymentLink = new PaymentLink();
+        $paymentLink->prospectiveMember = $prospectiveMember;
+        $prospectiveMember->setPaymentLink($paymentLink);
+
+        return $prospectiveMember;
     }
 
     private function paidProspectiveMember(): ProspectiveMember

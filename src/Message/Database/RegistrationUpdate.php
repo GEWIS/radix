@@ -17,6 +17,7 @@ enum RegistrationUpdate: string
     case CheckoutExpired = 'checkout-expired';
     case CheckoutFailed = 'checkout-failed';
     case RefundCreated = 'refund-created';
+    case PaymentLinkResent = 'payment-link-resent';
 
     public function template(): string
     {
@@ -26,6 +27,7 @@ enum RegistrationUpdate: string
             self::CheckoutExpired => 'database/email/checkout-expired.html.twig',
             self::CheckoutFailed => 'database/email/checkout-failed.html.twig',
             self::RefundCreated => 'database/email/refund-created.html.twig',
+            self::PaymentLinkResent => 'database/email/payment-link-resent.html.twig',
         };
     }
 
@@ -40,6 +42,7 @@ enum RegistrationUpdate: string
             self::CheckoutExpired => 'Complete your GEWIS registration',
             self::CheckoutFailed => 'Your GEWIS membership fee payment has failed',
             self::RefundCreated => 'Your GEWIS membership fee is being refunded',
+            self::PaymentLinkResent => 'Complete your GEWIS registration',
         };
     }
 
@@ -54,6 +57,7 @@ enum RegistrationUpdate: string
             self::CheckoutExpired => 'Membership payment expired: ',
             self::CheckoutFailed => 'Membership payment failed: ',
             self::RefundCreated => 'Membership payment refund started: ',
+            self::PaymentLinkResent => 'Membership payment link sent again: ',
         } . $fullName;
     }
 

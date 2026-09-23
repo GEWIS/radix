@@ -410,6 +410,16 @@ class ProspectiveMember
         return $this->paymentLink;
     }
 
+    /**
+     * Determine whether the payment link can be sent again. A link that is already used means the fee is settled,
+     * and there is nothing to pay.
+     */
+    public function canResendPaymentLink(): bool
+    {
+        return null !== $this->paymentLink
+            && !$this->paymentLink->used;
+    }
+
     public function setPaymentLink(PaymentLink $paymentLink): void
     {
         $this->paymentLink = $paymentLink;

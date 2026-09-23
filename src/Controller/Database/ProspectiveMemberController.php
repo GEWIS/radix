@@ -34,6 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function assert;
 use function is_int;
+use function Symfony\Component\Translation\t;
 
 /**
  * Everyone who has registered but whose membership the secretary has not confirmed yet, from the public sign-up form
@@ -323,6 +324,7 @@ final class ProspectiveMemberController extends AbstractController
                 'form' => true === $prospectiveMember['canBeApproved']
                     ? $this->createForm(MemberApproveType::class)
                     : null,
+                'canResendPaymentLink' => $prospectiveMember['canResendPaymentLink'],
             ],
         );
     }
@@ -375,6 +377,47 @@ final class ProspectiveMemberController extends AbstractController
             'danger',
             'This prospective member cannot be approved.',
         );
+
+        return $this->redirectToRoute(
+            'join_prospective_member_show',
+            ['id' => $id],
+        );
+    }
+
+    /**
+     * Only a hash of an action link's token is stored, so a link that was sent cannot be sent again as it was. This
+     * generates a new one, which invalidates the link the applicant was given before.
+     */
+    #[IsGranted(SudoVoter::ATTRIBUTE)]
+    #[Route(
+        path: '/members/prospective/{id}/resend',
+        name: 'join_prospective_member_resend',
+        requirements: ['id' => '\d+'],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        new Expression("'prospective_member_resend-' ~ args['id']"),
+        tokenKey: '_csrf_token',
+    )]
+    public function resend(int $id): Response
+    {
+        $prospectiveMember = $this->memberService->getProspectiveMember($id)['member'];
+
+        if (null === $prospectiveMember) {
+            throw $this->createNotFoundException();
+        }
+
+        if ($this->registrationService->resendPaymentLink($prospectiveMember)) {
+            $this->addFlash(
+                'success',
+                t('The payment link has been sent again.'),
+            );
+        } else {
+            $this->addFlash(
+                'danger',
+                t('This prospective member has no payment left to make.'),
+            );
+        }
 
         return $this->redirectToRoute(
             'join_prospective_member_show',

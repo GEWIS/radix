@@ -140,6 +140,22 @@ final class MemberAccessTest extends DatabaseTestCase
         );
     }
 
+    /**
+     * Sending an applicant their payment link again mails them and invalidates the link they were given before, so
+     * it needs the register's administrator, which the path grants on the method rather than the action declaring it.
+     */
+    public function testTheBoardCannotSendAnApplicantTheirPaymentLink(): void
+    {
+        self::assertSame(
+            Response::HTTP_FORBIDDEN,
+            $this->statusFor(
+                self::CHAIR,
+                '/en/admin/members/prospective/1/resend',
+                'POST',
+            ),
+        );
+    }
+
     private function user(int $lidnr): User
     {
         $user = $this->entityManager->getRepository(User::class)->find($lidnr);
