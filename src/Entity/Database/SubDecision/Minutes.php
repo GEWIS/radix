@@ -12,6 +12,7 @@ use App\Entity\Database\NamesMember;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\MinutesRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -49,13 +50,13 @@ class Minutes extends SubDecision implements NamesMember
     /**
      * If the minutes were approved.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $approval;
 
     /**
      * If there were changes made.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $changes;
 
     /**

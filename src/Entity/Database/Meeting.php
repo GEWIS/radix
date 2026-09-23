@@ -11,6 +11,7 @@ use App\Repository\Database\MeetingRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -46,7 +47,7 @@ class Meeting
      */
     #[Id]
     #[Column(
-        type: 'integer',
+        type: Types::INTEGER,
         options: [
             'unsigned' => true,
         ],
@@ -56,7 +57,7 @@ class Meeting
     /**
      * Meeting date.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public DateTimeImmutable $date;
 
     /**

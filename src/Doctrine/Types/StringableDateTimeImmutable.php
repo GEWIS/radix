@@ -11,7 +11,7 @@ namespace App\Doctrine\Types;
 use DateTimeImmutable;
 use NoDiscard;
 
-class StringableDateTime extends DateTimeImmutable
+class StringableDateTimeImmutable extends DateTimeImmutable
 {
     public function __toString(): string
     {

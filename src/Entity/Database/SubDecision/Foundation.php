@@ -11,6 +11,7 @@ use App\Entity\Database\SubDecision;
 use App\Repository\Database\SubDecision\FoundationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\OneToMany;
@@ -26,20 +27,20 @@ class Foundation extends SubDecision
     /**
      * Abbreviation (only for when organs are created)
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $abbr;
 
     /**
      * Name (only for when organs are created)
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $name;
 
     /**
      * Purpose (only for when organs are created)
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     private ?string $purpose = null;

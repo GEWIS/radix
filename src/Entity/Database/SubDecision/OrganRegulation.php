@@ -13,6 +13,7 @@ use App\Entity\Database\SubDecision;
 use App\Entity\Database\Traits\MemberAwareTrait;
 use App\Repository\Database\SubDecision\OrganRegulationRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -28,7 +29,7 @@ class OrganRegulation extends SubDecision implements NamesMember
     /**
      * Abbreviation of the organ.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $abbr;
 
     /**
@@ -43,7 +44,7 @@ class OrganRegulation extends SubDecision implements NamesMember
      * Version of the regulation.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         length: 32,
     )]
     public string $version;
@@ -51,19 +52,19 @@ class OrganRegulation extends SubDecision implements NamesMember
     /**
      * Date of the regulation.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public DateTimeImmutable $date;
 
     /**
      * If the regulation was approved.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $approval;
 
     /**
      * If there were changes made.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $changes;
 
     /**

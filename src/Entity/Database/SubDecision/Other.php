@@ -7,6 +7,7 @@ namespace App\Entity\Database\SubDecision;
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\SubDecision;
 use App\Repository\Database\SubDecision\OtherRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -19,12 +20,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Entity(repositoryClass: OtherRepository::class)]
 class Other extends SubDecision
 {
-    #[Column(type: 'text')]
+    #[Column(type: Types::TEXT)]
     public string $contentNL;
 
     /** Null for the decisions recorded before the form collected a translation. */
     #[Column(
-        type: 'text',
+        type: Types::TEXT,
         nullable: true,
     )]
     public ?string $contentEN = null;

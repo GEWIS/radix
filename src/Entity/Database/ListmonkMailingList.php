@@ -6,6 +6,7 @@ namespace App\Entity\Database;
 
 use App\Repository\Database\ListmonkMailingListRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -23,27 +24,27 @@ class ListmonkMailingList
     #[Id]
     #[Column(
         name: 'id',
-        type: 'integer',
+        type: Types::INTEGER,
     )]
     public int $listmonkId;
 
     /**
      * Name of this list in the listmonk side
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $name;
 
     /**
      * When this list was last observed in listmonk
      */
-    #[Column(type: 'datetime_immutable')]
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
     public private(set) DateTimeImmutable $lastSeen;
 
     /**
      * When the last full check of this mailing list took place
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     public private(set) ?DateTimeImmutable $lastCheck = null;

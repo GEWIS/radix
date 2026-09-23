@@ -7,6 +7,7 @@ namespace App\Entity\Database;
 use App\Repository\Database\MailingListRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -27,7 +28,7 @@ class MailingList
     // Length spelled out: ORM 3 only copies an explicit length onto the join columns that reference this one,
     // which would otherwise become unbounded VARCHAR.
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         length: 255,
     )]
     public string $name;
@@ -35,19 +36,19 @@ class MailingList
     /**
      * Dutch description of the mailing list.
      */
-    #[Column(type: 'text')]
+    #[Column(type: Types::TEXT)]
     private string $nl_description;
 
     /**
      * English description of the mailing list.
      */
-    #[Column(type: 'text')]
+    #[Column(type: Types::TEXT)]
     private string $en_description;
 
     /**
      * If the mailing list should be on the form.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $onForm;
 
     /**
@@ -55,7 +56,7 @@ class MailingList
      *
      * (when it is on the form, that means that the checkbox is checked by default)
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $defaultSub;
 
     /**

@@ -45,24 +45,24 @@ class ApiPrincipal
     private const int HINT_LENGTH = 5;
 
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     public protected(set) ?int $id = null;
 
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         length: 64,
     )]
     public protected(set) string $tokenHash;
 
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         length: self::HINT_LENGTH,
     )]
     protected string $tokenHint;
 
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     #[Assert\Length(
@@ -77,7 +77,7 @@ class ApiPrincipal
      * @var ApiPermissions[] $permissions
      */
     #[Column(
-        type: 'simple_array',
+        type: Types::SIMPLE_ARRAY,
         nullable: true,
         enumType: ApiPermissions::class,
     )]

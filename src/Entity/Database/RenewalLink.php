@@ -6,6 +6,7 @@ namespace App\Entity\Database;
 
 use App\Repository\Database\RenewalLinkRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -36,7 +37,7 @@ class RenewalLink extends ActionLink
     /**
      * Current expiration
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public private(set) DateTimeImmutable $currentExpiration;
 
     /**
@@ -44,7 +45,7 @@ class RenewalLink extends ActionLink
      * This is not neccessarily a year from the previous as in principle this
      * will be until the end of next association year.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public private(set) DateTimeImmutable $newExpiration;
 
     public function __construct(

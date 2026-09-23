@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Application\Traits;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Version;
 
@@ -16,7 +17,7 @@ trait VersionTrait
      */
     #[Version]
     #[Column(
-        type: 'integer',
+        type: Types::INTEGER,
         options: ['default' => 1000],
     )]
     private int $version;

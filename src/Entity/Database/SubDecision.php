@@ -29,6 +29,7 @@ use App\Entity\Database\SubDecision\OrganRegulation;
 use App\Entity\Database\SubDecision\Other;
 use App\Entity\Database\SubDecision\Reappointment;
 use App\Repository\Database\SubDecisionRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
@@ -50,7 +51,7 @@ use function str_replace;
 #[InheritanceType(value: 'SINGLE_TABLE')]
 #[DiscriminatorColumn(
     name: 'type',
-    type: 'string',
+    type: Types::STRING,
 )]
 #[DiscriminatorMap(
     value: [
@@ -125,7 +126,7 @@ abstract class SubDecision
      * NOTE: This is a hack to make the decision a primary key here.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     protected int $meeting_number;
 
     /**
@@ -134,7 +135,7 @@ abstract class SubDecision
      * NOTE: This is a hack to make the decision a primary key here.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     protected int $decision_point;
 
     /**
@@ -143,14 +144,14 @@ abstract class SubDecision
      * NOTE: This is a hack to make the decision a primary key here.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     protected int $decision_number;
 
     /**
      * Sub decision sequence number.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     public int $sequence;
 
     /**

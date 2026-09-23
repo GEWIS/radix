@@ -6,6 +6,7 @@ namespace App\Entity\Database;
 
 use App\Repository\Database\AuditRenewalRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -21,13 +22,13 @@ class AuditRenewal extends AuditEntry
     /**
      * Expiration value before this renewal took place
      */
-    #[Column(type: 'datetime_immutable')]
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
     public DateTimeImmutable $oldExpiration;
 
     /**
      * Expiration value after the renewal
      */
-    #[Column(type: 'datetime_immutable')]
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
     public DateTimeImmutable $newExpiration;
 
     final public static function fromRenewalLink(RenewalLink $renewalLink): AuditRenewal

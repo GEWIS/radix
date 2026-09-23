@@ -12,6 +12,7 @@ use App\Repository\Database\ProspectiveMemberRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -34,45 +35,45 @@ class ProspectiveMember
      * The user
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     public int $lidnr;
 
     /**
      * Member's email address.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $email;
 
     /**
      * Member's last name.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $lastName;
 
     /**
      * Middle name.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $middleName;
 
     /**
      * Initials.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $initials;
 
     /**
      * First name.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $firstName;
 
     /**
      * TU/e student number.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     public ?string $studentNumber = null;
@@ -88,19 +89,19 @@ class ProspectiveMember
     /**
      * Last changed date of membership.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public DateTimeImmutable $changedOn;
 
     /**
      * Member birthdate.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public DateTimeImmutable $birth;
 
     /**
      * How much the member has paid for membership. 0 by default.
      */
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     public int $paid = 0;
 
     /**
@@ -114,31 +115,31 @@ class ProspectiveMember
     /**
      * Street.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $street;
 
     /**
      * House number (+ suffix)
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $number;
 
     /**
      * Postal code.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $postalCode;
 
     /**
      * City.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $city;
 
     /**
      * Phone number.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $phone;
 
     /**
@@ -147,7 +148,7 @@ class ProspectiveMember
      * @var ?string[] $lists
      */
     #[Column(
-        type: 'simple_array',
+        type: Types::SIMPLE_ARRAY,
         nullable: true,
     )]
     private ?array $lists = [];

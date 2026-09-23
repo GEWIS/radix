@@ -7,6 +7,7 @@ namespace App\Entity\Database;
 use App\Entity\Database\Enums\MailingListMemberAction;
 use App\Entity\Database\Enums\MailingListMemberOrigin;
 use App\Repository\Database\AuditMailingListMembershipRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -20,7 +21,7 @@ class AuditMailingListMembership extends AuditEntry
         . '<emph>%s</emph> on <emph>%s</emph> (%s)';
 
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         enumType: MailingListMemberAction::class,
     )]
     public MailingListMemberAction $action;
@@ -37,11 +38,11 @@ class AuditMailingListMembership extends AuditEntry
     )]
     public MailingList $mailingList;
 
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $email;
 
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         enumType: MailingListMemberOrigin::class,
     )]
     public MailingListMemberOrigin $origin;

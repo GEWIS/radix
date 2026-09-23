@@ -9,6 +9,7 @@ use App\Repository\Database\CheckoutSessionRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -27,7 +28,7 @@ class CheckoutSession
      * Payment ID.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     public private(set) ?int $id = null;
 
@@ -38,7 +39,7 @@ class CheckoutSession
      * See {@link https://stripe.com/docs/upgrades#what-changes-does-stripe-consider-to-be-backwards-compatible}.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         unique: true,
     )]
     public string $checkoutId;
@@ -56,7 +57,7 @@ class CheckoutSession
     /**
      * Creation of the checkout session.
      */
-    #[Column(type: 'datetime_immutable')]
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
     public DateTimeImmutable $created;
 
     /**
@@ -64,14 +65,14 @@ class CheckoutSession
      *
      * If $state == CheckoutSessionStates::Expired, then this is the last date this checkout session can be recovered.
      */
-    #[Column(type: 'datetime_immutable')]
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
     public DateTimeImmutable $expiration;
 
     /**
      * The identifier of the PaymentIntent associated with this Checkout Session when the state is 'PAID'.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     public ?string $paymentIntentId = null;
@@ -80,7 +81,7 @@ class CheckoutSession
      * Recovery URL for the Checkout Session when the state is 'EXPIRED'.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     private ?string $recoveryUrl = null;

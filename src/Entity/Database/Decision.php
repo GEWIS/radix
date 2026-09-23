@@ -10,6 +10,7 @@ use App\Entity\Database\SubDecision\Annulment;
 use App\Repository\Database\DecisionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -71,21 +72,21 @@ class Decision
      * NOTE: This is a hack to make the meeting a primary key here.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     private int $meeting_number;
 
     /**
      * Point in the meeting in which the decision was made.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     public int $point;
 
     /**
      * Decision number.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     public int $number;
 
     /**

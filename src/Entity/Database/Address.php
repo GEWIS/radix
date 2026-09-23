@@ -7,6 +7,7 @@ namespace App\Entity\Database;
 use App\Entity\Database\Enums\AddressTypes;
 use App\Entity\Database\Enums\PostalRegions;
 use App\Repository\Database\AddressRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -59,31 +60,31 @@ class Address
     /**
      * Street.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $street;
 
     /**
      * House number (+ suffix)
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $number;
 
     /**
      * Postal code.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $postalCode;
 
     /**
      * City.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $city;
 
     /**
      * Phone number.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $phone;
 
     /**

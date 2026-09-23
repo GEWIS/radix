@@ -5,7 +5,7 @@ doctrine:
         # doctrine-bundle keeps one type registry for the whole DBAL rather than one per connection, so a type is
         # declared here even when a single entity on a single connection maps a column to it.
         types:
-            stringable_datetime: App\Doctrine\Types\StringableDateTimeType
+            stringable_datetime_immutable: App\Doctrine\Types\StringableDateTimeImmutableType
         connections:
             # The ledger, on PostgreSQL: the editable source of truth. The DSN's `role` is not a driver parameter;
             # App\Doctrine\Middleware\SetRoleDriver reads it from the parsed DSN and issues `SET ROLE` with it.

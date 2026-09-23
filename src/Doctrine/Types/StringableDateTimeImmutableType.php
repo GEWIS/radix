@@ -16,7 +16,7 @@ use Override;
  * Dropping requiresSQLCommentHint(), which DBAL 4 removed, stops the schema tool emitting the
  * `COMMENT ON COLUMN ... IS '(DC2Type:...)'` marker. The column type itself is unchanged.
  */
-class StringableDateTimeType extends DateTimeImmutableType
+class StringableDateTimeImmutableType extends DateTimeImmutableType
 {
     /**
      * {@inheritDoc}
@@ -28,7 +28,7 @@ class StringableDateTimeType extends DateTimeImmutableType
     public function convertToPHPValue(
         mixed $value,
         AbstractPlatform $platform,
-    ): ?StringableDateTime {
+    ): ?StringableDateTimeImmutable {
         $dateTime = parent::convertToPHPValue(
             $value,
             $platform,
@@ -38,6 +38,6 @@ class StringableDateTimeType extends DateTimeImmutableType
             return null;
         }
 
-        return new StringableDateTime('@' . $dateTime->format('U'))->setTimezone($dateTime->getTimezone());
+        return new StringableDateTimeImmutable('@' . $dateTime->format('U'))->setTimezone($dateTime->getTimezone());
     }
 }

@@ -6,6 +6,7 @@ namespace App\Entity\Database;
 
 use App\Entity\Application\Traits\TimestampableTrait;
 use App\Repository\Database\AuditEntryRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
@@ -29,7 +30,7 @@ use function strip_tags;
 #[InheritanceType('SINGLE_TABLE')]
 #[DiscriminatorColumn(
     name: 'type',
-    type: 'string',
+    type: Types::STRING,
 )]
 #[DiscriminatorMap(
     value: [
@@ -53,7 +54,7 @@ abstract class AuditEntry
      * Entry ID.
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 

@@ -9,6 +9,7 @@ use App\Entity\Application\Traits\FormattableDateTrait;
 use App\Entity\Database\SubDecision;
 use App\Repository\Database\SubDecision\Board\ReleaseRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -59,7 +60,7 @@ class Release extends SubDecision
     /**
      * Date of the discharge.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public DateTimeImmutable $date;
 
     #[Override]

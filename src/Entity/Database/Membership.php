@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity\Database;
 
-use App\Doctrine\Types\StringableDateTime;
+use App\Doctrine\Types\StringableDateTimeImmutable;
 use App\Entity\Application\AssociationYear;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Repository\Database\MembershipRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -46,19 +47,19 @@ class Membership
      * The start date of the membership.
      */
     #[Id]
-    #[Column(type: 'stringable_datetime')]
-    private StringableDateTime $startDate;
+    #[Column(type: 'stringable_datetime_immutable')]
+    private StringableDateTimeImmutable $startDate;
 
     /**
      * The end date of the membership.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public private(set) DateTimeImmutable $endDate;
 
     /**
      * How much the member has paid for membership. 0 by default.
      */
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     public private(set) int $paid = 0;
 
     /**
@@ -104,7 +105,7 @@ class Membership
 
         $this->member = $member;
         $this->type = $type;
-        $this->startDate = StringableDateTime::fromDateTime($startDate);
+        $this->startDate = StringableDateTimeImmutable::fromDateTime($startDate);
         $this->endDate = $endDate->setTime(
             0,
             0,

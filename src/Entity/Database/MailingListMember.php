@@ -6,6 +6,7 @@ namespace App\Entity\Database;
 
 use App\Repository\Database\MailingListMemberRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -74,7 +75,7 @@ class MailingListMember
      */
     #[Id]
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: false,
     )]
     public string $email;
@@ -83,7 +84,7 @@ class MailingListMember
      * When this association was last synced to/from Mailman.
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     public private(set) ?DateTimeImmutable $lastSyncOn = null;
@@ -94,7 +95,7 @@ class MailingListMember
      * At creation of the association, no sync has taken place (i.e. {@see MailingListMember::$lastSyncOn} is `null`) so
      * we default to `false`.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $lastSyncSuccess = false;
 
     /**
@@ -102,7 +103,7 @@ class MailingListMember
      *
      * It indicates that a new registration on a mailing list should be performed
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $toBeCreated = true;
 
     /**
@@ -110,7 +111,7 @@ class MailingListMember
      *
      * It indicates that there is no longer an association between the mailing list and the member.
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $toBeDeleted = false;
 
     public function __construct()

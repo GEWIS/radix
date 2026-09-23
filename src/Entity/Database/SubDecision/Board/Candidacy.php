@@ -7,6 +7,7 @@ namespace App\Entity\Database\SubDecision\Board;
 use App\Entity\Application\Enums\AppLanguages;
 use App\Entity\Database\SubDecision;
 use App\Repository\Database\SubDecision\Board\CandidacyRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -26,7 +27,7 @@ class Candidacy extends SubDecision
     /**
      * The first calendar year of the association year the candidates stand for.
      */
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     public int $boardYear;
 
     #[Override]

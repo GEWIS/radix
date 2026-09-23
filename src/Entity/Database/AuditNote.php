@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Database;
 
 use App\Repository\Database\AuditNoteRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
@@ -20,7 +21,7 @@ class AuditNote extends AuditEntry
     /**
      * The note itself
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $note;
 
     /**

@@ -12,6 +12,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -34,7 +35,7 @@ class Member
      * The user
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     public int $lidnr;
 
@@ -42,7 +43,7 @@ class Member
      * Member's email address.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     public private(set) ?string $email = null;
@@ -50,32 +51,32 @@ class Member
     /**
      * Member's last name.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $lastName;
 
     /**
      * Middle name.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $middleName;
 
     /**
      * Initials.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $initials;
 
     /**
      * First name.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $firstName;
 
     /**
      * TU/e student number.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     public ?string $studentNumber = null;
@@ -91,7 +92,7 @@ class Member
     /**
      * Last changed date of member.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public DateTimeImmutable $changedOn;
 
     /**
@@ -114,7 +115,7 @@ class Member
      * Last date membership status was checked.
      */
     #[Column(
-        type: 'date_immutable',
+        type: Types::DATE_IMMUTABLE,
         nullable: true,
     )]
     public ?DateTimeImmutable $lastCheckedOn = null;
@@ -122,14 +123,14 @@ class Member
     /**
      * Member birthdate.
      */
-    #[Column(type: 'date_immutable')]
+    #[Column(type: Types::DATE_IMMUTABLE)]
     public private(set) DateTimeImmutable $birth;
 
     /**
      * If the member receives a 'supremum'
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     public ?string $supremum = null;
@@ -141,7 +142,7 @@ class Member
      * for deleted members and members that are deceased but whose profile should be kept.
      */
     #[Column(
-        type: 'boolean',
+        type: Types::BOOLEAN,
         options: ['default' => false],
     )]
     public bool $hidden = false;
@@ -223,7 +224,7 @@ class Member
      * read the API.
      */
     #[Column(
-        type: 'boolean',
+        type: Types::BOOLEAN,
         options: ['default' => false],
     )]
     public bool $deleted = false;

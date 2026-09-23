@@ -7,6 +7,7 @@ namespace App\Entity\Database;
 use App\Entity\Application\Traits\TempHashTrait;
 use App\Repository\Database\ActionLinkRepository;
 use App\Util\Application\SplitToken;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
@@ -28,7 +29,7 @@ use Doctrine\ORM\Mapping\InheritanceType;
 #[InheritanceType('SINGLE_TABLE')]
 #[DiscriminatorColumn(
     name: 'type',
-    type: 'string',
+    type: Types::STRING,
 )]
 #[DiscriminatorMap(
     value: [
@@ -57,20 +58,20 @@ abstract class ActionLink
      * Identity
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     public private(set) ?int $id = null;
 
     /**
      * If the URL was clicked
      */
-    #[Column(type: 'boolean')]
+    #[Column(type: Types::BOOLEAN)]
     public bool $used = false;
 
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $selector;
 
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public private(set) string $hashedToken;
 
     /**

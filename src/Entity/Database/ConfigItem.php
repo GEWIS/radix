@@ -9,6 +9,7 @@ use App\Entity\Application\Traits\VersionTrait;
 use App\Entity\Database\Enums\ConfigNamespaces;
 use App\Repository\Application\ConfigItemRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -49,7 +50,7 @@ class ConfigItem
      * Primary key item ID (to avoid reference issues).
      */
     #[Id]
-    #[Column(type: 'integer')]
+    #[Column(type: Types::INTEGER)]
     #[GeneratedValue(strategy: 'AUTO')]
     protected ?int $id = null;
 
@@ -65,14 +66,14 @@ class ConfigItem
      * Configuration item key.
      * Configuration item keys are in snake_case.
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     protected string $key;
 
     /**
      * If the item is a string, its value.
      */
     #[Column(
-        type: 'string',
+        type: Types::STRING,
         nullable: true,
     )]
     protected ?string $valueString = null;
@@ -81,7 +82,7 @@ class ConfigItem
      * If the item is a DateTimeImmutable, its value.
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     protected ?DateTimeImmutable $valueDate = null;
@@ -90,7 +91,7 @@ class ConfigItem
      * If the item is a boolean, its value.
      */
     #[Column(
-        type: 'boolean',
+        type: Types::BOOLEAN,
         nullable: true,
     )]
     protected ?bool $valueBool = null;

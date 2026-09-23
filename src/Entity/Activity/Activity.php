@@ -139,7 +139,7 @@ class Activity implements RevisableInterface
      * can un-cancel it.
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     public private(set) ?DateTimeImmutable $cancelledAt = null;
@@ -161,7 +161,7 @@ class Activity implements RevisableInterface
      * interaction frozen; the board can re-publish it.
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     public private(set) ?DateTimeImmutable $unpublishedAt = null;
@@ -194,7 +194,7 @@ class Activity implements RevisableInterface
      * The cron redraws the cards that are due.
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     public ?DateTimeImmutable $shareImageStaleAt = null;

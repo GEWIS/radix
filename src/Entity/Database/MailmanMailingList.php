@@ -6,6 +6,7 @@ namespace App\Entity\Database;
 
 use App\Repository\Database\MailmanMailingListRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -25,7 +26,7 @@ class MailmanMailingList
     // which would otherwise become unbounded VARCHAR.
     #[Column(
         name: 'id',
-        type: 'string',
+        type: Types::STRING,
         length: 255,
     )]
     public string $mailmanId;
@@ -33,20 +34,20 @@ class MailmanMailingList
     /**
      * Name of this list in the mailman side
      */
-    #[Column(type: 'string')]
+    #[Column(type: Types::STRING)]
     public string $name;
 
     /**
      * When this list was last observed in mailman
      */
-    #[Column(type: 'datetime_immutable')]
+    #[Column(type: Types::DATETIME_IMMUTABLE)]
     public private(set) DateTimeImmutable $lastSeen;
 
     /**
      * When the last full check of this mailing list took place
      */
     #[Column(
-        type: 'datetime_immutable',
+        type: Types::DATETIME_IMMUTABLE,
         nullable: true,
     )]
     public private(set) ?DateTimeImmutable $lastCheck = null;
