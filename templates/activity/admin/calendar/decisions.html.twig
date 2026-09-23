@@ -103,7 +103,7 @@
                                                   action="{{ path('admin/activities/calendar/decisions/option_approve', {'option': option.id}) }}">
                                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('activity_date_option_approve-' ~ option.id) }}">
                                                 <button type="submit" class="btn btn-sm btn-outline-gewis-primary">
-                                                    {{ option.beginsAt|format_date(pattern: 'd MMM', locale: app.request.locale) }}
+                                                    {% include 'partials/activity/option-moment.html.twig' %}
                                                     <small>{{ option.timeOfDay|trans }}</small>
                                                 </button>
                                             </form>

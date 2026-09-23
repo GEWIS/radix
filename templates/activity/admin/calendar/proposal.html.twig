@@ -52,12 +52,7 @@
                                         <td class="text-muted">
                                             {{ loop.first ? 'Preferred'|trans : 'Alternative'|trans }}
                                         </td>
-                                        <td>
-                                            {{ option.beginsAt|format_date(pattern: 'd MMM yyyy', locale: app.request.locale) }}
-                                            {% if option.spansMultipleDays %}
-                                                &ndash; {{ option.endsAt|format_date(pattern: 'd MMM yyyy', locale: app.request.locale) }}
-                                            {% endif %}
-                                        </td>
+                                        <td>{% include 'partials/activity/option-moment.html.twig' %}</td>
                                         <td>{{ option.timeOfDay|trans }}</td>
                                         <td>{{ option.status|trans }}</td>
                                     </tr>

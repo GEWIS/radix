@@ -1,0 +1,15 @@
+{# Formats an activity date option's from/until moment, handling single days and multi-day spans across months/years #}
+{% set beginsAt = option.beginsAt %}
+{% set endsAt = option.endsAt %}
+{% set locale = app.request.locale %}
+{% set currentYear = "now"|date('Y') %}
+{% set sameMonth = option.spansMultipleDays and beginsAt|date('Ym') == endsAt|date('Ym') %}
+{% set sameYear = not option.spansMultipleDays or beginsAt|date('Y') == endsAt|date('Y') %}
+
+{% if not option.spansMultipleDays %}
+    {{ beginsAt|format_date(pattern: beginsAt|date('Y') != currentYear ? 'd MMM yyyy' : 'd MMM', locale: locale) }}
+{% elseif sameMonth %}
+    {{ beginsAt|format_date(pattern: 'd', locale: locale) }}&nbsp;&dash;&nbsp;{{ endsAt|format_date(pattern: endsAt|date('Y') != currentYear ? 'd MMM yyyy' : 'd MMM', locale: locale) }}
+{% else %}
+    {{ beginsAt|format_date(pattern: (not sameYear or beginsAt|date('Y') != currentYear) ? 'd MMM yyyy' : 'd MMM', locale: locale) }}&nbsp;&dash;&nbsp;{{ endsAt|format_date(pattern: endsAt|date('Y') != currentYear ? 'd MMM yyyy' : 'd MMM', locale: locale) }}
+{% endif %}

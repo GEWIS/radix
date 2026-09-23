@@ -104,6 +104,6 @@ class ActivityDateOption
 
     public function spansMultipleDays(): bool
     {
-        return $this->beginsAt->format('Y-m-d') !== $this->endsAt->format('Y-m-d');
+        return TimeOfDay::MultipleDays === $this->timeOfDay;
     }
 }
