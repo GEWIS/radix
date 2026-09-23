@@ -329,6 +329,10 @@
         <source>More places are held than the list has to give out.</source>
         <target>Er zijn meer plaatsen gereserveerd dan de lijst te vergeven heeft.</target>
       </trans-unit>
+      <trans-unit id="tFTqrSR" resname="Multiple days can only be selected with the &quot;Multiple days&quot; part of the day.">
+        <source>Multiple days can only be selected with the "Multiple days" part of the day.</source>
+        <target state="translated">Meerdere dagen kunnen alleen worden geselecteerd met het "Meerdere dagen" dagdeel.</target>
+      </trans-unit>
       <trans-unit id="Yg_k.o3" resname="Name the role.">
         <source>Name the role.</source>
         <target>Geef de rol een naam.</target>

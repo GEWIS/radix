@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Activity;
 
 use App\Entity\Activity\ActivityProposal;
+use App\Entity\Activity\Enums\TimeOfDay;
 use App\Entity\Activity\OptionPeriod;
 use App\Entity\Decision\Organ;
 use App\Entity\User\Enums\UserRoles;
@@ -357,6 +358,7 @@ class ActivityProposalType extends AbstractType
         foreach ($form->get('dateOptions') as $row) {
             $begins = $row->get('beginsAt')->getData();
             $ends = $row->get('endsAt')->getData();
+            $timeOfDay = $row->get('timeOfDay')->getData();
 
             // A row missing a day was already reported by NotBlank; saying so twice helps nobody, and the entity's
             // property was never written.
@@ -370,6 +372,19 @@ class ActivityProposalType extends AbstractType
             if ($ends < $begins) {
                 $row->get('endsAt')->addError(new FormError($this->translator->trans(
                     'A day cannot end before it starts.',
+                    [],
+                    'validators',
+                )));
+
+                continue;
+            }
+
+            if (
+                TimeOfDay::MultipleDays !== $timeOfDay
+                && $begins->format('Y-m-d') !== $ends->format('Y-m-d')
+            ) {
+                $row->get('endsAt')->addError(new FormError($this->translator->trans(
+                    'Multiple days can only be selected with the "Multiple days" part of the day.',
                     [],
                     'validators',
                 )));
