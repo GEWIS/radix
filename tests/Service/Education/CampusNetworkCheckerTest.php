@@ -30,7 +30,7 @@ final class CampusNetworkCheckerTest extends TestCase
 
     public function testAnAddressOutsideEveryRangeIsNot(): void
     {
-        self::assertFalse($this->checker()->matches('8.8.8.8'));
+        self::assertFalse($this->checker()->matches('192.0.2.1'));
         // One octet outside the /16, which is exactly the kind of thing a hand-rolled netmask gets wrong.
         self::assertFalse($this->checker()->matches('131.156.10.7'));
         self::assertFalse($this->checker()->matches('100.63.255.255'));

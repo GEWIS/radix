@@ -38,7 +38,7 @@ final class CourseDocumentVoterTest extends TestCase
             VoterInterface::ACCESS_GRANTED,
             $this->vote(
                 member: true,
-                clientIp: '8.8.8.8',
+                clientIp: '192.0.2.1',
             ),
         );
     }
@@ -60,7 +60,7 @@ final class CourseDocumentVoterTest extends TestCase
             VoterInterface::ACCESS_DENIED,
             $this->vote(
                 member: false,
-                clientIp: '8.8.8.8',
+                clientIp: '192.0.2.1',
             ),
         );
     }

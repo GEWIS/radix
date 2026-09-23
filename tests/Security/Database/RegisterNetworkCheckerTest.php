@@ -49,7 +49,7 @@ final class RegisterNetworkCheckerTest extends TestCase
 
     public function testAnAddressOutsideEveryRangeMayNot(): void
     {
-        self::assertFalse($this->checker()->matches('8.8.8.8'));
+        self::assertFalse($this->checker()->matches('192.0.2.1'));
         // Neighbouring the /24 on either side.
         self::assertFalse($this->checker()->matches('131.155.67.255'));
         self::assertFalse($this->checker()->matches('131.155.69.1'));
@@ -84,7 +84,7 @@ final class RegisterNetworkCheckerTest extends TestCase
         );
 
         self::assertFalse($checker->isRestricted());
-        self::assertTrue($checker->matches('8.8.8.8'));
+        self::assertTrue($checker->matches('192.0.2.1'));
         self::assertTrue($checker->matches(null));
         self::assertTrue($checker->allowsCurrentRequest());
     }
@@ -97,7 +97,7 @@ final class RegisterNetworkCheckerTest extends TestCase
     public function testTheCurrentRequestDecidesWhenThereIsOne(): void
     {
         self::assertTrue($this->checkerFor('131.155.68.69')->allowsCurrentRequest());
-        self::assertFalse($this->checkerFor('8.8.8.8')->allowsCurrentRequest());
+        self::assertFalse($this->checkerFor('192.0.2.1')->allowsCurrentRequest());
     }
 
     /** A console command, a Messenger worker and the scheduler have no request, and browse nothing. */

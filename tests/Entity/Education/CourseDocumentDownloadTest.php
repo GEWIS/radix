@@ -24,7 +24,7 @@ final class CourseDocumentDownloadTest extends TestCase
 
         self::assertTrue($download->isCollectableBy(
             $this->user(8000),
-            '8.8.8.8',
+            '192.0.2.1',
         ));
     }
 
@@ -34,7 +34,7 @@ final class CourseDocumentDownloadTest extends TestCase
 
         self::assertFalse($download->isCollectableBy(
             $this->user(8001),
-            '8.8.8.8',
+            '192.0.2.1',
         ));
     }
 
@@ -86,7 +86,7 @@ final class CourseDocumentDownloadTest extends TestCase
 
     private function download(
         ?User $user,
-        string $clientIp = '8.8.8.8',
+        string $clientIp = '192.0.2.1',
     ): CourseDocumentDownload {
         $download = new CourseDocumentDownload();
         $download->token = Uuid::v4();

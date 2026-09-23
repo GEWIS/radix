@@ -49,7 +49,7 @@ final class RegisterNetworkRoleHierarchyTest extends TestCase
     /** Both, not only the one assigned to the account: read-only is reached through the administrator's. */
     public function testBothOfThemAreGoneOffTheNetwork(): void
     {
-        $reachable = $this->hierarchyFor('8.8.8.8')->getReachableRoleNames([
+        $reachable = $this->hierarchyFor('192.0.2.1')->getReachableRoleNames([
             UserRoles::DatabaseAdmin->value,
         ]);
 
@@ -79,7 +79,7 @@ final class RegisterNetworkRoleHierarchyTest extends TestCase
     /** A secretary reading this from home is still whatever else they are. */
     public function testEverythingElseIsUntouchedOffTheNetwork(): void
     {
-        $reachable = $this->hierarchyFor('8.8.8.8')->getReachableRoleNames([
+        $reachable = $this->hierarchyFor('192.0.2.1')->getReachableRoleNames([
             UserRoles::ActiveMember->value,
             UserRoles::DatabaseAdmin->value,
         ]);
@@ -107,7 +107,7 @@ final class RegisterNetworkRoleHierarchyTest extends TestCase
     {
         $hierarchy = new RegisterNetworkRoleHierarchy(
             new RoleHierarchy(['ROLE_SOMETHING_ELSE' => [UserRoles::DatabaseReadOnly->value]]),
-            $this->checkerFor('8.8.8.8'),
+            $this->checkerFor('192.0.2.1'),
         );
 
         $reachable = $hierarchy->getReachableRoleNames(['ROLE_SOMETHING_ELSE']);
