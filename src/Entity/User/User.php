@@ -190,6 +190,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         UserRoles::Board->value,
         UserRoles::DatabaseAdmin->value,
         UserRoles::DatabaseReadOnly->value,
+        UserRoles::DatabaseMemberReadOnly->value,
     ];
 
     /**
@@ -224,6 +225,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         // roles above are derived from `Member` state rather than `UserRole` rows.
         if ($member->isBoardMember()) {
             $roles[] = UserRoles::Board->value;
+            $roles[] = UserRoles::DatabaseMemberReadOnly->value;
         }
 
         // The register's own rights, granted for as long as a member is the secretary rather than written down

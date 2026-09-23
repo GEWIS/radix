@@ -7829,6 +7829,10 @@
         <source>Register Admin</source>
         <target state="translated">Databasebeheerder</target>
       </trans-unit>
+      <trans-unit id="mgpnApI" resname="Register Members Read-only">
+        <source>Register Members Read-only</source>
+        <target state="translated">Database alleen-lezen (leden)</target>
+      </trans-unit>
       <trans-unit id="tzG7iit" resname="Register Read-only">
         <source>Register Read-only</source>
         <target state="translated">Database alleen-lezen</target>

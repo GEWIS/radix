@@ -3,14 +3,16 @@
 <div class="mb-4">
     <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
         <h3 class="h5 mb-0">{{ labels.address_type(address.type) }}</h3>
-        <a href="{{ path('member_address_edit', {lidnr: member.lidnr, type: address.type.value}) }}"
-           class="btn btn-sm btn-gewis-primary">
-            {{ 'Change'|trans }}
-        </a>
-        <a href="{{ path('member_address_remove', {lidnr: member.lidnr, type: address.type.value}) }}"
-           class="btn btn-sm btn-outline-danger">
-            {{ 'Delete'|trans }}
-        </a>
+        {% if is_granted('ROLE_DATABASE_ADMIN') %}
+            <a href="{{ path('member_address_edit', {lidnr: member.lidnr, type: address.type.value}) }}"
+               class="btn btn-sm btn-gewis-primary">
+                {{ 'Change'|trans }}
+            </a>
+            <a href="{{ path('member_address_remove', {lidnr: member.lidnr, type: address.type.value}) }}"
+               class="btn btn-sm btn-outline-danger">
+                {{ 'Delete'|trans }}
+            </a>
+        {% endif %}
     </div>
     <table class="table table-bordered mb-0">
         <tbody>

@@ -120,7 +120,9 @@ security:
         # that may read it. A page that only shows something therefore requires the read-only role and lets both
         # through, and only the paths that write require the administrator by name.
         ROLE_DATABASE_READ_ONLY: [ ]
-        ROLE_DATABASE_ADMIN: [ 'ROLE_DATABASE_READ_ONLY' ]
+        # Reached by the administrator and not by the reader, because a relieved secretary is not on the board.
+        ROLE_DATABASE_MEMBER_READ_ONLY: [ ]
+        ROLE_DATABASE_ADMIN: [ 'ROLE_DATABASE_READ_ONLY', 'ROLE_DATABASE_MEMBER_READ_ONLY' ]
 
 
     # Easy way to control access for large sections of your site
@@ -135,6 +137,9 @@ security:
         # being reachable by a user who may only read. Before the rule below, which would otherwise match first for a
         # reader who administers the register and nothing else.
         - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', methods: [POST, PUT, PATCH, DELETE], roles: [ROLE_DATABASE_ADMIN] }
+        # Anchored, so that `attention-needed`, `updates` and `bulk-renewal` are not part of what the board reads,
+        # and restricted to the methods that read, because a note is posted to the member page.
+        - { path: '^/(%app.locales%)/admin/members(/searchFiltered|/[0-9]{1,9})?$', methods: [GET, HEAD], roles: [ROLE_DATABASE_READ_ONLY, ROLE_DATABASE_MEMBER_READ_ONLY] }
         - { path: '^/(%app.locales%)/admin/(members|query|bodies/functions)', roles: [ROLE_DATABASE_READ_ONLY] }
         # Bearer tokens that read the register over the API. Credentials rather than a page about them, so reading the
         # list requires an administrator as much as changing it does. The association's administrator is named next to

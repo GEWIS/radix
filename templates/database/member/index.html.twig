@@ -12,14 +12,16 @@
             </p>
         {% endblock %}
         {% block header_actions %}
-            <a class="btn btn-outline-gewis-primary" href="{{ path('member_bulk_renewal_index') }}">
-                <span class="fas fa-rotate" aria-hidden="true"></span>
-                {{ 'Bulk renew memberships'|trans }}
-            </a>
-            <a class="btn btn-gewis-primary" href="{{ path('join_index') }}">
-                <span class="fas fa-plus" aria-hidden="true"></span>
-                {{ 'Register member'|trans }}
-            </a>
+            {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                <a class="btn btn-outline-gewis-primary" href="{{ path('member_bulk_renewal_index') }}">
+                    <span class="fas fa-rotate" aria-hidden="true"></span>
+                    {{ 'Bulk renew memberships'|trans }}
+                </a>
+                <a class="btn btn-gewis-primary" href="{{ path('join_index') }}">
+                    <span class="fas fa-plus" aria-hidden="true"></span>
+                    {{ 'Register member'|trans }}
+                </a>
+            {% endif %}
         {% endblock %}
     {% endembed %}
 {% endblock %}

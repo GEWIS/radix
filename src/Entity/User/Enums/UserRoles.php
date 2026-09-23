@@ -41,6 +41,14 @@ enum UserRoles: string implements TranslatableInterface
      */
     case DatabaseReadOnly = 'ROLE_DATABASE_READ_ONLY';
 
+    /**
+     * The register's member pages, granted for as long as a member sits on the board.
+     *
+     * {@see \App\Security\Database\RegisterNetworkRoleHierarchy} does not withhold this one outside the
+     * register's networks, because a board member needs the member pages away from them.
+     */
+    case DatabaseMemberReadOnly = 'ROLE_DATABASE_MEMBER_READ_ONLY';
+
     public function label(): TranslatableMessage
     {
         return match ($this) {
@@ -57,6 +65,7 @@ enum UserRoles: string implements TranslatableInterface
             self::Admin => new TranslatableMessage('Admin'),
             self::DatabaseAdmin => new TranslatableMessage('Register Admin'),
             self::DatabaseReadOnly => new TranslatableMessage('Register Read-only'),
+            self::DatabaseMemberReadOnly => new TranslatableMessage('Register Members Read-only'),
         };
     }
 

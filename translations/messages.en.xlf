@@ -7829,6 +7829,10 @@
         <source>Register Admin</source>
         <target state="translated">Register Admin</target>
       </trans-unit>
+      <trans-unit id="mgpnApI" resname="Register Members Read-only">
+        <source>Register Members Read-only</source>
+        <target state="translated">Register Members Read-only</target>
+      </trans-unit>
       <trans-unit id="tzG7iit" resname="Register Read-only">
         <source>Register Read-only</source>
         <target state="translated">Register Read-only</target>

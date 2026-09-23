@@ -81,6 +81,9 @@
                             'active': route starts with 'mailing_',
                         },
                     ]) }}
+                {% elseif is_granted('ROLE_DATABASE_MEMBER_READ_ONLY') %}
+                    {{ sidebar.link(path('member_index'), 'fa-user-group', 'Members'|trans,
+                        route starts with 'member_') }}
                 {% endif %}
 
                 {# The serving secretary keeps the meeting and has a board seat for as long as they do; a secretary

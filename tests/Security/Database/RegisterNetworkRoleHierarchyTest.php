@@ -24,7 +24,10 @@ final class RegisterNetworkRoleHierarchyTest extends TestCase
     private const array HIERARCHY = [
         'ROLE_MEMBER' => ['ROLE_USER'],
         'ROLE_ACTIVE_MEMBER' => ['ROLE_MEMBER'],
-        'ROLE_DATABASE_ADMIN' => ['ROLE_DATABASE_READ_ONLY'],
+        'ROLE_DATABASE_ADMIN' => [
+            'ROLE_DATABASE_READ_ONLY',
+            'ROLE_DATABASE_MEMBER_READ_ONLY',
+        ],
     ];
 
     public function testTheRegistersRolesSurviveOnTheNetwork(): void
@@ -56,6 +59,19 @@ final class RegisterNetworkRoleHierarchyTest extends TestCase
         );
         self::assertNotContains(
             UserRoles::DatabaseReadOnly->value,
+            $reachable,
+        );
+    }
+
+    /** The administrator reaches the member role, which is not one of the two that are withheld. */
+    public function testTheMemberPagesSurviveOffTheNetwork(): void
+    {
+        $reachable = $this->hierarchyFor('192.0.2.1')->getReachableRoleNames([
+            UserRoles::DatabaseAdmin->value,
+        ]);
+
+        self::assertContains(
+            UserRoles::DatabaseMemberReadOnly->value,
             $reachable,
         );
     }

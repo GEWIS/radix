@@ -25,17 +25,19 @@
             </p>
         {% endblock %}
         {% block header_actions %}
-            {% if can_change_membership_type %}
-                <a class="btn btn-outline-gewis-primary"
-                   href="{{ path('member_membership_edit', {lidnr: member.lidnr}) }}">
-                    <span class="fas fa-rotate" aria-hidden="true"></span>
-                    {{ 'Update / Renew'|trans }}
+            {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                {% if can_change_membership_type %}
+                    <a class="btn btn-outline-gewis-primary"
+                       href="{{ path('member_membership_edit', {lidnr: member.lidnr}) }}">
+                        <span class="fas fa-rotate" aria-hidden="true"></span>
+                        {{ 'Update / Renew'|trans }}
+                    </a>
+                {% endif %}
+                <a class="btn btn-gewis-primary" href="{{ path('member_edit', {lidnr: member.lidnr}) }}">
+                    <span class="fas fa-pen" aria-hidden="true"></span>
+                    {{ 'Change Data'|trans }}
                 </a>
             {% endif %}
-            <a class="btn btn-gewis-primary" href="{{ path('member_edit', {lidnr: member.lidnr}) }}">
-                <span class="fas fa-pen" aria-hidden="true"></span>
-                {{ 'Change Data'|trans }}
-            </a>
         {% endblock %}
     {% endembed %}
 {% endblock %}
@@ -126,7 +128,7 @@
                                             ? 'n/a'|trans
                                             : membership_ends_on|format_date(pattern: 'EEEE d MMMM y') }}
                                         ({{ member.expiration|format_date(pattern: 'EEEE d MMMM y') }})
-                                        {% if can_extend %}
+                                        {% if can_extend and is_granted('ROLE_DATABASE_ADMIN') %}
                                             <a href="{{ path('member_expiration_edit', {lidnr: member.lidnr}) }}"
                                                class="btn btn-sm btn-outline-gewis-primary ms-2">
                                                 {{ 'Extend'|trans }}
@@ -159,19 +161,22 @@
                 </div>
             </div>
 
-            <div class="panel border-danger">
-                <div class="panel-body d-flex flex-wrap align-items-center gap-3">
-                    <span class="flex-grow-1">
-                        <span class="d-block fw-semibold">{{ 'Destructive actions'|trans }}</span>
-                        <span class="text-secondary small">
-                            {{ 'Deleting a member removes their record and their body history. Letting the membership expire is almost always what you want instead.'|trans }}
+            {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                <div class="panel border-danger">
+                    <div class="panel-body d-flex flex-wrap align-items-center gap-3">
+                        <span class="flex-grow-1">
+                            <span class="d-block fw-semibold">{{ 'Destructive actions'|trans }}</span>
+                            <span class="text-secondary small">
+                                {{ 'Deleting a member removes their record and their body history. Letting the membership expire is almost always what you want instead.'|trans }}
+                            </span>
                         </span>
-                    </span>
-                    <a href="{{ path('member_delete', {lidnr: member.lidnr}) }}" class="btn btn-sm btn-outline-danger">
-                        {{ 'Delete Member'|trans }}
-                    </a>
+                        <a href="{{ path('member_delete', {lidnr: member.lidnr}) }}"
+                           class="btn btn-sm btn-outline-danger">
+                            {{ 'Delete Member'|trans }}
+                        </a>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
 
         <div class="col-12 col-xl-4">
@@ -192,7 +197,7 @@
                         'mail': 'Add Mail Address',
                     } %}
                     {% set missing = addable|filter((text, key) => key not in present) %}
-                    {% if missing is not empty %}
+                    {% if missing is not empty and is_granted('ROLE_DATABASE_ADMIN') %}
                         {# Vertical, because the column is too narrow for a row of labels this long. #}
                         <div class="btn-group-vertical btn-group-sm w-100" role="group"
                              aria-label="{{ 'Add an address'|trans }}">
@@ -221,10 +226,12 @@
                             <li class="text-secondary">{{ 'No mailing list subscriptions.'|trans }}</li>
                         {% endfor %}
                     </ul>
-                    <a href="{{ path('member_lists_edit', {lidnr: member.lidnr}) }}"
-                       class="btn btn-sm btn-outline-gewis-primary">
-                        {{ 'Change Mailing List Subscriptions'|trans }}
-                    </a>
+                    {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                        <a href="{{ path('member_lists_edit', {lidnr: member.lidnr}) }}"
+                           class="btn btn-sm btn-outline-gewis-primary">
+                            {{ 'Change Mailing List Subscriptions'|trans }}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -247,23 +254,25 @@
                     {# Setting the preference changes the member, so each answer is posted rather than linked. One
                        form reaches all three routes through `formaction`; they share a token because they share the
                        check that guards them. #}
-                    <form method="post" action="{{ path('member_supremum_reset', {lidnr: member.lidnr}) }}">
-                        <input type="hidden" name="_csrf_token"
-                               value="{{ csrf_token('member_supremum-' ~ member.lidnr) }}">
-                        <div class="btn-group btn-group-sm" role="group"
-                             aria-label="{{ 'Wants to Receive Supremum'|trans }}">
-                            {% for route, label in {
-                                'member_supremum_optin': 'Opt in',
-                                'member_supremum_optout': 'Opt out',
-                                'member_supremum_reset': 'Reset',
-                            } %}
-                                <button type="submit" class="btn btn-outline-gewis-primary"
-                                        formaction="{{ path(route, {lidnr: member.lidnr}) }}">
-                                    {{ label|trans }}
-                                </button>
-                            {% endfor %}
-                        </div>
-                    </form>
+                    {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                        <form method="post" action="{{ path('member_supremum_reset', {lidnr: member.lidnr}) }}">
+                            <input type="hidden" name="_csrf_token"
+                                   value="{{ csrf_token('member_supremum-' ~ member.lidnr) }}">
+                            <div class="btn-group btn-group-sm" role="group"
+                                 aria-label="{{ 'Wants to Receive Supremum'|trans }}">
+                                {% for route, label in {
+                                    'member_supremum_optin': 'Opt in',
+                                    'member_supremum_optout': 'Opt out',
+                                    'member_supremum_reset': 'Reset',
+                                } %}
+                                    <button type="submit" class="btn btn-outline-gewis-primary"
+                                            formaction="{{ path(route, {lidnr: member.lidnr}) }}">
+                                        {{ label|trans }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
 
@@ -285,15 +294,17 @@
                         </p>
                     {% endfor %}
 
-                    {{ form_start(note_form) }}
-                        <div class="input-group input-group-sm">
-                            {{ form_widget(note_form.note, {attr: {
-                                placeholder: note_form.note.vars.label|trans,
-                            }}) }}
-                            {{ form_widget(note_form.submit, {attr: {class: 'btn-gewis-primary'}}) }}
-                        </div>
-                        {{ form_errors(note_form.note) }}
-                    {{ form_end(note_form) }}
+                    {% if is_granted('ROLE_DATABASE_ADMIN') %}
+                        {{ form_start(note_form) }}
+                            <div class="input-group input-group-sm">
+                                {{ form_widget(note_form.note, {attr: {
+                                    placeholder: note_form.note.vars.label|trans,
+                                }}) }}
+                                {{ form_widget(note_form.submit, {attr: {class: 'btn-gewis-primary'}}) }}
+                            </div>
+                            {{ form_errors(note_form.note) }}
+                        {{ form_end(note_form) }}
+                    {% endif %}
                 </div>
             </div>
         </div>
