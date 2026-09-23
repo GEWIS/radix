@@ -30,7 +30,7 @@ final class ReferenceLibraryTest extends DatabaseTestCase
     /**
      * The rename input binds to a path inside the pending renames, and the client rejects a model path whose every
      * level does not already exist among the props. They are dehydrated before the template runs, so this renders
-     * the component rather than reading the array off it: seeding it during the render is what "Invalid model name"
+     * the component rather than reading the array from it: seeding it during the render is what "Invalid model name"
      * was.
      */
     public function testEveryInlineInputHasAModelPathAmongTheProps(): void

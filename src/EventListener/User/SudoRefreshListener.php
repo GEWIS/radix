@@ -18,8 +18,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * A grant expired a fixed half hour after the confirmation, regardless of activity, which interrupted long edits: the
  * expiration passed while the form was being filled in and the submission was then refused.
  *
- * Only a write extends it. A GET does not, and neither do the two edit-lock endpoints, because both are sent on a
- * timer rather than by user interaction.
+ * Only a write extends it. A GET does not, unless it is a live component request that writes, and neither do the
+ * two edit-lock endpoints, because both are sent on a timer rather than by user interaction.
  *
  * A live component is served outside the addresses {@see SudoArea} names, so a write to one extends a grant only
  * where the component requires the grant itself ({@see SudoComponents}). Every other component writes on pages the
@@ -50,11 +50,6 @@ final readonly class SudoRefreshListener
 
         $request = $event->getRequest();
 
-        // A safe method is not a write, so it does not extend the expiration.
-        if ($request->isMethodSafe()) {
-            return;
-        }
-
         if (!$this->isGuardedWrite($request)) {
             return;
         }
@@ -64,12 +59,18 @@ final readonly class SudoRefreshListener
 
     private function isGuardedWrite(Request $request): bool
     {
-        // A live component sends every action as a POST, so the method does not indicate whether the request writes.
-        // Undecided does not extend the expiration, which is the opposite of what maintenance does with the same
-        // answer ({@see LiveComponentAction}).
+        // A live component is classified by what the request invokes rather than by its method: an action is a POST
+        // whether it writes or not, and a re-render that applies inline edits is a GET where the props fit in the
+        // address. Undecided does not extend the expiration, which is the opposite of what maintenance does with
+        // the same answer ({@see LiveComponentAction}).
         if ($this->liveComponentAction->isRequest($request)) {
             return true === $this->liveComponentAction->writes($request)
                 && $this->sudoComponents->covers($request);
+        }
+
+        // A safe method is not a write, so it does not extend the expiration.
+        if ($request->isMethodSafe()) {
+            return false;
         }
 
         return $this->area->covers($request)

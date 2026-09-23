@@ -374,7 +374,7 @@ final class MeetingManageTest extends DatabaseTestCase
     /**
      * The inline inputs bind to a path inside one of the pending-edit arrays, and the client rejects a model path
      * whose every level does not already exist among the props. They are dehydrated before the template runs, so
-     * this renders the component rather than reading the arrays off it: seeding them during the render is what
+     * this renders the component rather than reading the arrays from it: seeding them during the render is what
      * "Invalid model name" was.
      */
     public function testEveryInlineInputHasAModelPathAmongTheProps(): void

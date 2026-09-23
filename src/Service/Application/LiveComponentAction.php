@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Service\Application;
 
 use App\Attribute\Application\ReadOnlySafe;
+use App\Attribute\Application\WritesOnRender;
 use InvalidArgumentException;
 use JsonException;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\UX\TwigComponent\ComponentFactory;
 
+use function class_exists;
 use function is_array;
 use function is_string;
 use function json_decode;
@@ -22,8 +25,9 @@ use const JSON_THROW_ON_ERROR;
 /**
  * Whether a live component request writes.
  *
- * Every component and action is sent as a POST to one route, so the method does not state whether the request writes.
- * A re-render invokes no method of the component, and an action that only changes what is displayed declares
+ * Every action is sent as a POST to one route, and a re-render is a GET where the props fit in the address, so the
+ * method does not state whether the request writes. A re-render invokes no action of the component, unless the
+ * component declares {@see WritesOnRender}, and an action that only changes what is displayed declares
  * {@see ReadOnlySafe}.
  *
  * Two listeners need that answer and have to agree on it:
@@ -79,15 +83,21 @@ final readonly class LiveComponentAction
             return null;
         }
 
-        // A re-render runs no method of the component's own: it rehydrates the props it was sent and renders again.
-        if (self::RENDER === $action) {
-            return false;
-        }
-
         try {
             $class = $this->components->metadataFor($component)->getClass();
         } catch (InvalidArgumentException) {
             return null;
+        }
+
+        // The component applies what it was sent before it renders, so every request to it writes.
+        if ($this->rendersAWrite($class)) {
+            return true;
+        }
+
+        // A re-render runs no other method of the component's own: it rehydrates the props it was sent and renders
+        // again.
+        if (self::RENDER === $action) {
+            return false;
         }
 
         if (self::BATCH !== $action) {
@@ -120,6 +130,15 @@ final readonly class LiveComponentAction
         }
 
         return false;
+    }
+
+    private function rendersAWrite(string $class): bool
+    {
+        if (!class_exists($class)) {
+            return false;
+        }
+
+        return [] !== new ReflectionClass($class)->getAttributes(WritesOnRender::class);
     }
 
     private function actionWrites(

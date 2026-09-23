@@ -10,11 +10,9 @@ use App\EventListener\Application\MaintenanceListener;
 use App\Repository\Application\MaintenanceWindowRepository;
 use App\Service\Application\LiveComponentAction;
 use App\Service\Application\MaintenanceStatusProvider;
-use App\Tests\Support\LiveActionsDouble;
+use App\Tests\Support\BuildsLiveComponents;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,11 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\UX\TwigComponent\ComponentFactory;
-use Symfony\UX\TwigComponent\ComponentTemplateFinderInterface;
-use Twig\Environment;
 
 use function array_map;
 use function dirname;
@@ -35,6 +29,8 @@ use function json_encode;
 
 final class MaintenanceListenerTest extends TestCase
 {
+    use BuildsLiveComponents;
+
     public function testTheEnvironmentFlagServesTheMaintenancePageToEveryone(): void
     {
         $event = $this->event(Request::create('/en/'));
@@ -207,6 +203,30 @@ final class MaintenanceListenerTest extends TestCase
         self::assertNull($event->getResponse());
     }
 
+    /**
+     * The component writes what it was sent before it renders, so the re-render is a write like any other, and it is
+     * a GET where the props fit in the address.
+     */
+    public function testReadOnlyRefusesAReRenderOfAComponentThatWritesAsItRenders(): void
+    {
+        $request = $this->liveComponentRequest(
+            null,
+            'meeting',
+            'GET',
+        );
+
+        $event = $this->event($request);
+        $this->listener(
+            $this->provider($this->window(MaintenanceStatus::ReadOnly)),
+            false,
+        )($event);
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $event->getResponse(),
+        );
+    }
+
     public function testReadOnlyLetsALiveActionThatOnlyPagesThrough(): void
     {
         $event = $this->event($this->liveComponentRequest('loadMore'));
@@ -320,11 +340,14 @@ final class MaintenanceListenerTest extends TestCase
         return $request;
     }
 
-    private function liveComponentRequest(?string $action): Request
-    {
+    private function liveComponentRequest(
+        ?string $action,
+        string $component = 'overview',
+        string $method = 'POST',
+    ): Request {
         $request = Request::create(
-            '/en/_components/overview/' . ($action ?? 'get'),
-            'POST',
+            '/en/_components/' . $component . '/' . ($action ?? 'get'),
+            $method,
         );
         $request->attributes->set(
             '_route',
@@ -332,7 +355,7 @@ final class MaintenanceListenerTest extends TestCase
         );
         $request->attributes->set(
             '_live_component',
-            'overview',
+            $component,
         );
 
         if (null !== $action) {
@@ -365,29 +388,6 @@ final class MaintenanceListenerTest extends TestCase
                 __DIR__,
                 3,
             ),
-        );
-    }
-
-    /**
-     * A factory configured with the one component the tests use. {@see ComponentFactory} is final, so it is built
-     * rather than stubbed; `metadataFor()` reads from the config it is given and uses nothing else.
-     */
-    private function components(): ComponentFactory
-    {
-        return new ComponentFactory(
-            self::createStub(ComponentTemplateFinderInterface::class),
-            self::createStub(ContainerInterface::class),
-            self::createStub(PropertyAccessorInterface::class),
-            self::createStub(EventDispatcherInterface::class),
-            [
-                'overview' => [
-                    'key' => 'overview',
-                    'template' => 'overview.html.twig',
-                    'class' => LiveActionsDouble::class,
-                ],
-            ],
-            [],
-            self::createStub(Environment::class),
         );
     }
 

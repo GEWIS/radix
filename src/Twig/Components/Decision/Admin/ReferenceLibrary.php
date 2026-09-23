@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Decision\Admin;
 
+use App\Attribute\Application\WritesOnRender;
 use App\Entity\Decision\MeetingActivityLog;
 use App\Entity\Decision\ReferenceDocument;
 use App\Entity\User\Enums\UserRoles;
@@ -35,6 +36,7 @@ use function trim;
  * {@see \App\Controller\Decision\AdminReferenceDocumentController}; removing a document is blocked while any meeting
  * still selects it.
  */
+#[WritesOnRender]
 #[AsLiveComponent(
     name: 'Decision:Admin:ReferenceLibrary',
     template: 'components/Decision/Admin/ReferenceLibrary.html.twig',

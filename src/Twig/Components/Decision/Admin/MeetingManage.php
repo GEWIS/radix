@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components\Decision\Admin;
 
+use App\Attribute\Application\WritesOnRender;
 use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingActivityLog;
@@ -66,6 +67,7 @@ use function trim;
  * ledger require the register administrator on top of that, and the decisions tab offers a board member nothing
  * but the list.
  */
+#[WritesOnRender]
 #[AsLiveComponent(
     name: 'Decision:Admin:MeetingManage',
     template: 'components/Decision/Admin/MeetingManage.html.twig',

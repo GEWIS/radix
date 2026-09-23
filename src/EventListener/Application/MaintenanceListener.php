@@ -132,14 +132,20 @@ final readonly class MaintenanceListener
     /**
      * Whether the request only reads. The method is enough for everything a browser navigates to, and for everything a
      * form posts; a live component sends paging and filtering as a POST like it sends a write, so those declare it
-     * themselves with {@see \App\Attribute\Application\ReadOnlySafe}, which
-     * {@see \App\Service\Application\LiveComponentAction} reads.
+     * themselves with {@see \App\Attribute\Application\ReadOnlySafe}, and a component that writes as it renders
+     * declares {@see \App\Attribute\Application\WritesOnRender}. Both are read by
+     * {@see \App\Service\Application\LiveComponentAction}.
      */
     private function isRead(Request $request): bool
     {
-        return $request->isMethodSafe()
-            // Undecided counts as a write here, so a request this cannot classify is refused rather than allowed.
-            || false === $this->liveComponentAction->writes($request);
+        // Undecided counts as a write here, so a request this cannot classify is refused rather than allowed. The
+        // method is not consulted for a live component: a re-render that applies inline edits is a GET where the
+        // props fit in the address.
+        if ($this->liveComponentAction->isRequest($request)) {
+            return false === $this->liveComponentAction->writes($request);
+        }
+
+        return $request->isMethodSafe();
     }
 
     private function flashReadOnly(Request $request): void
