@@ -155,7 +155,7 @@ class SignupListType extends AbstractType
             ->add(
                 'name',
                 LocalisedTextType::class,
-                ['label' => t('Name')],
+                ['label' => t('Sign-up list name')],
             )
             ->add(
                 'openDate',

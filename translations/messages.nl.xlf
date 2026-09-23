@@ -8909,6 +8909,10 @@
         <source>Sign-up list %position%</source>
         <target>Inschrijflijst %position%</target>
       </trans-unit>
+      <trans-unit id="ncYzbNA" resname="Sign-up list name">
+        <source>Sign-up list name</source>
+        <target>Naam van de inschrijflijst</target>
+      </trans-unit>
       <trans-unit id="JiavS3V" resname="Sign-up lists">
         <source>Sign-up lists</source>
         <target>Inschrijflijsten</target>
