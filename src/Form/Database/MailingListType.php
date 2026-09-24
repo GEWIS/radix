@@ -105,6 +105,19 @@ class MailingListType extends AbstractType
         );
 
         $builder->add(
+            'selfService',
+            CheckboxType::class,
+            [
+                'label' => t('Members may manage their own subscription'),
+                'help' => t(
+					// phpcs:ignore -- user-visible strings should not be split
+				'Leave this off for a list that belongs to one year or one group, which is offered when somebody joins but is not a list anybody may put themselves on later.',
+                ),
+                'required' => false,
+            ],
+        );
+
+        $builder->add(
             'mailmanList',
             EntityType::class,
             [

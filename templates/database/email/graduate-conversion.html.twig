@@ -1,0 +1,30 @@
+{% extends 'database/email/_base.html.twig' %}
+
+{% block emailTitle %}Your GEWIS membership is ending{% endblock %}
+{% block preheader %}{% endblock %}
+{% block heading %}Membership notification{% endblock %}
+{% block subheading %}Staying on as a graduate{% endblock %}
+{% block body %}
+    <p>Dear {{ firstName }},</p>
+    <p>
+        Your GEWIS membership ends on <b>{{ currentExpiration|date('F jS, Y') }}</b>. If you have finished studying,
+        you can stay with the association as a graduate (<i>Afgestudeerde</i>): you keep receiving our announcements
+        and remain welcome at our activities.
+    </p>
+    <p>
+        Please click
+        <a href="{{ url }}" style="color: #C40000; text-decoration: none;" target="_blank" rel="noopener nofollow">here</a>
+        to tell us what you would like to do. You can check the address we write to while you are there, because the
+        one we have may be your TU/e address, which stops working once you leave.
+    </p>
+    <p>
+        If you do nothing, your membership simply ends on the date above and we delete your data in the way described
+        in our
+        <a href="https://gewis.nl/en/association/regulations/privacy-statement" style="color: #C40000; text-decoration: none;" target="_blank" rel="noopener nofollow">privacy statement</a>.
+    </p>
+    <p>
+        Kind regards,
+        <br>The Secretary of GEWIS
+    </p>
+{% endblock %}
+{% block footerNote %}You receive this message because your GEWIS membership is about to end. You can not opt-out of these emails.{% endblock %}

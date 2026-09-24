@@ -5,18 +5,24 @@ declare(strict_types=1);
 namespace App\Service\Database;
 
 use App\Entity\Database\Address as AddressModel;
+use App\Entity\Database\AuditAddressChange;
 use App\Entity\Database\AuditEntry as AuditEntryModel;
 use App\Entity\Database\AuditMailingListMembership;
 use App\Entity\Database\AuditNote as AuditNoteModel;
 use App\Entity\Database\AuditRenewal as AuditRenewalModel;
+use App\Entity\Database\EmailChangeLink as EmailChangeLinkModel;
 use App\Entity\Database\Enums\AddressTypes;
 use App\Entity\Database\Enums\AttentionReasons;
+use App\Entity\Database\Enums\GraduateConversionOutcome;
 use App\Entity\Database\Enums\MailingListMemberAction;
 use App\Entity\Database\Enums\MailingListMemberOrigin;
+use App\Entity\Database\Enums\MemberDetailAction;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Enums\PostalRegions;
 use App\Entity\Database\Enums\ProspectiveMemberFilter;
 use App\Entity\Database\Enums\Studies;
+use App\Entity\Database\GraduateConversionLink as GraduateConversionLinkModel;
+use App\Entity\Database\MailingList as MailingListModel;
 use App\Entity\Database\MailingListMember as MailingListMemberModel;
 use App\Entity\Database\Member as MemberModel;
 use App\Entity\Database\Membership as MembershipModel;
@@ -25,11 +31,14 @@ use App\Entity\Database\ProspectiveMember as ProspectiveMemberModel;
 use App\Entity\Database\RenewalLink as RenewalLinkModel;
 use App\Entity\User\User;
 use App\Form\Database\Registration\RegistrationData;
+use App\Message\Database\GraduateRemovalRequested;
 use App\Message\Database\RefundProblemEmail;
 use App\Message\Database\RegistrationUpdate;
 use App\Message\Database\RegistrationUpdateEmail;
 use App\Repository\Database\ActionLinkRepository;
 use App\Repository\Database\AuditEntryRepository;
+use App\Repository\Database\EmailChangeLinkRepository;
+use App\Repository\Database\GraduateConversionLinkRepository;
 use App\Repository\Database\MailingListMemberRepository;
 use App\Repository\Database\MailingListRepository;
 use App\Repository\Database\MemberRepository;
@@ -45,6 +54,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_diff;
 use function array_intersect;
+use function array_map;
 use function array_merge;
 use function array_unique;
 use function array_values;
@@ -62,6 +72,8 @@ class Member
         private readonly ActionLinkRepository $actionLinkRepository,
         private readonly AuditEntryRepository $auditEntryRepository,
         private readonly MemberRepository $memberRepository,
+        private readonly EmailChangeLinkRepository $emailChangeLinkRepository,
+        private readonly GraduateConversionLinkRepository $graduateConversionLinkRepository,
         private readonly ProspectiveMemberRepository $prospectiveMemberRepository,
         private readonly MailingListService $mailingListService,
         private readonly RenewalService $renewalService,
@@ -761,7 +773,10 @@ class Member
      */
     public function editAddress(FormInterface $form): ?AddressModel
     {
-        return $this->persistAddressFromForm($form);
+        return $this->persistAddressFromForm(
+            $form,
+            MemberDetailAction::Changed,
+        );
     }
 
     /**
@@ -771,7 +786,10 @@ class Member
      */
     public function addAddress(FormInterface $form): ?AddressModel
     {
-        return $this->persistAddressFromForm($form);
+        return $this->persistAddressFromForm(
+            $form,
+            MemberDetailAction::Added,
+        );
     }
 
     /**
@@ -792,6 +810,15 @@ class Member
         );
         $this->memberRepository->removeAddress($address);
 
+        $this->auditService->persist(
+            AuditAddressChange::create(
+                $member,
+                $type,
+                MemberDetailAction::Removed,
+                $this->auditUser(),
+            ),
+        );
+
         return $member;
     }
 
@@ -806,27 +833,55 @@ class Member
         return $this->mailingListService->isSyncLocked();
     }
 
-    /**
-     * Update mailing list subscriptions of a member
-     */
     public function subscribeLists(
         MemberModel $member,
         FormInterface $form,
     ): ?MemberModel {
-        // Check if we are performing a sync or not.
-        if ($this->mailingListService->isSyncLocked()) {
-            return null;
-        }
-
         $data = $form->getData();
 
         /** @var string[] $selectedLists */
         $selectedLists = $data['lists'] ?: [];
-        $currentLists = $member->getMailingListMemberships()->map(
-            static function (MailingListMemberModel $subscription) {
-                return $subscription->mailingList->name;
-            },
-        )->toArray();
+
+        return $this->updateSubscriptions(
+            $member,
+            $selectedLists,
+            array_map(
+                static fn (MailingListModel $list): string => $list->name,
+                $this->mailingListRepository->findAll(),
+            ),
+            MailingListMemberOrigin::Manual,
+        );
+    }
+
+    /**
+     * Nothing outside the candidates is changed, or a page that offers some of the lists would unsubscribe the rest.
+     * Returns null while a synchronisation is running.
+     *
+     * @param string[] $selectedLists
+     * @param string[] $candidateLists
+     */
+    public function updateSubscriptions(
+        MemberModel $member,
+        array $selectedLists,
+        array $candidateLists,
+        MailingListMemberOrigin $origin,
+    ): ?MemberModel {
+        if ($this->mailingListService->isSyncLocked()) {
+            return null;
+        }
+
+        $selectedLists = array_values(array_intersect(
+            $selectedLists,
+            $candidateLists,
+        ));
+        $currentLists = array_values(array_intersect(
+            $member->getMailingListMemberships()->map(
+                static function (MailingListMemberModel $subscription) {
+                    return $subscription->mailingList->name;
+                },
+            )->toArray(),
+            $candidateLists,
+        ));
 
         // Determine which mailing lists the member should be (un)subscribed from/to.
         $intersection = array_intersect(
@@ -855,12 +910,17 @@ class Member
                 $list,
                 $member,
             );
+
+            if (null === $membership) {
+                continue;
+            }
+
             $membership->toBeDeleted = true;
 
             $this->auditService->persist(
                 AuditMailingListMembership::create(
                     MailingListMemberAction::Remove,
-                    MailingListMemberOrigin::Manual,
+                    $origin,
                     $member,
                     $list,
                     $membership->email,
@@ -886,7 +946,7 @@ class Member
             $this->auditService->persist(
                 AuditMailingListMembership::create(
                     MailingListMemberAction::Add,
-                    MailingListMemberOrigin::Manual,
+                    $origin,
                     $member,
                     $list,
                     $mailingListMember->email,
@@ -1138,12 +1198,29 @@ class Member
             $renewalAudit,
         );
         $this->memberRepository->persist($member);
+        $this->supersedeGraduateConversions($member);
 
         return $member;
     }
 
-    private function persistAddressFromForm(FormInterface $form): ?AddressModel
+    /**
+     * An outstanding offer of graduate membership is about the ending that has just been settled, so following it
+     * would write the membership a second time. The secretary's bulk conversion goes through here, which is where
+     * the two meet.
+     */
+    private function supersedeGraduateConversions(MemberModel $member): void
     {
+        foreach ($this->graduateConversionLinkRepository->findOutstandingForMember($member) as $link) {
+            $link->outcome = GraduateConversionOutcome::Superseded;
+            $link->used = true;
+            $this->actionLinkRepository->persist($link);
+        }
+    }
+
+    private function persistAddressFromForm(
+        FormInterface $form,
+        MemberDetailAction $action,
+    ): ?AddressModel {
         if (!$form->isValid()) {
             return null;
         }
@@ -1152,6 +1229,19 @@ class Member
         assert($address instanceof AddressModel);
 
         $this->memberRepository->persistAddress($address);
+
+        $member = $address->getMember();
+
+        if (null !== $member) {
+            $this->auditService->persist(
+                AuditAddressChange::create(
+                    $member,
+                    $address->type,
+                    $action,
+                    $this->auditUser(),
+                ),
+            );
+        }
 
         return $address;
     }
@@ -1207,6 +1297,7 @@ class Member
 
         /** @var array<value-of<AttentionReasons>, MemberModel[]> $combined */
         $combined = [];
+        $askedThemselves = $this->graduateConversionLinkRepository->findMembersWithAnOpenOffer();
 
         $combined[AttentionReasons::MissingEmail->value] = $this->memberRepository->findAttentionWithoutEmail();
         $combined[AttentionReasons::MissingStudentNumberOrdinary->value] =
@@ -1254,6 +1345,18 @@ class Member
 
             if ($reason->includeBulkGraduateConversion()) {
                 foreach ($combined[$reason->value] ?? [] as $member) {
+                    // A member who has been asked themselves is left out while their offer is open. They come back
+                    // once it expires unanswered, which is when the secretary is the one to settle it.
+                    if (
+                        in_array(
+                            $member->lidnr,
+                            $askedThemselves,
+                            true,
+                        )
+                    ) {
+                        continue;
+                    }
+
                     $bulkRenewalShortcuts['expiring_non_active'][] = $member->lidnr;
                 }
             }
@@ -1294,6 +1397,83 @@ class Member
             'rows' => $rows,
             'bulk_renewal_shortcuts' => $bulkRenewalShortcuts,
         ];
+    }
+
+    /**
+     * Nothing is changed by asking: the register keeps the old address until the new one is confirmed.
+     */
+    public function requestEmailChange(
+        MemberModel $member,
+        string $newEmail,
+    ): EmailChangeLinkModel {
+        $this->emailChangeLinkRepository->removeAllForMember($member);
+
+        $link = new EmailChangeLinkModel(
+            $member,
+            $newEmail,
+        );
+        $this->actionLinkRepository->persist($link);
+
+        return $link;
+    }
+
+    /**
+     * Only the address is written; the subscriptions and the audit entry are
+     * {@see \App\EventListener\Database\MemberEmailChangeListener}'s.
+     */
+    public function confirmEmailChange(EmailChangeLinkModel $link): MemberModel
+    {
+        $member = $link->member;
+
+        $member->setEmail($link->newEmail);
+        $member->changedOn = new DateTimeImmutable();
+
+        $link->used = true;
+        $this->actionLinkRepository->persist($link);
+        $this->memberRepository->persist($member);
+
+        return $member;
+    }
+
+    public function acceptGraduateConversion(
+        MemberModel $member,
+        GraduateConversionLinkModel $link,
+    ): MemberModel {
+        $link->outcome = GraduateConversionOutcome::Accepted;
+        $link->used = true;
+        $this->actionLinkRepository->persist($link);
+
+        return $this->applyMembershipChange(
+            $member,
+            MembershipTypes::Graduate,
+        );
+    }
+
+    public function declineGraduateConversion(
+        MemberModel $member,
+        GraduateConversionLinkModel $link,
+        bool $removalRequested,
+    ): MemberModel {
+        $link->outcome = $removalRequested
+            ? GraduateConversionOutcome::RemovalRequested
+            : GraduateConversionOutcome::Declined;
+        $link->used = true;
+        $this->actionLinkRepository->persist($link);
+
+        $note = new AuditNoteModel();
+        $note->note = $removalRequested
+            ? 'Declined to stay on as a graduate and asked for their data to be removed.'
+            : 'Declined to stay on as a graduate.';
+        $this->addAuditEntry(
+            $member,
+            $note,
+        );
+
+        if ($removalRequested) {
+            $this->bus->dispatch(new GraduateRemovalRequested($member->lidnr));
+        }
+
+        return $member;
     }
 
     /**

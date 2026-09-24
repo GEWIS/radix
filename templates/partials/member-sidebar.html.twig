@@ -26,6 +26,7 @@
         {{ sidebar.group('Settings'|trans) }}
         <ul class="sidebar-list">
             {{ sidebar.link(path('user_settings_index'), 'fa-sliders', 'General'|trans, 'general' == activeRoute) }}
+            {{ sidebar.link(path('user_settings_details_index'), 'fa-id-card', 'My details'|trans, 'details' == activeRoute) }}
             {{ sidebar.link(path('user_settings_notifications'), 'fa-bell', 'Notifications'|trans, 'notifications' == activeRoute) }}
             {{ sidebar.link(path('user_settings_privacy'), 'fa-user-shield', 'Privacy'|trans, 'privacy' == activeRoute) }}
             {{ sidebar.link(path('user_security_index'), 'fa-shield-halved', 'Security'|trans, 'security' == activeRoute) }}
