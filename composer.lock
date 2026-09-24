@@ -12843,7 +12843,7 @@
         },
         {
             "name": "symfony/ux-calendar-link",
-            "version": "v3.5.0",
+            "version": "v3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-calendar-link.git",
@@ -12906,7 +12906,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-calendar-link/tree/v3.5.0"
+                "source": "https://github.com/symfony/ux-calendar-link/tree/v3.5.1"
             },
             "funding": [
                 {
