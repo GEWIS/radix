@@ -3,7 +3,7 @@
    adding an entry clones it with its placeholder (`__list__` / `__field__`) replaced by a fresh index,
    keeping the collapse target ids unique. #}
 
-{% macro tier_modifier(field, ranks, label, settings, places = null) %}
+{% macro tier_modifier(field, ranks, label, settings = null, places = null) %}
     {% set on = field.vars.value is not empty %}
     <div class="mb-3" data-controller="tier-order">
         <div class="form-check">

@@ -29,4 +29,9 @@ final class Version20260922102347 extends AbstractMigration
     {
         $this->addSql('ALTER TABLE UserSettings DROP colourVision');
     }
+
+    public function isTransactional(): bool
+    {
+        return false;
+    }
 }

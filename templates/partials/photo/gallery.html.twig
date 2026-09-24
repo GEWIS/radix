@@ -67,7 +67,7 @@
     data-gallery-labels-value="{{ labels|json_encode }}"
 {% endmacro %}
 
-{% macro grid(empty_message) %}
+{% macro grid(empty_message = null) %}
     {# The grid and viewer are built entirely from the manifest by the gallery controller, so without JavaScript the
        page would otherwise be blank. #}
     <noscript>

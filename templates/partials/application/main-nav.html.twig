@@ -1,6 +1,6 @@
 {# `prefetch` is false for a link whose GET has a side effect, because Turbo fetches a link while the pointer is
    over it. #}
-{% macro item(href, icon, label, count, active, prefetch) %}
+{% macro item(href, icon, label, count = null, active = false, prefetch = true) %}
     <li>
         <a href="{{ href }}" class="dropdown-item {{ active|default(false) ? 'active' : '' }}"
            {% if active|default(false) %}aria-current="page"{% endif %}

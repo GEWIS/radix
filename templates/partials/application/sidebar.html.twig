@@ -30,7 +30,7 @@
     <span class="sidebar-group-label">{{ label }}</span>
 {% endmacro %}
 
-{% macro link(href, icon, label, active, count) %}
+{% macro link(href, icon, label, active, count = null) %}
     <li>
         <a class="sidebar-link {{ active ? 'active' : '' }}" href="{{ href }}"
            {% if active %}aria-current="page"{% endif %}>

@@ -113,4 +113,9 @@ final readonly class AlbumAutocompleter implements EntityAutocompleterInterface
     {
         return null;
     }
+
+    public function getTranslationDomain(): null
+    {
+        return null;
+    }
 }

@@ -2,7 +2,7 @@
    message, without a level and without a coloured indicator, rather than disappearing. The message runs
    through the translator because some controllers flash a sentence to be translated here; one that is not a
    translation key comes back unchanged. #}
-{% macro toast(message, label, delay) %}
+{% macro toast(message = null, label = null, delay = null) %}
     {% set level = enum('App\\Entity\\Application\\Enums\\AlertTypes').tryFrom(label|default('')) %}
     <div class="toast fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="{{ delay|default(5000) }}">
         <div class="toast-header">
