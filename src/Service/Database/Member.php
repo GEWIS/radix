@@ -404,6 +404,11 @@ class Member
      */
     public function removeProspective(ProspectiveMemberModel $member): void
     {
+        $paymentLink = $member->getPaymentLink();
+        if (null !== $paymentLink) {
+            $this->actionLinkRepository->remove($paymentLink);
+        }
+
         $this->prospectiveMemberRepository->remove($member);
     }
 
