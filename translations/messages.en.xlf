@@ -2213,6 +2213,10 @@
         <source>Clear</source>
         <target state="translated">Clear</target>
       </trans-unit>
+      <trans-unit id="7skU5Pj" resname="Clear all">
+        <source>Clear all</source>
+        <target state="translated">Clear all</target>
+      </trans-unit>
       <trans-unit id="_6w36F_" resname="Clear the search or pick another filter above.">
         <source>Clear the search or pick another filter above.</source>
         <target>Clear the search or pick another filter above.</target>
@@ -6620,6 +6624,10 @@
       <trans-unit id="kR1m9jw" resname="Nothing yet: your profile has not been approved, so your company is not shown on the website.">
         <source>Nothing yet: your profile has not been approved, so your company is not shown on the website.</source>
         <target state="translated">Nothing yet: your profile has not been approved, so your company is not shown on the website.</target>
+      </trans-unit>
+      <trans-unit id="FVgZpGA" resname="Notification actions">
+        <source>Notification actions</source>
+        <target state="translated">Notification actions</target>
       </trans-unit>
       <trans-unit id="gGxnmUA" resname="Notifications">
         <source>Notifications</source>

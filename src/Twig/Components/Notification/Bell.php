@@ -345,6 +345,47 @@ class Bell
     }
 
     /**
+     * Empty the list and clear the badge. The notifications are dismissed so they disappear for this member,
+     * and marked read so the badge drops to zero. One alone would leave the other behind.
+     */
+    #[LiveAction]
+    public function dismissAll(): void
+    {
+        $user = $this->currentUser();
+        if (null === $user) {
+            return;
+        }
+
+        $notifications = $this->notificationRepository->findRecentFor(
+            $this->windowStart(),
+            $user,
+            $this->rolesOf($user),
+            self::FETCH,
+        );
+
+        $now = new DateTimeImmutable();
+        foreach ($notifications as $notification) {
+            $id = $notification->id;
+            if (null === $id) {
+                continue;
+            }
+
+            $interaction = $this->interactionRepository->getOrCreate(
+                $user,
+                $notification,
+            );
+            $interaction->dismissedAt = $now;
+            $interaction->readAt ??= $now;
+        }
+
+        $this->settingsRepository->getOrCreateForUser($user)->notificationsReadAt = $now;
+        $this->entityManager->flush();
+
+        $this->readAtLoaded = false;
+        $this->entries = null;
+    }
+
+    /**
      * Apply a change to everything behind one line, which is several notifications when they are shown as a run.
      *
      * Only what is currently on show can be acted on, so an id that was never theirs to see reaches nothing.
