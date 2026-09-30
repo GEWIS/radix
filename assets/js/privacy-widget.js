@@ -156,7 +156,7 @@
     })
 
     privacy_widget_dismiss.addEventListener('click', () => {
-        document.cookie = "privacyWidgetDismissed=1; Domain=" + window.location.host
+        document.cookie = "privacyWidgetDismissed=1; Domain=" + window.location.hostname
             + "; Path=/; Max-Age=31536000; SameSite=Lax; Secure";
         privacy_widget.classList.replace('open', 'closed');
     }, false);
