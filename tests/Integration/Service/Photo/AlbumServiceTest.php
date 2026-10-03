@@ -32,7 +32,7 @@ final class AlbumServiceTest extends DatabaseTestCase
             UserRoles::Member,
         );
 
-        // The Gala and Trip albums are both dated six and three months ago, so they share an association year.
+        // The fixture albums are all in the same association year, so they can be found together.
         $names = $this->albumNamesForYearOf($this->albumRepository()->findOneBy(['name' => 'Gala 2024']));
 
         self::assertContains(

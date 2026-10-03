@@ -8,6 +8,7 @@ use App\DataFixtures\Activity\ActivityFixture;
 use App\DataFixtures\Decision\ProjectionReferenceFixture;
 use App\Entity\Activity\Activity;
 use App\Entity\Application\Enums\StorageNamespace;
+use App\Entity\Decision\AssociationYear;
 use App\Entity\Decision\Member;
 use App\Entity\Decision\Organ;
 use App\Entity\Photo\Album;
@@ -192,11 +193,17 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     #[Override]
     public function load(ObjectManager $manager): void
     {
+        // The albums must all be in the same association year so the browsing tests can find them together.
+        // The association year starts 01-07, so we anchor to that boundary.
+        $currentAssocYear = AssociationYear::fromDate(new DateTimeImmutable())->getYear();
+        // Both dates after July 1 to ensure they're in the same association year.
+        $galaStart = new DateTimeImmutable($currentAssocYear . '-09-15 19:00:00');
+        $tripStart = new DateTimeImmutable($currentAssocYear . '-11-20 10:00:00');
         $gala = $this->makeAlbum(
             'Gala 2024',
             true,
             null,
-            '-6 months',
+            $galaStart,
         );
         $manager->persist($gala);
 
@@ -204,7 +211,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             'Gala 2024 - Dinner',
             true,
             $gala,
-            '-6 months',
+            $galaStart,
         );
         $manager->persist($dinner);
 
@@ -212,7 +219,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             'Gala 2024 - Afterparty',
             true,
             $gala,
-            '-6 months 4 hours',
+            $currentAssocYear . '-09-15 23:00:00',
         );
         $manager->persist($afterparty);
 
@@ -221,7 +228,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             'Gala 2024 - Draft',
             false,
             $gala,
-            '-6 months 8 hours',
+            $currentAssocYear . '-09-16 03:00:00',
         );
         $manager->persist($galaDraft);
 
@@ -229,7 +236,7 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             'Trip 2024',
             true,
             null,
-            '-3 months',
+            $tripStart,
         );
         $manager->persist($trip);
 
@@ -237,15 +244,14 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
             'Draft Album',
             false,
             null,
-            '-1 week',
+            $currentAssocYear . '-12-01 00:00:00',
         );
         $manager->persist($secret);
-
         $movieNight = $this->makeAlbum(
             'Movie Night',
             true,
             null,
-            '-2 months 21:00',
+            $currentAssocYear . '-10-15 21:00:00',
         );
         $movieNight->activity = $this->getReference(
             ActivityFixture::REFERENCE_MOVIE_NIGHT,
@@ -491,13 +497,19 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
         string $name,
         bool $published,
         ?Album $parent,
-        string $startDateTime,
+        string|DateTimeImmutable $startDateTime,
     ): Album {
         $album = new Album();
         $album->name = $name;
         $album->published = $published;
-        $album->startDateTime = new DateTimeImmutable($startDateTime);
-        $album->endDateTime = new DateTimeImmutable($startDateTime);
+
+        if ($startDateTime instanceof DateTimeImmutable) {
+            $album->startDateTime = $startDateTime;
+            $album->endDateTime = $startDateTime;
+        } else {
+            $album->startDateTime = new DateTimeImmutable($startDateTime);
+            $album->endDateTime = new DateTimeImmutable($startDateTime);
+        }
 
         if (null !== $parent) {
             $album->setParent($parent);
