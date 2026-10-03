@@ -9,8 +9,8 @@
     {% set older_url = older_years is not empty ? path(route, query|merge({ year: max(older_years) })) : null %}
 
     <div class="btn-group">
-        <a class="btn btn-outline-secondary {{ newer_url is null ? 'disabled' }}"
-           href="{{ newer_url ?? '#' }}" aria-label="{{ 'Newer'|trans }}">
+        <a class="btn btn-outline-secondary {{ older_url is null ? 'disabled' }}"
+           href="{{ older_url ?? '#' }}" aria-label="{{ 'Older'|trans }}">
             <span class="fas fa-chevron-left"></span>
         </a>
         <div class="btn-group">
@@ -50,8 +50,8 @@
                 {% endfor %}
             </ul>
         </div>
-        <a class="btn btn-outline-secondary {{ older_url is null ? 'disabled' }}"
-           href="{{ older_url ?? '#' }}" aria-label="{{ 'Older'|trans }}">
+        <a class="btn btn-outline-secondary {{ newer_url is null ? 'disabled' }}"
+           href="{{ newer_url ?? '#' }}" aria-label="{{ 'Newer'|trans }}">
             <span class="fas fa-chevron-right"></span>
         </a>
     </div>

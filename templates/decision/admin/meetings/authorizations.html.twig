@@ -55,9 +55,9 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <h2 class="mb-0">{{ 'Authorizations'|trans }}</h2>
         <div class="btn-group">
-            <a class="btn btn-outline-secondary {{ newer is null ? 'disabled' }}"
-               href="{{ newer ? path('admin/meetings/authorizations', {'number': newer.number}) : '#' }}"
-               aria-label="{{ 'Newer'|trans }}">
+            <a class="btn btn-outline-secondary {{ older is null ? 'disabled' }}"
+               href="{{ older ? path('admin/meetings/authorizations', {'number': older.number}) : '#' }}"
+               aria-label="{{ 'Older'|trans }}">
                 <span class="fas fa-chevron-left"></span>
             </a>
             <div class="btn-group">
@@ -76,9 +76,9 @@
                     {% endfor %}
                 </ul>
             </div>
-            <a class="btn btn-outline-secondary {{ older is null ? 'disabled' }}"
-               href="{{ older ? path('admin/meetings/authorizations', {'number': older.number}) : '#' }}"
-               aria-label="{{ 'Older'|trans }}">
+            <a class="btn btn-outline-secondary {{ newer is null ? 'disabled' }}"
+               href="{{ newer ? path('admin/meetings/authorizations', {'number': newer.number}) : '#' }}"
+               aria-label="{{ 'Newer'|trans }}">
                 <span class="fas fa-chevron-right"></span>
             </a>
         </div>
