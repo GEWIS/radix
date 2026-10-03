@@ -420,11 +420,6 @@ parameters:
 			count: 1
 			path: src/Entity/Photo/OrganTag.php
 
-		-
-			message: '#^Property App\\Entity\\User\\ExternalApp\:\:\$claims type mapping mismatch\: database can contain list\<App\\Entity\\User\\Enums\\JWTClaims\>\|null but property expects array\<App\\Entity\\User\\Enums\\JWTClaims\>\.$#'
-			identifier: doctrine.columnType
-			count: 1
-			path: src/Entity/User/ExternalApp.php
 
 		-
 			message: '#^Method App\\Form\\DataTransformer\\SubDecisionLookupTransformer\:\:reverseTransform\(\) should return T of App\\Entity\\Database\\SubDecision but returns App\\Entity\\Database\\SubDecision\.$#'
@@ -1331,3 +1326,20 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Service/Report/SubDecisionService.php
+		-
+			message: '#Property App\\Entity\\Database\\User\\ApiPrincipal::\$permissions type mapping mismatch#'
+			identifier: doctrine.enumType
+			count: 1
+			path: src/Entity/Database/User/ApiPrincipal.php
+
+		-
+			message: '#Property App\\Entity\\User\\ExternalApp::\$claims type mapping mismatch: backing type string#'
+			identifier: doctrine.enumType
+			count: 1
+			path: src/Entity/User/ExternalApp.php
+
+		-
+			message: '#Property App\\Entity\\User\\ExternalApp::\$claims type mapping mismatch: database can contain#'
+			identifier: doctrine.columnType
+			count: 1
+			path: src/Entity/User/ExternalApp.php
