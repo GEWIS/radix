@@ -1,0 +1,40 @@
+{% set vacancy = this.currentVacancy() %}
+{% set total = this.total() %}
+
+<div{{ attributes }}>
+    {% if vacancy is not null %}
+        <div class="panel">
+            <div class="panel-heading d-flex justify-content-between align-items-baseline gap-2">
+                <h3>{{ 'Vacancy'|trans }}</h3>
+
+                {% include 'partials/application/panel-pager.html.twig' with {
+                    'index': this.index,
+                    'total': total,
+                    'previousLabel': 'Previous vacancy'|trans,
+                    'nextLabel': 'Next vacancy'|trans,
+                } only %}
+            </div>
+
+            <div class="panel-body">
+                <p class="fw-semibold mb-2">
+                    <a href="{{ path('career/vacancy', {
+                        companySlug: this.companySlug,
+                        category: vacancy.category.value,
+                        vacancySlug: vacancy.slugName,
+                    }) }}">
+                        {{ vacancy.name|localise_text }}
+                    </a>
+                </p>
+                <p class="text-muted small">
+                    {{ vacancy.description|localise_text|markdown_excerpt(220) }}
+                </p>
+            </div>
+
+            <div class="panel-footer">
+                <a href="{{ path('career/vacancies', {company: this.companySlug}) }}" class="panel-footer-link">
+                    {{ 'All vacancies'|trans }}
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>

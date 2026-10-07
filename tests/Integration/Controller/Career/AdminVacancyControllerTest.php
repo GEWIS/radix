@@ -33,11 +33,11 @@ final class AdminVacancyControllerTest extends DatabaseTestCase
         $content = $this->overview();
 
         self::assertStringContainsString(
-            'Backend Engineer',
+            'First Job',
             $content,
         );
         self::assertStringContainsString(
-            'Master Thesis',
+            'Master Thesis: Sensor Calibration',
             $content,
         );
     }

@@ -65,27 +65,9 @@
             </div>
 
             {% if company.getNumberOfActiveJobs() > 0 %}
-                <div class="panel mb-4">
-                    <div class="panel-heading">
-                        <h3>{{ 'Open positions'|trans }}</h3>
-                    </div>
-                    <div class="panel-body">
-                        {% for category in vacancy_categories() %}
-                            {% set vacancies = company.getActiveVacancies(category) %}
-                            {% if vacancies is not empty %}
-                                {% set vacancy = vacancies|first %}
-                                <a class="link-row" href="{{ path('career/vacancy', {
-                                    companySlug: company.slugName,
-                                    category: vacancy.category.value,
-                                    vacancySlug: vacancy.slugName,
-                                }) }}">
-                                    <span class="d-block fw-semibold">{{ vacancy.name|localise_text }}</span>
-                                    <span class="d-block small text-body-secondary">{{ category.pluralLabel|trans }}</span>
-                                </a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
+                {{ component('Career:Company:Vacancies', {
+                    'companySlug': company.slugName,
+                }) }}
             {% endif %}
 
             {% if activities is not empty %}

@@ -6005,6 +6005,10 @@
         <source>Next poll</source>
         <target state="translated">Next poll</target>
       </trans-unit>
+      <trans-unit id="y7PDtZD" resname="Next vacancy">
+        <source>Next vacancy</source>
+        <target state="translated">Next vacancy</target>
+      </trans-unit>
       <trans-unit id="wd1MvZW" resname="No">
         <source>No</source>
         <target>No</target>
@@ -6625,10 +6629,6 @@
         <source>Nothing yet: your profile has not been approved, so your company is not shown on the website.</source>
         <target state="translated">Nothing yet: your profile has not been approved, so your company is not shown on the website.</target>
       </trans-unit>
-      <trans-unit id="FVgZpGA" resname="Notification actions">
-        <source>Notification actions</source>
-        <target state="translated">Notification actions</target>
-      </trans-unit>
       <trans-unit id="gGxnmUA" resname="Notifications">
         <source>Notifications</source>
         <target state="translated">Notifications</target>
@@ -6772,10 +6772,6 @@
       <trans-unit id="NYE98.0" resname="Open from %open% until %close%.">
         <source>Open from %open% until %close%.</source>
         <target>Open from %open% until %close%.</target>
-      </trans-unit>
-      <trans-unit id="sGdI_d5" resname="Open positions">
-        <source>Open positions</source>
-        <target>Open positions</target>
       </trans-unit>
       <trans-unit id="nUcWlkX" resname="Open the full queue">
         <source>Open the full queue</source>
@@ -7452,6 +7448,10 @@
       <trans-unit id="8t_jGKE" resname="Previous poll">
         <source>Previous poll</source>
         <target state="translated">Previous poll</target>
+      </trans-unit>
+      <trans-unit id="WT_T4Si" resname="Previous vacancy">
+        <source>Previous vacancy</source>
+        <target state="translated">Previous vacancy</target>
       </trans-unit>
       <trans-unit id="1X7oKCl" resname="Previously a member of">
         <source>Previously a member of</source>

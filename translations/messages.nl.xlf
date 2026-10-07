@@ -6005,6 +6005,10 @@
         <source>Next poll</source>
         <target state="translated">Volgende poll</target>
       </trans-unit>
+      <trans-unit id="y7PDtZD" resname="Next vacancy">
+        <source>Next vacancy</source>
+        <target state="translated">Volgende vacature</target>
+      </trans-unit>
       <trans-unit id="wd1MvZW" resname="No">
         <source>No</source>
         <target>Nee</target>
@@ -6625,10 +6629,6 @@
         <source>Nothing yet: your profile has not been approved, so your company is not shown on the website.</source>
         <target state="translated">Nog niets: je profiel is niet goedgekeurd, dus je bedrijf staat niet op de website.</target>
       </trans-unit>
-      <trans-unit id="FVgZpGA" resname="Notification actions">
-        <source>Notification actions</source>
-        <target state="translated">Notificatie acties</target>
-      </trans-unit>
       <trans-unit id="gGxnmUA" resname="Notifications">
         <source>Notifications</source>
         <target state="translated">Meldingen</target>
@@ -6772,10 +6772,6 @@
       <trans-unit id="NYE98.0" resname="Open from %open% until %close%.">
         <source>Open from %open% until %close%.</source>
         <target>Open van %open% tot %close%.</target>
-      </trans-unit>
-      <trans-unit id="sGdI_d5" resname="Open positions">
-        <source>Open positions</source>
-        <target>Openstaande posities</target>
       </trans-unit>
       <trans-unit id="nUcWlkX" resname="Open the full queue">
         <source>Open the full queue</source>
@@ -7452,6 +7448,10 @@
       <trans-unit id="8t_jGKE" resname="Previous poll">
         <source>Previous poll</source>
         <target state="translated">Vorige poll</target>
+      </trans-unit>
+      <trans-unit id="WT_T4Si" resname="Previous vacancy">
+        <source>Previous vacancy</source>
+        <target state="translated">Vorige vacature</target>
       </trans-unit>
       <trans-unit id="1X7oKCl" resname="Previously a member of">
         <source>Previously a member of</source>
