@@ -79,12 +79,12 @@ final readonly class NotificationSubjectResolver
                 $type,
                 array_values($subjectIds),
             );
-            foreach ($subjectIds as $id => $subjectId) {
-                if (!isset($names[$subjectId])) {
+            foreach ($subjectIds as $notificationId => $sid) {
+                if (!isset($names[$sid])) {
                     continue;
                 }
 
-                $resolved[$id] = $names[$subjectId];
+                $resolved[$notificationId] = $names[$sid];
             }
         }
 

@@ -168,16 +168,16 @@ final class MeetingScheduleFixture extends Fixture implements FixtureGroupInterf
         $number = self::FIRST_CM_NUMBER;
         $pastCms = [];
         $upcomingCms = [];
-        foreach ($cmDates as $date) {
+        foreach ($cmDates as $cmDate) {
             $meeting = $this->createMeeting(
                 $manager,
                 MeetingTypes::VV,
                 $number,
-                $date,
+                $cmDate,
             );
             $number++;
 
-            if ($date < $today) {
+            if ($cmDate < $today) {
                 $pastCms[] = $meeting;
             } else {
                 $upcomingCms[] = $meeting;

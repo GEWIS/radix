@@ -343,15 +343,20 @@ class ListmonkService
     public function getStatusFigures(): array
     {
         $lastFetch = $this->getLastFetchTime();
+        $rawLastSync = $this->configService->getConfig(
+            ConfigNamespaces::DatabaseListmonk,
+            'lastSync',
+            null,
+        );
+
+        $lastSync = $rawLastSync instanceof DateTimeImmutable
+            ? $rawLastSync
+            : null;
 
         return [
             'listmonkLastFetch' => $lastFetch,
             'listmonkLastFetchOverdue' => self::isOverdue($lastFetch),
-            'listmonkLastSync' => $this->configService->getConfig(
-                ConfigNamespaces::DatabaseListmonk,
-                'lastSync',
-                new DateTimeImmutable('0001-01-01 00:00:00'),
-            ),
+            'listmonkLastSync' => $lastSync,
         ];
     }
 

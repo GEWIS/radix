@@ -344,15 +344,20 @@ class MailmanService
     public function getStatusFigures(): array
     {
         $lastFetch = $this->getLastFetchTime();
+        $rawLastSync = $this->configService->getConfig(
+            ConfigNamespaces::DatabaseMailman,
+            'lastSync',
+            null,
+        );
+
+        $lastSync = $rawLastSync instanceof DateTimeImmutable
+            ? $rawLastSync
+            : null;
 
         return [
             'mailmanLastFetch' => $lastFetch,
             'mailmanLastFetchOverdue' => self::isOverdue($lastFetch),
-            'mailmanLastSync' => $this->configService->getConfig(
-                ConfigNamespaces::DatabaseMailman,
-                'lastSync',
-                new DateTimeImmutable('0001-01-01 00:00:00'),
-            ),
+            'mailmanLastSync' => $lastSync,
         ];
     }
 

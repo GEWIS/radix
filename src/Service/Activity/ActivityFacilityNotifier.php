@@ -160,7 +160,7 @@ final readonly class ActivityFacilityNotifier
             ),
             null !== $memberEmail => new Address(
                 $memberEmail,
-                $author?->getFullName() ?? '',
+                $author->getFullName(),
             ),
             default => null,
         };

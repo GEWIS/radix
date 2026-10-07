@@ -17,8 +17,6 @@ use PHLAK\SemVer\Exceptions\InvalidVersionException;
 use PHLAK\SemVer\Version as SemanticVersion;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-use function is_bool;
-use function is_string;
 use function max;
 use function preg_replace;
 
@@ -121,15 +119,11 @@ class ApiService
             'sync_paused',
         );
 
-        if (is_string($pausedUntil)) {
-            return null;
+        if ($pausedUntil instanceof DateTimeImmutable) {
+            return $pausedUntil;
         }
 
-        if (is_bool($pausedUntil)) {
-            return null;
-        }
-
-        return $pausedUntil;
+        return null;
     }
 
     /**

@@ -68,14 +68,14 @@ final readonly class MeetingDocumentZipBuilder
         }
 
         $used = [];
-        foreach ($entries as [$document, $version]) {
+        foreach ($entries as [$doc, $version]) {
             $name = sprintf(
                 '%s (%s)',
-                $document->name,
+                $doc->name,
                 $version->versionLabel,
             );
 
-            $point = $document->point;
+            $point = $doc->point;
             if (null !== $point) {
                 $name = sprintf(
                     '%s. %s',

@@ -179,12 +179,12 @@ final class RunNotificationDigestsCommand extends Command
                 ++$digests;
             }
 
-            foreach ($dueSubscriptions as $value => $subscription) {
-                if (!isset($sentCategories[$value])) {
+            foreach ($dueSubscriptions as $category => $sub) {
+                if (!isset($sentCategories[$category])) {
                     continue;
                 }
 
-                $subscription->lastSentAt = $now;
+                $sub->lastSentAt = $now;
             }
         }
 
