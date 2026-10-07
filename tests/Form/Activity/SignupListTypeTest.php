@@ -318,6 +318,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testAMembershipOrderIsStoredAsTiersAndAsksHowItIsApplied(): void
     {
         $list = $this->list();
+        $list->onlyGEWIS = false;
         $form = $this->submitList(
             ['membershipTierOrder' => 'non-member,ordinary,graduate'],
             $list,
@@ -345,6 +346,7 @@ final class SignupListTypeTest extends TypeTestCase
     public function testTiersJoinedByAPlusShareARank(): void
     {
         $list = $this->list();
+        $list->onlyGEWIS = false;
         $form = $this->submitList(
             [
                 'membershipTierOrder' => 'ordinary+external+honorary+graduate,non-member',
@@ -399,6 +401,23 @@ final class SignupListTypeTest extends TypeTestCase
             $form->isValid(),
             (string) $form->getErrors(true),
         );
+    }
+
+    public function testUncheckingMembersOnlyAllowsNonMembers(): void
+    {
+        $list = $this->list();
+        // Fresh list defaults to onlyGEWIS = true (members only)
+        self::assertTrue($list->onlyGEWIS);
+
+        $form = $this->section(
+            SignupListSection::Basics,
+            $list,
+        );
+        $form->submit([
+            'onlyGEWIS' => null,
+        ]);
+
+        self::assertFalse($list->onlyGEWIS);
     }
 
     public function testAnOpenListRanksOnNeitherStudyPhaseNorCohort(): void
@@ -562,7 +581,14 @@ final class SignupListTypeTest extends TypeTestCase
         );
 
         self::assertSame(
-            MembershipTier::defaultRanks(),
+            [
+                [
+                    MembershipTier::Ordinary,
+                    MembershipTier::External,
+                    MembershipTier::Honorary,
+                ],
+                [MembershipTier::Graduate],
+            ],
             $form->createView()->vars['membershipTierOrderTiers'],
         );
 
