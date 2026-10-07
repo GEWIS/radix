@@ -135,7 +135,7 @@ parameters:
         webmail: 'https://webmail.gewis.nl'
         gewiki: 'https://wiki.gewis.nl'
         supremum: 'https://supremum.gewis.nl'
-        corporate_identity: '/corporateidentity'
+        corporate_identity: 'https://wiki.gewis.nl/books/corporate-identity'
 
 services:
     # default configuration for services in *this* file
