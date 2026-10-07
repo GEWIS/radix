@@ -37,12 +37,6 @@ parameters:
 			path: src/Entity/Activity/UserSignup.php
 
 		-
-			message: '#^Parameter \#1 \$langParam of static method App\\Entity\\Application\\Enums\\AppLanguages\:\:fromLangParam\(\) expects ''en''\|''nl'', string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Entity/Application/Enums/AppLanguages.php
-
-		-
 			message: '#^Property App\\Entity\\Career\\CompanyFeaturedPackage\:\:\$article type mapping mismatch\: database can contain App\\Entity\\Career\\CareerLocalisedText\|null but property expects App\\Entity\\Career\\CareerLocalisedText\.$#'
 			identifier: doctrine.associationType
 			count: 1

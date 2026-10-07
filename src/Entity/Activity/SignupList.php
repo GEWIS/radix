@@ -1009,9 +1009,9 @@ class SignupList
 
         // What the stored order left out is appended the way the association would rank it, ties and all, so a tier
         // added to the enum is placed beside the ones it belongs with rather than alone at the end.
-        foreach ($tier::defaultRanks() as $rank) {
+        foreach ($tier::defaultRanks() as $tierRank) {
             $missing = [];
-            foreach ($rank as $case) {
+            foreach ($tierRank as $case) {
                 if (
                     in_array(
                         $case,

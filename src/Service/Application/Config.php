@@ -38,9 +38,9 @@ class Config implements ResetInterface
     /**
      * @template T of bool|string|DateTimeImmutable|null
      *
-     * @psalm-param T $default
+     * @phpstan-param T $default
      *
-     * @psalm-return (T is null ? bool|string|DateTimeImmutable|null : T)
+     * @phpstan-return bool|string|DateTimeImmutable|null
      */
     public function getConfig(
         ConfigNamespaces $namespace,
