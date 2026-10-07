@@ -23,7 +23,7 @@ jobs:
             actions: write
             contents: write
             pull-requests: write
-        uses: 'GEWIS/actions/.github/workflows/dependabot-auto-merge.yml@4ca17949275ff7c4475e5bb24046c1fd39209f8e' # v1.17.1
+        uses: 'GEWIS/actions/.github/workflows/dependabot-auto-merge.yml@00d200d2d7d17ad3d58c7ec3464c7d2ecff2d814' # v1.18.1
         with:
             auto-approve: true
             auto-merge: true
