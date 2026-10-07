@@ -77,7 +77,7 @@ class ApiPrincipal
      * @var ApiPermissions[] $permissions
      */
     #[Column(
-        type: Types::SIMPLE_ARRAY,
+        type: Types::JSON,
         nullable: true,
         enumType: ApiPermissions::class,
     )]

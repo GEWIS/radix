@@ -75,7 +75,7 @@ class ExternalApp
      * @var JWTClaims[]
      */
     #[Column(
-        type: Types::SIMPLE_ARRAY,
+        type: Types::JSON,
         nullable: true,
         enumType: JWTClaims::class,
     )]

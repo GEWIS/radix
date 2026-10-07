@@ -148,7 +148,7 @@ class ProspectiveMember
      * @var ?string[] $lists
      */
     #[Column(
-        type: Types::SIMPLE_ARRAY,
+        type: Types::JSON,
         nullable: true,
     )]
     private ?array $lists = [];
