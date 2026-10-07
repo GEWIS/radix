@@ -188,7 +188,7 @@ class SignupList
      * Determines if people outside of GEWIS can sign up.
      */
     #[Column(type: Types::BOOLEAN)]
-    public bool $onlyGEWIS = false;
+    public bool $onlyGEWIS = true;
 
     /**
      * Determines if the number of signed up members should be displayed

@@ -161,6 +161,7 @@ final class AdmissionOrderTest extends TestCase
             [MembershipTier::Ordinary],
             [MembershipTier::Graduate],
         ]);
+        $list->onlyGEWIS = false;
         $list->membershipPriorityMode = MembershipPriorityMode::Ordering;
 
         $pool = [

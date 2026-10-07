@@ -836,8 +836,7 @@ class SignupListType extends AbstractType
                 : $list->getMembershipTierOrder() ?? $list->membershipRanks(),
             'cohortTierOrderTiers' => $list?->getCohortTierOrder() ?? CohortTier::defaultRanks(),
             'programTypeOrderTiers' => $list?->getProgramTypeOrder() ?? ProgramType::defaultRanks(),
-            'onlyGEWIS' => $list->onlyGEWIS ?? true,
-            // The places held for each rank of the membership order, which the control renders on the rank itself.
+            'onlyGEWIS' => null === $list || $list->onlyGEWIS,
             'membershipPlaces' => $list?->getHeldMembershipPlaces() ?? [],
         ];
     }

@@ -435,6 +435,7 @@ final class ActivityRevisionClonerTest extends TestCase
             [MembershipTier::Ordinary],
             [MembershipTier::Graduate],
         ]);
+        $list->onlyGEWIS = false;
         $list->membershipPriorityMode = MembershipPriorityMode::ReservedPlaces;
         $list->setHeldMembershipPlaces([MembershipTier::Ordinary->value => 3]);
         $list->organisingCommitteePlaces = 2;
