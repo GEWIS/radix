@@ -13,6 +13,7 @@ use App\Repository\Frontpage\PollRepository;
 use App\Repository\Frontpage\PollVoteRepository;
 use App\Service\Frontpage\PollService;
 use App\Twig\Components\Concerns\FlashesTrait;
+use App\Twig\Components\Concerns\PanelPagerTrait;
 use DateTimeImmutable;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use LogicException;
@@ -58,13 +59,11 @@ final class PollWidget
 {
     use DefaultActionTrait;
     use FlashesTrait;
+    use PanelPagerTrait;
 
     /** @var Poll[] */
     #[LiveProp]
     public array $polls = [];
-
-    #[LiveProp]
-    public int $index = 0;
 
     /** The poll's own page shows the whole card; the front page shows the short one. */
     #[LiveProp]
@@ -138,13 +137,9 @@ final class PollWidget
             ?? throw new LogicException('The poll panel was mounted without a poll to show.');
     }
 
-    #[LiveAction]
-    public function show(
-        #[LiveArg]
-        int $at,
-    ): void {
-        // Wraps, so neither control is ever dead.
-        $this->index = (($at % count($this->polls)) + count($this->polls)) % count($this->polls);
+    protected function pagedItemCount(): int
+    {
+        return count($this->polls);
     }
 
     #[LiveAction]

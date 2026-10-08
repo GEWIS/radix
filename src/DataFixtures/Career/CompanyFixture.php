@@ -358,6 +358,60 @@ class CompanyFixture extends Fixture implements FixtureGroupInterface
             ],
         );
 
+        // Company with multiple vacancies in the same category to test the "View more" link.
+        $this->createCompany(
+            $manager,
+            slug: 'multi-vacancy-co',
+            name: 'Multi Vacancy Co',
+            sloganEn: 'Many openings, one company',
+            sloganNl: 'Veel vacatures, één bedrijf',
+            descriptionEn: 'A test company with multiple vacancies in the same category.',
+            descriptionNl: 'Een testbedrijf met meerdere vacatures in dezelfde categorie.',
+            websiteEn: 'https://example.com/multi',
+            websiteNl: 'https://example.com/multi',
+            featured: false,
+            bannerFormat: null,
+            logos: false,
+            vacancies: [
+                [
+                    'slug' => 'job-one',
+                    'category' => VacancyCategories::Jobs,
+                    'nameEn' => 'First Job',
+                    'nameNl' => 'Eerste Vacature',
+                    'descriptionEn' => 'First job description.',
+                    'descriptionNl' => 'Eerste vacatureomschrijving.',
+                    'labels' => ['fulltime'],
+                ],
+                [
+                    'slug' => 'job-two',
+                    'category' => VacancyCategories::Jobs,
+                    'nameEn' => 'Second Job',
+                    'nameNl' => 'Tweede Vacature',
+                    'descriptionEn' => 'Second job description.',
+                    'descriptionNl' => 'Tweede vacatureomschrijving.',
+                    'labels' => ['fulltime'],
+                ],
+                [
+                    'slug' => 'job-three',
+                    'category' => VacancyCategories::Jobs,
+                    'nameEn' => 'Third Job',
+                    'nameNl' => 'Derde Vacature',
+                    'descriptionEn' => 'Third job description.',
+                    'descriptionNl' => 'Derde vacatureomschrijving.',
+                    'labels' => ['fulltime'],
+                ],
+                [
+                    'slug' => 'internship-one',
+                    'category' => VacancyCategories::Internships,
+                    'nameEn' => 'Software Engineering Internship',
+                    'nameNl' => 'Stage Software Engineering',
+                    'descriptionEn' => 'Internship description.',
+                    'descriptionNl' => 'Stage omschrijving.',
+                    'labels' => ['fulltime'],
+                ],
+            ],
+        );
+
         $manager->flush();
     }
 
