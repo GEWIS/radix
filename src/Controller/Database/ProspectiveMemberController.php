@@ -9,11 +9,15 @@ use App\Controller\Application\HandlesFormFlowTrait;
 use App\Controller\Application\NoLeakHeadersTrait;
 use App\Controller\Application\RendersRejectedSubmissionTrait;
 use App\Entity\Database\Enums\MembershipTypes;
+use App\Entity\Database\GraduateConversionLink;
 use App\Entity\Database\RenewalLink;
 use App\Form\Database\MemberApproveType;
+use App\Form\Database\MemberGraduateConversionType;
 use App\Form\Database\MemberRenewalType;
 use App\Form\Database\Registration\RegistrationData;
 use App\Form\Database\Registration\RegistrationFlowType;
+use App\Form\SubmitButtons;
+use App\Repository\Database\GraduateConversionLinkRepository;
 use App\Repository\Database\RenewalLinkRepository;
 use App\Security\User\SudoVoter;
 use App\Service\Application\LocalePreference;
@@ -56,6 +60,8 @@ final class ProspectiveMemberController extends AbstractController
 
     private const string RENEWAL_SESSION_KEY = '_renewal_link_id';
 
+    private const string CONVERSION_SESSION_KEY = '_graduate_conversion_link_id';
+
     public function __construct(
         private readonly MemberService $memberService,
         private readonly RegistrationService $registrationService,
@@ -63,6 +69,7 @@ final class ProspectiveMemberController extends AbstractController
         private readonly LocalePreference $localePreference,
         private readonly ActionLinkService $actionLinkService,
         private readonly RenewalLinkRepository $renewalLinkRepository,
+        private readonly GraduateConversionLinkRepository $graduateConversionLinkRepository,
     ) {
     }
 
@@ -113,7 +120,7 @@ final class ProspectiveMemberController extends AbstractController
                 $flow->movePrevious(RegistrationData::STEP_PERSONAL);
                 $this->addFlash(
                     'error',
-                    $this->translator->trans('There already is a member with this e-mail address.'),
+                    $this->translator->trans('There already is a member with this email address.'),
                 );
 
                 return $this->redirectToRoute(
@@ -261,7 +268,7 @@ final class ProspectiveMemberController extends AbstractController
                 )
             ) {
                 $form->get('email')->addError(new FormError(
-                    $this->translator->trans('There already is a member with this e-mail address.'),
+                    $this->translator->trans('There already is a member with this email address.'),
                 ));
             } elseif ($form->isValid()) {
                 $this->memberService->renewMember(
@@ -285,6 +292,133 @@ final class ProspectiveMemberController extends AbstractController
             'database/join/renew.html.twig',
             ['form' => $form],
             $this->rejectedSubmission($form),
+        ));
+    }
+
+    public function graduateClaim(string $token): Response
+    {
+        $link = $this->actionLinkService->resolveGraduateConversion($token);
+
+        if (null === $link) {
+            return $this->render('database/join/graduate-unavailable.html.twig');
+        }
+
+        return $this->withNoLeakHeaders($this->redirectToRoute(
+            'join_graduate',
+            ['th' => $this->actionLinkService->claim($link)],
+        ));
+    }
+
+    public function graduate(Request $request): Response
+    {
+        $session = $request->getSession();
+
+        if (null !== ($tempHash = $request->query->get('th'))) {
+            $link = $this->actionLinkService->findByTempHash((string) $tempHash);
+
+            if (!$link instanceof GraduateConversionLink) {
+                return $this->render('database/join/graduate-unavailable.html.twig');
+            }
+
+            // Single-use: spent as the form is handed over rather than once it is submitted.
+            $this->actionLinkService->consumeTempHash($link);
+
+            $session->set(
+                self::CONVERSION_SESSION_KEY,
+                $link->id,
+            );
+
+            return $this->withNoLeakHeaders($this->redirectToRoute('join_graduate'));
+        }
+
+        $linkId = $session->get(self::CONVERSION_SESSION_KEY);
+
+        if (!is_int($linkId)) {
+            return $this->render('database/join/graduate-unavailable.html.twig');
+        }
+
+        $link = $this->graduateConversionLinkRepository->find($linkId);
+
+        // Decided afresh: it may have been answered in another tab, or gone stale while the page was open.
+        if (
+            null === $link
+            || $link->used
+            || $link->linkExpired()
+        ) {
+            $session->remove(self::CONVERSION_SESSION_KEY);
+
+            return $this->render('database/join/graduate-unavailable.html.twig');
+        }
+
+        $member = $link->member;
+        $form = $this->createForm(
+            MemberGraduateConversionType::class,
+            $member,
+            ['conversion_link' => $link],
+        );
+        $form->handleRequest($request);
+
+        if (
+            $form->isSubmitted()
+            && $form->isValid()
+        ) {
+            $declined = SubmitButtons::clicked(
+                $form,
+                'decline',
+            );
+
+            if ($declined) {
+                $removal = true === $form->get('removal')->getData();
+                $this->memberService->declineGraduateConversion(
+                    $member,
+                    $link,
+                    $removal,
+                );
+
+                $session->remove(self::CONVERSION_SESSION_KEY);
+
+                return $this->render(
+                    'database/join/graduate-declined.html.twig',
+                    [
+                        'member' => $member,
+                        'removal_requested' => $removal,
+                        'expiration' => $link->currentExpiration,
+                    ],
+                );
+            }
+
+            $email = (string) $form->get('email')->getData();
+
+            if (
+                !$this->memberService->emailBelongsToSomeoneElse(
+                    $email,
+                    $member,
+                )
+            ) {
+                $this->memberService->acceptGraduateConversion(
+                    $member,
+                    $link,
+                );
+
+                $session->remove(self::CONVERSION_SESSION_KEY);
+
+                return $this->render(
+                    'database/join/graduate-done.html.twig',
+                    ['member' => $member],
+                );
+            }
+
+            $form->get('email')->addError(new FormError(
+                $this->translator->trans('There already is a member with this email address.'),
+            ));
+        }
+
+        return $this->withNoLeakHeaders($this->render(
+            'database/join/graduate.html.twig',
+            [
+                'form' => $form,
+                'expiration' => $link->currentExpiration,
+            ],
         ));
     }
 

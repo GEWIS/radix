@@ -70,7 +70,7 @@ enum ApiPermissions: string implements TranslatableInterface
             self::KeyholdersR => new TranslatableMessage('Keys - List keyholders'),
             self::MailingListsR => new TranslatableMessage('Mailing lists - List mailing lists'),
             self::MailingListMembersR => new TranslatableMessage(
-                'Mailing lists - List subscribers of a mailing list, including their e-mail addresses',
+                'Mailing lists - List subscribers of a mailing list, including their email addresses',
             ),
             self::ActivitiesR => new TranslatableMessage('Activities - List activities'),
             self::PhotoAlbumsR => new TranslatableMessage('Photos - Read albums and their photos'),

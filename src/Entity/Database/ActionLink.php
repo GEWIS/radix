@@ -35,6 +35,8 @@ use Doctrine\ORM\Mapping\InheritanceType;
     value: [
         'payment' => PaymentLink::class,
         'renewal' => RenewalLink::class,
+        'email_change' => EmailChangeLink::class,
+        'graduate_conversion' => GraduateConversionLink::class,
     ],
 )]
 #[Index(

@@ -19,7 +19,7 @@
         {label: 'Last name', value: member.lastName},
         {label: 'TU/e student number', value: member.studentNumber ?? 'Unknown'},
         {label: 'Study', value: member.study.getName|trans},
-        {label: 'E-mail address', value: member.email, href: 'mailto:' ~ member.email},
+        {label: 'Email address', value: member.email, href: 'mailto:' ~ member.email},
         {label: 'Birthdate', value: member.birth|date('l j F Y')},
     ]) }}
     {{ details.summary('Address Information', [

@@ -56,7 +56,7 @@ class PersonalStepType extends AbstractType
             ->add(
                 'email',
                 EmailType::class,
-                ['label' => t('E-mail Address')],
+                ['label' => t('Email Address')],
             )
             ->add(
                 'birth',
