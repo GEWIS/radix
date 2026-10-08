@@ -1007,16 +1007,16 @@
         },
         {
             "name": "api-platform/symfony",
-            "version": "v5.0.1",
+            "version": "v5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/api-platform/symfony.git",
-                "reference": "7b25b4e1fd301cd58d98751fef82f691a91d5167"
+                "reference": "580de5ee414656e05b48026574c99c29be2876ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/api-platform/symfony/zipball/7b25b4e1fd301cd58d98751fef82f691a91d5167",
-                "reference": "7b25b4e1fd301cd58d98751fef82f691a91d5167",
+                "url": "https://api.github.com/repos/api-platform/symfony/zipball/580de5ee414656e05b48026574c99c29be2876ad",
+                "reference": "580de5ee414656e05b48026574c99c29be2876ad",
                 "shasum": ""
             },
             "require": {
@@ -1134,9 +1134,9 @@
                 "symfony"
             ],
             "support": {
-                "source": "https://github.com/api-platform/symfony/tree/v5.0.1"
+                "source": "https://github.com/api-platform/symfony/tree/v5.0.2"
             },
-            "time": "2026-09-25T18:01:39+00:00"
+            "time": "2026-10-01T08:25:48+00:00"
         },
         {
             "name": "api-platform/validator",
