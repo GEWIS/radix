@@ -24,6 +24,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,13 +32,11 @@ use InvalidArgumentException;
 use SortDirection;
 
 use function addcslashes;
-use function filter_var;
 use function is_numeric;
 use function mb_strtolower;
 use function strtolower;
+use function transliterator_transliterate;
 use function trim;
-
-use const FILTER_VALIDATE_EMAIL;
 
 /**
  * @extends ServiceEntityRepository<Member>
@@ -88,57 +87,51 @@ class MemberRepository extends ServiceEntityRepository
      */
     public function search(string $query): array
     {
-        $qb = $this->createQueryBuilder('m');
+        // Uses a native query so we can call PostgreSQL's to_ascii() to strip diacritics; MariaDB does this by
+        // default (accent-insensitive collation), but PostgreSQL requires an explicit function.
+        $searchTerm = transliterator_transliterate(
+            'Any-Latin; Latin-ASCII',
+            $query,
+        );
 
-        $qb->where("CONCAT(LOWER(m.firstName), ' ', LOWER(m.lastName)) LIKE :name")
-            ->orWhere("CONCAT(LOWER(m.firstName), ' ', LOWER(m.middleName), ' ', LOWER(m.lastName)) LIKE :name")
-            ->orWhere('m.studentNumber = :name')
-            ->setMaxResults(32)
-            ->orderBy(
-                'm.lidnr',
-                SortDirection::Descending,
-            )
-            ->setFirstResult(0);
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(
+            Member::class,
+            'm',
+        );
 
-        if (
-            filter_var(
-                $query,
-                FILTER_VALIDATE_EMAIL,
-            )
-        ) {
-            $qb->orWhere('m.email LIKE :name');
-        }
+        $sql = <<<'SQL'
+            SELECT m.*
+            FROM Member m
+            WHERE
+                (
+                    CONCAT(LOWER(unaccent(m.firstName)), ' ', LOWER(unaccent(m.lastName))) LIKE :name
+                    OR CONCAT(LOWER(unaccent(m.firstName)), ' ', LOWER(unaccent(m.middleName)), ' ',
+                        LOWER(unaccent(m.lastName))) LIKE :name
+                )
+                AND m.deleted = false
+                AND m.hidden = false
+                AND EXISTS (
+                    SELECT 1
+                    FROM Membership ms
+                    WHERE ms.member_lidnr = m.lidnr
+                    AND ms.type IN ('ordinary', 'external', 'honorary')
+                    AND (ms.endDate IS NULL OR ms.endDate >= NOW())
+                )
+            ORDER BY m.lidnr DESC
+            LIMIT 32
+            SQL;
 
+        $qb = $this->getEntityManager()->createNativeQuery(
+            $sql,
+            $rsm,
+        );
         $qb->setParameter(
             ':name',
-            '%' . strtolower($query) . '%',
+            '%' . strtolower(false !== $searchTerm ? $searchTerm : $query) . '%',
         );
 
-        // also allow searching for membership number
-        if (is_numeric($query)) {
-            $qb->orWhere('m.lidnr = :nr');
-            $qb->setParameter(
-                ':nr',
-                $query,
-            );
-        }
-
-        $sq = self::getMembershipSubquery(
-            $qb,
-            includeGraduates: true,
-            includeFutureMembers: true,
-        );
-
-        $qb->andWhere(
-            $qb->expr()->in(
-                'm',
-                $sq->getDQL(),
-            ),
-        )
-            ->andWhere('m.deleted = False')
-            ->andWhere('m.hidden = False');
-
-        return $qb->getQuery()->getResult();
+        return $qb->getResult();
     }
 
     public function findMemberAddress(
