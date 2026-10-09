@@ -51,7 +51,10 @@ final class MeetingDocumentZipBuilderTest extends DatabaseTestCase
         sort($entries);
         self::assertSame(
             [
+                '2. Activity report (v1.0).pdf',
                 '2. Agenda (v1.1).pdf',
+                '2. Election results (v1.0).pdf',
+                '2. Financial report (v1.0).pdf',
                 '3. Decision list (v1.0).pdf',
                 '7a. Budget (v2.1).pdf',
                 'Letter to the GMM (v1).pdf',

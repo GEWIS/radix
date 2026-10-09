@@ -145,47 +145,99 @@
     <div class="row g-4">
         <div class="col-lg-8" data-controller="revision-filter">
             {% if not isVirtual %}
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 meeting-view-tabs">
-                <ul class="nav nav-pills" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link {% if not showDecisionsFirst %}active{% endif %}" id="meeting-documents-tab"
-                                data-bs-toggle="pill" data-bs-target="#meeting-documents-pane" type="button" role="tab"
-                                aria-controls="meeting-documents-pane" aria-selected="{{ not showDecisionsFirst ? 'true' : 'false' }}">
-                            {{ 'Documents'|trans }}
-                            <span class="badge ms-1">{{ view.documentCount }}</span>
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link {% if showDecisionsFirst %}active{% endif %}" id="meeting-decisions-tab"
-                                data-bs-toggle="pill" data-bs-target="#meeting-decisions-pane" type="button" role="tab"
-                                aria-controls="meeting-decisions-pane" aria-selected="{{ showDecisionsFirst ? 'true' : 'false' }}">
-                            {{ 'Decisions'|trans }}
-                            {% if decisionCount > 0 %}
-                                <span class="badge ms-1">{{ decisionCount }}</span>
-                            {% endif %}
-                        </button>
-                    </li>
-                </ul>
-                {% if view.points is not empty or view.meetingLevelDocuments is not empty %}
-                    <div class="d-flex gap-2 revision-filter-controls">
-                        <button type="button" class="btn btn-sm btn-outline-secondary active"
-                                data-revision-filter-target="all" data-action="revision-filter#showAll">
-                            {{ 'All documents'|trans }}
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                data-revision-filter-target="revised" data-action="revision-filter#showRevised">
-                            {{ 'Revised only'|trans }}
-                        </button>
-                    </div>
-                {% endif %}
-            </div>
-            {% endif %}
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 meeting-view-tabs">
+                    <ul class="nav nav-pills" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if not showDecisionsFirst %}active{% endif %}" id="meeting-documents-tab"
+                                    data-bs-toggle="pill" data-bs-target="#meeting-documents-pane" type="button" role="tab"
+                                    aria-controls="meeting-documents-pane" aria-selected="{{ not showDecisionsFirst ? 'true' : 'false' }}">
+                                {{ 'Documents'|trans }}
+                                <span class="badge ms-1">{{ view.documentCount }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if showDecisionsFirst %}active{% endif %}" id="meeting-decisions-tab"
+                                    data-bs-toggle="pill" data-bs-target="#meeting-decisions-pane" type="button" role="tab"
+                                    aria-controls="meeting-decisions-pane" aria-selected="{{ showDecisionsFirst ? 'true' : 'false' }}">
+                                {{ 'Decisions'|trans }}
+                                {% if decisionCount > 0 %}
+                                    <span class="badge ms-1">{{ decisionCount }}</span>
+                                {% endif %}
+                            </button>
+                        </li>
+                    </ul>
+                    {% if view.points is not empty or view.meetingLevelDocuments is not empty %}
+                        <div class="d-flex gap-2 meeting-filter-buttons {% if showDecisionsFirst %}d-none{% endif %}">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary active"
+                                        data-revision-filter-target="all" data-action="revision-filter#showAll">
+                                    {{ 'All documents'|trans }}
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary"
+                                        data-revision-filter-target="revised" data-action="revision-filter#showRevised">
+                                    {{ 'Revised only'|trans }}
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-revision-filter-target="focus" data-action="revision-filter#toggleFocus">
+                                {{ 'Focus view'|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
 
             <div class="tab-content">
-                {% if not isVirtual %}
                 <div class="tab-pane fade {% if not showDecisionsFirst %}show active{% endif %} meeting-documents"
                      id="meeting-documents-pane" role="tabpanel" aria-labelledby="meeting-documents-tab" tabindex="0">
+                <div class="no-revised-message panel d-none">
+                    <div class="panel-body text-center text-muted py-5">
+                        {{ 'No revised documents to display.'|trans }}
+                    </div>
+                </div>
                     {% if view.points is not empty or view.meetingLevelDocuments is not empty %}
+                        <div class="panel condensed-list-panel">
+                            <div class="panel-heading">
+                                <h3>{{ 'Documents'|trans }}</h3>
+                            </div>
+                            <div class="panel-body list-group-condensed">
+                                {% for pointView in view.points %}
+                                    {% for document in pointView.documents %}
+                                        {% set versionCount = document.versions|length %}
+                                        <a href="{{ path('meetings/document_download', {'version': document.latestVersion.id}) }}"
+                                           data-turbo="false"
+                                           target="_blank"
+                                           class="list-group-item-condensed"
+                                           data-version-count="{{ versionCount }}">
+                                            <span class="fw-semibold">{{ pointView.point.number }}. {{ document.name }}</span>
+                                            <span class="small text-muted">
+                                                {{ 'v%version%'|trans({'%version%': versionCount}) }}
+                                                {% if document.latestVersion.uploadedAt %}
+                                                    &middot; {{ document.latestVersion.uploadedAt|format_date('medium') }}
+                                                {% endif %}
+                                            </span>
+                                            <span class="fas fa-download text-muted ms-auto" aria-hidden="true"></span>
+                                        </a>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for document in view.meetingLevelDocuments %}
+                                    {% set versionCount = document.versions|length %}
+                                    <a href="{{ path('meetings/document_download', {'version': document.latestVersion.id}) }}"
+                                       data-turbo="false"
+                                       target="_blank"
+                                       class="list-group-item-condensed"
+                                       data-version-count="{{ versionCount }}">
+                                        <span class="fw-semibold">{{ document.name }}</span>
+                                        <span class="small text-muted">
+                                            {{ 'v%version%'|trans({'%version%': versionCount}) }}
+                                            {% if document.latestVersion.uploadedAt %}
+                                                &middot; {{ document.latestVersion.uploadedAt|format_date('medium') }}
+                                            {% endif %}
+                                        </span>
+                                        <span class="fas fa-download text-muted ms-auto" aria-hidden="true"></span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
                         {% for pointView in view.points %}
                             <div class="panel meeting-point-panel">
                                 <div class="panel-heading d-flex flex-wrap align-items-baseline gap-2">
@@ -228,7 +280,7 @@
                         {% endif %}
 
                         {% if view.unmatchedDecisions is not empty and view.points is not empty %}
-                            <div class="panel">
+                            <div class="panel raised-during-meeting-panel">
                                 <div class="panel-heading">
                                     <h3>{{ 'Raised during the meeting'|trans }}</h3>
                                 </div>
@@ -310,13 +362,12 @@
                     <div class="panel-heading">
                         <h3>{{ 'Reference documents'|trans }}</h3>
                     </div>
-                    <div class="panel-body">
-                        <p class="text-muted small mb-2">{{ 'Not tied to an agenda point; these apply to the meeting as a whole.'|trans }}</p>
+                    <div class="panel-body list-group-condensed">
                         {% for selection in view.references %}
                             {% set effective = selection.pinnedVersion %}
                             {% if effective %}
                                 <a href="{{ path('meetings/reference_download', {'version': effective.id}) }}" data-turbo="false"
-                                   class="d-flex align-items-center gap-2 py-2 text-body {% if not loop.first %}border-top{% endif %}">
+                                   class="list-group-item-condensed">
                                     <span class="fas fa-file-pdf" aria-hidden="true"></span>
                                     <span class="flex-grow-1">
                                         <span class="fw-semibold d-block">{{ selection.referenceDocument.name }}</span>
@@ -335,10 +386,10 @@
                     <div class="panel-heading">
                         <h3>{{ 'Other meetings'|trans }}</h3>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body list-group-condensed">
                         {% for other in nearby %}
                             <a href="{{ path('meetings/view', {'type': other.type.urlToken, 'number': other.number}) }}"
-                               class="d-flex align-items-center gap-3 py-2 text-body {% if not loop.first %}border-top{% endif %}">
+                               class="list-group-item-condensed">
                                 <span class="fw-semibold text-nowrap">{{ other.type.getName|trans }} {{ other.number }}</span>
                                 <span class="flex-grow-1 small text-muted">{{ other.date|format_date('full') }}</span>
                                 <span class="fas fa-chevron-right text-muted small" aria-hidden="true"></span>

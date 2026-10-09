@@ -96,9 +96,9 @@ final class MeetingQueryServiceTest extends DatabaseTestCase
             $view->minutes?->getLatestVersion()?->versionLabel,
         );
 
-        // Four documents plus one reference selection.
+        // Seven documents plus one reference selection.
         self::assertSame(
-            5,
+            8,
             $view->documentCount,
         );
     }

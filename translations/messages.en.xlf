@@ -4049,6 +4049,10 @@
         <source>Focal length</source>
         <target>Focal length</target>
       </trans-unit>
+      <trans-unit id="V10iMrv" resname="Focus view">
+        <source>Focus view</source>
+        <target>Focus view</target>
+      </trans-unit>
       <trans-unit id="zwnWbzQ" resname="For your protection, sensitive actions require you to re-enter your password and a verification code. The confirmation lasts %minutes% minutes, and working keeps it open.">
         <source>For your protection, sensitive actions require you to re-enter your password and a verification code. The confirmation lasts %minutes% minutes, and working keeps it open.</source>
         <target>For your protection, sensitive actions require you to re-enter your password and a verification code. The confirmation lasts %minutes% minutes, and working keeps it open.</target>
@@ -6293,6 +6297,10 @@
         <source>No results found</source>
         <target state="translated">No results found</target>
       </trans-unit>
+      <trans-unit id="70IGGzD" resname="No revised documents to display.">
+        <source>No revised documents to display.</source>
+        <target state="translated">No revised documents to display.</target>
+      </trans-unit>
       <trans-unit id="pW4SVZG" resname="No round is taking proposals at the moment. The board opens one before each quartile.">
         <source>No round is taking proposals at the moment. The board opens one before each quartile.</source>
         <target state="translated">No round is taking proposals at the moment. The board opens one before each quartile.</target>
@@ -6464,10 +6472,6 @@
       <trans-unit id="q_qZc3B" resname="Not studying">
         <source>Not studying</source>
         <target state="translated">Not studying</target>
-      </trans-unit>
-      <trans-unit id="H4tw96s" resname="Not tied to an agenda point; these apply to the meeting as a whole.">
-        <source>Not tied to an agenda point; these apply to the meeting as a whole.</source>
-        <target state="translated">Not tied to an agenda point; these apply to the meeting as a whole.</target>
       </trans-unit>
       <trans-unit id="Z458ldp" resname="Not used yet">
         <source>Not used yet</source>
@@ -12532,6 +12536,10 @@
       <trans-unit id="hHE2ypN" resname="used by %count% revision|used by %count% revisions">
         <source>used by %count% revision|used by %count% revisions</source>
         <target>used by %count% revision|used by %count% revisions</target>
+      </trans-unit>
+      <trans-unit id="RO.ngXo" resname="v%version%">
+        <source>v%version%</source>
+        <target state="translated">v%version%</target>
       </trans-unit>
       <trans-unit id="yqfaihZ" resname="waiting">
         <source>waiting</source>

@@ -68,8 +68,52 @@
     .meeting-point-panel:not(:has([data-version-count]:not([data-version-count='1']))) {
         display: none;
     }
+
+    .raised-during-meeting-panel {
+        display: none;
+    }
+
+    .list-group-item-condensed[data-version-count='1'] {
+        display: none;
+    }
 }
 
-.meeting-view-tabs:has(#meeting-documents-tab:not(.active)) .revision-filter-controls {
+.focus-view .meeting-documents {
+    .meeting-point-panel {
+        display: none;
+    }
+
+    .raised-during-meeting-panel {
+        display: none;
+    }
+
+    .condensed-list-panel {
+        display: block;
+    }
+}
+
+.condensed-list-panel {
     display: none;
+}
+.list-group-condensed {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    > .list-group-item-condensed {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        text-decoration: none;
+        color: inherit;
+
+        &:not(:first-child) {
+            border-top: 1px solid var(--#{$prefix}border-color);
+        }
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
