@@ -216,7 +216,6 @@ final class DecisionController extends AbstractController
         methods: ['POST'],
     )]
     #[IsGranted(UserRoles::DatabaseAdmin->value)]
-    #[RendersOnSuccess]
     public function form(
         Request $request,
         string $form,
@@ -246,12 +245,13 @@ final class DecisionController extends AbstractController
             try {
                 $recorded = $this->meetingService->recordDecision($decision);
 
-                return $this->render(
-                    'database/decision/decision/created.html.twig',
+                return $this->redirectToRoute(
+                    'decision_decision_recorded',
                     [
-                        'decision' => $recorded,
-                        'contents' => $recorded->contents,
-                        'warnings' => $recorded->warnings,
+                        'type' => $decision->getMeetingType()->value,
+                        'number' => $decision->getMeetingNumber(),
+                        'point' => $decision->point,
+                        'decision' => $decision->number,
                     ],
                 );
             } catch (AnnulmentNotPossible $e) {
@@ -275,10 +275,50 @@ final class DecisionController extends AbstractController
                 'grants' => $options->keyGrants,
                 'member_function_form' => $this->memberFunctionForm(),
             ],
-            // This action declares RendersOnSuccess for the page a recorded decision returns, so a rejected one must
-            // set the status itself. An impossible annulment adds its reason to the form after validity was first
-            // read, which is why validity is read again.
-            $this->rejectedSubmission($decisionForm),
+        );
+    }
+
+    /**
+     * The page shown after a decision has been recorded, reached through a redirect from the form action.
+     */
+    #[Route(
+        path: '/meetings/{type}/{number}/points/{point}/decisions/{decision}/recorded',
+        name: 'decision_decision_recorded',
+        requirements: [
+            'type' => 'ALV|BV|VV|Virt',
+            'number' => '-?\\d+',
+            'point' => '\\d+',
+            'decision' => '\\d+',
+        ],
+        methods: ['GET'],
+    )]
+    #[IsGranted(UserRoles::DatabaseAdmin->value)]
+    public function recorded(
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+    ): Response {
+        $decisionEntity = $this->meetingService->getDecision(
+            $type,
+            $number,
+            $point,
+            $decision,
+        );
+
+        if (null === $decisionEntity) {
+            throw $this->createNotFoundException();
+        }
+
+        $recorded = $this->meetingService->buildRecordedDecision($decisionEntity);
+
+        return $this->render(
+            'database/decision/decision/created.html.twig',
+            [
+                'decision' => $recorded,
+                'contents' => $recorded->contents,
+                'warnings' => $recorded->warnings,
+            ],
         );
     }
 

@@ -9,8 +9,8 @@ use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Database\MeetingRepository;
-use App\Service\Database\Meeting as MeetingService;
 use App\Tests\Integration\DatabaseTestCase;
+use App\Tests\Support\BuildsDecisions;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -25,6 +25,8 @@ use function sprintf;
  */
 final class DecisionControllerTest extends DatabaseTestCase
 {
+    use BuildsDecisions;
+
     public function testEveryDecisionFormIsOffered(): void
     {
         $this->authenticateSecretary();
@@ -103,7 +105,7 @@ final class DecisionControllerTest extends DatabaseTestCase
     {
         $this->authenticateSecretary();
 
-        $service = self::getContainer()->get(MeetingService::class);
+        $service = self::getContainer()->get('App\Service\Database\Meeting');
         $waiting = $service->getUntranslatedDecisions(
             1,
             1,
@@ -155,6 +157,54 @@ final class DecisionControllerTest extends DatabaseTestCase
             $subdecision->getDecisionNumber(),
             $subdecision->sequence,
         ));
+    }
+
+    public function testSubmittingADecisionFormRedirectsToSuccessPage(): void
+    {
+        $this->authenticateSecretary();
+        $this->pushRequest();
+
+        // Create a decision directly using the service.
+        $service = self::getContainer()->get('App\Service\Database\Meeting');
+        $meetingNumber = 999; // Use a fresh meeting number that doesn't exist in the DB
+        $meeting = $this->meeting(
+            MeetingTypes::VIRT,
+            $meetingNumber,
+        );
+        $decision = $this->decision(
+            $meeting,
+            1,
+            1,
+        );
+        $this->other(
+            $decision,
+            'Test besluit',
+            1,
+            'Test decision',
+        );
+        $recorded = $service->recordDecision($decision);
+
+        // Test that the recorded route returns the success page.
+        $controller = self::getContainer()->get(DecisionController::class);
+        $response = $controller->recorded(
+            MeetingTypes::VIRT,
+            $meetingNumber,
+            1,
+            1,
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+            'The recorded route should return 200',
+        );
+
+        $content = (string) $response->getContent();
+        self::assertStringContainsString(
+            $recorded->hash,
+            $content,
+            'The success page should show the decision hash',
+        );
     }
 
     /** CSRF is stateless here, so a same-origin request is what the manager accepts. */

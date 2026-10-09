@@ -93,6 +93,23 @@ class Meeting
     }
 
     /**
+     * Get a decision by its identifying fields.
+     */
+    public function getDecision(
+        MeetingTypes $type,
+        int $number,
+        int $point,
+        int $decision,
+    ): ?DecisionModel {
+        return $this->meetingRepository->findDecision(
+            $type,
+            $number,
+            $point,
+            $decision,
+        );
+    }
+
+    /**
      * Get a meeting with the decisions taken in it.
      */
     public function getMeetingView(
@@ -282,6 +299,27 @@ class Meeting
                 AppLanguages::cases(),
             ),
             $warnings,
+        );
+    }
+
+    /**
+     * Reconstruct the success page view model from a persisted decision.
+     */
+    public function buildRecordedDecision(DecisionModel $decision): RecordedDecision
+    {
+        return new RecordedDecision(
+            $decision->getHash(),
+            $decision->getMeetingType()->value,
+            $decision->getMeetingNumber(),
+            $this->getCopyContent($decision),
+            array_map(
+                fn (AppLanguages $language): string => $decision->getTranslatedContent(
+                    $this->translator,
+                    $language,
+                ),
+                AppLanguages::cases(),
+            ),
+            [],
         );
     }
 
