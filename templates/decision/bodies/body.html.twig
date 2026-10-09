@@ -1,13 +1,18 @@
 {% extends 'layout.html.twig' %}
 
-{% set summary = information is not null
-    ? (information.shortDescription|localise_text ?: information.description|localise_text|markdown_excerpt(200))
+{% set hasLiveRevision = information is not null and information.isPublished() %}
+{% set summary = hasLiveRevision
+    ? (information.shortDescription is not null
+        ? information.shortDescription|localise_text
+        : (information.description is not null
+            ? information.description|localise_text|markdown_excerpt(200)
+            : ''))
     : '' %}
-{% set banner = information is not null ? information.bannerPath : null %}
-{% set logo = information is not null ? information.logoPath : null %}
+{% set banner = hasLiveRevision ? information.bannerPath : null %}
+{% set logo = hasLiveRevision ? information.logoPath : null %}
 
 {% block page_title %}{{ organ.name|page_title }}{{ parent() }}{% endblock %}
-{% block meta_description %}{{ summary is not empty ? summary : parent() }}{% endblock %}
+{% block meta_description %}{{ summary is not empty ? summary : ('%abbr% likes to keep their existence a mystery' | trans({'%abbr%': organ.abbr})) }}{% endblock %}
 {% block meta_image %}{{ banner is not null ? absolute_url(image_url(banner, 'w1280')) : (logo is not null ? absolute_url(image_url(logo, 'w640')) : parent()) }}{% endblock %}
 {% block meta_card %}{{ banner is not null ? 'summary_large_image' : parent() }}{% endblock %}
 
