@@ -77,6 +77,10 @@
         <source>%ORGAN_TYPE% %ORGAN_NAME% met afkorting %ORGAN_ABBR% wordt opgericht.</source>
         <target state="translated">%ORGAN_TYPE% %ORGAN_NAME% met afkorting %ORGAN_ABBR% wordt opgericht.</target>
       </trans-unit>
+      <trans-unit id="Mm3I3tM" resname="%abbr% likes to keep their existence a mystery">
+        <source>%abbr% likes to keep their existence a mystery</source>
+        <target state="translated">%abbr% houdt hun bestaan graag een raadsel</target>
+      </trans-unit>
       <trans-unit id="cO1414V" resname="%actor% added %subject% to the library">
         <source>%actor% added %subject% to the library</source>
         <target state="translated">%actor% heeft %subject% aan de bibliotheek toegevoegd</target>
