@@ -52,38 +52,41 @@ class InstallType extends AbstractType
                 'installations',
                 CollectionType::class,
                 [
-                    'label' => t('Installations'),
+                    'label' => false,
                     'entry_type' => InstallationType::class,
                     'allow_add' => true,
                     'allow_delete' => true,
                     'prototype' => true,
                     'prototype_name' => '__index__',
+                    'attr' => ['data-add-button' => 'false'],
                 ],
             )
             ->add(
                 'reappointments',
                 CollectionType::class,
                 [
-                    'label' => t('Reappointments'),
+                    'label' => false,
                     'entry_type' => SubDecisionType::class,
                     'entry_options' => ['subdecision_class' => Installation::class],
                     'allow_add' => true,
                     'allow_delete' => true,
                     'prototype' => true,
                     'prototype_name' => '__index__',
+                    'attr' => ['data-add-button' => 'false'],
                 ],
             )
             ->add(
                 'discharges',
                 CollectionType::class,
                 [
-                    'label' => t('Discharges'),
+                    'label' => false,
                     'entry_type' => SubDecisionType::class,
                     'entry_options' => ['subdecision_class' => Installation::class],
                     'allow_add' => true,
                     'allow_delete' => true,
                     'prototype' => true,
                     'prototype_name' => '__index__',
+                    'attr' => ['data-add-button' => 'false'],
                 ],
             )
             ->add(

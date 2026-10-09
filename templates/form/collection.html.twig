@@ -24,8 +24,10 @@
     {% set placeholder = has_prototype ? (prototype.vars.name|split('[')|last|trim(']')) : '__name__' %}
     {% set add_label = add_label|default('Add'|trans) %}
     {% set remove_label = remove_label|default('Remove'|trans) %}
+    {% set show_add_button = allow_add and (attr is not defined or attr['data-add-button'] is not defined) %}
     <div {{ block('widget_container_attributes') }}
          data-controller="form-collection"
+         {% if attr is defined and attr['data-add-button'] is defined %}data-add-button="{{ attr['data-add-button'] }}"{% endif %}
          {% if has_prototype %}
              data-form-collection-prototype-value="{{ helper.collection_entry(prototype, allow_delete, remove_label)|e('html_attr') }}"
              data-form-collection-prototype-name-value="{{ placeholder }}"
@@ -35,7 +37,7 @@
                 {{ helper.collection_entry(child, allow_delete, remove_label) }}
             {% endfor %}
         </div>
-        {% if allow_add %}
+        {% if show_add_button %}
             <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
                     data-form-collection-target="add" data-action="form-collection#add">
                 {{ add_label }}

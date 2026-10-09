@@ -75,6 +75,14 @@ final class DecisionControllerTest extends DatabaseTestCase
                 $content,
             );
         }
+
+        // The install form collections use a custom Stimulus controller (install-editor) and must not render the
+        // generic form-collection "Add" buttons. We verify this by checking that the install collections are
+        // configured to suppress the add button.
+        self::assertStringContainsString(
+            'data-add-button="false"',
+            $content,
+        );
     }
 
     public function testOnlyDecisionsWithoutAnEnglishTextAreOfferedForTranslation(): void
