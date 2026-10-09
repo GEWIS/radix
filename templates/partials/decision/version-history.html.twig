@@ -21,7 +21,8 @@
                         {{ version.uploadedBy ? version.uploadedBy.member.fullName : '' }}
                     </span>
                 {% endif %}
-                <a href="{{ path(route, {'version': version.id}) }}" class="text-muted" aria-label="{{ 'Download'|trans }}">
+                <a href="{{ path(route, {'version': version.id}) }}" data-turbo="false"
+                   target="_blank" class="text-muted" aria-label="{{ 'Download'|trans }}">
                     <span class="fas fa-download" aria-hidden="true"></span>
                 </a>
             </div>

@@ -34,6 +34,7 @@ final readonly class FileDownloadHelper
         string $storedPath,
         string $downloadFilename,
         ?string $contentType = null,
+        bool $attachment = true,
     ): Response {
         $absolutePath = $this->storageRootDir . '/' . $storedPath;
 
@@ -56,7 +57,7 @@ final readonly class FileDownloadHelper
         $response->headers->set(
             'Content-Disposition',
             HeaderUtils::makeDisposition(
-                HeaderUtils::DISPOSITION_ATTACHMENT,
+                $attachment ? HeaderUtils::DISPOSITION_ATTACHMENT : HeaderUtils::DISPOSITION_INLINE,
                 $downloadFilename,
             ),
         );

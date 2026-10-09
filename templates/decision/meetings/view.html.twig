@@ -82,7 +82,8 @@
         <div class="border rounded p-2" data-version-count="{{ versionCount }}">
             <div class="d-flex align-items-center gap-3">
                 <span class="fas fa-file-pdf" aria-hidden="true"></span>
-                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false" class="flex-grow-1 text-body">
+                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false"
+                   target="_blank" class="flex-grow-1 text-body">
                     <span class="fw-semibold d-block">{{ document.name }}</span>
                     <span class="small text-muted">
                         {{ latest.versionLabel }}
@@ -97,7 +98,8 @@
                         {{ 'History'|trans }}
                     </button>
                 {% endif %}
-                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false" class="text-muted"
+                <a href="{{ path('meetings/document_download', {'version': latest.id}) }}" data-turbo="false"
+                   target="_blank" class="text-muted"
                    aria-label="{{ 'Download'|trans }}">
                     <span class="fas fa-download" aria-hidden="true"></span>
                 </a>
