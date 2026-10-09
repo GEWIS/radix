@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller\Decision;
 
 use App\Controller\Decision\BodyController;
+use App\Entity\Database\Enums\OrganTypes;
+use App\Entity\Decision\Organ;
+use App\Entity\Decision\OrganInformation;
 use App\Entity\User\CompanyUser;
 use App\Entity\User\User;
 use App\Repository\User\CompanyUserRepository;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
@@ -105,6 +109,58 @@ final class BodyControllerTest extends DatabaseTestCase
         self::assertStringNotContainsString(
             'BÖDY Smits',
             $content,
+        );
+    }
+
+    /**
+     * A body that has not written a page yet, or whose page is still awaiting approval, must not crash the body page.
+     * The summary, banner and logo are derived from the live revision, which is null in that case.
+     */
+    public function testABodyWithoutALiveRevisionRendersWithoutACrash(): void
+    {
+        // Create an organ with an organInformation entity but no approved revision.
+        // This triggers the crash if the template doesn't check for null shortDescription/description.
+        $organ = $this->entityManager->getRepository(Organ::class)->findOneBy([
+            'abbr' => 'NOINFO',
+        ]);
+
+        if (null === $organ) {
+            $organ = new Organ();
+            $organ->abbr = 'NOINFO';
+            $organ->type = OrganTypes::Committee;
+            $organ->foundationDate = new DateTimeImmutable('2025-01-15');
+            $organ->name = 'No Info Committee';
+
+            // Create an organInformation entity with no approved revision.
+            $info = new OrganInformation();
+            $info->organ = $organ;
+            $organ->organInformation = $info;
+
+            $this->entityManager->persist($organ);
+            $this->entityManager->flush();
+        }
+
+        $this->pushRequest();
+
+        $response = $this->controller()->body(
+            'committee',
+            'NOINFO',
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        $content = (string) $response->getContent();
+        self::assertStringContainsString(
+            'NOINFO',
+            $content,
+        );
+        self::assertStringContainsString(
+            'meta name="description"',
+            $content,
+            'The page is expected to have a description meta tag.',
         );
     }
 
