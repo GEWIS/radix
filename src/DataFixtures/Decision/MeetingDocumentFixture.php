@@ -128,6 +128,51 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
             $uploader,
             new DateTimeImmutable('-2 days'),
         );
+        // Additional documents for focus view demonstration
+        $financialReport = $this->createDocument(
+            $manager,
+            'meeting-gmm-complete',
+            'meeting-gmm-complete-point-2',
+            'Financial report',
+            0,
+        );
+        $this->createVersion(
+            $manager,
+            $financialReport,
+            'v1.0',
+            $uploader,
+            new DateTimeImmutable('-2 weeks'),
+        );
+
+        $activityReport = $this->createDocument(
+            $manager,
+            'meeting-gmm-complete',
+            'meeting-gmm-complete-point-2',
+            'Activity report',
+            0,
+        );
+        $this->createVersion(
+            $manager,
+            $activityReport,
+            'v1.0',
+            $uploader,
+            new DateTimeImmutable('-2 weeks'),
+        );
+
+        $electionResults = $this->createDocument(
+            $manager,
+            'meeting-gmm-complete',
+            'meeting-gmm-complete-point-2',
+            'Election results',
+            0,
+        );
+        $this->createVersion(
+            $manager,
+            $electionResults,
+            'v1.0',
+            $uploader,
+            new DateTimeImmutable('-1 week'),
+        );
 
         $manager->flush();
     }

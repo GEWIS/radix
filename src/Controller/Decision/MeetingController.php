@@ -161,6 +161,7 @@ class MeetingController extends AbstractController
                 $version->versionLabel,
             ),
             'application/pdf',
+            false,
         );
     }
 
