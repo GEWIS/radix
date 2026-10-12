@@ -1,0 +1,38 @@
+{# The memberships a member has held, oldest first, which is how the register records the years somebody was with the
+   association. A membership always ends on a date, even the one that is running: what a renewal writes is the next
+   membership after it, so a row that ends today is not the same as a member who left.
+
+   `show_paid` is for the register, where what was paid for a year is part of the record. It is not the member's own
+   business on their own page: what they paid they know, and it is the association's bookkeeping rather than theirs. #}
+{% set show_paid = show_paid|default(false) %}
+
+{% if memberships is empty %}
+    <p class="text-secondary mb-0">{{ 'No memberships on record.'|trans }}</p>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">{{ 'Type'|trans }}</th>
+                    <th scope="col">{{ 'From'|trans }}</th>
+                    <th scope="col">{{ 'Until'|trans }}</th>
+                    {% if show_paid %}
+                        <th scope="col" class="text-end">{{ 'Paid'|trans }}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for membership in memberships %}
+                    <tr>
+                        <td>{{ membership.type|trans }}</td>
+                        <td>{{ membership.startDate|format_date(pattern: 'd MMMM y') }}</td>
+                        <td>{{ membership.endDate|format_date(pattern: 'd MMMM y') }}</td>
+                        {% if show_paid %}
+                            <td class="text-end">{{ membership.paid }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

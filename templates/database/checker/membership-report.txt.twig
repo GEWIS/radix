@@ -1,0 +1,10 @@
+{# `errors` holds one line per thing that does not hold about one member's memberships. A `.txt.twig` template is not
+   escaped, so every line arrives as `App\ViewModel\Checker\MembershipError::asText()` wrote it. #}
+{% if 0 == count %}
+Every member's memberships run in order and do not overlap.
+{% else %}
+{{ count }} membership(s) do not hold:
+{% for error in errors %}
+{{ error.asText }}
+{% endfor %}
+{% endif %}
