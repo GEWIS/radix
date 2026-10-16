@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "42084ae4bbcaa2d22c14893a2ba6a08f",
+    "content-hash": "9c4e16ad77dba98ae6f213de0cda231d",
     "packages": [
         {
             "name": "altcha-org/altcha",
@@ -15014,16 +15014,16 @@
         },
         {
             "name": "igor-php/igor-php",
-            "version": "v0.9.7",
+            "version": "v0.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/igor-php/igor-php.git",
-                "reference": "48935c8cf42d0764a9d54f22e9c290816c5caa91"
+                "reference": "a4f9153de9bae1e746a34dfb571462bcda6f4235"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/igor-php/igor-php/zipball/48935c8cf42d0764a9d54f22e9c290816c5caa91",
-                "reference": "48935c8cf42d0764a9d54f22e9c290816c5caa91",
+                "url": "https://api.github.com/repos/igor-php/igor-php/zipball/a4f9153de9bae1e746a34dfb571462bcda6f4235",
+                "reference": "a4f9153de9bae1e746a34dfb571462bcda6f4235",
                 "shasum": ""
             },
             "require": {
@@ -15058,9 +15058,9 @@
             ],
             "support": {
                 "issues": "https://github.com/igor-php/igor-php/issues",
-                "source": "https://github.com/igor-php/igor-php/tree/v0.9.7"
+                "source": "https://github.com/igor-php/igor-php/tree/v0.10.1"
             },
-            "time": "2026-09-22T20:33:54+00:00"
+            "time": "2026-10-02T23:10:19+00:00"
         },
         {
             "name": "league/flysystem-memory",
