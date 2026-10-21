@@ -1,6 +1,6 @@
 #syntax=docker/dockerfile:1
 ARG PHP_VERSION=8.5
-ARG FRANKENPHP_VERSION=1.12
+ARG FRANKENPHP_VERSION=1.13
 # The IP databases device recognition and security notices read, baked in so a first start never waits on their
 # host. They live outside /app/data because the volume mounts over it; the entrypoint seeds that volume from them
 # and app:user:update-ip-databases keeps it fresh. Pinned to a commit so the layer caches, as IPLocate rebuilds
