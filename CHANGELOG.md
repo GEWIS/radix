@@ -8,6 +8,16 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.7.0](https://github.com/GEWIS/radix/tree/v5.7.0) (2026-10-21)
+* Added focus view for viewing meeting documents.
+* Added functionality to clear all notifications at once (marking them as read is still possible).
+* Changed the default value for new activity signup lists: new default is that only GEWIS members can subscribe.
+* Fixed an issue where a body could not be loaded when there were revisions, but no live revisions.
+* Fixed deprecation warnings in twig templates resulting in GBs of log files.
+* Fixed the reference to the corporate identity. It can now be found on the wiki. 
+* Fixed redirect after entering decision.
+* Fixed viewing company pages with many vacancies.
+
 ### [v5.6.0](https://github.com/GEWIS/radix/tree/v5.6.0) (2026-09-23)
 
 * Added read access to the member pages of the register for every board member.
