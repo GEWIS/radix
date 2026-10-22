@@ -3218,16 +3218,16 @@
         },
         {
             "name": "endroid/qr-code-bundle",
-            "version": "7.0.1",
+            "version": "7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endroid/qr-code-bundle.git",
-                "reference": "9d9701bae43ab45c7b082f492c0018c6324310c7"
+                "reference": "0b7ef7ab4a25989edb571b34fd9d58734d3948de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endroid/qr-code-bundle/zipball/9d9701bae43ab45c7b082f492c0018c6324310c7",
-                "reference": "9d9701bae43ab45c7b082f492c0018c6324310c7",
+                "url": "https://api.github.com/repos/endroid/qr-code-bundle/zipball/0b7ef7ab4a25989edb571b34fd9d58734d3948de",
+                "reference": "0b7ef7ab4a25989edb571b34fd9d58734d3948de",
                 "shasum": ""
             },
             "require": {
@@ -3275,7 +3275,7 @@
             ],
             "support": {
                 "issues": "https://github.com/endroid/qr-code-bundle/issues",
-                "source": "https://github.com/endroid/qr-code-bundle/tree/7.0.1"
+                "source": "https://github.com/endroid/qr-code-bundle/tree/7.0.2"
             },
             "funding": [
                 {
@@ -3283,7 +3283,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-20T21:21:57+00:00"
+            "time": "2026-10-13T15:00:26+00:00"
         },
         {
             "name": "fortawesome/font-awesome",
