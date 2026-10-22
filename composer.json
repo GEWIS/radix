@@ -67,7 +67,7 @@
         "symfony/intl": "8.1.*",
         "symfony/lock": "8.1.*",
         "symfony/mailer": "8.1.*",
-        "symfony/mercure": "^0.8.0",
+        "symfony/mercure": "^0.9.0",
         "symfony/mercure-bundle": "^0.6.1",
         "symfony/messenger": "8.1.*",
         "symfony/mime": "8.1.*",
