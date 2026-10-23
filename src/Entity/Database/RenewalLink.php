@@ -21,6 +21,11 @@ use Override;
 class RenewalLink extends ActionLink
 {
     /**
+     * Also how far back the sweep that sends these is willing to look.
+     */
+    public const int GRACE_DAYS = 30;
+
+    /**
      * The member
      */
     #[ManyToOne(
@@ -72,6 +77,6 @@ class RenewalLink extends ActionLink
     {
         $diff = new DateTimeImmutable()->diff($this->currentExpiration);
 
-        return 1 === $diff->invert && ($diff->days > 30);
+        return 1 === $diff->invert && ($diff->days > self::GRACE_DAYS);
     }
 }

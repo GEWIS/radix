@@ -1,0 +1,41 @@
+{% extends 'layout-sidebar.html.twig' %}
+
+{% block page_title %}{{ addressType.getName|trans }}{% endblock %}
+
+{% block sidebar_label %}{{ app.user.member.getFullName }}{% endblock %}
+{% block sidebar %}
+    {% include 'partials/member-sidebar.html.twig' with {
+        'member': app.user.member,
+        'isSelf': true,
+        'activeRoute': 'details',
+    } %}
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3>{{ addressType.getName|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(form) }}
+                        {{ form_row(form.country) }}
+                        {{ form_row(form.street) }}
+                        {{ form_row(form.number) }}
+                        {{ form_row(form.postalCode) }}
+                        {{ form_row(form.city) }}
+                        {{ form_row(form.phone) }}
+                        {{ form_widget(form.submit, {
+                            'label': add ? 'Add address'|trans : 'Save address'|trans,
+                            'attr': {'class': 'btn-gewis-primary'},
+                        }) }}
+                        <a class="btn btn-outline-secondary" href="{{ path('user_settings_details_index') }}">
+                            {{ 'Cancel'|trans }}
+                        </a>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

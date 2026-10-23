@@ -1,0 +1,25 @@
+{% extends 'layout.html.twig' %}
+
+
+{% block page_title %}{{ 'Staying on as a graduate'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block contents %}
+    {% embed 'database/partials/join/registration-header.html.twig' with {header_title: 'Your membership will end'|trans} %}
+        {% block registration_intro %}
+            <p>
+                {{ 'Thank you for letting us know, %name%. Your membership ends on %date% and we will not ask you about it again.'|trans({
+                    '%name%': member.firstName,
+                    '%date%': expiration|format_date(pattern: 'd MMMM y'),
+                }) }}
+            </p>
+            {% if removal_requested %}
+                <p>
+                    {{ 'We have passed your request to have your data removed on to the secretary, who will be in touch.'|trans }}
+                </p>
+            {% endif %}
+            <p>
+                {{ 'Thank you for the years you were with us.'|trans }}
+            </p>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

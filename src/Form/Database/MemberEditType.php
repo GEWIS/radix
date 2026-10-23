@@ -119,7 +119,7 @@ class MemberEditType extends AbstractType
             'email',
             EmailType::class,
             [
-                'label' => t('E-mail Address'),
+                'label' => t('Email Address'),
                 'required' => false,
                 'empty_data' => null,
                 'constraints' => [new Assert\Email()],
