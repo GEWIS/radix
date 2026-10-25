@@ -76,8 +76,9 @@ services:
                 watch ./var/typescript
             FRANKENPHP_SITE_CONFIG: "hot_reload"
             MERCURE_EXTRA_DIRECTIVES: |
-                ui
+                playground
                 anonymous
+                protocol_version_compatibility 8
             # See https://xdebug.org/docs/all_settings#mode
             XDEBUG_MODE: "${XDEBUG_MODE:-off}"
             # Names the IDE's server configuration, which is what carries the path mapping from /app back to the
