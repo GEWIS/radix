@@ -859,11 +859,7 @@ parameters:
 			count: 1
 			path: src/Repository/Database/MeetingRepository.php
 
-		-
-			message: '#^Only booleans are allowed in an if condition, string\|false given\.$#'
-			identifier: if.condNotBoolean
-			count: 1
-			path: src/Repository/Database/MemberRepository.php
+
 
 		-
 			message: '''
