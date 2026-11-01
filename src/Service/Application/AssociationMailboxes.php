@@ -24,9 +24,9 @@ final readonly class AssociationMailboxes
         private string $mailToC4Name,
         private string $mailToGeflitstAddress,
         private string $mailToGeflitstName,
-        private string $mailToGeflitstPlankaAddress,
-        private string $mailToGeflitstPlankaName,
-        private string $mailToGeflitstPlankaKey,
+        private string $mailToGeflitstKaneoAddress,
+        private string $mailToGeflitstKaneoName,
+        private string $mailToGeflitstKaneoProjectId,
         private string $mailToTreasurerAddress,
         private string $mailToTreasurerName,
     ) {
@@ -65,22 +65,25 @@ final readonly class AssociationMailboxes
     }
 
     /**
-     * GEFLITST's Planka board, which takes the same message as a second recipient and files it as a card.
+     * The mailbox GEFLITST's task board (Kaneo, read by [kaneo-mailer]) takes the same message as a second
+     * recipient and files it as a task.
+     *
+     * [kaneo-mailer]: https://github.com/GEWIS/kaneo-mailer
      */
-    public function geflitstPlanka(): Address
+    public function geflitstKaneo(): Address
     {
         return new Address(
-            $this->mailToGeflitstPlankaAddress,
-            $this->mailToGeflitstPlankaName,
+            $this->mailToGeflitstKaneoAddress,
+            $this->mailToGeflitstKaneoName,
         );
     }
 
     /**
-     * Which board the card belongs on, carried in the `X-Planka-Board-Id` header.
+     * Which Kaneo project the task belongs on, carried in the `X-Kaneo-Project-Id` header.
      */
-    public function geflitstPlankaKey(): string
+    public function geflitstKaneoProjectId(): string
     {
-        return $this->mailToGeflitstPlankaKey;
+        return $this->mailToGeflitstKaneoProjectId;
     }
 
     public function treasurer(): Address

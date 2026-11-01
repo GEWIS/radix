@@ -15,9 +15,9 @@ use Symfony\Component\Mime\Email;
 use function array_map;
 
 /**
- * GEFLITST are notified the moment an activity requests a photographer, and their Planka board is addressed on the
- * same message so that it files a card and a reply reaches everybody. The board is named by a header rather than by
- * anything in the body, so these pin the envelope rather than the words.
+ * GEFLITST are notified the moment an activity requests a photographer, and their Kaneo mailbox is addressed on the
+ * same message so that kaneo-mailer files a task and a reply reaches everybody. The task's project is named by a
+ * header rather than by anything in the body, so these pin the envelope rather than the words.
  */
 final class ActivityFacilityNotifierTest extends DatabaseTestCase
 {
@@ -36,7 +36,7 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
         self::assertEqualsCanonicalizing(
             [
                 $mailboxes->geflitst()->getAddress(),
-                $mailboxes->geflitstPlanka()->getAddress(),
+                $mailboxes->geflitstKaneo()->getAddress(),
             ],
             array_map(
                 static fn (object $address): string => $address->getAddress(),
@@ -44,13 +44,13 @@ final class ActivityFacilityNotifierTest extends DatabaseTestCase
             ),
         );
         self::assertSame(
-            $mailboxes->geflitstPlankaKey(),
-            $message->getHeaders()->get('X-Planka-Board-Id')?->getBodyAsString(),
+            $mailboxes->geflitstKaneoProjectId(),
+            $message->getHeaders()->get('X-Kaneo-Project-Id')?->getBodyAsString(),
         );
     }
 
     /**
-     * Planka replies to the message, so the reply has to reach the requester rather than the association at large.
+     * Kaneo replies to the message, so the reply has to reach the requester rather than the association at large.
      */
     public function testTheRequesterIsWhoAReplyReaches(): void
     {

@@ -25,9 +25,10 @@ use function sprintf;
  * Only the flip from off to on sends: a draft cloned from a revision that already asked for a photographer is not a
  * new request, and neither is saving the same draft again.
  *
- * The GEFLITST message is addressed to their Planka board as well as to themselves, with the board id in an
- * `X-Planka-Board-Id` header, which is what files it as a card. The subject format, the reply-to and that header are
- * kept exactly as the old website sent them, the board keying on all three.
+ * The GEFLITST message is addressed to their task board's mailbox (Kaneo, read by kaneo-mailer) as well as to
+ * themselves, with the project id in an `X-Kaneo-Project-Id` header, which is what files it as a task. kaneo-mailer
+ * takes the due date from the `dd-mm-yyyy hh:mm` stamp in the subject and the description from the plain-text body.
+ * The subject format and the reply-to are kept exactly as the old website sent them, the board keying on both.
  */
 final readonly class ActivityFacilityNotifier
 {
@@ -128,9 +129,10 @@ final readonly class ActivityFacilityNotifier
     }
 
     /**
-     * The subject and the reply-to are what GEFLITST's Planka board reads: it files the request under the subject and
-     * expects a reply to reach the requester, which is the body when it has an address of its own and the member who
-     * filled the form in when it does not.
+     * The subject and the reply-to are what GEFLITST's task board reads: kaneo-mailer files the request under the
+     * subject (taking the due date from its date stamp) and the board stays on the same message so a reply reaches
+     * the requester, which is the body when it has an address of its own and the member who filled the form in when
+     * it does not.
      */
     private function requestGeflitst(ActivityRevision $revision): void
     {
@@ -164,9 +166,9 @@ final readonly class ActivityFacilityNotifier
             ),
             default => null,
         };
-
-        // The Planka board is addressed on the same message rather than sent a copy: it files the card and GEFLITST
-        // respond by replying to all, which only works while both are recipients of the one message.
+        // The task board's mailbox is addressed on the same message rather than sent a copy: kaneo-mailer files the
+        // task and GEFLITST respond by replying to all, which only works while both are recipients of the one
+        // message.
         $this->email->send(
             $this->mailboxes->geflitst(),
             $subject,
@@ -179,8 +181,8 @@ final readonly class ActivityFacilityNotifier
                 'requester' => $requester,
             ],
             $replyTo,
-            alsoTo: [$this->mailboxes->geflitstPlanka()],
-            headers: ['X-Planka-Board-Id' => $this->mailboxes->geflitstPlankaKey()],
+            alsoTo: [$this->mailboxes->geflitstKaneo()],
+            headers: ['X-Kaneo-Project-Id' => $this->mailboxes->geflitstKaneoProjectId()],
         );
     }
 
