@@ -11333,9 +11333,9 @@
         <source>Welcome. Your account is ready.</source>
         <target state="translated">Welcome. Your account is ready.</target>
       </trans-unit>
-      <trans-unit id="qlyBI_b" resname="Well-being">
-        <source>Well-being</source>
-        <target state="translated">Well-being</target>
+      <trans-unit id="o4YsbS0" resname="Wellbeing">
+        <source>Wellbeing</source>
+        <target state="translated">Wellbeing</target>
       </trans-unit>
       <trans-unit id="i23fR0f" resname="Were used in the past and can no longer be picked.">
         <source>Were used in the past and can no longer be picked.</source>
