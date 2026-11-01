@@ -218,6 +218,8 @@ export default class extends Controller<HTMLElement> {
             pswpModule: () => import('photoswipe'),
         });
         this.registerToolbarButtons();
+        // Update the hash when the user navigates between photos.
+        this.lightbox.on('change', (): void => this.updateHash(this.lightbox.pswp.currIndex));
         // The tag/vote/profile layer attaches its own lightbox listeners; it must exist before init().
         new ViewerInteractions(this.lightbox, {
             detailsUrlTemplate: this.detailsUrlValue,
@@ -507,14 +509,22 @@ export default class extends Controller<HTMLElement> {
             return;
         }
 
-        const pid = this.slides[index].pid;
-        // Push a history entry so the mobile back button closes the viewer instead of leaving the page.
-        if (window.location.hash !== `#pid=${pid}`) {
-            window.history.pushState({ pid }, '', `#pid=${pid}`);
-            this.pushedHistory = true;
-        }
-
+        this.updateHash(index);
         this.lightbox.loadAndOpen(index);
+    }
+
+    private updateHash(index: number): void {
+        const pid = this.slides[index].pid;
+        // Update the hash so the mobile back button closes the viewer instead of leaving the page,
+        // and so pressing back from the original album returns to this photo, not the first one opened.
+        if (window.location.hash !== `#pid=${pid}`) {
+            if (!this.pushedHistory) {
+                window.history.pushState({ pid }, '', `#pid=${pid}`);
+                this.pushedHistory = true;
+            } else {
+                window.history.replaceState({ pid }, '', `#pid=${pid}`);
+            }
+        }
     }
 
     /**
@@ -611,6 +621,9 @@ export default class extends Controller<HTMLElement> {
                 tagName: 'a',
                 html: spriteIcon(this.iconSpriteUrlValue, 'images'),
                 onInit: (element: HTMLAnchorElement): void => {
+                    // Disable Turbo for this link so the history stack stays clean and the back button
+                    // returns to the member photos page without the viewer open.
+                    element.dataset.turbo = 'false';
                     element.title = this.labelsValue.goToAlbum ?? '';
                     // Hidden until a slide with an albumUrl is shown, so it does not flash on open.
                     element.hidden = true;
@@ -633,6 +646,8 @@ export default class extends Controller<HTMLElement> {
                 tagName: 'a',
                 html: spriteIcon(this.iconSpriteUrlValue, 'calendar-day'),
                 onInit: (element: HTMLAnchorElement): void => {
+                    // Same fix: disable Turbo so the back button works correctly.
+                    element.dataset.turbo = 'false';
                     element.title = this.labelsValue.goToActivity ?? '';
                     element.hidden = true;
                     this.lightbox.pswp.on('change', (): void => {
