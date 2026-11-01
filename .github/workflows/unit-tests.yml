@@ -116,19 +116,21 @@ jobs:
                     mysql --host=127.0.0.1 --port=3306 --user=root \
                       --execute="CREATE DATABASE IF NOT EXISTS \`gewis_test\` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci; GRANT ALL PRIVILEGES ON \`gewis_test\`.* TO 'gewis'@'%'; FLUSH PRIVILEGES;"
 
-            -   name: Prepare the test databases (schemas + fixtures)
+            -   name: Run migrations for the test databases
                 env:
                     APP_ENV: test
-                # The schemas are built from the mapping metadata (no migrations); dama/doctrine-test-bundle then rolls
-                # back each test, so this seed is loaded once for the whole run. Each connection is seeded by its own
-                # command, as `make test-prepare` does: every fixture names the database it seeds, the bundle's loader
-                # takes one entity manager at a time and is pointed at that manager's group, and the website's own
-                # loader drops the foreign key checks its purge cannot resolve in dependency order. The decision
-                # projection is filled by replaying the ledger, because its listeners stand down while the fixtures
-                # load.
+                # Run the migrations rather than doctrine:schema:create so the test databases are built the same way
+                # as development and production. This ensures extensions like unaccent are created and that any
+                # migration-specific behaviour is tested. The --no-interaction flag prevents prompts, and
+                # --allow-no-migrations handles the case where there are no pending migrations.
                 run: |
-                    bin/console doctrine:schema:create --em=default
-                    bin/console doctrine:schema:create --em=web
+                    bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/default.yaml
+                    bin/console doctrine:migrations:migrate --no-interaction --em=web --configuration=config/packages/migrations/web.yaml
+
+            -   name: Load test fixtures
+                env:
+                    APP_ENV: test
+                run: |
                     bin/console app:fixtures:load --no-interaction
                     bin/console app:decision:generate
 
