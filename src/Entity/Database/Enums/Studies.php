@@ -49,7 +49,7 @@ enum Studies: string implements TranslatableInterface
     case MDSBE = 'Master Data Science in Business and Entrepreneurship'; //65018
     case MES = 'Master Embedded Systems'; //60331
     case MIAM = 'Master Industrial and Applied Mathematics'; //1015O6311
-    case MIST = 'Master Information Security Technology'; //1015O6323
+    case MIST = 'Master Cybersecurity'; //1015O6323
     case MSEC = 'Master Science Education'; //69345
 
     /** EngD / PhD programs */
@@ -192,7 +192,7 @@ enum Studies: string implements TranslatableInterface
             self::MDSBE => new TranslatableMessage('Master Data Science in Business and Entrepreneurship'),
             self::MES => new TranslatableMessage('Master Embedded Systems'),
             self::MIAM => new TranslatableMessage('Master Industrial and Applied Mathematics'),
-            self::MIST => new TranslatableMessage('Master Information Security Technology'),
+            self::MIST => new TranslatableMessage('Master Cybersecurity'),
             self::MSEC => new TranslatableMessage('Master Science Education'),
             self::EngDASD => new TranslatableMessage('EngD Automotive Systems Design'),
             self::EngDDS => new TranslatableMessage('EngD Data Science'),

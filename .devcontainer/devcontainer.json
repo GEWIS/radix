@@ -113,5 +113,8 @@
 		"memory": "8gb",
 		"gpu": false,
 		"storage": "32gb"
+	},
+	"containerEnv": {
+		"COMPOSE_ENV_FILES": ".env,.env.local"
 	}
 }

@@ -5449,6 +5449,10 @@
         <source>Master Computer Science and Engineering</source>
         <target state="translated">Master Computer Science and Engineering</target>
       </trans-unit>
+      <trans-unit id="8YOQ.WG" resname="Master Cybersecurity">
+        <source>Master Cybersecurity</source>
+        <target state="translated">Master Cybersecurity</target>
+      </trans-unit>
       <trans-unit id="D6xnBk0" resname="Master Data Science &amp; Artificial Intelligence">
         <source>Master Data Science &amp; Artificial Intelligence</source>
         <target state="translated"><![CDATA[Master Data Science & Artificial Intelligence]]></target>
@@ -5464,10 +5468,6 @@
       <trans-unit id="GosNEEJ" resname="Master Industrial and Applied Mathematics">
         <source>Master Industrial and Applied Mathematics</source>
         <target state="translated">Master Industrial and Applied Mathematics</target>
-      </trans-unit>
-      <trans-unit id="6aAeAdg" resname="Master Information Security Technology">
-        <source>Master Information Security Technology</source>
-        <target state="translated">Master Information Security Technology</target>
       </trans-unit>
       <trans-unit id="_WDdQ1t" resname="Master Programs">
         <source>Master Programs</source>
