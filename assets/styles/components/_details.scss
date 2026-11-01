@@ -1,0 +1,137 @@
+// Collapsible details/summary elements with a GEWIS red chevron marker.
+// Works with spans, headings (h1-h6), and other content inside <summary>.
+
+details {
+    --#{$prefix}details-bg: #{$details-bg};
+    --#{$prefix}details-border-color: #{$details-border-color};
+    --#{$prefix}details-border-radius: #{$details-border-radius};
+    --#{$prefix}details-padding: #{$details-padding};
+    --#{$prefix}details-summary-color: #{$details-summary-color};
+    --#{$prefix}details-summary-hover-bg: #{$details-summary-hover-bg};
+    --#{$prefix}details-summary-active-bg: #{$details-summary-active-bg};
+    --#{$prefix}details-marker-color: #{$details-marker-color};
+    --#{$prefix}details-body-color: #{$details-body-color};
+
+    margin-bottom: 1rem;
+    background-color: var(--#{$prefix}details-bg);
+    border: var(--#{$prefix}border-width) solid var(--#{$prefix}details-border-color);
+    border-radius: var(--#{$prefix}details-border-radius);
+    overflow: hidden;
+
+    // Custom marker replaces the default triangle.
+    summary {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: var(--#{$prefix}details-padding);
+        background-color: transparent;
+        color: var(--#{$prefix}details-summary-color);
+        font-weight: 600;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+        transition: background-color $transition-duration-fast ease;
+
+        &:hover,
+        &:focus-visible {
+            background-color: var(--#{$prefix}details-summary-hover-bg);
+        }
+
+        &:active {
+            background-color: var(--#{$prefix}details-summary-active-bg);
+        }
+
+        // Remove default marker.
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::marker,
+        &::-moz-list-bullet {
+            content: "";
+        }
+
+        // Custom chevron indicator.
+        &::before {
+            display: inline-flex;
+            flex: none;
+            align-items: center;
+            justify-content: center;
+            width: 1.375rem;
+            height: 1.375rem;
+            margin-top: 0.125rem;
+            color: var(--#{$prefix}details-marker-color);
+            font-family: var(--#{$prefix}font-monospace);
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1;
+            content: "▸";
+            transition: transform $transition-duration-fast ease;
+        }
+
+        // Images inside summary align to the right, with a small gap from the text.
+        img {
+            flex: none;
+            margin-left: 0.75rem;
+            margin-right: -0.75rem;
+        }
+    }
+
+    // Rotate chevron when open.
+    &[open] > summary::before {
+        transform: rotate(90deg);
+    }
+
+    // Headings inside summary inherit appropriate sizing and reset to avoid double margins.
+    summary h1,
+    summary h2,
+    summary h3,
+    summary h4,
+    summary h5,
+    summary h6,
+    summary .h1,
+    summary .h2,
+    summary .h3,
+    summary .h4,
+    summary .h5,
+    summary .h6 {
+        margin: 0;
+        flex: 1 1 auto;
+    }
+
+    // Spans and other inline content inside summary flow naturally.
+    summary span {
+        flex: 1 1 auto;
+    }
+
+    // Body content below the summary (excluding nested details, which handle their own spacing).
+    > :not(summary):not(details) {
+        padding: var(--#{$prefix}details-padding);
+        border-top: var(--#{$prefix}border-width) solid var(--#{$prefix}details-border-color);
+        color: var(--#{$prefix}details-body-color);
+
+        // Remove margin from first/last child to avoid extra spacing.
+        > :first-child {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // Nested details: same styling as outer, but inset on all sides so they don't touch the parent's border.
+    > details {
+        margin: 0.5rem 1rem 1rem;
+    }
+}
+
+@include color-mode(gewis-night) {
+    details {
+        --#{$prefix}details-bg: #{$details-bg-dark};
+        --#{$prefix}details-border-color: #{$details-border-color-dark};
+        --#{$prefix}details-summary-hover-bg: #{$details-summary-hover-bg-dark};
+        --#{$prefix}details-summary-active-bg: #{$details-summary-active-bg-dark};
+        --#{$prefix}details-marker-color: #{$details-marker-color-dark};
+    }
+}

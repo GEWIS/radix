@@ -189,3 +189,21 @@ $panel-footer-link-color-dark: $body-secondary-color-dark;
 $panel-list-group-item-spacer-y: 0.5rem;
 
 $toast-spacing: 1rem;
+
+// Details/summary collapsible
+$details-bg: $white;
+$details-bg-dark: $body-bg-dark;
+$details-border-color: rgba($gray-500, 0.35);
+$details-border-color-dark: $body-secondary-bg-dark;
+$details-border-radius: var(--#{$prefix}border-radius);
+$details-padding: 1rem 1.25rem;
+$details-summary-color: $body-color;
+$details-summary-color-dark: $body-color-dark;
+$details-summary-hover-bg: rgba($gewis-red, 0.04);
+$details-summary-hover-bg-dark: rgba($white, 0.04);
+$details-summary-active-bg: rgba($gewis-red, 0.08);
+$details-summary-active-bg-dark: rgba($white, 0.08);
+$details-marker-color: $gewis-red;
+$details-marker-color-dark: $gewis-red;
+$details-body-color: $body-color;
+$details-body-color-dark: $body-color-dark;
