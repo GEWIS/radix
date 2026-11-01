@@ -40,15 +40,36 @@ body:
         validations:
             required: true
     -   type: dropdown
+        id: device
+        attributes:
+            label: What device are you using?
+            multiple: false
+            options:
+                - Mobile phone
+                - Folding mobile phone
+                - Tablet
+                - PC
+                - Other
+    -   type: dropdown
         id: os
         attributes:
             label: What operating system(s) are you seeing the problem on?
             multiple: true
             options:
-                - Linux
-                - macOS
                 - Windows
-                - Other
+                - macOS
+                - iOS / iPadOS
+                - Linux (Debian / Ubuntu family)
+                - Linux (Fedora / RHEL family)
+                - Linux (Arch family)
+                - Linux (Gentoo)
+                - Linux (Alpine)
+                - FreeBSD
+                - OpenBSD
+                - NetBSD
+                - Android
+                - ChromeOS
+                - Other Unix-like / Custom
     -   type: dropdown
         id: browsers
         attributes:
@@ -60,7 +81,7 @@ body:
                 - Firefox
                 - Microsoft Edge
                 - Safari
-                - Other
+                - Other (specify in details)
     -   type: textarea
         id: other
         attributes:
