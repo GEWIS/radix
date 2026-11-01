@@ -102,7 +102,10 @@
                         <div class="month-divider">{{ month }}</div>
                         {% set currentMonth = month %}
                     {% endif %}
-                    {% include 'partials/activity/list-item.html.twig' with {'activity': activity} only %}
+                    {% include 'partials/activity/list-item.html.twig' with {
+                        'activity': activity,
+                        'signupStatuses': this.viewerSignupStatuses,
+                    } only %}
                 {% endfor %}
             {% else %}
                 <p class="text-muted text-center py-4">{{ 'No activities match the current filters.'|trans }}</p>
@@ -117,7 +120,10 @@
                     <div class="month-divider">{{ month }}</div>
                     {% set currentMonth = month %}
                 {% endif %}
-                {% include 'partials/activity/list-item.html.twig' with {'activity': activity} only %}
+                {% include 'partials/activity/list-item.html.twig' with {
+    'activity': activity,
+    'signupStatuses': this.viewerSignupStatuses,
+} only %}
             {% else %}
                 <p class="text-muted text-center py-4">{{ 'No activities match the current filters.'|trans }}</p>
             {% endfor %}
