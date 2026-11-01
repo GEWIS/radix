@@ -33,8 +33,6 @@ use SortDirection;
 use function addcslashes;
 use function filter_var;
 use function is_numeric;
-use function mb_strtolower;
-use function strtolower;
 use function trim;
 
 use const FILTER_VALIDATE_EMAIL;
@@ -84,14 +82,18 @@ class MemberRepository extends ServiceEntityRepository
      * while a user is still typing and never wants a second page. Narrowing the query is what finds a member who
      * is not in the first thirty-two, not requesting more of them.
      *
+     * Uses PostgreSQL's unaccent() function to make name search accent-insensitive, matching MariaDB's default
+     * collation behaviour.
+     *
      * @return Member[]
      */
     public function search(string $query): array
     {
         $qb = $this->createQueryBuilder('m');
 
-        $qb->where("CONCAT(LOWER(m.firstName), ' ', LOWER(m.lastName)) LIKE :name")
-            ->orWhere("CONCAT(LOWER(m.firstName), ' ', LOWER(m.middleName), ' ', LOWER(m.lastName)) LIKE :name")
+        $qb->where(
+            $this->buildNameSearchPredicate(':name'),
+        )
             ->orWhere('m.studentNumber = :name')
             ->setMaxResults(32)
             ->orderBy(
@@ -101,7 +103,7 @@ class MemberRepository extends ServiceEntityRepository
             ->setFirstResult(0);
 
         if (
-            filter_var(
+            false !== filter_var(
                 $query,
                 FILTER_VALIDATE_EMAIL,
             )
@@ -111,7 +113,10 @@ class MemberRepository extends ServiceEntityRepository
 
         $qb->setParameter(
             ':name',
-            '%' . strtolower($query) . '%',
+            '%' . addcslashes(
+                $query,
+                '%_',
+            ) . '%',
         );
 
         // also allow searching for membership number
@@ -906,8 +911,19 @@ class MemberRepository extends ServiceEntityRepository
     }
 
     /**
-     * Name, e-mail, member number or student number: whichever the secretary has available.
+     * Builds the accent-insensitive name search predicate (first+last and first+middle+last).
+     *
+     * @param string $paramName The parameter name to use (e.g. ':name' or ':needle')
      */
+    private function buildNameSearchPredicate(string $paramName): string
+    {
+        return 'CONCAT(LOWER(UNACCENT(m.firstName)), \' \', LOWER(UNACCENT(m.lastName)))'
+            . ' LIKE LOWER(UNACCENT(' . $paramName . '))'
+            . ' OR CONCAT(LOWER(UNACCENT(m.firstName)), \' \', '
+            . 'LOWER(UNACCENT(m.middleName)), \' \', LOWER(UNACCENT(m.lastName)))'
+            . ' LIKE LOWER(UNACCENT(' . $paramName . '))';
+    }
+
     private function applyOverviewSearch(
         QueryBuilder $qb,
         string $search,
@@ -918,10 +934,14 @@ class MemberRepository extends ServiceEntityRepository
             return;
         }
 
+        $needle = '%' . addcslashes(
+            $search,
+            '%_',
+        ) . '%';
+
         $matches = $qb->expr()->orX(
-            "CONCAT(LOWER(m.firstName), ' ', LOWER(m.lastName)) LIKE :needle",
-            "CONCAT(LOWER(m.firstName), ' ', LOWER(m.middleName), ' ', LOWER(m.lastName)) LIKE :needle",
-            'LOWER(m.email) LIKE :needle',
+            $this->buildNameSearchPredicate(':needle'),
+            'LOWER(UNACCENT(m.email)) LIKE LOWER(UNACCENT(:needle))',
             'm.studentNumber LIKE :needle',
         );
 
@@ -936,7 +956,7 @@ class MemberRepository extends ServiceEntityRepository
         $qb->andWhere($matches)
             ->setParameter(
                 'needle',
-                '%' . mb_strtolower(addcslashes($search, '%_')) . '%',
+                $needle,
             );
     }
 

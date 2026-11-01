@@ -40,6 +40,9 @@ doctrine:
                 # AUTO_INCREMENT needs none of this, which is why the preference belongs to this manager alone.
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: sequence
+                dql:
+                    string_functions:
+                        UNACCENT: App\Doctrine\Functions\Unaccent
                 mappings:
                     # One directory, and therefore one entry: `App\Entity\Database\User` is the entity for the accounts
                     # that administer the ledger, and is defined under the ledger's namespace precisely so that it is
