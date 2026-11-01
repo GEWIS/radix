@@ -83,6 +83,17 @@
                             </span>
                         {% endif %}
                     {% endif %}
+                    {% set signupStatus = signupStatuses[activity.id] ?? null %}
+                    {% if is_granted('ROLE_USER') and signupStatus is not null %}
+                        <span class="badge badge-squared text-wrap badge-success">
+                            <span class="fas fa-check"></span>
+                            {% if signupStatus.total > 1 %}
+                                {{ 'Signed up'|trans }} ({{ signupStatus.signedUp }}/{{ signupStatus.total }})
+                            {% else %}
+                                {{ 'Signed up'|trans }}
+                            {% endif %}
+                        </span>
+                    {% endif %}
                 </div>
             </div>
 

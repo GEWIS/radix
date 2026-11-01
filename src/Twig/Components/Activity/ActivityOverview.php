@@ -11,6 +11,7 @@ use App\Entity\Decision\Member;
 use App\Entity\User\User;
 use App\Repository\Activity\ActivityLabelRepository;
 use App\Repository\Activity\ActivityRepository;
+use App\Repository\Activity\UserSignupRepository;
 use App\Repository\Application\LabelRepositoryInterface;
 use App\Twig\Components\Application\AbstractInfiniteScrollOverview;
 use App\Twig\Components\Application\FiltersLabelsTrait;
@@ -25,6 +26,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Metadata\UrlMapping;
 
 use function array_filter;
+use function array_keys;
 use function array_map;
 use function array_values;
 use function count;
@@ -112,12 +114,20 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     /** @var list<BodyOption>|null */
     private ?array $bodyOptions = null;
 
+    /**
+     * Map of activity ID => {signedUp: int, total: int} for the current viewer.
+     *
+     * @var array<int, array{signedUp: int, total: int}>
+     */
+    public array $viewerSignupStatuses = [];
+
     private bool $memberResolved = false;
     private ?Member $member = null;
 
     public function __construct(
         private readonly ActivityRepository $activityRepository,
         private readonly ActivityLabelRepository $activityLabelRepository,
+        private readonly UserSignupRepository $userSignupRepository,
         private readonly Security $security,
         private readonly RequestStack $requestStack,
     ) {
@@ -172,6 +182,9 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
         // not N+1.
         $this->activityRepository->primeSignupLists($activities);
         $this->activityRepository->primeLabels($activities);
+
+        // Compute which activities the current member is signed up for, so the overview can show that status.
+        $this->computeViewerSignupStatuses($activities);
 
         return $this->activities = $activities;
     }
@@ -395,6 +408,78 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
         return null !== $this->year
             ? AssociationYear::fromYear($this->year)->getEndDate()
             : null;
+    }
+
+    /**
+     * For each activity, compute how many of its sign-up lists the current member is signed up for.
+     *
+     * This is done by querying the member's sign-ups once and building a set of list IDs, then
+     * intersecting that set with each activity's lists. The status is stored so the template can
+     * display a "signed up" indicator.
+     *
+     * @param Activity[] $activities
+     */
+    private function computeViewerSignupStatuses(array $activities): void
+    {
+        $this->viewerSignupStatuses = [];
+
+        $member = $this->currentMember();
+        if (null === $member) {
+            return;
+        }
+
+        // Map list ID => activity ID, and count total lists per activity.
+        $activityByList = [];
+        $totals = [];
+        foreach ($activities as $activity) {
+            $activityId = $activity->id;
+            if (null === $activityId) {
+                continue;
+            }
+
+            foreach ($activity->getLiveSignupLists() as $list) {
+                if (null === $list->id) {
+                    continue;
+                }
+
+                $activityByList[$list->id] = $activityId;
+                $totals[$activityId] = ($totals[$activityId] ?? 0) + 1;
+            }
+        }
+
+        // No lists on this page: skip the query entirely.
+        if ([] === $activityByList) {
+            return;
+        }
+
+        // One scoped query, then iterate only the signed-up lists (small set).
+        $signedUpCounts = [];
+        foreach (
+            $this->userSignupRepository->findSignedUpListIds(
+                $member,
+                array_keys($activityByList),
+            ) as $listId
+        ) {
+            $activityId = $activityByList[$listId];
+            $signedUpCounts[$activityId] = ($signedUpCounts[$activityId] ?? 0) + 1;
+        }
+
+        foreach ($signedUpCounts as $id => $count) {
+            $this->viewerSignupStatuses[$id] = [
+                'signedUp' => $count,
+                'total' => $totals[$id],
+            ];
+        }
+    }
+
+    /**
+     * The sign-up status for the current viewer on a specific activity.
+     *
+     * @return array{signedUp: int, total: int}|null
+     */
+    public function getViewerSignupStatus(int $activityId): ?array
+    {
+        return $this->viewerSignupStatuses[$activityId] ?? null;
     }
 
     private function currentMember(): ?Member
