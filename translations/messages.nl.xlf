@@ -11333,8 +11333,8 @@
         <source>Welcome. Your account is ready.</source>
         <target state="translated">Welkom. Je account is klaar.</target>
       </trans-unit>
-      <trans-unit id="qlyBI_b" resname="Well-being">
-        <source>Well-being</source>
+      <trans-unit id="o4YsbS0" resname="Wellbeing">
+        <source>Wellbeing</source>
         <target state="translated">Welzijn</target>
       </trans-unit>
       <trans-unit id="i23fR0f" resname="Were used in the past and can no longer be picked.">

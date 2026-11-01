@@ -96,6 +96,16 @@
                                 'fa-medal',
                                 'Exceptional Members'|trans,
                             ) }}
+                            {{ menu.item(
+                                page_path(
+                                    category: 'vereniging',
+                                    categoryEn: 'association',
+                                    sub_category: 'lied',
+                                    sub_categoryEn: 'song',
+                                ),
+                                'fa-music',
+                                'GEWIS song'|trans,
+                            ) }}
 
                             <li><hr class="dropdown-divider"></li>
                             <li>
@@ -125,14 +135,10 @@
                                 'fa-gavel',
                                 'Regulations'|trans,
                             ) }}
-                            {{ menu.section('useful-information', 'fa-lightbulb', 'Useful Information'|trans, [
-                                {
-                                    'href': page_path(category: 'links', categoryEn: 'links'),
-                                    'label': 'Links'|trans,
-                                },
+                            {{ menu.section('wellbeing', 'fa-heart-pulse', 'Wellbeing'|trans, [
                                 {
                                     'href': page_path(category: 'welzijn', categoryEn: 'wellbeing'),
-                                    'label': 'Well-being'|trans,
+                                    'label': 'Information'|trans,
                                 },
                                 {
                                     'href': page_path(
@@ -142,6 +148,12 @@
                                         subCategoryEn: 'cps',
                                     ),
                                     'label': 'Confidential Peer Support (CPS)'|trans,
+                                },
+                            ]) }}
+                            {{ menu.section('useful-information', 'fa-lightbulb', 'Useful Information'|trans, [
+                                {
+                                    'href': page_path(category: 'links', categoryEn: 'links'),
+                                    'label': 'Links'|trans,
                                 },
                                 {
                                     'href': page_path(category: 'faq', categoryEn: 'faq'),
@@ -157,16 +169,6 @@
                                     'label': 'Housing'|trans,
                                 },
                             ]) }}
-                            {{ menu.item(
-                                page_path(
-                                    category: 'vereniging',
-                                    categoryEn: 'association',
-                                    sub_category: 'lied',
-                                    sub_categoryEn: 'song',
-                                ),
-                                'fa-music',
-                                'GEWIS song'|trans,
-                            ) }}
 
                             <li><hr class="dropdown-divider"></li>
                             <li>
