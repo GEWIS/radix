@@ -13,6 +13,11 @@
     background-color: var(--#{$prefix}navbar-bg);
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(255, 255, 255, 0.15);
 
+    // Below `lg` the navigation slides in as an offcanvas panel where the shadow would appear under the text.
+    @include media-breakpoint-down(lg) {
+        box-shadow: none;
+    }
+
     // Centred as a flex item, so the logo is not placed on the anchor's baseline with descender space under it.
     .navbar-brand {
         display: flex;
