@@ -2,7 +2,7 @@
     <div class="panel mb-3">
         <div class="panel-body">
             <label class="form-label" for="decision-search-query">{{ 'Search decisions'|trans }}</label>
-            <input type="search" class="form-control" id="decision-search-query"
+            <input type="search" class="form-control" id="decision-search-query" autofocus
                    placeholder="{{ 'Keyword or meeting reference, for example “budget” or “GMM 214.12.1”'|trans }}"
                    data-model="debounce(300)|q"
                    value="{{ this.q }}">
