@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Service\Database;
 
+use App\Entity\Database\Enums\GraduateConversionOutcome;
 use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Enums\Studies;
+use App\Entity\Database\GraduateConversionLink;
 use App\Entity\Database\Member as MemberModel;
+use App\Entity\Database\RenewalLink;
 use App\Service\Database\Member;
 use App\Tests\Support\LedgerBuilder;
 use DateTimeImmutable;
@@ -98,6 +101,48 @@ class MemberTest extends KernelTestCase
         self::assertCount(
             1,
             $member->getMemberships(),
+        );
+    }
+
+    /**
+     * When a member renews, any outstanding conversion link is invalidated: the link was sent because their
+     * membership was about to expire, but the renewal extends it, so the conversion is no longer relevant.
+     */
+    public function testRenewingInvalidatesConversionLinks(): void
+    {
+        $member = $this->build->member(
+            MembershipTypes::Ordinary,
+            '2025-08-01',
+            '2026-07-01',
+        );
+
+        // A conversion link was sent because their membership is about to expire.
+        $conversionLink = new GraduateConversionLink(
+            $member,
+            new DateTimeImmutable('2026-07-01'),
+        );
+        $this->entityManager->persist($conversionLink);
+
+        // They decide to renew instead.
+        $renewalLink = new RenewalLink(
+            $member,
+            new DateTimeImmutable('2027-07-01'),
+        );
+        $this->entityManager->persist($renewalLink);
+        $this->entityManager->flush();
+
+        $this->memberService->renewMember(
+            $member,
+            $renewalLink,
+            new DateTimeImmutable('2027-07-01'),
+        );
+
+        $this->entityManager->refresh($conversionLink);
+
+        self::assertTrue($conversionLink->used);
+        self::assertSame(
+            GraduateConversionOutcome::Superseded,
+            $conversionLink->outcome,
         );
     }
 

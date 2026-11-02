@@ -1542,6 +1542,13 @@ class Member
         $this->actionLinkRepository->persist($renewalLink);
         $this->renewalService->sendRenewalSuccessEmail($renewalLink);
 
+        // The member renewed; any outstanding conversion link is no longer relevant.
+        foreach ($this->graduateConversionLinkRepository->findOutstandingForMember($member) as $conversionLink) {
+            $conversionLink->outcome = GraduateConversionOutcome::Superseded;
+            $conversionLink->used = true;
+            $this->actionLinkRepository->persist($conversionLink);
+        }
+
         // Record a renewal audit entry
         $renewalAudit = AuditRenewalModel::fromRenewalLink($renewalLink);
         $renewalAudit->newExpiration = $newExpiration;
