@@ -12825,6 +12825,10 @@
         <source>¹ This permission will add more properties to existing entities that can already be requested.</source>
         <target state="translated">¹ Deze permissie voegt meer eigenschappen toe aan bestaande entiteiten die al opgevraagd kunnen worden.</target>
       </trans-unit>
+      <trans-unit id="value-pruned">
+        <source>value-pruned</source>
+        <target state="translated">[verwijderd]</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

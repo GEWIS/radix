@@ -42,6 +42,7 @@ class MainScheduleTest extends KernelTestCase
         'app:activity:run-due-draws' => 'cron',
         'app:activity:sync-agenda' => 'cron',
         'app:application:delete-stale-revisions' => 'gdpr',
+        'app:database:prune-audit-entries' => 'gdpr',
         'app:decision:generate' => 'maintenance',
         'app:education:prune-expired-downloads' => 'cron',
         'app:infimum:rotate' => 'cron',

@@ -280,6 +280,26 @@ retention period, which is what makes keeping any of it defensible.
 Every record carries the context the processors in `config/packages/monolog.yaml` add, `App\Monolog\Processor\RequestIdProcessor`
 among them, so the lines one visit produced can be read together and lined up against the row written beside them.
 
+### Audit log
+
+The register's audit log (`App\Entity\Database\AuditEntry` and its subclasses) records changes to member details:
+email changes, address changes, mailing list membership changes, renewal activity, and secretary notes.
+
+The personal data in audit entries (email addresses) is anonymized after 180 days by
+`app:database:prune-audit-entries`, which runs daily on the `gdpr` transport. The entries themselves remain,
+preserving the audit trail (we know a change happened and when), but the sensitive data is removed (we don't know
+what it changed from and to). That period covers the questions the log exists to answer — a member asking about
+a change to their details, the secretary looking into how an address was updated, and a pattern of changes that
+only becomes visible over a long window — without keeping personal data that is no longer needed.
+
+The renewal activity and secretary notes are not affected, as they are part of the membership history and working
+notes rather than personal data changes.
+
+The audit entries and the security log are distinct: the audit log records *what changed* (the content of the
+change), while the security log records *when and from where* (the access event). The security log rows are
+deleted after 180 days by `app:user:prune-security-log`, while the audit entries are anonymized (not deleted)
+by `app:database:prune-audit-entries`.
+
 ## API
 
 Everything under `^/api` is stateless, is read with `Authorization: Bearer <token>`, and answers the same envelope:

@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Override;
 
+use function Symfony\Component\Translation\t;
+
 #[Entity(repositoryClass: AuditEmailChangeRepository::class)]
 class AuditEmailChange extends AuditEntry
 {
@@ -23,8 +25,11 @@ class AuditEmailChange extends AuditEntry
     )]
     public ?string $oldEmail = null;
 
-    #[Column(type: 'string')]
-    public string $newEmail;
+    #[Column(
+        type: 'string',
+        nullable: true,
+    )]
+    public ?string $newEmail = null;
 
     public static function create(
         Member $member,
@@ -55,8 +60,8 @@ class AuditEmailChange extends AuditEntry
     {
         return [
             $this->member?->getFullName() ?? '-',
-            $this->oldEmail ?? '-',
-            $this->newEmail,
+            $this->oldEmail ?? t('value-pruned')->getMessage(),
+            $this->newEmail ?? t('value-pruned')->getMessage(),
         ];
     }
 }
