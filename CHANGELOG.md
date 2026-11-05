@@ -8,6 +8,24 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.8.0](https://github.com/GEWIS/radix/tree/v5.8.0) (2026-11-14)
+* Added functionality to email expected admittees and waiting list for first-come-first-serve lists
+* Added photographer/GEFLITST Kaneo integration
+* Added a signup badge to activities for which the user has already registered
+* Changed Master IST to Cybersecurity
+* Changed Mercure protocol from v0.x to v1.1 (incl. temporary fix to retain original behaviour during transition)
+* Changed navigation; moved wellbeing 1 level up
+* Changed sanitazion to keep `<details>` and `<summary>` HTML elements
+* Fixed hyperlink behaviour from photo albums by disabling turbo
+* Fixed query execution without saving the query by disabling turbo
+* Fixed bulk renewal by disabling turbo
+* Fixed deselecting sign-ups after selecting all
+* Improved development experience (devcontainers, AI policy, PR template, AGENTS.md, splitting `Report` domain)
+* Improved member search on the database to be accent-insensitive
+* Removed photographer/GEFLITST Planka integration
+* Restored form field autofocus for member and decision search
+
+
 ### [v5.7.0](https://github.com/GEWIS/radix/tree/v5.7.0) (2026-10-21)
 * Added focus view for viewing meeting documents.
 * Added functionality to clear all notifications at once (marking them as read is still possible).
