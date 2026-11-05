@@ -51,9 +51,6 @@
 		"build": "make setuplocalenv",
 		"noXdebug": "sudo rm -f /usr/local/etc/php/conf.d/xdebug.ini"
 	},
-	"postStartCommand": {
-		"runRadix": "(make start); true"
-	},
 	"waitFor": "postCreateCommand",
 	"forwardPorts": [
 		80,
@@ -66,7 +63,7 @@
 		15672
 	],
 	"portsAttributes": {
-		"80": {
+		"1024": {
 			"label": "Radix web interface",
 			"onAutoForward": "openBrowserOnce",
 			"protocol": "http"
