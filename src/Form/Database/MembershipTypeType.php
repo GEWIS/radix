@@ -58,7 +58,7 @@ class MembershipTypeType extends AbstractType
         ];
 
         if (null !== $membership) {
-            $typeOptions['data'] = $membership->getType();
+            $typeOptions['data'] = $membership->type;
             $changeDateOptions['data'] = min(
                 $membership->getStartDate(),
                 new DateTimeImmutable(),

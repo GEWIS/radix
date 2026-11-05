@@ -1,0 +1,24 @@
+{% extends 'database/email/_base.html.twig' %}
+
+{% block emailTitle %}Confirm your email address{% endblock %}
+{% block preheader %}{% endblock %}
+{% block heading %}Membership notification{% endblock %}
+{% block subheading %}Confirm your email address{% endblock %}
+{% block body %}
+    <p>Dear {{ firstName }},</p>
+    <p>
+        You asked us to reach you at <b>{{ newEmail }}</b> from now on. Before we change anything, we would like to be
+        sure that this message arrived, so please click
+        <a href="{{ url }}" style="color: #C40000; text-decoration: none;" target="_blank" rel="noopener nofollow">here</a>
+        within 24 hours to confirm. You will be asked to sign in with your GEWIS account first.
+    </p>
+    <p>
+        Until you do, we keep writing to the address we have. If you did not ask for this, you can ignore this message
+        and nothing will change.
+    </p>
+    <p>
+        Kind regards,
+        <br>The Secretary of GEWIS
+    </p>
+{% endblock %}
+{% block footerNote %}You receive this message because this address was entered as the new email address of a GEWIS member. You can not opt-out of these emails.{% endblock %}

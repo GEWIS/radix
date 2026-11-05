@@ -280,6 +280,26 @@ retention period, which is what makes keeping any of it defensible.
 Every record carries the context the processors in `config/packages/monolog.yaml` add, `App\Monolog\Processor\RequestIdProcessor`
 among them, so the lines one visit produced can be read together and lined up against the row written beside them.
 
+### Audit log
+
+The register's audit log (`App\Entity\Database\AuditEntry` and its subclasses) records changes to member details:
+email changes, address changes, mailing list membership changes, renewal activity, and secretary notes.
+
+The personal data in audit entries (email addresses) is anonymized after 180 days by
+`app:database:prune-audit-entries`, which runs daily on the `gdpr` transport. The entries themselves remain,
+preserving the audit trail (we know a change happened and when), but the sensitive data is removed (we don't know
+what it changed from and to). That period covers the questions the log exists to answer — a member asking about
+a change to their details, the secretary looking into how an address was updated, and a pattern of changes that
+only becomes visible over a long window — without keeping personal data that is no longer needed.
+
+The renewal activity and secretary notes are not affected, as they are part of the membership history and working
+notes rather than personal data changes.
+
+The audit entries and the security log are distinct: the audit log records *what changed* (the content of the
+change), while the security log records *when and from where* (the access event). The security log rows are
+deleted after 180 days by `app:user:prune-security-log`, while the audit entries are anonymized (not deleted)
+by `app:database:prune-audit-entries`.
+
 ## API
 
 Everything under `^/api` is stateless, is read with `Authorization: Bearer <token>`, and answers the same envelope:
@@ -462,6 +482,16 @@ Two extraction traps:
   `gewiswebgewis`; the register is reached with the same account, `8000` holding both `ROLE_ADMIN` and
   `ROLE_DATABASE_ADMIN` while `8001` holds only the former and `8002` only the latter. (Migrations have already run by
   the time you get here — they fire one-shot on container start.)
+- **Walking the member flows by hand.** The seed is set up so every one of them can be reached without editing rows.
+  Signed in as `8000`: **My details** (`/en/user/settings/details`) shows the addresses (a home one is on file, the
+  other two are not, so adding, correcting and removing are all reachable) and the mailing lists — `8000` is on
+  `activities`, which a member manages, and on `announcements`, which they do not and which therefore stays off the
+  page. Changing the address there sends the confirmation to MailPit; following its link and confirming moves the
+  subscriptions with it and writes to the address that was replaced. The two sweeps have a member each, expiring
+  twenty days after the seed was loaded: `make sf c=check:membership:conversion:graduate` writes to
+  `conversiontarget@example.com` and `make sf c=check:membership:renewal:graduate` to `renewaltarget@example.com`;
+  both messages carry a link that answers. `make sf c=check:membership:consistency` mails the membership report,
+  which finds nothing until a membership is made to overlap by hand.
 - `make bash` — shell into the FrankenPHP `app` container; `make exec cmd="..."` runs a single command in it.
 - `make sf c=...` / `make composer c='...'` — the console and Composer inside the container.
 - `make cc` — clear the cache and restart the worker.

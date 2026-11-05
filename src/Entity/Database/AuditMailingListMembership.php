@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Override;
 
+use function Symfony\Component\Translation\t;
+
 #[Entity(repositoryClass: AuditMailingListMembershipRepository::class)]
 class AuditMailingListMembership extends AuditEntry
 {
@@ -38,8 +40,11 @@ class AuditMailingListMembership extends AuditEntry
     )]
     public MailingList $mailingList;
 
-    #[Column(type: Types::STRING)]
-    public string $email;
+    #[Column(
+        type: Types::STRING,
+        nullable: true,
+    )]
+    public ?string $email = null;
 
     #[Column(
         type: Types::STRING,
@@ -81,7 +86,7 @@ class AuditMailingListMembership extends AuditEntry
         // The body is translated and these are substituted into it afterwards, so they go in as their source string.
         return [
             $this->action->getName()->getMessage(),
-            $this->email,
+            $this->email ?? t('value-pruned')->getMessage(),
             $this->mailingList->name,
             $this->origin->getName()->getMessage(),
         ];
