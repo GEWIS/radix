@@ -76,6 +76,7 @@ services:
                 watch ./var/typescript
             FRANKENPHP_SITE_CONFIG: "hot_reload"
             MERCURE_EXTRA_DIRECTIVES: |
+                cors_origins ${APP_URL}
                 playground
                 anonymous
                 protocol_version_compatibility 8
