@@ -85,7 +85,7 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
     {
         $this->assertApprovalIsRefused(
             'soon',
-            'Please enter a valid date.',
+            'This value is not a valid date.',
         );
     }
 

@@ -46,7 +46,6 @@ parameters:
     # go up. The percentages are global, so a baseline entry would stop matching the moment a file is added or
     # removed. Raise these numbers whenever the gap closes.
     type_coverage:
-        declare: 100
         # The ledger and its projection still carry a handful of untyped parameters and properties, so these two sit
         # a point below the rest.
         param_type: 98

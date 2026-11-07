@@ -1258,12 +1258,6 @@ parameters:
 			path: src/Service/Database/StripeService.php
 
 		-
-			message: '#^Parameter \#1 \$params of method Stripe\\Service\\Checkout\\SessionService\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{line_items\: array\{array\{price\: string, quantity\: 1\}\}, mode\: ''payment'', payment_intent_data\: array\{statement_descriptor\: non\-falsy\-string\}, cancel_url\: string, success_url\: string, expires_at\: int\<3601, max\>, after_expiration\: array\{recovery\: array\{enabled\: true\}\}, client_reference_id\: int, \.\.\.\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Service/Database/StripeService.php
-
-		-
 			message: '#^Parameter \#1 \$given of class App\\Exception\\Report\\VersionFormat constructor expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
