@@ -1629,6 +1629,10 @@
         <source>Association magazine</source>
         <target state="translated">Association magazine</target>
       </trans-unit>
+      <trans-unit id="fS2Q0GL" resname="At least one mutation is required.">
+        <source>At least one mutation is required.</source>
+        <target state="translated">At least one mutation is required.</target>
+      </trans-unit>
       <trans-unit id="_fp6hpn" resname="Attachment link">
         <source>Attachment link</source>
         <target state="translated">Attachment link</target>
@@ -3120,10 +3124,6 @@
       <trans-unit id="m12dSPp" resname="Discharge from bodies OR renew in appropriate type (ordinary or external)">
         <source>Discharge from bodies OR renew in appropriate type (ordinary or external)</source>
         <target state="translated">Discharge from bodies OR renew in appropriate type (ordinary or external)</target>
-      </trans-unit>
-      <trans-unit id=".0w9JW8" resname="Discharges">
-        <source>Discharges</source>
-        <target state="translated">Discharges</target>
       </trans-unit>
       <trans-unit id="IpNN_HL" resname="Disclaimer">
         <source>Disclaimer</source>
@@ -4812,10 +4812,6 @@
       <trans-unit id="AMmJitd" resname="Installation / Discharge">
         <source>Installation / Discharge</source>
         <target state="translated">Installation / Discharge</target>
-      </trans-unit>
-      <trans-unit id="9_qo0Zl" resname="Installations">
-        <source>Installations</source>
-        <target state="translated">Installations</target>
       </trans-unit>
       <trans-unit id="b2ZHt6a" resname="Installed by">
         <source>Installed by</source>
@@ -7724,10 +7720,6 @@
       <trans-unit id="hz7skLG" resname="Reappoint Member">
         <source>Reappoint Member</source>
         <target state="translated">Reappoint Member</target>
-      </trans-unit>
-      <trans-unit id="ruaklkm" resname="Reappointments">
-        <source>Reappointments</source>
-        <target state="translated">Reappointments</target>
       </trans-unit>
       <trans-unit id="g73eJiq" resname="Reason(s)">
         <source>Reason(s)</source>

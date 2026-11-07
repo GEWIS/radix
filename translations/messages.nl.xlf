@@ -1629,6 +1629,10 @@
         <source>Association magazine</source>
         <target state="translated">Verenigingsblad</target>
       </trans-unit>
+      <trans-unit id="fS2Q0GL" resname="At least one mutation is required.">
+        <source>At least one mutation is required.</source>
+        <target state="translated">Er moet op zijn minst één mutatie worden toegevoegd.</target>
+      </trans-unit>
       <trans-unit id="_fp6hpn" resname="Attachment link">
         <source>Attachment link</source>
         <target state="translated">Link naar bijlage</target>
@@ -3120,10 +3124,6 @@
       <trans-unit id="m12dSPp" resname="Discharge from bodies OR renew in appropriate type (ordinary or external)">
         <source>Discharge from bodies OR renew in appropriate type (ordinary or external)</source>
         <target state="translated">Dechargeer commissielid OF verleng als gewoon of extern lid</target>
-      </trans-unit>
-      <trans-unit id=".0w9JW8" resname="Discharges">
-        <source>Discharges</source>
-        <target state="translated">Decharges</target>
       </trans-unit>
       <trans-unit id="IpNN_HL" resname="Disclaimer">
         <source>Disclaimer</source>
@@ -4812,10 +4812,6 @@
       <trans-unit id="AMmJitd" resname="Installation / Discharge">
         <source>Installation / Discharge</source>
         <target state="translated">Installatie / decharge</target>
-      </trans-unit>
-      <trans-unit id="9_qo0Zl" resname="Installations">
-        <source>Installations</source>
-        <target state="translated">Installaties</target>
       </trans-unit>
       <trans-unit id="b2ZHt6a" resname="Installed by">
         <source>Installed by</source>
@@ -7724,10 +7720,6 @@
       <trans-unit id="hz7skLG" resname="Reappoint Member">
         <source>Reappoint Member</source>
         <target state="translated">Lid herbenoemen</target>
-      </trans-unit>
-      <trans-unit id="ruaklkm" resname="Reappointments">
-        <source>Reappointments</source>
-        <target state="translated">Herbenoemingen</target>
       </trans-unit>
       <trans-unit id="g73eJiq" resname="Reason(s)">
         <source>Reason(s)</source>

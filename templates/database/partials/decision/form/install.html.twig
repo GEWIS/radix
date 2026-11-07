@@ -50,6 +50,7 @@
             } only %}
             {{ form_errors(form.name) }}
             {{ form_errors(form.subdecision) }}
+            {{ form_errors(form) }}
         </div>
 
         {{ form_widget(form.subdecision.meeting_type, {'attr': {'data-body-lookup-target': 'meetingType'}}) }}

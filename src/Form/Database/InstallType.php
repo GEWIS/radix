@@ -13,13 +13,19 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function Symfony\Component\Translation\t;
 
 class InstallType extends AbstractType
 {
-    public function __construct(private readonly InstallMapper $dataMapper)
-    {
+    public function __construct(
+        private readonly InstallMapper $dataMapper,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     /**
@@ -93,6 +99,27 @@ class InstallType extends AbstractType
                 'submit',
                 SubmitType::class,
                 ['label' => t('Confirm Changes')],
+            )
+            ->addEventListener(
+                FormEvents::POST_SUBMIT,
+                function (FormEvent $event): void {
+                    $form = $event->getForm();
+                    $installations = $form->get('installations')->getData() ?? [];
+                    $reappointments = $form->get('reappointments')->getData() ?? [];
+                    $discharges = $form->get('discharges')->getData() ?? [];
+
+                    if (
+                        [] !== $installations
+                        || [] !== $reappointments
+                        || [] !== $discharges
+                    ) {
+                        return;
+                    }
+
+                    $form->addError(new FormError(
+                        $this->translator->trans('At least one mutation is required.'),
+                    ));
+                },
             )
             ->setDataMapper($this->dataMapper);
     }

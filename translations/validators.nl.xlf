@@ -79,7 +79,7 @@
       </trans-unit>
       <trans-unit id="mUY7qf3" resname="At least one language must be used.">
         <source>At least one language must be used.</source>
-        <target>Er moet ten minste één taal worden gebruikt.</target>
+        <target>Er moet op zijn minst één taal worden gebruikt.</target>
       </trans-unit>
       <trans-unit id="toeJ.wb" resname="Choose a category.">
         <source>Choose a category.</source>
