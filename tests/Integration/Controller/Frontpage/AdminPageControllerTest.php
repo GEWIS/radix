@@ -313,9 +313,9 @@ final class AdminPageControllerTest extends DatabaseTestCase
         $this->write();
         $page = $this->written();
 
-        // The topic is passed in the hub URL, where it is escaped as a query parameter.
+        // Protocol 1.0 uses 'match' instead of 'topic' for exact topic matches.
         self::assertStringContainsString(
-            'topic=' . urlencode('frontpage/page-images/' . $page->id),
+            'match=' . urlencode('frontpage/page-images/' . $page->id),
             $this->browser($page),
         );
     }

@@ -79,7 +79,6 @@ services:
                 cors_origins ${APP_URL}
                 playground
                 anonymous
-                protocol_version_compatibility 8
             # See https://xdebug.org/docs/all_settings#mode
             XDEBUG_MODE: "${XDEBUG_MODE:-off}"
             # Names the IDE's server configuration, which is what carries the path mapping from /app back to the

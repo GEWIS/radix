@@ -15,7 +15,8 @@ use function array_filter;
 use function array_values;
 use function base64_decode;
 use function explode;
-use function is_array;
+use function in_array;
+use function is_string;
 use function json_decode;
 use function str_contains;
 use function strtr;
@@ -95,7 +96,7 @@ final class RealtimeControllerTest extends KernelTestCase
         );
         self::assertIsString($payload);
 
-        /** @var array{mercure?: array{subscribe?: mixed}} $claims */
+        /** @var array<string, mixed> $claims */
         $claims = json_decode(
             $payload,
             true,
@@ -103,10 +104,29 @@ final class RealtimeControllerTest extends KernelTestCase
             JSON_THROW_ON_ERROR,
         );
 
-        /** @var string[]|null $subscribe */
-        $subscribe = $claims['mercure']['subscribe'] ?? null;
-        self::assertTrue(is_array($subscribe));
+        // Protocol 1.1 uses RFC 9068 authorization_details.
+        foreach ($claims['authorization_details'] as $detail) {
+            if (
+                in_array(
+                    'subscribe',
+                    $detail['actions'],
+                    true,
+                )
+            ) {
+                // Topics are matcher objects like {"match":"topic"}.
+                $topics = [];
+                foreach ($detail['topics'] as $topic) {
+                    if (is_string($topic)) {
+                        $topics[] = $topic;
+                    } elseif (isset($topic['match'])) {
+                        $topics[] = $topic['match'];
+                    }
+                }
 
-        return $subscribe;
+                return $topics;
+            }
+        }
+
+        self::fail('No subscribe authorization_details found');
     }
 }
