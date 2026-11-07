@@ -76,7 +76,7 @@ loadControllers(
         'meeting-number': () => import('./controllers/decision/meeting_number_controller.ts'),
         'member-lookup': () => import('./controllers/decision/member_lookup_controller.ts'),
         'member-search': () => import('./controllers/decision/member_search_controller.ts'),
-        'organ-lookup': () => import('./controllers/decision/organ_lookup_controller.ts'),
+        'body-lookup': () => import('./controllers/decision/body_lookup_controller.ts'),
         'organ-members': () => import('./controllers/decision/organ_members_controller.ts'),
         'revision-filter': () => import('./controllers/decision/revision_filter_controller.ts'),
         'subdecision-choice': () => import('./controllers/decision/subdecision_choice_controller.ts'),

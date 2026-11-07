@@ -4,23 +4,23 @@
 {{ form_start(form, {
     'action': path('decision_decision_form', {'form': 'abolish'}),
     'attr': {
-        'data-controller': 'organ-lookup organ-members',
-        'data-organ-lookup-url-value': path('decision_organ_search'),
-        'data-organ-lookup-info-url-value': path('decision_organ_info', {
+        'data-controller': 'body-lookup organ-members',
+        'data-body-lookup-url-value': path('decision_organ_search'),
+        'data-body-lookup-info-url-value': path('decision_organ_info', {
             'type': enum('App\\Entity\\Database\\Enums\\MeetingTypes').ALV.value,
             'number': 0,
             'point': 0,
             'decision': 0,
             'sequence': 0,
         }),
-        'data-organ-lookup-min-length-value': 1,
+        'data-body-lookup-min-length-value': 1,
         'data-organ-members-conjunction-value': 'and'|trans,
-        'data-action': 'organ-lookup:selected->organ-members#render',
+        'data-action': 'body-lookup:selected->organ-members#render',
     },
 }) }}
     <div class="mb-2">
         {% include 'database/partials/decision/lookup-input.html.twig' with {
-            'controller': 'organ-lookup',
+            'controller': 'body-lookup',
             'field': form.name,
             'placeholder': 'Body'|trans,
         } only %}
@@ -28,11 +28,11 @@
         {{ form_errors(form.subdecision) }}
     </div>
 
-    {{ form_widget(form.subdecision.meeting_type, {'attr': {'data-organ-lookup-target': 'meetingType'}}) }}
-    {{ form_widget(form.subdecision.meeting_number, {'attr': {'data-organ-lookup-target': 'meetingNumber'}}) }}
-    {{ form_widget(form.subdecision.decision_point, {'attr': {'data-organ-lookup-target': 'decisionPoint'}}) }}
-    {{ form_widget(form.subdecision.decision_number, {'attr': {'data-organ-lookup-target': 'decisionNumber'}}) }}
-    {{ form_widget(form.subdecision.sequence, {'attr': {'data-organ-lookup-target': 'sequence'}}) }}
+    {{ form_widget(form.subdecision.meeting_type, {'attr': {'data-body-lookup-target': 'meetingType'}}) }}
+    {{ form_widget(form.subdecision.meeting_number, {'attr': {'data-body-lookup-target': 'meetingNumber'}}) }}
+    {{ form_widget(form.subdecision.decision_point, {'attr': {'data-body-lookup-target': 'decisionPoint'}}) }}
+    {{ form_widget(form.subdecision.decision_number, {'attr': {'data-body-lookup-target': 'decisionNumber'}}) }}
+    {{ form_widget(form.subdecision.sequence, {'attr': {'data-body-lookup-target': 'sequence'}}) }}
 
     <div class="mb-2 d-none" data-organ-members-target="panel">
         <strong>{{ 'The body to be abolished includes the following members:'|trans }}</strong>
@@ -43,7 +43,7 @@
         {{ form_widget(form.submit, {'attr': {
             'class': 'btn-gewis-primary',
             'disabled': 'disabled',
-            'data-organ-lookup-target': 'submit',
+            'data-body-lookup-target': 'submit',
         }}) }}
     </div>
 {{ form_end(form) }}

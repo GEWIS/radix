@@ -19,22 +19,22 @@
 {% endset %}
 
 {# The modals are outside the form but inside the editor, so opening one never submits anything. #}
-<div data-controller="organ-lookup install-editor"
-     data-action="organ-lookup:selected->install-editor#organSelected
+<div data-controller="body-lookup install-editor"
+     data-action="body-lookup:selected->install-editor#organSelected
                   member-lookup:selected->install-editor#memberSelected"
-     data-organ-lookup-url-value="{{ path('decision_organ_search') }}"
+     data-body-lookup-url-value="{{ path('decision_organ_search') }}"
      {# The route constrains every one of these (the type to the meeting types, the rest to digits), so it cannot
         generate a template with named placeholders in them. A valid address is generated instead and the controller
         replaces the last five segments, which is what the route declares them to be. #}
-     data-organ-lookup-info-url-value="{{ path('decision_organ_info', {
+     data-body-lookup-info-url-value="{{ path('decision_organ_info', {
          'type': enum('App\\Entity\\Database\\Enums\\MeetingTypes').ALV.value,
          'number': 0,
          'point': 0,
          'decision': 0,
          'sequence': 0,
      }) }}"
-     data-organ-lookup-min-length-value="1"
-     data-organ-lookup-lock-value="true"
+     data-body-lookup-min-length-value="1"
+     data-body-lookup-lock-value="true"
      data-install-editor-member-function-value="{{ constant('App\\Entity\\Database\\Enums\\InstallationFunctions::Member').value }}"
      data-install-editor-inactive-function-value="{{ constant('App\\Entity\\Database\\Enums\\InstallationFunctions::InactiveMember').value }}"
      data-install-editor-installation-prototype-value="{{ installation_prototype|e('html_attr') }}"
@@ -44,7 +44,7 @@
     {{ form_start(form, {'action': path('decision_decision_form', {'form': 'install'})}) }}
         <div class="mb-2">
             {% include 'database/partials/decision/lookup-input.html.twig' with {
-                'controller': 'organ-lookup',
+                'controller': 'body-lookup',
                 'field': form.name,
                 'placeholder': 'Body'|trans,
             } only %}
@@ -52,11 +52,11 @@
             {{ form_errors(form.subdecision) }}
         </div>
 
-        {{ form_widget(form.subdecision.meeting_type, {'attr': {'data-organ-lookup-target': 'meetingType'}}) }}
-        {{ form_widget(form.subdecision.meeting_number, {'attr': {'data-organ-lookup-target': 'meetingNumber'}}) }}
-        {{ form_widget(form.subdecision.decision_point, {'attr': {'data-organ-lookup-target': 'decisionPoint'}}) }}
-        {{ form_widget(form.subdecision.decision_number, {'attr': {'data-organ-lookup-target': 'decisionNumber'}}) }}
-        {{ form_widget(form.subdecision.sequence, {'attr': {'data-organ-lookup-target': 'sequence'}}) }}
+        {{ form_widget(form.subdecision.meeting_type, {'attr': {'data-body-lookup-target': 'meetingType'}}) }}
+        {{ form_widget(form.subdecision.meeting_number, {'attr': {'data-body-lookup-target': 'meetingNumber'}}) }}
+        {{ form_widget(form.subdecision.decision_point, {'attr': {'data-body-lookup-target': 'decisionPoint'}}) }}
+        {{ form_widget(form.subdecision.decision_number, {'attr': {'data-body-lookup-target': 'decisionNumber'}}) }}
+        {{ form_widget(form.subdecision.sequence, {'attr': {'data-body-lookup-target': 'sequence'}}) }}
 
         <div class="d-none" data-install-editor-target="panel">
             <div class="row">
@@ -177,7 +177,7 @@
                     {{ form_widget(form.submit, {'attr': {
                         'class': 'btn-gewis-primary',
                         'disabled': 'disabled',
-                        'data-organ-lookup-target': 'submit',
+                        'data-body-lookup-target': 'submit',
                     }}) }}
                 </div>
             </div>
