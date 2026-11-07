@@ -26,7 +26,7 @@ SYMFONY_TEST = $(DOCKER_COMP) exec -T -e APP_ENV=test app bin/console
 
 # Misc
 .DEFAULT_GOAL   = help
-.PHONY          : help seed translations igor openapi lint lint-fix lint-fix-all lint-twig phpstan phpstan-pr \
+.PHONY          : help seed translations igor openapi lint lint-fix lint-twig phpstan phpstan-pr \
                   test test-browser test-coverage test-prepare build builddev buildprod buildapp buildappdev buildappprod \
                   buildmatomo buildpgadmin setuplocalenv up upprod start startprod stop logs bash exec composer \
                   sf cc migrate migrate-to migration-up \
@@ -84,10 +84,7 @@ openapi: ## Regenerate openapi.yaml from the application
 lint: ## Linter using PHP_CodeSniffer
 	@$(PHP) ./vendor/bin/phpcs -p
 
-lint-fix: ## Lint fix using phpcbf, limited to what git reports as modified
-	@$(PHP) ./vendor/bin/phpcbf -p --filter=GitModified
-
-lint-fix-all: ## Lint fix using phpcbf, over the whole tree
+lint-fix: ## Lint fix using phpcbf, over the whole tree
 	@$(PHP) ./vendor/bin/phpcbf -p
 
 lint-twig: ## Validate Twig templates

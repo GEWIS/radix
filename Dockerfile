@@ -1,11 +1,11 @@
 #syntax=docker/dockerfile:1
 ARG PHP_VERSION=8.5
-ARG FRANKENPHP_VERSION=1.13
+ARG FRANKENPHP_VERSION=1.13.5
 # The IP databases device recognition and security notices read, baked in so a first start never waits on their
 # host. They live outside /app/data because the volume mounts over it; the entrypoint seeds that volume from them
 # and app:user:update-ip-databases keeps it fresh. Pinned to a commit so the layer caches, as IPLocate rebuilds
 # daily. Keep this above the first `FROM`, or the stage below redeclares it empty and the URL 404s.
-ARG IPLOCATE_REVISION=1edefd96a5746a6e522786a56073e836f6597582
+ARG IPLOCATE_REVISION=f0283a17ca5af88e81c089da76d61500f5f9729d
 
 FROM dunglas/frankenphp:${FRANKENPHP_VERSION}-php${PHP_VERSION} AS frankenphp_upstream
 

@@ -209,6 +209,7 @@ final class CareerNotificationWiringTest extends DatabaseTestCase
      */
     private function sent(string $class): array
     {
+        /** @var list<T> $messages */
         $messages = [];
         foreach (
             [

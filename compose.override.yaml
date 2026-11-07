@@ -132,7 +132,7 @@ services:
             <<: *worker_dev_deploy
             replicas: 1
     rabbitmq:
-        image: rabbitmq:4.3-management-alpine
+        image: rabbitmq:4.4-management-alpine
         ports:
             - target: 5672
               protocol: tcp

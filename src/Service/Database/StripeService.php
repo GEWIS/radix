@@ -29,6 +29,7 @@ use UnexpectedValueException;
 use function get_debug_type;
 use function intval;
 use function sprintf;
+use function strval;
 use function time;
 
 class StripeService
@@ -177,7 +178,7 @@ class StripeService
                         'enabled' => true,
                     ],
                 ],
-                'client_reference_id' => $prospectiveMember->lidnr,
+                'client_reference_id' => strval($prospectiveMember->lidnr),
                 'customer_email' => $prospectiveMember->email,
             ]);
         } catch (ApiErrorException $e) {
