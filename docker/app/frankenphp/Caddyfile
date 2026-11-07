@@ -31,6 +31,14 @@
 	root /app/public
 
 	mercure {
+		issuer radix {
+			publisher {
+				jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
+			}
+			subscriber {
+				jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+			}
+		}
 		transport bolt {
 			path /data/caddy/mercure.db
 			# 0 is no limit rather than no history, and cleanup has nothing to trim against. Past some size a
@@ -38,8 +46,6 @@
 			size {$MERCURE_BOLT_SIZE:10000}
 			{$MERCURE_BOLT_EXTRA_DIRECTIVES}
 		}
-		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
-		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
 		{$MERCURE_EXTRA_DIRECTIVES}
 	}
 
