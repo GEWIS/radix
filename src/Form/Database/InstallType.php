@@ -13,13 +13,19 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function Symfony\Component\Translation\t;
 
 class InstallType extends AbstractType
 {
-    public function __construct(private readonly InstallMapper $dataMapper)
-    {
+    public function __construct(
+        private readonly InstallMapper $dataMapper,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     /**
@@ -52,44 +58,68 @@ class InstallType extends AbstractType
                 'installations',
                 CollectionType::class,
                 [
-                    'label' => t('Installations'),
+                    'label' => false,
                     'entry_type' => InstallationType::class,
                     'allow_add' => true,
                     'allow_delete' => true,
                     'prototype' => true,
                     'prototype_name' => '__index__',
+                    'attr' => ['data-add-button' => 'false'],
                 ],
             )
             ->add(
                 'reappointments',
                 CollectionType::class,
                 [
-                    'label' => t('Reappointments'),
+                    'label' => false,
                     'entry_type' => SubDecisionType::class,
                     'entry_options' => ['subdecision_class' => Installation::class],
                     'allow_add' => true,
                     'allow_delete' => true,
                     'prototype' => true,
                     'prototype_name' => '__index__',
+                    'attr' => ['data-add-button' => 'false'],
                 ],
             )
             ->add(
                 'discharges',
                 CollectionType::class,
                 [
-                    'label' => t('Discharges'),
+                    'label' => false,
                     'entry_type' => SubDecisionType::class,
                     'entry_options' => ['subdecision_class' => Installation::class],
                     'allow_add' => true,
                     'allow_delete' => true,
                     'prototype' => true,
                     'prototype_name' => '__index__',
+                    'attr' => ['data-add-button' => 'false'],
                 ],
             )
             ->add(
                 'submit',
                 SubmitType::class,
                 ['label' => t('Confirm Changes')],
+            )
+            ->addEventListener(
+                FormEvents::POST_SUBMIT,
+                function (FormEvent $event): void {
+                    $form = $event->getForm();
+                    $installations = $form->get('installations')->getData() ?? [];
+                    $reappointments = $form->get('reappointments')->getData() ?? [];
+                    $discharges = $form->get('discharges')->getData() ?? [];
+
+                    if (
+                        [] !== $installations
+                        || [] !== $reappointments
+                        || [] !== $discharges
+                    ) {
+                        return;
+                    }
+
+                    $form->addError(new FormError(
+                        $this->translator->trans('At least one mutation is required.'),
+                    ));
+                },
             )
             ->setDataMapper($this->dataMapper);
     }

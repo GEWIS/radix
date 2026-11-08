@@ -30,8 +30,8 @@ export interface OrganInfo extends OrganMatch {
 }
 
 /**
- * Choosing an organ fills in the reference to its foundation (which is what the form reads back) and then loads
- * who is currently installed in it, announced as `organ-lookup:selected` so the page around it can show the
+ * Choosing a body fills in the reference to its foundation (which is what the form reads back) and then loads
+ * who is currently installed in it, announced as `body-lookup:selected` so the page around it can show the
  * consequences before the decision is taken.
  */
 /* stimulusFetch: 'lazy' */
@@ -41,6 +41,34 @@ export default class extends LookupController<OrganMatch> {
         infoUrl: String,
         lock: Boolean,
     };
+
+    /**
+     * When the form is re-rendered after a validation error, the hidden reference fields still carry the organ that
+     * was selected. Detect that and reload the organ's info so the edit panel is restored.
+     */
+    connect(): void {
+        super.connect();
+
+        if (
+            this.meetingTypeTarget.value !== ''
+            && this.meetingNumberTarget.value !== ''
+            && this.decisionPointTarget.value !== ''
+            && this.decisionNumberTarget.value !== ''
+            && this.sequenceTarget.value !== ''
+        ) {
+            const match: OrganMatch = {
+                meeting_type: this.meetingTypeTarget.value,
+                meeting_number: Number(this.meetingNumberTarget.value),
+                decision_point: Number(this.decisionPointTarget.value),
+                decision_number: Number(this.decisionNumberTarget.value),
+                subdecision_sequence: Number(this.sequenceTarget.value),
+                name: '',
+                abbr: '',
+            };
+
+            void this.loadInfo(match);
+        }
+    }
 
     declare readonly meetingTypeTarget: HTMLInputElement;
     declare readonly meetingNumberTarget: HTMLInputElement;
