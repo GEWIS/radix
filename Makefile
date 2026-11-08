@@ -102,7 +102,7 @@ phpstan-pr: ## Regenerate the baseline against main, then analyse this branch ag
 	@git checkout -
 	@$(PHP) ./vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit 1G --no-progress
 
-test: ## Start tests with phpunit, pass the parameter "c=" to add options to phpunit, example: make test c="--group e2e --stop-on-failure"
+test: ## Start tests with phpunit, pass the parameter "c=" to add options to phpunit, example: make test c="--stop-on-failure" (browser tests: make test-browser)
 	@$(eval c ?=)
 	@$(DOCKER_COMP) exec -T -e APP_ENV=test app bin/phpunit $(c)
 

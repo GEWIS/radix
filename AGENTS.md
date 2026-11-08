@@ -1,88 +1,78 @@
 # AGENTS.md
 
-Guidance for AI coding agents working in this repository. Humans should read `README.md` first.
+Operating manual for AI coding agents working in this repository. RFC 2119 keywords (MUST, MUST NOT, SHOULD, MAY)
+are normative. Humans should read `README.md` first; `AI_POLICY.md` governs how contributions are made.
 
 ## What this project is
 
-radix is one Symfony application serving two things that belong to the same association:
+radix is one Symfony application serving two things that belong to the same association (GEWIS):
 
-- **The register** — meetings, decisions, members, memberships, bodies and mailing lists. The authoritative record of
-  what GEWIS decided and who its members are, written by the board and read by every other GEWIS system.
+- **The register** — meetings, decisions, members, memberships, bodies and mailing lists: the authoritative record of
+  what GEWIS decided and who its members are, written by the board and read by every other GEWIS system through the
+  API.
 - **The website** — activities, photos, course documents, custom pages, the careers portal, and the public face of the
   decisions above.
 
-They used to be two applications, GEWISDB and GEWISWEB, that copied data between themselves over HTTP. Here they are
-one codebase, one container image, one deployment. What used to cross the wire is now two entity managers in the same
-kernel. There is no sync command, no second repository and no separate report database.
+They used to be two applications (GEWISDB, GEWISWEB) joined by a sync script. Here they are one codebase, one
+container image, one deployment: two entity managers in the same kernel, with no sync command, no second
+repository and no separate report database.
 
 ## Two databases
 
 Two connections, and the distinction governs anything that touches data:
 
-- **`default`** — **PostgreSQL**, the **ledger**. The editable source of truth: members, prospective members,
-  memberships, meetings, decisions, bodies, mailing lists. Entities under `src/Entity/Database`, migrations in
+- **`default`** — PostgreSQL, the **ledger**. The editable source of truth: members, prospective members,
+  memberships, meetings, decisions, bodies, mailing lists. Entities in `src/Entity/Database`, migrations in
   `migrations/database`.
-- **`web`** — **MariaDB**, everything else. The website's own data — activities, photos, companies, pages, users,
-  sessions — *and* the projection of the ledger that the site and the API read. The projection's entities are
-  `src/Entity/Decision`; the other domains own the rest. Migrations in `migrations/web`.
+- **`web`** — MariaDB, everything else. The website's own data (activities, photos, companies, pages, users,
+  sessions) *and* the **projection** of the ledger that the site and the API read: `src/Entity/Decision`, with the
+  other domains owning the rest. Migrations in `migrations/web`.
 
-The projection is not a cache you may bypass, and it is not a copy you may let drift. `App\Service\Report` writes it,
-`App\EventListener\Report\DatabaseUpdateListener` and `DatabaseDeletionListener` keep it level with the ledger as the
-ledger is written, and `app:decision:generate` rebuilds it from the ledger — that is what to run after a bulk change.
-The listeners stand down while fixtures load (`BulkLoadListener`), for exactly that reason.
-
-A change to a ledger entity therefore usually needs the matching change on the projection side and in the projection
-services under `src/Service/Report`. Changing one and not the other is the easiest way to break this application: the
-register keeps accepting writes and the website quietly renders a version of the association that no longer exists.
-
-Rules that follow from having two connections:
-
-- **No query spans both.** DQL, joins and associations stay inside one entity manager. Ask the other manager for what
-  you need and match up in PHP.
-- **Say which manager you mean.** The default manager is the ledger's, and for most of the codebase that is the wrong
-  one. Inject the manager or repository you want rather than letting `ManagerRegistry` hand you the default.
-- **Migrations are per entity manager.** They run on container start; `make migrate` runs both by hand. Each set is a
-  file in `config/packages/migrations/` naming its own connection, so every command passes
-  `--configuration=config/packages/migrations/{default,web}.yaml` and never `--em`. Without one a command finds no
-  migrations at all.
-- **The PostgreSQL connections `SET ROLE`** to a least-privileged role (`src/Doctrine/Middleware/`). Anything needing
-  owner rights fails as a permission error, which reads like a configuration bug and is not one.
+- The projection is not a cache to bypass, and not a copy to let drift. `App\Service\Report` writes
+  it; `App\EventListener\Report\DatabaseUpdateListener` and `DatabaseDeletionListener` keep it level with the ledger
+  as the ledger is written; `app:decision:generate` rebuilds it from the ledger — run it after a bulk change.
+  `App\EventListener\Report\BulkLoadListener` stands the listeners down while fixtures load.
+- A change to a ledger entity MUST come with the matching change on the projection side (`src/Entity/Decision`,
+  `src/Service/Report`). Change one without the other and the website quietly renders an association that no
+  longer exists.
+- A query MUST NOT span both connections. DQL, joins and associations stay inside one entity manager; ask the other
+  for what you need and match up in PHP.
+- The default manager is the ledger's — usually the wrong one. Inject the manager or repository you want; do not
+  let `ManagerRegistry` hand you the default.
+- Migrations are per entity manager and run on container start; `make migrate` runs both by hand. Each set is a file
+  in `config/packages/migrations/` naming its own connection, so every command passes
+  `--configuration=config/packages/migrations/{default,web}.yaml` and never `--em`.
+- The PostgreSQL connections `SET ROLE` to a least-privileged role (`src/Doctrine/Middleware/`); anything needing
+  owner rights fails as a permission error — that is not a configuration bug.
 
 ## Stack
 
 `composer.json` is the authority on versions — do not quote them from here.
 
-- **PHP 8.5** with `declare(strict_types=1)` required in every file.
-- **Symfony 8** across the board (framework-bundle, security-bundle, messenger, scheduler, asset-mapper, stimulus,
-  ux-live-component, workflow, …).
-- **Doctrine ORM 3** with attribute mapping, over the two entity managers above. Patched at install for sub-decision
-  joins — see `composer.json` `extra.patches`.
-- **Doctrine Migrations** — `migrations/database` and `migrations/web`, generated from `migrations/template.tpl`.
-- **FrankenPHP worker mode** behind Caddy. Worker-mode safety is non-negotiable here — see Things to be careful
-  about, below.
-- **API Platform 4** (`config/packages/api_platform.yaml`, all stateless, JSON only) serves almost all of `^/api`,
-  alongside four hand-written endpoints in `src/Controller/Report`; see the API section.
-- **Symfony Messenger** over RabbitMQ in dev, in-memory in test (`config/packages/messenger.yaml`). **Scheduler** in
-  `src/Scheduler/`.
-- **Symfony Workflow** drives the revision/approval lifecycle (`config/packages/workflow.yaml`) — see the Revision
-  workflow section.
-- **Twig + Stimulus + Live Components**, Bootstrap, Font Awesome, Sass via `symfonycasts/sass-bundle`, asset-mapper.
-  Stimulus controllers are **TypeScript**, compiled by `sensiolabs/typescript-bundle` (SWC) — see Frontend assets.
-- **Altcha** (`config/packages/altcha.yaml`) — self-hosted proof-of-work captcha on public forms (external activity
-  sign-up, password-reset request, and the join form). `App\Service\Application\AltchaSolutionGuard` blocks replay of
-  solved challenges.
-- **Stripe** for membership fees on the join host; **Mailman** and **Listmonk** for mailing lists and newsletters.
-- **Mercure** for SSE; **Mailer** with MailPit in dev; **Notifier**; **Matomo** analytics; **scheb/2fa** for MFA.
-- Runs under Docker via `docker compose`; most `make` targets shell into the `app` container.
+- PHP 8.5.
+- Symfony 8.1 across the board (framework, security, messenger, scheduler, asset-mapper, ux-live-component,
+  workflow).
+- Doctrine ORM 3 with attribute mapping over the two entity managers, patched at install for sub-decision joins
+  (`composer.json` `extra.patches`).
+- FrankenPHP worker mode behind Caddy; worker-mode safety is non-negotiable — `make igor`, see Gates.
+- API Platform 5 (`config/packages/api_platform.yaml`, all stateless, JSON only) serves almost all of `^/api`,
+  alongside the hand-written endpoints in `src/Controller/Report`.
+- Symfony Messenger (RabbitMQ in dev, in-memory in test) and Scheduler — see Messaging & scheduling.
+- Symfony Workflow drives the revision/approval lifecycle — see Revision workflow.
+- Twig + Stimulus (TypeScript, compiled by `sensiolabs/typescript-bundle`/SWC) + Live Components; Bootstrap, Font
+  Awesome, Sass, asset-mapper. No npm; third-party JS is vendored under `assets/vendor/`.
+- Altcha (self-hosted proof-of-work captcha on public forms), Stripe (membership fees), Mailman and Listmonk (lists
+  and newsletters), Mercure (SSE), Mailer (MailPit in dev), Notifier, Matomo, `scheb/2fa`.
+- Docker via `docker compose`; most `make` targets shell into the `app` container.
 
 ## Layout
 
-Classes are grouped by the role they play, then by domain. The domains are **Activity**, **Application**, **Career**,
-**Checker**, **Database**, **Decision**, **Education**, **Frontpage**, **Photo**, **Report** and **User**. `Database`
-is the ledger, `Decision` is the projection of it, `Report` is the machinery that maintains that projection and serves
-it, and `Application` is what is shared. Member, Meeting, Organ, MailingList and the rest are entities *in* a domain,
-never domains of their own. There is no `Api` domain: the API is a delivery mechanism, and its parts belong to what
-they serve.
+Classes are grouped by the role they play, then by domain. The entity domains are **Activity**, **Application**,
+**Career**, **Database** (the ledger), **Decision** (the projection — all its entities are in `src/Entity/Decision`,
+there are no `Report` entities), **Education**, **Frontpage**, **Photo** and **User**. `Report` and `Checker` are
+machinery without entities: `Report` maintains and serves the projection, `Checker` enforces consistency over the
+ledger, `Application` is what is shared. A member, a meeting or an organ is an entity *in* a domain, never a domain
+of its own; there is no `Api` domain, because the API's parts belong to what they serve.
 
 ```
 src/
@@ -103,7 +93,7 @@ src/
   OpenApi/          decorators completing the generated OpenAPI document
   Repository/       Doctrine repositories
   Scheduler/        Symfony Scheduler providers (flat)
-  Security/         user checkers, voters (SudoVoter, RevisionVoter), remember-me handler, API authentication
+  Security/         user checkers, voters, remember-me handler, API authentication
   Serializer/       serializer context builders and normalizers
   Service/          domain services
   State/            API Platform state providers and processors, by domain
@@ -114,171 +104,142 @@ src/
   Workflow/         revision-workflow plumbing: marking store, RevisionCloner implementations + registry
 config/             framework + per-bundle config under packages/, routes under routes/
 migrations/         database/ (the ledger) and web/ (everything else)
-templates/          Twig templates, mirrors src/Controller; components/<Namespace>/ for Live components,
+templates/          Twig templates; components/<Namespace>/ for Live components,
                     partials/application/ for stateless includes
 translations/       .xlf files for en/nl
 assets/             TypeScript Stimulus controllers, Sass, vendored assets
-tests/              unit tests + Integration/ (see Static analysis & tests); bootstrap.php + object-manager.php
+tests/              unit tests, mostly mirroring src/; Browser/ is the Panther e2e suite (see Testing)
 ```
 
 When adding to a domain, follow the sibling pattern — do not invent a new home. Prefer passing a `ViewModel` to a
-template over handing it entities or loose arrays when the view needs derived or aggregated data (final readonly
-classes, no behaviour beyond accessors).
+template over entities or loose arrays when the view needs derived or aggregated data (final readonly classes, no
+behaviour beyond accessors).
 
 ## Routing & locale
 
-The application is bilingual (`en`, `nl`) and most controller routes are prefixed from `config/routes.yaml`:
+The application is bilingual (`en`, `nl`):
 
-- The `localised_routes` resource attribute-scans `src/Controller/` and applies `/en` and `/nl` prefixes. Controllers
-  themselves use `#[Route]` attributes with locale-agnostic paths.
+- `localised_routes` in `config/routes.yaml` attribute-scans `src/Controller/` and applies the `/en` and `/nl`
+  prefixes; controllers use locale-agnostic `#[Route]` paths.
 - **The register is part of the administration and answers under `/{_locale}/admin`.** `src/Controller/Database`
-  carries paths below that prefix, with the locale as a path segment rather than through the prefix map above, so its
-  routes keep a single name each (`member_index`, not `member_index.en`). Sharing the prefix with `localised_routes`
-  is not a conflict: two imports may contribute routes under one path as long as no two claim the same path and
-  method. `/{_locale}/database` still answers, permanently redirecting to wherever each page moved to
-  (`ApplicationController::legacyRegister`). The website's own URLs are unchanged by the merge, and must stay that
-  way.
-- **`page_route`** (custom-pages catch-all) and **`catch_all`** (404 fallback to `FrontpageController::notFound`) are
-  defined in `config/routes.yaml` rather than as attributes — **order matters**. Attribute scanning that ran before the
-  explicit YAML routes used to steal traffic; that bug bit voting committees. Don't reorder this file lightly.
-- **Every page a person reads carries its language in its own address.** What is left without one is either not a page
-  (`image_serve`, whose slash-bearing `{path}` must be matched before `page_route` could grab it; the public JWKS
-  document; the Stripe webhook; `/health`) or an address we do not get to move, which answers through
-  `App\Controller\Application\LocaleRedirectController` and forwards to the page proper. Those are the sign-up and
-  renewal links that sit in mailboxes and on posters, the checkout return addresses that travel with a session already
-  open, and `/user/token/{app}`, which external applications are configured with. The
-  redirect is a 302, not a 301: where it lands depends on `Accept-Language`, so it must not be remembered.
-- A locale-prefixed route has to be declared **above `page_route`** in `config/routes.yaml`, whose
-  `/{_locale}/{category}/{subCategory}/{name}` otherwise reads three segments of it as a page that does not exist.
-  That is why `user_token` sits with the anonymous flows rather than next to the JWKS document it used to follow.
-- **There is no session-stored locale.** `/lang/{lang}` and the listener that applied what it wrote are gone; a
-  request's language comes from `_locale` in its path, and `App\Service\Application\LocalePreference` answers for the
-  handful of addresses that have no room to say. E-mail is written in English and links to `/en/…` explicitly
-  (`_locale => Languages::English->getLangParam()`), rather than leaving it to whatever the router is holding.
-- Other YAML route files under `config/routes/`: `api_platform.yaml`, `scheb_2fa.yaml`, `security.yaml`,
-  `framework.yaml`, `nelmio_security.yaml`, `altcha.yaml`, `ux_live_component.yaml`, `ux_autocomplete.yaml`, and
-  `web_profiler.yaml` (dev).
-- `src/EventListener/Application/LocaleRedirectListener.php` redirects bare `/` to the visitor's preferred locale,
-  through the same `LocalePreference` as everything else, falling back to `%kernel.default_locale%` (= `en`).
-- `$defaultLocale` and `$supportedLocales` are auto-bound in `config/services.yaml` — services that need them can just
-  declare the parameter.
-- **Live-component routes are locale-prefixed** (`config/routes/ux_live_component.yaml` → `/{_locale}/_components`).
-  Without the locale segment, action POSTs would have no `_locale` route attribute and re-renders would always come
-  back in the framework default (`en`) — there is no `LocaleSubscriber` syncing the session locale to fall back on.
+  carries its paths below that prefix, so its routes keep a single name each (`member_index`, not
+  `member_index.en`). `/{_locale}/database` still answers, permanently redirecting to wherever each page moved to
+  (`ApplicationController::legacyRegister`).
+- **`page_route`** (custom-pages catch-all) and **`catch_all`** (404 fallback) are defined in `config/routes.yaml`
+  rather than as attributes — order matters. A locale-prefixed route has to be declared **above `page_route`**,
+  whose `/{_locale}/{category}/{subCategory}/{name}` otherwise reads three segments of it as a missing page. Don't
+  reorder this file lightly.
+- **There is no session-stored locale.** A request's language is its `_locale`; `App\Service\Application\LocalePreference`
+  answers for the handful of addresses that have no room to say it. E-mail is written in English and links to
+  `/en/…` explicitly.
+- **Live-component routes are locale-prefixed** (`config/routes/ux_live_component.yaml` → `/{_locale}/_components`);
+  without the segment, re-renders come back in the framework default.
+- Addresses that do not carry a locale — the sign-up and renewal links that sit in mailboxes and on posters, the
+  checkout return addresses, `/user/token/{app}` (external applications are configured with it), plus `image_serve`,
+  the public JWKS document, the Stripe webhook and `/health` — answer through
+  `App\Controller\Application\LocaleRedirectController`, which forwards to the page proper. The redirect is a 302,
+  not a 301: where it lands depends on `Accept-Language`, so it must not be remembered.
 
 ## Twig components & partials
 
-Two template locations, deliberately distinct:
+- **`templates/components/<Namespace>/`** holds Twig / Live component templates, each paired with a backing class in
+  `src/Twig/Components/<Namespace>/`. Names use `:` separators, set explicitly via
+  `#[AsLiveComponent(name: ..., template: ...)]` so renames stay obvious; the namespace mirrors `src/Controller/`.
+- **`templates/partials/application/`** holds stateless `{% include %}` fragments — sidebars, pagination, sort
+  headers. Anything reused by multiple components belongs here; files use kebab-case without a leading underscore.
 
-- **`templates/components/<Namespace>/`** holds Twig / Live component templates, each paired with a backing PHP class
-  in `src/Twig/Components/<Namespace>/`. Component names use `:` separators (e.g. `User:Admin:UsersOverview`); set them
-  explicitly via `#[AsLiveComponent(name: ..., template: ...)]` so renames stay obvious. The namespace structure should
-  mirror `src/Controller/` (e.g. `User/Admin/`, not flat `Admin/`) so admin tooling stays grouped with its domain.
-- **`templates/partials/application/`** holds stateless `{% include %}` fragments — sidebars, pagination, sort headers.
-  Anything reused by multiple components belongs here, not co-located inside `templates/components/`. Files use
-  kebab-case without a leading underscore (`pagination.html.twig`, `sort-header.html.twig`).
-
-Render components from a regular template with `{{ component('User:Admin:UsersOverview') }}` (or
-`<twig:User:Admin:UsersOverview />`). Live-component action handlers re-render the component on the server, so any
-locale-dependent output (translations, date formatting) depends on the locale-prefixed route above.
+Render components from a regular template with `{{ component('User:Admin:UsersOverview') }}`. Live-component action
+handlers re-render on the server, so locale-dependent output depends on the locale-prefixed route above.
 
 ## Frontend assets
 
-- **Stimulus controllers are TypeScript.** They live in `assets/controllers/<domain>/` and are named `*_controller.ts`.
-  Write new controllers in TypeScript — never plain JS. The single exception is
-  `assets/controllers/csrf_protection_controller.js`, which is recipe-managed by Symfony Flex; leave it as JS so recipe
-  updates apply cleanly.
-- TS is compiled by `sensiolabs/typescript-bundle` via SWC (`.swcrc`, wired in `config/packages/asset_mapper.yaml`).
-  **SWC strips types but does not type-check** — there is no `tsc` or eslint gate, so type errors surface at runtime.
-  Be precise with DOM/Stimulus typings and verify behaviour in the browser (see Validating changes below).
-- Sass lives in `assets/styles/`; third-party JS is vendored under `assets/vendor/` (asset-mapper, no `package.json`
-  and no npm). In dev, the entrypoint watches `assets/` and recompiles.
+- Stimulus controllers live in `assets/controllers/<domain>/` as `*_controller.ts`. **Write new controllers in
+  TypeScript, never plain JS.** The single exception is `assets/controllers/csrf_protection_controller.js`, which is
+  recipe-managed by Symfony Flex; leave it as JS so recipe updates apply cleanly.
+- **SWC strips types but does not type-check** — there is no `tsc` or eslint gate, so type errors surface at runtime.
+  Verify changed behaviour in the browser (see Testing).
 
-## Security & users
+## Security & authorization
 
-The firewalls are in `config/packages/security.yaml`. The API surface (`^/api`) is stateless; the interactive
-firewalls carry `form_login`, login throttling, two-factor authentication and a `UserChecker`.
+The firewalls are in `config/packages/security.yaml`. `^/api` is stateless; the interactive firewalls carry
+`form_login`, login throttling, two-factor authentication and a `UserChecker`.
 
-The user entities are distinct on purpose, and any new authorization logic has to reason about which one it has —
-never assume `$this->getUser()` is a member:
+There are three kinds of user, and any new authorization logic MUST reason about which one it has — never assume
+`$this->getUser()` is a member:
 
 - `App\Entity\User\User` — website members, keyed by `lidnr` (membership number); roles derived from member type,
   explicit `UserRole` rows, and self-assigned role.
 - `App\Entity\User\CompanyUser` — corporate users, keyed by company id; always `ROLE_COMPANY_USER`.
 - `App\Entity\Database\User\ApiPrincipal` — the principals and tokens for machine access, on the ledger.
 
-The register has no accounts of its own: it is reached with a member's own `User`, and who may read or change it is
-decided by two roles granted for as long as somebody holds the office. `ROLE_DATABASE_ADMIN` follows a serving
-secretary (installed, their installation date passed, not relieved) and `ROLE_DATABASE_READ_ONLY` a secretary who has
-been relieved but whose year is not yet discharged. Both are derived in `User::getRoles()` from board installations
-rather than written against an account, and both require MFA before they are granted at all.
+**The register has no accounts of its own.** It is reached with a member's own `User`, and who may read or change it
+is decided by roles granted for as long as somebody holds the office, derived in `User::getRoles()` from board
+installations rather than written against an account: `UserRoles::DatabaseAdmin` (`ROLE_DATABASE_ADMIN`) follows a
+serving secretary; `UserRoles::DatabaseReadOnly` (`ROLE_DATABASE_READ_ONLY`) a secretary who has been relieved but
+whose year is not yet discharged; and `UserRoles::DatabaseMemberReadOnly` the current board. When MFA enforcement
+is on, an in-scope user who has not enrolled has their protective roles stripped in `getRoles()`, so every
+`#[IsGranted]` and `access_control` check fails until they enrol — `MfaEnforcementListener` converts the exception
+into the redirect.
 
-Both are also withheld from a request that did not arrive from one of the subnets in `REGISTER_IP_RANGES`:
-`App\Security\Database\RegisterNetworkRoleHierarchy` filters them out of the reachable role set, so every
-`access_control` rule, `#[IsGranted]` and `is_granted()` naming them fails at once and the register's links disappear
-from the menus with them. An empty list places the register nowhere and restricts nothing, which is what development
-and the tests run with. The check refuses an address belonging to a trusted proxy, so getting `SYMFONY_TRUSTED_PROXIES`
-wrong shuts the register rather than opening it.
+`ROLE_DATABASE_ADMIN` and `ROLE_DATABASE_READ_ONLY` are also withheld from a request that did not arrive from one of
+the subnets in `REGISTER_IP_RANGES`:
+`App\Security\Database\RegisterNetworkRoleHierarchy` filters them out of the reachable role set, so every check
+naming them fails at once and the register's menu links disappear with them. An empty list restricts nothing —
+what dev and tests run. The check refuses an address belonging to a trusted proxy, so getting
+`SYMFONY_TRUSTED_PROXIES` wrong shuts the register rather than opening it.
 
-`App\Security\User\UserChecker` blocks `User` login for deleted, hidden or expired members and members without an
-email. Authorization beyond roles lives in voters under `src/Security/`; notably
-`App\Security\User\SudoVoter` gates the `SUDO` attribute on a 30-minute time-bounded grant (see `SudoMode`).
+`App\Security\User\UserChecker` blocks login for deleted, hidden or expired members and members without an email.
+Authorization beyond roles lives in voters under `src/Security/`.
 
-Whole areas are behind that grant rather than lists of actions within them.
-`App\EventListener\User\SudoEnforcementListener` asks for it on every address under
-`/{_locale}/{admin,user/settings,user/security,company/security}`, the areas named in its own `AREAS` constant, so a
-new controller in any of them needs no `#[IsGranted(SudoVoter::ATTRIBUTE)]` and adding one says nothing the path does
-not already say. Three things sit outside it deliberately. Signing in, resetting a password and confirming sudo answer
-under `/user` and `/company` but outside `/security`, which is what keeps somebody with no grant able to go and get
-one. The live components an admin page is built from answer under `/{_locale}/_components` and carry the attribute
-themselves. And `/user/cosmetics` (`CosmeticsController`) is the navbar's festive-effects switch, moved out of
-`/user/settings` because it posts with `fetch` from every page on the site.
+**Sudo** is a time-bounded grant: `App\Security\User\SudoVoter` gates the `SUDO` attribute and
+`App\Security\User\SudoMode` keeps it in Valkey, scoped to the firewall, account and session it was given on. It has
+two expirations: an idle TTL (1800 s, `app.sudo_idle_ttl`) extended by every guarded write, so a long edit is not
+interrupted by a prompt — a GET does not extend it — and an absolute TTL (7200 s, `app.sudo_absolute_ttl`) measured
+from the confirmation that never extends.
 
-Two places keep the attribute because the rule there is about the thing being looked at rather than about where it
-answers: the review screens in `AbstractRevisionReviewController` (whether this reader may approve *this* revision),
-and the four administrative actions on `ProspectiveMemberController`, the one controller whose public flows and
-administrative ones answer at addresses declared in two different places, so the prefix is a property of the action
-rather than of the class.
-
-`App\EventListener\User\SudoGrantOnLoginListener` hands out the grant to somebody who has just signed in, so the
-password typed a moment ago is not asked for again on the way in. It follows the credentials on the passport rather
-than the login: a remember-me cookie presents nothing to check, and re-proving a session restored from one is what
-sudo is for. Do not reach for `InteractiveLoginEvent` here, Symfony calls the remember-me authenticator interactive as
-well. The grant runs for thirty minutes from when it was given rather than from the last page, so **an XHR endpoint
-inside a guarded area answers a lapsed grant with the confirmation page instead of its JSON**, which is nothing the
-script that asked can act on. That is the reason the cosmetics switch had to move, and the thing to check before
-putting a new `fetch` target inside one of these areas.
+- Whole areas are behind that grant rather than lists of actions within them.
+  `App\EventListener\User\SudoEnforcementListener` requires it on every address `App\Security\User\SudoArea` names —
+  `/{_locale}/{admin, user/settings, user/security, company/security}` — so a new controller in any of them needs no
+  `#[IsGranted(SudoVoter::ATTRIBUTE)]`.
+- Deliberately outside the area: signing in, resetting a password and confirming sudo answer under `/user` and
+  `/company` but outside `/security` — so somebody without a grant can still go and get one. The live components an
+  admin page is built from, which answer under `/{_locale}/_components` and carry the attribute themselves. And
+  `/user/cosmetics`, the festive-effects switch, which every page `fetch`es.
+- Two places keep the attribute, because the rule is about the object, not the URL: the review screens in
+  `AbstractRevisionReviewController` (may *this* reader approve *this* revision) and the administrative actions on
+  `ProspectiveMemberController`.
+- `App\EventListener\User\SudoGrantOnLoginListener` grants the permission on fresh sign-in, so the just-typed
+  password is not asked again on the way in. It follows the passport credentials, not the login — a remember-me
+  cookie presents nothing to check — and do not reach for `InteractiveLoginEvent`: Symfony calls the remember-me
+  authenticator interactive as well.
+- **An XHR endpoint inside a guarded area answers a lapsed grant with the confirmation page, not its JSON** —
+  nothing the asking script can act on. Check this before putting a new `fetch` target inside one of these areas.
 
 Remember-me is a **custom** integration (`App\Security\User\PersistentSignatureRememberMeHandler`, persisted via the
 `Session` entity). The cookies, lifetimes and per-firewall handlers differ deliberately — read
-`config/packages/security.yaml` and `config/packages/session.yaml` before touching anything here.
+`config/packages/security.yaml` and `config/packages/session.yaml` before touching.
 
 ## Logging
 
-Two pipelines, and which one a message belongs in is decided by who reads it.
+Two pipelines; the reader decides which one a message belongs in.
 
-**Ordinary logging** is `LoggerInterface` on the default channel, for whoever is working out why something broke. In
-production it goes through a `fingers_crossed` handler: `debug` and `info` are buffered and only written when the same
-request also fails, and **`warning` and above are always written** (`passthru_level`). Anything worth saying when
-nothing else went wrong therefore has to be at least a `warning`. Before that setting existed, every warning this
-application raised about a terminated session was buffered and dropped, which is why nobody could answer a member
-asking why they had been signed out.
-
-**Security logging** is `App\Service\User\SecurityEventLogger`, and it is the only way to record that something
-happened to an account: a sign-in, a session torn down, a second factor turned off, an administrator acting as
-somebody else. Call `record()` with a case of `App\Entity\User\Enums\SecurityEventType`. Everything else, meaning
-the address, the browser, who was signed in and which request it was, is gathered there, so two places reporting the
-same event cannot describe it differently. Do not reach for the plain logger for these, and do not write a sentence where a
-case belongs: the administration filters on the cases and a data export names them.
-
-It writes twice. The `security` monolog channel is never buffered and keeps half a year and a bit of daily files, so
-its copy survives a request that later failed and rolled back. `App\Entity\User\SecurityLog` is the copy that can be
-queried, is what `/admin/users/security-log` reads, and is included in a member's data export. Rows are personal data: keep the columns to what recognises an event, put nothing in `detail` that is not
-flat and scalar, and never a token, a cookie or a session identifier. `app:user:prune-security-log` enforces the
-retention period, which is what makes keeping any of it defensible.
-
-Every record carries the context the processors in `config/packages/monolog.yaml` add, `App\Monolog\Processor\RequestIdProcessor`
-among them, so the lines one visit produced can be read together and lined up against the row written beside them.
+- **Ordinary logging** is `LoggerInterface` on the default channel. In production a `fingers_crossed` handler
+  buffers `debug` and `info` until the same request fails; `warning` and above pass through (`passthru_level`) —
+  anything that must survive a successful request MUST be at least a `warning`.
+- **Security logging** is `App\Service\User\SecurityEventLogger` — the only way to record that something happened to
+  an account: a sign-in, a session torn down, a second factor turned off, an administrator acting as somebody else.
+  Call `record()` with a case of `App\Entity\User\Enums\SecurityEventType` — the address, browser, signed-in user
+  and request are gathered there, so two places reporting the same event cannot describe it differently. Never use
+  the plain logger for these, and pass a case, not a sentence: the administration filters on the cases and a data
+  export names them.
+- It writes twice. The `security` monolog channel is never buffered, so its copy survives a request that later failed
+  and rolled back. `App\Entity\User\SecurityLog` is the queryable copy, read by `/admin/users/security-log` and the
+  member data export. Rows are personal data: keep the columns to what recognises an event, flat
+  and scalar — never a token, a cookie or a session identifier. `app:user:prune-security-log` enforces the retention
+  period.
+- Every record carries the context the processors in `config/packages/monolog.yaml` add
+  (`App\Monolog\Processor\RequestIdProcessor` among them), so a visit's lines line up against the row written beside
+  them.
 
 ## API
 
@@ -289,223 +250,177 @@ Everything under `^/api` is stateless, is read with `Authorization: Bearer <toke
 {"status": "forbidden", "error": {"type": "…", "exception": "…"}}
 ```
 
-`meta` is present on every collection and nowhere else, and `/api/docs.json` is the one path exempt from the
-envelope because an OpenAPI document has to stay one. **The envelope, the status codes, the wire names and the
-version negotiation are a contract with other GEWIS applications** — changing a field name changes someone else's
-input. `openapi.yaml` publishes it and is **generated**: run `make openapi` after touching a resource, never edit it
-by hand. `ApiDocumentationTest` fails on drift.
-
-Almost everything is an **API Platform resource**:
-
-- `src/ApiResource/<Domain>/` — plain `final readonly` DTOs with `#[ApiResource]`. Property declaration order is the
-  JSON key order. The directory is excluded from the service container.
-- `src/State/<Domain>/` — the `ProviderInterface` that builds them from the projection.
-- `src/State/Api/` — the shared plumbing: `EnvelopeProcessor` (the envelope) and `CollectionPagination` (the page).
-- `src/Serializer/Api/` — the serializer context, including the permission-driven groups of the member payload.
-- `src/OpenApi/` — the decorator that completes the generated document with the endpoints that are not resources.
-- `src/EventListener/Api/` — the charset header, and `UnexposedRouteListener`, which hides the routes API Platform
-  mounts under `/api` for its own plumbing so no path there answers outside the contract.
-
-Every operation carries `security:` and `securityMessage:`; the attribute is an `ApiPermissions` wire value and
-`App\Security\Api\ApiPermissionVoter` decides it. Every collection is paged (default 100, maximum 500), and a page
-without a deterministic `ORDER BY` is a bug. A collection provider that returns a plain array instead of a paginator
-silently drops `meta`. Nothing a request asks for is worth refusing it over: a page below 1 is clamped, one past
-the end is an empty page, and every query parameter is read through `App\Util\Application\QueryValue`, which
-never answers 400.
-
-A permission that names people is enforced twice — as the operation gate, and as a row filter for deleted members
-(`ApiPermissions::MembersDeleted`) applied in the query rather than to the page, or the totals stop matching.
-
-**Everything added when the API moved onto API Platform requires a contract version**, declared either as
-`Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` or as `X-Api-Version: 5.0.0` — the second exists because
-OpenAPI requires tooling to ignore an `Accept` parameter, so Swagger UI cannot send the first. A new operation says
-so with `extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT]` and
-`App\State\Api\MinimumVersionProvider` enforces it, after the permission check and before the read. The member
-endpoints that predate the versioned contract keep answering without one; that list is
-`ApiOpenApiFactory::UNVERSIONED_PATHS` and it does not grow.
-
-Swagger UI answers on **`/api-docs`**, deliberately outside `^/api`: a browser cannot send an `Authorization` header
-on the first navigation, so behind the bearer wall the page could never render. It is public, because `openapi.yaml`
-is committed to a public repository and describes the API without containing any of its data.
-
-`src/Controller/Report/ApiController` keeps the four endpoints that are **not** resources, and that is a considered
-escape hatch rather than a leftover: `/health` (no `data` key), the two function lists (their vendor `Accept` header
-carries a `version` parameter that content negotiation answers 406 to before the version can be read), the two
-examples, and the catch-all that makes an unknown `/api` path answer `error-router-no-match`. That catch-all must
-stay the last method in the class.
-
-`GET /api/members/{lidnr}` answers **204 with no body** for a member that does not exist. That is the legacy
-contract, not an oversight, and it is why its provider returns a `Response`.
-
-Both surfaces read the projection, never the ledger directly.
+- `meta` is present on every collection and nowhere else; `/api/docs.json` is the one path exempt, because an
+  OpenAPI document has to stay one.
+- **The envelope, the status codes, the wire names and the version negotiation are a contract with other GEWIS
+  applications** — a field name change changes someone else's input. `openapi.yaml` publishes it and is
+  **generated**: run `make openapi` after touching a resource, never edit it by hand; `ApiDocumentationTest` fails
+  on drift.
+- Almost everything is an **API Platform resource**:
+  - `src/ApiResource/<Domain>/` — plain `final readonly` DTOs with `#[ApiResource]`; property declaration order is
+    the JSON key order; the directory is excluded from the container.
+  - `src/State/<Domain>/` — the providers that build them from the projection; `src/State/Api/` the shared plumbing
+    (`EnvelopeProcessor`, `CollectionPagination`).
+  - `src/Serializer/Api/` — the serializer contexts, including the permission-driven groups of the member payload;
+    `src/OpenApi/` — the decorator that completes the generated document.
+- Every operation carries `security:` and `securityMessage:`; the attribute is an `ApiPermissions` wire value and
+  `App\Security\Api\ApiPermissionVoter` decides it.
+- Every collection is paged (default 100, maximum 500), and a page without a deterministic `ORDER BY` is a bug. A
+  collection provider that returns a plain array instead of a paginator silently drops `meta`.
+- Nothing a request asks for is worth a 400: a page below 1 is clamped, one past the end is an empty page, and
+  query parameters are read through `App\Util\Application\QueryValue`.
+- A permission that names people is enforced twice — as the operation gate, and as a row filter for deleted members
+  (`ApiPermissions::MembersDeleted`) applied in the query rather than to the page, or the totals stop matching.
+- **Everything added when the API moved onto API Platform requires a contract version**, declared as
+  `Accept: application/vnd.gewis.gewisdb+json;version=5.0.0` or as `X-Api-Version: 5.0.0` — the second exists
+  because Swagger UI cannot send an `Accept` parameter. A new operation
+  declares `extraProperties: [ApiVersion::MINIMUM => ApiVersion::CURRENT]` and
+  `App\State\Api\MinimumVersionProvider` enforces it, after the permission check and before the read. The member
+  endpoints that predate the versioned contract keep answering without one; that list is
+  `ApiOpenApiFactory::UNVERSIONED_PATHS` and it does not grow.
+- Swagger UI answers on **`/api-docs`**, outside `^/api` — a browser cannot send an `Authorization` header on the
+  first navigation. It is public, because `openapi.yaml` is committed to a public repository.
+- `src/Controller/Report/ApiController` keeps the endpoints that are not resources: `/health`, the two function
+  lists, the example error endpoint, and the catch-all that makes an unknown `/api` path answer
+  `error-router-no-match` — that catch-all MUST stay the last method in the class.
+- `GET /api/members/{lidnr}` answers **204 with no body** for a member that does not exist, *or that the principal
+  may not see* — an empty dataset rather than a missing resource. It is the legacy contract, not an oversight —
+  which is why `MemberProvider` returns a `Response`.
+- Both surfaces read the projection, never the ledger directly.
 
 ## Dependency injection
 
-Pure autowire / autoconfigure from `src/`, with scalar bindings in `config/services.yaml` and exclusions for
-`src/DependencyInjection/`, `src/Entity/`, `src/ApiResource/`, `src/ViewModel/` and
-`src/Security/User/HandlerRegistry.php`. There are **no factory
+Pure autowire / autoconfigure from `src/`, with scalar bindings in `config/services.yaml`. There are **no factory
 classes** — constructor property promotion does all the wiring, and `readonly` where it holds. If autowire cannot
 resolve a dependency, define the service explicitly in `config/services.yaml`; do not add a factory.
 
 ## Coding style
 
-- `declare(strict_types=1);` immediately after the opening `<?php`.
-- Constructor property promotion everywhere; many service-like classes are `final readonly`.
+- `declare(strict_types=1);` in every file, immediately after the opening `<?php`.
 - Native PHP type hints on parameters, return types and properties wherever a parent signature allows.
-- Yoda-style comparisons: `null === $x`, `true === $foo->getDeleted()`.
-- Multi-clause `if` conditions split one clause per line:
-  ```php
-  if (
-      $a
-      && $b
-  ) {
-  ```
-- Attribute-based wiring throughout: `#[Route]`, `#[AsEventListener]`, `#[AsCommand]`, `#[AsMessageHandler]`. Use
-  `#[Override]` on inherited methods.
-- Doctrine entities use attribute mapping, not annotations or XML. Import each attribute by its short name
-  (`use Doctrine\ORM\Mapping\Entity;`, `use Doctrine\ORM\Mapping\Column;`) and write `#[Entity]`, `#[Column]` —
-  **not** the `ORM\` alias form (`#[ORM\Entity]`, `#[ORM\Column]`).
+- Yoda-style comparisons: `null === $x`.
+- Multi-clause `if` conditions, one clause per line.
+- Attribute-based wiring throughout; `#[Override]` on inherited methods.
+- Doctrine attribute mapping with short-name imports: `use Doctrine\ORM\Mapping\Entity;` and write `#[Entity]` —
+  **not** the `ORM\` alias form.
 - Comments explain decisions and non-obvious mechanics in full sentences, not what the code already says.
-- Follow `GEWISPHPCodingStandards` (the rule set in `phpcs.xml.dist`). `make lint` is authoritative; `make lint-fix`
-  autofixes a subset.
-- Match the surrounding code when in doubt; consistency beats stylistic preference.
+- Follow `GEWISPHPCodingStandards` (the rule set in `phpcs.xml.dist`); `make lint` is authoritative,
+  `make lint-fix` autofixes a subset.
 
-## Static analysis & tests
+## Testing
 
-Run these inside the `app` container (the `make` targets handle that for you). **`make lint` (after `make lint-fix`)
-and `make phpstan` must pass for any change** — they are not optional; do not claim work done while one of them fails.
-Add `make lint-twig` whenever templates changed and `make igor` for any non-trivial change.
+The suite runs with PHPUnit inside the `app` container, against isolated copies of both databases — real PostgreSQL
+and MariaDB, because both are production and a substitute like SQLite cannot reproduce the custom DQL functions
+(`RAND`, `YEAR`), `EditLockService`'s named locks, the UUID and `uca1400` columns, or what the ledger asks of
+PostgreSQL.
 
-| Command | What it does |
-|---|---|
-| `make lint` / `make lint-fix` | PHPCS / PHPCBF against `GEWISPHPCodingStandards`. Run `lint-fix` first, then `lint` must be clean. |
-| `make phpstan` | PHPStan at level 8, with a baseline and a type-coverage ratchet. Must pass. |
-| `make lint-twig` | `lint:twig` over `templates/`. Run whenever you add or edit a template. |
-| `make igor` | Validates the codebase for FrankenPHP worker-mode safety. **Run this for any non-trivial change.** |
-| `make test` | PHPUnit under `APP_ENV=test`; `c=` passes options through. Must pass. |
-| `make test-prepare` | (Re)builds the test schemas and loads the fixtures. Run once, and again after any schema or fixture change. |
-| `make translations` | Extracts translatable strings into `translations/`. See below. |
-| `make sf c=check:database` | The consistency checks from the Articles of Association and Internal Regulations. |
+- Integration tests boot the kernel and grab the managers (`tests/Integration/DatabaseTestCase`) — **query the seeded
+  fixtures, don't hand-build entity graphs.**
+- `dama/doctrine-test-bundle` wraps each test in a transaction and rolls it back, so one schema and one seed serve
+  the whole run and tests share the seed without leaking writes.
+- Locally, `make test-prepare` (re)builds both schemas from the mapping and loads the seed; run it once, and again
+  after any schema or fixture change. CI builds the test databases from the migrations instead
+  (`.github/workflows/unit-tests.yml`).
+- Pure domain logic (mappers, voters, guard listeners, enums) stays a DB-less `TestCase`.
 
-When a new error hits a baseline, fix it rather than extending the baseline. Baselines are for legacy debt, not new
-code. The same goes for the type-coverage percentages: they are pinned just under where the codebase stands so they
-can only go up.
+### Browser tests
 
-The checker is worth running after anything that changes decisions or installations — it is the only thing that will
-tell you that a seed or a decision path is producing data the regulations forbid.
+`tests/Browser/` drives a real Chromium against a real server (`symfony/panther`, extending `BrowserTestCase`).
+They cover what a page does once its JavaScript has run — an editor surviving a cache restore, a lock released on
+navigation, a live component still responding — none of which a test that only renders a template can see.
 
-**Tests.** Integration tests run against real PostgreSQL and MariaDB matching production, on isolated test databases.
-A substitute like SQLite is deliberately not used: it cannot reproduce the custom DQL functions (`RAND`, `YEAR`),
-`EditLockService`'s named locks, the UUID and `uca1400` columns, or what the ledger asks of PostgreSQL. The schemas
-are built by `SchemaTool` (**no migrations**) and the full `DataFixtures` set is loaded once by `make test-prepare`;
-`dama/doctrine-test-bundle` then wraps each test in a transaction and rolls it back, so tests share the seed yet never
-leak writes. `DatabaseTestCase` boots the kernel and grabs the managers — **query the seeded fixtures, don't hand-build
-entity graphs**. Pure domain logic (mappers, voters, guard listeners, enums) stays a DB-less `TestCase`.
+- **A change to interactive or user-facing behaviour MUST be covered by a browser test.** A unit or kernel test
+  alone is not sufficient: it renders the template and stops. Browser (e2e) tests are the default for user-facing
+  behaviour; DB-less and kernel tests are for logic a browser test cannot reach cheaply.
+- They are a testsuite of their own, excluded from `make test`, because each one starts Chromium and a web server.
+  Run them with `make test-browser`; CI runs the suite after the ordinary one.
+- The server the browser drives has a connection of its own, outside the transaction every other test is rolled back
+  with: read the seeded fixtures rather than building data, treat anything a test writes as permanent, and sign in
+  through the real form — the kernel-level sign-in helpers authenticate in this process and reach none of the
+  server. `make test-browser` re-seeds when the run ends; run the target, not a bare `bin/phpunit`.
+
+### Gates
+
+- `make lint` (after `make lint-fix`) and `make phpstan` MUST pass for any change. `make lint-twig` whenever
+  templates changed; `make igor` for any non-trivial change.
+- Baselines are for legacy debt, not new code: when a new error hits a baseline, fix it rather than extending the
+  baseline. The type-coverage percentages are pinned just under where the codebase stands, so they can only go up.
+  `make phpstan-pr` regenerates the baseline against `main` for a PR.
+- **Validate what you changed.** Non-trivial work needs a smoke run: exercise the changed path and observe the
+  result; passing tests alone are not proof. For a bug, reproduce before the fix, confirm after, and keep a
+  regression test.
+- CSRF is **stateless** (double-submit cookie plus Origin/Referer checks), so a hand-crafted `curl` POST fails by
+  design. **Do not "verify" forms, login or sign-up flows with curl** — a 4xx proves nothing. Validate interactive
+  flows through the browser suite, or in a real browser against the seeded local stack (login in Local development
+  workflow; outbound mail in MailPit).
+- **The checker.** `make sf c=check:database` runs the consistency checks from the Articles of Association and
+  Internal Regulations. Worth running after anything that changes decisions or installations: it is the only thing
+  that catches data the regulations forbid.
 
 ## Translatable strings
 
-`make translations` extracts into `translations/{messages,validators}.{en,nl}.xlf`. Never hand-roll
-`bin/console translation:extract` — the Makefile target sets the project's expected flags (`--sort=asc --no-fill
---force --clean`). `--clean` removes entries no longer referenced in source, which is safe for the `validators` domain
-because Symfony falls back to the vendor `validators.{en,nl}.xlf` for any key not in the project file.
+`make translations` extracts into `translations/{messages,validators}.{en,nl}.xlf` with the project's expected flags
+(`--sort=asc --no-fill --force --clean`); never hand-roll `bin/console translation:extract`. `--clean` removes
+entries no longer referenced in source, which is safe for the `validators` domain because Symfony falls back to the
+vendor files.
 
-**Extraction alone is not enough.** Because of `--no-fill`, new entries land with an empty `<target/>` in *both* the
-`en` and `nl` files, and an empty target is used *as* the translation, so the interface renders blank rather than
-falling back. Find them with
+**Extraction alone is not enough.** `--no-fill` leaves new entries with an empty `<target/>` in *both* locales, and
+an empty target is used *as* the translation, so the interface renders blank rather than falling back. Find them
+with `grep -rn -e '<target/>' -e '<target></target>' translations/` and fill every one: `en` targets get the source
+text verbatim, `nl` targets your best Dutch — and list the Dutch you wrote in the final report so a human can
+review it.
 
-```sh
-grep -rn -e '<target/>' -e '<target></target>' translations/
-```
+Three extraction traps:
 
-then fill every one: `en` targets get the source text verbatim, `nl` targets your best Dutch translation. Always list
-the Dutch translations you wrote in your final report so a human can review them — never leave empty targets behind
-silently.
-
-Two extraction traps:
-
-- `t()` and `TranslatableMessage` are extracted by their **literal** argument. An enum that builds a label must put the
-  constructor *inside* each match arm:
-
+- `t()` and `TranslatableMessage` are extracted by their **literal** argument. An enum that builds a label must put
+  the constructor *inside* each match arm:
   ```php
   return match ($this) {
       self::Chair => new TranslatableMessage('Voorzitter'),
   };
   ```
-
   Not `new TranslatableMessage(match ($this) { ... })` — the extractor cannot see through that, and `--clean` then
   deletes every translation for those labels.
-- A bare string handed to the form theme for it to translate — a `help:` on a `form_row()` call — is invisible to
-  the extractor, so `--clean` deletes its translation while the template still uses it. Write `help: t('…')`
-  instead; Twig's `t()` is extracted and yields a `TranslatableMessage` the theme still translates. Put the
-  parameters inside `t()` rather than in `help_translation_parameters`, because the `trans` filter refuses to take
-  its own arguments alongside a `TranslatableMessage`.
+- A bare string handed to the form theme for it to translate (a `help:` on a `form_row()` call) is invisible to the
+  extractor, so `--clean` deletes its translation while the template still uses it. Write `help: t('…')` instead.
 - **A validation message has to be written where the extractor can see it.** It reads `t('…')`,
-  `new TranslatableMessage('…')`, a `trans()` call, and the message arguments of a constraint that is written out
-  (`#[Assert\NotBlank(message: '…')]`, and our own constraints too — the visitor's class list is built from the
-  `validator.constraint_validator` services). It does not read a literal handed to `$context->buildViolation('…')`,
-  a literal passed on to a helper, or the default of a `$message` property on a constraint class. Those were deleted
-  by `--clean` on every run, which is how a message that is said on a Dutch page ends up rendering in English. So:
-  hand `buildViolation()` the key as `t('…', [], 'validators')->getMessage()`, give a helper that raises errors a
-  `TranslatableMessage` rather than a string, and put a constraint's messages in the attribute that applies it rather
-  than in a property default.
-- In form types, wrap user-facing labels and `invalid_message` strings with `t()`
-  (`use function Symfony\Component\Translation\t;`). Symfony's PHP extractor does not recurse into `RepeatedType`'s
-  `first_options` / `second_options`, so plain `'label' => 'My label'` strings nested there are silently skipped;
-  `t('My label')` is always picked up. Don't eagerly call `$translator->trans()` at form-build time — it locks the
-  locale before render and bypasses the form renderer's own translation pass.
+  `TranslatableMessage`, and the message arguments of a constraint that is written out; it does not read a literal
+  handed to `$context->buildViolation('…')`, a literal passed on to a helper, or the default of a `$message`
+  property on a constraint class. So: hand `buildViolation()` the key as `t('…', [], 'validators')->getMessage()`,
+  give a helper that raises errors a `TranslatableMessage` rather than a string, and put a constraint's messages in
+  the attribute that applies them rather than in a property default. In form types, wrap user-facing labels and
+  `invalid_message` strings with `t()` (the extractor does not recurse into `RepeatedType`'s `first_options` /
+  `second_options`), and don't call `$translator->trans()` at form-build time — it locks the locale before render.
 
 ## Local development workflow
 
-- `make start` — build the images and start the stack. Creates `.env.local` from `.env.local.dist` if it is missing.
-- `make seed` — load the fixtures (`app:fixtures:load` seeds both connections: the ledger first, then the web
-  database), rebuild the projection, and prepare Mailman and Listmonk. Seeded login: member number `8000`, password
-  `gewiswebgewis`; the register is reached with the same account, `8000` holding both `ROLE_ADMIN` and
-  `ROLE_DATABASE_ADMIN` while `8001` holds only the former and `8002` only the latter. (Migrations have already run by
-  the time you get here — they fire one-shot on container start.)
-- `make bash` — shell into the FrankenPHP `app` container; `make exec cmd="..."` runs a single command in it.
-- `make sf c=...` / `make composer c='...'` — the console and Composer inside the container.
-- `make cc` — clear the cache and restart the worker.
-- `make stop` / `make logs` — as named.
-
-**Where a variable lives.** `.env` is committed and holds almost nothing — only `APP_ENV`. Docker compose reads it
-too, so a value there would silently satisfy the `${VAR:?...}` guards in `compose.yaml` that are supposed to catch a
-missing production variable, and `composer dump-env prod` would bake it into the production image as a fallback. So:
-
-- **`config/services.yaml`, as `env(NAME): default`** — a constant with a sane fallback rather than something a
-  deployment sets: the mail display names, the pinned Stripe and Mailman API versions, the watermark tag, the TU/e
-  subnets. Changing one is a code change.
-- **`.env.local`** — the whole of development, copied from `.env.local.dist` by `make start`. Both Symfony and compose
-  read it, so the containers that have no dotenv chain of their own (the databases, pgadmin, Matomo, the Stripe CLI)
-  are configured from the same file.
-- **`.env.test`** — the test suite, which does not read `.env.local` at all. CI loads the same file into the job.
-- **The orchestrator** — production, which is Portainer's stack environment for `compose.yaml`.
-
-Hot reload covers almost everything in dev: FrankenPHP reloads the workers on source changes, and the dev entrypoint
-(`docker/web/docker-entrypoint.sh`) watches `assets/` to rebuild Sass and the asset map. You should very rarely need
-`make cc` or a container restart — reach for them only if something genuinely will not budge. `vendor/` sits in the
-bind mount, so the IDE indexes the same directory the container installs into.
-
-Development mail is caught by MailPit; other locally exposed services are listed in `README.md`, with their ports in
-`compose.override.yaml`.
-
-### Validating changes in the browser
-
-CSRF protection is **stateless** (`config/packages/csrf.yaml`) — validation relies on a double-submit cookie plus
-Origin/Referer checks, with `assets/controllers/csrf_protection_controller.js` generating the token client-side. A
-hand-crafted `curl` POST therefore fails CSRF by design. **Do not "verify" forms, login or sign-up flows with curl** —
-a 4xx proves nothing about your change, and you cannot bypass the protection.
-
-Validate interactive flows in a real browser with Playwright instead (use your own browser tooling — there is no
-Playwright setup in this repository), against `http://localhost`. Seed first with `make seed`, then log in with one of
-the seeded accounts above. Outbound mail is visible in MailPit, which is what the external sign-up verification,
-password-reset and membership flows send through.
+- `make start` — build the images and start the stack; creates `.env.local` from `.env.local.dist` if it is missing.
+- `make seed` — load the fixtures (seeds both connections: the ledger first, then the web database), rebuild the
+  projection, and prepare Mailman and Listmonk. Seeded login: member number `8000`, password `gewiswebgewis`; the
+  register is reached with the same account, `8000` holding both `ROLE_ADMIN` and `ROLE_DATABASE_ADMIN`, `8001`
+  only the former, `8002` only the latter. (Migrations already run — they fire one-shot on container start.)
+- `make bash` — shell into the FrankenPHP `app` container; `make exec cmd="…"`, `make sf c=…`,
+  `make composer c='…'` — single commands in it. `make cc` clears the cache and restarts the worker.
+  `make stop` / `make logs` — as named.
+- **Where a variable lives.** `.env` is committed and holds almost nothing — only `APP_ENV`. Docker compose reads it
+  too, so a value there would silently satisfy the `${VAR:?…}` guards in `compose.yaml` that are supposed to catch a
+  missing production variable, and `composer dump-env prod` would bake it into the production image as a fallback.
+  So: **`config/services.yaml`, as `env(NAME): default`**, for a constant with a sane fallback rather than something
+  a deployment sets; **`.env.local`** for the whole of development (both Symfony and compose read it, so the
+  containers without a dotenv chain of their own — the databases, pgadmin, Matomo, the Stripe CLI — are configured
+  from the same file); **`.env.test`** for the test suite, which does not read `.env.local`; **the orchestrator's
+  stack environment** for production.
+- Hot reload covers almost everything in dev: FrankenPHP reloads the workers on source changes, and the dev
+  entrypoint watches `assets/` to rebuild Sass and the asset map. Reach for `make cc` or a container restart only if
+  something genuinely will not budge. `vendor/` sits in the bind mount, so the IDE indexes the same directory the
+  container installs into.
 
 ## Messaging & scheduling
 
-Messenger is backed by RabbitMQ in dev, in-memory in test. Buses, transports and routing are in
-`config/packages/messenger.yaml`. Message classes go in `src/Message/`; handlers in `src/MessageHandler/` with
-`#[AsMessageHandler]`. Recurring work runs through `src/Scheduler/` (Symfony Scheduler), which is also where the
-register's periodic jobs — mailing list synchronisation, expiry sweeps, renewal reminders — are declared.
+Messenger is backed by RabbitMQ in dev, in-memory in test (`config/packages/messenger.yaml`). Message classes go in
+`src/Message/`; handlers in `src/MessageHandler/` with `#[AsMessageHandler]`. Recurring work runs through
+`src/Scheduler/` (Symfony Scheduler), which is also where the register's periodic jobs — mailing list
+synchronisation, expiry sweeps, renewal reminders — are declared.
 
 ## File storage
 
@@ -513,30 +428,27 @@ Uploaded and generated files live under `data/`, never under `public/`. `Storage
 directory and carries the rules with it — whether the namespace is scoped (photos per album, company assets per
 company, meeting documents per meeting), whether serving a file needs an authenticated signed request, which MIME
 types it accepts and how large a file may be. `FileStorage` is the only writer, over a Flysystem adapter rooted at
-`data/` (in-memory under test). Public images are served through `ImageUrlBuilder` as `/img/{variant}/{path}`; nothing
-is linked to by its path on disk.
+`data/` (in-memory under test). Public images are served through `ImageUrlBuilder` as `/img/{variant}/{path}`;
+nothing is linked to by its path on disk.
 
 **A web request never encodes an image.** Serving reads the pre-generated variant cache only; a miss on an existing
-original queues one `GenerateImageVariantMessage` on the `images` transport (deduplicated through a shared-cache
-marker) and answers 503 with `Retry-After` (`ImageVariantResponder`). The variants exist because uploads queue them
-(`ProcessImageVariantsMessage`) and because `app:image:pregenerate` queues the rest
-(`PregenerateImageVariantMessage`). That command only dispatches, so a backfill is encoded by the `messenger-images`
-workers rather than by whichever container the command was run from, and `IMAGE_WORKER_REPLICAS` is what paces it.
-Run it after clearing the variant cache, and with `--force` after changing the variant set or the encoding.
-Synchronous encode-on-miss is what once saturated the production host; do not reintroduce it.
+original queues one `GenerateImageVariantMessage` and answers 503 with `Retry-After`. The variants exist because
+uploads queue them (`ProcessImageVariantsMessage`) and because `app:image:pregenerate` queues the rest — that command
+only dispatches, so a backfill is encoded by the `messenger-images` workers rather than by whichever container the
+command was run from, and `IMAGE_WORKER_REPLICAS` is what paces it. Run it after clearing the variant cache, and
+with `--force` after changing the variant set or the encoding. Synchronous encode-on-miss is what once saturated the
+production host; do not reintroduce it.
 
 ## Doctrine caching
 
-The projection's `Member` is the only entity in Doctrine's second-level cache (`config/packages/doctrine.yaml`, region
-`member_region`). It is read almost everywhere — sign-up lists, photo tags, decision rendering — and changes only when
-the projection is written, which makes by-ID loads (`find()`, lazy associations) worth serving from cache. DQL queries
-that select Members still hit the database unless explicitly marked cacheable.
-
-Deliberately **not** cached: `User`, because MFA enrolment toggles must take effect on the next request, and
-`UserRole`, because admin grants and revocations need to be visible immediately.
-
-Anything that writes a cached entity outside the ORM has to evict its region by hand — Doctrine cannot see a raw DBAL
-write. If you add caching to another entity, check how it is written before choosing a strategy.
+- The projection's `Member` is the only entity in Doctrine's second-level cache (`config/packages/doctrine.yaml`,
+  region `member_region`). It is read almost everywhere and changes only when the projection is written, which makes
+  by-ID loads (`find()`, lazy associations) worth serving from cache. DQL queries that select Members still hit the
+  database unless explicitly marked cacheable.
+- Deliberately **not** cached: `User`, because MFA enrolment toggles must take effect on the next request, and
+  `UserRole`, because admin grants and revocations need to be visible immediately.
+- Anything that writes a cached entity outside the ORM MUST evict its region by hand — Doctrine cannot see a raw
+  DBAL write. If you add caching to another entity, check how it is written before choosing a strategy.
 
 ## Revision workflow
 
@@ -545,72 +457,50 @@ workflow. Read this before touching any of those domains.
 
 - **Contracts** in `src/Entity/Application/`: `RevisableInterface` (the stable aggregate — `Activity`,
   `Career\Company`, `Career\Vacancy`, `Decision\OrganInformation`, `Frontpage\Poll`: identity, revision chain,
-  `markRevisionLive()`), `RevisionInterface` / `AbstractRevision` (a MappedSuperclass snapshotting all editable content
-  per revision), and `Enums/RevisionStatus`.
+  `markRevisionLive()`), `RevisionInterface` / `AbstractRevision` (a per-revision snapshot of all editable content),
+  and `Enums/RevisionStatus`.
 - **Lifecycle** (`config/packages/workflow.yaml`, state machine `revision`): draft → submitted → in-review →
   { approved | changes-requested | rejected → closed }. The marking store is custom
-  (`App\Workflow\RevisionStatusMarkingStore`, bridging the status enum). Only a *draft* revision is mutable; approval
-  promotes it to the live revision.
+  (`App\Workflow\RevisionStatusMarkingStore`, bridging the status enum).
+- **Non-draft revisions are immutable.** Only a `draft` revision may be edited; approval promotes it to the live
+  revision. To change approved content, spawn a new draft via the cloner registry and run it through the workflow —
+  never mutate a submitted or approved `*Revision` row directly.
 - **Guards and side effects** are event listeners, not workflow config: `RevisionGuardListener` delegates to
-  `App\Security\Application\RevisionVoter` (organ/creator/company scoping); `SpawnNextDraftListener` clones a new draft
-  after changes-requested; `PromoteLiveRevisionListener` and `MigrateSignupsOnApprovalListener` run on approval;
-  `NotifyOnRevisionSubmissionListener` tells the reviewers. A domain may add its own guard on top
-  (`Activity/PastActivityGuardListener`, `Frontpage/PollRevisionGuardListener`); they are additive, so all must pass.
-- **Per-domain registries** tagged by interface, so a new revisable domain arrives with its own answers rather than
-  editing a shared `match`: `RevisionDescriberRegistry` (what the review screen shows),
+  `App\Security\Application\RevisionVoter` (organ/creator/company scoping); `SpawnNextDraftListener` clones a new
+  draft after changes-requested; `PromoteLiveRevisionListener` and `MigrateSignupsOnApprovalListener` run on
+  approval; `NotifyOnRevisionSubmissionListener` tells the reviewers. A domain may add its own guard on top
+  (`Activity/PastActivityGuardListener`, `Frontpage/PollRevisionGuardListener`); they are additive, so all must
+  pass.
+- **Per-domain registries** tagged by interface, so a new revisable domain adds its own answers instead of editing a
+  shared `match`: `RevisionDescriberRegistry` (what the review screen shows),
   `RevisionNotificationRegistry` (which notification a submission raises and who it goes to), and
   `RevisionCommentRepositoryInterface` (the review discussion). Review screens extend
   `Controller/Application/AbstractRevisionReviewController` and share `templates/partials/application/review-*`.
-- **Cloning**: each domain implements `App\Workflow\RevisionClonerInterface` (deep copy, bump revision number, link
-  `previousRevision`), routed through `RevisionClonerRegistry`. A revisable domain that can be edited adds a cloner,
-  never bespoke copy logic. A poll deliberately has none: it is written and submitted in one request,
-  `request_changes` is withheld by its guard, and asking the question again writes a new revision from scratch.
+- **Cloning**: each revisable domain that can be edited implements `App\Workflow\RevisionClonerInterface` (deep
+  copy, bump revision number, link `previousRevision`), routed through `RevisionClonerRegistry` — a cloner, never
+  bespoke copy logic. A poll deliberately has none: it is written and submitted in one request, `request_changes`
+  is withheld by its guard, and asking the question again writes a new revision from scratch.
 - **Edit locking**: `Entity/Application/EditLock` + `Service/Application/EditLockService` give one user at a time
-  exclusive editing (90-second ping TTL, serialized via MariaDB `GET_LOCK`, reviewers can force-take). The
+  exclusive editing (90-second ping TTL, serialised via MariaDB `GET_LOCK`, reviewers can force-take). The
   `application/edit_lock_controller.ts` Stimulus controller does the pinging.
 - **Activity sign-ups** are versioned with the revision: each `ActivityRevision` owns clones of its `SignupList`s,
-  matched across revisions by `lineageId`; on approval `Service/Activity/SignupListMigrator` carries live sign-ups over
-  (and guards block approval if migration would lose data). All sign-up writes go through
+  matched across revisions by `lineageId`; on approval `Service/Activity/SignupListMigrator` carries live sign-ups
+  over (and guards block approval if migration would lose data). All sign-up writes go through
   `Service/Activity/SignupManager` — members sign up directly, external guests get double-opt-in email verification
   plus Altcha.
 
-## Things to be careful about
+## AI contribution
 
-- **The ledger and its projection move together.** A column added to `src/Entity/Database` that never reaches
-  `src/Entity/Decision` and `src/Service/Report` is a silent divergence between what the association decided and what
-  it is told it decided.
-- **Decisions are the historical record.** They are amended by further decisions, never edited. Subdecision `sequence`
-  is part of the primary key and is copied downstream, so subdecisions cannot be reordered. Don't "fix" past data by
-  editing decision rows; model corrections as new decisions or sub-decisions. The one thing written afterwards is the
-  English text of a free-text decision, on the page the register's menu calls "Untranslated decisions". That is how the
-  decision reads rather than what was decided, the Dutch text it was decided in stays as it is, and a decision that
-  already has an English text is not offered there at all.
-- **Nothing joins across the two connections.** If a query needs the ledger and the website's data at once, it is two
-  queries and a match in PHP.
-- **The API is a contract.** Other GEWIS systems read it. The envelope, status codes and version negotiation are not
-  yours to change casually.
-- **FrankenPHP worker mode.** Avoid static state, lazy-singleton patterns, mutable globals and runtime container
-  mutation — these survive across requests in worker mode and cause subtle leaks. Run `make igor` before claiming work
-  done.
-- **Route ordering.** `page_route` and `catch_all` in `config/routes.yaml` are sensitive to attribute-scan order.
-  Don't reorder this file lightly — that is how the voting-committees 404 bug happened.
-- **Several kinds of user.** Any new authorization logic must reason about `User` and `CompanyUser`, and about the
-  roles a `User` holds only while in office. Don't assume `$this->getUser()` returns a member.
-- **Custom remember-me.** The per-firewall handlers, cookie names and lifetimes are deliberate. Read `security.yaml`
-  and `session.yaml` before touching them.
-- **Non-draft revisions are immutable.** Only a `draft` revision may be edited; everything after submission is
-  history. To change approved content, spawn a new draft via the cloner registry and run it through the workflow —
-  never mutate a submitted or approved `*Revision` row directly.
-- **CSRF can't be curl'd.** Stateless CSRF plus Origin checks mean scripted POSTs fail by design — validate flows in a
-  real browser.
-- **No factories.** Never introduce factory classes.
-- **Build artifacts.** Treat `vendor/`, `var/`, `public/assets/` as read-only.
-- **Commits.** Conventional-commit prefixes (`feat:`, `fix:`, `chore:`), and they must be signed.
+This project follows [AI_POLICY.md](./AI_POLICY.md). For an agent working here, that means:
 
-## When you don't know
+- **MUST NOT write or post prose in the contributor's voice** — PR descriptions, issue bodies, review replies, or
+  other GitHub comments. When opening a PR, fill in the title and checklist structure only and leave the
+  description to the contributor; if they ask for help, give notes in chat that they rewrite themselves.
+- **MUST NOT tick the "I understand every change in this PR and can explain it" checkbox** in the PR template, or
+  any other confirmation of the policy. Only the contributor can confirm they followed it.
+- **Keep the contributor able to explain the change.** After making changes, say what changed and why, and call out
+  the non-obvious decisions, so the contributor can review and own them.
 
-Read the nearest sibling: the existing controllers, services and listeners in the same domain folder are the canonical
-reference, and the two halves of the application are expected to solve the same problem the same way — form themes,
-page layout, Live Component shape, mail, dev tooling. If the question is genuinely unclear — especially anything
-touching auth, routing order, or the boundary between the ledger and its projection — ask rather than guess: getting
-the projection wrong corrupts what every other GEWIS system reads.
+## Commits
+
+Conventional-commit prefixes (`feat:`, `fix:`, `chore:`, …), and they MUST be signed.
