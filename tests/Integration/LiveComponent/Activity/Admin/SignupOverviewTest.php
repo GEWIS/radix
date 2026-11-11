@@ -20,6 +20,9 @@ use Twig\Environment;
 use function array_column;
 use function array_combine;
 use function array_keys;
+use function array_map;
+use function count;
+use function strval;
 
 /**
  * The sign-up admin component is the first live component that writes to the database and dispatches mail, so it
@@ -51,6 +54,48 @@ final class SignupOverviewTest extends DatabaseTestCase
         $component->clearSelection(6);
         self::assertCount(
             0,
+            $component->selected,
+        );
+    }
+
+    public function testSelectingAllShownStoresTheIdsInTheFormTheCheckboxesUse(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(9);
+
+        $component->selectShown();
+
+        $ids = $this->signupIds(6);
+        self::assertCount(
+            count($ids),
+            $component->selected,
+        );
+        foreach ($component->selected as $stored) {
+            // The client merges checkbox state by strict string comparison against the checkbox value attribute,
+            // which is the id as a string; a stored int would never be removed by an untick.
+            self::assertIsString($stored);
+            self::assertContains(
+                $stored,
+                array_map(
+                    static fn (int $id): string => strval($id),
+                    $ids,
+                ),
+            );
+        }
+    }
+
+    public function testClearingAListLeavesForeignIdsInTheirStoredForm(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(9);
+
+        // The string form a checkbox delivers, for an id that belongs to no list of this activity.
+        $component->selected = ['424242'];
+
+        $component->clearSelection(6);
+
+        self::assertSame(
+            ['424242'],
             $component->selected,
         );
     }
@@ -465,6 +510,29 @@ final class SignupOverviewTest extends DatabaseTestCase
         $component->activity = $activity;
 
         return $component;
+    }
+
+    /**
+     * @return int[]
+     */
+    private function signupIds(int $listId): array
+    {
+        $list = $this->entityManager->getRepository(SignupList::class)->find($listId);
+        self::assertInstanceOf(
+            SignupList::class,
+            $list,
+        );
+
+        $ids = [];
+        foreach ($list->getSignUps() as $signup) {
+            if (null === $signup->id) {
+                continue;
+            }
+
+            $ids[] = $signup->id;
+        }
+
+        return $ids;
     }
 
     /**

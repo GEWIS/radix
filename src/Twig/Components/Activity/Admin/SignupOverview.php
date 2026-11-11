@@ -46,7 +46,9 @@ use function assert;
 use function count;
 use function implode;
 use function in_array;
+use function intval;
 use function sprintf;
+use function strval;
 use function trim;
 
 /**
@@ -78,8 +80,9 @@ final class SignupOverview
     /**
      * The ticked signup ids, stored as one flat set. Signup ids are globally unique, so this maps back to lists
      * unambiguously and every operation on it (the per-list "Selected" count, the email recipients, selectAll() and
-     * clearSelection()) is scoped to a single sign-up list; there is no cross-list selection. Checkbox hydration
-     * delivers the ids as strings while selectAll() pushes ints, so the type is mixed; read them normalised via
+     * clearSelection()) is scoped to a single sign-up list; there is no cross-list selection. The stored values are
+     * the checkboxes' value attributes, i.e. the ids as strings, because the client merges checkbox state by strict
+     * string comparison against that attribute; other shapes hydration may deliver are read normalised via
      * {@see self::selectedIds()}.
      *
      * @var list<int|string>
@@ -950,8 +953,8 @@ final class SignupOverview
     }
 
     /**
-     * Normalise a writable id-list LiveProp to ints: checkbox/JS hydration delivers ids as strings while the live
-     * actions push ints, so the stored type is mixed; callers compare against int entity ids.
+     * Normalise a writable id-list LiveProp to ints: the stored values are the checkboxes' string value attributes,
+     * while callers compare against int entity ids.
      *
      * @param list<int|string> $ids
      *
@@ -960,7 +963,7 @@ final class SignupOverview
     private function intList(array $ids): array
     {
         return array_map(
-            static fn (int|string $id): int => (int) $id,
+            static fn (int|string $id): int => intval($id),
             $ids,
         );
     }
@@ -973,7 +976,7 @@ final class SignupOverview
         $this->assertAccess();
 
         // Select every subscriber on the list, regardless of the quick filter (the button says "Select all"); read the
-        // already-selected ids as ints so a mix of checkbox-supplied strings and these ids dedupes correctly.
+        // already-selected ids normalised so the checkbox-supplied string ids dedupe against the stored ones.
         $list = $this->findOwnedList($listId);
         if (null === $list) {
             return;
@@ -993,7 +996,7 @@ final class SignupOverview
                 continue;
             }
 
-            $this->selected[] = $id;
+            $this->selected[] = strval($id);
             $selected[] = $id;
         }
 
@@ -1007,8 +1010,9 @@ final class SignupOverview
     {
         $this->assertAccess();
 
-        // Selection is scoped per list: drop only this list's signup ids and leave any other list's selection intact.
-        // Signup ids are globally unique, so the flat $selected set maps back to a single list unambiguously.
+        // Selection is scoped per list: drop only this list's signup ids and leave any other list's selection intact,
+        // in its stored string form. Signup ids are globally unique, so the flat $selected set maps back to a single
+        // list unambiguously.
         $list = $this->findOwnedList($listId);
         if (null === $list) {
             return;
@@ -1025,10 +1029,10 @@ final class SignupOverview
         }
 
         $kept = [];
-        foreach ($this->selectedIds() as $id) {
+        foreach ($this->selected as $stored) {
             if (
                 in_array(
-                    $id,
+                    intval($stored),
                     $listIds,
                     true,
                 )
@@ -1036,7 +1040,7 @@ final class SignupOverview
                 continue;
             }
 
-            $kept[] = $id;
+            $kept[] = $stored;
         }
 
         $this->selected = $kept;
@@ -1044,7 +1048,8 @@ final class SignupOverview
     }
 
     /**
-     * Tick every row on screen, which in people mode is every sign-up of every person shown.
+     * Tick every row on screen, which in people mode is every sign-up of every person shown. The ids are stored as
+     * strings, the form the checkboxes' value attributes carry.
      */
     #[LiveAction]
     #[ReadOnlySafe]
@@ -1078,7 +1083,7 @@ final class SignupOverview
                 continue;
             }
 
-            $this->selected[] = $id;
+            $this->selected[] = strval($id);
             $selected[] = $id;
         }
 
