@@ -9,11 +9,11 @@
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/GEWIS/radix/main)](https://github.com/GEWIS/radix/commits/main)
 [![License](https://img.shields.io/github/license/GEWIS/radix.svg)](./LICENSE.txt)
 
-<p>radix is the <a href="https://gewis.nl" target="_blank">website</a> and the decision and membership database of GEWIS - <em>GEmeenschap van Wiskunde en Informatica Studenten</em> - in a single application. It succeeds GEWISWEB and GEWISDB, which were separate applications until they were merged here.</p>
+<p>radix is the <a href="https://gewis.nl" target="_blank">website</a> and the decision and membership database of GEWIS - <em>GEmeenschap van Wiskunde en Informatica Studenten</em> - in a single application. It replaced GEWISWEB and GEWISDB, which were separate applications; a sync script copied the data directly from GEWISDB to GEWISWEB.</p>
 </div>
 
 ## What radix Is
-Two things that were always about the same association, and were always kept in step by hand, now live in one codebase:
+Two things about the same association, once two applications, are now one:
 
 - **The register.** Every meeting, decision, member, body and mailing list of the association. This is the ledger: the
   authoritative record of what GEWIS decided and who its members are, written by the board and read by every other
@@ -21,69 +21,44 @@ Two things that were always about the same association, and were always kept in 
 - **The website.** Activities, photos, course documents, custom pages, and the careers portal, for members and for the
   world.
 
-They meet in the middle. The website shows the association's decisions, the bodies that exist because of them, and the
-members installed in those bodies; it now reads them from the same application that records them, instead of copying
-them across an HTTP boundary twice an hour.
+The website shows the association's decisions, the bodies that exist because of them, and the members installed in
+those bodies, and it reads them from the application that records them.
 
-That leaves radix with two databases, and the split matters for anything that touches data:
+So there are two databases, and the split matters for anything that touches data:
 
-- **PostgreSQL** holds the ledger - the editable source of truth, behind the `default` connection.
-- **MariaDB** holds everything else, behind the `web` connection: the website's own data, and the projection of the
+- **PostgreSQL** stores the ledger - the editable source of truth, behind the `default` connection.
+- **MariaDB** stores everything else, behind the `web` connection: the website's own data, and the projection of the
   ledger that the site and the API read from.
 
 ## Features
-The website provides its members and other visitors with lots of functionality:
+The website has the following features:
 
-- **Activities**:
-    - Create activities with a wide range of options for sign-up lists.
-    - Enables members to sign up for various events and activities, enhancing engagement and participation.
+- **Activities**: members create activities with sign-up lists and their options, such as capacity limits and
+  waitlists, and join them through the activity pages.
+- **Career**: companies that collaborate with GEWIS publish vacancies, and members browse them and sign up.
+- **Decisions**: visitors read the association's decisions, meetings and bodies.
+- **Education**: an archive of course documents, such as exams and summaries, grouped by course.
+- **Pages**: custom pages written by the board for content and announcements that do not belong to a fixed section.
+- **Photos**: albums of pictures from activities, which members can add to.
 
-- **Career**:
-    - Allows companies that collaborate with GEWIS to publish job vacancies and opportunities.
-    - Facilitates connections between students and potential employers, aiding in career development.
+The register has the following parts:
 
-- **Decisions**:
-    - Provides a platform for members to view and interact with decisions and meetings.
-    - Ensures transparency and member involvement in the decision-making process.
-
-- **Education**:
-    - Offers an extensive archive of course documents, including exams and summaries.
-    - Serves as a valuable resource for students looking to study or review past materials.
-
-- **Pages**:
-    - Custom pages created by the board to provide dynamic content.
-    - Allows for flexible and timely updates to information and announcements.
-
-- **Photos**:
-    - Maintains a comprehensive photo archive of the numerous activities organised by GEWIS.
-    - Helps preserve and share memories of events and gatherings with the community.
-
-The decision and membership database provides the board and other GEWIS systems with lots of functionality:
-
-- **Management of Decisions**:
-    - Organise and manage various types of meetings.
-    - Handle a range of decisions, from financial budgets and statements to the installation of members in various organs, along with customisable decisions.
-    - While decisions can be altered to reflect changes, they remain more or less immutable to maintain historical accuracy.
-
-- **Management of Memberships**:
-    - The join page, which [join.gewis.nl](https://join.gewis.nl) redirects onto, facilitates new memberships and can automatically collect membership fees through Stripe.
-    - Validation of student information ensures that all member information is accurate.
-    - Allows for detailed and precise editing of member information.
-
-- **Checker Module**:
-    - Ensures that the database remains in a consistent state by enforcing many constraints derived from the Articles of Association and Internal Regulations.
-    - For instance, it prevents members from being installed in an organ if their membership has expired, ensuring adherence to (regulatory) requirements.
-
-- **API**:
-    - Serves a consistent projection of the ledger, so decisions and membership information can be queried without touching the register itself.
-    - Used by most GEWIS systems as a single, reliable source of truth, ensuring consistency and accuracy across all systems.
-    - Covers members, bodies, board and body installations, keyholders, mailing lists, activities and photos, so applications no longer need AD or LDAP for them.
-    - Each token carries only the permissions it was given, down to individual properties of a member.
-
-And there is plenty more!
+- **Meetings and decisions**: the meetings that take place in the association, and the decisions taken in them, from
+  budgets and statements to the installation of members in bodies. A decision is corrected when it needs to change,
+  not rewritten, so the record stays what was decided.
+- **Memberships**: the join page that [join.gewis.nl](https://join.gewis.nl) points to, new memberships, and the
+  membership fee, collected with Stripe. Student information is checked against the student administration, and
+  member data is edited in the administration.
+- **Checker**: the consistency checks derived from the Articles of Association and the Internal Regulations, run
+  over the data in the register. It reports a violation when, for example, a member is installed in a body while
+  their membership has expired.
+- **API**: the projection of the ledger, exposed to the other GEWIS systems. It covers members, bodies, board and
+  body installations, keyholders, mailing lists, activities and photos, so the applications that use it do not
+  connect to AD or LDAP. A token is limited to the permissions it was given, down to individual properties of a
+  member.
 
 ## Getting Started
-radix is built on PHP and the [Symfony framework](https://symfony.com/). The Symfony framework provides a solid foundation for building scalable and maintainable web applications.
+radix is a PHP application on the [Symfony framework](https://symfony.com/).
 
 ### Prerequisites
 We recommend developing natively on a Linux machine or through WSL2 on Windows (note: Arch-based distributions are **not** recommended) with the [PhpStorm](https://www.jetbrains.com/phpstorm/) IDE or another IDE with good support for PHP.<br/>
@@ -95,7 +70,7 @@ You will need at least:
 - `make`
 - A `.xlf` file editor (e.g. POEdit)
 
-PHP, Composer, and all other runtime tooling live inside the Docker image, no need to install them yourself.
+PHP, Composer, and all other runtime tooling are in the Docker image, no need to install them yourself.
 
 It is possible to use [rootless docker](https://docs.docker.com/engine/security/rootless/) on many Linux systems. For this, install `uidmap`, ensure IP forwarding is enabled, run `dockerd-rootless-setuptool.sh install` and set the `DOCKER_HOST` variable in your profile (e.g. `.bashrc`). Note that a rootless daemon cannot bind a port below 1024, which is where the application (80) and Matomo (82) are published by default. Move them in your `.env.local`:
 
@@ -114,9 +89,9 @@ To set up radix locally, follow these steps:
 2. Clone your fork (`git clone git@github.com:{username}/radix.git`).
 3. Run `make start` to build and serve the application (a `.env.local` will be created for you; alter it to your needs). The first build may take 5-10 minutes.
 4. Run `make seed` to get some test data (migrations will run automatically).
-5. Go to [`http://localhost/`](http://localhost/) in your browser and you are greeted with the GEWIS website.
+5. Go to [`http://localhost/`](http://localhost/) in your browser to see the GEWIS website.
 6. Log in with membership number `8000` and the password `gewiswebgewis`.
-7. The register is part of the administration, under [`http://localhost/en/admin/`](http://localhost/en/admin/); the same sign-in reaches it, and member `8000` holds both the website's and the register's administrator roles.
+7. The register is part of the administration, under [`http://localhost/en/admin/`](http://localhost/en/admin/); the same sign-in works there, and member `8000` holds both the website's and the register's administrator roles.
 
 #### Other Accessible Services
 During development, several other services are accessible on your local machine:
@@ -131,22 +106,22 @@ During development, several other services are accessible on your local machine:
 
 ### Deployment
 Production runs the image `abc.docker-registry.gewis.nl/web/radix/app` through Docker, deployed with Portainer.
-`compose.yaml` *is* the production stack; `compose.override.yaml` is what turns it into the development one, and
-`docker compose up` in a checkout loads both. Portainer names `compose.yaml` on its own, which is also what stops
+`compose.yaml` *is* the production stack; `compose.override.yaml` is the development part of it, and
+`docker compose up` in a checkout merges the two. Portainer names `compose.yaml` on its own, which is also what stops
 compose merging the development override. Every variable is guarded with `${VAR:?...}`, so one that Portainer's stack
-environment is missing aborts the deploy rather than falling back to a development default. The single `app` container
+environment is missing aborts the deploy rather than using a development default. The single `app` container
 runs the migrations on start.
 
 Values that rarely differ between deployments are passed the same way, but with a default instead of a guard: the mail
 display names, the pinned Stripe and Mailman API versions, the watermark tag, the TU/e subnets. `config/services.yaml`
-defaults each of them as well, which is what a run outside the stack falls back to, so setting one in the stack
+defaults each of them as well, which is the default for a run outside the stack, so setting one in the stack
 environment is all it takes to change it.
 
 ### Contributing
-We welcome contributions from the community, especially GEWIS members! To contribute:
+Contributions from GEWIS members and others are welcome. To contribute:
 
 1. Perform the steps from [Installation](#installation).
-2. Create your feature of bug fix branch (`git switch -c feature/my-amazing-feature`).
+2. Create a branch for your feature or bug fix (`git switch -c feature/my-amazing-feature`).
 3. Commit your changes (`git commit -m 'feat: added my amazing feature'`). <ins>**NOTE:** radix requires commits to be signed, see [this GitHub article](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) for more information on how to sign commits.</ins>
 4. Push to the branch (`git push origin feature/my-amazing-feature`).
 5. Open a pull request.
@@ -154,8 +129,11 @@ We welcome contributions from the community, especially GEWIS members! To contri
 > [!NOTE]
 > More detailed information on GEWIS' contribution guidelines, including conventions on branch names and commit messages, can be found in the [contribution guidelines](https://github.com/GEWIS/.github/blob/main/CONTRIBUTING.md).
 
+> [!NOTE]
+> The [AI contribution policy](./AI_POLICY.md) governs how AI tools may be used on contributions to this repository. AI tools may help with exploration and code, but the prose you submit, and the understanding of what you submit, must be your own.
+
 ### Useful Commands During Development
-While developing, use these commonly used commands from the Makefile:
+While developing, you will mostly use these commands from the Makefile:
 
 - `make bash` - Shell into the FrankenPHP `app` container.
 - `make sf c='...'` - Run a Symfony console command inside the container (e.g. `make sf c=check:database`).
@@ -170,22 +148,27 @@ While developing, use these commonly used commands from the Makefile:
 For a complete list of available commands, run `make help`.
 
 > [!TIP]
-> If you are using AI coding tools (Claude Code, Copilot, Cursor, ...), they will pick up `AGENTS.md` automatically. It documents architecture, conventions, and gotchas in more depth than this README. However, it is not only for AI coding tools, have a look too if you are interested.
+> If you are using an AI coding tool (Claude Code, Copilot, Cursor, ...), it reads `AGENTS.md` automatically. That file documents the architecture, conventions and pitfalls in more depth than this README, and it is for people as well as for tools.
 
 ### Testing
 The test suite runs with PHPUnit, inside the `app` container, against isolated copies of both databases:
 
-- `make test-prepare` - Build the test schemas and load the seed into them. Run this once, and again after a schema or fixture change; the tests roll back their own writes, so the seed survives a run.
-- `make test` - Run the suite. Pass `c=` to hand options to PHPUnit, for example `make test c="--stop-on-failure"`.
+- `make test-prepare` - Build the test schemas and load the seed into them. Run this once, and again after a schema or fixture change; the tests roll back their own writes, so one seed serves the whole run.
+- `make test` - Run the suite. Pass `c=` for PHPUnit options, for example `make test c="--stop-on-failure"`.
+- `make test-browser` - Run the browser tests, which drive a real Chromium against a server of their own (Symfony Panther). They are excluded from the ordinary run, and because that server writes outside the transaction the other tests roll back, the target re-seeds the databases when the run ends, passed or failed.
 
 Tests that need a database run against real PostgreSQL and MariaDB matching production rather than an in-memory
-substitute, because the schema uses more of both than a substitute can reproduce.
+substitute, because the schema uses features of both databases that an in-memory database does not implement.
+
+When a change touches what a page does once its JavaScript has run (a form flow, an editor, a live component, a
+lock), prefer a test in `tests/Browser/` over a unit test: the rest of the suite renders the template and stops, so
+it cannot say what the page does afterwards.
 
 Beyond the tests, `make sf c=check:database` runs the consistency checks derived from the Articles of Association and
 Internal Regulations over the register. It is worth running after anything that changes decisions or installations.
 
 ### Project Structure
-A general overview of important folders required for the functioning of the application:
+The important folders:
 
 ```txt
 ./
@@ -209,15 +192,14 @@ association decided and who its members are, `Decision` for the projection of it
 API, and `Application` for what is shared.
 
 ### Testing Stripe Behaviour
-Some additional configuration needs to be done to set up the Stripe API:
+The Stripe API needs the following additional configuration:
 
-* Create a restricted key on https://dashboard.stripe.com/test/apikeys and set it in the `STRIPE_SECRET_KEY` environment variable (check `.env.local.dist` for the permissions to set)
+* Create a restricted key on https://dashboard.stripe.com/test/apikeys and set it in the `STRIPE_SECRET_KEY` environment variable (check `.env.local.dist` for which permissions to grant it)
 * Copy the publishable key from https://dashboard.stripe.com/test/apikeys and set it in the `STRIPE_PUBLISHABLE_KEY` environment variable
 * Copy the webhook signing secret from the output of `make stripewebhooksecret`
 * Create a product with a one-off price on https://dashboard.stripe.com/test/products?active=true and copy its price ID to `STRIPE_MEMBERSHIP_PRICE_ID`
 
-Tip: to reduce waiting time for checkout sessions to expire, you can speed up this process by invoking `docker compose exec stripe stripe checkout sessions expire cs_test_fromcheckoutsessionstable`.
-This will enable cash payment and send the retry email.
+Tip: to reduce the wait for a checkout session to expire, run `docker compose exec stripe stripe checkout sessions expire cs_test_fromcheckoutsessionstable`. Cash payment is then enabled and the retry email is sent.
 
 Note: the links in the e-mails do not resolve in the development setup. Replace the host with `http://localhost/` to follow them.
 
@@ -230,7 +212,7 @@ A running deployment also serves Swagger UI at [`/api-docs`](http://localhost/ap
 and try the endpoints.
 
 Every endpoint is read with the token of an API principal, created under **Users → API principals** in the
-administration, and only answers for the permissions that principal was given. Collections are paged: `?page=` and
+administration, and is limited to the permissions that principal was given. Collections are paged: `?page=` and
 `?itemsPerPage=` (100 by default, 500 at most), with the totals in the response's `meta`.
 
 Everything except the oldest member endpoints needs the contract version, as either
@@ -239,7 +221,7 @@ Everything except the oldest member endpoints needs the contract version, as eit
 Alternatively, you can use PowerShell, for example:
 
 ```powershell
-((Invoke-WebRequest -Uri http://localhost/api/organFunctions -Headers @{"Authorization" = "Bearer APITOKEN"; "Accept" = "application/vnd.gewis.gewisdb+json;version=4.3.3"}).Content | ConvertFrom-Json).data | Format-List
+((Invoke-WebRequest -Uri http://localhost/api/organFunctions -Headers @{"Authorization" = "Bearer APITOKEN"; "Accept" = "application/vnd.gewis.gewisdb+json;version=5.0.0"}).Content | ConvertFrom-Json).data | Format-List
 ```
 
 ## License
