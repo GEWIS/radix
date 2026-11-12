@@ -108,7 +108,7 @@ final class RequestIdProcessorTest extends TestCase
     private function event(int $type = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
         return new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
+            self::createStub(HttpKernelInterface::class),
             new Request(),
             $type,
         );

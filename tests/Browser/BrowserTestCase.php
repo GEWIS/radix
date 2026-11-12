@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Browser;
 
 use Override;
-use PHPUnit\Framework\Attributes\Group;
 use RuntimeException;
 use Symfony\Component\Panther\PantherTestCase;
 
@@ -22,8 +21,7 @@ use function sprintf;
  * Whether an editor survives a cache restore, whether a lock is released on navigation, whether a live component
  * still responds after one. None of that is visible to a test that only renders a template.
  *
- * They are in the `browser` group and excluded from the default run, because each one starts Chromium and a web
- * server. Run them with `make test-browser`.
+ * They are excluded from the default run, due to requiring spinning up Chromium. Run them with `make test-browser`.
  *
  * Two things are different here from every other test in this suite, and both are consequences of the server being a
  * separate process:
@@ -37,7 +35,6 @@ use function sprintf;
  * The browser signs in through the real form, because {@see \App\Tests\Support\SignsInThroughTheKernel} authenticates
  * through container services in this process and none of that reaches the server.
  */
-#[Group('browser')]
 abstract class BrowserTestCase extends PantherTestCase
 {
     /**
