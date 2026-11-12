@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Service\Application;
 
+use App\Service\Api\ApiService;
 use App\Service\Database\ListmonkService;
 use App\Service\Database\MailingListService;
 use App\Service\Database\MailmanService;
 use App\Service\Database\Member as MemberService;
-use App\Service\Report\ApiService;
 use DateTimeImmutable;
 use Override;
 use Psr\Cache\CacheItemInterface;

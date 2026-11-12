@@ -1,0 +1,256 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\Decision;
+
+use App\Attribute\Application\RendersOnSuccess;
+use App\Controller\Application\RendersRejectedSubmissionTrait;
+use App\Entity\Database\SavedQuery;
+use App\Form\Decision\QueryExportType;
+use App\Form\Decision\QuerySaveType;
+use App\Form\SubmitButtons;
+use App\Service\Decision\QueryService;
+use Doctrine\ORM\Exception\ORMException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+
+use function str_replace;
+
+#[Route(path: '/query')]
+final class QueryController extends AbstractController
+{
+    use RendersRejectedSubmissionTrait;
+
+    public function __construct(private readonly QueryService $queryService)
+    {
+    }
+
+    #[Route(
+        path: '',
+        name: 'query_index',
+        methods: [
+            'GET',
+            'POST',
+        ],
+    )]
+    #[RendersOnSuccess]
+    public function index(Request $request): Response
+    {
+        return $this->page(
+            $request,
+            null,
+        );
+    }
+
+    /**
+     * Show a stored query, and its result.
+     */
+    #[Route(
+        path: '/show/{query}',
+        name: 'query_show',
+        requirements: ['query' => '[0-9]+'],
+        methods: [
+            'GET',
+            'POST',
+        ],
+    )]
+    #[RendersOnSuccess]
+    public function show(
+        Request $request,
+        int $query,
+    ): Response {
+        $savedQuery = $this->queryService->getSavedQuery($query);
+
+        if (null === $savedQuery) {
+            throw $this->createNotFoundException();
+        }
+
+        return $this->page(
+            $request,
+            $savedQuery,
+        );
+    }
+
+    #[Route(
+        path: '/delete/{query}',
+        name: 'query_delete',
+        requirements: ['query' => '[0-9]+'],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        new Expression("'query_delete-' ~ args['query']"),
+        tokenKey: '_csrf_token',
+    )]
+    public function delete(int $query): Response
+    {
+        $savedQuery = $this->queryService->getSavedQuery($query);
+
+        if (null === $savedQuery) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->queryService->delete($savedQuery);
+        $this->addFlash(
+            'success',
+            'The stored query has been deleted.',
+        );
+
+        return $this->redirectToRoute('query_index');
+    }
+
+    /**
+     * The query page, which is the same whether it was reached with a stored query or without one.
+     *
+     * Both the editor and the export are on this page and post back to it; they are distinguished by the form their
+     * fields arrive under.
+     */
+    private function page(
+        Request $request,
+        ?SavedQuery $savedQuery,
+    ): Response {
+        $exportForm = $this->createForm(QueryExportType::class);
+        $exportForm->handleRequest($request);
+
+        if (
+            $exportForm->isSubmitted()
+            && $exportForm->isValid()
+        ) {
+            return $this->export($exportForm->getData());
+        }
+
+        $form = $this->createForm(
+            QuerySaveType::class,
+            null === $savedQuery ? null : [
+                'query' => $savedQuery->query,
+                'category' => $savedQuery->category,
+                'name' => $savedQuery->name,
+            ],
+        );
+        $form->handleRequest($request);
+
+        // A stored query is run as it was opened, until the editor is submitted, from which point on what was
+        // typed is what runs.
+        $query = $savedQuery?->query;
+
+        if ($form->isSubmitted()) {
+            $query = null;
+
+            if ($form->isValid()) {
+                /** @var array{query: string, category: string, name: string} $data */
+                $data = $form->getData();
+
+                if (
+                    SubmitButtons::clicked(
+                        $form,
+                        'submit_save',
+                    )
+                ) {
+                    $stored = $this->queryService->save(
+                        $data['name'],
+                        $data['category'],
+                        $data['query'],
+                    );
+
+                    return $this->redirectToRoute(
+                        'query_show',
+                        ['query' => $stored->id],
+                    );
+                }
+
+                $query = $data['query'];
+            }
+        }
+
+        $result = null;
+
+        if (null !== $query) {
+            try {
+                $result = $this->queryService->execute($query);
+            } catch (ORMException $e) {
+                // Whatever the parser objected to is the only information about what is wrong with the query, so it
+                // is reported on the field it was typed in.
+                $form->get('query')->addError(new FormError($e->getMessage()));
+                $query = null;
+            }
+        }
+
+        return $this->render(
+            'database/query/index.html.twig',
+            [
+                'form' => $form,
+                'export_form' => $this->createForm(
+                    QueryExportType::class,
+                    [
+                        'query' => $query,
+                        'name' => null === $savedQuery
+                            ? null
+                            : $savedQuery->category . ' - ' . $savedQuery->name,
+                    ],
+                ),
+                'entities' => $this->queryService->getEntities(),
+                'saved_queries' => $this->queryService->getSavedQueries(),
+                'current_query' => $savedQuery,
+                'result' => $result,
+            ],
+            // The actions this serves declare RendersOnSuccess, because a query returns its result on this page, so
+            // a rejected submission must set the status here. The parser's error is added to the form above, after
+            // validity was first read, which is why validity is read again.
+            $this->rejectedSubmission($form),
+        );
+    }
+
+    /**
+     * The result of a query as a file to download.
+     *
+     * @param array{query: string, name: ?string, type: string} $data
+     */
+    private function export(array $data): Response
+    {
+        try {
+            $result = $this->queryService->execute($data['query']);
+        } catch (ORMException $e) {
+            $this->addFlash(
+                'danger',
+                $e->getMessage(),
+            );
+
+            return $this->redirectToRoute('query_index');
+        }
+
+        // A stored query's name is free text and ends up in a filename, where a path separator is not allowed.
+        $name = str_replace(
+            [
+                '/',
+                '\\',
+            ],
+            '-',
+            $data['name'] ?: 'query',
+        );
+
+        $response = $this->render(
+            'database/query/export.csv.twig',
+            ['result' => $result],
+        );
+        $response->headers->set(
+            'Content-Type',
+            'text/csv; charset=UTF-8',
+        );
+        $response->headers->set(
+            'Content-Disposition',
+            HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                $name . '.csv',
+                'query.csv',
+            ),
+        );
+
+        return $response;
+    }
+}

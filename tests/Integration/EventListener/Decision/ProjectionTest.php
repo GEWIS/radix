@@ -1,0 +1,280 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Integration\EventListener\Decision;
+
+use App\Entity\Database\Enums\InstallationFunctions;
+use App\Entity\Database\Enums\Studies;
+use App\Entity\Database\SubDecision\Other;
+use App\Entity\Decision\Decision as DecisionDecision;
+use App\Entity\Decision\Meeting as DecisionMeeting;
+use App\Entity\Decision\Member as DecisionMember;
+use App\Entity\Decision\Organ as DecisionOrgan;
+use App\Entity\Decision\OrganMember as DecisionOrganMember;
+use App\EventListener\Decision\DatabaseDeletionListener;
+use App\EventListener\Decision\DatabaseUpdateListener;
+use App\Tests\Support\LedgerBuilder;
+use Doctrine\ORM\EntityManagerInterface;
+use Override;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
+/**
+ * The projection is a copy of the ledger kept on the web connection, and it is what every page and every API response
+ * about a member or a body is built from. The ledger itself is read by almost nothing. What the listeners write as the
+ * ledger is written is therefore not an internal detail: it is what the rest of the application sees.
+ */
+#[CoversClass(DatabaseUpdateListener::class)]
+#[CoversClass(DatabaseDeletionListener::class)]
+class ProjectionTest extends KernelTestCase
+{
+    private EntityManagerInterface $ledger;
+    private EntityManagerInterface $projection;
+    private LedgerBuilder $build;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        self::bootKernel();
+
+        $ledger = self::getContainer()->get(EntityManagerInterface::class);
+        $projection = self::getContainer()->get('doctrine')->getManager('web');
+        self::assertInstanceOf(
+            EntityManagerInterface::class,
+            $projection,
+        );
+
+        $this->ledger = $ledger;
+        $this->projection = $projection;
+        $this->build = new LedgerBuilder($ledger);
+    }
+
+    public function testWritingAMemberWritesTheProjectedMember(): void
+    {
+        $member = $this->build->member();
+
+        $projected = $this->projection->getRepository(DecisionMember::class)->find($member->lidnr);
+
+        self::assertNotNull($projected);
+        self::assertSame(
+            $member->lastName,
+            $projected->lastName,
+        );
+        self::assertSame(
+            $member->email,
+            $projected->email,
+        );
+    }
+
+    /**
+     * The study is only recorded in the ledger, so the website can only order sign-ups by program if the projection
+     * stores it too.
+     */
+    public function testWritingAMemberWritesTheirStudy(): void
+    {
+        $member = $this->build->member();
+        $member->study = Studies::MCSE;
+        $this->ledger->flush();
+
+        $projected = $this->projection->getRepository(DecisionMember::class)->find($member->lidnr);
+
+        self::assertNotNull($projected);
+        self::assertSame(
+            Studies::MCSE,
+            $projected->study,
+        );
+    }
+
+    public function testWritingAMeetingWritesTheProjectedMeeting(): void
+    {
+        $meeting = $this->build->meeting();
+
+        $projected = $this->projection->getRepository(DecisionMeeting::class)->find([
+            'type' => $meeting->type,
+            'number' => $meeting->getNumber(),
+        ]);
+
+        self::assertNotNull($projected);
+        self::assertEquals(
+            $meeting->date,
+            $projected->date,
+        );
+    }
+
+    /**
+     * A foundation is not projected as a subdecision alone: the organ it founds is derived from it, and that is the
+     * table the site reads to know which bodies exist.
+     */
+    public function testFoundingAnOrganDerivesTheOrgan(): void
+    {
+        $foundation = $this->build->foundOrgan(
+            $this->build->meeting(),
+            'TTC',
+            'Testtaartcommissie',
+        );
+
+        $organ = $this->organOf($foundation->abbr);
+
+        self::assertNotNull($organ);
+        self::assertSame(
+            'Testtaartcommissie',
+            $organ->name,
+        );
+        self::assertNull($organ->abrogationDate);
+    }
+
+    public function testAbrogatingAnOrganDatesItRatherThanRemovingIt(): void
+    {
+        $meeting = $this->build->meeting();
+        $foundation = $this->build->foundOrgan(
+            $meeting,
+            'ATC',
+        );
+        $this->build->abrogate(
+            $this->build->meeting(date: '2027-08-20'),
+            $foundation,
+        );
+
+        $organ = $this->organOf('ATC');
+
+        self::assertNotNull($organ);
+        self::assertSame(
+            '2027-08-20',
+            $organ->abrogationDate?->format('Y-m-d'),
+        );
+    }
+
+    /**
+     * The membership of a body, which is what the API returns and what a member's page shows.
+     */
+    public function testInstallingSomeoneDerivesTheirOrganMembership(): void
+    {
+        $meeting = $this->build->meeting();
+        $foundation = $this->build->foundOrgan(
+            $meeting,
+            'ITC',
+        );
+        $member = $this->build->member();
+        $this->build->install(
+            $meeting,
+            $foundation,
+            $member,
+            InstallationFunctions::Member,
+        );
+
+        $organMember = $this->organMemberOf('ITC');
+
+        self::assertNotNull($organMember);
+        self::assertSame(
+            $member->lidnr,
+            $organMember->member->lidnr,
+        );
+        self::assertSame(
+            InstallationFunctions::Member,
+            $organMember->function,
+        );
+        self::assertNull($organMember->dischargeDate);
+    }
+
+    public function testDischargingSomeoneEndsTheOrganMembershipInPlace(): void
+    {
+        $meeting = $this->build->meeting();
+        $foundation = $this->build->foundOrgan(
+            $meeting,
+            'DTC',
+        );
+        $installation = $this->build->install(
+            $meeting,
+            $foundation,
+            $this->build->member(),
+            InstallationFunctions::Member,
+        );
+        $this->build->discharge(
+            $this->build->meeting(date: '2027-02-01'),
+            $installation,
+        );
+
+        $organMember = $this->organMemberOf('DTC');
+
+        self::assertNotNull($organMember);
+        self::assertSame(
+            '2027-02-01',
+            $organMember->dischargeDate?->format('Y-m-d'),
+        );
+    }
+
+    /**
+     * The other direction: what leaves the ledger has to leave the projection, or the site goes on showing it.
+     */
+    public function testRemovingADecisionRemovesWhatWasDerivedFromIt(): void
+    {
+        $meeting = $this->build->meeting();
+        $foundation = $this->build->foundOrgan(
+            $meeting,
+            'RTC',
+        );
+
+        self::assertNotNull($this->organOf('RTC'));
+
+        $this->ledger->remove($foundation->decision);
+        $this->ledger->flush();
+
+        self::assertNull($this->organOf('RTC'));
+    }
+
+    public function testTranslatingAFreeTextDecisionRewritesWhatTheDecisionReadsAs(): void
+    {
+        $other = $this->build->decideFreely(
+            $this->build->meeting(),
+            'Er wordt een taart gekocht.',
+        );
+        $projected = $this->projectedDecisionOf($other);
+
+        self::assertNotNull($projected);
+        self::assertSame(
+            'Er wordt een taart gekocht.',
+            $projected->contentNL,
+        );
+        self::assertSame(
+            'If you are reading this, the secretary has not done their job.',
+            $projected->contentEN,
+        );
+
+        $other->contentEN = 'A cake is bought.';
+        $this->ledger->flush();
+
+        self::assertSame(
+            'A cake is bought.',
+            $projected->contentEN,
+        );
+        self::assertSame(
+            'Er wordt een taart gekocht.',
+            $projected->contentNL,
+        );
+    }
+
+    private function projectedDecisionOf(Other $other): ?DecisionDecision
+    {
+        return $this->projection->getRepository(DecisionDecision::class)->find([
+            'meeting_type' => $other->getMeetingType(),
+            'meeting_number' => $other->getMeetingNumber(),
+            'point' => $other->getDecisionPoint(),
+            'number' => $other->getDecisionNumber(),
+        ]);
+    }
+
+    private function organOf(string $abbreviation): ?DecisionOrgan
+    {
+        return $this->projection->getRepository(DecisionOrgan::class)->findOneBy(['abbr' => $abbreviation]);
+    }
+
+    private function organMemberOf(string $abbreviation): ?DecisionOrganMember
+    {
+        $organ = $this->organOf($abbreviation);
+
+        self::assertNotNull($organ);
+
+        return $this->projection->getRepository(DecisionOrganMember::class)->findOneBy(['organ' => $organ]);
+    }
+}

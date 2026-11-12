@@ -58,7 +58,7 @@ class GenerateCommandTest extends KernelTestCase
         SubDecision::class,
     ];
 
-    private EntityManagerInterface $report;
+    private EntityManagerInterface $projection;
     private LedgerBuilder $build;
 
     #[Override]
@@ -67,13 +67,13 @@ class GenerateCommandTest extends KernelTestCase
         self::bootKernel();
 
         $ledger = self::getContainer()->get(EntityManagerInterface::class);
-        $report = self::getContainer()->get('doctrine')->getManager('web');
+        $projection = self::getContainer()->get('doctrine')->getManager('web');
         self::assertInstanceOf(
             EntityManagerInterface::class,
-            $report,
+            $projection,
         );
 
-        $this->report = $report;
+        $this->projection = $projection;
         $this->build = new LedgerBuilder($ledger);
 
         $this->aLedgerWorthProjecting();
@@ -157,7 +157,7 @@ class GenerateCommandTest extends KernelTestCase
 
         // The replay rewrote every projected row, so what this manager still contains describes a projection that
         // has since been thrown away and built again.
-        $this->report->clear();
+        $this->projection->clear();
     }
 
     /**
@@ -168,7 +168,7 @@ class GenerateCommandTest extends KernelTestCase
         $counts = [];
 
         foreach (self::PROJECTED_ENTITIES as $entity) {
-            $counts[$entity] = $this->report->getRepository($entity)->count([]);
+            $counts[$entity] = $this->projection->getRepository($entity)->count([]);
         }
 
         return $counts;
@@ -176,7 +176,7 @@ class GenerateCommandTest extends KernelTestCase
 
     private function emptyTheProjection(): void
     {
-        $connection = $this->report->getConnection();
+        $connection = $this->projection->getConnection();
 
         // DELETE rather than TRUNCATE: TRUNCATE commits in MariaDB, which would end the transaction the test is
         // wrapped in and leave the projection empty for everything that runs after this. The keys are lifted for the
@@ -197,7 +197,7 @@ class GenerateCommandTest extends KernelTestCase
             $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
         }
 
-        $this->report->clear();
+        $this->projection->clear();
     }
 
     /**
@@ -211,7 +211,7 @@ class GenerateCommandTest extends KernelTestCase
         $tables = [];
 
         foreach (self::PROJECTED_ENTITIES as $entity) {
-            $metadata = $this->report->getClassMetadata($entity);
+            $metadata = $this->projection->getClassMetadata($entity);
             $tables[$metadata->getTableName()] = true;
 
             foreach ($metadata->associationMappings as $association) {

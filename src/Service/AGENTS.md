@@ -8,4 +8,4 @@ Uploaded and generated files live under `data/`, never under `public/`.
 
 **A web request never encodes an image.** Serving reads the pre-generated variant cache only; a miss on an existing original queues one `GenerateImageVariantMessage` and answers 503 with `Retry-After`. Variants exist because uploads queue them (`ProcessImageVariantsMessage`) and because `app:image:pregenerate` queues the rest. That command only dispatches, so a backfill is encoded by the `messenger-images` workers, paced by `IMAGE_WORKER_REPLICAS`. Run it after clearing the variant cache, and with `--force` after changing the variant set or the encoding. Synchronous encode-on-miss once saturated the production host; do not reintroduce it.
 
-See also `src/Entity/AGENTS.md` for how `Service/Report` maintains the projection.
+See also `src/Entity/AGENTS.md` for how `Service/Decision` maintains the projection.

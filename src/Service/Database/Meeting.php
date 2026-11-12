@@ -27,7 +27,7 @@ use App\Exception\Database\DecisionStillReferenced;
 use App\Repository\Database\MeetingRepository;
 use App\Repository\Database\SubDecision\FoundationRepository;
 use App\Repository\Database\SubDecision\OtherRepository;
-use App\Service\Report\ApiService;
+use App\Service\Api\ApiService;
 use App\ViewModel\Database\DecisionOptions;
 use App\ViewModel\Database\DecisionReference;
 use App\ViewModel\Database\DecisionRow;

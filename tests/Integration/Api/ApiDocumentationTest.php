@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Api;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
-use App\OpenApi\ApiOpenApiFactory;
+use App\Service\Api\ApiOpenApiFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Routing\RouterInterface;
