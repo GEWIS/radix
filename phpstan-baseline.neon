@@ -28,7 +28,7 @@ parameters:
 			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
 			identifier: ternary.shortNotAllowed
 			count: 1
-			path: src/Controller/Report/QueryController.php
+			path: src/Controller/Decision/QueryController.php
 
 		-
 			message: '#^Property App\\Entity\\Activity\\UserSignup\:\:\$user type mapping mismatch\: database can contain App\\Entity\\Decision\\Member\|null but property expects App\\Entity\\Decision\\Member\.$#'
@@ -752,28 +752,28 @@ parameters:
 			path: src/Form/Database/SubDecisionType.php
 
 		-
-			message: '#^Class App\\Form\\Report\\ExportType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			message: '#^Class App\\Form\\Decision\\ExportType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
-			path: src/Form/Report/ExportType.php
+			path: src/Form/Decision/ExportType.php
 
 		-
-			message: '#^Class App\\Form\\Report\\QueryExportType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			message: '#^Class App\\Form\\Decision\\QueryExportType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
-			path: src/Form/Report/QueryExportType.php
+			path: src/Form/Decision/QueryExportType.php
 
 		-
-			message: '#^Class App\\Form\\Report\\QuerySaveType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			message: '#^Class App\\Form\\Decision\\QuerySaveType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
-			path: src/Form/Report/QuerySaveType.php
+			path: src/Form/Decision/QuerySaveType.php
 
 		-
-			message: '#^Class App\\Form\\Report\\QueryType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			message: '#^Class App\\Form\\Decision\\QueryType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
 			identifier: missingType.generics
 			count: 1
-			path: src/Form/Report/QueryType.php
+			path: src/Form/Decision/QueryType.php
 
 		-
 			message: '#^Method App\\Form\\SubmitButtons\:\:clicked\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
@@ -1258,58 +1258,58 @@ parameters:
 			path: src/Service/Database/StripeService.php
 
 		-
-			message: '#^Parameter \#1 \$given of class App\\Exception\\Report\\VersionFormat constructor expects string, string\|null given\.$#'
+			message: '#^Parameter \#1 \$given of class App\\Exception\\Api\\VersionFormat constructor expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Service/Report/ApiService.php
+			path: src/Service/Api/ApiService.php
 
 		-
 			message: '#^Parameter \#1 \$version of class PHLAK\\SemVer\\Version constructor expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Service/Report/ApiService.php
+			path: src/Service/Api/ApiService.php
 
 		-
 			message: '#^Cannot call method getSubdecisions\(\) on App\\Entity\\Decision\\Decision\|null\.$#'
 			identifier: method.nonObject
 			count: 1
-			path: src/Service/Report/MeetingService.php
+			path: src/Service/Decision/MeetingService.php
 
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
 			count: 1
-			path: src/Service/Report/MeetingService.php
+			path: src/Service/Decision/MeetingService.php
 
 		-
 			message: '#^Parameter \#1 \$object of method Doctrine\\Persistence\\ObjectManager\:\:remove\(\) expects object, App\\Entity\\Decision\\Decision\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Service/Report/MeetingService.php
+			path: src/Service/Decision/MeetingService.php
 
 		-
 			message: '#^Cannot access property \$lidnr on App\\Entity\\Database\\Member\|null\.$#'
 			identifier: property.nonObject
 			count: 2
-			path: src/Service/Report/MemberService.php
+			path: src/Service/Decision/MemberService.php
 
 		-
 			message: '#^Cannot access property \$lidnr on App\\Entity\\Database\\Member\|null\.$#'
 			identifier: property.nonObject
 			count: 1
-			path: src/Service/Report/MiscService.php
+			path: src/Service/Decision/MiscService.php
 
 		-
 			message: '#^Only booleans are allowed in an if condition, int\|false given\.$#'
 			identifier: if.condNotBoolean
 			count: 1
-			path: src/Service/Report/QueryService.php
+			path: src/Service/Decision/QueryService.php
 
 		-
 			message: '#^Parameter \#2 \$property of class ReflectionProperty constructor expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Service/Report/SubDecisionService.php
+			path: src/Service/Decision/SubDecisionService.php
 		-
 			message: '#Property App\\Entity\\Database\\User\\ApiPrincipal::\$permissions type mapping mismatch#'
 			identifier: doctrine.enumType

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Command\Decision;
 
 use App\Command\HoldsRunLockTrait;
-use App\Service\Report\ApiService;
-use App\Service\Report\MeetingService;
-use App\Service\Report\MemberService;
-use App\Service\Report\MiscService;
+use App\Service\Api\ApiService;
+use App\Service\Decision\MeetingService;
+use App\Service\Decision\MemberService;
+use App\Service\Decision\MiscService;
 use Closure;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;

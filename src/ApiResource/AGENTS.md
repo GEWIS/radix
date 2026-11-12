@@ -1,6 +1,6 @@
 # API
 
-Applies to `src/ApiResource/`, `src/State/`, `src/Serializer/Api/`, `src/OpenApi/` and `src/Controller/Report`.
+Applies to `src/ApiResource/`, `src/State/`, `src/Serializer/Api/`, `src/Service/Api/` and `src/Controller/Api/`.
 
 Everything under `^/api` is stateless, read with `Authorization: Bearer <token>`, and answers the same envelope:
 
@@ -22,8 +22,8 @@ Everything under `^/api` is stateless, read with `Authorization: Bearer <token>`
 - `src/State/<Domain>/`: providers that build them from the projection; `src/State/Api/` holds the shared plumbing
   (`EnvelopeProcessor`, `CollectionPagination`).
 - `src/Serializer/Api/`: serializer contexts, including the permission-driven groups of the member payload.
-- `src/OpenApi/`: the decorator that completes the generated document.
-- `src/Controller/Report/ApiController` keeps the endpoints that are not resources: `/health`, the two function lists,
+- `src/Service/Api/`: the decorator that completes the generated document.
+- `src/Controller/Api/ApiController` keeps the endpoints that are not resources: `/health`, the two function lists,
   the example error endpoint, and the catch-all that makes an unknown `/api` path answer `error-router-no-match`. **That
   catch-all MUST stay the last method in the class.**
 - Both the API and the website read the projection, never the ledger directly.

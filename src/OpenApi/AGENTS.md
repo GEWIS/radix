@@ -1,1 +1,0 @@
-./src/ApiResource/AGENTS.md

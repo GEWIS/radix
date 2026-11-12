@@ -8,7 +8,8 @@ localised_routes:
         - '../src/Controller/Application/HealthController.php'
         - '../src/Controller/Database/'
         - '../src/Controller/Photo/ApiController.php'
-        - '../src/Controller/Report/'
+        - '../src/Controller/Api/'
+        - '../src/Controller/Decision/QueryController.php'
         - '../src/Controller/User/ApiPrincipalController.php'
     type: attribute
     prefix:
@@ -52,7 +53,7 @@ application_routes:
 
 # Saved queries over the register.
 database_query_routes:
-    resource: '../src/Controller/Report/QueryController.php'
+    resource: '../src/Controller/Decision/QueryController.php'
     type: attribute
     prefix: '/{_locale}/admin'
     defaults:
@@ -99,7 +100,7 @@ api_photo_routes:
     type: attribute
 
 api_routes:
-    resource: '../src/Controller/Report/ApiController.php'
+    resource: '../src/Controller/Api/ApiController.php'
     type: attribute
 
 # Where a visitor is returned to after paying, and where Stripe reports the payment. The pages include their

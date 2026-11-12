@@ -60,7 +60,7 @@ Two connections; the distinction governs anything that touches data.
 
 Rules that apply everywhere:
 
-- A change to a ledger entity MUST come with the matching change on the projection side (`src/Entity/Decision`, `src/Service/Report`). Change one without the other and the website quietly renders an association that no longer exists.
+- A change to a ledger entity MUST come with the matching change on the projection side (`src/Entity/Decision`, `src/Service/Decision`). Change one without the other and the website quietly renders an association that no longer exists.
 - A query MUST NOT span both connections. DQL, joins and associations stay inside one entity manager; ask the other for what you need and match up in PHP.
 - The default manager is the ledger's, usually the wrong one. Inject the manager or repository you want; do not let `ManagerRegistry` hand you the default.
 - Both the website and the API read the projection, never the ledger directly.
@@ -75,14 +75,14 @@ How the projection is maintained, migration commands and caching: `src/Entity/AG
 - PHP 8.5; Symfony 8.1 (framework, security, messenger, scheduler, asset-mapper, ux-live-component, workflow).
 - Doctrine ORM 3, attribute mapping, two entity managers, patched at install for sub-decision joins (`composer.json` `extra.patches`).
 - FrankenPHP worker mode behind Caddy. Worker-mode safety is non-negotiable: `make igor`.
-- API Platform 5 serves almost all of `^/api` alongside hand-written endpoints in `src/Controller/Report`.
+- API Platform 5 serves almost all of `^/api` alongside hand-written endpoints in `src/Controller/Api`.
 - Messenger (RabbitMQ in dev, in-memory in test) and Scheduler; Symfony Workflow for revisions.
 - Twig + Stimulus (TypeScript via SWC) + Live Components; Bootstrap, Font Awesome, Sass, asset-mapper. No npm; third-party JS is vendored under `assets/vendor/`.
 - Altcha (captcha on public forms), Stripe, Mailman and Listmonk, Mercure, Mailer (MailPit in dev), Notifier, Matomo, `scheb/2fa`.
 
 ## Layout
 
-Classes are grouped by the role they play, then by domain. The entity domains are **Activity**, **Application**, **Career**, **Database** (the ledger), **Decision** (the projection; there are no `Report` entities), **Education**, **Frontpage**, **Photo** and **User**. `Report` and `Checker` are machinery without entities: `Report` maintains and serves the projection, `Checker` enforces consistency over the ledger, `Application` is what is shared. A member, a meeting or an organ is an entity *in* a domain, never a domain of its own; there is no `Api` domain.
+Classes are grouped by the role they play, then by domain. The entity domains are **Activity**, **Application**, **Career**, **Database** (the ledger), **Decision** (the projection), **Education**, **Frontpage**, **Photo** and **User**. `Api` and `Checker` are machinery without entities: `Api` is the API contract (versioning, the envelope, the OpenAPI document, the hand-written endpoints), `Checker` enforces consistency over the ledger, `Application` is what is shared. A member, a meeting or an organ is an entity *in* a domain, never a domain of its own.
 
 ```
 src/

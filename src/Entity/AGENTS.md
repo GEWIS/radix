@@ -1,16 +1,16 @@
 # Entities, the projection and caching
 
-Read the root `AGENTS.md` first; this adds the detail for `src/Entity/`, `src/Service/Report` and the Report listeners.
+Read the root `AGENTS.md` first; this adds the detail for `src/Entity/`, `src/Service/Decision` and the Decision listeners.
 
 ## The projection
 
 The projection is not a cache to bypass, and not a copy to let drift.
 
-- `App\Service\Report` writes it.
-- `App\EventListener\Report\DatabaseUpdateListener` and `DatabaseDeletionListener` keep it level with the ledger as the ledger is written.
+- `App\Service\Decision` writes it.
+- `App\EventListener\Decision\DatabaseUpdateListener` and `DatabaseDeletionListener` keep it level with the ledger as the ledger is written.
 - `app:decision:generate` rebuilds it from the ledger. Run it after a bulk change.
-- `App\EventListener\Report\BulkLoadListener` stands the listeners down while fixtures load.
-- A change to a ledger entity (`src/Entity/Database`) MUST come with the matching change in `src/Entity/Decision` and `src/Service/Report`.
+- `App\EventListener\Decision\BulkLoadListener` stands the listeners down while fixtures load.
+- A change to a ledger entity (`src/Entity/Database`) MUST come with the matching change in `src/Entity/Decision` and `src/Service/Decision`.
 - `make sf c=check:database` runs the consistency checks from the Articles of Association and Internal Regulations. Run it after anything that changes decisions or installations; it is the only thing that catches data the regulations forbid.
 
 ## Doctrine second-level cache

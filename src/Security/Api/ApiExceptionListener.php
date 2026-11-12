@@ -6,10 +6,10 @@ namespace App\Security\Api;
 
 use App\Entity\Application\Enums\ApiResponseStatuses;
 use App\Entity\User\Enums\ApiPermissions;
+use App\Exception\Api\VersionExpected;
+use App\Exception\Api\VersionFormat;
+use App\Exception\Api\VersionIncompatible;
 use App\Exception\Database\AnnulmentNotPossible;
-use App\Exception\Report\VersionExpected;
-use App\Exception\Report\VersionFormat;
-use App\Exception\Report\VersionIncompatible;
 use App\Exception\User\ApiException;
 use App\Exception\User\NotAllowed;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;

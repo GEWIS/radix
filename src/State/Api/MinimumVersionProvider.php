@@ -7,7 +7,7 @@ namespace App\State\Api;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\EventListener\Api\VendorAcceptListener;
-use App\Service\Report\ApiService;
+use App\Service\Api\ApiService;
 use Override;
 use PHLAK\SemVer\Version as SemanticVersion;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;

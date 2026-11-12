@@ -9,7 +9,7 @@ use App\Entity\Database\RenewalLink as RenewalLinkModel;
 use App\Entity\Decision\OrganMember as OrganMemberModel;
 use App\Repository\Checker\MemberRepository;
 use App\Repository\Database\ActionLinkRepository;
-use App\Repository\Decision\MemberRepository as ReportMemberRepository;
+use App\Repository\Decision\MemberRepository as DecisionMemberRepository;
 use App\Service\Application\Email as EmailService;
 use DateInterval;
 use DateTimeImmutable;
@@ -26,7 +26,7 @@ class Renewal
     public function __construct(
         private readonly ActionLinkRepository $actionLinkRepository,
         private readonly MemberRepository $memberRepository,
-        private readonly ReportMemberRepository $reportMemberRepository,
+        private readonly DecisionMemberRepository $decisionMemberRepository,
         private readonly EmailService $emailService,
         private readonly UrlGeneratorInterface $urlGenerator,
     ) {
@@ -62,8 +62,8 @@ class Renewal
 
     private function sendRenewalEmail(RenewalLinkModel $link): void
     {
-        $reportMember = $this->reportMemberRepository->findSimple($link->member->lidnr);
-        $isInstalled = !$reportMember->getOrganInstallations()
+        $decisionMember = $this->decisionMemberRepository->findSimple($link->member->lidnr);
+        $isInstalled = !$decisionMember->getOrganInstallations()
             ->filter(static fn (OrganMemberModel $member) => $member->isCurrent())
             ->isEmpty();
 

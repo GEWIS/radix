@@ -30,7 +30,7 @@ use App\Form\Database\MinutesType;
 use App\Form\Database\OrganRegulationType;
 use App\Form\Database\OtherTranslationType;
 use App\Form\Database\OtherType;
-use App\Form\Report\ExportType;
+use App\Form\Decision\ExportType;
 use App\Service\Database\Meeting as MeetingService;
 use App\ViewModel\Database\UntranslatedDecision;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
