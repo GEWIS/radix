@@ -115,6 +115,17 @@ final class PageContentSanitizerTest extends KernelTestCase
             '<td>One</td>',
         ];
 
+        // A collapsible section. The page styles its chevron off the `open` attribute, so it must survive as well.
+        yield 'a collapsible section' => [
+            '<details><summary>The title</summary><p>Hidden text</p></details>',
+            '<summary>The title</summary>',
+        ];
+
+        yield 'an open collapsible section' => [
+            '<details open><summary>The title</summary><p>Hidden text</p></details>',
+            '<details open',
+        ];
+
         // Images uploaded through the editor are served from our own pipeline, so they arrive site-relative.
         yield 'an image of ours' => [
             '<img src="/img/w1280/page-images/ab/abcdef.jpg" alt="A photo">',

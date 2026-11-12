@@ -29,6 +29,8 @@ framework:
                     figcaption: ['class', 'style']
                     hr: ['class', 'style']
                     br: ['class']
+                    details: ['class', 'style', 'open']
+                    summary: ['class', 'style']
                     # Lists.
                     ul: ['class', 'style']
                     ol: ['class', 'style', 'start', 'type']
