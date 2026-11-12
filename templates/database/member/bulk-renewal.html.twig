@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block contents %}
-    {{ form_start(form) }}
+    {{ form_start(form, {attr: {'data-turbo': 'false'}}) }}
     <div class="row g-3">
         <div class="col-12 col-xl-7">
             <div class="panel">
@@ -36,7 +36,7 @@
 
                     <div class="d-flex flex-wrap gap-2">
                         {{ form_widget(form.submit, {attr: {class: 'btn-gewis-primary'}}) }}
-                        <a href="{{ path('member_index') }}" class="btn btn-secondary">{{ 'Cancel'|trans }}</a>
+                        <a href="{{ path('member_attention_index') }}" class="btn btn-secondary">{{ 'Cancel'|trans }}</a>
                     </div>
                 </div>
             </div>
