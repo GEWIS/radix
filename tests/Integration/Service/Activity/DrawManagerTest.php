@@ -5,26 +5,35 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Service\Activity;
 
 use App\Entity\Activity\Enums\AllocationMethod;
+use App\Entity\Activity\Enums\CohortTier;
 use App\Entity\Activity\Enums\DrawCutoffRule;
 use App\Entity\Activity\Enums\MembershipPriorityMode;
 use App\Entity\Activity\Enums\MembershipTier;
 use App\Entity\Activity\ExternalSignup;
+use App\Entity\Activity\Signup;
 use App\Entity\Activity\SignupList;
+use App\Entity\Activity\UserSignup;
+use App\Entity\Application\AssociationYear;
 use App\Entity\Decision\Member;
 use App\Service\Activity\DrawManager;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
 
 use function array_map;
+use function array_slice;
 use function count;
+use function in_array;
 use function json_encode;
+use function usort;
 
 /**
  * The shared draw runner behind both the board's manual draw and the automated deadline draw. Pinned here: the guard
  * differences between the two paths (a manual draw needs close or a passed draw moment, an automated draw its own
  * moment), the one-shot lock, the audit stamp (a member for manual, null for automated), the refusal to touch
  * manual-allocation lists and that the manual fallback draws the same cutoff snapshot as an on-time automated draw.
- * Dates are pinned explicitly per scenario, so nothing depends on seed freshness.
+ * Dates are pinned explicitly per scenario, so nothing depends on seed freshness, except the expected-admission
+ * scenarios, which read the closed, not-yet-drawn allocation-matrix lists #22 (C2: cohort order) and #34 (G2:
+ * unranked) exactly as the draw at close will admit them.
  *
  * Activity #9 (the Gala) has an open limited list (#6, capacity 2, four waitlisted sign-ups); activity #13 (the
  * Excursion) has a closed limited list (#11, capacity 2, four sign-ups).
@@ -513,6 +522,139 @@ final class DrawManagerTest extends DatabaseTestCase
         self::assertSame(
             2,
             $this->drawnCount($list),
+        );
+    }
+
+    public function testTheExpectedAdmissionOfAnUnrankedFirstComeFirstServedListIsInSignupOrder(): void
+    {
+        $list = $this->list(34); // G2: capacity four, eleven sign-ups, no priority modifiers.
+        $expected = $this->drawManager()->expectedAdmission($list);
+        $confirmed = $this->confirmed($list);
+
+        self::assertSame(
+            $this->ids(array_slice($confirmed, 0, 4)),
+            $this->ids($expected['admitted']),
+        );
+        self::assertSame(
+            $this->ids(array_slice($confirmed, 4)),
+            $this->ids($expected['waitlisted']),
+        );
+    }
+
+    public function testTheExpectedAdmissionTakesTheListCohortOrderIntoAccount(): void
+    {
+        $list = $this->list(22); // C2: capacity four, nine sign-ups, first years before second years before seniors.
+        $expected = $this->drawManager()->expectedAdmission($list);
+        $confirmed = $this->confirmed($list);
+
+        $year = AssociationYear::fromDate(new DateTimeImmutable())->getYear();
+        $ranked = [];
+        foreach ($confirmed as $signup) {
+            self::assertInstanceOf(
+                UserSignup::class,
+                $signup,
+            );
+            $ranked[] = [
+                $this->cohortRank(
+                    $list,
+                    $signup->user->generation,
+                    $year,
+                ),
+                $signup,
+            ];
+        }
+
+        // The list's order is applied stably over the sign-up order, so only the rank breaks ties.
+        usort(
+            $ranked,
+            static fn (array $a, array $b): int => $a[0] <=> $b[0],
+        );
+
+        $ordered = array_map(
+            static fn (array $entry): Signup => $entry[1],
+            $ranked,
+        );
+        self::assertSame(
+            $this->ids(array_slice($ordered, 0, 4)),
+            $this->ids($expected['admitted']),
+        );
+        self::assertSame(
+            $this->ids(array_slice($ordered, 4)),
+            $this->ids($expected['waitlisted']),
+        );
+    }
+
+    /**
+     * The list's confirmed sign-ups in id order (an external still awaiting its double opt-in is not a subscriber).
+     *
+     * @return list<Signup>
+     */
+    private function confirmed(SignupList $list): array
+    {
+        $confirmed = [];
+        foreach ($list->getSignUps() as $signup) {
+            if (
+                $signup instanceof ExternalSignup
+                && null === $signup->verifiedAt
+            ) {
+                continue;
+            }
+
+            $confirmed[] = $signup;
+        }
+
+        usort(
+            $confirmed,
+            static fn (Signup $a, Signup $b): int => $a->id <=> $b->id,
+        );
+
+        return $confirmed;
+    }
+
+    /**
+     * The position of a generation's rank in the list's configured cohort order.
+     */
+    private function cohortRank(
+        SignupList $list,
+        int $generation,
+        int $year,
+    ): int {
+        $tier = $generation < 1
+            ? CohortTier::Unknown
+            : match ($year - $generation) {
+                0 => CohortTier::FirstYear,
+                1 => CohortTier::SecondYear,
+                default => CohortTier::Senior,
+            };
+
+        $order = $list->getCohortTierOrder();
+        self::assertNotNull($order);
+
+        foreach ($order as $position => $rank) {
+            if (
+                in_array(
+                    $tier,
+                    $rank,
+                    true,
+                )
+            ) {
+                return $position;
+            }
+        }
+
+        self::fail("The list's cohort order does not contain the tier the sign-up belongs to.");
+    }
+
+    /**
+     * @param list<Signup> $signups
+     *
+     * @return list< ?int >
+     */
+    private function ids(array $signups): array
+    {
+        return array_map(
+            static fn (Signup $signup): ?int => $signup->id,
+            $signups,
         );
     }
 

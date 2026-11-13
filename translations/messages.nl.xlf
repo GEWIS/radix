@@ -3453,6 +3453,14 @@
         <source>Email sign-ups</source>
         <target>Inschrijvingen e-mailen</target>
       </trans-unit>
+      <trans-unit id="iSwRI54" resname="Email the expected admittees">
+        <source>Email the expected admittees</source>
+        <target state="translated">Verwachte toegelatenen e-mailen</target>
+      </trans-unit>
+      <trans-unit id="U6ESI2T" resname="Email the expected waiting list">
+        <source>Email the expected waiting list</source>
+        <target state="translated">Verwachte wachtlijst e-mailen</target>
+      </trans-unit>
       <trans-unit id="c.6lvru" resname="Email the waiting list">
         <source>Email the waiting list</source>
         <target>Wachtlijst e-mailen</target>
@@ -3812,6 +3820,14 @@
       <trans-unit id="eQiPQYt" resname="Exit impersonation">
         <source>Exit impersonation</source>
         <target state="translated">Verlaat de imitatiemodus</target>
+      </trans-unit>
+      <trans-unit id="XPzK3Vo" resname="Expected admittees">
+        <source>Expected admittees</source>
+        <target state="translated">Verwachte toegelatenen</target>
+      </trans-unit>
+      <trans-unit id="gL8WxY0" resname="Expected waiting list">
+        <source>Expected waiting list</source>
+        <target state="translated">Verwachte wachtlijst</target>
       </trans-unit>
       <trans-unit id="owCbCHc" resname="Expiration">
         <source>Expiration</source>
@@ -9848,6 +9864,14 @@
       <trans-unit id="9GQe.io" resname="The payment link has been sent again.">
         <source>The payment link has been sent again.</source>
         <target state="translated">De betaallink is opnieuw verstuurd.</target>
+      </trans-unit>
+      <trans-unit id="Y6FwVM5" resname="The people expected to have a place on %list%, the priority order taken into account.">
+        <source>The people expected to have a place on %list%, the priority order taken into account.</source>
+        <target state="translated">De mensen die bij de toeloting naar verwachting een plaats krijgen op %list%, de ingestelde prioriteitsvolgorde meegeteld.</target>
+      </trans-unit>
+      <trans-unit id="yuLmoPj" resname="The people expected to wait for a place on %list%, the priority order taken into account.">
+        <source>The people expected to wait for a place on %list%, the priority order taken into account.</source>
+        <target state="translated">De mensen die bij de toeloting naar verwachting op een plaats op %list% moeten wachten, de ingestelde prioriteitsvolgorde meegeteld.</target>
       </trans-unit>
       <trans-unit id="dHbvW.F" resname="The people marked present on %list%.">
         <source>The people marked present on %list%.</source>

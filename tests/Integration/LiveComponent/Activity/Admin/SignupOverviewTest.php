@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\LiveComponent\Activity\Admin;
 
 use App\Entity\Activity\Activity;
+use App\Entity\Activity\Enums\RecipientScope;
 use App\Entity\Activity\SignupList;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\User\User;
@@ -36,7 +37,10 @@ use function strval;
  * the substantive per-action authorisation ({@see SignupOverview::assertAccess()}, board-only draws) is.
  *
  * Activity #9 (the Gala) has one limited list (#6) with four subscribers; activity #13 (the Excursion) has a closed,
- * not-yet-drawn limited list (#11, capacity 2, four sign-ups) ready for a draw.
+ * not-yet-drawn limited list (#11, capacity 2, four sign-ups) ready for a draw. The allocation-matrix activities
+ * cover the expected admittees / waiting list of a first-come-first-served list before its draw: #18 (A2) ranks
+ * by membership tier, #24 (C2) by cohort, #36 (G2) is an unranked first-come-first-served list; all three are
+ * closed and not yet drawn, while #37 (G3) is the same list, drawn, and #33 (F2) a not-yet-drawn conditional draw.
  */
 final class SignupOverviewTest extends DatabaseTestCase
 {
@@ -475,6 +479,336 @@ final class SignupOverviewTest extends DatabaseTestCase
         self::assertSame(
             AlertTypes::Warning->value,
             $component->feedbackType,
+        );
+    }
+
+    public function testTheExpectedScopesAreOfferedWhileTheFirstComeFirstServedDrawIsStillOpen(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+
+        // A1 is open, A2 and G2 are closed; none has been drawn, so all three offer the expectation.
+        $scopes = [];
+        foreach ([17, 18, 36] as $activityId) {
+            $component = $this->overviewFor($activityId);
+            $scopes = array_column(
+                $component->getAudiences(),
+                'scope',
+            );
+            self::assertContains(
+                RecipientScope::ExpectedAdmitted,
+                $scopes,
+            );
+            self::assertContains(
+                RecipientScope::ExpectedWaitlisted,
+                $scopes,
+            );
+            // Admission is not settled, so the settled scopes are not offered next to them.
+            self::assertNotContains(
+                RecipientScope::Admitted,
+                $scopes,
+            );
+            self::assertNotContains(
+                RecipientScope::Waitlisted,
+                $scopes,
+            );
+        }
+
+        // A2 (list #16): capacity four of eleven subscribers, so the expectation splits 4 / 7.
+        $component = $this->overviewFor(18);
+        foreach ($component->getAudiences() as $audience) {
+            if (
+                RecipientScope::ExpectedAdmitted === $audience['scope']
+            ) {
+                self::assertSame(
+                    4,
+                    $audience['count'],
+                );
+            }
+
+            if (
+                RecipientScope::ExpectedWaitlisted !== $audience['scope']
+            ) {
+                continue;
+            }
+
+            self::assertSame(
+                7,
+                $audience['count'],
+            );
+        }
+
+        // The composer renders the offered scopes as its audience choices.
+        $html = $this->render(
+            18,
+            ['composerOpen' => true],
+        );
+        self::assertStringContainsString(
+            'Expected admittees',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Expected waiting list',
+            $html,
+        );
+    }
+
+    public function testTheExpectedScopesAreNotOfferedOnceTheDrawIsLocked(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(37); // G3: first-come-first-served, drawn.
+
+        $scopes = array_column(
+            $component->getAudiences(),
+            'scope',
+        );
+        self::assertNotContains(
+            RecipientScope::ExpectedAdmitted,
+            $scopes,
+        );
+        self::assertNotContains(
+            RecipientScope::ExpectedWaitlisted,
+            $scopes,
+        );
+        // The settled scopes take over once the draw has locked the list.
+        self::assertContains(
+            RecipientScope::Admitted,
+            $scopes,
+        );
+        self::assertContains(
+            RecipientScope::Waitlisted,
+            $scopes,
+        );
+    }
+
+    public function testTheExpectedScopesAreNotOfferedForAConditionalDraw(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(33); // F2: a not-yet-drawn conditional draw has no deterministic expectation.
+
+        $scopes = array_column(
+            $component->getAudiences(),
+            'scope',
+        );
+        self::assertNotContains(
+            RecipientScope::ExpectedAdmitted,
+            $scopes,
+        );
+        self::assertNotContains(
+            RecipientScope::ExpectedWaitlisted,
+            $scopes,
+        );
+    }
+
+    public function testSendingToTheExpectedScopesReachesWhatTheDrawWillDecide(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(24); // C2: capacity four, nine sign-ups, ranked by cohort.
+
+        $component->setScope('expected-admitted');
+        $component->emailSubject = 'You have a place';
+        $component->emailBody = 'When the list is drawn, you are in.';
+        $component->sendEmail(22);
+
+        $component->setScope('expected-waitlisted');
+        $component->emailSubject = 'You are waiting';
+        $component->emailBody = 'When the list is drawn, you wait.';
+        $component->sendEmail(22);
+
+        // The draw is first-come-first-served, so it is deterministic: the admitted and waiting sets it produces
+        // are exactly what the expectation computed before it ran.
+        $component->drawFirstCome(22);
+
+        $list = $this->entityManager->getRepository(SignupList::class)->find(22);
+        self::assertInstanceOf(
+            SignupList::class,
+            $list,
+        );
+        self::assertNotNull($list->drawnAt);
+
+        $drawn = [];
+        $waiting = [];
+        foreach ($list->getSignUps() as $signup) {
+            $email = $signup->getEmail();
+            if (null === $email) {
+                continue;
+            }
+
+            if ($signup->drawn) {
+                $drawn[] = $email;
+            } else {
+                $waiting[] = $email;
+            }
+        }
+
+        $sent = $this->bulkMessages();
+        self::assertCount(
+            2,
+            $sent,
+        );
+        self::assertEqualsCanonicalizing(
+            $drawn,
+            array_column(
+                $sent[0]->getRecipients(),
+                'email',
+            ),
+        );
+        self::assertEqualsCanonicalizing(
+            $waiting,
+            array_column(
+                $sent[1]->getRecipients(),
+                'email',
+            ),
+        );
+        self::assertCount(
+            4,
+            $drawn,
+        );
+        self::assertCount(
+            5,
+            $waiting,
+        );
+    }
+
+    public function testTheExpectedScopesOfAListWithReservedPlacesReachWhatTheDrawWillDecide(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(21); // B2: capacity eight, thirteen sign-ups, places held back.
+
+        $component->setScope('expected-admitted');
+        $component->emailSubject = 'You have a place';
+        $component->emailBody = 'When the list is drawn, you are in.';
+        $component->sendEmail(19);
+
+        $component->setScope('expected-waitlisted');
+        $component->emailSubject = 'You are waiting';
+        $component->emailBody = 'When the list is drawn, you wait.';
+        $component->sendEmail(19);
+
+        $component->drawFirstCome(19);
+
+        $list = $this->entityManager->getRepository(SignupList::class)->find(19);
+        self::assertInstanceOf(
+            SignupList::class,
+            $list,
+        );
+
+        $drawn = [];
+        $waiting = [];
+        foreach ($list->getSignUps() as $signup) {
+            $email = $signup->getEmail();
+            if (null === $email) {
+                continue;
+            }
+
+            if ($signup->drawn) {
+                $drawn[] = $email;
+            } else {
+                $waiting[] = $email;
+            }
+        }
+
+        $sent = $this->bulkMessages();
+        self::assertCount(
+            2,
+            $sent,
+        );
+        self::assertEqualsCanonicalizing(
+            $drawn,
+            array_column(
+                $sent[0]->getRecipients(),
+                'email',
+            ),
+        );
+        self::assertEqualsCanonicalizing(
+            $waiting,
+            array_column(
+                $sent[1]->getRecipients(),
+                'email',
+            ),
+        );
+        self::assertCount(
+            8,
+            $drawn,
+        );
+        self::assertCount(
+            5,
+            $waiting,
+        );
+    }
+
+    public function testTheExpectedScopesAreRefusedOnceTheDrawIsLocked(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(37); // G3: drawn, so the expectation is no longer offered.
+        $component->setScope('expected-admitted');
+        $component->emailSubject = 'You have a place';
+        $component->emailBody = 'Too late: the list is already drawn.';
+
+        $component->sendEmail(35);
+
+        self::assertSame(
+            [],
+            $this->bulkMessages(),
+        );
+        self::assertSame(
+            AlertTypes::Warning->value,
+            $component->feedbackType,
+        );
+    }
+
+    public function testTheExpectedScopesAreRefusedInPeopleMode(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $component = $this->overviewFor(36);
+        $component->setMode(SignupOverview::MODE_PEOPLE);
+        $component->setScope('expected-admitted');
+        $component->emailSubject = 'You have a place';
+        $component->emailBody = 'Admission is per sign-up list, so it cannot be stated across them.';
+
+        $component->sendToPeople();
+
+        self::assertSame(
+            [],
+            $this->bulkMessages(),
+        );
+        self::assertSame(
+            AlertTypes::Warning->value,
+            $component->feedbackType,
+        );
+    }
+
+    public function testTheRowOffersTheExpectedEmailShortcutsInsteadOfTheSettledOnes(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+
+        // A2 is not yet drawn, so the row's email shortcuts are the expected pair rather than the settled one.
+        $html = $this->render(18);
+        self::assertStringContainsString(
+            'Email the expected admittees',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Email the expected waiting list',
+            $html,
+        );
+        self::assertStringNotContainsString(
+            'Email admittees',
+            $html,
+        );
+
+        // G3 is drawn, so the settled pair shows and the expected ones are not offered alongside it.
+        $html = $this->render(37);
+        self::assertStringContainsString(
+            'Email admittees',
+            $html,
+        );
+        self::assertStringContainsString(
+            'Email the waiting list',
+            $html,
+        );
+        self::assertStringNotContainsString(
+            'Email the expected admittees',
+            $html,
         );
     }
 

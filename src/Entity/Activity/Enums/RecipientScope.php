@@ -11,9 +11,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Which subscribers of a sign-up list a bulk email is addressed to. Mirrors the
  * Subscribee -> Admittee -> Attendee progression: {@see self::All} is every subscriber, {@see self::Admitted} and
- * {@see self::Waitlisted} the drawn / not-drawn halves of a limited-capacity list, {@see self::Present} the
- * attendees and {@see self::NoShow} the admittees who were not marked present. {@see self::Selected} cuts across all
- * of these: the rows the organiser ticked by hand.
+ * {@see self::Waitlisted} the drawn / not-drawn halves of a limited-capacity list, {@see self::ExpectedAdmitted} and
+ * {@see self::ExpectedWaitlisted} the same two halves of a first-come-first-served list before its draw, in the order
+ * the draw admits them, {@see self::Present} the attendees and {@see self::NoShow} the admittees who were
+ * not marked present. {@see self::Selected} cuts across all of these: the rows the organiser ticked by hand.
  */
 enum RecipientScope: string implements TranslatableInterface
 {
@@ -28,6 +29,12 @@ enum RecipientScope: string implements TranslatableInterface
 
     /** The waiting list of a limited-capacity list (drawn === false). */
     case Waitlisted = 'waitlisted';
+
+    /** The people a first-come-first-served list will admit when it is drawn (priority modifiers applied). */
+    case ExpectedAdmitted = 'expected-admitted';
+
+    /** The people a first-come-first-served list will waitlist when it is drawn (priority modifiers applied). */
+    case ExpectedWaitlisted = 'expected-waitlisted';
 
     /** The attendees: those marked present. */
     case Present = 'present';
@@ -57,6 +64,14 @@ enum RecipientScope: string implements TranslatableInterface
             ),
             self::Admitted => $translator->trans(
                 'Admittees',
+                locale: $locale,
+            ),
+            self::ExpectedAdmitted => $translator->trans(
+                'Expected admittees',
+                locale: $locale,
+            ),
+            self::ExpectedWaitlisted => $translator->trans(
+                'Expected waiting list',
                 locale: $locale,
             ),
             self::Waitlisted => $translator->trans(
