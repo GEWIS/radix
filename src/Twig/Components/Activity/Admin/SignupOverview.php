@@ -402,7 +402,9 @@ final class SignupOverview
     /**
      * The recipient groups offered in the composer for what is on screen, each with how many people it reaches and
      * what it means. {@see RecipientScope::Admitted}/{@see RecipientScope::Waitlisted} only distinguish anybody on a
-     * limited-capacity list, where a draw sets admittees apart from the waiting list.
+     * limited-capacity list whose admission is settled (drawn or set by hand); on a first-come-first-served list
+     * whose draw has not run yet, {@see RecipientScope::ExpectedAdmitted}/{@see RecipientScope::ExpectedWaitlisted}
+     * are the two halves the draw will produce, in the list's priority order.
      *
      * @return list<array{scope: RecipientScope, count: int, explain: string}>
      */
@@ -475,6 +477,28 @@ final class SignupOverview
                     RecipientScope::Waitlisted,
                     $this->translator->trans(
                         'Only the people still waiting for a place on %list%.',
+                        ['%list%' => $name],
+                    ),
+                ];
+            }
+
+            if (
+                null !== $list
+                && $list->limitedCapacity
+                && !$list->drawLocked
+                && AllocationMethod::FirstComeFirstServed === $list->allocationMethod
+            ) {
+                $scopes[] = [
+                    RecipientScope::ExpectedAdmitted,
+                    $this->translator->trans(
+                        'The people expected to have a place on %list%, the priority order taken into account.',
+                        ['%list%' => $name],
+                    ),
+                ];
+                $scopes[] = [
+                    RecipientScope::ExpectedWaitlisted,
+                    $this->translator->trans(
+                        'The people expected to wait for a place on %list%, the priority order taken into account.',
                         ['%list%' => $name],
                     ),
                 ];
@@ -689,7 +713,20 @@ final class SignupOverview
         $selected = $this->selectedIds();
         $recipients = [];
         $seen = [];
+        // The expected scopes are not offered in people mode, but $scope is a writable prop; a stale one falls back
+        // to the per-list resolution the other per-list scopes use here.
+        $expectedScopes = [
+            RecipientScope::ExpectedAdmitted,
+            RecipientScope::ExpectedWaitlisted,
+        ];
         foreach ($this->activity->getLiveSignupLists() as $signupList) {
+            $expected = in_array(
+                $scope,
+                $expectedScopes,
+                true,
+            )
+                ? $this->expectedSignupIds($signupList)
+                : null;
             foreach ($this->confirmedSignups($signupList) as $signup) {
                 $key = $signup->personKey();
                 $memberships = $this->memberships()[$key] ?? [];
@@ -707,6 +744,18 @@ final class SignupOverview
                     ),
                     RecipientScope::Admitted => $signup->drawn,
                     RecipientScope::NoShow => $signup->drawn && !$signup->present,
+                    RecipientScope::ExpectedAdmitted => null !== $expected
+                        && in_array(
+                            $signup->id,
+                            $expected['admitted'],
+                            true,
+                        ),
+                    RecipientScope::ExpectedWaitlisted => null !== $expected
+                        && in_array(
+                            $signup->id,
+                            $expected['waitlisted'],
+                            true,
+                        ),
                 };
 
                 if (
@@ -1288,14 +1337,20 @@ final class SignupOverview
             || $signupList->allocationMethod->isManual();
 
         // Admitted/Waitlisted only distinguish recipients on a limited list whose admission is settled; anywhere else
-        // the two would silently resolve to "everyone" and "no one". Admitted-but-not-present needs the same, except
-        // on a list with no capacity to be admitted to, where every sign-up has a place from the start and the group
-        // is everybody who was absent. The composer offers each of them in exactly these circumstances, but $scope is
-        // a writable prop, so re-check it here.
+        // the two would silently resolve to "everyone" and "no one". Their expected counterparts exist only on a
+        // first-come-first-served list whose draw has not run yet; once the draw locks the list, the settled
+        // scopes apply and the expectation is the outcome itself. Admitted-but-not-present needs the settled
+        // guard too, except on a list with no capacity to be admitted to, where every sign-up has a place from the
+        // start and the group is everybody who was absent. The composer offers each of them in exactly these
+        // circumstances, but $scope is a writable prop, so re-check it here.
         $unavailable = match ($scope) {
             RecipientScope::Multi => true,
             RecipientScope::Admitted,
             RecipientScope::Waitlisted => !$signupList->limitedCapacity || !$admissionSettled,
+            RecipientScope::ExpectedAdmitted,
+            RecipientScope::ExpectedWaitlisted => !$signupList->limitedCapacity
+                || $signupList->isDrawLocked()
+                || AllocationMethod::FirstComeFirstServed !== $signupList->allocationMethod,
             RecipientScope::NoShow => $signupList->limitedCapacity && !$admissionSettled,
             RecipientScope::All,
             RecipientScope::Selected,
@@ -1345,6 +1400,8 @@ final class SignupOverview
                 [
                     RecipientScope::Admitted,
                     RecipientScope::NoShow,
+                    RecipientScope::ExpectedAdmitted,
+                    RecipientScope::ExpectedWaitlisted,
                 ],
                 true,
             )
@@ -1569,6 +1626,17 @@ final class SignupOverview
     ): array {
         // Normalise once: the $selected LiveProp contains checkbox-supplied strings, while getId() is an int.
         $selected = $this->selectedIds();
+        // The expected admission orders the whole list, so it is computed once, not per row.
+        $expected = in_array(
+            $scope,
+            [
+                RecipientScope::ExpectedAdmitted,
+                RecipientScope::ExpectedWaitlisted,
+            ],
+            true,
+        )
+            ? $this->expectedSignupIds($signupList)
+            : null;
         $recipients = [];
         foreach ($this->confirmedSignups($signupList) as $signup) {
             $external = !$signup instanceof UserSignup;
@@ -1585,6 +1653,18 @@ final class SignupOverview
                 RecipientScope::Waitlisted => !$signup->drawn,
                 RecipientScope::External => $external,
                 RecipientScope::Multi => count($this->memberships()[$signup->personKey()] ?? []) > 1,
+                RecipientScope::ExpectedAdmitted => null !== $expected
+                    && in_array(
+                        $signup->id,
+                        $expected['admitted'],
+                        true,
+                    ),
+                RecipientScope::ExpectedWaitlisted => null !== $expected
+                    && in_array(
+                        $signup->id,
+                        $expected['waitlisted'],
+                        true,
+                    ),
             };
 
             if (!$include) {
@@ -1605,6 +1685,32 @@ final class SignupOverview
         }
 
         return $recipients;
+    }
+
+    /**
+     * The expected admittees and waiting list of a first-come-first-served list that has not yet been drawn, as
+     * lists of signup ids: what the draw at close will admit once the list's priority modifiers are applied.
+     *
+     * @return array{admitted: list<int>, waitlisted: list<int>}
+     */
+    private function expectedSignupIds(SignupList $signupList): array
+    {
+        $expected = $this->drawManager->expectedAdmission($signupList);
+        $ids = [
+            'admitted' => [],
+            'waitlisted' => [],
+        ];
+        foreach (['admitted', 'waitlisted'] as $half) {
+            foreach ($expected[$half] as $signup) {
+                if (null === $signup->id) {
+                    continue;
+                }
+
+                $ids[$half][] = $signup->id;
+            }
+        }
+
+        return $ids;
     }
 
     /**

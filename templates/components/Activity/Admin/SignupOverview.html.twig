@@ -230,6 +230,18 @@
                                     <span class="fas {{ isFcfs ? 'fa-list-ol' : 'fa-dice' }}"></span>
                                     {{ isFcfs ? 'First-come-first-served'|trans : 'Random draw'|trans }}
                                 </button>
+                                {% if isFcfs %}
+                                    <button type="button" class="btn btn-sm btn-outline-gewis-primary"
+                                            data-action="live#action" data-live-action-param="openComposer"
+                                            data-live-scope-param="expected-admitted">
+                                        <span class="fas fa-envelope"></span> {{ 'Email the expected admittees'|trans }}
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            data-action="live#action" data-live-action-param="openComposer"
+                                            data-live-scope-param="expected-waitlisted">
+                                        <span class="fas fa-envelope"></span> {{ 'Email the expected waiting list'|trans }}
+                                    </button>
+                                {% endif %}
                             {% endif %}
                             {% if list.isOpen and not list.frozen %}
                                 <a class="btn btn-sm btn-outline-success"

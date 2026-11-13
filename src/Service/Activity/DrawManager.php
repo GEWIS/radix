@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Random\Randomizer;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+use function array_slice;
 use function array_values;
 use function usort;
 
@@ -82,6 +83,36 @@ final readonly class DrawManager
             null,
             requireDue: true,
         );
+    }
+
+    /**
+     * The admission a first-come-first-served list will reach when it is drawn: its confirmed sign-ups in the order
+     * the draw admits them (priority modifiers applied), split into the first capacity, who will get a place, and
+     * the rest, who will wait. The draw is deterministic for this method, so the expectation is exact up to new
+     * sign-ups before close, and the method only reads the list, so it may be used while the draw is still open. A list
+     * with no capacity admits nobody, like the draw {@see self::canDraw()} refuses to run on it.
+     *
+     * @return array{admitted: list<Signup>, waitlisted: list<Signup>}
+     */
+    public function expectedAdmission(SignupList $list): array
+    {
+        $ordered = $this->signupsInDrawOrder(
+            $list,
+            AllocationMethod::FirstComeFirstServed,
+        );
+        $capacity = $list->capacity ?? 0;
+
+        return [
+            'admitted' => array_slice(
+                $ordered,
+                0,
+                $capacity,
+            ),
+            'waitlisted' => array_slice(
+                $ordered,
+                $capacity,
+            ),
+        ];
     }
 
     private function runDraw(
