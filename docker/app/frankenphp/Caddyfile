@@ -31,7 +31,8 @@
 	root /app/public
 
 	mercure {
-		issuer radix {
+		name default
+		issuer {$MERCURE_TRUSTED_ISSUERS:http://localhost} {
 			publisher {
 				jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
 			}
@@ -39,6 +40,8 @@
 				jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
 			}
 		}
+		resource_identifier {$MERCURE_PUBLIC_URL}
+		cors_origins {$DEFAULT_URI}
 		transport bolt {
 			path /data/caddy/mercure.db
 			# 0 is no limit rather than no history, and cleanup has nothing to trim against. Past some size a

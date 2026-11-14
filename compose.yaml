@@ -62,6 +62,8 @@ x-app-environment: &app_environment
     # reload, production leaves the hub closed (no `anonymous`) and idle.
     MERCURE_URL: "${MERCURE_URL:-http://app/.well-known/mercure}"
     MERCURE_PUBLIC_URL: "${MERCURE_PUBLIC_URL:?MERCURE_PUBLIC_URL must be set}"
+    MERCURE_JWT_ISSUER: "${DEFAULT_URI}"
+    MERCURE_TRUSTED_ISSUERS: "${MERCURE_JWT_ISSUER}"
     MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET must be set}"
     MERCURE_PUBLISHER_JWT_KEY: "${MERCURE_JWT_SECRET}"
     MERCURE_SUBSCRIBER_JWT_KEY: "${MERCURE_JWT_SECRET}"

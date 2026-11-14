@@ -76,7 +76,6 @@ services:
                 watch ./var/typescript
             FRANKENPHP_SITE_CONFIG: "hot_reload"
             MERCURE_EXTRA_DIRECTIVES: |
-                cors_origins ${APP_URL}
                 playground
                 anonymous
             # See https://xdebug.org/docs/all_settings#mode
