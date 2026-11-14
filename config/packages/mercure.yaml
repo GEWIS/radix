@@ -10,6 +10,6 @@ mercure:
                 secret: '%env(MERCURE_JWT_SECRET)%'
                 publish: '*'
                 claims:
-                    iss: radix
-                    sub: radix
-                    client_id: radix
+                    iss: '%env(MERCURE_JWT_ISSUER)%'
+                    sub: 'radix'
+                    client_id: 'radix'
