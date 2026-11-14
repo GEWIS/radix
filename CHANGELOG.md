@@ -8,6 +8,9 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.8.1](https://github.com/GEWIS/radix/tree/v5.8.1) (2026-11-14)
+* Fixed an issue where Mercure requests were unauthorised due to mismatching issuer and audiences.
+
 ### [v5.8.0](https://github.com/GEWIS/radix/tree/v5.8.0) (2026-11-14)
 * Added functionality to email expected admittees and waiting list for first-come-first-serve lists
 * Added photographer/GEFLITST Kaneo integration
