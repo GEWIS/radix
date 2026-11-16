@@ -131,6 +131,11 @@
                         'label': 'Approvals'|trans,
                         'active': route starts with 'admin/bodies/approvals',
                     } : null,
+                    is_granted('ROLE_BOARD') ? {
+                        'href': path('admin/bodies/labels/index'),
+                        'label': 'Labels'|trans,
+                        'active': route starts with 'admin/bodies/labels',
+                    } : null,
                     register ? {
                         'href': path('decision_organ_functions'),
                         'label': 'Functions'|trans,

@@ -1,0 +1,26 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ 'Labels'|trans|page_title }}{{ 'Bodies'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item">
+        <a href="{{ path('admin/bodies/index') }}">{{ 'Bodies'|trans }}</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Labels'|trans }}</li>
+{% endblock %}
+
+{% block contents %}
+    {% include 'partials/application/label-overview.html.twig' with {
+        'heading': 'Body labels'|trans,
+        'intro': 'Labels are shared by every body, so renaming one changes it everywhere it is used.'|trans,
+        'labels': labels,
+        'form': form,
+        'editRoute': 'admin/bodies/labels/edit',
+        'retireRoute': 'admin/bodies/labels/retire',
+        'restoreRoute': 'admin/bodies/labels/restore',
+        'deleteRoute': 'admin/bodies/labels/delete',
+        'retireToken': 'body_label_retire-',
+        'restoreToken': 'body_label_restore-',
+        'deleteToken': 'body_label_delete-',
+    } only %}
+{% endblock %}

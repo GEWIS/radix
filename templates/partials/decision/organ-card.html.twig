@@ -26,6 +26,13 @@
         <div class="card-body">
             <h5 class="card-title mb-1"><a href="{{ url }}">{{ organ.abbr }}</a></h5>
             <h6 class="card-subtitle text-muted fw-normal mb-2">{{ organ.name }}</h6>
+            {% if organ.type.allowsLabels and information and information.getLabels is not empty %}
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                    {% for label in information.getLabels %}
+                        <span class="badge badge-tag">{{ label.name|localise_text }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
             {% if information and information.shortDescription %}
                 <p class="card-text small">{{ information.shortDescription|localise_text }}</p>
             {% endif %}

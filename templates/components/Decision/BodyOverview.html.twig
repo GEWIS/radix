@@ -1,5 +1,6 @@
 <div {{ attributes }}>
-    <div class="collapse mb-3" id="body-filters-{{ this.type }}-{{ this.abrogated ? 'past' : 'now' }}">
+    {# data-live-ignore: keeps the filter panel intact across re-renders. #}
+    <div class="collapse mb-3" id="body-filters-{{ this.type }}-{{ this.abrogated ? 'past' : 'now' }}" data-live-ignore>
         <div class="panel my-0">
             <div class="panel-body">
                 <div class="row g-3 align-items-end">
@@ -13,6 +14,25 @@
                                data-model="debounce(300)|search"
                                value="{{ this.search }}">
                     </div>
+                    {% if this.labels is not empty %}
+                        {# See ActivityOverview: the morph is kept out of the subtree Tom Select rewrites. #}
+                        <div class="col-12" data-live-ignore>
+                            <label class="form-label" for="body-overview-labels-{{ this.type }}-{{ this.abrogated ? 'past' : 'now' }}">
+                                {{ 'Labels'|trans }}
+                            </label>
+                            <select class="form-select" id="body-overview-labels-{{ this.type }}-{{ this.abrogated ? 'past' : 'now' }}"
+                                    multiple
+                                    data-model="labelFilters"
+                                    data-controller="symfony--ux-autocomplete--autocomplete"
+                                    data-placeholder="{{ 'Search labels...'|trans }}">
+                                {% for label in this.labels %}
+                                    <option value="{{ label.id }}" {% if label.id in this.labelFilters %}selected{% endif %}>
+                                        {{ label.name|localise_text }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -20,7 +40,9 @@
 
     {% if this.organs is empty %}
         <p class="text-muted text-center py-4">
-            {{ this.search is empty ? this.emptyMessage : 'No bodies match the current search.'|trans }}
+            {{ this.search is empty and this.labelFilters is empty
+                ? this.emptyMessage
+                : 'No bodies match the current filters.'|trans }}
         </p>
     {% else %}
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">

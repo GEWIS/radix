@@ -30,10 +30,18 @@ class OrganPageFlowType extends AbstractStepperFlowType
             $options,
         );
 
+        // Read from the run rather than passed in beside it, so a request cannot open the form without the labels the
+        // revision already carries and drop them on save.
+        $data = $builder->getData();
+
         $builder
             ->addStep(
                 OrganPageData::STEP_PAGE,
                 PageStepType::class,
+                [
+                    'current_label_ids' => $data instanceof OrganPageData ? $data->labelIds : [],
+                    'labels_enabled' => $options['labels_enabled'],
+                ],
             )
             ->addStep(
                 OrganPageData::STEP_CONTACT,
@@ -53,6 +61,9 @@ class OrganPageFlowType extends AbstractStepperFlowType
         $resolver->setDefaults([
             'data_class' => OrganPageData::class,
             'finish_label' => t('Save draft'),
+            // The offer of the label picker, decided by the controller from the body's kind. Off by default: a flow
+            // that forgets it drops the picker rather than showing it to a body it cannot use.
+            'labels_enabled' => false,
             'step_labels' => [
                 OrganPageData::STEP_PAGE => t('Page'),
                 OrganPageData::STEP_CONTACT => t('Where to find you'),

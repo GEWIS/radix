@@ -1,0 +1,20 @@
+{% extends 'layout-admin.html.twig' %}
+
+{% block page_title %}{{ label.name|localise_text|page_title }}{{ 'Labels'|trans|page_title }}{{ 'Bodies'|trans|page_title }}{{ parent() }}{% endblock %}
+
+{% block admin_breadcrumbs %}
+    <li class="breadcrumb-item">
+        <a href="{{ path('admin/bodies/index') }}">{{ 'Bodies'|trans }}</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{{ path('admin/bodies/labels/index') }}">{{ 'Labels'|trans }}</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Edit'|trans }}</li>
+{% endblock %}
+
+{% block contents %}
+    {% include 'partials/application/label-form.html.twig' with {
+        'form': form,
+        'cancelRoute': 'admin/bodies/labels/index',
+    } only %}
+{% endblock %}

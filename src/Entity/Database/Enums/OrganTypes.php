@@ -81,6 +81,16 @@ enum OrganTypes: string implements TranslatableInterface
     }
 
     /**
+     * Whether a body of this kind may carry labels on its page. Labels group the committees by what they offer; the
+     * other kinds are not grouped, so a body of one of them neither picks labels nor shows them. The bodies a general
+     * members' meeting appoints are committees in name only and are among those other kinds.
+     */
+    public function allowsLabels(): bool
+    {
+        return self::Committee === $this;
+    }
+
+    /**
      * Whether this type of organ must be led by a chair.
      *
      * Per the Articles of Association ("Iedere commissie heeft een voorzitter", art. 22.3) and the Internal

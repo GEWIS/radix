@@ -101,6 +101,20 @@
                             </div>
                         </div>
                     </div>
+
+                    {% if organ.type.allowsLabels %}
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h3>{{ 'Labels'|trans }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <p class="text-muted">
+                                    {{ 'Shown on the committee page, where the body is grouped by what it offers.'|trans }}
+                                </p>
+                                {{ form_row(fields.labelIds) }}
+                            </div>
+                        </div>
+                    {% endif %}
                 {% elseif 'contact' == step %}
                     {% set fields = form.contact %}
                     <div class="panel">

@@ -50,7 +50,7 @@ class VacancyLabel implements LabelInterface
     public CareerLocalisedText $name;
 
     /**
-     * The vacancy revisions this Label is assigned to (labels are on the revision so their changes are reviewable).
+     * The vacancy revisions this label is assigned to (labels are on the revision so their changes are reviewable).
      *
      * @var Collection<array-key, VacancyRevision>
      */

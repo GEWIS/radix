@@ -53,8 +53,8 @@ class ActivityFlowType extends AbstractStepperFlowType
             $options,
         );
 
-        // Read from the run rather than passed in beside it, so an edit cannot open without the labels the revision
-        // already carries and save them away.
+        // Read from the run rather than passed in beside it, so a request cannot open the form without the labels the
+        // revision already carries and drop them on save.
         $data = $builder->getData();
 
         $builder

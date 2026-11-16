@@ -65,5 +65,7 @@ final readonly class OrganInformationRevisionCloner extends AbstractRevisionClon
             $copy->revision = $draft;
             $draft->getSocialLinks()->add($copy);
         }
+
+        $draft->addLabels($source->getLabels()->toArray());
     }
 }

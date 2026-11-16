@@ -38,7 +38,7 @@ class ActivityLabel implements LabelInterface
     use RetirableTrait;
 
     /**
-     * The activity revisions this Label is assigned to (labels are on the revision so their changes are reviewable).
+     * The activity revisions this label is assigned to (labels are on the revision so their changes are reviewable).
      *
      * @var Collection<array-key, ActivityRevision>
      */
@@ -51,7 +51,7 @@ class ActivityLabel implements LabelInterface
     private Collection $revisions;
 
     /**
-     * Name for the Label.
+     * The name of the label.
      */
     #[OneToOne(
         targetEntity: ActivityLocalisedText::class,

@@ -11,6 +11,7 @@ use App\Entity\Decision\Member as MemberModel;
 use App\Entity\Decision\Organ;
 use App\Entity\Decision\OrganInformation;
 use App\Entity\Decision\OrganInformationRevision;
+use App\Entity\Decision\OrganLabel;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -84,6 +85,33 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
             social: [SocialPlatform::Discord->value => 'keurKEUR1'],
         );
 
+        // The party committee: its page carries the Fun label, so the committee page has a label to show. The other
+        // pages carry none, which is what a committee that has not picked labels looks like.
+        $this->createPage(
+            $manager,
+            $this->getReference(
+                'organ-bac',
+                Organ::class,
+            ),
+            $reviewer,
+            shortDescriptionEn: 'The committee that turns a study association into a party.',
+            shortDescriptionNl: 'De commissie die van een studievereniging een feest maakt.',
+            descriptionEn: 'BAC plans the parties the rest of the year is built around: the study week, the '
+                . "association's birthday and everything in between.\n\n"
+                . 'If you enjoy a good party and want to help make one, come and find us.',
+            descriptionNl: 'BAC plant de feesten waar de rest van het jaar omheen draait: de studieweek, het '
+                . "verenigingsjaarfeest en alles daartussen.\n\n"
+                . 'Als jij van een goed feestje houdt en mee wilt helpen het te maken, kom dan langs.',
+            website: null,
+            social: [SocialPlatform::Instagram->value => 'bac.gewis'],
+            labels: [
+                $this->getReference(
+                    OrganLabelFixture::REFERENCE_FUN,
+                    OrganLabel::class,
+                ),
+            ],
+        );
+
         // A third page left at its approved revision, so one page still has its current revision equal to its live
         // revision once BodyReviewFixture adds a draft to another.
         $this->createPage(
@@ -108,6 +136,7 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
 
     /**
      * @param array<string, string> $social
+     * @param OrganLabel[]          $labels
      */
     private function createPage(
         ObjectManager $manager,
@@ -119,6 +148,7 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
         string $descriptionNl,
         ?string $website,
         array $social,
+        array $labels = [],
     ): void {
         $abbr = $organ->abbr;
 
@@ -144,6 +174,7 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
         $revision->email = $this->slugger->slug($abbr)->lower() . '@gewis.nl';
         $revision->website = $website;
         $revision->updateSocialLinks($social);
+        $revision->addLabels($labels);
 
         // The fixture artwork is drawn at the shape it is shown in, so the whole of it is the crop.
         $cover = $this->imageGenerator->storeBanner($abbr);
@@ -188,7 +219,10 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
     #[Override]
     public function getDependencies(): array
     {
-        return [ProjectionReferenceFixture::class];
+        return [
+            ProjectionReferenceFixture::class,
+            OrganLabelFixture::class,
+        ];
     }
 
     /**

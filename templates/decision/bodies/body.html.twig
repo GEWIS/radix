@@ -49,6 +49,11 @@
                 {% else %}
                     <span class="badge badge-success">{{ 'Active'|trans }}</span>
                 {% endif %}
+                {% if organ.type.allowsLabels and information %}
+                    {% for label in information.getLabels %}
+                        <span class="badge badge-tag">{{ label.name|localise_text }}</span>
+                    {% endfor %}
+                {% endif %}
             </div>
         {% endblock %}
 

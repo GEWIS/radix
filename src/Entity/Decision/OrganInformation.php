@@ -257,4 +257,14 @@ class OrganInformation implements RevisableInterface
     {
         return $this->liveRevision?->getSocialLinks() ?? new ArrayCollection();
     }
+
+    /**
+     * Display proxy. The labels the body's page carries, which the overviews show on the body's card.
+     *
+     * @return Collection<array-key, OrganLabel>
+     */
+    public function getLabels(): Collection
+    {
+        return $this->liveRevision?->getLabels() ?? new ArrayCollection();
+    }
 }
