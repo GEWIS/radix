@@ -9,6 +9,7 @@ use App\Entity\Decision\OrganInformationRevision;
 use App\Service\Application\AbstractRevisionDescriber;
 use App\ViewModel\Application\Review\RevisionFieldKind;
 use App\ViewModel\Application\Review\RevisionSection;
+use App\ViewModel\Application\Review\RevisionTag;
 use Override;
 
 use function assert;
@@ -56,6 +57,14 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                         $revision->description,
                         $comparable,
                         RevisionFieldKind::LongText,
+                    ),
+                    $this->field(
+                        t('Labels'),
+                        RevisionFieldKind::Tags,
+                        $this->labels($previous),
+                        $this->labels($revision),
+                        $comparable,
+                        emptyLabel: t('No labels.'),
                     ),
                 ],
             ),
@@ -121,5 +130,22 @@ final class OrganInformationRevisionDescriber extends AbstractRevisionDescriber
                 ],
             ),
         ];
+    }
+
+    /**
+     * @return list<RevisionTag>
+     */
+    private function labels(?OrganInformationRevision $revision): array
+    {
+        $tags = [];
+
+        foreach ($revision?->getLabels() ?? [] as $label) {
+            $tags[] = new RevisionTag(
+                $label->id,
+                $label->name,
+            );
+        }
+
+        return $tags;
     }
 }

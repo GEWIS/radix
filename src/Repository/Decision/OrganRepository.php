@@ -132,7 +132,10 @@ class OrganRepository extends ServiceEntityRepository
 
     /**
      * The ids of the bodies of one kind that an overview lists, in alphabetical order. Ids rather than entities so the
-     * overview can shuffle or page them before hydrating only the ones it shows.
+     * overview can shuffle or page them before hydrating only the ones it shows. When labels are given, only the
+     * bodies whose live revision carries one of them, because that is the revision the overviews show on the card.
+     *
+     * @param int[] $labelIds
      *
      * @return int[]
      */
@@ -140,6 +143,7 @@ class OrganRepository extends ServiceEntityRepository
         OrganTypes $type,
         bool $abrogated,
         string $search = '',
+        array $labelIds = [],
     ): array {
         $qb = $this->createQueryBuilder('o')
             ->select('o.id')
@@ -189,6 +193,34 @@ class OrganRepository extends ServiceEntityRepository
                 );
         }
 
+        // A subquery rather than a join, because a body with two of the labels would come back twice and the ids
+        // feed both the count and the ordered list.
+        if ([] !== $labelIds) {
+            $withLabels = $this->createQueryBuilder('f')
+                ->select('f.id')
+                ->join(
+                    'f.organInformation',
+                    'fi',
+                )
+                ->join(
+                    'fi.liveRevision',
+                    'flr',
+                )
+                ->join(
+                    'flr.labels',
+                    'flb',
+                )
+                ->where('flb.id IN (:labelIds)');
+
+            // The subquery's parameters stay on its own builder, and the DQL is embedded as text, so the binding has
+            // to be made on the outer query or the placeholder goes unbound.
+            $qb->andWhere($qb->expr()->in('o.id', $withLabels->getDQL()))
+                ->setParameter(
+                    'labelIds',
+                    $labelIds,
+                );
+        }
+
         return array_map(
             static fn (array $row): int => (int) $row['id'],
             $qb->getQuery()->getScalarResult(),
@@ -196,8 +228,9 @@ class OrganRepository extends ServiceEntityRepository
     }
 
     /**
-     * Hydrate the given bodies, in the order they are requested, with the page each one is shown by. Ids that no longer
-     * resolve to a body are left out.
+     * Hydrate the given bodies, in the order they are requested, with the page each one is shown by. The labels are
+     * fetched with it: the card draws a badge per label, which is two lazy loads per card (the collection, then a
+     * name row per label) without the fetch. Ids that no longer resolve to a body are left out.
      *
      * @param int[] $ids
      *
@@ -218,6 +251,8 @@ class OrganRepository extends ServiceEntityRepository
                 'lr',
                 'sd',
                 'sl',
+                'lbl',
+                'lbln',
             )
             ->leftJoin(
                 'o.organInformation',
@@ -234,6 +269,14 @@ class OrganRepository extends ServiceEntityRepository
             ->leftJoin(
                 'lr.socialLinks',
                 'sl',
+            )
+            ->leftJoin(
+                'lr.labels',
+                'lbl',
+            )
+            ->leftJoin(
+                'lbl.name',
+                'lbln',
             )
             ->where('o.id IN (:ids)')
             ->setParameter(

@@ -17,6 +17,8 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -163,9 +165,24 @@ class OrganInformationRevision extends AbstractRevision
     )]
     private Collection $socialLinks;
 
+    /**
+     * The labels of this revision of the body's page. Each revision owns its own assignments (carried forward when a
+     * draft is cloned), so label changes are staged with the revision and only become public on approval.
+     *
+     * @var Collection<array-key, OrganLabel>
+     */
+    #[ManyToMany(
+        targetEntity: OrganLabel::class,
+        inversedBy: 'revisions',
+        cascade: ['persist'],
+    )]
+    #[JoinTable(name: 'OrganInformationRevisionLabelAssignment')]
+    private Collection $labels;
+
     public function __construct()
     {
         $this->socialLinks = new ArrayCollection();
+        $this->labels = new ArrayCollection();
 
         // Which localised texts a revision has is its own business, and a form cannot bind to one that has none.
         // Doctrine does not run this when it hydrates a stored revision, so nothing is thrown away.
@@ -235,5 +252,53 @@ class OrganInformationRevision extends AbstractRevision
         $link->revision = $this;
 
         return $link;
+    }
+
+    /**
+     * @return Collection<array-key, OrganLabel>
+     */
+    public function getLabels(): Collection
+    {
+        return $this->labels;
+    }
+
+    /**
+     * @param OrganLabel[] $labels
+     */
+    public function addLabels(array $labels): void
+    {
+        foreach ($labels as $label) {
+            $this->addLabel($label);
+        }
+    }
+
+    public function addLabel(OrganLabel $label): void
+    {
+        if ($this->labels->contains($label)) {
+            return;
+        }
+
+        $this->labels->add($label);
+        $label->addRevision($this);
+    }
+
+    /**
+     * @param OrganLabel[] $labels
+     */
+    public function removeLabels(array $labels): void
+    {
+        foreach ($labels as $label) {
+            $this->removeLabel($label);
+        }
+    }
+
+    public function removeLabel(OrganLabel $label): void
+    {
+        if (!$this->labels->contains($label)) {
+            return;
+        }
+
+        $this->labels->removeElement($label);
+        $label->removeRevision($this);
     }
 }

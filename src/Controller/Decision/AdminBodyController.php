@@ -19,6 +19,7 @@ use App\Entity\User\User;
 use App\Form\Decision\OrganPage\OrganPageData;
 use App\Form\Decision\OrganPage\OrganPageFlowType;
 use App\Repository\Decision\OrganInformationRevisionCommentRepository;
+use App\Repository\Decision\OrganLabelRepository;
 use App\Security\Application\RevisionVoter;
 use App\Service\Decision\OrganImageUploadService;
 use App\Service\Decision\OrganPageService;
@@ -34,6 +35,7 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function array_filter;
+use function array_map;
 use function assert;
 
 /**
@@ -63,6 +65,7 @@ class AdminBodyController extends AbstractRevisionController
         private readonly OrganInformationRevisionCommentRepository $commentRepository,
         private readonly OrganImageUploadService $imageUploadService,
         private readonly OrganPageService $organPageService,
+        private readonly OrganLabelRepository $labelRepository,
     ) {
     }
 
@@ -210,7 +213,10 @@ class AdminBodyController extends AbstractRevisionController
         $flow = $this->createFlow(
             OrganPageFlowType::class,
             OrganPageData::fromRevision($draft),
-            ['flow_key' => $run],
+            [
+                'flow_key' => $run,
+                'labels_enabled' => $organ->type->allowsLabels(),
+            ],
         );
         $flow->handleRequest($request);
 
@@ -253,6 +259,19 @@ class AdminBodyController extends AbstractRevisionController
         $data = $flow->getData();
         assert($data instanceof OrganPageData);
         $data->applyTo($draft);
+
+        // Labels are the committees' own. Without the picker the data object still carries the ids the revision
+        // has, and applying them would churn the association for nothing, so a body of another kind keeps its
+        // revision as it stands.
+        if ($organ->type->allowsLabels()) {
+            $wanted = array_filter(array_map(
+                $this->labelRepository->find(...),
+                $data->labelIds,
+            ));
+
+            $draft->removeLabels($draft->getLabels()->toArray());
+            $draft->addLabels($wanted);
+        }
 
         $images = $flow->get(OrganPageData::STEP_IMAGES);
         $banner = $images->get('bannerFile')->getData();

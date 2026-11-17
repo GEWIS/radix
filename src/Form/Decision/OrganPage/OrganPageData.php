@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Form\Decision\OrganPage;
 
 use App\Entity\Decision\OrganInformationRevision;
+use App\Entity\Decision\OrganLabel;
 use App\Form\Application\Flow\HasFlowStep;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+use function array_map;
 use function Symfony\Component\Translation\t;
 use function trim;
 
@@ -73,6 +75,13 @@ final class OrganPageData
     /** @var array<string, string> */
     public array $socialLinks = [];
 
+    /**
+     * The identifiers of the labels the page carries. The controller resolves them and applies them to the revision.
+     *
+     * @var int[]
+     */
+    public array $labelIds = [];
+
     public static function fromRevision(OrganInformationRevision $revision): self
     {
         $data = new self();
@@ -83,6 +92,10 @@ final class OrganPageData
         $data->email = $revision->email;
         $data->website = $revision->website;
         $data->socialLinks = $revision->getSocialHandles();
+        $data->labelIds = array_map(
+            static fn (OrganLabel $label): int => (int) $label->id,
+            $revision->getLabels()->toArray(),
+        );
 
         // A body that already wrote something in a language keeps that language on, or opening the form would
         // silently offer to drop half of a page. A page that has not been written yet starts with both on.

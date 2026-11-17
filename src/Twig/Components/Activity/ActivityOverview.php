@@ -344,28 +344,6 @@ final class ActivityOverview extends AbstractInfiniteScrollOverview
     }
 
     /**
-     * Normalise a raw list of label-id values into a clean, re-indexed list of positive ints (dropping blanks, zero and
-     * negatives). Shared by mount() (query-string parsing) and selectedLabelIds() (paginator filtering) so the two can
-     * never differ.
-     *
-     * @param array<mixed> $values
-     *
-     * @return int[]
-     */
-    private static function positiveIntIds(array $values): array
-    {
-        return array_values(
-            array_filter(
-                array_map(
-                    'intval',
-                    $values,
-                ),
-                static fn (int $id): bool => $id > 0,
-            ),
-        );
-    }
-
-    /**
      * The time-window mode for {@see ActivityRepository::findForOverview()}: false on the default upcoming overview
      * (future only), true on a selected association-year archive (past only, so the current year's archive excludes its
      * still-upcoming activities), and null on the cross-year search page (past and upcoming, every year).

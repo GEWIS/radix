@@ -1949,6 +1949,10 @@
         <source>Body Regulation</source>
         <target state="translated">Orgaanreglement</target>
       </trans-unit>
+      <trans-unit id="jNfIQmd" resname="Body labels">
+        <source>Body labels</source>
+        <target>Organlabels</target>
+      </trans-unit>
       <trans-unit id="bka63xN" resname="Books via GEWIS">
         <source>Books via GEWIS</source>
         <target state="translated">Boeken via GEWIS</target>
@@ -5037,6 +5041,10 @@
         <source>Labels</source>
         <target state="translated">Labels</target>
       </trans-unit>
+      <trans-unit id="PUJrRxa" resname="Labels are shared by every body, so renaming one changes it everywhere it is used.">
+        <source>Labels are shared by every body, so renaming one changes it everywhere it is used.</source>
+        <target>Labels worden door alle organen gedeeld, dus een label hernoemen verandert het overal waar het gebruikt wordt.</target>
+      </trans-unit>
       <trans-unit id="jyKCtav" resname="Labels are shared by every company, so renaming one changes it everywhere it is used.">
         <source>Labels are shared by every company, so renaming one changes it everywhere it is used.</source>
         <target state="translated">Labels worden door alle bedrijven gedeeld, dus een label hernoemen verandert het overal waar het gebruikt wordt.</target>
@@ -6081,9 +6089,9 @@
         <source>No banner.</source>
         <target state="translated">Geen banner.</target>
       </trans-unit>
-      <trans-unit id="CasM6.S" resname="No bodies match the current search.">
-        <source>No bodies match the current search.</source>
-        <target state="translated">Geen organen komen overeen met de huidige zoekopdracht.</target>
+      <trans-unit id="v8m6kMB" resname="No bodies match the current filters.">
+        <source>No bodies match the current filters.</source>
+        <target>Geen organen komen overeen met de huidige filters.</target>
       </trans-unit>
       <trans-unit id="p0iyin." resname="No budget needed">
         <source>No budget needed</source>
@@ -8792,6 +8800,10 @@
       <trans-unit id="A064eYn" resname="Shown on a course that holds nothing of its own.">
         <source>Shown on a course that holds nothing of its own.</source>
         <target>Wordt getoond bij een vak dat zelf niets bevat.</target>
+      </trans-unit>
+      <trans-unit id="AXTLVUD" resname="Shown on the committee page, where the body is grouped by what it offers.">
+        <source>Shown on the committee page, where the body is grouped by what it offers.</source>
+        <target>Getoond op de commissiepagina, waar het orgaan wordt ingedeeld naar wat het biedt.</target>
       </trans-unit>
       <trans-unit id="9NDKecJ" resname="Shown on the member page while the meeting is upcoming.">
         <source>Shown on the member page while the meeting is upcoming.</source>
