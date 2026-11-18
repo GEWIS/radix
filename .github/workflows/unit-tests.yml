@@ -20,6 +20,9 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
+            # Reads the coverage artifact of the last successful run on main. The comparison only parses a JSON file
+            # from it; nothing from that run is executed.
+            actions: read
 
         # Real PostgreSQL, the engine both databases run on: custom DQL functions, advisory locks and engine-specific
         # column types that SQLite cannot reproduce. The `when@test` doctrine configuration puts each connection on
@@ -69,6 +72,10 @@ jobs:
                 with:
                     php-version: '8.5'
                     extensions: 'amqp, apcu, calendar, curl, ffi, gd, intl, opcache, pcntl, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
+                    # PCOV rather than Xdebug: line coverage is enough and PCOV is faster. Without a directory, PCOV
+                    # measures everything the entry point can reach, so it is restricted to `src`.
+                    coverage: pcov
+                    ini-values: 'memory_limit=-1, pcov.directory=${{ github.workspace }}/src'
 
             -   name: Setup problem matchers for PHPUnit
                 run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
@@ -151,10 +158,29 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install -y --no-install-recommends fonts-dejavu-core fonts-inter poppler-utils
 
+            # The default branch records the baseline a pull request is compared against. A missing artifact is not a
+            # failure: the first run has nothing to compare against, and a fork cannot read one.
+            -   name: Restore the coverage baseline
+                if: github.event_name == 'pull_request'
+                continue-on-error: true
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                run: |
+                    run=$(gh run list --workflow=unit-tests.yml --branch=main --event=push --status=success \
+                      --limit=1 --json databaseId --jq '.[0].databaseId // empty')
+                    if [ -z "$run" ]; then
+                      echo "No successful run on main has recorded a baseline yet."
+                      exit 0
+                    fi
+                    gh run download "$run" --name coverage-baseline --dir var/coverage/baseline \
+                      || echo "Run $run has no coverage-baseline artifact."
+
             -   name: Run PHPUnit
                 env:
                     APP_ENV: test
-                run: bin/phpunit
+                run: |
+                    mkdir -p var/coverage/unit
+                    bin/phpunit --coverage-clover var/coverage/unit/clover.xml
 
             -   name: Run the browser tests
                 env:
@@ -163,8 +189,29 @@ jobs:
                 # Nothing has to be installed or started for them: the runner image ships Chrome and ChromeDriver, and
                 # Panther starts a web server of its own.
                 #
-                # They come last because that server uses a connection of its own, outside the transaction every
-                # other test is rolled back with, so whatever they write stays written for the rest of the job. Nothing
-                # runs after them here, so the seed is left as they leave it; `make test-browser` loads it again
-                # locally, where the next run is not a fresh database.
+                # They run last because their server uses its own connection, outside the transaction that rolls the
+                # other tests back, so their writes stay for the rest of the job. Nothing later touches the database,
+                # and `make test-browser` loads the seed again locally.
                 run: bin/phpunit --testsuite "Browser Test Suite"
+
+            # Only the ordinary suite is measured: code that runs inside the browser server's own process is outside
+            # this report, and the logic behind a workflow belongs in a unit or integration test.
+            -   name: Summarise the coverage
+                env:
+                    APP_ENV: test
+                run: php -d memory_limit=-1 tests/Coverage/summary.php
+
+            -   name: Upload the coverage baseline
+                if: github.event_name == 'push'
+                uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+                with:
+                    name: coverage-baseline
+                    path: var/coverage/summary.json
+                    retention-days: 30
+
+            # Reports the comparison and leaves the job green. `--fail-on-drop` makes the same script a gate.
+            -   name: Report the coverage against the baseline
+                if: github.event_name == 'pull_request'
+                env:
+                    APP_ENV: test
+                run: php tests/Coverage/check.php

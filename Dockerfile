@@ -113,7 +113,9 @@ ENV FRANKENPHP_WORKER_CONFIG=watch
 
 RUN <<-EOF
     mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-    install-php-extensions xdebug
+    # Xdebug for debugging, PCOV for coverage, which is what CI uses and the faster driver. PHPUnit and
+    # tests/Coverage/prepend.php prefer PCOV when both are loaded.
+    install-php-extensions xdebug pcov
     # On macOS `id -g` returns 20 (staff), which already exists in the base image; reuse the existing group in that case
     # instead of failing on a duplicate GID.
     if ! getent group "$USER_GID" >/dev/null; then

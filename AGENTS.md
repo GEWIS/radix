@@ -40,7 +40,8 @@ Run these before reporting work complete. The condition column says when each is
 | `make igor` | Any non-trivial change (worker-mode safety: state must not leak between requests) |
 | `make test` | Always |
 | `make test-prepare` first | Schema or fixtures changed (builds both test schemas and the seed) |
-| `make test-browser` | Interactive or user-facing behaviour changed (and write the covering browser test) |
+|`make test-browser`|Interactive or user-facing behaviour changed (and write the covering browser test)|
+|`make test-coverage`|Code added or removed in `src/`: CI reports the total against `main` and annotates the files whose coverage fell|
 | `make openapi` | An API resource, operation or serializer group changed |
 | `make translations`, then fill every empty `<target/>` | Any translatable string changed (see `translations/AGENTS.md`) |
 | `make sf c=check:database` | Decisions or installations changed |

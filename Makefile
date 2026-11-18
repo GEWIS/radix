@@ -116,8 +116,10 @@ test-browser: ## Run the browser tests, which drive Chromium against a server of
 		$(MAKE) --no-print-directory test-prepare; \
 		exit $$status
 
-test-coverage: ## Run the tests and write an HTML coverage report to ./coverage
-	@$(DOCKER_COMP) exec -T -e APP_ENV=test -e XDEBUG_MODE=coverage app bin/phpunit --coverage-html ./coverage
+# Only the ordinary suite is measured; browser coverage is not part of the number. Covering all of src needs more than
+# the container's 512M default, so the memory limit is raised rather than letting PHPUnit abort.
+test-coverage: ## Print the coverage of src/, which is the number CI compares against the default branch
+	@$(DOCKER_COMP) exec -T -e APP_ENV=test app sh -c 'mkdir -p var/coverage && php -d memory_limit=-1 bin/phpunit --coverage-clover var/coverage/clover.xml && php tests/Coverage/summary.php'
 
 # The schemas are built from the mapping metadata rather than by the migrations: what the tests run against is what
 # the entities say, and the migrations are checked separately by the migration workflow. The projection is filled by

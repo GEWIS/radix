@@ -8,6 +8,7 @@ PHPUnit runs inside the `app` container against isolated copies of both database
 make test-prepare      # (re)build both schemas from the mapping and load the seed; once, and after schema/fixture changes
 make test              # the ordinary suite; excludes Browser/
 make test-browser      # the Panther e2e suite; re-seeds when the run ends
+make test-coverage     # the ordinary suite's coverage of src/, as CI measures it
 ```
 
 Run a single test through the container, e.g. `make exec cmd="bin/phpunit --filter SomeTest"` or a path. For the browser suite always use the make target, never a bare `bin/phpunit`.
@@ -28,3 +29,11 @@ A real Chromium against a real server (`symfony/panther`, extending `BrowserTest
 - They are a testsuite of their own because each one starts Chromium and a web server. CI runs them after the ordinary suite.
 - The server the browser drives has a connection of its own, outside the transaction every other test is rolled back with. Read the seeded fixtures rather than building data, treat anything a test writes as permanent, and sign in through the real form: the kernel-level sign-in helpers authenticate in this process and reach none of the server.
 - Do not verify forms, login or sign-up with `curl` (stateless CSRF); use this suite.
+
+## Coverage (`tests/Coverage/`)
+
+The total is measured over the whole of `src/` from the ordinary suite's Clover report: PHPUnit analyses every file in the source filter, so a class no test loads counts as uncovered. The browser suite is not part of it, because it runs in a server process of its own. Whatever a browser test drives should already be covered by a unit or integration test.
+
+- CI records the summary on `main` and, on a pull request, annotates the files whose coverage fell and prints the comparison in the step summary. A drop does not fail the build; `tests/Coverage/check.php --fail-on-drop` enables that once the normal movement is known. A missing baseline (the first run, or an artifact past 30 days) is reported and skipped.
+- Line coverage is not a standard by itself: a test that asserts nothing raises it. The suite above, and the browser test required for user-facing behaviour, remain the standard.
+- Reproduce CI's number with `make test-coverage`. Both use PCOV, so the per-file HTML report is `php -d memory_limit=-1 bin/phpunit --coverage-html ./coverage` inside the container.

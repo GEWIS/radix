@@ -1,0 +1,4 @@
+# A workflow or a coverage script can weaken a required check without touching `src/`, and a pull request from a fork
+# runs the workflow file it brings. Changes here need a review from the CI owners.
+/.github/workflows/ @GEWIS/website-and-membership-management
+/tests/Coverage/    @GEWIS/website-and-membership-management
