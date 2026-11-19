@@ -355,10 +355,11 @@
                                 class="nav-link dropdown-toggle"
                                 aria-label="{{ 'Toggle members menu'|trans }}"
                         >
-                            <span class="fas fa-user me-1"></span>
-                            <span id="gws-members-text">{{ 'Members'|trans }}</span>
+                            <span class="fas fa-right-to-bracket d-md-none me-1" aria-hidden="true"></span>
+                            <span class="fas fa-user d-none d-md-inline me-1" aria-hidden="true"></span>
+                            <span id="gws-members-text" class="d-none d-md-inline">{{ 'Members'|trans }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-members-text">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-members">
                             {{ menu.item(path('user_login'), 'fa-right-to-bracket', 'Login'|trans) }}
                             {# The sign-up form is locale-less and is served on this host as well as on the sign-up
                                host, so there is no reason to send a visitor across to that name to reach it. #}
@@ -374,9 +375,10 @@
                                 class="nav-link dropdown-toggle"
                                 aria-label="{{ 'Toggle company menu'|trans }}"
                         >
-                            <span id="gws-company-text">{{ company.name }}</span>
+                            <span class="fas fa-building d-md-none" aria-hidden="true"></span>
+                            <span id="gws-company-text" class="d-none d-md-inline">{{ company.name }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-company-text">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-company">
                             <li>
                                 <div class="nav-menu-identity">
                                     <span class="nav-menu-avatar" aria-hidden="true">{{ company.name|slice(0, 1) }}</span>
@@ -397,9 +399,10 @@
                                 class="nav-link dropdown-toggle"
                                 aria-label="{{ 'Toggle member menu'|trans }}"
                         >
-                            <span id="gws-member-text">{{ member.firstName }}</span>
+                            <span class="fas fa-user d-md-none" aria-hidden="true"></span>
+                            <span id="gws-member-text" class="d-none d-md-inline">{{ member.firstName }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-member-text">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gws-member">
                             <li>
                                 <div class="nav-menu-identity">
                                     <span class="nav-menu-avatar" aria-hidden="true">
