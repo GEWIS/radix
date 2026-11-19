@@ -52,7 +52,6 @@ doctrine:
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Database'
                         prefix: 'App\Entity\Database'
-                        alias: Database
 
             web:
                 connection: web
@@ -88,49 +87,41 @@ doctrine:
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Activity'
                         prefix: 'App\Entity\Activity'
-                        alias: Activity
                     Application:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Application'
                         prefix: 'App\Entity\Application'
-                        alias: Application
                     Company:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Career'
                         prefix: 'App\Entity\Career'
-                        alias: Company
                     Decision:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Decision'
                         prefix: 'App\Entity\Decision'
-                        alias: Decision
                     Education:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Education'
                         prefix: 'App\Entity\Education'
-                        alias: Education
                     Frontpage:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Frontpage'
                         prefix: 'App\Entity\Frontpage'
-                        alias: Frontpage
                     Photo:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/Photo'
                         prefix: 'App\Entity\Photo'
-                        alias: Photo
                     User:
                         type: attribute
                         is_bundle: false
                         dir: '%kernel.project_dir%/src/Entity/User'
                         prefix: 'App\Entity\User'
-                        alias: User
 
 when@test:
     doctrine:
