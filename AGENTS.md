@@ -40,13 +40,13 @@ Run these before reporting work complete. The condition column says when each is
 | `make igor` | Any non-trivial change (worker-mode safety: state must not leak between requests) |
 | `make test` | Always |
 | `make test-prepare` first | Schema or fixtures changed (builds both test schemas and the seed) |
-|`make test-browser`|Interactive or user-facing behaviour changed (and write the covering browser test)|
+|`make test-browser`|A critical workflow that depends on browser JavaScript changed (write the covering browser test)|
 |`make test-coverage`|Code added or removed in `src/`: CI reports the total against `main` and annotates the files whose coverage fell|
 | `make openapi` | An API resource, operation or serializer group changed |
 | `make translations`, then fill every empty `<target/>` | Any translatable string changed (see `translations/AGENTS.md`) |
 | `make sf c=check:database` | Decisions or installations changed |
 
-- **Browser tests are the default test for user-facing behaviour.** A change to a page, form, live component, Stimulus controller or anything else a person interacts with MUST be covered by a browser test in `tests/Browser/` (`make test-browser`), even if your change touches nothing under `tests/`. A unit or kernel test alone only renders the template and cannot see what happens once JavaScript has run. Reserve DB-less and kernel tests for logic a browser test cannot reach cheaply (mappers, voters, guard listeners, enums, query correctness). Read `tests/AGENTS.md` before writing either kind.
+- **Browser tests are for critical workflows that depend on browser JavaScript**: the stepper forms, modal confirmation, Turbo cache and restore, edit locks, realtime updates, link prefetch, and the unsaved-changes prompt. Such a change MUST be covered by a browser test in `tests/Browser/` (`make test-browser`). Ordinary integration or kernel tests are preferred elsewhere, even for a page or form a person uses: they see the template, the submitted data and the response, cost far less, and count toward coverage. Read `tests/AGENTS.md` before writing either kind.
 - **Smoke-run what you changed.** Exercise the changed path and observe the result; passing tests alone are not proof. For a bug, reproduce before the fix, confirm after, and keep a regression test.
 - **Baselines are for legacy debt.** When a new error hits a baseline, fix it; do not extend the baseline. Type-coverage percentages are pinned just under where the codebase stands, so they only go up. `make phpstan-pr` regenerates the baseline against `main` for a PR.
 - **Do not verify forms, login or sign-up flows with `curl`.** CSRF is stateless (double-submit cookie plus Origin/Referer checks), so a hand-crafted POST fails by design and a 4xx proves nothing. Use the browser suite, or a real browser against the seeded stack.

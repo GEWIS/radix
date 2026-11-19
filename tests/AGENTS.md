@@ -25,8 +25,8 @@ Run a single test through the container, e.g. `make exec cmd="bin/phpunit --filt
 
 A real Chromium against a real server (`symfony/panther`, extending `BrowserTestCase`). They cover what a page does once its JavaScript has run: an editor surviving a cache restore, a lock released on navigation, a live component still responding. A test that only renders a template cannot see any of that.
 
-- **A change to interactive or user-facing behaviour MUST be covered by a browser test.** A unit or kernel test alone is not sufficient. Browser tests are the default for user-facing behaviour; DB-less and kernel tests are for logic a browser test cannot reach cheaply.
-- They are a testsuite of their own because each one starts Chromium and a web server. CI runs them after the ordinary suite.
+- **Reserve a browser test for a critical workflow that depends on browser JavaScript**: the stepper forms, modal confirmation, Turbo cache and restore, edit locks, realtime updates, link prefetch, and the unsaved-changes prompt. Only then is a unit or kernel test insufficient, because the behaviour exists in the browser and nowhere else. Anything the server renders or a plain form submission produces belongs in an integration test, which is cheaper, counts toward coverage, and is the default for user-facing behaviour. DB-less and kernel tests are for logic a browser test cannot reach cheaply.
+- They are a testsuite of their own because each one starts Chromium and a web server. CI runs them after the ordinary suite, and they are not part of the coverage number: whatever they exercise should already be covered by an ordinary test.
 - The server the browser drives has a connection of its own, outside the transaction every other test is rolled back with. Read the seeded fixtures rather than building data, treat anything a test writes as permanent, and sign in through the real form: the kernel-level sign-in helpers authenticate in this process and reach none of the server.
 - Do not verify forms, login or sign-up with `curl` (stateless CSRF); use this suite.
 
