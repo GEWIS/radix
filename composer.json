@@ -26,7 +26,8 @@
         "doctrine/dbal": "^4.4.4",
         "doctrine/doctrine-bundle": "^3.3.4",
         "doctrine/doctrine-migrations-bundle": "^4.0.1",
-        "doctrine/orm": "^3.7.6",
+        "doctrine/orm": "^3.8.0",
+        "doctrine/orm-plugin-second-level-cache": "^1.0",
         "doctrineencryptbundle/doctrine-encrypt-bundle": "^7.0.3",
         "dragonmantank/cron-expression": "^3.6",
         "endroid/qr-code-bundle": "^7.1.0",
@@ -177,7 +178,7 @@
     "extra": {
         "patches": {
             "doctrine/orm": {
-                "Fix issues with SubDecisions.": "https://raw.githubusercontent.com/GEWIS/orm/3.6.x/1-to-1-multiple-join-columns.patch"
+                "Fix issues with SubDecisions.": "https://raw.githubusercontent.com/GEWIS/orm/3.8.x/1-to-1-multiple-join-columns.patch"
             }
         },
         "symfony": {

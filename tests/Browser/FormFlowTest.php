@@ -62,31 +62,20 @@ final class FormFlowTest extends BrowserTestCase
     public function testBecomingAMemberKeepsItsStateAcrossTheRedirect(): void
     {
         $client = static::createPantherClient();
-        $client->request(
+        $crawler = $client->request(
             'GET',
             '/en/join',
         );
 
-        $client->waitFor('input[name$="[initials]"]');
-        $client->executeScript(<<<'JS'
-            const fill = (name, value) => {
-                const field = document.querySelector(`[name$="[${name}]"]`);
-
-                if (null !== field) {
-                    field.value = value;
-                }
-            };
-
-            fill('initials', 'T.');
-            fill('firstName', 'Turbo');
-            fill('lastName', 'Test');
-            // A real domain, because the step checks that the address could receive mail by looking up its MX
-            // records. A reserved one such as example.invalid is rejected, which is the point of the check.
-            fill('email', 'turbo.test@gewis.nl');
-            fill('birth', '2000-01-01');
-        JS);
-
-        $client->submitForm('Next');
+        $client->waitFor('#registration_flow_personal_initials');
+        $form = $crawler->selectButton('Next')->form([
+            'registration_flow[personal][initials]' => 'T.',
+            'registration_flow[personal][firstName]' => 'Turbo',
+            'registration_flow[personal][lastName]' => 'Test',
+            'registration_flow[personal][email]' => 'turbo.test@gewis.nl',
+            'registration_flow[personal][birth]' => '2000-01-01',
+        ]);
+        $client->submit($form);
 
         // The student number belongs to the step after the personal one, so finding it means the flow moved and found
         // itself again on the other side of the redirect.
