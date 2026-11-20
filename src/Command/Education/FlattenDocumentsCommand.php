@@ -41,7 +41,7 @@ final class FlattenDocumentsCommand extends Command
     public function __construct(
         private readonly CourseDocumentRepository $documentRepository,
         private readonly CourseDocumentFlattener $flattener,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();

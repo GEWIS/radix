@@ -82,7 +82,7 @@ class AlbumRepository extends ServiceEntityRepository
             ->andWhere('a.published = TRUE')
             ->andWhere('a.startDateTime IS NOT NULL')
             ->andWhere('a.endDateTime IS NOT NULL')
-            ->andWhere('a.name LIKE :query')
+            ->andWhere('LOWER(UNACCENT(a.name)) LIKE LOWER(UNACCENT(:query))')
             ->setParameter(
                 'query',
                 '%' . addcslashes(

@@ -123,7 +123,8 @@ class NewsItemRepository extends ServiceEntityRepository
                 );
             // The wildcards in what was typed are escaped so they are matched as the characters they are.
             $builder->andWhere(
-                'LOWER(title.' . $value . ') LIKE :needle OR LOWER(content.' . $value . ') LIKE :needle',
+                'LOWER(UNACCENT(title.' . $value . ')) LIKE LOWER(UNACCENT(:needle))'
+                . ' OR LOWER(UNACCENT(content.' . $value . ')) LIKE LOWER(UNACCENT(:needle))',
             )
                 ->setParameter(
                     'needle',

@@ -24,8 +24,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 abstract class DatabaseTestCase extends KernelTestCase
 {
     /**
-     * The MariaDB manager, which contains everything but the ledger. A test that writes decisions into the ledger
-     * itself wants the default manager instead, and gets it by name.
+     * The application manager, which contains everything but the ledger: the website's own data and the projection
+     * of the ledger, on PostgreSQL. A test that writes decisions into the ledger itself wants the database manager
+     * instead, and gets it by name.
      */
     protected EntityManagerInterface $entityManager;
 
@@ -44,7 +45,7 @@ abstract class DatabaseTestCase extends KernelTestCase
         // the ordering dependency this prevents.
         MfaEnforcementSwitch::setEnabled((bool) self::getContainer()->getParameter('app.mfa.enforcement_enabled'));
 
-        $entityManager = self::getContainer()->get('doctrine')->getManager('web');
+        $entityManager = self::getContainer()->get('doctrine')->getManager('application');
         self::assertInstanceOf(
             EntityManagerInterface::class,
             $entityManager,

@@ -1,8 +1,17 @@
 # Migrations
 
-- Migrations are per entity manager: `migrations/database` (the PostgreSQL ledger) and `migrations/web` (MariaDB).
-- They run on container start; `make migrate` runs both by hand.
-- Each set is a file in `config/packages/migrations/` naming its own connection, so every command passes `--configuration=config/packages/migrations/{default,web}.yaml` and **never `--em`**.
-- The PostgreSQL connections `SET ROLE` (`src/Doctrine/Middleware/`) to ensure that anything created by the migrations is properly owned.
+- Migrations are per entity manager: `migrations/database` (the PostgreSQL ledger), `migrations/application` (the
+  PostgreSQL website and projection) and `migrations/web` (the MariaDB copy source).
+- They run on container start; `make migrate` runs all sets by hand.
+- Each set is a file in `config/packages/migrations/` naming its own connection, so every command passes
+  `--configuration=config/packages/migrations/{database,web,application}.yaml` and **never `--em`**.
+- The PostgreSQL connections `SET ROLE` (`src/Doctrine/Middleware/`) to ensure that anything created by the
+  migrations is properly owned.
 - A ledger schema change needs its projection counterpart (see `src/Entity/AGENTS.md`).
-- Tests: locally `make test-prepare` rebuilds both schemas from the mapping; CI builds them from the migrations (`.github/workflows/unit-tests.yml`), so a migration that disagrees with the mapping shows up in CI.
+- The application set's initial migration also creates the `messenger_messages` table (no entity maps it; the
+  messenger schema listener injects it into the application schema only, because that is where its transport
+  points) and the `unaccent` extension. The web set keeps its own copy of the messenger table until the copy
+  source is removed; its drift comparison excludes that table.
+- Tests: locally `make test-prepare` rebuilds the ledger schema from the mapping and runs the web and application
+  sets from their migrations; CI builds all three from the migrations (`.github/workflows/unit-tests.yml`), so a
+  migration that disagrees with the mapping shows up in CI.

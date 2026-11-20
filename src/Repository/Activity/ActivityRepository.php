@@ -451,7 +451,7 @@ class ActivityRepository extends ServiceEntityRepository
                 : 'n.valueEN';
             // Escape the LIKE wildcards (`%` and `_`) in user input so they are matched literally instead of acting as
             // wildcards (see DecisionRepository::search). $column is a fixed internal field name, never user input.
-            $qb->andWhere('LOWER(' . $column . ') LIKE :needle')
+            $qb->andWhere('LOWER(UNACCENT(' . $column . ')) LIKE LOWER(UNACCENT(:needle))')
                 ->setParameter(
                     'needle',
                     '%' . addcslashes(

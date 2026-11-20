@@ -89,7 +89,7 @@ class Bell
         private readonly NotificationContextResolver $contextResolver,
         private readonly UserSettingsRepository $settingsRepository,
         private readonly NotificationInteractionRepository $interactionRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly RoleHierarchyInterface $roleHierarchy,

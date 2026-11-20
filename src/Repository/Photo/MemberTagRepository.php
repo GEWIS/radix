@@ -174,10 +174,10 @@ class MemberTagRepository extends ServiceEntityRepository
 
         $sql = <<<'QUERY'
             SELECT DISTINCT
-                `p`.`album_id` as `album_id`
-            FROM `Photo` `p`
-            LEFT JOIN `Tag` `t` ON `t`.`photo_id` = `p`.`id`
-            WHERE `t`.`member_id` = :member_id
+                p.album_id AS album_id
+            FROM photo p
+            LEFT JOIN tag t ON t.photo_id = p.id
+            WHERE t.member_id = :member_id
             QUERY;
 
         $query = $this->getEntityManager()->createNativeQuery(

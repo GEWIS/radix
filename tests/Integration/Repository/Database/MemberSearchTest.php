@@ -26,7 +26,7 @@ final class MemberSearchTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $em = self::getContainer()->get('doctrine')->getManager('default');
+        $em = self::getContainer()->get('doctrine')->getManager('database');
         self::assertInstanceOf(
             EntityManagerInterface::class,
             $em,

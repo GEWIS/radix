@@ -20,7 +20,7 @@ final readonly class PageAdminService
     public function __construct(
         private PageContentSanitizer $sanitizer,
         private PageImageStore $pageImageStore,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {
     }

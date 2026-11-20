@@ -32,7 +32,7 @@ abstract class ApiTestCase extends DatabaseTestCase
     {
         parent::setUp();
 
-        $ledger = self::getContainer()->get('doctrine')->getManager('default');
+        $ledger = self::getContainer()->get('doctrine')->getManager('database');
         self::assertInstanceOf(
             EntityManagerInterface::class,
             $ledger,

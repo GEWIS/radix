@@ -214,7 +214,7 @@ services:
             # Left to itself the image names the database after `POSTGRES_USER`, which silently stops matching the
             # moment a checkout points the ledger connection somewhere else. Name it from the same value the
             # connection is built from instead.
-            POSTGRES_DB: "${DOCTRINE_DEFAULT_DATABASE:-gewisdb}"
+            POSTGRES_DB: "${POSTGRESQL_DATABASE:-radixdev_db}"
         volumes:
             - postgres_data:/var/lib/postgresql/data:rw
         configs:
@@ -228,7 +228,9 @@ services:
               published: 5432
               protocol: tcp
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-gewisdb}"]
+            # `-d postgres` names the maintenance database: without it pg_isready connects to the database named
+            # after the user, which exists nowhere once the ledger's own database has a name of its own.
+            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-radix} -d postgres"]
             start_period: 30s
             interval: 10s
             timeout: 5s
@@ -404,13 +406,18 @@ configs:
                 CREATE USER '${MAILMAN_DATABASE_USERNAME:-mailman}'@'%' IDENTIFIED BY '${MAILMAN_DATABASE_PASSWORD:-mailman}';
                 GRANT ALL PRIVILEGES ON `${MAILMAN_DATABASE_DBNAME:-mailman}`.* TO '${MAILMAN_DATABASE_USERNAME:-mailman}'@'%';
             EOF
-    # The database Listmonk keeps beside the ledger. The ledger's own database is the one the image creates from
-    # `POSTGRES_DB`; the test database is made by `make test-prepare`, which owns the schema in it.
+    # The database Listmonk keeps beside the ledger, and the application database the website moves onto. The
+    # ledger's own database is the one the image creates from `POSTGRES_DB`; the test database is made by
+    # `make test-prepare`, which owns the schema in it.
     init_postgres_databases:
         content: |
-            psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER:-gewisdb}" <<-PGSQL
-                CREATE DATABASE ${POSTGRES_LISTMONK_DATABASE:-gewisdb_listmonk};
-                GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_LISTMONK_DATABASE:-gewisdb_listmonk} TO ${POSTGRES_USER:-gewisdb};
+            # `--dbname=postgres` names the maintenance database: without it psql connects to the user-named
+            # database, which held the ledger (`gewisdb`) before it became `radixdev_db` and no longer exists.
+            psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER:-radix}" --dbname=postgres <<-PGSQL
+                CREATE DATABASE ${POSTGRES_LISTMONK_DATABASE:-radixdev_listmonk};
+                GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_LISTMONK_DATABASE:-radixdev_listmonk} TO ${POSTGRES_USER:-radix};
+                CREATE DATABASE ${POSTGRESQL_APPLICATION_DATABASE:-radixdev_app};
+                GRANT ALL PRIVILEGES ON DATABASE ${POSTGRESQL_APPLICATION_DATABASE:-radixdev_app} TO ${POSTGRES_USER:-radix};
             PGSQL
 
 volumes:

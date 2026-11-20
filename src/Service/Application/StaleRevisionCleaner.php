@@ -46,7 +46,7 @@ final readonly class StaleRevisionCleaner
         #[AutowireIterator('app.stale_revision_policy')]
         private iterable $policies,
         private StaleRevisionRepository $staleRevisions,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private RevisionDiscarder $revisionDiscarder,
         private EditLockService $editLockService,

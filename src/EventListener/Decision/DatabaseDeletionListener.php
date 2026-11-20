@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 #[AsDoctrineListener(
     event: Events::preRemove,
-    connection: 'default',
+    connection: 'database',
 )]
 final class DatabaseDeletionListener
 {
@@ -38,7 +38,7 @@ final class DatabaseDeletionListener
         private readonly MeetingService $meetingService,
         private readonly MemberService $memberService,
         private readonly MiscService $miscService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $emWeb,
     ) {
     }

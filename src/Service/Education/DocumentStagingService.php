@@ -37,7 +37,7 @@ final readonly class DocumentStagingService
         private FileStorage $fileStorage,
         private DocumentMetadataGuesser $guesser,
         private CourseRepository $courseRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private MessageBusInterface $messageBus,
     ) {

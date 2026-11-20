@@ -210,7 +210,7 @@ class PhotoRepository extends ServiceEntityRepository
     public function findPhotosByMember(Member $member): array
     {
         $qb = $this->createQueryBuilder('p');
-        $qb->where('p.artist LIKE :full_name')
+        $qb->where('LOWER(UNACCENT(p.artist)) LIKE LOWER(UNACCENT(:full_name))')
             ->setParameter(
                 'full_name',
                 '%' . addcslashes(

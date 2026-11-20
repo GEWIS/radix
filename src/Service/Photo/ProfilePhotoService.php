@@ -25,7 +25,7 @@ final readonly class ProfilePhotoService
         private MemberTagRepository $memberTagRepository,
         private ProfilePhotoRepository $profilePhotoRepository,
         private HiddenPhotoRepository $hiddenPhotoRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {
     }

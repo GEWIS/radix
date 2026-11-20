@@ -32,7 +32,7 @@ class SummaryRepository extends ServiceEntityRepository
     public function findSummariesByAuthor(Member $member): array
     {
         $qb = $this->createQueryBuilder('d');
-        $qb->where('d.author LIKE :full_name')
+        $qb->where('LOWER(UNACCENT(d.author)) LIKE LOWER(UNACCENT(:full_name))')
             ->setParameter(
                 'full_name',
                 '%' . addcslashes(

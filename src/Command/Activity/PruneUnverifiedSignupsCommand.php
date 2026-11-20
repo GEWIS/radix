@@ -39,7 +39,7 @@ final class PruneUnverifiedSignupsCommand extends Command
 
     public function __construct(
         private readonly ExternalSignupVerificationRepository $verificationRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
     ) {

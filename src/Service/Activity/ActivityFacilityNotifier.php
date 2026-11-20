@@ -35,7 +35,7 @@ final readonly class ActivityFacilityNotifier
     public function __construct(
         private Email $email,
         private AssociationMailboxes $mailboxes,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {
     }

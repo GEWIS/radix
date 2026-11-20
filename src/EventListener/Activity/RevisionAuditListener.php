@@ -37,7 +37,7 @@ use function spl_object_id;
  */
 #[AsDoctrineListener(
     event: Events::onFlush,
-    connection: 'web',
+    connection: 'application',
 )]
 final readonly class RevisionAuditListener
 {

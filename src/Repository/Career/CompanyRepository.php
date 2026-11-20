@@ -30,24 +30,24 @@ use function trim;
 class CompanyRepository extends ServiceEntityRepository
 {
     private const string PUBLIC_SOURCE = <<<'QUERY'
-        FROM `Company` AS `t1`
+        FROM Company AS t1
         LEFT JOIN (
-            SELECT `company_id`,
-                COUNT(`company_id`) AS `totalPackages`,
+            SELECT company_id,
+                COUNT(company_id) AS totalPackages,
                 SUM(
-                    CASE WHEN `expires` <= CURRENT_TIMESTAMP
-                            OR `published` = 0
-                            OR `starts` > CURRENT_TIMESTAMP
+                    CASE WHEN expires <= CURRENT_DATE
+                            OR published = FALSE
+                            OR starts > CURRENT_DATE
                         THEN 1
                         ELSE 0
                     END
-                ) AS `expiredHiddenOrNotStartedPackages`
-            FROM `CompanyPackage`
-            GROUP BY `company_id`
-        ) `CompanyPackages` ON `CompanyPackages`.`company_id` = `t1`.`id`
-        WHERE `t1`.`published` = 1
-        AND `t1`.`liveRevision_id` IS NOT NULL
-        AND `CompanyPackages`.`totalPackages` > `CompanyPackages`.`expiredHiddenOrNotStartedPackages`
+                ) AS expiredHiddenOrNotStartedPackages
+            FROM CompanyPackage
+            GROUP BY company_id
+        ) CompanyPackages ON CompanyPackages.company_id = t1.id
+        WHERE t1.published = TRUE
+        AND t1.liveRevision_id IS NOT NULL
+        AND CompanyPackages.totalPackages > CompanyPackages.expiredHiddenOrNotStartedPackages
         QUERY;
 
     public function __construct(ManagerRegistry $registry)
@@ -77,7 +77,7 @@ class CompanyRepository extends ServiceEntityRepository
 
         $sql = <<<QUERY
             SELECT {$select} {$source}
-            ORDER BY `t1`.`name` ASC
+            ORDER BY t1.name ASC
             QUERY;
 
         $companies = $this->getEntityManager()->createNativeQuery(
@@ -108,13 +108,14 @@ class CompanyRepository extends ServiceEntityRepository
 
         $search = trim($search);
         if ('' !== $search) {
-            $source .= ' AND (LOWER(`t1`.`name`) LIKE :search OR LOWER(`t1`.`slugName`) LIKE :search)';
+            $source .= ' AND (LOWER(unaccent(t1.name)) LIKE unaccent(:search)'
+                . ' OR LOWER(unaccent(t1.slugName)) LIKE unaccent(:search))';
             $parameters['search'] = '%' . mb_strtolower($search) . '%';
         }
 
         $sql = <<<QUERY
-            SELECT `t1`.`id` {$source}
-            ORDER BY `t1`.`name` ASC
+            SELECT t1.id {$source}
+            ORDER BY t1.name ASC
             QUERY;
 
         return array_map(
@@ -402,7 +403,10 @@ class CompanyRepository extends ServiceEntityRepository
 
         $search = trim($search);
         if ('' !== $search) {
-            $qb->andWhere('LOWER(c.name) LIKE :needle OR LOWER(c.slugName) LIKE :needle')
+            $qb->andWhere(
+                'LOWER(UNACCENT(c.name)) LIKE LOWER(UNACCENT(:needle))'
+                . ' OR LOWER(UNACCENT(c.slugName)) LIKE LOWER(UNACCENT(:needle))',
+            )
                 ->setParameter(
                     'needle',
                     '%' . mb_strtolower($search) . '%',

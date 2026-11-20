@@ -33,8 +33,9 @@ env:
   # The tag compose.override.yaml gives the development image; built below rather than by compose.
   APP_IMAGE: abc.docker-registry.gewis.nl/web/radix/app:development
   # One set per database, each naming its own connection. Mirrors the Makefile.
-  DEFAULT_MIGRATIONS: --configuration=config/packages/migrations/default.yaml
+  DATABASE_MIGRATIONS: --configuration=config/packages/migrations/database.yaml
   WEB_MIGRATIONS: --configuration=config/packages/migrations/web.yaml
+  APPLICATION_MIGRATIONS: --configuration=config/packages/migrations/application.yaml
 
 permissions: {}
 
@@ -91,11 +92,21 @@ jobs:
           ref: ${{ github.event.pull_request.base.ref }}
           persist-credentials: false
 
+      # The stack runs the head branch's files and environment, which alone carry the application connection and
+      # its `POSTGRESQL_*` values; the base branch is checked out again for its steps, and once more after them.
+      - name: Checkout head branch for the stack
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       # `.env.local` is not committed, and it is where the development values live. A missing `var/` bind-mount
       # source is created as root, which the container user then cannot write.
       - name: Prepare the checkout
         run: |
           make setuplocalenv
+          # The application's entrypoint migrates every connection on boot; the steps below time the base and head
+          # migrations themselves, so the stack starts with migrations skipped.
+          echo "SKIP_MIGRATIONS=1" >> .env.local
           mkdir -p var
           echo "HOST_UID=$(id -u)" >> "$GITHUB_ENV"
           echo "HOST_GID=$(id -g)" >> "$GITHUB_ENV"
@@ -151,18 +162,36 @@ jobs:
           docker compose $COMPOSE_FILES logs app
           exit 1
 
+      # The stack runs the head branch's environment; these steps execute the base branch's migrations and seed
+      # against it, so the working tree is moved to the base branch until the head branch's steps below.
+      - name: Checkout base branch for the base-phase steps
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          clean: false
+          persist-credentials: false
+
       - name: migrate base
         run: make migrate
 
       - name: get migration status
         # `current` prints "<version> - <description>"; only the version is something to migrate back to.
         run: |
-          MIGRATION_BASE_DEFAULT=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $DEFAULT_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
-          echo "Default is at: $MIGRATION_BASE_DEFAULT"
-          echo "MIGRATION_BASE_DEFAULT=$MIGRATION_BASE_DEFAULT" >> $GITHUB_ENV
+          MIGRATION_BASE_DATABASE=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $DATABASE_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
+          echo "Database is at: $MIGRATION_BASE_DATABASE"
+          echo "MIGRATION_BASE_DATABASE=$MIGRATION_BASE_DATABASE" >> $GITHUB_ENV
           MIGRATION_BASE_WEB=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $WEB_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
           echo "Web is at: $MIGRATION_BASE_WEB"
           echo "MIGRATION_BASE_WEB=$MIGRATION_BASE_WEB" >> $GITHUB_ENV
+          # The base branch may predate the application connection and its migrations; only record a version to
+          # revert to when the branch knows the set at all.
+          if [ -f config/packages/migrations/application.yaml ]; then
+            MIGRATION_BASE_APPLICATION=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $APPLICATION_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
+            echo "Application is at: $MIGRATION_BASE_APPLICATION"
+            echo "MIGRATION_BASE_APPLICATION=$MIGRATION_BASE_APPLICATION" >> $GITHUB_ENV
+          else
+            echo "Application is at: none (the base branch has no application migrations)"
+          fi
 
       # Seeds the databases only; `make seed` would also drive the sync-based Mailman and Listmonk services, which
       # `--no-deps` deliberately never started. Each connection has its own loader and its own fixture group: the
@@ -226,8 +255,12 @@ jobs:
 
       - name: revert to base migration
         run: |
-          docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $DEFAULT_MIGRATIONS $MIGRATION_BASE_DEFAULT
+          docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $DATABASE_MIGRATIONS $MIGRATION_BASE_DATABASE
           docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $WEB_MIGRATIONS $MIGRATION_BASE_WEB
+          # A base branch without the application set has no version to revert to.
+          if [ -n "$MIGRATION_BASE_APPLICATION" ]; then
+            docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $APPLICATION_MIGRATIONS $MIGRATION_BASE_APPLICATION
+          fi
 
       - name: stop
         run: docker compose $COMPOSE_FILES down

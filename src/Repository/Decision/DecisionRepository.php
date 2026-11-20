@@ -81,7 +81,8 @@ class DecisionRepository extends ServiceEntityRepository
         $textParts = [];
         foreach ($search->includeTerms as $index => $term) {
             $textParts[] = sprintf(
-                '(d.contentNL LIKE :include%1$d OR d.contentEN LIKE :include%1$d)',
+                '(LOWER(UNACCENT(d.contentNL)) LIKE LOWER(UNACCENT(:include%1$d))'
+                . ' OR LOWER(UNACCENT(d.contentEN)) LIKE LOWER(UNACCENT(:include%1$d)))',
                 $index,
             );
             $qb->setParameter(
@@ -95,7 +96,8 @@ class DecisionRepository extends ServiceEntityRepository
 
         foreach ($search->excludeTerms as $index => $term) {
             $textParts[] = sprintf(
-                '(d.contentNL NOT LIKE :exclude%1$d AND d.contentEN NOT LIKE :exclude%1$d)',
+                '(LOWER(UNACCENT(d.contentNL)) NOT LIKE LOWER(UNACCENT(:exclude%1$d))'
+                . ' AND LOWER(UNACCENT(d.contentEN)) NOT LIKE LOWER(UNACCENT(:exclude%1$d)))',
                 $index,
             );
             $qb->setParameter(

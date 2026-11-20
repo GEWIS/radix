@@ -32,7 +32,7 @@ final readonly class AuthorizationService
     public const int MAX_RECEIVED = 2;
 
     public function __construct(
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private AuthorizationRepository $authorizationRepository,
         private MemberRepository $memberRepository,

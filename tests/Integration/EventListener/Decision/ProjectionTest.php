@@ -39,7 +39,7 @@ class ProjectionTest extends KernelTestCase
         self::bootKernel();
 
         $ledger = self::getContainer()->get(EntityManagerInterface::class);
-        $projection = self::getContainer()->get('doctrine')->getManager('web');
+        $projection = self::getContainer()->get('doctrine')->getManager('application');
         self::assertInstanceOf(
             EntityManagerInterface::class,
             $projection,

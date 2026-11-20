@@ -1,4 +1,4 @@
-# The web database's set, on MariaDB. The counterpart of default.yaml, shaped the same so the two commands differ only
+# The web database's set, on MariaDB. The counterpart of database.yaml, shaped the same so the two commands differ only
 # in the file they name.
 em: 'web'
 

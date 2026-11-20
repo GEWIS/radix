@@ -88,7 +88,7 @@ class CompanyFeaturedPackageRepository extends ServiceEntityRepository
                 'p.article',
                 'article',
             )
-            ->where('p.published = 1')
+            ->where('p.published = TRUE')
             ->andWhere('p.expires > :startOfDay')
             ->setParameter(
                 'startOfDay',

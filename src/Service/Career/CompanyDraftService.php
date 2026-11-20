@@ -31,7 +31,7 @@ final readonly class CompanyDraftService
         private CompanyAuditLogger $auditLogger,
         private CompanyImageUploadService $imageUploadService,
         private EditLockService $editLockService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {
     }

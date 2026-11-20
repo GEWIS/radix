@@ -59,7 +59,7 @@ class PersistentSignatureRememberMeHandler extends AbstractRememberMeHandler
     public function __construct(
         UserProviderInterface $userProvider,
         RequestStack $requestStack,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly SessionRepository $repository,
         private readonly UserAgentParser $userAgentParser,

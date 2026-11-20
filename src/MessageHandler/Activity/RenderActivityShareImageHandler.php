@@ -29,7 +29,7 @@ class RenderActivityShareImageHandler
         private readonly ActivityShareImageRenderer $renderer,
         private readonly FileStorage $fileStorage,
         private readonly VariantGenerator $variantGenerator,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
     ) {
     }

@@ -30,7 +30,7 @@ final readonly class CompanyPackageService
     public function __construct(
         private CompanyAuditLogger $auditLogger,
         private EditLockService $editLockService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private FileStorage $fileStorage,
         private NotificationRepository $notificationRepository,
