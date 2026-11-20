@@ -79,7 +79,7 @@ How the projection is maintained, migration commands and caching: `src/Entity/AG
 - API Platform 5 serves almost all of `^/api` alongside hand-written endpoints in `src/Controller/Api`.
 - Messenger (RabbitMQ in dev, in-memory in test) and Scheduler; Symfony Workflow for revisions.
 - Twig + Stimulus (TypeScript via SWC) + Live Components; Bootstrap, Font Awesome, Sass, asset-mapper. No npm; third-party JS is vendored under `assets/vendor/`.
-- Altcha (captcha on public forms), Stripe, Mailman and Listmonk, Mercure, Mailer (MailPit in dev), Notifier, Matomo, `scheb/2fa`.
+- Altcha (captcha on public forms), Stripe, Mailman and Listmonk, Mercure, Mailer (MailPit in dev), Notifier, Matomo (production only), `scheb/2fa`.
 
 ## Layout
 
