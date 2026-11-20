@@ -48,7 +48,7 @@ final class LoadFixturesCommand extends Command
     public function __construct(
         #[Autowire(service: 'doctrine.fixtures.loader')]
         private readonly FixturesProvider $fixturesProvider,
-        #[Autowire(service: 'doctrine.orm.default_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.database_entity_manager')]
         private readonly EntityManagerInterface $ledgerManager,
         #[Autowire(service: 'doctrine.orm.web_entity_manager')]
         private readonly EntityManagerInterface $webManager,

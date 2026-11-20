@@ -214,7 +214,7 @@ services:
             # Left to itself the image names the database after `POSTGRES_USER`, which silently stops matching the
             # moment a checkout points the ledger connection somewhere else. Name it from the same value the
             # connection is built from instead.
-            POSTGRES_DB: "${DOCTRINE_DEFAULT_DATABASE:-gewisdb}"
+            POSTGRES_DB: "${DOCTRINE_DATABASE_DATABASE:-gewisdb}"
         volumes:
             - postgres_data:/var/lib/postgresql/data:rw
         configs:

@@ -124,7 +124,7 @@ jobs:
                 # migration-specific behaviour is tested. The --no-interaction flag prevents prompts, and
                 # --allow-no-migrations handles the case where there are no pending migrations.
                 run: |
-                    bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/default.yaml
+                    bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/database.yaml
                     bin/console doctrine:migrations:migrate --no-interaction --em=web --configuration=config/packages/migrations/web.yaml
 
             -   name: Load test fixtures

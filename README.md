@@ -26,7 +26,7 @@ those bodies, and it reads them from the application that records them.
 
 So there are two databases, and the split matters for anything that touches data:
 
-- **PostgreSQL** stores the ledger - the editable source of truth, behind the `default` connection.
+- **PostgreSQL** stores the ledger - the editable source of truth, behind the `database` connection.
 - **MariaDB** stores everything else, behind the `web` connection: the website's own data, and the projection of the
   ledger that the site and the API read from.
 

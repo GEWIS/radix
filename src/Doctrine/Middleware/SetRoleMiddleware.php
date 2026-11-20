@@ -10,13 +10,13 @@ use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 /**
- * Tagged for `default` alone: `SET ROLE` is written here in PostgreSQL syntax, and the website's MariaDB connection
+ * Tagged for `database` alone: `SET ROLE` is written here in PostgreSQL syntax, and the website's MariaDB connection
  * has no role of its own to drop to. {@see SetRoleDriver} for what a connection is dropped to.
  */
 #[Autoconfigure(tags: [
     [
         'name' => 'doctrine.middleware',
-        'connection' => 'default',
+        'connection' => 'database',
     ],
 ])]
 class SetRoleMiddleware implements MiddlewareInterface

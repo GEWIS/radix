@@ -55,14 +55,14 @@ Run these before reporting work complete. The condition column says when each is
 
 Two connections; the distinction governs anything that touches data.
 
-- **`default`**: PostgreSQL, the **ledger**. The editable source of truth: members, prospective members, memberships, meetings, decisions, bodies, mailing lists. Entities in `src/Entity/Database`, migrations in `migrations/database`.
+- **`database`**: PostgreSQL, the **ledger**. The editable source of truth: members, prospective members, memberships, meetings, decisions, bodies, mailing lists. Entities in `src/Entity/Database`, migrations in `migrations/database`.
 - **`web`**: MariaDB, everything else. The website's own data *and* the **projection** of the ledger that the site and the API read (`src/Entity/Decision`). Migrations in `migrations/web`.
 
 Rules that apply everywhere:
 
 - A change to a ledger entity MUST come with the matching change on the projection side (`src/Entity/Decision`, `src/Service/Decision`). Change one without the other and the website quietly renders an association that no longer exists.
 - A query MUST NOT span both connections. DQL, joins and associations stay inside one entity manager; ask the other for what you need and match up in PHP.
-- The default manager is the ledger's, usually the wrong one. Inject the manager or repository you want; do not let `ManagerRegistry` hand you the default.
+- The `database` manager is the ledger's, usually the wrong one. Inject the manager or repository you want; do not let `ManagerRegistry` hand you the default manager.
 - Both the website and the API read the projection, never the ledger directly.
 - After a bulk change to the ledger, run `app:decision:generate` to rebuild the projection.
 

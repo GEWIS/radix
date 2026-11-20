@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 #[AsDoctrineListener(
     event: Events::preRemove,
-    connection: 'default',
+    connection: 'database',
 )]
 final class DatabaseDeletionListener
 {

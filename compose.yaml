@@ -39,10 +39,10 @@ x-app-environment: &app_environment
     LOG_NAME: "${LOG_NAME:-app}"
     # The domain the mailing lists are created under on Mailman, which is what it reports back when asked for a list.
 
-    # The ledger, on PostgreSQL: the `default` connection. `role` is not a driver parameter —
+    # The ledger, on PostgreSQL: the `database` connection. `role` is not a driver parameter —
     # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it, so the
     # application runs as a least-privileged role rather than as the owner of the schema it reads.
-    DATABASE_DSN: "postgresql://${DOCTRINE_DEFAULT_USER:?DOCTRINE_DEFAULT_USER must be set}:${DOCTRINE_DEFAULT_PASSWORD:?DOCTRINE_DEFAULT_PASSWORD must be set}@${DOCTRINE_DEFAULT_HOST:?DOCTRINE_DEFAULT_HOST must be set}:${DOCTRINE_DEFAULT_PORT:?DOCTRINE_DEFAULT_PORT must be set}/${DOCTRINE_DEFAULT_DATABASE:?DOCTRINE_DEFAULT_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${DOCTRINE_DEFAULT_SSLMODE:?DOCTRINE_DEFAULT_SSLMODE must be set}&role=${DOCTRINE_DEFAULT_ROLE:?DOCTRINE_DEFAULT_ROLE must be set}"
+    DATABASE_DSN: "postgresql://${DOCTRINE_DATABASE_USER:?DOCTRINE_DATABASE_USER must be set}:${DOCTRINE_DATABASE_PASSWORD:?DOCTRINE_DATABASE_PASSWORD must be set}@${DOCTRINE_DATABASE_HOST:?DOCTRINE_DATABASE_HOST must be set}:${DOCTRINE_DATABASE_PORT:?DOCTRINE_DATABASE_PORT must be set}/${DOCTRINE_DATABASE_DATABASE:?DOCTRINE_DATABASE_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${DOCTRINE_DATABASE_SSLMODE:?DOCTRINE_DATABASE_SSLMODE must be set}&role=${DOCTRINE_DATABASE_ROLE:?DOCTRINE_DATABASE_ROLE must be set}"
     # Everything else, on MariaDB: the `web` connection. The charset and the collation belong in the DSN because they
     # have to match what the tables were created with; a mismatch makes a schema comparison report every string column
     # as changed.

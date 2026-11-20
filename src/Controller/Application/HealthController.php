@@ -38,7 +38,7 @@ final class HealthController extends AbstractController
     ];
 
     public function __construct(
-        #[Autowire(service: 'doctrine.dbal.default_connection')]
+        #[Autowire(service: 'doctrine.dbal.database_connection')]
         private readonly Connection $ledger,
         #[Autowire(service: 'doctrine.dbal.web_connection')]
         private readonly Connection $web,

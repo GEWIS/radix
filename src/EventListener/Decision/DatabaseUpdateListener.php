@@ -32,11 +32,11 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 #[AsDoctrineListener(
     event: Events::postPersist,
-    connection: 'default',
+    connection: 'database',
 )]
 #[AsDoctrineListener(
     event: Events::postUpdate,
-    connection: 'default',
+    connection: 'database',
 )]
 final class DatabaseUpdateListener
 {

@@ -1,6 +1,6 @@
 # The ledger's set, on PostgreSQL. Not loaded by Symfony: doctrine/migrations' own format, read when a command names
 # it. `em` belongs to the set, so no command has to remember one.
-em: 'default'
+em: 'database'
 
 # Paths are resolved relative to this file. The namespace is what doctrine_migration_versions records its classes by,
 # so it cannot be renamed without rewriting every row, and it must differ from the web set's.

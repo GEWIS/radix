@@ -39,11 +39,11 @@ clear_marker_when_nothing_to_migrate() {
 	while [ -f "$MIGRATIONS_SKIPPED_MARKER" ]; do
 		sleep 60
 
-		php bin/console dbal:run-sql -q --connection=default "SELECT 1" >/dev/null 2>&1 || continue
+		php bin/console dbal:run-sql -q --connection=database "SELECT 1" >/dev/null 2>&1 || continue
 		php bin/console dbal:run-sql -q --connection=web "SELECT 1" >/dev/null 2>&1 || continue
 
 		if
-			! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/default.yaml >/dev/null 2>&1 \
+			! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/database.yaml >/dev/null 2>&1 \
 			|| ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/web.yaml >/dev/null 2>&1
 		then
 			echo "Both databases answer, but a migration is pending: this container started in the middle of a deploy. Restart it to migrate."
@@ -83,7 +83,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	DATABASES_REACHABLE=1
 
 	if [ -n "$DATABASE_DSN" ]; then
-		wait_for_database default || DATABASES_REACHABLE=0
+		wait_for_database database || DATABASES_REACHABLE=0
 		wait_for_database web || DATABASES_REACHABLE=0
 	fi
 
@@ -110,7 +110,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		for set in database web; do
 			if find "./migrations/$set" -iname '*.php' -print -quit | grep --quiet .; then
 				case "$set" in
-					database) configuration=config/packages/migrations/default.yaml ;;
+					database) configuration=config/packages/migrations/database.yaml ;;
 					web) configuration=config/packages/migrations/web.yaml ;;
 				esac
 

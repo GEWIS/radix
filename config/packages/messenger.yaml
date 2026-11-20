@@ -9,8 +9,8 @@ framework:
             # is made up of.
             #
             # `auto_setup` is off because the table is owned by the website migrations, and because leaving it on
-            # breaks building the schemas from the mapping metadata: this transport is on `web` while the default
-            # manager is the ledger, so `doctrine:schema:create --em=default` checks through the transport whether the
+            # breaks building the schemas from the mapping metadata: this transport is on `web` while the database
+            # manager is the ledger, so `doctrine:schema:create --em=database` checks through the transport whether the
             # two connections are the same database by running a statement on it. That statement queries a table that
             # only exists on the ledger, the resulting `TableNotFoundException` is taken for a missing transport
             # table, and the transport creates `messenger_messages` on the website database, which the subsequent

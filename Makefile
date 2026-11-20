@@ -207,15 +207,15 @@ cc: sf
 
 ## —— Doctrine —————————————————————————————————————————————————————————————————
 # One set per database, each naming its own connection; without --configuration a command finds no migrations.
-DEFAULT_MIGRATIONS := --configuration=config/packages/migrations/default.yaml
-WEB_MIGRATIONS     := --configuration=config/packages/migrations/web.yaml
+DATABASE_MIGRATIONS := --configuration=config/packages/migrations/database.yaml
+WEB_MIGRATIONS      := --configuration=config/packages/migrations/web.yaml
 
 # MIGRATE_FLAGS is what `seed` passes --no-interaction through; on its own this target still asks before it changes
 # a schema that is still there.
 MIGRATE_FLAGS ?=
 
 migrate: ## Run the migrations on both entity managers
-	@$(SYMFONY) doctrine:migrations:migrate $(DEFAULT_MIGRATIONS) $(MIGRATE_FLAGS)
+	@$(SYMFONY) doctrine:migrations:migrate $(DATABASE_MIGRATIONS) $(MIGRATE_FLAGS)
 	@$(SYMFONY) doctrine:migrations:migrate $(WEB_MIGRATIONS) $(MIGRATE_FLAGS)
 
 migrate-to: ## Migrate one entity manager to a given version
@@ -223,8 +223,8 @@ migrate-to: ## Migrate one entity manager to a given version
 
 migration-diff: ## Generate migrations for both entity managers from the current entities
 	@set -e; \
-	echo "Generating migrations for default..."; \
-	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(DEFAULT_MIGRATIONS); \
+	echo "Generating migrations for database..."; \
+	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(DATABASE_MIGRATIONS); \
 	echo "Generating migrations for web..."; \
 	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(WEB_MIGRATIONS);
 	@$(DOCKER) cp "$$($(DOCKER_COMP) ps -q app)":/app/migrations ./
