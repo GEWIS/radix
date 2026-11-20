@@ -145,7 +145,7 @@ test-prepare: ## Prepare the isolated test databases: (re)build the three schema
 	@$(SYMFONY_TEST) app:decision:generate --no-interaction
 
 ## —— Docker ———————————————————————————————————————————————————————————————————
-builddev: buildappdev buildmatomo ## Builds the development Docker images
+builddev: buildappdev ## Builds the development Docker images
 
 buildprod: buildappprod buildmatomo ## Builds the production Docker images
 

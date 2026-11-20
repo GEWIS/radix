@@ -137,32 +137,9 @@ services:
             - target: 15672
               published: 15672
               protocol: tcp
+    # Matomo is only required in production.
     matomo:
-        image: abc.docker-registry.gewis.nl/web/radix/matomo:latest
-        deploy:
-            resources:
-                limits:
-                    cpus: "${MATOMO_CPU_LIMIT:-0}"
-                    memory: "${MATOMO_MEMORY_LIMIT:-0}"
-        build:
-            context: docker/matomo
-            dockerfile: Dockerfile
-        restart: unless-stopped
-        env_file:
-            - .env.local
-        volumes:
-            - matomo:/var/www/html:rw
-        networks:
-            - radix_network
-        ports:
-            # As with the application: a variable so a rootless Docker can move it off a privileged port.
-            # `MATOMO_DOMAIN` in `.env.local` has to name the same port.
-            - target: 80
-              published: "${MATOMO_PORT:-82}"
-              protocol: tcp
-        depends_on:
-            mariadb:
-                condition: service_healthy
+        profiles: [ "production" ]
     mariadb:
         image: mariadb:11.8
         restart: unless-stopped
@@ -171,9 +148,6 @@ services:
         volumes:
             - mariadb_data:/var/lib/mysql:rw
         configs:
-            - source: init_matomo_db
-              target: /docker-entrypoint-initdb.d/matomo.sh
-              mode: 0644
             - source: init_gewis_test_db
               target: /docker-entrypoint-initdb.d/gewis-test.sh
               mode: 0644
@@ -379,14 +353,6 @@ services:
 ###< symfony/mailer ###
 
 configs:
-    init_matomo_db:
-        content: |
-            mysql_note "Creating Matomo database and user"
-            docker_process_sql <<'EOF'
-                CREATE DATABASE `${MATOMO_DATABASE_DBNAME:-matomo}`;
-                CREATE USER '${MATOMO_DATABASE_USERNAME:-matomo}'@'%' IDENTIFIED BY '${MATOMO_DATABASE_PASSWORD:-matomo}';
-                GRANT ALL PRIVILEGES ON `${MATOMO_DATABASE_DBNAME:-matomo}`.* TO '${MATOMO_DATABASE_USERNAME:-matomo}'@'%';
-            EOF
     # Isolated database for the PHPUnit integration tests (the `when@test` doctrine config appends the `_test` suffix).
     # The schema itself is built by SchemaTool in App\Tests\Integration\DatabaseTestCase, so no migrations run here.
     init_gewis_test_db:
@@ -426,5 +392,4 @@ volumes:
     mailman_static:
     mailman_web:
     mariadb_data:
-    matomo:
     postgres_data:
