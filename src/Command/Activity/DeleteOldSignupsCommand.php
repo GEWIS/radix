@@ -35,7 +35,7 @@ final class DeleteOldSignupsCommand extends Command
     public function __construct(
         private readonly SignupRepository $signupRepository,
         private readonly SignupFieldValueRepository $signupFieldValueRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
     ) {

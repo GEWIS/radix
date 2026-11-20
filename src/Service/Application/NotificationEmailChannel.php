@@ -23,7 +23,7 @@ final readonly class NotificationEmailChannel implements NotificationChannelInte
 {
     public function __construct(
         private NotificationEmailSubscriptionRepository $subscriptions,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
     ) {
     }

@@ -46,7 +46,7 @@ final class DatabaseUpdateListener
         private readonly MemberService $memberService,
         private readonly MiscService $miscService,
         private readonly SubDecisionService $subDecisionService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $emWeb,
     ) {
     }

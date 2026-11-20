@@ -41,8 +41,10 @@ class CourseRepository extends ServiceEntityRepository
     public function search(string $query): array
     {
         $qb = $this->createQueryBuilder('c');
-        $qb->where('c.code LIKE ?1')
-            ->orWhere('c.name LIKE ?1');
+        // The ai_ci collation used to make these comparisons accent- and case-insensitive; folding both sides the
+        // same way keeps that on PostgreSQL, where the unaccent function lives.
+        $qb->where('LOWER(UNACCENT(c.code)) LIKE LOWER(UNACCENT(?1))')
+            ->orWhere('LOWER(UNACCENT(c.name)) LIKE LOWER(UNACCENT(?1))');
         $qb->setParameter(
             1,
             '%' . addcslashes(
@@ -229,7 +231,10 @@ class CourseRepository extends ServiceEntityRepository
 
         $search = trim($search);
         if ('' !== $search) {
-            $qb->andWhere('c.code LIKE :needle OR LOWER(c.name) LIKE :needle')
+            $qb->andWhere(
+                'LOWER(UNACCENT(c.code)) LIKE LOWER(UNACCENT(:needle))'
+                . ' OR LOWER(UNACCENT(c.name)) LIKE LOWER(UNACCENT(:needle))',
+            )
                 ->setParameter(
                     'needle',
                     '%' . mb_strtolower(addcslashes(
@@ -366,7 +371,10 @@ class CourseRepository extends ServiceEntityRepository
             null !== $query
             && '' !== trim($query)
         ) {
-            $qb->andWhere('c.code LIKE :query OR c.name LIKE :query')
+            $qb->andWhere(
+                'LOWER(UNACCENT(c.code)) LIKE LOWER(UNACCENT(:query))'
+                . ' OR LOWER(UNACCENT(c.name)) LIKE LOWER(UNACCENT(:query))',
+            )
                 ->setParameter(
                     'query',
                     '%' . addcslashes(

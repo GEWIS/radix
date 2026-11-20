@@ -42,15 +42,15 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 #[AsDoctrineListener(
     event: Events::postPersist,
-    connection: 'web',
+    connection: 'application',
 )]
 #[AsDoctrineListener(
     event: Events::postUpdate,
-    connection: 'web',
+    connection: 'application',
 )]
 #[AsDoctrineListener(
     event: Events::postRemove,
-    connection: 'web',
+    connection: 'application',
 )]
 #[AsDoctrineListener(
     event: Events::postPersist,

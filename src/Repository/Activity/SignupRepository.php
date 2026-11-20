@@ -7,6 +7,7 @@ namespace App\Repository\Activity;
 use App\Entity\Activity\ExternalSignup;
 use App\Entity\Activity\Signup;
 use App\Entity\Activity\SignupList;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
@@ -74,7 +75,11 @@ class SignupRepository extends ServiceEntityRepository
                 'l.revision',
                 'r',
             )
-            ->where("r.endTime <= DATE_SUB(CURRENT_TIMESTAMP(), 5, 'YEAR')");
+            ->where('r.endTime <= :fiveYearsAgo')
+            ->setParameter(
+                'fiveYearsAgo',
+                new DateTimeImmutable('-5 years'),
+            );
 
         return $qb->getQuery()->getResult();
     }

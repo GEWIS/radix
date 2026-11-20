@@ -90,9 +90,9 @@ final class CopyWebToApplicationTest extends DatabaseTestCase
 
     public function testCopiedRowsLeaveTheNextInsertAndTheUUIDsWorking(): void
     {
-        // A few rows stand in for what the copy carries; the transport table is injected into the test schema,
-        // and the copy must take them over.
-        $web = $this->entityManager->getConnection();
+        // A few rows stand in for what the copy carries: the source is the MariaDB web database, whose transport
+        // table the schema listener injects, and the copy must take them over.
+        $web = $this->webConnection();
         for ($id = 0; $id < 3; $id++) {
             $web->executeStatement(
                 'INSERT INTO messenger_messages (body, headers, queue_name, created_at, available_at) '
@@ -116,8 +116,12 @@ final class CopyWebToApplicationTest extends DatabaseTestCase
             'The identity advance after the copy was skipped or off.',
         );
 
-        // A UUID stored as BINARY(16) on MariaDB has to come out of the copy as the text PostgreSQL stores; the
-        // sign-up lists' lineage id is the uuid column the fixtures always fill.
+        // A UUID stored as BINARY(16) on MariaDB has to come out of the copy as the text PostgreSQL stores. The
+        // fixtures no longer land in the web database (they serve the site directly), so the source row is written
+        // by hand with the two NOT NULL foreign keys it needs.
+        $this->insertSourceGraph();
+        $this->copy();
+
         $lineageId = $this->application->fetchOne(
             'SELECT lineageid FROM signuplist WHERE lineageid IS NOT NULL LIMIT 1',
         );
@@ -136,10 +140,16 @@ final class CopyWebToApplicationTest extends DatabaseTestCase
     public function testCompositeKeyTableCopiesEveryRow(): void
     {
         $web = $this->webConnection();
-        $values = [];
+        $meetings = [];
+        $details = [];
         foreach (['BV', 'ALV'] as $meetingType) {
             for ($number = 1; $number <= 300; $number++) {
-                $values[] = sprintf(
+                $meetings[] = sprintf(
+                    "('%s', %d, NOW())",
+                    $meetingType,
+                    $number,
+                );
+                $details[] = sprintf(
                     "('%s', %d, NOW(), NOW())",
                     $meetingType,
                     $number,
@@ -147,11 +157,18 @@ final class CopyWebToApplicationTest extends DatabaseTestCase
             }
         }
 
+        // The web source is schema-only, so the meeting rows the details reference have to be written here too.
+        $web->executeStatement(
+            'INSERT INTO Meeting (type, number, date) VALUES ' . implode(
+                ', ',
+                $meetings,
+            ),
+        );
         $web->executeStatement(
             'INSERT INTO MeetingLocalDetails (meeting_type, meeting_number, createdAt, updatedAt) VALUES '
             . implode(
                 ', ',
-                $values,
+                $details,
             ),
         );
 

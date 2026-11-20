@@ -40,8 +40,8 @@ final class HealthController extends AbstractController
     public function __construct(
         #[Autowire(service: 'doctrine.dbal.database_connection')]
         private readonly Connection $ledger,
-        #[Autowire(service: 'doctrine.dbal.web_connection')]
-        private readonly Connection $web,
+        #[Autowire(service: 'doctrine.dbal.application_connection')]
+        private readonly Connection $application,
         #[Autowire('%kernel.project_dir%/var/.migrations-skipped')]
         private readonly string $migrationsSkippedMarker,
     ) {
@@ -78,7 +78,7 @@ final class HealthController extends AbstractController
                 'migrations' => $migrated,
                 'databases' => [
                     'ledger' => $this->reaches($this->ledger),
-                    'web' => $this->reaches($this->web),
+                    'application' => $this->reaches($this->application),
                 ],
             ],
             $migrated ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE,

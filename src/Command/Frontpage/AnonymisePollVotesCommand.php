@@ -48,7 +48,7 @@ final class AnonymisePollVotesCommand extends Command
         private readonly PollRepository $pollRepository,
         private readonly PollVoteRepository $voteRepository,
         private readonly PollCommentReactionRepository $reactionRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
     ) {

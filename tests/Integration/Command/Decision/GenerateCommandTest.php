@@ -18,6 +18,7 @@ use App\Entity\Decision\Organ;
 use App\Entity\Decision\OrganMember;
 use App\Entity\Decision\SubDecision;
 use App\Tests\Support\LedgerBuilder;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ManyToManyOwningSideMapping;
 use Override;
@@ -67,7 +68,7 @@ class GenerateCommandTest extends KernelTestCase
         self::bootKernel();
 
         $ledger = self::getContainer()->get(EntityManagerInterface::class);
-        $projection = self::getContainer()->get('doctrine')->getManager('web');
+        $projection = self::getContainer()->get('doctrine')->getManager('application');
         self::assertInstanceOf(
             EntityManagerInterface::class,
             $projection,
@@ -178,23 +179,23 @@ class GenerateCommandTest extends KernelTestCase
     {
         $connection = $this->projection->getConnection();
 
-        // DELETE rather than TRUNCATE: TRUNCATE commits in MariaDB, which would end the transaction the test is
-        // wrapped in and leave the projection empty for everything that runs after this. The keys are lifted for the
-        // duration instead of deleting in dependency order, because the projection is a graph and no order over it
-        // satisfies every constraint.
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        // DELETE rather than TRUNCATE: TRUNCATE commits, which would end the transaction the test is wrapped in and
+        // leave the projection empty for everything that runs after this. The keys are lifted for the duration
+        // instead of deleting in dependency order, because the projection is a graph and no order over it satisfies
+        // every constraint. The switch that lifts them is engine-specific; the suite only runs as the schema owner.
+        $mysql = $connection->getDatabasePlatform() instanceof AbstractMySQLPlatform;
+        $connection->executeStatement($mysql ? 'SET FOREIGN_KEY_CHECKS = 0' : 'SET session_replication_role = replica');
 
         try {
             foreach ($this->projectedTables() as $table) {
-                $connection->executeStatement(
-                    sprintf(
-                        'DELETE FROM %s',
-                        $connection->quoteSingleIdentifier($table),
-                    ),
-                );
+                // Unquoted: PostgreSQL folds the name to the lowercase the migration created, and none of the
+                // projection's tables needed quoting in the first place.
+                $connection->executeStatement(sprintf('DELETE FROM %s', $table));
             }
         } finally {
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+            $connection->executeStatement(
+                $mysql ? 'SET FOREIGN_KEY_CHECKS = 1' : 'SET session_replication_role = origin',
+            );
         }
 
         $this->projection->clear();

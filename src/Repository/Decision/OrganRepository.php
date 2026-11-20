@@ -184,8 +184,8 @@ class OrganRepository extends ServiceEntityRepository
         $search = trim($search);
         if ('' !== $search) {
             $qb->andWhere($qb->expr()->orX(
-                'LOWER(o.abbr) LIKE :search',
-                'LOWER(o.name) LIKE :search',
+                'LOWER(UNACCENT(o.abbr)) LIKE LOWER(UNACCENT(:search))',
+                'LOWER(UNACCENT(o.name)) LIKE LOWER(UNACCENT(:search))',
             ))
                 ->setParameter(
                     'search',

@@ -42,7 +42,7 @@ final class RedrawStaleShareImagesCommand extends Command
     public function __construct(
         private readonly ActivityRepository $activityRepository,
         private readonly MessageBusInterface $messageBus,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();

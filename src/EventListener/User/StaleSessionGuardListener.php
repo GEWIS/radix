@@ -59,7 +59,7 @@ final class StaleSessionGuardListener
     public function __construct(
         private readonly SessionRepository $repository,
         private readonly HandlerRegistry $registry,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly TranslatorInterface $translator,

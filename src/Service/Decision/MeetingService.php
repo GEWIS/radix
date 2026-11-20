@@ -42,7 +42,7 @@ class MeetingService
         private readonly MeetingRepository $meetingRepository,
         private readonly DecisionRepository $decisionRepository,
         private readonly SubDecisionService $subDecisionService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $emWeb,
         private readonly MailerInterface $mailer,
         private readonly string $mailFromAddress,

@@ -41,7 +41,7 @@ class PasswordResetRequestEmailHandler
         private readonly MemberRepository $memberRepository,
         private readonly CompanyUserRepository $companyUserRepository,
         private readonly PasswordResetRepository $passwordResetRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly SecurityEventLogger $securityEvents,

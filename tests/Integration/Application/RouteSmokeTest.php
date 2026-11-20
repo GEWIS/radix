@@ -18,6 +18,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Throwable;
 
+use function fwrite;
 use function html_entity_decode;
 use function in_array;
 use function json_encode;
@@ -27,6 +28,8 @@ use function sprintf;
 use function str_replace;
 use function str_starts_with;
 use function trim;
+
+use const STDERR;
 
 /**
  * Requests every page the application serves, once each.
@@ -189,6 +192,16 @@ final class RouteSmokeTest extends DatabaseTestCase
                     $exception->getMessage(),
                 );
             } catch (Throwable $exception) {
+                fwrite(
+                    STDERR,
+                    sprintf(
+                        "RAISED %s (%s): %s: %s\n",
+                        $route,
+                        $path,
+                        $exception::class,
+                        $exception->getMessage(),
+                    ),
+                );
                 $raised[] = sprintf(
                     '%s (%s): %s: %s',
                     $route,

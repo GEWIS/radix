@@ -52,7 +52,7 @@ final class PurgeExpiredSessionsCommand extends Command
         private readonly KnownDeviceRepository $knownDeviceRepository,
         private readonly KnownNetworkRepository $knownNetworkRepository,
         private readonly KnownDeviceTokenRepository $knownDeviceTokenRepository,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $em,
     ) {
         parent::__construct();

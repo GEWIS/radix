@@ -79,7 +79,7 @@ final class CopyWebToApplicationCommand extends Command
         private readonly Connection $web,
         #[Autowire(service: 'doctrine.dbal.application_connection')]
         private readonly Connection $application,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $webManager,
     ) {
         parent::__construct();
@@ -375,9 +375,9 @@ final class CopyWebToApplicationCommand extends Command
             return null;
         }
 
-        // MariaDB stores a datetime that was never set as `0000-00-00 00:00:00`, which PostgreSQL refuses to
-        // parse. The ledger spells the same unset date as `0001-01-01 00:00:00` (a deleted member), so the copy
-        // writes that sentinel; the column may be NOT NULL, so NULL would not always do.
+        // MariaDB stores an unset datetime as `0000-00-00 00:00:00`, which PostgreSQL refuses; the copy writes the
+        // ledger's sentinel for an unset date (`0001-01-01 00:00:00`, a deleted member) because the column may be
+        // NOT NULL. The type name arrives in its immutable spelling (`datetime_immutable`), hence both forms.
         if (
             is_string($value)
             && str_starts_with(
@@ -388,13 +388,23 @@ final class CopyWebToApplicationCommand extends Command
                 $typeName,
                 [
                     'date',
+                    'date_immutable',
                     'datetime',
+                    'datetime_immutable',
                     'datetimetz',
+                    'datetimetz_immutable',
                 ],
                 true,
             )
         ) {
-            return 'date' === $typeName
+            return in_array(
+                $typeName,
+                [
+                    'date',
+                    'date_immutable',
+                ],
+                true,
+            )
                 ? '0001-01-01'
                 : '0001-01-01 00:00:00';
         }

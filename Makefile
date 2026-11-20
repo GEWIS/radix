@@ -51,13 +51,11 @@ seed: ## Reset the development databases: drop the schemas, migrate them back up
 	@$(SYMFONY) doctrine:schema:drop --force --full-database --em=web
 	@$(SYMFONY) doctrine:schema:drop --force --full-database --em=application
 	@$(MAKE) migrate MIGRATE_FLAGS=--no-interaction
-	@# One command for all of it: the ledger, then the replay into the projection, then the web database whose
-	@# fixtures hang off what that replay produced. The projection is never seeded directly, so there is nothing to
-	@# regenerate afterwards.
+	@# One command for all of it: the ledger, then the replay into the projection, then the web fixtures that hang
+	@# off it. The projection is never seeded directly, so there is nothing to regenerate afterwards.
 	@$(SYMFONY) app:fixtures:load --no-interaction
-	@# The copy target is refreshed with the seeded website, so a flip of the web connection can be tried against
-	@# fixtures without running the copy by hand.
-	@$(SYMFONY) app:web:copy-to-application --no-interaction
+	@# The fixture load itself replays the projection; the copy from the MariaDB web database is production-only
+	@# and has nothing to copy from in a fresh stack.
 	@$(MAKE) preparemailman
 	@$(DOCKER_COMP) exec mailman-web bash -c '(python3 ./manage.py createsuperuser --no-input 2>/dev/null || true)'
 	@# Removed and made again rather than left alone: the fixtures put every membership back as still to be
@@ -132,12 +130,19 @@ test-prepare: ## Prepare the isolated test databases: (re)build the three schema
 	@$(SYMFONY_TEST) doctrine:database:create --if-not-exists --connection=application
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database
 	@$(SYMFONY_TEST) doctrine:schema:create
+	# The ledger's migrations never run under test (schema:create does), so the unaccent extension they install is
+	# installed by hand.
+	@$(SYMFONY_TEST) app:database:install-unaccent
+	# The web and application sets migrate rather than schema:create: the messenger table, the deferrable foreign
+	# keys and the unaccent extension are what the copy command must work against.
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=web
-	@$(SYMFONY_TEST) doctrine:schema:create --em=web
-	# The application set migrates rather than schema:create: the schema it builds (deferrable foreign keys,
-	# the messenger table, the unaccent extension) is what the copy command must work against.
+	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=application
+	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(WEB_MIGRATIONS)
 	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(APPLICATION_MIGRATIONS)
+	# The suite reads the application database, so the fixtures land next to the projection there; the web
+	# database stays schema-only, as the copy command's test fills it with its own source rows.
 	@$(SYMFONY_TEST) app:fixtures:load --no-interaction
+	@$(SYMFONY_TEST) app:decision:generate --no-interaction
 
 ## —— Docker ———————————————————————————————————————————————————————————————————
 builddev: buildappdev buildmatomo ## Builds the development Docker images
@@ -240,12 +245,11 @@ migration-diff: ## Generate migrations for both entity managers from the current
 	@set -e; \
 	echo "Generating migrations for database..."; \
 	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(DATABASE_MIGRATIONS); \
+	# messenger_messages is kept out of the web set's comparison: no entity maps it, the schema listener injects
+	# it into the application manager, and the application baseline migration owns it.
 	echo "Generating migrations for web..."; \
-	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(WEB_MIGRATIONS); \
-	# messenger_messages is kept out of the comparison: no entity maps it, and the messenger schema listener only
-	# injects it into schemas whose connection a doctrine transport points at (which is what keeps the web set clean).
-	# The table belongs to the application baseline migration instead, like it does to the web's.
-	if $(APPLICATION_DB_ENABLED); then echo "Generating migrations for application..."; $(SYMFONY) doctrine:migrations:diff --allow-empty-diff --filter-expression='~^(?!messenger_messages$$)~' $(APPLICATION_MIGRATIONS); else echo "Skipping application migrations (no APPLICATION_DSN)"; fi
+	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff --filter-expression='~^(?!messenger_messages$$)~' $(WEB_MIGRATIONS); \
+	if $(APPLICATION_DB_ENABLED); then echo "Generating migrations for application..."; $(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(APPLICATION_MIGRATIONS); else echo "Skipping application migrations (no APPLICATION_DATABASE_DSN)"; fi
 	@$(DOCKER) cp "$$($(DOCKER_COMP) ps -q app)":/app/migrations ./
 
 migration-up: ## Execute a single migration upwards

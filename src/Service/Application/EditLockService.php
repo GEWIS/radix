@@ -12,7 +12,6 @@ use App\Repository\Application\EditLockRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 use function sprintf;
@@ -36,9 +35,10 @@ final readonly class EditLockService
     public const int ACQUIRE_TIMEOUT_SECONDS = 10;
 
     public function __construct(
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private EditLockRepository $editLockRepository,
+        private NamedLock $locks,
     ) {
     }
 
@@ -53,33 +53,21 @@ final readonly class EditLockService
     ): ?EditLock {
         // Serialise concurrent acquisitions of the same resource at the DB level. Otherwise the find-then-insert /
         // take-over below is a TOCTOU race: two first acquirers both INSERT (the loser's flush 500s on the unique
-        // index), or two take-overs both win. A MariaDB named lock keeps it atomic without a failed flush closing the
+        // index), or two take-overs both win. A named lock keeps it atomic without a failed flush closing the
         // EntityManager; the UNIQUE(resourceId, resourceKey) index stays the integrity backstop.
-        $connection = $this->entityManager->getConnection();
         $mutex = sprintf(
             'edit_lock_%s_%d',
             $resource->getResourceId(),
             $this->key($resource),
         );
-        $granted = $connection->executeQuery(
-            'SELECT GET_LOCK(?, ?)',
-            [
+        if (
+            !$this->locks->acquire(
                 $mutex,
                 self::ACQUIRE_TIMEOUT_SECONDS,
-            ],
-        )->fetchOne();
-        // GET_LOCK() returns 1 when granted, 0 when the wait timed out and NULL on error. Without the mutex the
-        // find-then-insert below is exactly the TOCTOU race we are guarding against, so never fall through unguarded:
-        // a NULL is an infrastructure fault worth surfacing, a timeout means another acquisition holds the mutex
-        // mid-flight, so report the resource as momentarily blocked (the caller already handles a null lock).
-        if (null === $granted) {
-            throw new RuntimeException(sprintf(
-                'Failed to obtain the edit-lock mutex %s.',
-                $mutex,
-            ));
-        }
-
-        if (1 !== (int) $granted) {
+            )
+        ) {
+            // Held by another acquisition: report the resource as momentarily blocked (the caller already handles
+            // a null lock).
             return null;
         }
 
@@ -118,10 +106,7 @@ final readonly class EditLockService
 
             return $lock;
         } finally {
-            $connection->executeQuery(
-                'SELECT RELEASE_LOCK(?)',
-                [$mutex],
-            );
+            $this->locks->release($mutex);
         }
     }
 

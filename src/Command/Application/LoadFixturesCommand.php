@@ -8,6 +8,7 @@ use Doctrine\Bundle\FixturesBundle\Loader\FixturesProvider;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -21,24 +22,16 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use function sprintf;
 
 /**
- * Seeds both databases in the order they depend on one another, with the projection rebuilt in between:
- *
- *   1. the ledger, which is where the members, the meetings and the decisions about them are written;
- *   2. `app:decision:generate`, which replays that into the decision projection the website reads (the members,
- *      their addresses and list memberships, and the organs, organ members, board members and keyholders the
- *      decisions imply);
- *   3. the web database, whose fixtures hang activities, photos, accounts and the rest off what step 2 produced.
- *
- * Nothing fixtures the projection directly. A body exists because a decision founded it, and a member is in it because
- * a decision installed them, so the only way to seed one is to seed the decision and replay it.
- *
- * Every fixture names the group it belongs to, and the bundle's loader takes one entity manager at a time, so the two
- * halves are executed separately. They are purged differently as well, which is the other reason this exists rather
- * than two invocations of `doctrine:fixtures:load`.
+ * Seeds the databases in the order they depend on one another, with the projection rebuilt in between: the
+ * ledger first, then `app:decision:generate` replays it into the projection the website reads, then the
+ * application fixtures hang off what that produced. Nothing fixtures the projection directly: a body exists
+ * because a decision founded it, so the only way to seed one is to seed the decision and replay it. The two
+ * halves are purged differently, which is why this command exists rather than two invocations of
+ * `doctrine:fixtures:load`.
  */
 #[AsCommand(
     name: 'app:fixtures:load',
-    description: 'Seed the ledger and the web database with their data fixtures.',
+    description: 'Seed the ledger and the application database with their data fixtures.',
 )]
 final class LoadFixturesCommand extends Command
 {
@@ -50,8 +43,8 @@ final class LoadFixturesCommand extends Command
         private readonly FixturesProvider $fixturesProvider,
         #[Autowire(service: 'doctrine.orm.database_entity_manager')]
         private readonly EntityManagerInterface $ledgerManager,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
-        private readonly EntityManagerInterface $webManager,
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
+        private readonly EntityManagerInterface $applicationManager,
     ) {
         parent::__construct();
     }
@@ -71,7 +64,7 @@ final class LoadFixturesCommand extends Command
                 sprintf(
                     'Careful, databases "%s" and "%s" will be purged. Do you want to continue?',
                     $this->ledgerManager->getConnection()->getDatabase() ?? '',
-                    $this->webManager->getConnection()->getDatabase() ?? '',
+                    $this->applicationManager->getConnection()->getDatabase() ?? '',
                 ),
                 !$input->isInteractive(),
             )
@@ -85,19 +78,17 @@ final class LoadFixturesCommand extends Command
             return $status;
         }
 
-        $this->purgeWeb();
+        $this->purgeApplication();
 
         return $this->rebuildProjection(
             $ui,
             $output,
-        ) ?? $this->loadWeb($ui) ?? Command::SUCCESS;
+        ) ?? $this->loadApplication($ui) ?? Command::SUCCESS;
     }
 
     /**
-     * Replay the ledger into the projection, before the web fixtures that hang off it are loaded.
-     *
-     * The command is run rather than its services called in turn, so that the pause it puts on the API for the length
-     * of the rebuild, and the progress it reports, are not a second copy that can drift from the first.
+     * Replays the ledger into the projection, before the fixtures that hang off it are loaded. Run rather than
+     * called in turn, so the API pause and the reported progress are not a second copy that can drift.
      *
      * @return int|null the failure to report, or null to carry on
      */
@@ -141,8 +132,7 @@ final class LoadFixturesCommand extends Command
 
         $ui->text('Loading fixtures into the ledger...');
 
-        // Nothing special: the ledger's constraints resolve in dependency order, so the executor may purge and load
-        // inside one transaction the way `doctrine:fixtures:load` does.
+        // The ledger's constraints resolve in dependency order, so purge and load share one transaction.
         new ORMExecutor(
             $this->ledgerManager,
             new ORMPurger($this->ledgerManager),
@@ -152,31 +142,29 @@ final class LoadFixturesCommand extends Command
     }
 
     /**
-     * Empty the web database, before the projection is replayed into it rather than after.
+     * Emptied before the replay: a purge after it would take the organs, board and keyholders the replay
+     * derived straight back out.
      *
-     * The replay is what fills the decision half of this schema, so a purge that ran after it would take the organs,
-     * the board and the keyholders it had just derived straight back out again.
-     *
-     * Foreign key checks are lifted around it: large parts of this schema lack explicit CASCADEs, so that projecting
-     * the ledger cannot cascade data away, and the dependency-ordered purge cannot resolve the self-referential and
-     * cross-table constraints that leaves (SubDecision among them) over existing data.
+     * Foreign key checks are lifted because this schema lacks explicit CASCADEs and the dependency-ordered purge
+     * cannot resolve the remaining constraints over existing data. Development and tests only, where the loaders
+     * run as the schema's owner.
      */
-    private function purgeWeb(): void
+    private function purgeApplication(): void
     {
-        $connection = $this->webManager->getConnection();
-        $purger = new ORMPurger($this->webManager);
+        $connection = $this->applicationManager->getConnection();
+        $purger = new ORMPurger($this->applicationManager);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
 
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        $connection->executeStatement($this->disableForeignKeyChecks());
 
         try {
             $purger->purge();
         } finally {
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+            $connection->executeStatement($this->enableForeignKeyChecks());
         }
     }
 
-    private function loadWeb(SymfonyStyle $ui): ?int
+    private function loadApplication(SymfonyStyle $ui): ?int
     {
         $fixtures = $this->fixtures(
             $ui,
@@ -187,26 +175,41 @@ final class LoadFixturesCommand extends Command
             return Command::FAILURE;
         }
 
-        $connection = $this->webManager->getConnection();
+        $connection = $this->applicationManager->getConnection();
 
-        $ui->text('Loading fixtures into the web database...');
+        $ui->text('Loading fixtures into the application database...');
 
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        $connection->executeStatement($this->disableForeignKeyChecks());
 
         try {
-            // Loaded with append: the schema was emptied before the replay, and what the replay wrote is what these
-            // fixtures hang off, so there is nothing left to purge here.
-            new ORMExecutor($this->webManager)->execute(
+            // Append mode: the schema was emptied before the replay, and these fixtures hang off what it wrote.
+            new ORMExecutor($this->applicationManager)->execute(
                 $fixtures,
                 true,
             );
         } finally {
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+            $connection->executeStatement($this->enableForeignKeyChecks());
         }
 
         $ui->success('Loaded fixtures!');
 
         return null;
+    }
+
+    private function disableForeignKeyChecks(): string
+    {
+        return $this->applicationManager->getConnection()->getDatabasePlatform()
+            instanceof AbstractMySQLPlatform
+            ? 'SET FOREIGN_KEY_CHECKS = 0'
+            : 'SET session_replication_role = replica';
+    }
+
+    private function enableForeignKeyChecks(): string
+    {
+        return $this->applicationManager->getConnection()->getDatabasePlatform()
+            instanceof AbstractMySQLPlatform
+            ? 'SET FOREIGN_KEY_CHECKS = 1'
+            : 'SET session_replication_role = origin';
     }
 
     /**

@@ -42,7 +42,7 @@ final class ForceReloginUsersCommand extends Command
     use HoldsRunLockTrait;
 
     public function __construct(
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
         private readonly SecurityEventLogger $securityEvents,

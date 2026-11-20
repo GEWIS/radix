@@ -72,7 +72,7 @@ final readonly class KnownDeviceRegistry
         private KnownNetworkRepository $networks,
         private KnownDeviceTokenRepository $tokens,
         private DeviceFingerprint $fingerprint,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
         private LoggerInterface $logger,

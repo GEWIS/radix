@@ -63,7 +63,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
                 $companyPackageClass,
                 'p',
             )
-            ->where('p.published = 1')
+            ->where('p.published = TRUE')
             // All packages that will expire between today and then, ordered smallest first
             ->andWhere('p.expires > CURRENT_DATE()')
             ->andWhere('p.expires <= :date')
@@ -111,7 +111,7 @@ class CompanyPackageRepository extends ServiceEntityRepository
                 $companyPackageClass,
                 'p',
             )
-            ->where('p.published = 1')
+            ->where('p.published = TRUE')
             // All packages that will start between today and then, ordered smallest first
             ->andWhere('p.starts > CURRENT_DATE()')
             ->andWhere('p.starts <= :date')

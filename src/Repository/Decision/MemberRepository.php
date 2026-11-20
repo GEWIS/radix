@@ -146,20 +146,31 @@ class MemberRepository extends ServiceEntityRepository
             );
 
         $sql = <<<QUERY
-            SELECT `Member`.`lidnr` as `lidnr`,
-                CONCAT_WS(' ', `firstName`, IF(LENGTH(`middleName`), `middleName`, NULL), `lastName`) as `fullName`,
-                `generation`
-            FROM `Member`
-            LEFT JOIN `UserSettings` ON `UserSettings`.`lidnr` = `Member`.`lidnr`
+            SELECT m.lidnr,
+                CONCAT_WS(
+                    ' ',
+                    m.firstName,
+                    CASE WHEN LENGTH(m.middleName) > 0 THEN m.middleName ELSE NULL END,
+                    m.lastName
+                ) AS "fullName",
+                m.generation
+            FROM member m
+            LEFT JOIN usersettings ON usersettings.lidnr = m.lidnr
             WHERE
                 (
-                CONCAT(LOWER(`firstName`), ' ', LOWER(`lastName`)) LIKE :name
-                OR CONCAT(LOWER(`firstName`), ' ', LOWER(`middleName`), ' ', LOWER(`lastName`)) LIKE :name
+                CONCAT(LOWER(unaccent(m.firstName)), ' ', LOWER(unaccent(m.lastName))) LIKE unaccent(:name)
+                OR CONCAT(
+                    LOWER(unaccent(m.firstName)),
+                    ' ',
+                    LOWER(unaccent(m.middleName)),
+                    ' ',
+                    LOWER(unaccent(m.lastName))
+                ) LIKE unaccent(:name)
                 )
-                AND deleted = 0
-                AND expiration >= NOW()
-                AND hidden = 0
-                AND COALESCE(`UserSettings`.`photoTaggingOptOut`, 0) = 0
+                AND m.deleted = FALSE
+                AND m.expiration >= CURRENT_DATE
+                AND m.hidden = FALSE
+                AND COALESCE(usersettings.photoTaggingOptOut, FALSE) = FALSE
             ORDER BY $orderColumn $orderDirection LIMIT :limit
             QUERY;
 
@@ -210,19 +221,30 @@ class MemberRepository extends ServiceEntityRepository
             );
 
         $sql = <<<'QUERY'
-            SELECT `lidnr`,
-                CONCAT_WS(' ', `firstName`, IF(LENGTH(`middleName`), `middleName`, NULL), `lastName`) as `fullName`,
-                `generation`
-            FROM `Member`
+            SELECT m.lidnr,
+                CONCAT_WS(
+                    ' ',
+                    m.firstName,
+                    CASE WHEN LENGTH(m.middleName) > 0 THEN m.middleName ELSE NULL END,
+                    m.lastName
+                ) AS "fullName",
+                m.generation
+            FROM member m
             WHERE
                 (
-                CONCAT(LOWER(`firstName`), ' ', LOWER(`lastName`)) LIKE :name
-                OR CONCAT(LOWER(`firstName`), ' ', LOWER(`middleName`), ' ', LOWER(`lastName`)) LIKE :name
+                CONCAT(LOWER(unaccent(m.firstName)), ' ', LOWER(unaccent(m.lastName))) LIKE unaccent(:name)
+                OR CONCAT(
+                    LOWER(unaccent(m.firstName)),
+                    ' ',
+                    LOWER(unaccent(m.middleName)),
+                    ' ',
+                    LOWER(unaccent(m.lastName))
+                ) LIKE unaccent(:name)
                 )
-                AND deleted = 0
-                AND expiration >= NOW()
-                AND hidden = 0
-            ORDER BY `generation` DESC, `lidnr` ASC LIMIT :limit
+                AND m.deleted = FALSE
+                AND m.expiration >= CURRENT_DATE
+                AND m.hidden = FALSE
+            ORDER BY m.generation DESC, m.lidnr ASC LIMIT :limit
             QUERY;
 
         $query = $this->getEntityManager()->createNativeQuery(
@@ -263,18 +285,17 @@ class MemberRepository extends ServiceEntityRepository
 
         $select = $builder->generateSelectClause(['m' => 't1']);
 
+        // The day of the year the birthday falls on, relative to today's: the DATEDIFF chain's anniversary
+        // arithmetic in one extract.
         $sql = <<<QUERY
-            SELECT $select FROM Member AS t1
-            LEFT JOIN UserSettings AS us ON us.lidnr = t1.lidnr
-            WHERE DATEDIFF(
-                DATE_SUB(t1.birth, INTERVAL YEAR(t1.birth) YEAR),
-                DATE_SUB(CURDATE(), INTERVAL YEAR(CURDATE()) YEAR)
-            ) BETWEEN 0 AND :days
-            AND t1.deleted = 0
-            AND t1.expiration > CURDATE()
-            AND t1.hidden = 0
-            AND COALESCE(us.hideBirthdayOnFrontpage, 0) = 0
-            ORDER BY DATE_SUB(t1.birth, INTERVAL YEAR(t1.birth) YEAR) ASC
+            SELECT $select FROM member AS t1
+            LEFT JOIN usersettings AS us ON us.lidnr = t1.lidnr
+            WHERE EXTRACT(DOY FROM t1.birth) - EXTRACT(DOY FROM CURRENT_DATE) BETWEEN 0 AND :days
+            AND t1.deleted = FALSE
+            AND t1.expiration > CURRENT_DATE
+            AND t1.hidden = FALSE
+            AND COALESCE(us.hideBirthdayOnFrontpage, FALSE) = FALSE
+            ORDER BY EXTRACT(DOY FROM t1.birth) ASC
             QUERY;
 
         $query = $this->getEntityManager()->createNativeQuery(

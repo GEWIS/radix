@@ -34,7 +34,7 @@ final readonly class CourseDocumentFlattener
     public function __construct(
         private PdfRasterizer $rasterizer,
         private FileStorage $fileStorage,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private EntityManagerInterface $entityManager,
         private Filesystem $filesystem,
     ) {

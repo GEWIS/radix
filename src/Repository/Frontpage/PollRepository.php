@@ -236,8 +236,10 @@ class PollRepository extends ServiceEntityRepository
                     't',
                 )
                 ->andWhere(
-                    'q.valueEN LIKE :search OR q.valueNL LIKE :search'
-                    . ' OR t.valueEN LIKE :search OR t.valueNL LIKE :search',
+                    'LOWER(UNACCENT(q.valueEN)) LIKE LOWER(UNACCENT(:search))'
+                    . ' OR LOWER(UNACCENT(q.valueNL)) LIKE LOWER(UNACCENT(:search))'
+                    . ' OR LOWER(UNACCENT(t.valueEN)) LIKE LOWER(UNACCENT(:search))'
+                    . ' OR LOWER(UNACCENT(t.valueNL)) LIKE LOWER(UNACCENT(:search))',
                 )
                 ->setParameter(
                     'search',

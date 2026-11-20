@@ -55,7 +55,7 @@ final class RemindOptionBudgetCommand extends Command
         private readonly ActivityProposalRepository $activityProposalRepository,
         private readonly UserRepository $userRepository,
         private readonly NotificationPublisher $publisher,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly OptionBudgetSchedule $schedule,
     ) {

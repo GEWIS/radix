@@ -42,7 +42,7 @@ class GenerateCommand extends Command
 
     public function __construct(
         private readonly ApiService $apiService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly MeetingService $meetingService,
         private readonly MemberService $memberService,

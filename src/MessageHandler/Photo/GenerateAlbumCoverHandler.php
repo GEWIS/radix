@@ -29,7 +29,7 @@ class GenerateAlbumCoverHandler
     public function __construct(
         private readonly AlbumRepository $albumRepository,
         private readonly AlbumCoverService $albumCoverService,
-        #[Autowire(service: 'doctrine.orm.web_entity_manager')]
+        #[Autowire(service: 'doctrine.orm.application_entity_manager')]
         private readonly EntityManagerInterface $entityManager,
         private readonly MessageBusInterface $messageBus,
         private readonly HubInterface $hub,

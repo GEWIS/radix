@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Doctrine\Functions;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
@@ -16,6 +17,9 @@ use Override;
  * This code originates from https://gist.github.com/Ocramius/919465.
  *
  * Usage: Call addSelect('RAND() as HIDDEN rand') and orderBy('rand') on a QueryBuilder object
+ *
+ * MariaDB spells it `RAND()` and PostgreSQL `random()`; the platform behind the query decides. Doctrine salts the
+ * DQL cache key with the platform, so the two translations never mix.
  */
 class Rand extends FunctionNode
 {
@@ -30,6 +34,10 @@ class Rand extends FunctionNode
     #[Override]
     public function getSql(SqlWalker $sqlWalker): string
     {
-        return 'RAND()';
+        if ($sqlWalker->getConnection()->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return 'RAND()';
+        }
+
+        return 'random()';
     }
 }
