@@ -1,0 +1,17 @@
+// Add `contents` to Bootstrap's `d-*` display utilities. This is required for
+// complex modals to render as transparent layout wrappers, so any form fields
+// stay direct flex children of `.modal-content`, which
+// `.modal-dialog-scrollable` needs for the modal's body to scroll.
+$utilities: map-merge($utilities, (
+    "display": map-merge(
+        map-get($utilities, "display"),
+        (
+            // The `display` utility uses a bare list rather than a map, so
+            // `contents` is appended instead of merging it in.
+            values: append(
+                map-get(map-get($utilities, "display"), "values"),
+                contents,
+            ),
+        ),
+    ),
+));
