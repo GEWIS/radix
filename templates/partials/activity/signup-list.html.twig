@@ -115,7 +115,7 @@
                         {# No captcha: this creates no data (only remails a pending sign-up) and always reports the
                            same neutral result, so it never reveals whether an address is signed up. #}
                         <div class="modal fade" id="{{ resendModalId }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">{{ 'Resend confirmation email'|trans }}</h5>

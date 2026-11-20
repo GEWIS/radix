@@ -66,6 +66,7 @@
                         attr: form.vars.attr|merge({
                             'data-action': 'live#action:prevent',
                             'data-live-action-param': 'submit',
+                            'class': (form.vars.attr.class ?? '') ~ ' d-contents',
                         }),
                     }) }}
                         <div class="modal-body">

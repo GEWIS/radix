@@ -24,8 +24,11 @@ $enable-negative-margins: true;
 // Custom root
 @import 'root';
 
-// Core components
+// Custom utilities
 @import '../../vendor/twbs/bootstrap/scss/utilities';
+@import 'utilities';
+
+// Core components
 @import '../../vendor/twbs/bootstrap/scss/reboot';
 @import '../../vendor/twbs/bootstrap/scss/alert';
 @import '../../vendor/twbs/bootstrap/scss/badge';
