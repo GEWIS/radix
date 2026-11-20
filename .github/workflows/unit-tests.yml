@@ -29,13 +29,13 @@ jobs:
             postgresql:
                 image: postgres:17
                 env:
-                    POSTGRES_USER: gewisdb
-                    POSTGRES_PASSWORD: gewisdb
-                    POSTGRES_DB: gewisdb
+                    POSTGRES_USER: radix
+                    POSTGRES_PASSWORD: radix
+                    POSTGRES_DB: radixdev_db
                 ports:
                     - 5432:5432
                 options: >-
-                    --health-cmd="pg_isready --username=gewisdb"
+                    --health-cmd="pg_isready --username=radix --dbname=postgres"
                     --health-interval=10s
                     --health-timeout=5s
                     --health-retries=10
@@ -98,14 +98,16 @@ jobs:
                 with:
                     env-file: .env.test
 
-            -   name: Create the isolated ledger test database
+            -   name: Create the isolated test databases on PostgreSQL
                 env:
-                    PGPASSWORD: gewisdb
-                # Only the empty database; the schema is built from the mapping metadata below. The name is the one
-                # `.env.test` points at, with the `_test` suffix `when@test` appends.
+                    PGPASSWORD: radix
+                # Only the empty databases; the schemas are built from the mapping metadata below. The names are the
+                # ones `.env.test` points at, with the `_test` suffix `when@test` appends.
                 run: |
-                    psql --host=127.0.0.1 --port=5432 --username=gewisdb --dbname=gewisdb \
-                      --command="CREATE DATABASE gewisdb_test;"
+                    psql --host=127.0.0.1 --port=5432 --username=radix --dbname=radixdev_db \
+                      --command="CREATE DATABASE radixdev_db_test;"
+                    psql --host=127.0.0.1 --port=5432 --username=radix --dbname=radixdev_db \
+                      --command="CREATE DATABASE radixdev_app_test;"
 
             -   name: Create the isolated website test database
                 env:
@@ -126,6 +128,7 @@ jobs:
                 run: |
                     bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/database.yaml
                     bin/console doctrine:migrations:migrate --no-interaction --em=web --configuration=config/packages/migrations/web.yaml
+                    bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/application.yaml
 
             -   name: Load test fixtures
                 env:

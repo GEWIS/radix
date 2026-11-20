@@ -41,10 +41,12 @@ clear_marker_when_nothing_to_migrate() {
 
 		php bin/console dbal:run-sql -q --connection=database "SELECT 1" >/dev/null 2>&1 || continue
 		php bin/console dbal:run-sql -q --connection=web "SELECT 1" >/dev/null 2>&1 || continue
+		[ -z "$APPLICATION_DSN" ] || php bin/console dbal:run-sql -q --connection=application "SELECT 1" >/dev/null 2>&1 || continue
 
 		if
 			! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/database.yaml >/dev/null 2>&1 \
-			|| ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/web.yaml >/dev/null 2>&1
+			|| ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/web.yaml >/dev/null 2>&1 \
+			|| { [ -n "$APPLICATION_DSN" ] && ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/application.yaml >/dev/null 2>&1; }
 		then
 			echo "Both databases answer, but a migration is pending: this container started in the middle of a deploy. Restart it to migrate."
 			return 0
@@ -85,6 +87,10 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	if [ -n "$DATABASE_DSN" ]; then
 		wait_for_database database || DATABASES_REACHABLE=0
 		wait_for_database web || DATABASES_REACHABLE=0
+		# Only where a deployment created the copy target; before that a deployment keeps the two-database behaviour.
+		if [ -n "$APPLICATION_DSN" ]; then
+			wait_for_database application || DATABASES_REACHABLE=0
+		fi
 	fi
 
 	# The image is built with `cache:clear --no-optional-warmers` (see Dockerfile): the optional warmers instantiate
@@ -107,11 +113,16 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		# the web set does not support it. MariaDB commits DDL implicitly, so its migrations declare themselves
 		# non-transactional, and the migrator refuses a plan that contains one of those. The wrapping transaction it would
 		# have opened there was destroyed by the first DDL statement in any case.
-		for set in database web; do
+		for set in database web application; do
 			if find "./migrations/$set" -iname '*.php' -print -quit | grep --quiet .; then
+				# No database to migrate until a deployment creates the copy target; the variable is what says it has.
+				if [ "$set" = application ] && [ -z "$APPLICATION_DSN" ]; then
+					continue
+				fi
 				case "$set" in
 					database) configuration=config/packages/migrations/database.yaml ;;
 					web) configuration=config/packages/migrations/web.yaml ;;
+					application) configuration=config/packages/migrations/application.yaml ;;
 				esac
 
 				php bin/console doctrine:migrations:migrate \

@@ -42,11 +42,15 @@ x-app-environment: &app_environment
     # The ledger, on PostgreSQL: the `database` connection. `role` is not a driver parameter —
     # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it, so the
     # application runs as a least-privileged role rather than as the owner of the schema it reads.
-    DATABASE_DSN: "postgresql://${DOCTRINE_DATABASE_USER:?DOCTRINE_DATABASE_USER must be set}:${DOCTRINE_DATABASE_PASSWORD:?DOCTRINE_DATABASE_PASSWORD must be set}@${DOCTRINE_DATABASE_HOST:?DOCTRINE_DATABASE_HOST must be set}:${DOCTRINE_DATABASE_PORT:?DOCTRINE_DATABASE_PORT must be set}/${DOCTRINE_DATABASE_DATABASE:?DOCTRINE_DATABASE_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${DOCTRINE_DATABASE_SSLMODE:?DOCTRINE_DATABASE_SSLMODE must be set}&role=${DOCTRINE_DATABASE_ROLE:?DOCTRINE_DATABASE_ROLE must be set}"
+    DATABASE_DSN: "postgresql://${POSTGRESQL_USER:?POSTGRESQL_USER must be set}:${POSTGRESQL_PASSWORD:?POSTGRESQL_PASSWORD must be set}@${POSTGRESQL_HOST:?POSTGRESQL_HOST must be set}:${POSTGRESQL_PORT:?POSTGRESQL_PORT must be set}/${POSTGRESQL_DATABASE:?POSTGRESQL_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${POSTGRESQL_SSLMODE:?POSTGRESQL_SSLMODE must be set}&role=${POSTGRESQL_ROLE:?POSTGRESQL_ROLE must be set}"
     # Everything else, on MariaDB: the `web` connection. The charset and the collation belong in the DSN because they
     # have to match what the tables were created with; a mismatch makes a schema comparison report every string column
     # as changed.
     WEB_DATABASE_DSN: "pdo-mysql://${DOCTRINE_WEB_USER:?DOCTRINE_WEB_USER must be set}:${DOCTRINE_WEB_PASSWORD:?DOCTRINE_WEB_PASSWORD must be set}@${DOCTRINE_WEB_HOST:?DOCTRINE_WEB_HOST must be set}:${DOCTRINE_WEB_PORT:?DOCTRINE_WEB_PORT must be set}/${DOCTRINE_WEB_DATABASE:?DOCTRINE_WEB_DATABASE must be set}?serverVersion=${DOCTRINE_WEB_VERSION:?DOCTRINE_WEB_VERSION must be set}&charset=${DOCTRINE_WEB_CHARSET:?DOCTRINE_WEB_CHARSET must be set}&collation=${DOCTRINE_WEB_COLLATION:?DOCTRINE_WEB_COLLATION must be set}"
+    # The website's own database once it moves off MariaDB, on PostgreSQL: the `application` connection. Shares the
+    # ledger's credentials and role, differs only in the database it names. The entrypoint skips everything needing
+    # it while the variable is unset, so an old deployment keeps its current behaviour.
+    APPLICATION_DSN: "postgresql://${POSTGRESQL_USER:?POSTGRESQL_USER must be set}:${POSTGRESQL_PASSWORD:?POSTGRESQL_PASSWORD must be set}@${POSTGRESQL_HOST:?POSTGRESQL_HOST must be set}:${POSTGRESQL_PORT:?POSTGRESQL_PORT must be set}/${POSTGRESQL_APPLICATION_DATABASE:?POSTGRESQL_APPLICATION_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${POSTGRESQL_SSLMODE:?POSTGRESQL_SSLMODE must be set}&role=${POSTGRESQL_ROLE:?POSTGRESQL_ROLE must be set}"
 
     MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER must be set}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS must be set}@${RABBITMQ_HOST:-rabbitmq}:${RABBITMQ_PORT:-5672}"
     # The cache, Doctrine's second-level cache and symfony/lock all sit on this one Valkey. The locks have to be
@@ -114,6 +118,9 @@ x-app-environment: &app_environment
     TUE_IP_RANGES: "${TUE_IP_RANGES:-131.155.0.0/16,100.64.0.0/10}"
     WATERMARK_TAG: "${WATERMARK_TAG:-GEWIS-EDU}"
 
+    # The entrypoint migrates on boot unless SKIP_MIGRATIONS is set; compose passes the variable through so an
+    # operator can name it, and the CI migration check sets it to drive the migrations itself.
+    SKIP_MIGRATIONS: "${SKIP_MIGRATIONS:-}"
     # The subnets `ROLE_DATABASE_ADMIN` and `ROLE_DATABASE_READ_ONLY` are granted on, comma separated, CIDR notation.
     # Never the same list as TUE_IP_RANGES above: that one is as wide as a university, and a value that wide restricts
     # nothing here. Addresses in SYMFONY_TRUSTED_PROXIES are refused whatever this says. Empty restricts nothing.

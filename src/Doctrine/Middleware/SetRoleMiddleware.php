@@ -10,13 +10,18 @@ use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 /**
- * Tagged for `database` alone: `SET ROLE` is written here in PostgreSQL syntax, and the website's MariaDB connection
- * has no role of its own to drop to. {@see SetRoleDriver} for what a connection is dropped to.
+ * Tagged for the PostgreSQL connections: the application connection drops to the same least-privileged role as the
+ * ledger, which lets the copy write there, and the website's MariaDB connection has no role of its own to drop to.
+ * {@see SetRoleDriver} for what a connection is dropped to.
  */
 #[Autoconfigure(tags: [
     [
         'name' => 'doctrine.middleware',
         'connection' => 'database',
+    ],
+    [
+        'name' => 'doctrine.middleware',
+        'connection' => 'application',
     ],
 ])]
 class SetRoleMiddleware implements MiddlewareInterface
