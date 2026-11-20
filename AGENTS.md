@@ -11,7 +11,7 @@ radix is one Symfony application serving two things that belong to the same asso
 - **The register**: meetings, decisions, members, memberships, bodies and mailing lists. The authoritative record of what GEWIS decided and who its members are, written by the board and read by every other GEWIS system through the API.
 - **The website**: activities, photos, course documents, custom pages, the careers portal, and the public face of the decisions above.
 
-They used to be two applications (GEWISDB, GEWISWEB) joined by a sync script. Here they are one codebase, one container image, one deployment: two entity managers in the same kernel, no sync command, no second repository.
+They used to be two applications (GEWISDB, GEWISWEB) joined by a sync script. Here they are one codebase, one container image, one deployment: the ledger and the website are two entity managers in the same kernel, no sync command, no second repository. A third connection, `web`, still exists while the migration from MariaDB runs; the two connections are the whole picture once it is gone.
 
 ## Quick start
 
@@ -51,18 +51,19 @@ Run these before reporting work complete. The condition column says when each is
 - **Do not verify forms, login or sign-up flows with `curl`.** CSRF is stateless (double-submit cookie plus Origin/Referer checks), so a hand-crafted POST fails by design and a 4xx proves nothing. Use the browser suite, or a real browser against the seeded stack.
 - **If you cannot run a gate** (no Docker, no Chromium, a tool unavailable), say which one and why in the final report. Never imply it passed.
 
-## Two databases
+## Three connections
 
-Two connections; the distinction governs anything that touches data.
+The two the code reads, plus the copy source the migration still bridges; the distinction governs anything that touches data.
 
 - **`database`**: PostgreSQL, the **ledger**. The editable source of truth: members, prospective members, memberships, meetings, decisions, bodies, mailing lists. Entities in `src/Entity/Database`, migrations in `migrations/database`.
-- **`web`**: MariaDB, everything else. The website's own data *and* the **projection** of the ledger that the site and the API read (`src/Entity/Decision`). Migrations in `migrations/web`.
+- **`application`**: PostgreSQL, everything else. The website's own data *and* the **projection** of the ledger that the site and the API read (`src/Entity/Decision`). Migrations in `migrations/application`.
+- **`web`**: MariaDB, the copy source of the migration only. The fixtures no longer land there and nothing serves from it; `app:web:copy-to-application` moves its data across once at the cutover, after which this connection and `migrations/web` go away in a follow-up.
 
 Rules that apply everywhere:
 
 - A change to a ledger entity MUST come with the matching change on the projection side (`src/Entity/Decision`, `src/Service/Decision`). Change one without the other and the website quietly renders an association that no longer exists.
 - A query MUST NOT span both connections. DQL, joins and associations stay inside one entity manager; ask the other for what you need and match up in PHP.
-- The `database` manager is the ledger's, usually the wrong one. Inject the manager or repository you want; do not let `ManagerRegistry` hand you the default manager.
+- The `database` manager is the ledger's, usually the wrong one. Inject the manager or repository you want; do not let `ManagerRegistry` hand you the default manager. The `application` manager is the website's — it comes before `web` in `doctrine.yaml` on purpose, so repository services bound to the site classes resolve to it.
 - Both the website and the API read the projection, never the ledger directly.
 - After a bulk change to the ledger, run `app:decision:generate` to rebuild the projection.
 

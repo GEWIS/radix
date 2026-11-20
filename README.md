@@ -24,11 +24,15 @@ Two things about the same association, once two applications, are now one:
 The website shows the association's decisions, the bodies that exist because of them, and the members installed in
 those bodies, and it reads them from the application that records them.
 
-So there are two databases, and the split matters for anything that touches data:
+So there are two databases the code reads, and a third that is the migration's bridge, and the split matters for
+anything that touches data:
 
 - **PostgreSQL** stores the ledger - the editable source of truth, behind the `database` connection.
-- **MariaDB** stores everything else, behind the `web` connection: the website's own data, and the projection of the
-  ledger that the site and the API read from.
+- **PostgreSQL** stores everything else, behind the `application` connection: the website's own data, and the
+  projection of the ledger that the site and the API read from.
+- **MariaDB**, behind the `web` connection, is the copy source of the migration: the fixtures no longer land there
+  and nothing serves from it. `app:web:copy-to-application` moves its data across once, at the cutover, after which
+  the connection and everything around it goes away in a follow-up.
 
 ## Features
 The website has the following features:
@@ -158,7 +162,9 @@ The test suite runs with PHPUnit, inside the `app` container, against isolated c
 - `make test-browser` - Run the browser tests, which drive a real Chromium against a server of their own (Symfony Panther). They are excluded from the ordinary run, and because that server writes outside the transaction the other tests roll back, the target re-seeds the databases when the run ends, passed or failed.
 
 Tests that need a database run against real PostgreSQL and MariaDB matching production rather than an in-memory
-substitute, because the schema uses features of both databases that an in-memory database does not implement.
+substitute, because the schema uses features of both databases (the ledger's PostgreSQL queries, the copy source's
+MariaDB) that an in-memory database does not implement. The suite itself reads from the `application` database on
+PostgreSQL.
 
 When a change touches what a page does once its JavaScript has run (a form flow, an editor, a live component, a
 lock), prefer a test in `tests/Browser/` over a unit test: the rest of the suite renders the template and stops, so
