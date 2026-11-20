@@ -775,6 +775,6 @@ class PhotoFixture extends Fixture implements DependentFixtureInterface, Fixture
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

@@ -2,8 +2,8 @@
 set -e
 
 # Waits for the Doctrine connection named in $1 to become reachable. Both databases are waited for before anything
-# is migrated: the ledger and the web database are equally required, and a container that comes up against one that
-# is not ready fails on its first request instead of at startup, where it can be seen.
+# is migrated: the ledger and the application database are equally required, and a container that comes up against one
+# that is not ready fails on its first request instead of at startup, where it can be seen.
 wait_for_database() {
 	echo "Waiting for the $1 database to be ready..."
 	ATTEMPTS_LEFT_TO_REACH_DATABASE=60
@@ -40,12 +40,10 @@ clear_marker_when_nothing_to_migrate() {
 		sleep 60
 
 		php bin/console dbal:run-sql -q --connection=database "SELECT 1" >/dev/null 2>&1 || continue
-		php bin/console dbal:run-sql -q --connection=web "SELECT 1" >/dev/null 2>&1 || continue
 		[ -z "$APPLICATION_DSN" ] || php bin/console dbal:run-sql -q --connection=application "SELECT 1" >/dev/null 2>&1 || continue
 
 		if
 			! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/database.yaml >/dev/null 2>&1 \
-			|| ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/web.yaml >/dev/null 2>&1 \
 			|| { [ -n "$APPLICATION_DSN" ] && ! php bin/console doctrine:migrations:up-to-date --configuration=config/packages/migrations/application.yaml >/dev/null 2>&1; }
 		then
 			echo "Both databases answer, but a migration is pending: this container started in the middle of a deploy. Restart it to migrate."
@@ -86,8 +84,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 
 	if [ -n "$DATABASE_DSN" ]; then
 		wait_for_database database || DATABASES_REACHABLE=0
-		wait_for_database web || DATABASES_REACHABLE=0
-		# Only where a deployment created the copy target; before that a deployment keeps the two-database behaviour.
+		# Only where a deployment created the application database; before that a deployment keeps the ledger-only
+		# behaviour.
 		if [ -n "$APPLICATION_DSN" ]; then
 			wait_for_database application || DATABASES_REACHABLE=0
 		fi
@@ -108,20 +106,15 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		touch "$MIGRATIONS_SKIPPED_MARKER"
 		clear_marker_when_nothing_to_migrate &
 	elif [ -n "$DATABASE_DSN" ] && [ -z "$SKIP_MIGRATIONS" ]; then
-		# One set per database, each naming its own connection; a command given no configuration finds none. Whether a
-		# set is wrapped in a single transaction is left to that configuration: --all-or-nothing overrides both sets, and
-		# the web set does not support it. MariaDB commits DDL implicitly, so its migrations declare themselves
-		# non-transactional, and the migrator refuses a plan that contains one of those. The wrapping transaction it would
-		# have opened there was destroyed by the first DDL statement in any case.
-		for set in database web application; do
+		# One set per database, each naming its own connection; a command given no configuration finds none.
+		for set in database application; do
 			if find "./migrations/$set" -iname '*.php' -print -quit | grep --quiet .; then
-				# No database to migrate until a deployment creates the copy target; the variable is what says it has.
+				# A deployment without the application database skips that set; the variable is what says it exists.
 				if [ "$set" = application ] && [ -z "$APPLICATION_DSN" ]; then
 					continue
 				fi
 				case "$set" in
 					database) configuration=config/packages/migrations/database.yaml ;;
-					web) configuration=config/packages/migrations/web.yaml ;;
 					application) configuration=config/packages/migrations/application.yaml ;;
 				esac
 

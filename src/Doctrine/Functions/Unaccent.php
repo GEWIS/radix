@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Doctrine\Functions;
 
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
@@ -15,9 +14,7 @@ use Override;
 /**
  * UnaccentFunction ::= "UNACCENT" "(" StringPrimary ")"
  *
- * Folds the accents off an expression: the unaccent() extension on PostgreSQL, a pass-through on MariaDB, where
- * the ai_ci collation already ignores them. Doctrine salts the DQL cache key with the platform, so the two
- * translations never mix.
+ * Folds the accents off an expression through the unaccent() extension.
  */
 class Unaccent extends FunctionNode
 {
@@ -36,10 +33,6 @@ class Unaccent extends FunctionNode
     public function getSql(SqlWalker $sqlWalker): string
     {
         $expression = $sqlWalker->walkStringPrimary($this->input);
-
-        if ($sqlWalker->getConnection()->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-            return $expression;
-        }
 
         return 'unaccent(' . $expression . ')';
     }

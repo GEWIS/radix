@@ -3,7 +3,7 @@
 em: 'application'
 
 # The namespace is what doctrine_migration_versions records its classes by, so it cannot be renamed without rewriting
-# every row; it must differ from the web set's.
+# every row; it must differ from the database set's.
 migrations_paths:
     'Application\Migrations': '../../../migrations/application'
 

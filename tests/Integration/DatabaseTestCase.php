@@ -12,8 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 /**
  * Base for integration tests that need a real Doctrine flush against a real database.
  *
- * Tests run against a MariaDB matching production (dev and CI both run one), isolated onto the `_test`
- * database that the `when@test` doctrine config targets. The schema and the full {@see \App\DataFixtures}
+ * Tests run against PostgreSQL matching production (dev and CI both run it), isolated onto the `_test`
+ * databases that the `when@test` doctrine config targets. The schema and the full {@see \App\DataFixtures}
  * dataset are loaded once out of band (`make test-prepare`, or the CI prepare steps). `dama/doctrine-test-bundle`
  * wraps each test in a transaction that is rolled back afterwards, so every test sees the same seeded data yet its own
  * writes never leak. Reference the seeded entities by querying for them.

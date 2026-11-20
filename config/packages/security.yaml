@@ -13,17 +13,17 @@ security:
                 - bcrypt
 
     providers:
-        # Both accounts are mapped on `web`, and the declarative provider looks up the manager it is named rather than
-        # the one that maps the class. Left unnamed it would use the default manager, which is the ledger, and every
-        # lookup would fail on a class it does not map.
+        # Both accounts live in the application database, and the declarative provider looks up the manager it is
+        # named rather than the one that maps the class. Left unnamed it would use the default manager, which is the
+        # ledger, and every lookup would fail on a class it does not map.
         user_provider:
             entity:
                 class: App\Entity\User\User
-                manager_name: web
+                manager_name: application
         company_user_provider:
             entity:
                 class: App\Entity\User\CompanyUser
-                manager_name: web
+                manager_name: application
 
     firewalls:
         dev:

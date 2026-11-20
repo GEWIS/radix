@@ -48,14 +48,12 @@ SEEDED_LISTS := announcements activities vacancies
 seed: ## Reset the development databases: drop the schemas, migrate them back up, then load the fixtures and prepare Mailman and Listmonk (run after `make start`)
 	@# Dropped rather than only purged, so migrations a branch of its own added leave nothing behind.
 	@$(SYMFONY) doctrine:schema:drop --force --full-database
-	@$(SYMFONY) doctrine:schema:drop --force --full-database --em=web
 	@$(SYMFONY) doctrine:schema:drop --force --full-database --em=application
 	@$(MAKE) migrate MIGRATE_FLAGS=--no-interaction
-	@# One command for all of it: the ledger, then the replay into the projection, then the web fixtures that hang
-	@# off it. The projection is never seeded directly, so there is nothing to regenerate afterwards.
+	@# One command for all of it: the ledger, then the replay into the projection, then the application fixtures
+	@# that hang off it. The projection is never seeded directly, so there is nothing to regenerate afterwards.
 	@$(SYMFONY) app:fixtures:load --no-interaction
-	@# The fixture load itself replays the projection; the copy from the MariaDB web database is production-only
-	@# and has nothing to copy from in a fresh stack.
+	@# The fixture load itself replays the projection, so there is nothing to regenerate.
 	@$(MAKE) preparemailman
 	@$(DOCKER_COMP) exec mailman-web bash -c '(python3 ./manage.py createsuperuser --no-input 2>/dev/null || true)'
 	@# Removed and made again rather than left alone: the fixtures put every membership back as still to be
@@ -124,23 +122,19 @@ test-coverage: ## Run the tests and write an HTML coverage report to ./coverage
 # The schemas are built from the mapping metadata rather than by the migrations: what the tests run against is what
 # the entities say, and the migrations are checked separately by the migration workflow. The projection is filled by
 # replaying the ledger, exactly as `seed` does, because its listeners stand down while fixtures load.
-test-prepare: ## Prepare the isolated test databases: (re)build the three schemas and load the seed. Run once, and again after a schema or fixture change (the tests roll back their own writes, so the seed survives a run)
+test-prepare: ## Prepare the isolated test databases: (re)build both schemas and load the seed. Run once, and again after a schema or fixture change (the tests roll back their own writes, so the seed survives a run)
 	@$(SYMFONY_TEST) doctrine:database:create --if-not-exists
-	@$(SYMFONY_TEST) doctrine:database:create --if-not-exists --connection=web
 	@$(SYMFONY_TEST) doctrine:database:create --if-not-exists --connection=application
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database
 	@$(SYMFONY_TEST) doctrine:schema:create
 	# The ledger's migrations never run under test (schema:create does), so the unaccent extension they install is
 	# installed by hand.
 	@$(SYMFONY_TEST) app:database:install-unaccent
-	# The web and application sets migrate rather than schema:create: the messenger table, the deferrable foreign
-	# keys and the unaccent extension are what the copy command must work against.
-	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=web
+	# The application set migrates rather than schema:create: the messenger table and the deferrable foreign keys
+	# are what its migrations build.
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=application
-	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(WEB_MIGRATIONS)
 	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(APPLICATION_MIGRATIONS)
-	# The suite reads the application database, so the fixtures land next to the projection there; the web
-	# database stays schema-only, as the copy command's test fills it with its own source rows.
+	# The suite reads the application database, so the fixtures land next to the projection there.
 	@$(SYMFONY_TEST) app:fixtures:load --no-interaction
 	@$(SYMFONY_TEST) app:decision:generate --no-interaction
 
@@ -220,10 +214,8 @@ cc: sf
 
 ## —— Doctrine —————————————————————————————————————————————————————————————————
 # One set per database, each naming its own connection; without --configuration a command finds no migrations.
-# The application set runs only where the copy target exists; a deployment without APPLICATION_DSN keeps the
-# two-database behaviour.
+# The application set runs only where a deployment created the database; without APPLICATION_DSN it is skipped.
 DATABASE_MIGRATIONS    := --configuration=config/packages/migrations/database.yaml
-WEB_MIGRATIONS         := --configuration=config/packages/migrations/web.yaml
 APPLICATION_MIGRATIONS := --configuration=config/packages/migrations/application.yaml
 # The probe runs where compose injects the variable: in the Makefile's own shell `$${APPLICATION_DSN:-}` would
 # always be empty.
@@ -233,9 +225,8 @@ APPLICATION_DB_ENABLED := $(DOCKER_COMP) exec -T app sh -c 'test -n "$${APPLICAT
 # a schema that is still there.
 MIGRATE_FLAGS ?=
 
-migrate: ## Run the migrations on all three entity managers
+migrate: ## Run the migrations on both entity managers
 	@$(SYMFONY) doctrine:migrations:migrate $(DATABASE_MIGRATIONS) $(MIGRATE_FLAGS)
-	@$(SYMFONY) doctrine:migrations:migrate $(WEB_MIGRATIONS) $(MIGRATE_FLAGS)
 	@if $(APPLICATION_DB_ENABLED); then $(SYMFONY) doctrine:migrations:migrate $(APPLICATION_MIGRATIONS) $(MIGRATE_FLAGS); else echo "Skipping application migrations (no APPLICATION_DSN)"; fi
 
 migrate-to: ## Migrate one entity manager to a given version
@@ -245,10 +236,6 @@ migration-diff: ## Generate migrations for both entity managers from the current
 	@set -e; \
 	echo "Generating migrations for database..."; \
 	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(DATABASE_MIGRATIONS); \
-	# messenger_messages is kept out of the web set's comparison: no entity maps it, the schema listener injects
-	# it into the application manager, and the application baseline migration owns it.
-	echo "Generating migrations for web..."; \
-	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff --filter-expression='~^(?!messenger_messages$$)~' $(WEB_MIGRATIONS); \
 	if $(APPLICATION_DB_ENABLED); then echo "Generating migrations for application..."; $(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(APPLICATION_MIGRATIONS); else echo "Skipping application migrations (no APPLICATION_DATABASE_DSN)"; fi
 	@$(DOCKER) cp "$$($(DOCKER_COMP) ps -q app)":/app/migrations ./
 

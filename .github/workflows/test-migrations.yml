@@ -34,7 +34,6 @@ env:
   APP_IMAGE: abc.docker-registry.gewis.nl/web/radix/app:development
   # One set per database, each naming its own connection. Mirrors the Makefile.
   DATABASE_MIGRATIONS: --configuration=config/packages/migrations/database.yaml
-  WEB_MIGRATIONS: --configuration=config/packages/migrations/web.yaml
   APPLICATION_MIGRATIONS: --configuration=config/packages/migrations/application.yaml
 
 permissions: {}
@@ -116,7 +115,7 @@ jobs:
 
       # Before the build rather than after, so both databases initialise while buildx works.
       - name: Start the databases
-        run: docker compose $COMPOSE_FILES up --detach --quiet-pull postgresql mariadb valkey
+        run: docker compose $COMPOSE_FILES up --detach --quiet-pull postgresql valkey
 
       # Not through `docker compose up --build`: reaching the Actions cache needs credentials the runner only puts
       # in an action's environment, so compose ignored `cache_from` and rebuilt from scratch every run. The scope is
@@ -180,9 +179,6 @@ jobs:
           MIGRATION_BASE_DATABASE=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $DATABASE_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
           echo "Database is at: $MIGRATION_BASE_DATABASE"
           echo "MIGRATION_BASE_DATABASE=$MIGRATION_BASE_DATABASE" >> $GITHUB_ENV
-          MIGRATION_BASE_WEB=$(docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:current --no-interaction $WEB_MIGRATIONS | sed 's/[[:space:]]-[[:space:]].*//' | tr -d '[:space:]')
-          echo "Web is at: $MIGRATION_BASE_WEB"
-          echo "MIGRATION_BASE_WEB=$MIGRATION_BASE_WEB" >> $GITHUB_ENV
           # The base branch may predate the application connection and its migrations; only record a version to
           # revert to when the branch knows the set at all.
           if [ -f config/packages/migrations/application.yaml ]; then
@@ -256,7 +252,6 @@ jobs:
       - name: revert to base migration
         run: |
           docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $DATABASE_MIGRATIONS $MIGRATION_BASE_DATABASE
-          docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $WEB_MIGRATIONS $MIGRATION_BASE_WEB
           # A base branch without the application set has no version to revert to.
           if [ -n "$MIGRATION_BASE_APPLICATION" ]; then
             docker compose $COMPOSE_FILES exec -T app bin/console doctrine:migrations:migrate --no-interaction $APPLICATION_MIGRATIONS $MIGRATION_BASE_APPLICATION

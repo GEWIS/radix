@@ -151,6 +151,6 @@ class BodyReviewFixture extends Fixture implements DependentFixtureInterface, Fi
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

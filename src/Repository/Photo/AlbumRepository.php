@@ -161,16 +161,22 @@ class AlbumRepository extends ServiceEntityRepository
     }
 
     /**
-     * All root (top-level) albums, most recent first, for the board admin overview. Undated albums sort last (MariaDB
-     * orders NULL dates after any value on a descending sort), and both published and unpublished albums are returned.
+     * All root (top-level) albums, most recent first, for the board admin overview. A hidden sort key keeps undated
+     * albums last, where PostgreSQL's descending sort would put them first; both published and unpublished albums are
+     * returned.
      *
      * @return Album[]
      */
     public function findRootAlbums(): array
     {
         return $this->createQueryBuilder('a')
+            ->addSelect('CASE WHEN a.startDateTime IS NULL THEN 1 ELSE 0 END AS HIDDEN undated')
             ->where('a.parent IS NULL')
             ->orderBy(
+                'undated',
+                SortDirection::Ascending,
+            )
+            ->addOrderBy(
                 'a.startDateTime',
                 SortDirection::Descending,
             )

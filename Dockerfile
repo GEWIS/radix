@@ -162,7 +162,7 @@ RUN <<-EOF
     composer dump-autoload --classmap-authoritative --no-dev
     composer dump-env prod
     # `post-install-cmd` is inlined rather than run: the `cache:clear` in its `auto-scripts` runs the optional cache
-    # warmers, and Doctrine's instantiates both entity managers, which resolves DATABASE_DSN, WEB_DATABASE_DSN and
+    # warmers, and Doctrine's instantiates both entity managers, which resolves DATABASE_DSN, APPLICATION_DSN and
     # VALKEY_DSN against a build that has none of those services. The entrypoint warms them at startup instead, where
     # the variables do exist.
     php bin/console cache:clear --no-optional-warmers

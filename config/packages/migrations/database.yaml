@@ -3,7 +3,7 @@
 em: 'database'
 
 # Paths are resolved relative to this file. The namespace is what doctrine_migration_versions records its classes by,
-# so it cannot be renamed without rewriting every row, and it must differ from the web set's.
+# so it cannot be renamed without rewriting every row, and it must differ from the application set's.
 migrations_paths:
     'Database\Migrations': '../../../migrations/database'
 

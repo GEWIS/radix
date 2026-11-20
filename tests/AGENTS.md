@@ -1,6 +1,6 @@
 # Testing
 
-PHPUnit runs inside the `app` container against isolated copies of both databases: real PostgreSQL and MariaDB, because both are production and a substitute like SQLite cannot reproduce the custom DQL functions (`RAND`, `YEAR`), `EditLockService`'s named locks, the UUID and `uca1400` columns, or what the ledger asks of PostgreSQL.
+PHPUnit runs inside the `app` container against isolated copies of both databases on real PostgreSQL, because both are production and a substitute like SQLite cannot reproduce the custom DQL functions (`RAND`, `YEAR`), `EditLockService`'s advisory locks, the UUID columns, or what the ledger asks of PostgreSQL.
 
 ## Commands
 

@@ -21,9 +21,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * Takes precedence over the body's standing {@see ProposalLimit} and the period's own default. Like the standing
  * limit, rows exist only where the board wants something different; nothing is generated when a period is opened.
  *
- * This is a separate entity rather than a nullable period on {@see ProposalLimit} because MariaDB treats NULLs as
- * distinct in a unique index, so a single `UNIQUE (organ_id, period_id)` would accept two standing rows for the same
- * body. Two tables, two plain constraints, no invariant that only holds if everybody remembers it.
+ * This is a separate entity rather than a nullable period on {@see ProposalLimit} because NULLs are distinct in a
+ * unique index, so a single `UNIQUE (organ_id, period_id)` would accept two standing rows for the same body. Two
+ * tables, two plain constraints, no invariant that only holds if everybody remembers it.
  */
 #[Entity(repositoryClass: PeriodProposalLimitRepository::class)]
 #[UniqueConstraint(

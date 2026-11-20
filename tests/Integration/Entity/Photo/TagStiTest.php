@@ -20,8 +20,9 @@ use function array_filter;
 
 /**
  * Exercises the {@see Tag} single-table-inheritance mapping against the seeded photo tree: that member and organ tags
- * coexist in one table, that each subtype's uniqueness holds independently (MariaDB's distinct-NULL behaviour), that
- * point-in-image positions round-trip, and that the member-tags inverse (the GDPR entry point) never surfaces organ
+ * coexist in one table, that each subtype's uniqueness holds independently (NULLs being distinct in a unique
+ * index), that point-in-image positions round-trip, and that the member-tags inverse (the GDPR entry point) never
+ * surfaces organ
  * tags.
  */
 final class TagStiTest extends DatabaseTestCase
@@ -119,7 +120,7 @@ final class TagStiTest extends DatabaseTestCase
         $photo = $this->dinnerPhoto();
 
         // Both a member tag and an organ tag already reference the dinner photo in the seed, proving the two unique
-        // indexes coexist (each other's discriminating column is NULL, which MariaDB treats as distinct).
+        // indexes coexist (each other's discriminating column is NULL, which the unique index treats as distinct).
         $organTags = $this->entityManager->getRepository(OrganTag::class)->findBy(['photo' => $photo->id]);
         $memberTags = $this->entityManager->getRepository(MemberTag::class)->findBy(['photo' => $photo->id]);
 

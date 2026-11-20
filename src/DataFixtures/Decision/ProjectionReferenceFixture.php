@@ -22,7 +22,8 @@ use function sprintf;
 use function usort;
 
 /**
- * Provides the rest of the web fixtures with the members, meetings and bodies that were replayed out of the ledger.
+ * Provides the rest of the application fixtures with the members, meetings and bodies that were replayed out of
+ * the ledger.
  *
  * Nothing here writes anything. Members are not seeded into the projection, they are derived from the ledger:
  * `app:fixtures:load` replays it before this group is loaded, so by the time this runs every member already exists.
@@ -35,7 +36,7 @@ use function usort;
 final class ProjectionReferenceFixture extends Fixture implements FixtureGroupInterface
 {
     /**
-     * The bodies the web fixtures need, by the abbreviation their founding decision gave them.
+     * The bodies the application fixtures need, by the abbreviation their founding decision gave them.
      *
      * A mapping rather than a definition: rename one in {@see \App\DataFixtures\Database\OrganDecisionFixture} and
      * this is where it has to be followed.
@@ -47,7 +48,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
         'organ-bac' => 'BAC',
     ];
 
-    // Members whose number the ledger draws from a sequence, so the web seeds name them by what stays the same.
+    // Members whose number the ledger draws from a sequence, so the application seeds name them by what stays the same.
     private const array MEMBERS = [
         'member-spring-master' => 'springmaster@example.com',
         'member-autumn-external' => 'autumnexternal@example.com',
@@ -80,7 +81,7 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
 
             if (null === $member) {
                 throw new LogicException(sprintf(
-                    'The replay produced no member with the address "%s", which the web fixtures call "%s".',
+                    'The replay produced no member with the address "%s", which the application fixtures call "%s".',
                     $email,
                     $reference,
                 ));
@@ -118,8 +119,9 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
 
             if (null === $standing) {
                 throw new LogicException(sprintf(
-                    'The replay produced no body abbreviated "%s" that is still standing, which the web fixtures call'
-                    . ' "%s". A body comes from the decision that founded it, so it is the ledger that is missing it.',
+                    'The replay produced no body abbreviated "%s" that is still standing, which the application'
+                    . ' fixtures call "%s". A body comes from the decision that founded it, so it is the ledger that'
+                    . ' is missing it.',
                     $abbreviation,
                     $reference,
                 ));
@@ -294,6 +296,6 @@ final class ProjectionReferenceFixture extends Fixture implements FixtureGroupIn
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

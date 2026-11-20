@@ -432,6 +432,6 @@ class PollFixture extends Fixture implements DependentFixtureInterface, FixtureG
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }
