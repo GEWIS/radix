@@ -55,6 +55,9 @@ seed: ## Reset the development databases: drop the schemas, migrate them back up
 	@# fixtures hang off what that replay produced. The projection is never seeded directly, so there is nothing to
 	@# regenerate afterwards.
 	@$(SYMFONY) app:fixtures:load --no-interaction
+	@# The copy target is refreshed with the seeded website, so a flip of the web connection can be tried against
+	@# fixtures without running the copy by hand.
+	@$(SYMFONY) app:web:copy-to-application --no-interaction
 	@$(MAKE) preparemailman
 	@$(DOCKER_COMP) exec mailman-web bash -c '(python3 ./manage.py createsuperuser --no-input 2>/dev/null || true)'
 	@# Removed and made again rather than left alone: the fixtures put every membership back as still to be
@@ -131,8 +134,9 @@ test-prepare: ## Prepare the isolated test databases: (re)build the three schema
 	@$(SYMFONY_TEST) doctrine:schema:create
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=web
 	@$(SYMFONY_TEST) doctrine:schema:create --em=web
-	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=application
-	@$(SYMFONY_TEST) doctrine:schema:create --em=application
+	# The application set migrates rather than schema:create: the schema it builds (deferrable foreign keys,
+	# the messenger table, the unaccent extension) is what the copy command must work against.
+	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(APPLICATION_MIGRATIONS)
 	@$(SYMFONY_TEST) app:fixtures:load --no-interaction
 
 ## —— Docker ———————————————————————————————————————————————————————————————————
