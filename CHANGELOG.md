@@ -8,6 +8,21 @@ were made by separate applications on separate schedules and reading them as one
 
 The releases of the merged application. Tags and links point at this repository.
 
+### [v5.9.1](https://github.com/GEWIS/radix/tree/v5.9.1) (2026-11-21)
+* Improved the dev stack by removing Matomo, MariaDB, and PhpMyAdmin.
+* Removed the script for data migration from MariaDB to PostgreSQL.
+* Removed support for MariaDB.
+* Fixed an issue where future meetings would include meetings from yesterday.
+* Updated dependencies (addresses PHP vulnerabilities from 2026-11-19).
+
+### [v5.9.0](https://github.com/GEWIS/radix/tree/v5.9.0) (2026-11-21)
+* Added label management for committees.
+* Added script for data migration from MariaDB to PostgreSQL.
+* Fixed an issue where the navbar would cover two rows due to small screens.
+* Fixed an issue where modals would not scroll.
+* Fixex deprecation warnings.
+* Updated dependencies.
+
 ### [v5.8.1](https://github.com/GEWIS/radix/tree/v5.8.1) (2026-11-14)
 * Fixed an issue where Mercure requests were unauthorised due to mismatching issuer and audiences.
 
