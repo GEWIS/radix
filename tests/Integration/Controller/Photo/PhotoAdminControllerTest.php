@@ -214,6 +214,250 @@ final class PhotoAdminControllerTest extends DatabaseTestCase
         self::assertNull($this->photoRepository()->find($id));
     }
 
+    public function testTheCreateFormIsRenderedForARootAlbum(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+
+        $response = $this->controller()->createAlbum(new Request());
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+    }
+
+    /**
+     * A sub-album is created from its parent's manage view, so the parent comes in as a query parameter rather than
+     * from the form.
+     */
+    public function testASubAlbumIsCreatedUnderTheGivenParent(): void
+    {
+        $this->authenticateBoard();
+        $parent = $this->album('Trip 2024');
+
+        $request = $this->albumPost([
+            'name' => 'Trip 2024 - Day 1',
+            'published' => '1',
+        ]);
+        $this->pushRequest($request);
+
+        $response = $this->controller()->createAlbum(
+            $request,
+            (int) $parent->id,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        $this->entityManager->clear();
+        $created = self::getContainer()->get(AlbumRepository::class)->findOneBy(['name' => 'Trip 2024 - Day 1']);
+        self::assertInstanceOf(
+            Album::class,
+            $created,
+        );
+        self::assertSame(
+            (int) $parent->id,
+            (int) $created->getParent()?->id,
+        );
+    }
+
+    public function testCreatingAPublishedAlbumAnnouncesIt(): void
+    {
+        $this->authenticateBoard();
+        $request = $this->albumPost([
+            'name' => 'Winter Gala',
+            'published' => '1',
+        ]);
+        $this->pushRequest($request);
+
+        $response = $this->controller()->createAlbum($request);
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        $this->entityManager->clear();
+        $created = self::getContainer()->get(AlbumRepository::class)->findOneBy(['name' => 'Winter Gala']);
+        self::assertInstanceOf(
+            Album::class,
+            $created,
+        );
+        self::assertTrue($created->published);
+    }
+
+    public function testEditingAnAlbumRendersTheFormWhenNothingWasSubmitted(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+
+        $response = $this->controller()->editAlbum(
+            $this->album('Trip 2024'),
+            new Request(),
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testDeletingAnAlbumReturnsToTheOverview(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+        $album = $this->album('Movie Night');
+        $id = (int) $album->id;
+
+        $response = $this->controller()->deleteAlbum($album);
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertNull(self::getContainer()->get(AlbumRepository::class)->find($id));
+    }
+
+    public function testTheManagePageAndItsManifestAreServedForADraftAlbum(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+        $draft = self::getContainer()->get(AlbumRepository::class)->findOneBy(['published' => false]);
+        self::assertInstanceOf(
+            Album::class,
+            $draft,
+            'The seed is expected to contain an unpublished album.',
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $this->controller()->album($draft)->getStatusCode(),
+        );
+        self::assertSame(
+            Response::HTTP_OK,
+            $this->controller()->albumManifest($draft)->getStatusCode(),
+        );
+    }
+
+    /**
+     * The manage view regenerates in-page and only falls back to a redirect when the request did not come from the
+     * script.
+     */
+    public function testRegeneratingACoverAnswersJsonToTheScriptAndARedirectOtherwise(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+        $album = $this->album('Trip 2024');
+
+        $scripted = new Request();
+        $scripted->headers->set(
+            'X-Requested-With',
+            'XMLHttpRequest',
+        );
+        $response = $this->controller()->regenerateCover(
+            $album,
+            $scripted,
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertSame(
+            ['status' => 'queued'],
+            json_decode(
+                (string) $response->getContent(),
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            ),
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $this->controller()->regenerateCover(
+                $album,
+                new Request(),
+            ),
+        );
+    }
+
+    public function testMovingWithoutADestinationReportsThatNothingWasChosen(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+        $session = self::getContainer()->get('request_stack')->getSession();
+
+        $request = new Request();
+        $request->request->set(
+            'photos',
+            ['1'],
+        );
+
+        $response = $this->controller()->movePhotos(
+            $this->album('Trip 2024'),
+            $request,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertNotEmpty(self::flashBag($session)->peek('warning'));
+    }
+
+    /**
+     * A selection that is already in the destination changes nothing, which is said rather than claimed as a move.
+     */
+    public function testMovingPhotosThatAreAlreadyThereChangesNothing(): void
+    {
+        $this->authenticateBoard();
+        $this->pushRequest();
+        $session = self::getContainer()->get('request_stack')->getSession();
+        $album = $this->album('Trip 2024');
+        $photo = $this->storedPhoto($album);
+
+        $request = new Request();
+        $request->request->set(
+            'destination',
+            (string) $album->id,
+        );
+        $request->request->set(
+            'photos',
+            [(string) $photo->id],
+        );
+
+        $response = $this->controller()->movePhotos(
+            $album,
+            $request,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertNotEmpty(self::flashBag($session)->peek('warning'));
+    }
+
+    /**
+     * @param array<string, string> $fields
+     */
+    private function albumPost(array $fields): Request
+    {
+        $request = Request::create(
+            '/en/admin/photos/albums/create',
+            'POST',
+            ['album' => $fields + ['_csrf_token' => 'csrf-token']],
+        );
+        $request->headers->set(
+            'Sec-Fetch-Site',
+            'same-origin',
+        );
+
+        return $request;
+    }
+
     private function controller(): AdminController
     {
         return self::getContainer()->get(AdminController::class);

@@ -10,12 +10,15 @@ use App\Entity\Photo\MemberTag;
 use App\Entity\Photo\Photo;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
+use App\Repository\Decision\OrganRepository;
 use App\Repository\Photo\AlbumRepository;
 use App\Repository\Photo\MemberTagRepository;
 use App\Repository\Photo\PhotoRepository;
+use App\Repository\Photo\ProfilePhotoRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -233,6 +236,169 @@ final class PhotoInteractionControllerTest extends DatabaseTestCase
         self::assertTrue($details['taggedSelf']);
         // The dinner photo is the (hidden) photo of the week in the seed, so the viewer can badge it.
         self::assertNotNull($details['photoOfTheWeek']);
+    }
+
+    public function testAMemberCanTagAnOrgan(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+        $organId = $this->organId();
+
+        $response = $this->controller()->tag(
+            (int) $this->tripPhoto()->id,
+            $this->payload(['type' => 'organ', 'id' => $organId]),
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertTrue($this->decode($response)['success']);
+    }
+
+    /**
+     * A point outside the image cannot be stored on a tag, so the request is refused rather than saved somewhere
+     * meaningless.
+     */
+    public function testATagAtAnImpossiblePositionIsRefused(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+
+        $response = $this->controller()->tag(
+            (int) $this->tripPhoto()->id,
+            $this->payload([
+                'type' => 'member',
+                'id' => self::OTHER_MEMBER,
+                'x' => '2',
+                'y' => '0.5',
+            ]),
+        );
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $response->getStatusCode(),
+        );
+        self::assertFalse($this->decode($response)['success']);
+    }
+
+    public function testAnOrganThatIsNotActiveCannotBeTagged(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+
+        $response = $this->controller()->tag(
+            (int) $this->tripPhoto()->id,
+            $this->payload(['type' => 'organ', 'id' => 999999]),
+        );
+
+        self::assertSame(
+            Response::HTTP_CONFLICT,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testRemovingATagThatDoesNotExistIsNotFound(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->removeTag(999999);
+    }
+
+    public function testAMemberCanMakeATaggedPhotoTheirProfilePhoto(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+        $photo = $this->graduateTag()->photo;
+
+        $response = $this->controller()->setProfilePhoto((int) $photo->id);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertNotNull(
+            self::getContainer()->get(ProfilePhotoRepository::class)->getProfilePhotoByLidnr(self::MEMBER),
+        );
+    }
+
+    /**
+     * A photo the member does not appear in cannot become their profile picture, and that is a refusal rather than a
+     * silent no-op.
+     */
+    public function testAPhotoTheMemberIsNotTaggedInCannotBecomeTheirProfilePhoto(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+
+        $this->expectException(AccessDeniedException::class);
+        $this->controller()->setProfilePhoto($this->photoTaggedOnlyWithSomeoneElse());
+    }
+
+    public function testRemovingTheProfilePhotoLeavesTheMemberWithoutOne(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+        $this->controller()->setProfilePhoto((int) $this->graduateTag()->photo->id);
+
+        $response = $this->controller()->removeProfilePhoto();
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertNull(
+            self::getContainer()->get(ProfilePhotoRepository::class)->getProfilePhotoByLidnr(self::MEMBER),
+        );
+    }
+
+    public function testAnUnknownPhotoIsNotFound(): void
+    {
+        $this->authenticate(
+            self::MEMBER,
+            UserRoles::Member,
+        );
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->details(999999);
+    }
+
+    /**
+     * A photo the seeded member appears in only as another member's tag, so it is theirs to look at and not to claim.
+     */
+    private function photoTaggedOnlyWithSomeoneElse(): int
+    {
+        $tag = self::getContainer()->get(MemberTagRepository::class)->getTagsByLidnr(self::OTHER_MEMBER)[0] ?? null;
+        self::assertInstanceOf(
+            MemberTag::class,
+            $tag,
+        );
+
+        return (int) $tag->photo->id;
+    }
+
+    private function organId(): int
+    {
+        $organs = self::getContainer()->get(OrganRepository::class)->findActive();
+        self::assertNotEmpty($organs);
+
+        return (int) $organs[0]->id;
     }
 
     private function controller(): PhotoInteractionController
