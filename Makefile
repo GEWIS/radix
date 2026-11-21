@@ -126,15 +126,9 @@ test-prepare: ## Prepare the isolated test databases: (re)build both schemas and
 	@$(SYMFONY_TEST) doctrine:database:create --if-not-exists
 	@$(SYMFONY_TEST) doctrine:database:create --if-not-exists --connection=application
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database
-	@$(SYMFONY_TEST) doctrine:schema:create
-	# The ledger's migrations never run under test (schema:create does), so the unaccent extension they install is
-	# installed by hand.
-	@$(SYMFONY_TEST) app:database:install-unaccent
-	# The application set migrates rather than schema:create: the messenger table and the deferrable foreign keys
-	# are what its migrations build.
 	@$(SYMFONY_TEST) doctrine:schema:drop --force --full-database --em=application
+	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(DATABASE_MIGRATIONS)
 	@$(SYMFONY_TEST) doctrine:migrations:migrate --no-interaction $(APPLICATION_MIGRATIONS)
-	# The suite reads the application database, so the fixtures land next to the projection there.
 	@$(SYMFONY_TEST) app:fixtures:load --no-interaction
 	@$(SYMFONY_TEST) app:decision:generate --no-interaction
 
@@ -217,9 +211,6 @@ cc: sf
 # The application set runs only where a deployment created the database; without APPLICATION_DSN it is skipped.
 DATABASE_MIGRATIONS    := --configuration=config/packages/migrations/database.yaml
 APPLICATION_MIGRATIONS := --configuration=config/packages/migrations/application.yaml
-# The probe runs where compose injects the variable: in the Makefile's own shell `$${APPLICATION_DSN:-}` would
-# always be empty.
-APPLICATION_DB_ENABLED := $(DOCKER_COMP) exec -T app sh -c 'test -n "$${APPLICATION_DSN:-}"'
 
 # MIGRATE_FLAGS is what `seed` passes --no-interaction through; on its own this target still asks before it changes
 # a schema that is still there.
@@ -227,7 +218,7 @@ MIGRATE_FLAGS ?=
 
 migrate: ## Run the migrations on both entity managers
 	@$(SYMFONY) doctrine:migrations:migrate $(DATABASE_MIGRATIONS) $(MIGRATE_FLAGS)
-	@if $(APPLICATION_DB_ENABLED); then $(SYMFONY) doctrine:migrations:migrate $(APPLICATION_MIGRATIONS) $(MIGRATE_FLAGS); else echo "Skipping application migrations (no APPLICATION_DSN)"; fi
+	@$(SYMFONY) doctrine:migrations:migrate $(APPLICATION_MIGRATIONS) $(MIGRATE_FLAGS)
 
 migrate-to: ## Migrate one entity manager to a given version
 	@$(DOCKER_COMP) exec -T app sh -c '. ./scripts/migrate-version.sh && bin/console doctrine:migrations:migrate $$migrations $$configuration'

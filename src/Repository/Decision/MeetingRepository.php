@@ -8,7 +8,6 @@ use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Decision\Decision;
 use App\Entity\Decision\Meeting;
 use App\Entity\Decision\MeetingMinutesVersion;
-use DateInterval;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
@@ -278,10 +277,6 @@ class MeetingRepository extends ServiceEntityRepository
     public function findLatestALV(): ?Meeting
     {
         $qb = $this->createQueryBuilder('m');
-
-        $today = new DateTimeImmutable();
-        $maxDate = $today->sub(new DateInterval('P1D'));
-
         $qb->where('m.type = :gmm')
             ->andWhere('m.date >= :date')
             ->orderBy(
@@ -294,7 +289,7 @@ class MeetingRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'date',
-                $maxDate,
+                new DateTimeImmutable('today'),
                 Types::DATETIME_IMMUTABLE,
             )
             ->setMaxResults(1);
@@ -310,10 +305,6 @@ class MeetingRepository extends ServiceEntityRepository
     public function findUpcomingALVs(): array
     {
         $qb = $this->createQueryBuilder('m');
-
-        $today = new DateTimeImmutable();
-        $maxDate = $today->sub(new DateInterval('P1D'));
-
         $qb->where('m.type = :gmm')
             ->andWhere('m.date >= :date')
             ->orderBy(
@@ -326,7 +317,7 @@ class MeetingRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'date',
-                $maxDate,
+                new DateTimeImmutable('today'),
                 Types::DATETIME_IMMUTABLE,
             );
         $this->selectOneToOneSides($qb);
@@ -340,10 +331,6 @@ class MeetingRepository extends ServiceEntityRepository
     public function findUpcomingAnnouncedMeetings(): array
     {
         $qb = $this->createQueryBuilder('m');
-
-        $today = new DateTimeImmutable();
-        $maxDate = $today->sub(new DateInterval('P1D'));
-
         $qb->where('m.type = :gmm OR m.type = :cm')
             ->andWhere('m.date >= :date')
             ->orderBy(
@@ -362,7 +349,7 @@ class MeetingRepository extends ServiceEntityRepository
             )
             ->setParameter(
                 'date',
-                $maxDate,
+                new DateTimeImmutable('today'),
                 Types::DATETIME_IMMUTABLE,
             );
 
