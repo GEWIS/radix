@@ -29,7 +29,7 @@ final class MailingListMaintenanceCommandTest extends TestCase
                     static fn (OutputInterface $output): bool => OutputInterface::VERBOSITY_DEBUG
                         === $output->getVerbosity(),
                 ),
-                false,
+                true,
             );
 
         $tester = new CommandTester(new MailingListMaintenanceCommand($service));
@@ -51,7 +51,7 @@ final class MailingListMaintenanceCommandTest extends TestCase
             ->method('performMaintenance')
             ->with(
                 self::isInstanceOf(OutputInterface::class),
-                true,
+                false,
             );
 
         $tester = new CommandTester(new MailingListMaintenanceCommand($service));
