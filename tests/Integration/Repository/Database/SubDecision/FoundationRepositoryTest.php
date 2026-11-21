@@ -7,7 +7,6 @@ namespace App\Tests\Integration\Repository\Database\SubDecision;
 use App\Entity\Database\Decision;
 use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Database\Enums\MeetingTypes;
-use App\Entity\Database\Meeting;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation;
@@ -338,23 +337,6 @@ final class FoundationRepositoryTest extends DatabaseTestCase
             $subDecision->getDecisionNumber(),
             $subDecision->sequence,
         ];
-    }
-
-    private function reloadMeeting(Meeting $meeting): Meeting
-    {
-        $reloaded = $this->entityManager->find(
-            Meeting::class,
-            [
-                'type' => $meeting->type->value,
-                'number' => $meeting->getNumber(),
-            ],
-        );
-        self::assertInstanceOf(
-            Meeting::class,
-            $reloaded,
-        );
-
-        return $reloaded;
     }
 
     private function findAnInstallationOf(string $abbr): Installation
