@@ -2038,6 +2038,6 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface, Fixt
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

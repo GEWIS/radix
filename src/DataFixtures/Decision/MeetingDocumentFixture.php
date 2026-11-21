@@ -283,6 +283,6 @@ class MeetingDocumentFixture extends Fixture implements DependentFixtureInterfac
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

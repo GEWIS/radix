@@ -82,8 +82,8 @@ class MemberRepository extends ServiceEntityRepository
      * while a user is still typing and never wants a second page. Narrowing the query is what finds a member who
      * is not in the first thirty-two, not requesting more of them.
      *
-     * Uses PostgreSQL's unaccent() function to make name search accent-insensitive, matching MariaDB's default
-     * collation behaviour.
+     * Uses PostgreSQL's unaccent() function to make name search accent-insensitive, as the site's collation used to
+     * be.
      *
      * @return Member[]
      */

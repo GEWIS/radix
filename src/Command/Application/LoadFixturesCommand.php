@@ -8,7 +8,6 @@ use Doctrine\Bundle\FixturesBundle\Loader\FixturesProvider;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -36,7 +35,7 @@ use function sprintf;
 final class LoadFixturesCommand extends Command
 {
     private const string LEDGER_GROUP = 'ledger';
-    private const string WEB_GROUP = 'web';
+    private const string APPLICATION_GROUP = 'application';
 
     public function __construct(
         #[Autowire(service: 'doctrine.fixtures.loader')]
@@ -168,7 +167,7 @@ final class LoadFixturesCommand extends Command
     {
         $fixtures = $this->fixtures(
             $ui,
-            self::WEB_GROUP,
+            self::APPLICATION_GROUP,
         );
 
         if (null === $fixtures) {
@@ -198,18 +197,12 @@ final class LoadFixturesCommand extends Command
 
     private function disableForeignKeyChecks(): string
     {
-        return $this->applicationManager->getConnection()->getDatabasePlatform()
-            instanceof AbstractMySQLPlatform
-            ? 'SET FOREIGN_KEY_CHECKS = 0'
-            : 'SET session_replication_role = replica';
+        return 'SET session_replication_role = replica';
     }
 
     private function enableForeignKeyChecks(): string
     {
-        return $this->applicationManager->getConnection()->getDatabasePlatform()
-            instanceof AbstractMySQLPlatform
-            ? 'SET FOREIGN_KEY_CHECKS = 1'
-            : 'SET session_replication_role = origin';
+        return 'SET session_replication_role = origin';
     }
 
     /**

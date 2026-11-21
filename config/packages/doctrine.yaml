@@ -13,28 +13,18 @@ doctrine:
                 url: '%env(resolve:DATABASE_DSN)%'
                 profiling_collect_backtrace: '%kernel.debug%'
                 options:
-                    # Bounds the connection attempt only (libpq `connect_timeout`, MYSQL_OPT_CONNECT_TIMEOUT), so a long
-                    # query is unaffected. Without it libpq waits out the TCP timeout and occupies one of the eight
+                    # Bounds the connection attempt only (libpq `connect_timeout`), so a long query is unaffected.
+                    # Without it libpq waits out the TCP timeout and occupies one of the eight
                     # FrankenPHP worker threads for two minutes.
                     !php/const PDO::ATTR_TIMEOUT: 10
-            # The website's own database, on PostgreSQL: what the site, the API and the projection read and write after
-            # the copy. It shares the ledger's credentials and least-privileged role (the DSN's `role`, handled by
-            # the same middleware).
+            # The website's own database, on PostgreSQL: what the site, the API and the projection read and write.
+            # It shares the ledger's credentials and least-privileged role (the DSN's `role`, handled by the same
+            # middleware).
             application:
                 url: '%env(resolve:APPLICATION_DSN)%'
                 profiling_collect_backtrace: '%kernel.debug%'
                 options:
                     !php/const PDO::ATTR_TIMEOUT: 10
-            # The MariaDB copy source: the copy command reads it and the fixtures fill it. Removed once the migration
-            # is done with it.
-            web:
-                url: '%env(resolve:WEB_DATABASE_DSN)%'
-                profiling_collect_backtrace: '%kernel.debug%'
-                options:
-                    !php/const PDO::ATTR_TIMEOUT: 10
-                    # The copy streams tables without a primary key row by row, which needs the driver to leave
-                    # the result on the server instead of buffering it whole.
-                    !php/const PDO::MYSQL_ATTR_USE_BUFFERED_QUERY: false
     # The ledger is the default manager, so an unqualified `getRepository()` reaches the wrong one for most of
     # the codebase: use `application` explicitly.
     orm:
@@ -47,8 +37,8 @@ doctrine:
                 # `created_at`) and the tables with them.
                 naming_strategy: doctrine.orm.naming_strategy.default
                 # ORM 3 resolves AUTO to IDENTITY on PostgreSQL where ORM 2 resolved it to SEQUENCE. The ledger's id
-                # columns are plain INT with no DEFAULT nextval(...), so IDENTITY fails every INSERT. MariaDB's
-                # AUTO_INCREMENT needs none of this, which is why the preference belongs to this manager alone.
+                # columns are plain INT with no DEFAULT nextval(...), so IDENTITY fails every INSERT. The application's
+                # ids need no preference, which is why it belongs to this manager alone.
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: sequence
                 dql:
@@ -87,17 +77,14 @@ doctrine:
                                 type: pool
                                 pool: cache.app
                 dql:
-                    # Registered on this manager alone: no query on the ledger uses them, and the function classes branch on
-                    # the platform behind the query. UNACCENT passes through on MariaDB, where the ai_ci collation
-                    # ignores accents; the web fixtures reuse the classes without registering them.
+                    # Registered on this manager alone: no query on the ledger uses them.
                     string_functions:
                         UNACCENT: App\Doctrine\Functions\Unaccent
                     numeric_functions:
                         MONTH: App\Doctrine\Functions\Month
                         RAND: App\Doctrine\Functions\Rand
                         YEAR: App\Doctrine\Functions\Year
-                # One list for both managers, so adding a domain cannot leave the copy target behind.
-                mappings: &web_mappings
+                mappings:
                     Activity:
                         type: attribute
                         is_bundle: false
@@ -139,51 +126,24 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity/User'
                         prefix: 'App\Entity\User'
 
-            # The MariaDB copy source, mapped so the fixtures can fill it; removed once the migration is done with it.
-            # After the application manager, whose registry lookup must win for the website's classes.
-            web:
-                connection: web
-                naming_strategy: doctrine.orm.naming_strategy.default
-                mappings: *web_mappings
-
 when@test:
     doctrine:
         dbal:
             connections:
-                # All three databases move aside, or a test run writes over the development ledger, the copy source
-                # and the projection of the ledger. "TEST_TOKEN" is typically set by ParaTest.
+                # Both databases move aside, or a test run writes over the development ledger or the projection of
+                # the ledger. "TEST_TOKEN" is typically set by ParaTest.
                 database:
-                    dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-                web:
                     dbname_suffix: '_test%env(default::TEST_TOKEN)%'
                 application:
                     dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
     doctrine:
-        dbal:
-            # The ledger and the application connection state their TLS in the DSN, so there is nothing to add for
-            # them here.
-            connections:
-                web:
-                    # TLS to the production MariaDB. CAPATH points at the system CA bundle, which is present in the
-                    # production image. These are MySQL-specific PDO attributes, so they only apply to this
-                    # connection. Merged with the `options` above rather than replacing them.
-                    options:
-                        !php/const Pdo\Mysql::ATTR_SSL_CAPATH: '/etc/ssl/certs/'
-                        !php/const Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT: true
         orm:
             # Both managers parse DQL and both serve pages, so both get the pools. Sharing them is safe: the ORM salts
             # a query cache key with the platform behind the query.
             entity_managers:
                 database:
-                    query_cache_driver:
-                        type: pool
-                        pool: doctrine.system_cache_pool
-                    result_cache_driver:
-                        type: pool
-                        pool: doctrine.result_cache_pool
-                web:
                     query_cache_driver:
                         type: pool
                         pool: doctrine.system_cache_pool

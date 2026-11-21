@@ -166,8 +166,8 @@ final class QueryableWalker extends TreeWalkerAdapter
 
     /**
      * A DQL UPDATE or DELETE does not go through the unit of work: its executor sends the statement directly to the
-     * connection, which is why one typed into the console would really run, on the same MariaDB that contains the
-     * site's own tables. The console is a read surface, and this is where that is stated.
+     * connection, which is why one typed into the console would really run, on the application database as much as
+     * the ledger. The console is a read surface, and this is where that is stated.
      */
     private static function readOnly(): QueryException
     {

@@ -116,6 +116,6 @@ class CompanyUserFixture extends Fixture implements DependentFixtureInterface, F
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

@@ -90,6 +90,6 @@ class MeetingActivityLogFixture extends Fixture implements DependentFixtureInter
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

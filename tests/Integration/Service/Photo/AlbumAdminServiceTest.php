@@ -28,8 +28,8 @@ use function unlink;
 /**
  * The administrative album operations move a photo between albums (re-covering both), delete photos (reclaiming their
  * files, since originals are scoped per album and never shared), and delete an album with its whole subtree. The writes
- * run against the seeded MariaDB and are rolled back by dama; storage is the in-memory adapter, so a reclaimed file can
- * be asserted gone.
+ * run against the seeded database and are rolled back by dama; storage is the in-memory adapter, so a reclaimed
+ * file can be asserted gone.
  */
 final class AlbumAdminServiceTest extends DatabaseTestCase
 {

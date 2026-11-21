@@ -43,13 +43,9 @@ x-app-environment: &app_environment
     # App\Doctrine\Middleware\SetRoleDriver reads it off the parsed DSN and issues `SET ROLE` with it, so the
     # application runs as a least-privileged role rather than as the owner of the schema it reads.
     DATABASE_DSN: "postgresql://${POSTGRESQL_USER:?POSTGRESQL_USER must be set}:${POSTGRESQL_PASSWORD:?POSTGRESQL_PASSWORD must be set}@${POSTGRESQL_HOST:?POSTGRESQL_HOST must be set}:${POSTGRESQL_PORT:?POSTGRESQL_PORT must be set}/${POSTGRESQL_DATABASE:?POSTGRESQL_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${POSTGRESQL_SSLMODE:?POSTGRESQL_SSLMODE must be set}&role=${POSTGRESQL_ROLE:?POSTGRESQL_ROLE must be set}"
-    # Everything else, on MariaDB: the `web` connection. The charset and the collation belong in the DSN because they
-    # have to match what the tables were created with; a mismatch makes a schema comparison report every string column
-    # as changed.
-    WEB_DATABASE_DSN: "pdo-mysql://${DOCTRINE_WEB_USER:?DOCTRINE_WEB_USER must be set}:${DOCTRINE_WEB_PASSWORD:?DOCTRINE_WEB_PASSWORD must be set}@${DOCTRINE_WEB_HOST:?DOCTRINE_WEB_HOST must be set}:${DOCTRINE_WEB_PORT:?DOCTRINE_WEB_PORT must be set}/${DOCTRINE_WEB_DATABASE:?DOCTRINE_WEB_DATABASE must be set}?serverVersion=${DOCTRINE_WEB_VERSION:?DOCTRINE_WEB_VERSION must be set}&charset=${DOCTRINE_WEB_CHARSET:?DOCTRINE_WEB_CHARSET must be set}&collation=${DOCTRINE_WEB_COLLATION:?DOCTRINE_WEB_COLLATION must be set}"
-    # The website's own database once it moves off MariaDB, on PostgreSQL: the `application` connection. Shares the
-    # ledger's credentials and role, differs only in the database it names. The entrypoint skips everything needing
-    # it while the variable is unset, so an old deployment keeps its current behaviour.
+    # The website's own database, on PostgreSQL: the `application` connection. Shares the ledger's credentials and
+    # role, differs only in the database it names. The entrypoint skips everything needing it while the variable is
+    # unset, so an old deployment keeps its current behaviour.
     APPLICATION_DSN: "postgresql://${POSTGRESQL_USER:?POSTGRESQL_USER must be set}:${POSTGRESQL_PASSWORD:?POSTGRESQL_PASSWORD must be set}@${POSTGRESQL_HOST:?POSTGRESQL_HOST must be set}:${POSTGRESQL_PORT:?POSTGRESQL_PORT must be set}/${POSTGRESQL_APPLICATION_DATABASE:?POSTGRESQL_APPLICATION_DATABASE must be set}?serverVersion=${POSTGRES_VERSION:?POSTGRES_VERSION must be set}&charset=utf8&sslmode=${POSTGRESQL_SSLMODE:?POSTGRESQL_SSLMODE must be set}&role=${POSTGRESQL_ROLE:?POSTGRESQL_ROLE must be set}"
 
     MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER must be set}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS must be set}@${RABBITMQ_HOST:-rabbitmq}:${RABBITMQ_PORT:-5672}"
@@ -362,8 +358,8 @@ services:
         command: [ "bin/console", "messenger:consume", "maintenance", "-vv", "--time-limit=3600", "--memory-limit=512M" ]
     # Analytics, on its own hostname: the proxy sends analytics.gewis.nl to the port below. It is part of this stack
     # rather than a separate one because the image is built and published beside the application's, and the site's
-    # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name a
-    # schema on the same MariaDB server the website uses.
+    # tracker points at whatever MATOMO_DOMAIN says. Its database is not in this stack; the credentials below name
+    # the schema the deployment points it at.
     matomo:
         image: "abc.docker-registry.gewis.nl/web/radix/matomo:${RADIX_VERSION:-latest}"
         restart: unless-stopped

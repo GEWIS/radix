@@ -48,6 +48,6 @@ class MeetingLocalDetailsFixture extends Fixture implements DependentFixtureInte
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

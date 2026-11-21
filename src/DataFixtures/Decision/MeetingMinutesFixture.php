@@ -119,6 +119,6 @@ class MeetingMinutesFixture extends Fixture implements DependentFixtureInterface
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

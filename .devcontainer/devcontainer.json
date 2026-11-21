@@ -59,7 +59,6 @@
 		8022,
 		8025,
 		8080,
-		8081,
 		15672
 	],
 	"portsAttributes": {
@@ -89,11 +88,6 @@
 			"protocol": "http"
 		},
 		"8080": {
-			"label": "phpMyAdmin",
-			"onAutoForward": "silent",
-			"protocol": "http"
-		},
-		"8081": {
 			"label": "pgAdmin",
 			"onAutoForward": "silent",
 			"protocol": "http"

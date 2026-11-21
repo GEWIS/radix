@@ -10,8 +10,7 @@ use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 /**
- * Tagged for the PostgreSQL connections: the application connection drops to the same least-privileged role as the
- * ledger, which lets the copy write there, and the website's MariaDB connection has no role of its own to drop to.
+ * Tagged for the PostgreSQL connections, which both drop to the least-privileged role their DSNs name.
  * {@see SetRoleDriver} for what a connection is dropped to.
  */
 #[Autoconfigure(tags: [

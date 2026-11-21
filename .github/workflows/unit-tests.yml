@@ -21,10 +21,10 @@ jobs:
         permissions:
             contents: read
 
-        # Both engines, because both are production: the ledger's rules are PostgreSQL queries, and the rest of the
-        # application relies on MariaDB for custom DQL functions, named locks and `uca1400` columns that SQLite cannot
-        # reproduce. The `when@test` doctrine configuration puts each connection on its own `_test` database, and
-        # dama/doctrine-test-bundle rolls every test back so one schema and one seed serve the whole run.
+        # Real PostgreSQL, the engine both databases run on: custom DQL functions, advisory locks and engine-specific
+        # column types that SQLite cannot reproduce. The `when@test` doctrine configuration puts each connection on
+        # its own `_test` database, and dama/doctrine-test-bundle rolls every test back so one schema and one seed
+        # serve the whole run.
         services:
             postgresql:
                 image: postgres:17
@@ -36,21 +36,6 @@ jobs:
                     - 5432:5432
                 options: >-
                     --health-cmd="pg_isready --username=radix --dbname=postgres"
-                    --health-interval=10s
-                    --health-timeout=5s
-                    --health-retries=10
-
-            mariadb:
-                image: mariadb:11.8
-                env:
-                    MARIADB_ROOT_PASSWORD: root
-                    MARIADB_DATABASE: gewis
-                    MARIADB_USER: gewis
-                    MARIADB_PASSWORD: gewis
-                ports:
-                    - 3306:3306
-                options: >-
-                    --health-cmd="healthcheck.sh --connect --innodb_initialized"
                     --health-interval=10s
                     --health-timeout=5s
                     --health-retries=10
@@ -83,7 +68,7 @@ jobs:
                 uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
                 with:
                     php-version: '8.5'
-                    extensions: 'amqp, apcu, calendar, curl, ffi, gd, intl, opcache, pcntl, pdo_mysql, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
+                    extensions: 'amqp, apcu, calendar, curl, ffi, gd, intl, opcache, pcntl, pdo_pgsql, pdo_sqlite, pgsql, redis, zip'
 
             -   name: Setup problem matchers for PHPUnit
                 run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
@@ -109,15 +94,6 @@ jobs:
                     psql --host=127.0.0.1 --port=5432 --username=radix --dbname=radixdev_db \
                       --command="CREATE DATABASE radixdev_app_test;"
 
-            -   name: Create the isolated website test database
-                env:
-                    MYSQL_PWD: root
-                # As above, this only creates the empty `_test` database (the `when@test` doctrine config targets it)
-                # and grants the application user.
-                run: |
-                    mysql --host=127.0.0.1 --port=3306 --user=root \
-                      --execute="CREATE DATABASE IF NOT EXISTS \`gewis_test\` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci; GRANT ALL PRIVILEGES ON \`gewis_test\`.* TO 'gewis'@'%'; FLUSH PRIVILEGES;"
-
             -   name: Run migrations for the test databases
                 env:
                     APP_ENV: test
@@ -127,7 +103,6 @@ jobs:
                 # --allow-no-migrations handles the case where there are no pending migrations.
                 run: |
                     bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/database.yaml
-                    bin/console doctrine:migrations:migrate --no-interaction --em=web --configuration=config/packages/migrations/web.yaml
                     bin/console doctrine:migrations:migrate --no-interaction --configuration=config/packages/migrations/application.yaml
 
             -   name: Load test fixtures

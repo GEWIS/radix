@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93266ef8c392c68624c42d1a973cfe97",
+    "content-hash": "5d370bd6a68958c9fc8b2317e7db5527",
     "packages": [
         {
             "name": "altcha-org/altcha",
@@ -15747,7 +15747,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-03T12:14:22+00:00"
+            "time": "2026-11-03T12:14:22+00:00",
+            "published-time": "2026-11-03T12:14:36+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -18638,9 +18639,8 @@
         "ext-ffi": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
-        "ext-pdo_mysql": "*",
         "ext-pdo_pgsql": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

@@ -90,6 +90,6 @@ class ActivityLabelFixture extends Fixture implements FixtureGroupInterface
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

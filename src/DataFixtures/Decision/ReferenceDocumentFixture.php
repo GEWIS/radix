@@ -180,6 +180,6 @@ class ReferenceDocumentFixture extends Fixture implements DependentFixtureInterf
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }

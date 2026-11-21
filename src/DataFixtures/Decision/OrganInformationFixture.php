@@ -231,6 +231,6 @@ class OrganInformationFixture extends Fixture implements DependentFixtureInterfa
     #[Override]
     public static function getGroups(): array
     {
-        return ['web'];
+        return ['application'];
     }
 }
