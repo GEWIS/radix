@@ -7,21 +7,14 @@ namespace App\Tests\Form\Activity;
 use App\Entity\Activity\PeriodProposalLimit;
 use App\Entity\Decision\Organ;
 use App\Form\Activity\PeriodProposalLimitType;
-use App\Repository\Decision\OrganRepository;
-use Override;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use App\Tests\Integration\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use ReflectionProperty;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Validation;
 
 #[CoversClass(PeriodProposalLimitType::class)]
-// TypeTestCase creates an unconfigured EventDispatcher mock internally; opt out of the no-expectations notice.
-#[AllowMockObjectsWithoutExpectations]
-final class PeriodProposalLimitTypeTest extends TypeTestCase
+final class PeriodProposalLimitTypeTest extends DatabaseTestCase
 {
     /**
      * A negative limit is invalid: zero is the intended way to stop a body.
@@ -29,7 +22,7 @@ final class PeriodProposalLimitTypeTest extends TypeTestCase
     public function testANegativeNumberIsRefused(): void
     {
         $form = $this->submit([
-            'organ' => $this->organ(),
+            'organ' => (string) $this->organ()->id,
             'maxProposals' => '-1',
         ]);
 
@@ -43,7 +36,7 @@ final class PeriodProposalLimitTypeTest extends TypeTestCase
     public function testZeroIsAValidLimit(): void
     {
         $form = $this->submit([
-            'organ' => $this->organ(),
+            'organ' => (string) $this->organ()->id,
             'maxProposals' => '0',
         ]);
 
@@ -69,9 +62,10 @@ final class PeriodProposalLimitTypeTest extends TypeTestCase
             17,
         );
 
-        $form = $this->factory->create(
+        $form = $this->factory()->create(
             PeriodProposalLimitType::class,
             $limit,
+            ['csrf_protection' => false],
         );
 
         self::assertTrue($form->get('organ')->isDisabled());
@@ -79,9 +73,10 @@ final class PeriodProposalLimitTypeTest extends TypeTestCase
 
     public function testANewLimitLetsTheBoardPickTheBody(): void
     {
-        $form = $this->factory->create(
+        $form = $this->factory()->create(
             PeriodProposalLimitType::class,
             new PeriodProposalLimit(),
+            ['csrf_protection' => false],
         );
 
         self::assertFalse($form->get('organ')->isDisabled());
@@ -102,69 +97,39 @@ final class PeriodProposalLimitTypeTest extends TypeTestCase
     }
 
     /**
-     * @return list<FormExtensionInterface>
-     */
-    #[Override]
-    protected function getExtensions(): array
-    {
-        return [
-            new ValidatorExtension(Validation::createValidator()),
-        ];
-    }
-
-    /**
-     * @return list<PeriodProposalLimitType>
-     */
-    #[Override]
-    protected function getTypes(): array
-    {
-        $repository = self::createStub(OrganRepository::class);
-        $repository->method('findActive')->willReturn([
-            $this->organ(
-                1,
-                'TC',
-            ),
-            $this->organ(
-                2,
-                'KCC',
-            ),
-        ]);
-
-        return [new PeriodProposalLimitType($repository)];
-    }
-
-    /**
      * @param array<string, mixed> $values
      *
      * @return FormInterface<mixed>
      */
     private function submit(array $values): FormInterface
     {
-        $form = $this->factory->create(
+        $form = $this->factory()->create(
             PeriodProposalLimitType::class,
             new PeriodProposalLimit(),
+            ['csrf_protection' => false],
         );
         $form->submit($values);
 
         return $form;
     }
 
-    /**
-     * The form uses a repository in production; the test submits the organ object itself because it has no entity
-     * manager.
-     */
-    private function organ(
-        int $id = 1,
-        string $abbr = 'TC',
-    ): Organ {
-        $organ = new Organ();
-        $organ->abbr = $abbr;
-        new ReflectionProperty(
+    private function factory(): FormFactoryInterface
+    {
+        $factory = self::getContainer()->get('form.factory');
+        self::assertInstanceOf(
+            FormFactoryInterface::class,
+            $factory,
+        );
+
+        return $factory;
+    }
+
+    private function organ(): Organ
+    {
+        $organ = $this->entityManager->getRepository(Organ::class)->findOneBy([]);
+        self::assertInstanceOf(
             Organ::class,
-            'id',
-        )->setValue(
             $organ,
-            $id,
         );
 
         return $organ;
