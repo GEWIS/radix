@@ -27,7 +27,7 @@ final class RevokeSessionsRealtimeHandlerTest extends TestCase
             },
         );
 
-        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects(self::once())
             ->method('generate')
             ->with(
@@ -75,10 +75,10 @@ final class RevokeSessionsRealtimeHandlerTest extends TestCase
 
     public function testAnUnknownFirewallPublishesNothing(): void
     {
-        $hub = self::createMock(HubInterface::class);
+        $hub = $this->createMock(HubInterface::class);
         $hub->expects(self::never())->method('publish');
 
-        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects(self::never())->method('generate');
 
         $handler = new RevokeSessionsRealtimeHandler(

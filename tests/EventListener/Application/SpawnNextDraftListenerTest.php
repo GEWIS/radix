@@ -30,7 +30,7 @@ final class SpawnNextDraftListenerTest extends TestCase
         $cloner->method('cloneAsDraft')->willReturn($draft);
         $registry = new RevisionClonerRegistry([$cloner]);
 
-        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())
             ->method('persist')
             ->with($draft);

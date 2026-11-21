@@ -24,7 +24,7 @@ final class RevisionGuardListenerTest extends TestCase
     public function testSubmitIsAuthorisedThroughTheSubmitAttribute(): void
     {
         $subject = new stdClass();
-        $security = self::createMock(Security::class);
+        $security = $this->createMock(Security::class);
         $security->expects(self::once())
             ->method('isGranted')
             ->with(
@@ -57,7 +57,7 @@ final class RevisionGuardListenerTest extends TestCase
 
         foreach ($boardTransitions as $transition) {
             $subject = new stdClass();
-            $security = self::createMock(Security::class);
+            $security = $this->createMock(Security::class);
             $security->expects(self::once())
                 ->method('isGranted')
                 ->with(
