@@ -259,8 +259,8 @@ final class ActivityFlowTypeTest extends DatabaseTestCase
                 $name,
                 $name,
             );
-            $list->openDate = new DateTimeImmutable('2030-01-01 12:00');
-            $list->closeDate = new DateTimeImmutable('2030-02-01 12:00');
+            $list->openDate = new DateTimeImmutable('+1 week');
+            $list->closeDate = new DateTimeImmutable('+2 weeks');
             $revision->addSignupList($list);
         }
 
