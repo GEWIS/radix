@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function count;
+use function file_put_contents;
 use function imagecolorallocate;
 use function imagecreatetruecolor;
 use function imagefilledrectangle;
@@ -321,6 +322,130 @@ final class AdminPageControllerTest extends DatabaseTestCase
     }
 
     /**
+     * Opening the editor without a run of the flow in the address starts one, so a reload of the first step stays in
+     * the same run rather than beginning again underneath what has been typed.
+     */
+    public function testOpeningTheEditorStartsARunOfTheFlow(): void
+    {
+        $page = $this->seededPage();
+
+        $request = new Request();
+        $request->attributes->set(
+            '_route',
+            'admin/frontpage/pages/edit',
+        );
+        $request->attributes->set(
+            '_route_params',
+            ['page' => $page->id],
+        );
+        $this->authenticateAsBoard($request);
+
+        $response = $this->controller()->edit(
+            $request,
+            $page,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertMatchesRegularExpression(
+            '#/admin/pages/\d+/edit\?flow=[0-9a-f]{16}$#',
+            strval($response->headers->get('Location')),
+        );
+    }
+
+    /**
+     * A run that cannot name a directory gives the browser no topic to listen on, rather than one it invents.
+     */
+    public function testARunThatCannotNameADirectoryLeavesTheBrowserListeningToNothing(): void
+    {
+        $session = $this->session();
+
+        // Handing in the address reaches the step that has the editor, under a run that names no directory.
+        $address = new Request(
+            query: ['flow' => 'not-a-run'],
+            request: [
+                'page_flow' => [
+                    'address' => $this->address([]),
+                    'next' => '',
+                    '_csrf_token' => 'csrf-token',
+                ],
+            ],
+            server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
+        );
+        $address->setMethod(Request::METHOD_POST);
+        $address->setSession($session);
+        $this->authenticateAsBoard($address);
+        $this->controller()->create($address);
+
+        $content = new Request(query: ['flow' => 'not-a-run']);
+        $content->setSession($session);
+        $this->authenticateAsBoard($content);
+
+        $response = $this->controller()->create($content);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            'The images of this page',
+            strval($response->getContent()),
+        );
+        self::assertMatchesRegularExpression(
+            '/data-page-images-hub-url-value=""[\s>]/',
+            strval($response->getContent()),
+        );
+    }
+
+    /**
+     * A file that is not an image is refused by the storage layer rather than stored and served as one later.
+     */
+    public function testAnUploadThatIsNotAnImageIsRefused(): void
+    {
+        $path = tempnam(
+            sys_get_temp_dir(),
+            'gewisweb-page-not-an-image',
+        );
+        self::assertIsString($path);
+        file_put_contents(
+            $path,
+            'This is not an image.',
+        );
+
+        $request = new Request(
+            request: [
+                '_csrf_token' => 'csrf-token',
+                'flow' => self::RUN,
+            ],
+            files: [
+                'image' => new UploadedFile(
+                    $path,
+                    'notes.txt',
+                    'text/plain',
+                    null,
+                    true,
+                ),
+            ],
+            server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
+        );
+        $request->setMethod(Request::METHOD_POST);
+        $this->authenticateAsBoard($request);
+
+        $response = $this->controller()->upload($request);
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            'cannot be used as an image on a page',
+            strval($response->getContent()),
+        );
+    }
+
+    /**
      * The editor's own upload is not loaded at all, so a file dropped into the text cannot put a picture in a page
      * before the website is able to serve it.
      */
@@ -412,6 +537,22 @@ final class AdminPageControllerTest extends DatabaseTestCase
     private function controller(): AdminPageController
     {
         return self::getContainer()->get(AdminPageController::class);
+    }
+
+    private function seededPage(): Page
+    {
+        $page = $this->repository()->findPage(
+            Languages::English,
+            'association',
+            null,
+            null,
+        );
+        self::assertInstanceOf(
+            Page::class,
+            $page,
+        );
+
+        return $page;
     }
 
     private function repository(): PageRepository

@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller\Frontpage;
 
 use App\Controller\Frontpage\AdminPollApprovalController;
+use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\Frontpage\PollRevision;
 use App\Entity\User\User;
+use App\Repository\Frontpage\PollRevisionCommentRepository;
 use App\Security\User\SudoMode;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Workflow\Registry;
 
+use function count;
 use function strval;
 
 /**
@@ -154,6 +158,117 @@ final class AdminPollApprovalControllerTest extends DatabaseTestCase
         self::assertStringContainsString(
             $refusal,
             strval($response->getContent()),
+        );
+    }
+
+    public function testTheQueueListsTheQuestionsWaitingOnTheBoard(): void
+    {
+        $request = new Request();
+        $this->authenticateAsBoardWithSudo($request);
+
+        $content = strval($this->controller()->index()->getContent());
+
+        self::assertStringContainsString(
+            'second coffee machine',
+            $content,
+        );
+    }
+
+    /**
+     * The review screen is where the board reads the wording and its answers before deciding, so opening it has to
+     * work for a question that is only submitted.
+     */
+    public function testAQuestionWaitingOnTheBoardCanBeOpened(): void
+    {
+        $revision = $this->aQuestionWaitingOnTheBoard();
+        $request = new Request();
+        $this->authenticateAsBoardWithSudo($request);
+
+        $response = $this->controller()->review($revision);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            'second coffee machine',
+            strval($response->getContent()),
+        );
+    }
+
+    public function testLeavingACommentKeepsItOnTheThreadAndReturnsToTheQuestion(): void
+    {
+        $revision = $this->aQuestionWaitingOnTheBoard();
+        $comments = self::getContainer()->get(PollRevisionCommentRepository::class);
+        $before = count($comments->findThreadForPoll($revision->poll));
+
+        $request = new Request(
+            request: ['message' => 'Check whether the budget allows it.'],
+            server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
+        );
+        $request->setMethod(Request::METHOD_POST);
+        $this->authenticateAsBoardWithSudo($request);
+
+        $response = $this->controller()->comment(
+            $request,
+            $revision,
+            $this->board(),
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertStringContainsString(
+            '/admin/polls/approvals/' . $revision->id,
+            strval($response->headers->get('Location')),
+        );
+
+        $thread = $comments->findThreadForPoll($revision->poll);
+        self::assertCount(
+            $before + 1,
+            $thread,
+        );
+        self::assertSame(
+            'Check whether the budget allows it.',
+            $thread[count($thread) - 1]->body,
+        );
+    }
+
+    /**
+     * Claiming a question for review leaves the board on the same screen so it can decide straight away.
+     */
+    public function testStartingAReviewStaysOnTheQuestion(): void
+    {
+        $revision = $this->aQuestionWaitingOnTheBoard();
+        $request = $this->decisionRequest(
+            'start_review',
+            null,
+            '',
+        );
+        $this->authenticateAsBoardWithSudo($request);
+
+        $response = $this->controller()->decide(
+            $request,
+            $revision,
+            $this->board(),
+        );
+
+        self::assertSame(
+            RevisionStatus::InReview,
+            $revision->getStatus(),
+        );
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertStringContainsString(
+            '/admin/polls/approvals/' . $revision->id,
+            strval($response->headers->get('Location')),
+        );
+        self::assertContains(
+            'Review started.',
+            self::flashBag($request)->get(AlertTypes::Success->value),
         );
     }
 

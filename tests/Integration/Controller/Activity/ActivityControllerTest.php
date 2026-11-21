@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
@@ -182,6 +183,98 @@ final class ActivityControllerTest extends DatabaseTestCase
             $this->albumUrl($album),
             $content,
         );
+    }
+
+    public function testTheMembersOwnActivityPageRendersTheirYears(): void
+    {
+        $user = $this->entityManager->getRepository(User::class)->find(8030);
+        self::assertInstanceOf(
+            User::class,
+            $user,
+        );
+
+        self::getContainer()->get('security.token_storage')->setToken(
+            new UsernamePasswordToken(
+                $user,
+                'main',
+                $user->getRoles(),
+            ),
+        );
+        $this->pushRequest();
+
+        $response = $this->controller()->my($user);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testViewIsNotFoundForAnUnpublishedActivity(): void
+    {
+        $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->controller()->view($this->activityNamed('Unpublished Workshop'));
+    }
+
+    /**
+     * A cancelled activity stays on the website, with the marker that says not to come.
+     */
+    public function testViewMarksACancelledActivity(): void
+    {
+        $this->pushRequest();
+
+        $response = $this->controller()->view($this->activityNamed('Cancelled Gala'));
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            '[CANCELLED]',
+            (string) $response->getContent(),
+        );
+    }
+
+    public function testTheMembersArchiveRendersTheirOwnYears(): void
+    {
+        $user = $this->entityManager->getRepository(User::class)->find(8030);
+        self::assertInstanceOf(
+            User::class,
+            $user,
+        );
+
+        self::getContainer()->get('security.token_storage')->setToken(
+            new UsernamePasswordToken(
+                $user,
+                'main',
+                $user->getRoles(),
+            ),
+        );
+        $this->pushRequest();
+
+        $response = $this->controller()->myArchive(
+            $user,
+            AssociationYear::fromDate(new DateTimeImmutable())->getYear(),
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+    }
+
+    private function activityNamed(string $name): int
+    {
+        foreach ($this->entityManager->getRepository(Activity::class)->findAll() as $activity) {
+            if ($name === $activity->getLiveRevision()?->name->getValueEN()) {
+                return (int) $activity->id;
+            }
+        }
+
+        self::fail('The seed is expected to contain the activity "' . $name . '".');
     }
 
     private function albumUrl(Album $album): string
