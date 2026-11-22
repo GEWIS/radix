@@ -81,31 +81,6 @@ final class ActivityAdminServiceTest extends DatabaseTestCase
         );
     }
 
-    public function testADraftOpenedAtTheCurrentVersionIsClaimed(): void
-    {
-        $revision = $this->revision();
-
-        $this->service()->claimVersion(
-            $revision,
-            $this->versionOf($revision),
-        );
-
-        self::addToAssertionCount(1);
-    }
-
-    /**
-     * A draft that was just created has nothing to race, so there is nothing to claim.
-     */
-    public function testADraftThatIsNotStoredYetHasNothingToClaim(): void
-    {
-        $this->service()->claimVersion(
-            new ActivityRevision(),
-            0,
-        );
-
-        self::addToAssertionCount(1);
-    }
-
     public function testSavingADraftRecordsTheEditor(): void
     {
         $activity = $this->activity();

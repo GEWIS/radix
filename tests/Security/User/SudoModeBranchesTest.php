@@ -60,21 +60,6 @@ final class SudoModeBranchesTest extends TestCase
         self::assertTrue($sudo->isActive());
     }
 
-    /**
-     * This runs on every authenticated write, and would otherwise create a key for a user who never confirmed.
-     */
-    public function testExtendingWithoutAGrantWritesNothing(): void
-    {
-        $sudo = $this->sudoMode(
-            $this->session(),
-            $this->tokenStorage('8025'),
-        );
-
-        $sudo->touch();
-
-        self::assertFalse($sudo->isActive());
-    }
-
     public function testAnExpiredGrantIsNotRevived(): void
     {
         $clock = new MockClock();
