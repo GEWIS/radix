@@ -7,6 +7,7 @@
 {% endmacro %}
 
 {% import _self as flag %}
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
 
 <div {{ attributes }}>
     <div class="panel mb-3">
@@ -56,10 +57,11 @@
                                    class="btn btn-sm btn-outline-gewis-primary">
                                     {{ 'Edit'|trans }}
                                 </a>
-                                <a href="{{ path('mailing_list_delete', {'name': list.name}) }}"
-                                   class="btn btn-sm btn-outline-danger">
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modal-delete-mailing-list-{{ list.name }}">
                                     {{ 'Delete'|trans }}
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     {% else %}
@@ -88,4 +90,18 @@
             } only %}
         </div>
     </div>
+
+    {% for list in this.lists %}
+        {{ modals.confirm_modal(
+            'modal-delete-mailing-list-' ~ list.name,
+            path('mailing_list_delete', {'name': list.name}),
+            csrf_token('mailing_list_delete-' ~ list.name),
+            'Delete Mailing List'|trans,
+            'This deletes the %name% mailing list and every subscription to it.'|trans({
+                '%name%': list.name,
+            }),
+            'Delete'|trans,
+            'outline-danger',
+        ) }}
+    {% endfor %}
 </div>

@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Controller\Database;
 
 use App\Entity\Database\MailingList;
-use App\Form\Database\DeleteListType;
 use App\Form\Database\MailingListType;
 use App\Service\Database\MailingListService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 #[Route(path: '/members/mailing-lists')]
 final class ListController extends AbstractController
@@ -141,44 +142,26 @@ final class ListController extends AbstractController
         path: '/delete/{name}',
         name: 'mailing_list_delete',
         requirements: ['name' => '[a-zA-Z0-9_-]+'],
-        methods: [
-            'GET',
-            'POST',
-        ],
+        methods: ['POST'],
     )]
-    public function delete(
-        Request $request,
-        string $name,
-    ): Response {
+    #[IsCsrfTokenValid(
+        new Expression("'mailing_list_delete-' ~ args['name']"),
+        tokenKey: '_csrf_token',
+    )]
+    public function delete(string $name): Response
+    {
         $list = $this->mailingListService->getList($name);
 
         if (null === $list) {
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm(DeleteListType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            // The form is only valid when the confirming button was the one clicked, so a declined confirmation
-            // simply returns to the overview.
-            if ($form->isValid()) {
-                $this->mailingListService->delete($list);
-                $this->addFlash(
-                    'success',
-                    'The mailing list has been deleted.',
-                );
-            }
-
-            return $this->redirectToRoute('mailing_list_index');
-        }
-
-        return $this->render(
-            'database/mailing/list/delete.html.twig',
-            [
-                'form' => $form,
-                'name' => $name,
-            ],
+        $this->mailingListService->delete($list);
+        $this->addFlash(
+            'success',
+            'The mailing list has been deleted.',
         );
+
+        return $this->redirectToRoute('mailing_list_index');
     }
 }

@@ -1,5 +1,6 @@
 {% extends 'layout-register.html.twig' %}
 {% import 'database/partials/member/labels.html.twig' as labels %}
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
 
 {% block page_title %}{{ member.fullName|page_title }}{{ parent() }}{% endblock %}
 
@@ -129,10 +130,11 @@
                                             : membership_ends_on|format_date(pattern: 'EEEE d MMMM y') }}
                                         ({{ member.expiration|format_date(pattern: 'EEEE d MMMM y') }})
                                         {% if can_extend and is_granted('ROLE_DATABASE_ADMIN') %}
-                                            <a href="{{ path('member_expiration_edit', {lidnr: member.lidnr}) }}"
-                                               class="btn btn-sm btn-outline-gewis-primary ms-2">
+                                            <button type="button" class="btn btn-sm btn-outline-gewis-primary ms-2"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modal-extend-membership-{{ member.lidnr }}">
                                                 {{ 'Extend'|trans }}
-                                            </a>
+                                            </button>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -170,10 +172,10 @@
                                 {{ 'Deleting a member removes their record and their body history. Letting the membership expire is almost always what you want instead.'|trans }}
                             </span>
                         </span>
-                        <a href="{{ path('member_delete', {lidnr: member.lidnr}) }}"
-                           class="btn btn-sm btn-outline-danger">
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                data-bs-toggle="modal" data-bs-target="#modal-delete-member-{{ member.lidnr }}">
                             {{ 'Delete Member'|trans }}
-                        </a>
+                        </button>
                     </div>
                 </div>
             {% endif %}
@@ -309,4 +311,43 @@
             </div>
         </div>
     </div>
+    {% if can_extend and is_granted('ROLE_DATABASE_ADMIN') %}
+        {{ modals.confirm_modal(
+            'modal-extend-membership-' ~ member.lidnr,
+            path('member_expiration_edit', {lidnr: member.lidnr}),
+            csrf_token('member_expiration_edit-' ~ member.lidnr),
+            'Extend Membership'|trans,
+            'This extends the membership of %name% to %to%. It currently runs to %from%.'|trans({
+                '%name%': member.fullName,
+                '%to%': new_expiration|date('l j F Y'),
+                '%from%': member.expiration|date('l j F Y'),
+            }),
+            'Extend Membership'|trans,
+            'gewis-primary',
+        ) }}
+    {% endif %}
+
+    {% if is_granted('ROLE_DATABASE_ADMIN') %}
+        {% set removal_body %}
+            {% if can_remove %}
+                {{ 'This deletes %name% and everything on record about them.'|trans({
+                    '%name%': member.fullName,
+                }) }}
+            {% else %}
+                {{ '%name% has been a member of a body, or has budgets or statements to their name, so their name stays on record: we have a legal basis under the GDPR to keep it, and the decisions that mention them have to stay correct.'|trans({
+                    '%name%': member.fullName,
+                }) }}
+                {{ 'Everything else about them can be deleted.'|trans }}
+            {% endif %}
+        {% endset %}
+        {{ modals.confirm_modal(
+            'modal-delete-member-' ~ member.lidnr,
+            path('member_delete', {lidnr: member.lidnr}),
+            csrf_token('member_delete-' ~ member.lidnr),
+            can_remove ? 'Delete Member'|trans : 'Delete Member Data'|trans,
+            removal_body,
+            'Delete Member'|trans,
+            'outline-danger',
+        ) }}
+    {% endif %}
 {% endblock %}

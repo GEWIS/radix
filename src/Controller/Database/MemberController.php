@@ -10,7 +10,6 @@ use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Form\Database\AuditNoteType;
 use App\Form\Database\BulkMemberRenewalType;
-use App\Form\Database\DeleteMemberType;
 use App\Form\Database\MemberEditType;
 use App\Form\Database\MemberListsType;
 use App\Form\SubmitButtons;
@@ -225,6 +224,10 @@ final class MemberController extends AbstractMemberController
                 'membership_ends_on' => $profile->membershipEndsOn,
                 'can_change_membership_type' => $profile->canChangeMembershipType,
                 'can_extend' => $profile->canExtend,
+                'new_expiration' => $profile->canExtend
+                    ? $this->memberService->getExtendedExpiration($member)
+                    : null,
+                'can_remove' => $this->memberService->canRemove($member),
                 'organs' => $profile->organs,
                 'notes' => $profile->notes,
                 'note_form' => $noteForm,
@@ -289,71 +292,35 @@ final class MemberController extends AbstractMemberController
         );
     }
 
-    /**
-     * The confirmation and the removal are one route, so the confirmation is a form: it is the form that contains the
-     * token, which a bare POST on a page that is also reachable by GET could not.
-     */
     #[Route(
         path: '/{lidnr}/delete',
         name: 'member_delete',
         requirements: ['lidnr' => '\d+'],
-        methods: [
-            'GET',
-            'POST',
-        ],
+        methods: ['POST'],
     )]
-    public function delete(
-        Request $request,
-        int $lidnr,
-    ): Response {
+    #[IsCsrfTokenValid(
+        new Expression("'member_delete-' ~ args['lidnr']"),
+        tokenKey: '_csrf_token',
+    )]
+    public function delete(int $lidnr): Response
+    {
         $member = $this->resolveMember($lidnr);
 
         if ($member instanceof Response) {
             return $member;
         }
 
-        $form = $this->createForm(DeleteMemberType::class);
-        $form->handleRequest($request);
+        $this->memberService->remove($member);
 
-        if (
-            $form->isSubmitted()
-            && $form->isValid()
-        ) {
-            if (
-                !SubmitButtons::clicked(
-                    $form,
-                    'submit_yes',
-                )
-            ) {
-                return $this->redirectToRoute(
-                    'member_show',
-                    ['lidnr' => $lidnr],
-                );
-            }
-
-            $this->memberService->remove($member);
-
-            $this->addFlash(
-                'success',
-                t(
-                    'Succesfully deleted %entity%!',
-                    ['%entity%' => t('member')],
-                ),
-            );
-
-            return $this->redirectToRoute('member_index');
-        }
-
-        return $this->render(
-            'database/member/delete.html.twig',
-            [
-                'form' => $form,
-                'member' => $member,
-                // A member who is named in a decision, budget or statement cannot go entirely; the confirmation
-                // says so.
-                'can_remove' => $this->memberService->canRemove($member),
-            ],
+        $this->addFlash(
+            'success',
+            t(
+                'Succesfully deleted %entity%!',
+                ['%entity%' => t('member')],
+            ),
         );
+
+        return $this->redirectToRoute('member_index');
     }
 
     /**

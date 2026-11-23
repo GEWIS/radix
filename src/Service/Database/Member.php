@@ -721,8 +721,8 @@ class Member
     /**
      * The date the membership would run until after being extended once more.
      *
-     * The period is built the same way {@see self::expiration()} builds the one it stores, so what is shown on the
-     * confirmation page cannot differ from what is executed.
+     * The period is built the same way {@see self::expiration()} builds the one it stores, so what is shown in the
+     * confirmation cannot differ from what is executed.
      */
     public function getExtendedExpiration(MemberModel $member): DateTimeImmutable
     {
@@ -738,14 +738,8 @@ class Member
     /**
      * Extend the duration of the membership.
      */
-    public function expiration(
-        MemberModel $member,
-        FormInterface $form,
-    ): ?MemberModel {
-        if (!$form->isValid()) {
-            return null;
-        }
-
+    public function expiration(MemberModel $member): ?MemberModel
+    {
         $newMembership = new MembershipModel(
             member: $member,
             type: $member->getCurrentOrLastMembership()->type,
@@ -785,12 +779,7 @@ class Member
     public function removeAddress(
         MemberModel $member,
         AddressTypes $type,
-        FormInterface $form,
     ): ?MemberModel {
-        if (!$form->isValid()) {
-            return null;
-        }
-
         $address = $this->memberRepository->findMemberAddress(
             $member,
             $type,
