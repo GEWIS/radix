@@ -8,12 +8,14 @@ use App\Entity\Database\Meeting as MeetingModel;
 use App\Entity\Database\SubDecision\Abrogation as AbrogationModel;
 use App\Entity\Database\SubDecision\Foundation as FoundationModel;
 use App\Repository\Checker\OrganRepository;
+use Override;
+use Symfony\Contracts\Service\ResetInterface;
 
 use function array_keys;
 use function array_map;
 use function in_array;
 
-class Organ
+class Organ implements ResetInterface
 {
     /**
      * The organs of the meeting most recently queried, for the same reason as in {@see Installation}.
@@ -26,6 +28,14 @@ class Organ
 
     public function __construct(private readonly OrganRepository $organRepository)
     {
+    }
+
+    /** A memo from an earlier request can predate a change to the ledger. */
+    #[Override]
+    public function reset(): void
+    {
+        $this->foundations = null;
+        $this->foundationsFor = null;
     }
 
     /**
