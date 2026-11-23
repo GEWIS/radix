@@ -45,8 +45,8 @@ jobs:
                 uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
                 with:
                     registry: ${{ vars.ABC_DOCKER_REGISTRY }}
-                    username: ${{ secrets.SVC_GH_ABCWEB_USERNAME }}
-                    password: ${{ secrets.SVC_GH_ABCWEB_PWD }}
+                    username: ${{ secrets.SVC_GH_ABCWMM_USERNAME }}
+                    password: ${{ secrets.SVC_GH_ABCWMM_PWD }}
 
             -   name: Build and push image
                 uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
