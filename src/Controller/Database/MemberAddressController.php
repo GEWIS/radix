@@ -6,11 +6,11 @@ namespace App\Controller\Database;
 
 use App\Entity\Database\Enums\AddressTypes;
 use App\Form\Database\AddressEditType;
-use App\Form\Database\DeleteAddressType;
-use App\Form\SubmitButtons;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 use function Symfony\Component\Translation\t;
 
@@ -157,13 +157,13 @@ final class MemberAddressController extends AbstractMemberController
     #[Route(
         path: '/remove/address/{type}',
         name: 'member_address_remove',
-        methods: [
-            'GET',
-            'POST',
-        ],
+        methods: ['POST'],
+    )]
+    #[IsCsrfTokenValid(
+        new Expression("'member_address_remove-' ~ args['lidnr']"),
+        tokenKey: '_csrf_token',
     )]
     public function remove(
-        Request $request,
         int $lidnr,
         AddressTypes $type,
     ): Response {
@@ -182,46 +182,22 @@ final class MemberAddressController extends AbstractMemberController
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm(DeleteAddressType::class);
-        $form->handleRequest($request);
+        $this->memberService->removeAddress(
+            $member,
+            $type,
+        );
 
-        // `isValid()` before the button: a clicked button says nothing about the token, which is only checked when
-        // the form as a whole is validated.
-        if (
-            $form->isSubmitted()
-            && $form->isValid()
-            && SubmitButtons::clicked(
-                $form,
-                'submit_yes',
-            )
-        ) {
-            $this->memberService->removeAddress(
-                $member,
-                $type,
-                $form,
-            );
+        $this->addFlash(
+            'success',
+            t(
+                'Succesfully deleted %entity%!',
+                ['%entity%' => t('member address')],
+            ),
+        );
 
-            $this->addFlash(
-                'success',
-                t(
-                    'Succesfully deleted %entity%!',
-                    ['%entity%' => t('member address')],
-                ),
-            );
-
-            return $this->redirectToRoute(
-                'member_show',
-                ['lidnr' => $lidnr],
-            );
-        }
-
-        return $this->render(
-            'database/member/remove-address.html.twig',
-            [
-                'address_type' => $type,
-                'form' => $form,
-                'member' => $member,
-            ],
+        return $this->redirectToRoute(
+            'member_show',
+            ['lidnr' => $lidnr],
         );
     }
 }

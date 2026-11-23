@@ -15,7 +15,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * What happens to a member over time: the membership being extended, and the member being taken out of the register.
@@ -66,10 +65,7 @@ class MemberTest extends KernelTestCase
             '2026-07-01',
         );
 
-        $extended = $this->memberService->expiration(
-            $member,
-            $this->submittedForm(),
-        );
+        $extended = $this->memberService->expiration($member);
         $this->entityManager->flush();
 
         $added = $member->getLastMembership();
@@ -87,17 +83,6 @@ class MemberTest extends KernelTestCase
         self::assertSame(
             '2027-07-01',
             $added->endDate->format('Y-m-d'),
-        );
-    }
-
-    public function testAnExtensionIsNotCarriedOutOnAnInvalidForm(): void
-    {
-        $member = $this->build->member();
-
-        self::assertNull($this->memberService->expiration($member, $this->submittedForm(valid: false)));
-        self::assertCount(
-            1,
-            $member->getMemberships(),
         );
     }
 
@@ -182,16 +167,5 @@ class MemberTest extends KernelTestCase
 
         self::assertNull($repository->find($expiredLidnr));
         self::assertNotNull($repository->find($currentLidnr));
-    }
-
-    /**
-     * @return FormInterface<mixed>
-     */
-    private function submittedForm(bool $valid = true): FormInterface
-    {
-        $form = self::createStub(FormInterface::class);
-        $form->method('isValid')->willReturn($valid);
-
-        return $form;
     }
 }

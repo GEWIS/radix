@@ -1,4 +1,5 @@
 {% import 'database/partials/member/labels.html.twig' as labels %}
+{% import 'partials/application/confirm-post-modal.html.twig' as modals %}
 
 <div class="mb-4">
     <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
@@ -8,10 +9,11 @@
                class="btn btn-sm btn-gewis-primary">
                 {{ 'Change'|trans }}
             </a>
-            <a href="{{ path('member_address_remove', {lidnr: member.lidnr, type: address.type.value}) }}"
-               class="btn btn-sm btn-outline-danger">
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modal-remove-address-{{ member.lidnr }}-{{ address.type.value }}">
                 {{ 'Delete'|trans }}
-            </a>
+            </button>
         {% endif %}
     </div>
     <table class="table table-bordered mb-0">
@@ -35,3 +37,16 @@
         </tbody>
     </table>
 </div>
+
+{{ modals.confirm_modal(
+    'modal-remove-address-' ~ member.lidnr ~ '-' ~ address.type.value,
+    path('member_address_remove', {lidnr: member.lidnr, type: address.type.value}),
+    csrf_token('member_address_remove-' ~ member.lidnr),
+    'Delete Address'|trans,
+    'This deletes the %type% of %name%.'|trans({
+        '%type%': labels.address_type(address.type),
+        '%name%': member.fullName,
+    }),
+    'Delete'|trans,
+    'outline-danger',
+) }}
