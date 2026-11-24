@@ -1,0 +1,484 @@
+{
+  "files": {
+    "src/Command/Database/DeleteExpiredMembersCommand.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Command/Database/DeleteExpiredProspectiveMembersCommand.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Command/Frontpage/AnonymisePollVotesCommand.php": [
+      {
+        "message": "Potential Memory Leak: Injection of a closure capturing local state into a shared service.",
+        "reason": "The closure is passed to wrapInTransaction() and invoked before that call returns; the entity manager does not retain it."
+      }
+    ],
+    "src/Command/HoldsRunLockTrait.php": [
+      {
+        "message": "Mutation of state 'lockFactory' in HoldsRunLockTrait::setRunLockFactory()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      }
+    ],
+    "src/Command/Photo/GenerateWeeklyPhotoCommand.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->weeklyPhotoService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Command/User/PruneExpiredDataExportsCommand.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Activity/AdminController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->activityAdminService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->activityAdminService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Activity/AdminProposalDecisionController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->proposalManager). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Application/AbstractLabelController.php": [
+      {
+        "message": "Mutation of state 'labelService' in AbstractLabelController::setLabelDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      },
+      {
+        "message": "Mutation of state 'translator' in AbstractLabelController::setLabelDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      }
+    ],
+    "src/Controller/Application/AbstractRevisionController.php": [
+      {
+        "message": "Mutation of state 'revisionActionResolver' in AbstractRevisionController::setRevisionDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      },
+      {
+        "message": "Mutation of state 'revisionDescribers' in AbstractRevisionController::setRevisionDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      },
+      {
+        "message": "Mutation of state 'revisionReviewService' in AbstractRevisionController::setRevisionDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      },
+      {
+        "message": "Mutation of state 'translator' in AbstractRevisionController::setRevisionDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      },
+      {
+        "message": "Mutation of state 'requestStack' in AbstractRevisionController::setRevisionDependencies()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      }
+    ],
+    "src/Controller/Application/AnnouncementController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->announcementService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Application/HoldsEditLockTrait.php": [
+      {
+        "message": "Mutation of state 'editLockService' in HoldsEditLockTrait::setEditLockService()",
+        "reason": "Symfony calls this setter once with the injected dependency. The value is identical for every request and is not request data."
+      }
+    ],
+    "src/Controller/Application/MaintenanceController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->maintenanceWindowService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Career/AdminRepresentativeController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->representativeService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->representativeService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->representativeService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Database/ListController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Database/MemberAddressController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Database/MemberController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Database/ProspectiveMemberController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->registrationService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->registrationService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/Photo/PhotoInteractionController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->tagService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->tagService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->tagService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->profilePhotoService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->profilePhotoService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/User/AbstractSecurityController.php": [
+      {
+        "message": "Mutation detected on a local reference to a shared service ($handler). Risk of State Leak in a worker.",
+        "reason": "The call is a normal remember-me API call; the cookie state is managed by the Symfony handler and reset by the framework."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->multiFactorService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->multiFactorService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Controller/User/CosmeticsController.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->userSettingsService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Security/User/SudoReplay.php": [
+      {
+        "message": "Mutation detected on a local reference to a shared service ($rerun). Risk of State Leak in a worker.",
+        "reason": "The receiver is a Request created for this replay; its session and headers belong to that request, not to a shared service property."
+      },
+      {
+        "message": "Mutation detected on a local reference to a shared service ($rerun). Risk of State Leak in a worker.",
+        "reason": "The receiver is a Request created for this replay; its session and headers belong to that request, not to a shared service property."
+      },
+      {
+        "message": "Mutation detected on a local reference to a shared service ($rerun). Risk of State Leak in a worker.",
+        "reason": "The receiver is a Request created for this replay; its session and headers belong to that request, not to a shared service property."
+      }
+    ],
+    "src/Service/Activity/DrawManager.php": [
+      {
+        "message": "Potential Memory Leak: Injection of a closure capturing local state into a shared service.",
+        "reason": "The closure is passed to wrapInTransaction() and invoked before that call returns; the entity manager does not retain it."
+      }
+    ],
+    "src/Service/Application/AbstractImageUploadService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Application/Config.php": [
+      {
+        "message": "Property 'configItemRepository' of Config is mutated but not reset in reset().",
+        "reason": "Igor treats the repository call as an assignment to configItemRepository. Config clears its own memo ($values) in reset(); the injected repository is unchanged."
+      }
+    ],
+    "src/Service/Application/StaleRevisionCleaner.php": [
+      {
+        "message": "Potential Memory Leak: Injection of a closure capturing local state into a shared service.",
+        "reason": "The closure is passed to wrapInTransaction() and invoked before that call returns; the entity manager does not retain it."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->revisionDiscarder). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Career/CompanyBannerService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Career/CompanyPackageService.php": [
+      {
+        "message": "Potential Memory Leak: Injection of a closure capturing local state into a shared service.",
+        "reason": "The closure is passed to wrapInTransaction() and invoked before that call returns; the entity manager does not retain it."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->revisionDiscarder). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->notificationRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Checker/Renewal.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->actionLinkRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Database/ListmonkService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListMemberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListMemberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Database/MailingListService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListMemberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Database/MailmanService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListMemberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->mailingListMemberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Database/Member.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->actionLinkRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->prospectiveMemberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->auditEntryRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Database/RegistrationService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->memberService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Decision/MeetingDocumentService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Decision/MeetingMinutesService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Decision/QueryService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->savedQueryRepository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Decision/ReferenceDocumentService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Education/CourseAdminService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Education/CourseDocumentDownloadService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Education/DocumentStagingService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Frontpage/PageAdminService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->pageImageStore). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Frontpage/PageImageStore.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Photo/AlbumAdminService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Potential Memory Leak: Injection of a closure capturing local state into a shared service.",
+        "reason": "The closure is passed to wrapInTransaction() and invoked before that call returns; the entity manager does not retain it."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Photo/MemberTagPurgeService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->tagService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->profilePhotoService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Photo/PhotoPrivacyService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->profilePhotoService). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Photo/PhotoUploadService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/Photo/WeeklyPhotoService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      },
+      {
+        "message": "Mutation detected on an injected dependency ($this->fileStorage). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/User/SecurityEventLogger.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->repository). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Service/User/UserSettingsService.php": [
+      {
+        "message": "Mutation detected on an injected dependency ($this->notificationSubscriptions). Risk of State Leak in a worker.",
+        "reason": "Igor reads a mutator-shaped method name as a property assignment. This line calls a collaborator (file storage, a repository or another service); it assigns nothing on this service, and the collaborator does not keep request data."
+      }
+    ],
+    "src/Twig/Extensions/MarkdownExtension.php": [
+      {
+        "message": "Mutation of state 'converter' in MarkdownExtension::getConverter()",
+        "reason": "The converter is built from fixed configuration and is immutable after construction; it cannot carry request data."
+      }
+    ],
+    "src/Validator/Application/NotLikeCategoryValidator.php": [
+      {
+        "message": "Mutation of state 'categoryWords' in NotLikeCategoryValidator::validate()",
+        "reason": "Both caches derive from configured category translations and the ICU ruleset; they contain no request-specific data and are bounded by the configured categories."
+      },
+      {
+        "message": "Mutation of state 'transliterator' in NotLikeCategoryValidator::transliterator()",
+        "reason": "Both caches derive from configured category translations and the ICU ruleset; they contain no request-specific data and are bounded by the configured categories."
+      }
+    ]
+  }
+}

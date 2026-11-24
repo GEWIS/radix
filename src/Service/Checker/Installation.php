@@ -7,8 +7,10 @@ namespace App\Service\Checker;
 use App\Entity\Database\Meeting as MeetingModel;
 use App\Entity\Database\SubDecision\Installation as InstallationModel;
 use App\Repository\Checker\InstallationRepository;
+use Override;
+use Symfony\Contracts\Service\ResetInterface;
 
-class Installation
+class Installation implements ResetInterface
 {
     /**
      * The installations of the meeting most recently queried.
@@ -25,6 +27,14 @@ class Installation
 
     public function __construct(private readonly InstallationRepository $installationRepository)
     {
+    }
+
+    /** A memo from an earlier request can predate a change to the ledger. */
+    #[Override]
+    public function reset(): void
+    {
+        $this->installations = null;
+        $this->installationsFor = null;
     }
 
     /**

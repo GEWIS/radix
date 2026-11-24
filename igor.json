@@ -1,13 +1,15 @@
 {
   "exclude": [
       "docker/matomo",
-      "src/DataFixtures"
+      "src/DataFixtures",
+      "src/Entity",
+      "src/Twig/Components"
   ],
   "safe_namespaces": [
     "Symfony\\",
     "Doctrine\\"
   ],
-  "scan_vendors": null,
+  "ignore_vendors": true,
   "console_path": "bin/console",
   "env": "dev",
   "verbose": false,

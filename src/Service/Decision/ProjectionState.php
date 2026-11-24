@@ -4,17 +4,28 @@ declare(strict_types=1);
 
 namespace App\Service\Decision;
 
+use Override;
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Whether the projection is following the ledger, and whether it is in the middle of doing so.
  *
  * Shared by the listeners that keep the projection level with the ledger. The container guarantees they all share the
  * same instance, which is what lets one of them disable the others.
  */
-final class ProjectionState
+final class ProjectionState implements ResetInterface
 {
     private bool $enabled = true;
 
     private bool $projecting = false;
+
+    /** Reset after each request so a bulk load cannot disable projection for the next one. */
+    #[Override]
+    public function reset(): void
+    {
+        $this->enabled = true;
+        $this->projecting = false;
+    }
 
     public function isEnabled(): bool
     {

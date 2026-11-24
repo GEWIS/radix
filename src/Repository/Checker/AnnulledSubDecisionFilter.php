@@ -7,6 +7,8 @@ namespace App\Repository\Checker;
 use App\Entity\Database\SubDecision;
 use App\Entity\Database\SubDecision\Annulment;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
+use Symfony\Contracts\Service\ResetInterface;
 
 use function spl_object_id;
 
@@ -15,13 +17,20 @@ use function spl_object_id;
  *
  * Not backed by a single entity: it reads every annulment and works on subdecisions of any type.
  */
-class AnnulledSubDecisionFilter
+class AnnulledSubDecisionFilter implements ResetInterface
 {
     /** @var array<int, SubDecision>|null Annulled subdecisions, keyed by object id. */
     private ?array $deleted = null;
 
     public function __construct(private readonly EntityManagerInterface $em)
     {
+    }
+
+    /** Object ids are only meaningful in the identity map of the request that produced them. */
+    #[Override]
+    public function reset(): void
+    {
+        $this->deleted = null;
     }
 
     /**
