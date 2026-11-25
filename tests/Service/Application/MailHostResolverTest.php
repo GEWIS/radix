@@ -77,7 +77,7 @@ class MailHostResolverTest extends TestCase
      */
     public function testRefusesAHostTheResolverCouldNotAnswerForAndSaysSo(): void
     {
-        $logger = self::createMock(LoggerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::once())
             ->method('warning')
             ->with(
@@ -95,7 +95,7 @@ class MailHostResolverTest extends TestCase
      */
     public function testDoesNotReportADomainThatDoesNotExistAsAFailure(): void
     {
-        $logger = self::createMock(LoggerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::never())->method('warning');
 
         self::assertFalse(
@@ -107,7 +107,7 @@ class MailHostResolverTest extends TestCase
         DNSRecords $records,
         ?LoggerInterface $logger = null,
     ): MailHostResolver {
-        $wrapper = self::createMock(DNSGetRecordWrapper::class);
+        $wrapper = $this->createMock(DNSGetRecordWrapper::class);
         $wrapper->expects(self::atLeastOnce())
             ->method('getRecords')
             ->willReturn($records);

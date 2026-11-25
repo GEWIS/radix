@@ -574,31 +574,6 @@ class Member
     }
 
     /**
-     * Get the current board the member is part of.
-     */
-    public function getCurrentBoardInstallation(): ?BoardMember
-    {
-        // Filter out past board installations
-        $today = new DateTimeImmutable();
-
-        $boards = $this->getBoardInstallations()->filter(
-            static function (BoardMember $boardMember) use ($today) {
-                $dischargeDate = $boardMember->dischargeDate;
-
-                // Keep installation if not discharged or discharged in the future
-                return null === $dischargeDate || $dischargeDate > $today;
-            },
-        );
-
-        if ($boards->isEmpty()) {
-            return null;
-        }
-
-        // Assume a member has a single board installation at a time
-        return $boards[0];
-    }
-
-    /**
      * @return MemberGdprArrayType
      */
     public function toGdprArray(): array

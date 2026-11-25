@@ -16,6 +16,7 @@ use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -162,6 +163,129 @@ final class BodyControllerTest extends DatabaseTestCase
             $content,
             'The page is expected to have a description meta tag.',
         );
+    }
+
+    public function testABodyThatDoesNotExistIsNotFound(): void
+    {
+        $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->controller()->body(
+            'committee',
+            'DOESNOTEXIST',
+        );
+    }
+
+    /**
+     * A reused abbreviation may name a body by its founding year, which is what the overviews link with when it is
+     * unambiguous.
+     */
+    public function testAFoundingYearSelectsTheBodyFoundedThen(): void
+    {
+        $this->pushRequest();
+        $organ = $this->iteration();
+
+        $response = $this->controller()->body(
+            'committee',
+            self::BODY_ABBR,
+            $organ->foundationDate->format('Y'),
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            self::BODY_ABBR,
+            (string) $response->getContent(),
+        );
+    }
+
+    /**
+     * Two bodies founded in the same year are told apart by their whole founding date.
+     */
+    public function testAFullFoundingDateSelectsTheBodyFoundedThatDay(): void
+    {
+        $this->pushRequest();
+        $organ = $this->iteration();
+
+        $response = $this->controller()->body(
+            'committee',
+            self::BODY_ABBR,
+            $organ->foundationDate->format('Y-m-d'),
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            self::BODY_ABBR,
+            (string) $response->getContent(),
+        );
+    }
+
+    public function testAFoundingYearWithoutABodyIsNotFound(): void
+    {
+        $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->controller()->body(
+            'committee',
+            self::BODY_ABBR,
+            '1900',
+        );
+    }
+
+    /**
+     * A body's roll call: who the decisions installed and discharged, which is a page of its own.
+     */
+    public function testTheInstallationsOfABodyAreListed(): void
+    {
+        $this->pushRequest();
+
+        // Every seeded body has mutations, and their meeting links use the type token the route does not accept.
+        // A body with no mutations is a page of its own and has nothing to link.
+        $organ = new Organ();
+        $organ->abbr = 'TESTORGAN';
+        $organ->type = OrganTypes::Committee;
+        $organ->foundationDate = new DateTimeImmutable('2026-01-05');
+        $organ->name = 'Test Organ';
+        $this->entityManager->persist($organ);
+        $this->entityManager->flush();
+
+        $response = $this->controller()->organ($organ);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        $content = (string) $response->getContent();
+        self::assertStringContainsString(
+            'TESTORGAN',
+            $content,
+        );
+        self::assertStringContainsString(
+            'Test Organ',
+            $content,
+        );
+    }
+
+    private function iteration(): Organ
+    {
+        $organ = $this->entityManager->getRepository(Organ::class)->findOneBy([
+            'abbr' => self::BODY_ABBR,
+        ]);
+        self::assertInstanceOf(
+            Organ::class,
+            $organ,
+            'The seed is expected to contain the body the page is written about.',
+        );
+
+        return $organ;
     }
 
     private function render(): string

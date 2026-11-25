@@ -8,6 +8,7 @@ use App\Controller\Decision\QueryController;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Form\Decision\QueryExportType;
+use App\Form\Decision\QuerySaveType;
 use App\Repository\Database\SavedQueryRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -197,6 +198,187 @@ final class QueryControllerTest extends DatabaseTestCase
             ),
             $content,
         );
+    }
+
+    public function testShowingAStoredQueryThatDoesNotExistIsNotFound(): void
+    {
+        $this->authenticateSecretary();
+        $request = $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+
+        self::getContainer()->get(QueryController::class)->show(
+            $request,
+            0,
+        );
+    }
+
+    /**
+     * Saving names the query and sends the secretary to it, which is where it can be run and exported.
+     */
+    public function testSavingAQueryRedirectsToTheStoredCopy(): void
+    {
+        $this->authenticateSecretary();
+        $name = 'Seeded query, stored again';
+        $request = $this->editorSubmission([
+            'name' => $name,
+            'category' => 'Members',
+            'query' => $this->seededQuery(),
+            'submit_save' => '',
+        ]);
+
+        $response = self::getContainer()->get(QueryController::class)->index($request);
+
+        self::assertSame(
+            Response::HTTP_FOUND,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            '/query/show/',
+            self::redirectTarget($response),
+        );
+        self::assertNotNull(
+            self::getContainer()->get(SavedQueryRepository::class)->findByName($name),
+        );
+    }
+
+    /**
+     * Running without saving is the other button on the same form: the query is executed and stays on the page.
+     */
+    public function testExecutingATypedQueryShowsTheResultOnThePage(): void
+    {
+        $this->authenticateSecretary();
+        $request = $this->editorSubmission([
+            'name' => '',
+            'category' => '',
+            'query' => $this->seededQuery(),
+            'submit' => '',
+        ]);
+
+        $response = self::getContainer()->get(QueryController::class)->index($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            'Export',
+            (string) $response->getContent(),
+        );
+    }
+
+    /**
+     * The parser's objection is the only feedback about what is wrong with the query, so it is reported as a rejected
+     * submission rather than a crash.
+     */
+    public function testAQueryTheParserRejectsIsReported(): void
+    {
+        $this->authenticateSecretary();
+        $request = $this->editorSubmission([
+            'name' => '',
+            'category' => '',
+            'query' => 'db:Member nonsense',
+            'submit' => '',
+        ]);
+
+        $response = self::getContainer()->get(QueryController::class)->index($request);
+
+        self::assertSame(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testAnEmptyQueryIsRejected(): void
+    {
+        $this->authenticateSecretary();
+        $request = $this->editorSubmission([
+            'name' => '',
+            'category' => '',
+            'query' => '',
+            'submit' => '',
+        ]);
+
+        $response = self::getContainer()->get(QueryController::class)->index($request);
+
+        self::assertSame(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            $response->getStatusCode(),
+        );
+    }
+
+    /**
+     * An export of a query that cannot run comes back to the page with the reason, rather than downloading an empty
+     * file.
+     */
+    public function testAnExportOfAQueryThatCannotRunRedirectsWithTheReason(): void
+    {
+        $this->authenticateSecretary();
+        $request = $this->pushRequest();
+
+        $request->request->set(
+            $this->exportFormName(),
+            [
+                'query' => 'db:Member nonsense',
+                'name' => 'Broken',
+                'type' => 'csv',
+                '_csrf_token' => 'csrf-token',
+            ],
+        );
+        $request->setMethod(Request::METHOD_POST);
+        $request->headers->set(
+            'Sec-Fetch-Site',
+            'same-origin',
+        );
+
+        $response = self::getContainer()->get(QueryController::class)->index($request);
+
+        self::assertSame(
+            Response::HTTP_FOUND,
+            $response->getStatusCode(),
+        );
+        self::assertStringContainsString(
+            '/query',
+            self::redirectTarget($response),
+        );
+        self::assertNotEmpty(
+            self::flashBag($request)->get('danger'),
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     */
+    private function editorSubmission(array $fields): Request
+    {
+        $request = $this->pushRequest();
+        $request->request->set(
+            $this->saveFormName(),
+            $fields + ['_csrf_token' => 'csrf-token'],
+        );
+        $request->setMethod(Request::METHOD_POST);
+        $request->headers->set(
+            'Sec-Fetch-Site',
+            'same-origin',
+        );
+
+        return $request;
+    }
+
+    private function saveFormName(): string
+    {
+        return self::getContainer()->get('form.factory')->create(QuerySaveType::class)->getName();
+    }
+
+    private function seededQuery(): string
+    {
+        $savedQuery = self::getContainer()->get(SavedQueryRepository::class)->findByName(self::SEEDED_QUERY);
+        self::assertNotNull(
+            $savedQuery,
+            'The seed is expected to contain a stored query.',
+        );
+
+        return $savedQuery->query;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\EventListener\Application;
 
+use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\MaintenanceStatus;
 use App\Entity\Application\MaintenanceWindow;
 use App\EventListener\Application\MaintenanceListener;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -140,6 +142,16 @@ final class MaintenanceListenerTest extends TestCase
         self::assertSame(
             '/en/photo',
             $response->getTargetUrl(),
+        );
+
+        $session = $request->getSession();
+        self::assertInstanceOf(
+            FlashBagAwareSessionInterface::class,
+            $session,
+        );
+        self::assertCount(
+            1,
+            $session->getFlashBag()->peek(AlertTypes::Warning->value),
         );
     }
 

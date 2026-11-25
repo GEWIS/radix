@@ -91,7 +91,7 @@ class ApiTokenAuthenticatorTest extends TestCase
     public function testResolvesAKnownTokenToItsPrincipal(): void
     {
         $principal = new ApiPrincipal();
-        $repository = self::createMock(ApiPrincipalRepository::class);
+        $repository = $this->createMock(ApiPrincipalRepository::class);
         $repository->expects(self::once())
             ->method('findByToken')
             ->with('s3cr3t')

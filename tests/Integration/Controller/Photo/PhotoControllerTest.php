@@ -9,14 +9,18 @@ use App\Entity\Application\Enums\StorageNamespace;
 use App\Entity\Decision\AssociationYear;
 use App\Entity\Photo\Album;
 use App\Entity\Photo\Enums\AlbumType;
+use App\Entity\Photo\MemberTag;
 use App\Entity\Photo\Photo;
 use App\Entity\User\Enums\UserRoles;
 use App\Entity\User\User;
 use App\Repository\Photo\AlbumRepository;
+use App\Repository\Photo\HiddenPhotoRepository;
+use App\Repository\Photo\MemberTagRepository;
 use App\Repository\Photo\OrganTagRepository;
 use App\Repository\Photo\PhotoRepository;
 use App\Repository\Photo\WeeklyPhotoRepository;
 use App\Service\Application\FileStorage;
+use App\Service\Photo\AlbumService;
 use App\Tests\Integration\DatabaseTestCase;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +29,7 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
+use function array_values;
 use function imagecreatetruecolor;
 use function imagejpeg;
 use function json_decode;
@@ -460,6 +465,255 @@ final class PhotoControllerTest extends DatabaseTestCase
             $otherAlbum,
             (int) $photo->id,
         );
+    }
+
+    /**
+     * The year switcher may point at a year without albums (a stale bookmark); the page then falls back to the most
+     * recent year rather than rendering nothing.
+     */
+    public function testTheOverviewFallsBackWhenAskedForAYearWithoutAlbums(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $response = $this->controller()->index(1999);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testTheOverviewAcceptsAYearThatHasAlbums(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $year = self::getContainer()->get(AlbumService::class)->getViewableRootAlbumYears()[0] ?? null;
+        self::assertNotNull($year);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $this->controller()->index($year)->getStatusCode(),
+        );
+    }
+
+    public function testAWeekManifestIsServedForAYearOfPhotosOfTheWeek(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $years = self::getContainer()->get(WeeklyPhotoRepository::class)->findAll();
+        self::assertNotEmpty($years);
+
+        $response = $this->controller()->weeklyManifest((int) $years[0]->week->format('Y'));
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testABodyManifestIsServedForAnOrganThatIsTagged(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $response = $this->controller()->bodyManifest($this->taggedOrganId());
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        $entries = json_decode(
+            (string) $response->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        self::assertIsArray($entries);
+        self::assertNotEmpty($entries);
+        // A virtual album deep-links each photo into the album it really lives in.
+        self::assertNotNull($entries[0]['albumUrl']);
+    }
+
+    public function testABodyManifestIsNotFoundForAnUnknownOrgan(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->bodyManifest(999999);
+    }
+
+    public function testAMemberManifestServesThePhotosTheyAreTaggedIn(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+        $tagged = $this->ownTags(8030);
+        self::assertNotEmpty($tagged);
+
+        $response = $this->controller()->memberManifest(8030);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+        $entries = json_decode(
+            (string) $response->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        self::assertIsArray($entries);
+        self::assertNotEmpty($entries);
+    }
+
+    public function testAMemberManifestIsNotFoundForAnUnknownMember(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->memberManifest(999999);
+    }
+
+    /**
+     * Hiding a photo only affects the member's own page, and only for a photo they are tagged in.
+     */
+    public function testHidingAPhotoFromTheMembersOwnPageRecordsIt(): void
+    {
+        $user = $this->authenticateWithUser(
+            8030,
+            UserRoles::Member,
+        );
+        $tag = $this->ownTags(8030)[0];
+
+        $response = $this->controller()->hidePhotos(
+            new Request(request: ['photos' => [(int) $tag->photo->id]]),
+            $user,
+        );
+
+        self::assertSame(
+            Response::HTTP_FOUND,
+            $response->getStatusCode(),
+        );
+        self::assertNotNull(self::getContainer()->get(HiddenPhotoRepository::class)->findByMemberAndPhoto(
+            $user->member,
+            $tag->photo,
+        ));
+    }
+
+    public function testHidingWithNothingSelectedChangesNothing(): void
+    {
+        $user = $this->authenticateWithUser(
+            8030,
+            UserRoles::Member,
+        );
+
+        $response = $this->controller()->hidePhotos(
+            new Request(),
+            $user,
+        );
+
+        self::assertSame(
+            Response::HTTP_FOUND,
+            $response->getStatusCode(),
+        );
+        self::assertSame(
+            [],
+            self::getContainer()->get(HiddenPhotoRepository::class)->getHiddenPhotoIds($user->member),
+        );
+    }
+
+    public function testUnhidingAPhotoRemovesItFromTheHiddenSet(): void
+    {
+        $user = $this->authenticateWithUser(
+            8030,
+            UserRoles::Member,
+        );
+        $tag = $this->ownTags(8030)[0];
+
+        $this->controller()->hidePhotos(
+            new Request(request: ['photos' => [(int) $tag->photo->id]]),
+            $user,
+        );
+        self::assertNotEmpty(self::getContainer()->get(HiddenPhotoRepository::class)->getHiddenPhotoIds($user->member));
+
+        $this->controller()->unhidePhotos(
+            new Request(request: ['photos' => [(int) $tag->photo->id]]),
+            $user,
+        );
+
+        self::assertSame(
+            [],
+            self::getContainer()->get(HiddenPhotoRepository::class)->getHiddenPhotoIds($user->member),
+        );
+    }
+
+    public function testDownloadIsNotFoundForAPhotoThatDoesNotExist(): void
+    {
+        $this->authenticate(
+            8030,
+            UserRoles::Member,
+        );
+        $this->pushRequest();
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->download(
+            $this->albumId('Trip 2024'),
+            999999,
+        );
+    }
+
+    /**
+     * @return list<MemberTag>
+     */
+    private function ownTags(int $lidnr): array
+    {
+        $tags = self::getContainer()->get(MemberTagRepository::class)->getTagsByLidnr($lidnr);
+        self::assertIsArray($tags);
+
+        return array_values($tags);
+    }
+
+    private function authenticateWithUser(
+        int $lidnr,
+        UserRoles $role,
+    ): User {
+        $this->authenticate(
+            $lidnr,
+            $role,
+        );
+
+        $user = $this->entityManager->getRepository(User::class)->find($lidnr);
+        self::assertInstanceOf(
+            User::class,
+            $user,
+        );
+
+        return $user;
     }
 
     private function controller(): PhotoController

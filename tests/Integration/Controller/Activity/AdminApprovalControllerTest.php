@@ -14,6 +14,7 @@ use App\Entity\Application\EditLock;
 use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\RevisionStatus;
 use App\Entity\User\User;
+use App\Repository\Activity\ActivityRevisionCommentRepository;
 use App\Repository\Application\EditLockRepository;
 use App\Security\User\SudoMode;
 use App\Service\Activity\ActivityRevisionCloner;
@@ -26,7 +27,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Workflow\Registry;
 
+use function count;
 use function str_contains;
 
 /**
@@ -109,7 +112,7 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
         self::assertNotNull(
             $this->entityManager->getRepository(ActivityRevision::class)->find($draftId),
         );
-        self::assertNotEmpty($session->getFlashBag()->peek(AlertTypes::Warning->value));
+        self::assertNotEmpty(self::flashBag($session)->peek(AlertTypes::Warning->value));
     }
 
     public function testDiscardIsDeniedForANonOwnerNonBoardMember(): void
@@ -247,6 +250,299 @@ final class AdminApprovalControllerTest extends DatabaseTestCase
             0,
             $texts,
         );
+    }
+
+    public function testTheApprovalQueueRenders(): void
+    {
+        $this->authenticate(['ROLE_BOARD']);
+        $this->pushRequestWithSession();
+
+        $response = $this->controller()->index();
+
+        self::assertSame(
+            200,
+            $response->getStatusCode(),
+        );
+    }
+
+    public function testStartingAReviewKeepsTheBoardOnTheScreen(): void
+    {
+        $revision = $this->aRevisionInStatus(RevisionStatus::Submitted);
+        $request = $this->boardDecisionRequest([
+            'start_review' => '',
+        ]);
+
+        $response = $this->controller()->decide(
+            $request,
+            $this->user(8025),
+            $revision,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertSame(
+            RevisionStatus::InReview,
+            $revision->getStatus(),
+        );
+        self::assertStringContainsString(
+            '/admin/activities/approvals/' . $revision->id,
+            $response->getTargetUrl(),
+        );
+        self::assertContains(
+            'Review started.',
+            self::flashBag($request)->get(AlertTypes::Success->value),
+        );
+    }
+
+    public function testApprovingMakesTheRevisionLiveAndReturnsToTheQueue(): void
+    {
+        $revision = $this->aRevisionInStatus(RevisionStatus::InReview);
+        $request = $this->boardDecisionRequest([
+            'approve' => '',
+        ]);
+
+        $response = $this->controller()->decide(
+            $request,
+            $this->user(8025),
+            $revision,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertSame(
+            RevisionStatus::Approved,
+            $revision->getStatus(),
+        );
+        self::assertSame(
+            $revision,
+            $revision->activity->getLiveRevision(),
+        );
+        self::assertStringEndsWith(
+            '/admin/activities/approvals',
+            $response->getTargetUrl(),
+        );
+        self::assertContains(
+            'The activity revision was updated.',
+            self::flashBag($request)->get(AlertTypes::Success->value),
+        );
+    }
+
+    public function testRejectingWithFeedbackTurnsTheRevisionDown(): void
+    {
+        $revision = $this->aRevisionInStatus(RevisionStatus::Submitted);
+
+        // A decision is made from the in-review screen, which is where the board claims a submission first. The claim
+        // is a guarded transition, so the board is signed in before it is applied.
+        $request = $this->boardDecisionRequest([
+            'reject' => '',
+            'message' => 'This does not fit the association calendar.',
+        ]);
+        self::getContainer()->get(Registry::class)->get(
+            $revision,
+            'revision',
+        )->apply(
+            $revision,
+            'start_review',
+        );
+        $this->entityManager->flush();
+
+        $response = $this->controller()->decide(
+            $request,
+            $this->user(8025),
+            $revision,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertSame(
+            RevisionStatus::Rejected,
+            $revision->getStatus(),
+        );
+    }
+
+    public function testAnAuthorSubmittingADraftGoesBackToTheirOverview(): void
+    {
+        // The seeded draft that continues a "changes requested" review, so submitting it also includes the response
+        // the resubmission form requires.
+        $revision = $this->aBeerTastingDraft();
+        $author = $revision->getAuthor();
+        self::assertNotNull($author);
+        $author = $this->entityManager->getRepository(User::class)->find(
+            $author->lidnr,
+        );
+        self::assertInstanceOf(
+            User::class,
+            $author,
+        );
+
+        $request = $this->decisionRequest(
+            $author,
+            [
+                'submit' => '',
+                'message' => 'The price is on the page and the room is booked.',
+            ],
+            false,
+        );
+
+        $response = $this->controller()->decide(
+            $request,
+            $author,
+            $revision,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertSame(
+            RevisionStatus::Submitted,
+            $revision->getStatus(),
+        );
+        self::assertStringEndsWith(
+            '/admin/activities',
+            $response->getTargetUrl(),
+        );
+        self::assertContains(
+            'Activity submitted for review.',
+            self::flashBag($request)->get(AlertTypes::Success->value),
+        );
+    }
+
+    public function testACommentIsAddedAndTheReaderStaysOnTheScreen(): void
+    {
+        $revision = $this->aRevisionInStatus(RevisionStatus::InReview);
+
+        $before = count(self::getContainer()->get(ActivityRevisionCommentRepository::class)
+            ->findThreadForActivity($revision->activity));
+
+        $request = $this->boardDecisionRequest([]);
+        $request->request->set(
+            'message',
+            'The venue is confirmed.',
+        );
+
+        $response = $this->controller()->comment(
+            $request,
+            $this->user(8025),
+            $revision,
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertStringContainsString(
+            '/admin/activities/approvals/' . $revision->id,
+            $response->getTargetUrl(),
+        );
+        self::assertCount(
+            $before + 1,
+            self::getContainer()->get(ActivityRevisionCommentRepository::class)
+                ->findThreadForActivity($revision->activity),
+        );
+    }
+
+    /**
+     * @param array<string, string> $decision
+     */
+    private function boardDecisionRequest(array $decision): Request
+    {
+        return $this->decisionRequest(
+            $this->user(8025),
+            $decision,
+            true,
+        );
+    }
+
+    /**
+     * @param array<string, string> $decision
+     */
+    private function decisionRequest(
+        User $user,
+        array $decision,
+        bool $sudo,
+    ): Request {
+        $decision['_csrf_token'] = 'csrf-token';
+
+        $request = new Request(
+            request: ['review_decision' => $decision],
+            server: ['HTTP_SEC_FETCH_SITE' => 'same-origin'],
+        );
+        $request->setMethod('POST');
+
+        self::getContainer()->get('security.token_storage')->setToken(new UsernamePasswordToken(
+            $user,
+            'main',
+            $user->getRoles(),
+        ));
+
+        $session = self::getContainer()->get('session.factory')->createSession();
+        self::assertInstanceOf(
+            FlashBagAwareSessionInterface::class,
+            $session,
+        );
+        $request->setSession($session);
+        $request->setLocale('en');
+        $request->cookies->set(
+            $session->getName(),
+            'test',
+        );
+        self::getContainer()->get('request_stack')->push($request);
+
+        if ($sudo) {
+            self::getContainer()->get(SudoMode::class)->grant();
+        }
+
+        return $request;
+    }
+
+    /**
+     * The seeded second revision of "Beer Tasting": a draft that responds to a "changes requested" review.
+     */
+    private function aBeerTastingDraft(): ActivityRevision
+    {
+        foreach ($this->entityManager->getRepository(ActivityRevision::class)->findAll() as $revision) {
+            if (
+                RevisionStatus::Draft === $revision->getStatus()
+                && 'Beer Tasting' === $revision->name->getValueEN()
+                && null !== $revision->getPreviousRevision()
+            ) {
+                return $revision;
+            }
+        }
+
+        self::fail('The seed is expected to contain the resubmitted Beer Tasting draft.');
+    }
+
+    private function aRevisionInStatus(RevisionStatus $status): ActivityRevision
+    {
+        $revision = $this->entityManager->createQueryBuilder()
+            ->select('r')
+            ->from(
+                ActivityRevision::class,
+                'r',
+            )
+            ->where('r.status = :status')
+            ->setParameter(
+                'status',
+                $status->value,
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+        self::assertInstanceOf(
+            ActivityRevision::class,
+            $revision,
+            'The seed is expected to contain a revision in status ' . $status->value . '.',
+        );
+
+        return $revision;
     }
 
     private function authenticateAsBoardWithSudo(): void

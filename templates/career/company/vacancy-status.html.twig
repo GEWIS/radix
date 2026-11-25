@@ -15,6 +15,7 @@
 
 {% block contents %}
     {% embed 'partials/application/review-screen.html.twig' with {
+        'vacancy': vacancy,
         'subjectName': revision.name|localise_text,
         'revision': revision,
         'previous': previous,

@@ -15,6 +15,7 @@ use App\Form\Activity\ActivityFlow\ActivityFlowType;
 use App\Form\Activity\Enums\SignupListSection;
 use App\Service\Activity\ActivityAdminService;
 use App\Tests\Integration\DatabaseTestCase;
+use DateTimeImmutable;
 use SortDirection;
 use Symfony\Component\Form\Flow\DataStorage\SessionDataStorage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -33,6 +34,36 @@ use function count;
 final class AdminCreateControllerTest extends DatabaseTestCase
 {
     private const string RUN = 'testrun';
+
+    public function testOpeningTheCreateFormStartsARun(): void
+    {
+        $this->authenticate();
+        $this->pushRequestWithSession();
+
+        $request = new Request();
+        $request->attributes->set(
+            '_route',
+            'admin/activities/create',
+        );
+        $request->attributes->set(
+            '_route_params',
+            [],
+        );
+
+        $response = $this->controller()->create(
+            $request,
+            $this->user(),
+        );
+
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+        self::assertStringContainsString(
+            'flow=',
+            $response->getTargetUrl(),
+        );
+    }
 
     public function testNothingIsSavedWhileTheActivityItselfIsBeingDescribed(): void
     {
@@ -199,6 +230,9 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             $session,
         );
 
+        $open = new DateTimeImmutable('+1 week');
+        $close = new DateTimeImmutable('+2 weeks');
+
         $handed = $this->controller()->edit(
             $this->post(
                 $step,
@@ -207,8 +241,8 @@ final class AdminCreateControllerTest extends DatabaseTestCase
                         'valueEN' => 'Dinner',
                         'valueNL' => 'Diner',
                     ],
-                    'openDate' => '2030-05-01T12:00',
-                    'closeDate' => '2030-05-20T12:00',
+                    'openDate' => $open->format('Y-m-d\TH:i'),
+                    'closeDate' => $close->format('Y-m-d\TH:i'),
                 ],
                 $session,
             ),
@@ -232,7 +266,7 @@ final class AdminCreateControllerTest extends DatabaseTestCase
             $saved->name->getValueEN(),
         );
         self::assertSame(
-            '2030-05-01 12:00',
+            $open->format('Y-m-d H:i'),
             $saved->openDate?->format('Y-m-d H:i'),
         );
     }

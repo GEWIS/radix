@@ -14,6 +14,7 @@
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
+        <ini name="date.timezone" value="Europe/Amsterdam" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
     </php>
@@ -41,6 +42,12 @@
         <include>
             <directory>src</directory>
         </include>
+
+        <!-- The fixtures are the development seed, loaded outside the test process by `make test-prepare`. No test
+             exercises them, so counting them only lowers the total. -->
+        <exclude>
+            <directory>src/DataFixtures</directory>
+        </exclude>
 
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>

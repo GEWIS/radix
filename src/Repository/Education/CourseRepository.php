@@ -108,8 +108,14 @@ class CourseRepository extends ServiceEntityRepository
                 'c.code',
                 SortDirection::Ascending,
             ),
-            // Courses that never gained anything sort last rather than first, which is what a null date would do.
-            CourseSort::RecentlyUpdated => $qb->orderBy(
+            // Courses without a document date sort last: DQL has no NULLS LAST, and PostgreSQL sorts NULL first
+            // under a descending date, so the hidden flag states whether a date exists.
+            CourseSort::RecentlyUpdated => $qb->addSelect(
+                'CASE WHEN MAX(d.date) IS NULL THEN 1 ELSE 0 END AS HIDDEN neverUpdated',
+            )->orderBy(
+                'neverUpdated',
+                SortDirection::Ascending,
+            )->addOrderBy(
                 'lastAddedAt',
                 SortDirection::Descending,
             )->addOrderBy(

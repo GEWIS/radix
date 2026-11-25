@@ -11,11 +11,12 @@ use ArrayIterator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AbstractPaginatedOverview::class)]
-#[CoversClass(PageSizeTrait::class)]
+#[CoversTrait(PageSizeTrait::class)]
 class AbstractPaginatedOverviewTest extends TestCase
 {
     /**

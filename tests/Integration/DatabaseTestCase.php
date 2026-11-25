@@ -8,6 +8,12 @@ use App\Security\User\MfaEnforcementSwitch;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Base for integration tests that need a real Doctrine flush against a real database.
@@ -52,5 +58,36 @@ abstract class DatabaseTestCase extends KernelTestCase
         );
 
         $this->entityManager = $entityManager;
+    }
+
+    /**
+     * The flash bag of a request's session. The kernel returns a flash-bag-aware session, but a request promises only
+     * {@see SessionInterface}, so the narrowing is here.
+     */
+    protected static function flashBag(Request|SessionInterface $session): FlashBagInterface
+    {
+        $session = $session instanceof Request
+            ? $session->getSession()
+            : $session;
+        self::assertInstanceOf(
+            FlashBagAwareSessionInterface::class,
+            $session,
+        );
+
+        return $session->getFlashBag();
+    }
+
+    /**
+     * The target of a redirect response. An action declares the generic {@see Response}, so the redirect is narrowed
+     * here.
+     */
+    protected static function redirectTarget(Response $response): string
+    {
+        self::assertInstanceOf(
+            RedirectResponse::class,
+            $response,
+        );
+
+        return $response->getTargetUrl();
     }
 }

@@ -238,8 +238,6 @@ class ActivityProposal
             return;
         }
 
-        $this->assertRoomForAnotherDateOption();
-
         $this->dateOptions->add($dateOption);
         $dateOption->proposal = $this;
     }
@@ -306,18 +304,6 @@ class ActivityProposal
             'A proposal must put forward between 1 and %d dates, got %d.',
             self::MAX_DATE_OPTIONS,
             $count,
-        ));
-    }
-
-    private function assertRoomForAnotherDateOption(): void
-    {
-        if (count($this->dateOptions) < self::MAX_DATE_OPTIONS) {
-            return;
-        }
-
-        throw new LogicException(sprintf(
-            'A proposal cannot put forward more than %d dates.',
-            self::MAX_DATE_OPTIONS,
         ));
     }
 }

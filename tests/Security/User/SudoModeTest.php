@@ -332,6 +332,9 @@ final class SudoModeTest extends TestCase
         self::assertFalse($sudo->isActive());
     }
 
+    /**
+     * This runs on every authenticated write, and would otherwise create a key for a user who never confirmed.
+     */
     public function testAWriteWithoutAGrantLeavesNothingBehind(): void
     {
         $sudo = $this->sudoMode(

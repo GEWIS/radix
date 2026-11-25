@@ -123,6 +123,47 @@ final class AdminNewsControllerTest extends DatabaseTestCase
         );
     }
 
+    /**
+     * Changing an item is the same form as writing one, so an empty title comes back with the form and the stored
+     * item is left as it was.
+     */
+    public function testAnEditWithoutATitleComesBackWithTheForm(): void
+    {
+        $item = $this->anItemTitled('Career day: 34 companies confirmed');
+        $id = $item->id;
+
+        $response = $this->controller()->edit(
+            $this->form([
+                'date' => $item->date->format('Y-m-d'),
+                'category' => $item->category->value,
+                'title' => [
+                    'valueNL' => '',
+                    'valueEN' => '',
+                ],
+                'content' => [
+                    'valueNL' => $item->content->getValueNL() ?? '',
+                    'valueEN' => $item->content->getValueEN() ?? '',
+                ],
+            ]),
+            $item,
+        );
+
+        self::assertStringContainsString(
+            'Title',
+            strval($response->getContent()),
+        );
+        $this->entityManager->clear();
+        $stored = $this->entityManager->getRepository(NewsItem::class)->find($id);
+        self::assertInstanceOf(
+            NewsItem::class,
+            $stored,
+        );
+        self::assertSame(
+            'Career day: 34 companies confirmed',
+            $stored->title->getValueEN(),
+        );
+    }
+
     private function controller(): AdminNewsController
     {
         return self::getContainer()->get(AdminNewsController::class);

@@ -14,6 +14,7 @@ use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use function strval;
@@ -96,6 +97,16 @@ final class FrontpageControllerTest extends DatabaseTestCase
             'ORGAN_ORDINARY',
             $content,
         );
+    }
+
+    /**
+     * The fallback the catch-all route points at: an address no other route matched is a page that does not exist.
+     */
+    public function testAnUnmatchedAddressIsNotFound(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->controller()->notFound();
     }
 
     private function controller(): FrontpageController

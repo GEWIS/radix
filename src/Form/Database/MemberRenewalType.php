@@ -76,7 +76,7 @@ class MemberRenewalType extends AbstractType
                 [
                     'widget' => 'single_text',
                     'mapped' => false,
-                    'data' => $options['renewal_link']->getNewExpiration(),
+                    'data' => $options['renewal_link']->newExpiration,
                 ],
             ),
         );

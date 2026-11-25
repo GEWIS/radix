@@ -71,6 +71,23 @@ final class SignupFieldTypeTest extends TypeTestCase
     }
 
     /**
+     * A fixed answer is a minimum equal to its maximum, not an invalid range.
+     */
+    public function testANumberQuestionWithEqualBoundsIsAccepted(): void
+    {
+        $form = $this->submitField([
+            'type' => SignupFieldTypes::Number->value,
+            'minimumValue' => '5',
+            'maximumValue' => '5',
+        ]);
+
+        self::assertTrue(
+            $form->isValid(),
+            (string) $form->getErrors(true),
+        );
+    }
+
+    /**
      * The bounds belong to the number type alone: another type is not asked for them, and anything a type change left
      * behind is dropped rather than carried into the next revision.
      */

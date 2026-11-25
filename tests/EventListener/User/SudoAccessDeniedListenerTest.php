@@ -124,6 +124,91 @@ final class SudoAccessDeniedListenerTest extends TestCase
         );
     }
 
+    /**
+     * A referer from another host is not a page of this site, so the refused address is used instead.
+     */
+    public function testARefererFromAnotherHostIsNotFollowed(): void
+    {
+        $request = Request::create('/en/admin/pages/1/edit');
+        $request->headers->set(
+            'Referer',
+            'https://example.org/en/elsewhere',
+        );
+        $request->headers->set(
+            'X-Requested-With',
+            'XMLHttpRequest',
+        );
+
+        $response = $this->refuse($request);
+
+        self::assertStringContainsString(
+            'next=%2Fen%2Fadmin%2Fpages%2F1%2Fedit',
+            $this->confirmUrl($response),
+        );
+    }
+
+    /**
+     * A referer without a path names no page to return to.
+     */
+    public function testARefererWithoutAPathIsNotFollowed(): void
+    {
+        $request = Request::create('/en/admin/pages/1/edit');
+        $request->headers->set(
+            'Referer',
+            'http://localhost',
+        );
+        $request->headers->set(
+            'X-Requested-With',
+            'XMLHttpRequest',
+        );
+
+        $response = $this->refuse($request);
+
+        self::assertStringContainsString(
+            'next=%2Fen%2Fadmin%2Fpages%2F1%2Fedit',
+            $this->confirmUrl($response),
+        );
+    }
+
+    /**
+     * The query of the page the user came from belongs in the address they return to.
+     */
+    public function testTheRefererQueryIsCarriedIntoTheReturnAddress(): void
+    {
+        $request = Request::create('/en/admin/pages/1/edit');
+        $request->headers->set(
+            'Referer',
+            'http://localhost/en/pages?tab=2',
+        );
+        $request->headers->set(
+            'X-Requested-With',
+            'XMLHttpRequest',
+        );
+
+        $response = $this->refuse($request);
+
+        self::assertStringContainsString(
+            'next=%2Fen%2Fpages%3Ftab%3D2',
+            $this->confirmUrl($response),
+        );
+    }
+
+    private function confirmUrl(?Response $response): string
+    {
+        self::assertInstanceOf(
+            JsonResponse::class,
+            $response,
+        );
+
+        $payload = json_decode(
+            strval($response->getContent()),
+            true,
+        );
+        self::assertIsArray($payload);
+
+        return strval($payload['confirmUrl']);
+    }
+
     private function refuse(Request $request): ?Response
     {
         $refused = new AccessDeniedException('This part of the site is behind sudo.');

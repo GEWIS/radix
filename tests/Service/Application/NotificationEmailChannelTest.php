@@ -21,7 +21,7 @@ final class NotificationEmailChannelTest extends TestCase
         $subscriptions = self::createStub(NotificationEmailSubscriptionRepository::class);
         $subscriptions->method('findSubscribedUsers')->willReturn([$this->subscriber('ada@example.com')]);
 
-        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())
             ->method('persist')
             ->with(self::isInstanceOf(PendingNotificationEmail::class));
@@ -35,7 +35,7 @@ final class NotificationEmailChannelTest extends TestCase
         $subscriptions = self::createStub(NotificationEmailSubscriptionRepository::class);
         $subscriptions->method('findSubscribedUsers')->willReturn([]);
 
-        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::never())->method('persist');
         $entityManager->expects(self::never())->method('flush');
 
@@ -48,10 +48,10 @@ final class NotificationEmailChannelTest extends TestCase
      */
     public function testANotificationAddressedToSomeoneIsNeverQueued(): void
     {
-        $subscriptions = self::createMock(NotificationEmailSubscriptionRepository::class);
+        $subscriptions = $this->createMock(NotificationEmailSubscriptionRepository::class);
         $subscriptions->expects(self::never())->method('findSubscribedUsers');
 
-        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::never())->method('persist');
         $entityManager->expects(self::never())->method('flush');
 
