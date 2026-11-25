@@ -5,11 +5,21 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller\Application;
 
 use App\Controller\Application\HealthController;
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function json_decode;
+use function unlink;
+
+use const JSON_THROW_ON_ERROR;
 
 /**
  * `/health` opens both connections on every request, so an outage turns each one into two connect timeouts occupying
