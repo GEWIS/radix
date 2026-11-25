@@ -210,7 +210,6 @@ cc: sf
 
 ## —— Doctrine —————————————————————————————————————————————————————————————————
 # One set per database, each naming its own connection; without --configuration a command finds no migrations.
-# The application set runs only where a deployment created the database; without APPLICATION_DSN it is skipped.
 DATABASE_MIGRATIONS    := --configuration=config/packages/migrations/database.yaml
 APPLICATION_MIGRATIONS := --configuration=config/packages/migrations/application.yaml
 
@@ -229,7 +228,8 @@ migration-diff: ## Generate migrations for both entity managers from the current
 	@set -e; \
 	echo "Generating migrations for database..."; \
 	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(DATABASE_MIGRATIONS); \
-	if $(APPLICATION_DB_ENABLED); then echo "Generating migrations for application..."; $(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(APPLICATION_MIGRATIONS); else echo "Skipping application migrations (no APPLICATION_DATABASE_DSN)"; fi
+	echo "Generating migrations for application..."; \
+	$(SYMFONY) doctrine:migrations:diff --allow-empty-diff $(APPLICATION_MIGRATIONS)
 	@$(DOCKER) cp "$$($(DOCKER_COMP) ps -q app)":/app/migrations ./
 
 migration-up: ## Execute a single migration upwards
