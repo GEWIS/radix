@@ -249,6 +249,86 @@ final class CollectionPaginationTest extends TestCase
         );
     }
 
+    /**
+     * The page size decides the offset even when the consumer did not name one. The operation's default is the size
+     * the window reports, so an offset computed from a different size would skip or repeat rows.
+     */
+    public function testAnUnfilteredPageIsOffsetByTheOperationPageSize(): void
+    {
+        self::assertSame(
+            [
+                2,
+                50,
+                50,
+            ],
+            $this->pagination()->window(
+                $this->operation(),
+                ['filters' => ['page' => 2]],
+            ),
+        );
+    }
+
+    /**
+     * The last safe page depends on the requested page size, not on the default: a consumer asking for 200 items per
+     * page can reach a higher offset than one asking for 50 before the multiplication overflows.
+     */
+    public function testTheOverflowLimitUsesTheRequestedPageSize(): void
+    {
+        [
+            $page,
+            $offset,
+            $itemsPerPage,
+        ] = $this->pagination()->window(
+            $this->operation(),
+            [
+                'filters' => [
+                    'page' => PHP_INT_MAX,
+                    'itemsPerPage' => 200,
+                ],
+            ],
+        );
+
+        self::assertSame(
+            intdiv(
+                PHP_INT_MAX,
+                200,
+            ),
+            $page,
+        );
+        self::assertSame(
+            ($page - 1) * $itemsPerPage,
+            $offset,
+        );
+    }
+
+    /**
+     * Not every caller hands in an array; the paginator has to read a generator without materialising it first.
+     */
+    public function testThePaginatorReadsAGenerator(): void
+    {
+        $first = new stdClass();
+        $second = new stdClass();
+        $items = (static function () use ($first, $second): iterable {
+            yield $first;
+            yield $second;
+        })();
+
+        $paginator = $this->pagination()->paginator(
+            $items,
+            1,
+            2,
+            2,
+        );
+
+        self::assertSame(
+            [
+                $first,
+                $second,
+            ],
+            iterator_to_array($paginator),
+        );
+    }
+
     private function pagination(): CollectionPagination
     {
         return new CollectionPagination(new Pagination([
