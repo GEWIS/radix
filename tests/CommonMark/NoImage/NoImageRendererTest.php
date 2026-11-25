@@ -6,10 +6,12 @@ namespace App\Tests\CommonMark\NoImage;
 
 use App\CommonMark\NoImage\NoImageExtension;
 use App\CommonMark\NoImage\NoImageRenderer;
+use InvalidArgumentException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Image;
 use League\CommonMark\MarkdownConverter;
+use League\CommonMark\Node\Block\Paragraph;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use PHPUnit\Framework\TestCase;
 
