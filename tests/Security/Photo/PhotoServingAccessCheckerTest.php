@@ -174,9 +174,11 @@ final class PhotoServingAccessCheckerTest extends TestCase
         $photos = self::createStub(PhotoRepository::class);
         $photos->method('findOneBy')->willReturn($photo);
 
-        $albums = $albumRepository ?? self::createStub(AlbumRepository::class);
-        if (null === $albumRepository) {
-            $albums->method('findOneBy')->willReturn($album);
+        $albums = $albumRepository;
+        if (null === $albums) {
+            $stub = self::createStub(AlbumRepository::class);
+            $stub->method('findOneBy')->willReturn($album);
+            $albums = $stub;
         }
 
         return new PhotoServingAccessChecker(

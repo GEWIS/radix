@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -142,9 +143,15 @@ final class MaintenanceListenerTest extends TestCase
             '/en/photo',
             $response->getTargetUrl(),
         );
+
+        $session = $request->getSession();
+        self::assertInstanceOf(
+            FlashBagAwareSessionInterface::class,
+            $session,
+        );
         self::assertCount(
             1,
-            $request->getSession()->getFlashBag()->peek(AlertTypes::Warning->value),
+            $session->getFlashBag()->peek(AlertTypes::Warning->value),
         );
     }
 
