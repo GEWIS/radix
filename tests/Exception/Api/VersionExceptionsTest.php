@@ -42,6 +42,10 @@ final class VersionExceptionsTest extends TestCase
             $exception->getHttpStatusCode(),
         );
         self::assertSame(
+            0,
+            $exception->getCode(),
+        );
+        self::assertSame(
             'API version expected, but not%20a%20version%2Fwith%20a%20slash was given',
             $exception->getMessage(),
         );
@@ -58,6 +62,10 @@ final class VersionExceptionsTest extends TestCase
         self::assertSame(
             406,
             $exception->getHttpStatusCode(),
+        );
+        self::assertSame(
+            0,
+            $exception->getCode(),
         );
         self::assertSame(
             'API version must be at least 5.0.0, but 4.9.0 was given.',
