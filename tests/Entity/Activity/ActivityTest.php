@@ -160,6 +160,46 @@ final class ActivityTest extends TestCase
         self::assertNull($activity->getRelevantSignupList());
     }
 
+    /**
+     * A closed list is skipped, not treated as the end of the collection; an open list after it still counts.
+     */
+    public function testAClosedListDoesNotHideALaterOpenList(): void
+    {
+        $activity = new Activity();
+        $live = $this->revision(
+            $activity,
+            'Live',
+        );
+        $activity->addRevision($live);
+        $activity->setLiveRevision($live);
+        $live->addSignupList($this->list('-2 weeks', '-1 week'));
+        $live->addSignupList($this->list('-1 week', '+1 week'));
+
+        self::assertSame(
+            1,
+            $activity->countPendingSignupLists(),
+        );
+    }
+
+    /**
+     * A revision belongs to the activity once; adding the same one again must not make it appear twice.
+     */
+    public function testAddingTheSameRevisionTwiceKeepsOne(): void
+    {
+        $activity = new Activity();
+        $revision = $this->revision(
+            $activity,
+            'Live',
+        );
+        $activity->addRevision($revision);
+        $activity->addRevision($revision);
+
+        self::assertCount(
+            1,
+            $activity->getRevisions(),
+        );
+    }
+
     public function testTheListWorthShowingIsTheOpenOneClosingSoonest(): void
     {
         $activity = new Activity();

@@ -21,6 +21,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
+use function array_keys;
+
 #[CoversClass(SignupList::class)]
 final class SignupListTest extends TestCase
 {
@@ -108,6 +110,61 @@ final class SignupListTest extends TestCase
             SignupList::nextTransitionAmong([$list, $second, $exactlyNow], $now)?->format('c'),
         );
         self::assertNull(SignupList::nextTransitionAmong([$exactlyNow], $now));
+    }
+
+    /**
+     * Two lists opening at the same instant are equally soon; the first one wins so the answer does not depend on the
+     * order the caller happened to pass them in.
+     */
+    public function testAnUpcomingTieKeepsTheFirstList(): void
+    {
+        $now = new DateTimeImmutable();
+        $first = $this->list(
+            '+1 day',
+            '+3 days',
+        );
+        $second = $this->list(
+            '+1 day',
+            '+4 days',
+        );
+
+        self::assertSame(
+            $first,
+            SignupList::relevantAmong(
+                [
+                    $first,
+                    $second,
+                ],
+                $now,
+            ),
+        );
+    }
+
+    /**
+     * A moment that is not in the future is skipped, but it must not stop the remaining lists from being read.
+     */
+    public function testAMomentAtTheBoundaryDoesNotStopLaterLists(): void
+    {
+        $now = new DateTimeImmutable('2026-01-01 12:00:00');
+        $boundary = $this->list(
+            '2026-01-01 12:00:00',
+            null,
+        );
+        $future = $this->list(
+            '2026-01-02 12:00:00',
+            null,
+        );
+
+        self::assertSame(
+            $future->openDate,
+            SignupList::nextTransitionAmong(
+                [
+                    $boundary,
+                    $future,
+                ],
+                $now,
+            ),
+        );
     }
 
     /**
@@ -235,6 +292,7 @@ final class SignupListTest extends TestCase
             ],
             $list->membershipTiers(),
         );
+
         self::assertSame(
             [
                 [
@@ -587,7 +645,58 @@ final class SignupListTest extends TestCase
         $role->minimum = 2;
         $list->addRole($role);
 
+        $secondRole = new SignupRole();
+        $secondRole->name = 'Secretaris';
+        $secondRole->minimum = 1;
+        $list->addRole($secondRole);
+
         $array = $list->toArray();
+        self::assertSame(
+            [
+                'id',
+                'name',
+                'nameEn',
+                'openDate',
+                'closeDate',
+                'onlyGEWIS',
+                'displaySubscribedNumber',
+                'limitedCapacity',
+                'capacity',
+                'allocationMethod',
+                'drawCutoffRule',
+                'drawCutoffAt',
+                'drawAfterDurationHours',
+                'externalPolicyUrl',
+                'externalForceOrdering',
+                'externalPaymentByExternal',
+                'customMethodDescription',
+                'membershipTierOrder',
+                'membershipPriorityMode',
+                'membershipPlaces',
+                'cohortTierOrder',
+                'programTypeOrder',
+                'organisingCommitteePlaces',
+                'roles',
+                'presenceTaken',
+                'promoted',
+                'fields',
+            ],
+            array_keys($array),
+        );
+        self::assertSame(
+            [
+                'id',
+                'sensitive',
+                'name',
+                'nameEn',
+                'type',
+                'minimumValue',
+                'maximumValue',
+                'options',
+                'optionsEn',
+            ],
+            array_keys($array['fields'][0]),
+        );
         self::assertSame(
             'Naam',
             $array['name'],
@@ -610,11 +719,58 @@ final class SignupListTest extends TestCase
                     'name' => 'Voorzitter',
                     'minimum' => 2,
                 ],
+                [
+                    'name' => 'Secretaris',
+                    'minimum' => 1,
+                ],
             ],
             $array['roles'],
         );
 
         $gdpr = $list->toGdprArray();
+        self::assertSame(
+            [
+                'id',
+                'name',
+                'openDate',
+                'closeDate',
+                'onlyGEWIS',
+                'displaySubscribedNumber',
+                'limitedCapacity',
+                'capacity',
+                'allocationMethod',
+                'drawCutoffRule',
+                'drawCutoffAt',
+                'drawAfterDurationHours',
+                'externalPolicyUrl',
+                'externalForceOrdering',
+                'externalPaymentByExternal',
+                'customMethodDescription',
+                'membershipTierOrder',
+                'membershipPriorityMode',
+                'membershipPlaces',
+                'cohortTierOrder',
+                'programTypeOrder',
+                'organisingCommitteePlaces',
+                'roles',
+                'presenceTaken',
+                'promoted',
+                'fields',
+            ],
+            array_keys($gdpr),
+        );
+        self::assertSame(
+            [
+                'id',
+                'sensitive',
+                'name',
+                'type',
+                'minimumValue',
+                'maximumValue',
+                'options',
+            ],
+            array_keys($gdpr['fields'][0]),
+        );
         self::assertSame(
             '2026-06-01T12:00:00+02:00',
             $gdpr['openDate'],
@@ -635,6 +791,10 @@ final class SignupListTest extends TestCase
                 [
                     'name' => 'Voorzitter',
                     'minimum' => 2,
+                ],
+                [
+                    'name' => 'Secretaris',
+                    'minimum' => 1,
                 ],
             ],
             $gdpr['roles'],
