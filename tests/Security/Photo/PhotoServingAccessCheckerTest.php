@@ -93,6 +93,44 @@ final class PhotoServingAccessCheckerTest extends TestCase
         self::assertFalse($checker->isGranted('photos/covers/1.jpg', StorageNamespace::PhotoCover));
     }
 
+    /**
+     * A missing album is denied even when the voter would grant the view; there is nothing to grant it on.
+     */
+    public function testAMissingCoverIsDeniedEvenWhenTheVoterWouldGrantIt(): void
+    {
+        $checker = $this->checker(
+            member: false,
+            graduate: true,
+            album: null,
+            granted: [AlbumVoter::VIEW],
+        );
+
+        self::assertFalse($checker->isGranted('photos/covers/1.jpg', StorageNamespace::PhotoCover));
+    }
+
+    /**
+     * The cover is looked up by its path; any album would let a leaked cover URL reach a different album.
+     */
+    public function testACoverIsLookedUpByItsPath(): void
+    {
+        $album = self::createStub(Album::class);
+        $albums = $this->createMock(AlbumRepository::class);
+        $albums->expects(self::once())
+            ->method('findOneBy')
+            ->with(['coverPath' => 'photos/covers/1.jpg'])
+            ->willReturn($album);
+
+        $checker = $this->checker(
+            member: false,
+            graduate: true,
+            album: $album,
+            granted: [AlbumVoter::VIEW],
+            albumRepository: $albums,
+        );
+
+        self::assertTrue($checker->isGranted('photos/covers/1.jpg', StorageNamespace::PhotoCover));
+    }
+
     public function testAnAnonymousVisitorIsDenied(): void
     {
         self::assertFalse(
@@ -112,6 +150,7 @@ final class PhotoServingAccessCheckerTest extends TestCase
         ?Photo $photo = null,
         ?Album $album = null,
         array $granted = [],
+        ?AlbumRepository $albumRepository = null,
     ): PhotoServingAccessChecker {
         $security = self::createStub(Security::class);
         $security->method('isGranted')->willReturnCallback(
@@ -135,8 +174,10 @@ final class PhotoServingAccessCheckerTest extends TestCase
         $photos = self::createStub(PhotoRepository::class);
         $photos->method('findOneBy')->willReturn($photo);
 
-        $albums = self::createStub(AlbumRepository::class);
-        $albums->method('findOneBy')->willReturn($album);
+        $albums = $albumRepository ?? self::createStub(AlbumRepository::class);
+        if (null === $albumRepository) {
+            $albums->method('findOneBy')->willReturn($album);
+        }
 
         return new PhotoServingAccessChecker(
             $security,

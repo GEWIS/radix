@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 use function array_column;
 use function array_filter;
+use function array_keys;
 use function array_unique;
 use function count;
 use function strlen;
@@ -171,6 +172,124 @@ final class BackupCodeManagerTest extends TestCase
                 ],
             ],
             $user->getBackupCodeSlots(),
+        );
+    }
+
+    /**
+     * A spent slot at the front is skipped, not treated as the end of the set.
+     */
+    public function testSpendingSkipsASpentSlotAndFindsALaterMatch(): void
+    {
+        $user = $this->user([
+            [
+                'code' => 'aaaa',
+                'used' => true,
+            ],
+            [
+                'code' => 'bbbb',
+                'used' => false,
+            ],
+        ]);
+
+        $this->manager()->invalidateBackupCode(
+            $user,
+            'bbbb',
+        );
+
+        self::assertSame(
+            [
+                [
+                    'code' => 'aaaa',
+                    'used' => true,
+                ],
+                [
+                    'code' => 'bbbb',
+                    'used' => true,
+                ],
+            ],
+            $user->getBackupCodeSlots(),
+        );
+    }
+
+    /**
+     * The same code can appear twice; the first unused slot is the one that is spent.
+     */
+    public function testADuplicateCodeSpendsTheFirstUnusedSlot(): void
+    {
+        $user = $this->user([
+            [
+                'code' => 'aaaa',
+                'used' => false,
+            ],
+            [
+                'code' => 'aaaa',
+                'used' => false,
+            ],
+        ]);
+
+        $this->manager()->invalidateBackupCode(
+            $user,
+            'aaaa',
+        );
+
+        self::assertSame(
+            [
+                [
+                    'code' => 'aaaa',
+                    'used' => true,
+                ],
+                [
+                    'code' => 'aaaa',
+                    'used' => false,
+                ],
+            ],
+            $user->getBackupCodeSlots(),
+        );
+    }
+
+    /**
+     * Slots are stored with sequential keys; spending one must leave a list, not an array with a hole.
+     */
+    public function testSpendingReindexesTheSlots(): void
+    {
+        $user = $this->user([
+            5 => [
+                'code' => 'aaaa',
+                'used' => false,
+            ],
+            9 => [
+                'code' => 'bbbb',
+                'used' => false,
+            ],
+        ]);
+
+        $this->manager()->invalidateBackupCode(
+            $user,
+            'bbbb',
+        );
+
+        self::assertSame(
+            [
+                0,
+                1,
+            ],
+            array_keys($user->getBackupCodeSlots() ?? []),
+        );
+    }
+
+    public function testSpendingFlushesTheEntityManager(): void
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('flush');
+
+        new BackupCodeManager($entityManager)->invalidateBackupCode(
+            $this->user([
+                [
+                    'code' => 'aaaa',
+                    'used' => false,
+                ],
+            ]),
+            'aaaa',
         );
     }
 
