@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\EventListener\Application;
 
+use App\Entity\Application\Enums\AlertTypes;
 use App\Entity\Application\Enums\MaintenanceStatus;
 use App\Entity\Application\MaintenanceWindow;
 use App\EventListener\Application\MaintenanceListener;
@@ -140,6 +141,10 @@ final class MaintenanceListenerTest extends TestCase
         self::assertSame(
             '/en/photo',
             $response->getTargetUrl(),
+        );
+        self::assertCount(
+            1,
+            $request->getSession()->getFlashBag()->peek(AlertTypes::Warning->value),
         );
     }
 
