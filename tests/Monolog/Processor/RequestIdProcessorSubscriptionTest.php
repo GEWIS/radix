@@ -26,8 +26,8 @@ final class RequestIdProcessorSubscriptionTest extends TestCase
             'onKernelRequest',
             $events[RequestEvent::class][0],
         );
-        self::assertGreaterThan(
-            0,
+        self::assertSame(
+            4096,
             $events[RequestEvent::class][1],
         );
     }
