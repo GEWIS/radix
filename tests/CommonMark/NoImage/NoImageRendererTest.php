@@ -84,4 +84,18 @@ final class NoImageRendererTest extends TestCase
 
         return new MarkdownConverter($environment)->convert($markdown)->getContent();
     }
+
+    /**
+     * The renderer is registered for images only; reading a title from any other node would be a type error, so it
+     * refuses the node before touching it.
+     */
+    public function testANodeThatIsNotAnImageIsRefused(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new NoImageRenderer()->render(
+            new Paragraph(),
+            self::createStub(ChildNodeRendererInterface::class),
+        );
+    }
 }
