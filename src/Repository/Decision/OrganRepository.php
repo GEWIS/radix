@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repository\Decision;
 
 use App\Entity\Database\Enums\OrganTypes;
-use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Decision\Organ;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -533,16 +532,5 @@ class OrganRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getSingleResult();
-    }
-
-    /**
-     * The body a foundation created, if the projection has it.
-     *
-     * The ledger addresses a body by the subdecision that founded it and the projection addresses it by an id of its
-     * own, so this is what turns one into the other for an address that was written before they were the same page.
-     */
-    public function findByFoundation(Foundation $foundation): ?Organ
-    {
-        return $this->findOneBy(['foundation' => $foundation]);
     }
 }

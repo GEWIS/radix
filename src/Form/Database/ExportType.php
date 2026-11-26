@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Form\Decision;
+namespace App\Form\Database;
 
 use App\Repository\Database\MeetingRepository;
 use Override;
@@ -18,6 +18,8 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Form to select the meetings whose decisions are exported.
+ *
+ * @extends AbstractType<array<string, mixed>|null>
  */
 class ExportType extends AbstractType
 {

@@ -17,7 +17,6 @@ use App\Entity\Database\SubDecision\Board\Installation as BoardInstallationModel
 use App\Entity\Database\SubDecision\Discharge as DischargeModel;
 use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Foundation as FoundationModel;
-use App\Entity\Database\SubDecision\Foundation;
 use App\Entity\Database\SubDecision\Installation as InstallationModel;
 use App\Entity\Database\SubDecision\Other;
 use App\Exception\Database\AnnulmentNotPossible;
@@ -648,25 +647,6 @@ class Meeting
         return array_map(
             static fn (MeetingModel $meeting): array => $meeting->toArray(),
             $this->meetingRepository->searchMeeting($query),
-        );
-    }
-
-    /**
-     * The foundation subdecision that created an organ, which is how an organ is addressed.
-     */
-    public function findFoundation(
-        MeetingTypes $meetingType,
-        int $meetingNumber,
-        int $decisionPoint,
-        int $decisionNumber,
-        int $sequence,
-    ): ?Foundation {
-        return $this->foundationRepository->findOrgan(
-            $meetingType,
-            $meetingNumber,
-            $decisionPoint,
-            $decisionNumber,
-            $sequence,
         );
     }
 

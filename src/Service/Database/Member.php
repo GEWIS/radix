@@ -266,15 +266,6 @@ class Member
     }
 
     /**
-     * Get a member including decision information if that exists. This can therefor return `null` even though the
-     * member exists.
-     */
-    public function getMemberWithDecisions(int $id): ?MemberModel
-    {
-        return $this->memberRepository->findWithInstallations($id);
-    }
-
-    /**
      * Get prospective member info
      *
      * @return array{

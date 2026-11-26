@@ -430,16 +430,9 @@ final class MeetingDecisionTest extends DatabaseTestCase
         // Reloaded so that the organ's references reflect what was installed after it was founded.
         $this->ledger->clear();
 
-        $found = $this->meetingService->findFoundation(...$identifiers);
-        self::assertNotNull($found);
-        self::assertSame(
-            'QQQ',
-            $found->abbr,
-        );
-
         $organs = $this->meetingService->findOrgans('Quantum');
         self::assertContains(
-            $found->getHash(),
+            $foundation->getHash(),
             array_map(
                 static fn ($organ): string => $organ->getHash(),
                 $organs,

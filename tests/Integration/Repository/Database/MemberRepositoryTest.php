@@ -7,13 +7,11 @@ namespace App\Tests\Integration\Repository\Database;
 use App\Entity\Database\Address;
 use App\Entity\Database\Enums\AddressTypes;
 use App\Entity\Database\Enums\InstallationFunctions;
-use App\Entity\Database\Enums\MeetingTypes;
 use App\Entity\Database\Enums\MemberFilter;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Enums\PostalRegions;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
-use App\Entity\Database\SubDecision\Installation;
 use App\Repository\Database\MemberRepository;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Support\LedgerBuilder;
@@ -159,56 +157,6 @@ final class MemberRepositoryTest extends DatabaseTestCase
             $member,
             AddressTypes::Mail,
         ));
-    }
-
-    public function testFindWithInstallationsDropsADischargedInstallation(): void
-    {
-        $meeting = $this->build->meeting();
-        $foundation = $this->build->foundOrgan($meeting);
-        $member = $this->build->member();
-        $installation = $this->build->install(
-            $meeting,
-            $foundation,
-            $member,
-            InstallationFunctions::Member,
-        );
-        $installationHash = $installation->getHash();
-
-        $this->entityManager->clear();
-
-        $found = $this->repository->findWithInstallations($member->lidnr);
-        self::assertNotNull($found);
-        self::assertContains(
-            $installationHash,
-            $this->installationHashes($found),
-        );
-
-        $installation = $this->entityManager->getRepository(
-            Installation::class,
-        )->find([
-            'meeting_type' => $installation->getMeetingType()->value,
-            'meeting_number' => $installation->getMeetingNumber(),
-            'decision_point' => $installation->getDecisionPoint(),
-            'decision_number' => $installation->getDecisionNumber(),
-            'sequence' => $installation->sequence,
-        ]);
-        self::assertInstanceOf(
-            Installation::class,
-            $installation,
-        );
-
-        $this->build->discharge(
-            $this->build->meeting(
-                MeetingTypes::ALV,
-                '2044-01-01',
-            ),
-            $installation,
-        );
-        $this->entityManager->clear();
-
-        // The discharge is part of the predicate, not the join condition, so a member whose only installation was
-        // discharged returns no row.
-        self::assertNull($this->repository->findWithInstallations($member->lidnr));
     }
 
     public function testFindSimpleReturnsAMemberAndNullForAnUnknownNumber(): void
@@ -743,18 +691,5 @@ final class MemberRepositoryTest extends DatabaseTestCase
         $address->phone = '1';
 
         return $address;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function installationHashes(Member $member): array
-    {
-        $hashes = [];
-        foreach ($member->getInstallations() as $installation) {
-            $hashes[] = $installation->getHash();
-        }
-
-        return $hashes;
     }
 }
