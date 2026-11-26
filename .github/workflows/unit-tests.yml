@@ -179,8 +179,8 @@ jobs:
                 env:
                     APP_ENV: test
                 run: |
-                    mkdir -p var/coverage/unit
-                    bin/phpunit --coverage-clover var/coverage/unit/clover.xml
+                    mkdir -p var/coverage
+                    bin/phpunit --coverage-clover var/coverage/clover.xml
 
             -   name: Run the browser tests
                 env:
