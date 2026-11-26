@@ -75,7 +75,9 @@ jobs:
                     # PCOV rather than Xdebug: line coverage is enough and PCOV is faster. Without a directory, PCOV
                     # measures everything the entry point can reach, so it is restricted to `src`.
                     coverage: pcov
-                    ini-values: 'memory_limit=-1, pcov.directory=${{ github.workspace }}/src'
+                    # The image sets date.timezone to Europe/Amsterdam and PHPUnit sets the same. The console commands
+                    # below would write the fixtures in UTC, which the tests then read as Europe/Amsterdam.
+                    ini-values: 'memory_limit=-1, pcov.directory=${{ github.workspace }}/src, date.timezone=Europe/Amsterdam'
 
             -   name: Setup problem matchers for PHPUnit
                 run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
