@@ -42,7 +42,7 @@
                 <div class="panel">
                     <div class="panel-heading"><h3>{{ 'Meetings'|trans }}</h3></div>
                     <div class="panel-body">
-                        {{ form_start(form) }}
+                        {{ form_start(form, {attr: {'data-turbo': 'false'}}) }}
                             {{ form_row(form.meetings, {'attr': {'size': 24}}) }}
                             {{ form_widget(form.submit, {'attr': {'class': 'btn-gewis-primary'}}) }}
                         {{ form_end(form) }}
