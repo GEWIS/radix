@@ -10,9 +10,7 @@ use App\Entity\Database\Enums\MemberFilter;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
 use App\Entity\Database\Membership;
-use App\Entity\Database\SubDecision\Annulment;
 use App\Entity\Database\SubDecision\Board\Installation as BoardInstallation;
-use App\Entity\Database\SubDecision\Discharge;
 use App\Entity\Database\SubDecision\Financial\Budget;
 use App\Entity\Database\SubDecision\Financial\Statement;
 use App\Entity\Database\SubDecision\Installation;
@@ -175,97 +173,6 @@ class MemberRepository extends ServiceEntityRepository
         $qb->setParameter(
             ':type',
             $type,
-        );
-
-        return $qb->getQuery()->getOneOrNullResult();
-    }
-
-    /**
-     * Find a member (by lidnr), and calculate their organ memberships.
-     *
-     * Only installations that are neither discharged nor annulled (and whose discharge is not itself annulled) are
-     * hydrated onto the member.
-     */
-    public function findWithInstallations(int $lidnr): ?Member
-    {
-        $qb = $this->createQueryBuilder('m');
-
-        $qb->select('m, r, l')
-            ->where('m.lidnr = :lidnr')
-            ->leftJoin(
-                'm.installations',
-                'r',
-            )
-            ->leftJoin(
-                'm.mailingListMemberships',
-                'l',
-            )
-            ->andWhere('(r.function = \'Lid\' OR r.function = \'Inactief Lid\' OR r.function IS NULL)');
-
-        // discharges
-        $qbn = $this->getEntityManager()->createQueryBuilder();
-        $qbn->select('d')
-            ->from(
-                Discharge::class,
-                'd',
-            )
-            ->join(
-                'd.installation',
-                'x',
-            )
-            ->where('x.meeting_type = r.meeting_type')
-            ->andWhere('x.meeting_number = r.meeting_number')
-            ->andWhere('x.decision_point = r.decision_point')
-            ->andWhere('x.decision_number = r.decision_number')
-            ->andWhere('x.sequence = r.sequence');
-
-        // annulled discharge decisions
-        $qbnd = $this->getEntityManager()->createQueryBuilder();
-        $qbnd->select('b')
-            ->from(
-                Annulment::class,
-                'b',
-            )
-            ->join(
-                'b.target',
-                'z',
-            )
-            ->where('z.meeting_type = d.meeting_type')
-            ->andWhere('z.meeting_number = d.meeting_number')
-            ->andWhere('z.point = d.decision_point')
-            ->andWhere('z.number = d.decision_number');
-
-        $qbn->andWhere($qbn->expr()->not(
-            $qbn->expr()->exists($qbnd->getDQL()),
-        ));
-
-        $qb->andWhere($qb->expr()->not(
-            $qb->expr()->exists($qbn->getDQL()),
-        ));
-
-        // annulled installation decisions
-        $qbd = $this->getEntityManager()->createQueryBuilder();
-        $qbd->select('a')
-            ->from(
-                Annulment::class,
-                'a',
-            )
-            ->join(
-                'a.target',
-                'y',
-            )
-            ->where('y.meeting_type = r.meeting_type')
-            ->andWhere('y.meeting_number = r.meeting_number')
-            ->andWhere('y.point = r.decision_point')
-            ->andWhere('y.number = r.decision_number');
-
-        $qb->andWhere($qb->expr()->not(
-            $qb->expr()->exists($qbd->getDQL()),
-        ));
-
-        $qb->setParameter(
-            ':lidnr',
-            $lidnr,
         );
 
         return $qb->getQuery()->getOneOrNullResult();

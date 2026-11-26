@@ -144,25 +144,6 @@
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-heading">
-                    <h3>{{ 'Membership of Committees and Fraternities'|trans }}</h3>
-                </div>
-                <div class="panel-body">
-                    {% if has_correct_installations and organs is not empty %}
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for organ in organs %}
-                                <a href="{{ organ.url }}" class="badge badge-gewis-primary">
-                                    {{ organ.abbr }}
-                                </a>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-secondary mb-0">{{ 'This member is not installed in a body.'|trans }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
             {% if is_granted('ROLE_DATABASE_ADMIN') %}
                 <div class="panel border-danger">
                     <div class="panel-body d-flex flex-wrap align-items-center gap-3">

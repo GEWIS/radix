@@ -7,10 +7,8 @@ namespace App\ViewModel\Database;
 use App\Entity\Database\AuditEntry;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Member;
-use App\Entity\Database\SubDecision\Installation;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_map;
@@ -25,25 +23,20 @@ use function in_array;
 final readonly class MemberProfile
 {
     /**
-     * @param OrganRow[]      $organs
      * @param AuditEntryRow[] $notes
      */
     private function __construct(
         public Member $member,
-        public bool $hasCorrectInstallations,
         public ?DateTimeInterface $membershipEndsOn,
         public bool $canChangeMembershipType,
         public bool $canExtend,
-        public array $organs,
         public array $notes,
     ) {
     }
 
     public static function fromMember(
         Member $member,
-        bool $hasCorrectInstallations,
         TranslatorInterface $translator,
-        UrlGeneratorInterface $urlGenerator,
     ): self {
         // The last membership rather than the current one: a membership that has been renewed already is what the
         // next change would apply to.
@@ -51,7 +44,6 @@ final readonly class MemberProfile
 
         return new self(
             $member,
-            $hasCorrectInstallations,
             $member->getMembershipEndDate(),
             null !== $lastMembership
                 && MembershipTypes::Honorary !== $lastMembership->type,
@@ -67,17 +59,6 @@ final readonly class MemberProfile
                     ],
                     true,
                 ),
-            // Without installations that meet the requirements, the ones on the member are whatever happens to be on
-            // file, discharges and annulments included, so they are not stated at all.
-            $hasCorrectInstallations
-                ? array_map(
-                    static fn (Installation $installation): OrganRow => OrganRow::fromInstallation(
-                        $installation,
-                        $urlGenerator,
-                    ),
-                    $member->getInstallations()->toArray(),
-                )
-                : [],
             array_map(
                 static fn (AuditEntry $entry): AuditEntryRow => AuditEntryRow::fromEntry(
                     $entry,

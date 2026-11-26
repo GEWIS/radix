@@ -37,21 +37,6 @@ final class OrganControllerTest extends DatabaseTestCase
         );
     }
 
-    public function testAnAddressThatFoundedNothingIsNotFound(): void
-    {
-        $this->authenticate();
-
-        $this->expectException(NotFoundHttpException::class);
-
-        self::getContainer()->get(OrganController::class)->view(
-            MeetingTypes::BV,
-            999,
-            2,
-            1,
-            1,
-        );
-    }
-
     public function testTheInfoEndpointListsTheMembersOfTheBody(): void
     {
         $this->authenticate();

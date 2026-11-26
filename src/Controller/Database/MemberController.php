@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -46,7 +45,6 @@ final class MemberController extends AbstractMemberController
     public function __construct(
         MemberService $memberService,
         private readonly TranslatorInterface $translator,
-        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
         parent::__construct($memberService);
     }
@@ -161,17 +159,10 @@ final class MemberController extends AbstractMemberController
         Request $request,
         int $lidnr,
     ): Response {
-        $member = $this->memberService->getMemberWithDecisions($lidnr);
-        // The query that computes the organ memberships only returns a member who has installations that meet the
-        // requirements, so a member it does not return is looked up plainly and their organs are not stated at all.
-        $hasCorrectInstallations = null !== $member;
+        $member = $this->memberService->getMember($lidnr);
 
         if (null === $member) {
-            $member = $this->memberService->getMember($lidnr);
-
-            if (null === $member) {
-                throw $this->createNotFoundException();
-            }
+            throw $this->createNotFoundException();
         }
 
         $guarded = $this->guardDeleted($member);
@@ -211,16 +202,13 @@ final class MemberController extends AbstractMemberController
 
         $profile = MemberProfile::fromMember(
             $member,
-            $hasCorrectInstallations,
             $this->translator,
-            $this->urlGenerator,
         );
 
         return $this->render(
             'database/member/show.html.twig',
             [
                 'member' => $profile->member,
-                'has_correct_installations' => $profile->hasCorrectInstallations,
                 'membership_ends_on' => $profile->membershipEndsOn,
                 'can_change_membership_type' => $profile->canChangeMembershipType,
                 'can_extend' => $profile->canExtend,
@@ -228,7 +216,6 @@ final class MemberController extends AbstractMemberController
                     ? $this->memberService->getExtendedExpiration($member)
                     : null,
                 'can_remove' => $this->memberService->canRemove($member),
-                'organs' => $profile->organs,
                 'notes' => $profile->notes,
                 'note_form' => $noteForm,
             ],

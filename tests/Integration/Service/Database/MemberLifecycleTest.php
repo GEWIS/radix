@@ -12,7 +12,6 @@ use App\Entity\Database\CheckoutSession;
 use App\Entity\Database\Enums\AddressTypes;
 use App\Entity\Database\Enums\CheckoutSessionStates;
 use App\Entity\Database\Enums\ConfigNamespaces;
-use App\Entity\Database\Enums\InstallationFunctions;
 use App\Entity\Database\Enums\MailingListMemberAction;
 use App\Entity\Database\Enums\MembershipTypes;
 use App\Entity\Database\Enums\PostalRegions;
@@ -1075,53 +1074,6 @@ final class MemberLifecycleTest extends DatabaseTestCase
     public function testAnUnknownMembershipNumberHasNoRecord(): void
     {
         self::assertNull($this->memberService->getMember(999_999));
-        self::assertNull($this->memberService->getMemberWithDecisions(999_999));
-    }
-
-    /**
-     * The member lookup with decisions, as the member page uses it: it includes the installations that show what
-     * someone has done, not only the register row.
-     */
-    public function testTheMemberWithDecisionsIsReadBackWithItsInstallations(): void
-    {
-        $meeting = $this->build->meeting();
-        $member = $this->build->member();
-        $this->build->install(
-            $meeting,
-            $this->build->foundOrgan($meeting),
-            $member,
-            InstallationFunctions::Member,
-        );
-
-        $found = $this->memberService->getMemberWithDecisions($member->lidnr);
-
-        self::assertInstanceOf(
-            MemberModel::class,
-            $found,
-        );
-        self::assertSame(
-            $member->lidnr,
-            $found->lidnr,
-        );
-
-        // The query only follows an installation that names someone as a member; an ordinary register entry is still
-        // readable through getMember, which is why the decision lookup may come back empty for someone who exists.
-        $officer = $this->build->member();
-        $this->build->install(
-            $this->build->meeting(),
-            $this->build->foundOrgan(
-                $this->build->meeting(),
-                'CHAIR',
-            ),
-            $officer,
-            InstallationFunctions::Chair,
-        );
-
-        self::assertInstanceOf(
-            MemberModel::class,
-            $this->memberService->getMember($officer->lidnr),
-        );
-        self::assertNull($this->memberService->getMemberWithDecisions($officer->lidnr));
     }
 
     public function testRegistrationUpdateEmailsAreQueuedWithTheMembershipNumber(): void

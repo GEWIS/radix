@@ -19,6 +19,7 @@ use App\Form\Database\Board\InstallType as BoardInstallType;
 use App\Form\Database\Board\ReleaseType as BoardReleaseType;
 use App\Form\Database\BudgetType;
 use App\Form\Database\ContinuationType;
+use App\Form\Database\ExportType;
 use App\Form\Database\FoundationType;
 use App\Form\Database\InstallType;
 use App\Form\Database\Key\GrantType as KeyGrantType;
@@ -30,7 +31,6 @@ use App\Form\Database\MinutesType;
 use App\Form\Database\OrganRegulationType;
 use App\Form\Database\OtherTranslationType;
 use App\Form\Database\OtherType;
-use App\Form\Decision\ExportType;
 use App\Service\Database\Meeting as MeetingService;
 use App\ViewModel\Database\UntranslatedDecision;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -134,7 +134,7 @@ final class DecisionController extends AbstractController
         name: 'decision_decision_create',
         requirements: [
             'type' => 'ALV|BV|VV|Virt',
-            'number' => '-?\d+',
+            'number' => '\d+',
             'point' => '\d+',
             'decision' => '\d+',
         ],
@@ -286,8 +286,8 @@ final class DecisionController extends AbstractController
         name: 'decision_decision_recorded',
         requirements: [
             'type' => 'ALV|BV|VV|Virt',
-            'number' => '-?\\d+',
-            'point' => '\\d+',
+            'number' => '\d+',
+            'point' => '\d+',
             'decision' => '\\d+',
         ],
         methods: ['GET'],
@@ -345,7 +345,7 @@ final class DecisionController extends AbstractController
         name: 'decision_decision_translate',
         requirements: [
             'type' => 'ALV|BV|VV|Virt',
-            'number' => '-?\d+',
+            'number' => '\d+',
             'point' => '\d+',
             'decision' => '\d+',
             'sequence' => '\d+',

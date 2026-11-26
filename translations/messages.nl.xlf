@@ -5645,10 +5645,6 @@
         <source>Membership numbers</source>
         <target state="translated">Lidmaatschapsnummers</target>
       </trans-unit>
-      <trans-unit id="WGafmAS" resname="Membership of Committees and Fraternities">
-        <source>Membership of Committees and Fraternities</source>
-        <target state="translated">Lidmaatschap van commissies en disputen</target>
-      </trans-unit>
       <trans-unit id="7zFN335" resname="Membership priority">
         <source>Membership priority</source>
         <target>Voorrang op lidmaatschap</target>
@@ -10456,10 +10452,6 @@
       <trans-unit id="xwQ1IJ4" resname="This member has been deleted">
         <source>This member has been deleted</source>
         <target state="translated">Dit lid is verwijderd</target>
-      </trans-unit>
-      <trans-unit id="aWvFOrg" resname="This member is not installed in a body.">
-        <source>This member is not installed in a body.</source>
-        <target state="translated">Dit lid is niet lid van een orgaan.</target>
       </trans-unit>
       <trans-unit id="GsFYDiN" resname="This message uses a placeholder that is not available here: %placeholders%.">
         <source>This message uses a placeholder that is not available here: %placeholders%.</source>
